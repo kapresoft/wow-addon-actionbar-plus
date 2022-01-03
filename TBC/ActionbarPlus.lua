@@ -6,6 +6,7 @@
 local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger  = ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
+local ButtonTypes = ButtonTypes
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
@@ -99,14 +100,10 @@ end
 -- #####################################################################################
 
 local function AddonLoaded()
-    --print(format('B: %s, C: %s', B:GetVersion(), C()))
     S:Initialized()
     B:Initialized()
     BF:Initialized()
-    --print(format(ABP_PREFIX .. "%s.%s initialized", 'Core', MAJOR, MINOR))
     A:log("%s.%s initialized", MAJOR, MINOR)
-    --local BUI = LibStub("ActionbarPlus-ButtonUI-1.0")
-    --print(format('B: %s', BUI:GetVersion()))
 end
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
