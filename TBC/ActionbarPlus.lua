@@ -8,7 +8,100 @@ local ADDON_NAME = 'ActionbarPlus'
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
 if not A then return end
+
 local format = string.format
+local dbopt = LibStub("AceDBOptions-3.0")
+local acedb = LibStub("AceDB-3.0")
+local cfg = LibStub("AceConfig-3.0")
+local cfgDialog = LibStub("AceConfigDialog-3.0")
+
+
+StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
+    text = "Reload UI?",
+    button1 = "Yes",
+    button2 = "No",
+    OnAccept = function() ReloadUI() end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+}
+
+function A:RegisterSlashCommands()
+    --self:RegisterChatCommand("bbc", "OpenConfig")
+    --self:RegisterChatCommand("bb", "HandleBoxerCommands")
+    --self:RegisterChatCommand("boxer", "HandleBoxerCommands")
+end
+
+function A:RegisterKeyBindings()
+    --SetBindingClick("SHIFT-T", self:Info())
+    --SetBindingClick("SHIFT-F1", BoxerButton3:GetName())
+    --SetBindingClick("ALT-CTRL-F1", BoxerButton1:GetName())
+
+    -- Warning: Replaces F5 keybinding in Wow Config
+    -- SetBindingClick("F5", BoxerButton3:GetName())
+    -- TODO: Configure Button 1 to be the Boxer Follow Button (or create an invisible one)
+    --SetBindingClick("SHIFT-R", BoxerButton1:GetName())
+end
+
+function A:OnProfileChanged()
+    --self:ConfirmReloadUI()
+end
+
+function A:ConfirmReloadUI()
+    if IsShiftKeyDown() then
+        ReloadUI()
+        return
+    end
+    StaticPopup_Show("CONFIRM_RELOAD_UI")
+end
+
+function A:OpenConfig(_)
+    cfgDialog:Open(ADDON_NAME)
+end
+
+local options = {
+    name = ADDON_NAME,
+    handler = A,
+    type = "group",
+    args = {
+        enabled = {
+            type = "toggle",
+            name = "Enable",
+            desc = format("Enable %s", ADDON_NAME),
+            order = 0,
+            get = function(_) return A.profile.enabled end,
+            set = function(_, v)
+                A.profile.enabled = v
+                if v then A:Enable() else A:Disable() end
+            end,
+        }
+    }
+}
+
+function A:OnInitialize()
+    -- Set up our database
+    self.db = acedb:New("ABP_PLUS_DB")
+    self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+    self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+    self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+
+    self.profile = self.db.profile
+    self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
+
+    -- Register options table and slash command
+    cfg:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
+    --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
+    cfgDialog:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
+
+    -- Get the option table for profiles
+    options.args.profiles = dbopt:GetOptionsTable(self.db)
+
+    self:RegisterSlashCommands()
+    self:RegisterKeyBindings()
+end
+
+-- #####################################################################################
 
 local function AddonLoaded()
     print(format("{{|cfd2db9fbActionBar|r|cfdfbeb2dPlus|r}} %s.%s initialized", MAJOR, MINOR))
@@ -17,3 +110,4 @@ end
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
 frame:SetScript("OnEvent", AddonLoaded)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+ABP = A
