@@ -10,6 +10,5 @@ function BF:GetVersion()
 end
 
 function BF:Initialized()
-    print(format(ABP_PREFIX .. '%s.%s initialized',
-            NAME, MAJOR, MINOR))
+    print(format(ABP_PREFIX .. '%s.%s initialized', NAME, MAJOR, MINOR))
 end

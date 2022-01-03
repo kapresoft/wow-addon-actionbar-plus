@@ -1,4 +1,7 @@
-local MAJOR, MINOR = "ActionbarPlus-ButtonUI-1.0", tonumber(("$Revision: 1 $"):match("%d+"))
+local format = string.format
+local NAME = 'ButtonUI'
+local MAJOR, MINOR = format("ActionbarPlus-%s-1.0", NAME), tonumber(("$Revision: 1 $"):match("%d+"))
+
 local B = LibStub:NewLibrary(MAJOR, MINOR)
 if not B then return end
 local format = string.format
@@ -8,7 +11,5 @@ function B:GetVersion()
 end
 
 function B:Initialized()
-
-    print(format(ABP_PREFIX .. '%s.%s initialized',
-            'ButtonsUI', MAJOR, MINOR))
+    print(format(ABP_PREFIX .. '%s.%s initialized', NAME, MAJOR, MINOR))
 end
