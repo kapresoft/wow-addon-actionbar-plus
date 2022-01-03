@@ -13,7 +13,8 @@ local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEve
 if not A then return end
 
 local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ABP_ACE())
-local S, B, BF = unpack(ABP_Globals())
+local libModules = ABP_Globals()
+local C, S, B, BF = unpack(libModules)
 Embed_Logger(A, 'Core')
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
@@ -56,24 +57,6 @@ function A:OpenConfig(_)
     ACECFGD:Open(ADDON_NAME)
 end
 
-local options = {
-    name = ADDON_NAME,
-    handler = A,
-    type = "group",
-    args = {
-        enabled = {
-            type = "toggle",
-            name = "Enable",
-            desc = format("Enable %s", ADDON_NAME),
-            order = 0,
-            get = function(_) return A.profile.enabled end,
-            set = function(_, v)
-                A.profile.enabled = v
-                if v then A:Enable() else A:Disable() end
-            end,
-        }
-    }
-}
 
 function A:OnInitialize()
     -- Set up our database
@@ -85,6 +68,7 @@ function A:OnInitialize()
     self.profile = self.db.profile
     self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
 
+    local options = C:GetOptions(self)
     -- Register options table and slash command
     ACECFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
     --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
@@ -100,9 +84,7 @@ end
 -- #####################################################################################
 
 local function AddonLoaded()
-    S:Initialized()
-    B:Initialized()
-    BF:Initialized()
+    for _, m in ipairs(libModules) do m:Initialized() end
     A:log("%s.%s initialized", MAJOR, MINOR)
 end
 

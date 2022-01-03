@@ -22,10 +22,11 @@ ABP_VERSION = function(libName)
 end
 
 ABP_Globals = function()
+    local config = LibStub:GetLibrary(format(VERSION_FORMAT, 'Config'))
     local settings = LibStub:GetLibrary(format(VERSION_FORMAT, 'Settings'))
     local buttonUI = LibStub:GetLibrary(format(VERSION_FORMAT, 'ButtonUI'))
     local buttonFactory = LibStub:GetLibrary(format(VERSION_FORMAT, 'ButtonFactory'))
-    return { settings, buttonUI, buttonFactory }
+    return { config, settings, buttonUI, buttonFactory }
 end
 
 ---@param localLibBaseName string The local library base name
@@ -52,11 +53,14 @@ ABP_ACE_NEWLIB = function(libName)
     local lib = LibStub:NewLibrary(unpack(version))
     function lib:GetVersion() return version end
     Embed_Logger(lib, libName)
+    return lib
 end
 
 ABP_ACE_NEWLIB_RAW = function(libName)
-    local major, minor = unpack(ABP_VERSION(libName))
-    return LibStub:NewLibrary(major, minor)
+    local version = ABP_VERSION(libName)
+    local lib = LibStub:NewLibrary(unpack(version))
+    function lib:GetVersion() return version end
+    return lib
 end
 
 
