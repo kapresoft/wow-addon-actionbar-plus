@@ -17,4 +17,6 @@
     <Include file='LibBase64-1.0\lib.xml'/>
     <!--@end no-lib-strip@-->
 
+    <Include file='ActionbarPlus\load_lib.xml'/>
+
 </Ui>

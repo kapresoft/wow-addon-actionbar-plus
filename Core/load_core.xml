@@ -5,9 +5,5 @@
     <Include file='General\load_general.xml'/>
     <Include file='Lib\load_lib.xml'/>
 
-    <Script file="Lib\Settings.lua"/>
-    <Script file="Lib\ButtonUI.lua"/>
-    <Script file="Lib\ButtonFactory.lua"/>
-    <Script file="Constants.lua"/>
 
 </Ui>

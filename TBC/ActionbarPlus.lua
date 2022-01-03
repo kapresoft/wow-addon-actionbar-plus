@@ -3,30 +3,22 @@
 --- Created by tony.
 --- DateTime: 1/2/2022 5:43 PM
 ---
-local _G = _G
-local ADDON_NAME = 'ActionbarPlus'
+local _G, unpack, format = _G, table.unpackIt, string.format
+local ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger  = ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger
+local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
+
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
 if not A then return end
 
-local S, B, BF, C = unpack(ABP_Globals)
---local BUI = LibStub("ActionbarPlus-ButtonUI-1.0")
-
-local format = string.format
-local dbopt = LibStub("AceDBOptions-3.0")
-local acedb = LibStub("AceDB-3.0")
-local cfg = LibStub("AceConfig-3.0")
-local cfgDialog = LibStub("AceConfigDialog-3.0")
-
+local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ABP_ACE())
+local S, B, BF = unpack(ABP_Globals())
+Embed_Logger(A, 'Core')
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
-    text = "Reload UI?",
-    button1 = "Yes",
-    button2 = "No",
+    text = "Reload UI?", button1 = "Yes", button2 = "No",
+    timeout = 0, whileDead = true, hideOnEscape = true,
     OnAccept = function() ReloadUI() end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
     preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
 }
 
@@ -60,7 +52,7 @@ function A:ConfirmReloadUI()
 end
 
 function A:OpenConfig(_)
-    cfgDialog:Open(ADDON_NAME)
+    ACECFGD:Open(ADDON_NAME)
 end
 
 local options = {
@@ -84,7 +76,7 @@ local options = {
 
 function A:OnInitialize()
     -- Set up our database
-    self.db = acedb:New("ABP_PLUS_DB")
+    self.db = ACEDB:New("ABP_PLUS_DB")
     self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
@@ -93,12 +85,12 @@ function A:OnInitialize()
     self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
 
     -- Register options table and slash command
-    cfg:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
+    ACECFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
     --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
-    cfgDialog:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
+    ACECFGD:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
 
     -- Get the option table for profiles
-    options.args.profiles = dbopt:GetOptionsTable(self.db)
+    options.args.profiles = ACEDBO:GetOptionsTable(self.db)
 
     self:RegisterSlashCommands()
     self:RegisterKeyBindings()
@@ -111,7 +103,8 @@ local function AddonLoaded()
     S:Initialized()
     B:Initialized()
     BF:Initialized()
-    print(format(ABP_PREFIX .. "%s.%s initialized", 'Core', MAJOR, MINOR))
+    --print(format(ABP_PREFIX .. "%s.%s initialized", 'Core', MAJOR, MINOR))
+    A:log("%s.%s initialized", MAJOR, MINOR)
     --local BUI = LibStub("ActionbarPlus-ButtonUI-1.0")
     --print(format('B: %s', BUI:GetVersion()))
 end
