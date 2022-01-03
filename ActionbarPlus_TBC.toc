@@ -1,0 +1,21 @@
+## Interface: 20502
+## Version: 1.0
+## Title: Actionbar|cff1784d1Plus|r TBC
+## Notes: Actionbar Addon for World of Warcraft
+## Author: antonio@kapresoft.com
+## DefaultState: enabled
+## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE
+## SavedVariablesPerCharacter: ABP_CHARACTER_DB
+## LoadManagers: AddonLoader
+
+## X-Min-Interface: 20501
+## X-LoadOn-Always: delayed
+## X-Credits: antonio@kapresoft.com
+## X-Category: ActionBars
+## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
+## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus
+
+Core\Constants.lua
+Core\load_core.xml
+
+TBC\load.xml
