@@ -3,15 +3,15 @@
 --- Created by tony.
 --- DateTime: 1/2/2022 5:43 PM
 ---
-
+local _G = _G
 local ADDON_NAME = 'ActionbarPlus'
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
 if not A then return end
---local format = string.format
+local format = string.format
 
 local function AddonLoaded()
-    print(format("|cfd2db9fb{{ActionBarPlus}}|r %s.%s initialized...%s", MAJOR, MINOR, XXX))
+    print(format("{{|cfd2db9fbActionBar|r|cfdfbeb2dPlus|r}} %s.%s initialized", MAJOR, MINOR))
 end
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
