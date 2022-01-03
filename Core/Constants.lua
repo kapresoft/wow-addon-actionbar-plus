@@ -3,13 +3,14 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 
 ABP_PREFIX = '{{|cfd2db9fbActionBarPlus|r|cfdfbeb2d::%s|r}} '
 local settings = LibStub:GetLibrary("ActionbarPlus-Settings-1.0")
-local buttonsUI = LibStub:GetLibrary("ActionbarPlus-ButtonUI-1.0")
+local buttonUI = LibStub:GetLibrary("ActionbarPlus-ButtonUI-1.0")
+local buttonFactory = LibStub:GetLibrary("ActionbarPlus-ButtonFactory-1.0")
 
 local function initGlobals()
     local C = function()
         return "hellox"
     end
-    return { settings, buttonsUI, C }
+    return { settings, buttonUI, buttonFactory, C }
 end
 
 ABP_Globals = initGlobals()

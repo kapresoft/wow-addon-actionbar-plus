@@ -9,7 +9,7 @@ local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
 if not A then return end
 
-local S,B,C = unpack(ABP_Globals)
+local S, B, BF, C = unpack(ABP_Globals)
 --local BUI = LibStub("ActionbarPlus-ButtonUI-1.0")
 
 local format = string.format
@@ -108,8 +108,9 @@ end
 
 local function AddonLoaded()
     --print(format('B: %s, C: %s', B:GetVersion(), C()))
-    B:Initialized()
     S:Initialized()
+    B:Initialized()
+    BF:Initialized()
     print(format(ABP_PREFIX .. "%s.%s initialized", 'Core', MAJOR, MINOR))
     --local BUI = LibStub("ActionbarPlus-ButtonUI-1.0")
     --print(format('B: %s', BUI:GetVersion()))
