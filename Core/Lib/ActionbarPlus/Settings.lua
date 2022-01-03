@@ -13,22 +13,6 @@ local DETAILS = { spell = SPELL, item = ITEM, macro = MACRO, macrotext = MACROTE
 local TOOLTIP = { text = nil, link = nil }
 local BUTTON = { type = nil, name = nil, icon = nil, macrotext = nil, tooltip = TOOLTIP, details = DETAILS }
 
-local ButtonType = {
-    SPELL = "spell",
-    ITEM = "item",
-    MACRO = "macro",
-    MACROTEXT = "macrotext",
-}
-
-local ButtonTypeCode = {
-    ["spell"] = 1,
-    ["item"] = 2,
-    ["macro"] = 3,
-    ["macrotext"] = 4
-}
-
-
-
 function S:CreateButtonSettingsTemplate()
     return BUTTON
 end
