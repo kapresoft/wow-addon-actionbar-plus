@@ -19,11 +19,11 @@ local function SetFrameState(frameIndex, isEnabled)
     -- TODO: needs reload
     local f = _G[enabledFrames[frameIndex]]
     if isEnabled then
-        --f:ShowGroup()
+        if f.ShowGroup then f:ShowGroup() end
         P:SetBarEnabledState(frameIndex, isEnabled)
         return
     end
-    --f:HideGroup()
+    if f.HideGroup then f:HideGroup() end
 end
 
 local function CreateSetterHandler(frameIndex, p)

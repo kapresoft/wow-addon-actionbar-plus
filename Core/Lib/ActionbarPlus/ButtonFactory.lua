@@ -28,7 +28,10 @@ local function ShowConfigTooltip(frame)
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
-local function OnShowConfigTooltip(frame) C_Timer.After(1, function() ShowConfigTooltip(frame) end) end
+local function OnShowConfigTooltip(frame)
+    C_Timer.After(1, function() ShowConfigTooltip(frame) end)
+    C_Timer.After(3, function() GameTooltip:Hide() end)
+end
 local function OnMouseDownFrame(_, mouseButton)
     --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
     GameTooltip:Hide()
@@ -56,7 +59,7 @@ function F:OnAfterAddonLoaded()
     for i,f in ipairs(frames) do
         local frameName = PU:GetFrameNameFromIndex(i)
         local frameEnabled = P:IsBarNameEnabled(frameName)
-        self:log('frame(%s): %s enabled: %s', tostring(i), f, tostring(frameEnabled))
+        --self:log('frame(%s): %s enabled: %s', tostring(i), f, tostring(frameEnabled))
         local config = frameDetails[i]
         if frameEnabled then self:CreateButtons(frameName, config.rowSize, config.colSize) end
     end
