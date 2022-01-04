@@ -4,18 +4,18 @@
 --- DateTime: 1/2/2022 5:43 PM
 ---
 local _G, unpack, format = _G, table.unpackIt, string.format
-local ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger  = ADDON_NAME, LibStub, ABP_Globals, ABP_ACE, Embed_Logger
+local ADDON_NAME, LibStub, ABP_GLOBALS, ABP_ACE, EMBED_LOGGER  = ADDON_NAME, LibStub, ABP_GLOBALS, ABP_ACE, EMBED_LOGGER
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
-local ButtonTypes = ButtonTypes
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
 if not A then return end
+ABP = A
 
 local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ABP_ACE())
-local libModules = ABP_Globals()
+local libModules = ABP_GLOBALS()
 local C, S, B, BF = unpack(libModules)
-Embed_Logger(A, 'Core')
+EMBED_LOGGER(A, 'Core')
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
@@ -57,7 +57,6 @@ function A:OpenConfig(_)
     ACECFGD:Open(ADDON_NAME)
 end
 
-
 function A:OnInitialize()
     -- Set up our database
     self.db = ACEDB:New("ABP_PLUS_DB")
@@ -85,10 +84,10 @@ end
 
 local function AddonLoaded()
     for _, m in ipairs(libModules) do m:Initialized() end
+    BF:OnAddonLoaded(A)
     A:log("%s.%s initialized", MAJOR, MINOR)
 end
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
 frame:SetScript("OnEvent", AddonLoaded)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-ABP = A

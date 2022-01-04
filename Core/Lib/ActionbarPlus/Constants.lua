@@ -3,15 +3,74 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 ADDON_NAME = 'ActionbarPlus'
 ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
 VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
+SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate'
+TOPLEFT = 'TOPLEFT'
+ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
+CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 
 -- Usage
 -- A,B = unpack(ABPGlobals)
 
 local LibStub, format, unpack = LibStub, string.format, table.unpackIt
-local function getLogger() return LibStub:GetLibrary(format(VERSION_FORMAT, 'Logger')) end
+local Module = {
+    Logger = 'Logger',
+    Config = 'Config',
+    Settings = 'Settings',
+    ButtonUI = 'ButtonUI',
+    ButtonFactory = 'ButtonFactory'
+}
+local AceModule = {
+    AceConsole = 'AceConsole-3.0',
+    AceDB = 'AceDB-3.0',
+    AceDBOptions = 'AceDBOptions-3.0',
+    AceConfig = 'AceConfig-3.0',
+    AceConfigDialog = 'AceConfigDialog-3.0',
+    LibSharedMedia = 'LibSharedMedia-3.0'
+}
+
+---@return Logger
+local function getLogger() return LibStub(format(VERSION_FORMAT, Module.Logger)) end
+---@param localLibBaseName string The local library base name
+local LocalLibStub = function(localLibBaseName) return LibStub(format(VERSION_FORMAT, localLibBaseName)) end
+
+ABP_ACE_CONSOLE = function() return LibStub(AceModule.AceConsole) end
+ABP_SHARED_MEDIA = function() return LibStub(AceModule.LibSharedMedia) end
+ABP_BUTTON_FACTORY = function() return LocalLibStub(Module.Settings), ABP_SHARED_MEDIA() end
+
+ABP_GLOBALS = function()
+    local config = LocalLibStub(Module.Config)
+    local settings = LocalLibStub(Module.Settings)
+    local buttonUI = LocalLibStub(Module.ButtonUI)
+    local buttonFactory = LocalLibStub(Module.ButtonFactory)
+    return { config, settings, buttonUI, buttonFactory }
+end
+
+ABP_ACE = function()
+    return {
+        LibStub(AceModule.AceDB), LibStub(AceModule.AceDBOptions),
+        LibStub(AceModule.AceConfig), LibStub(AceModule.AceConfigDialog)
+    }
+end
+
+---@param libName string The library name
+ABP_ACE_NEWLIB = function(libName)
+    local version = ABP_VERSION(libName)
+    local lib = LibStub:NewLibrary(unpack(version))
+    function lib:GetVersion() return version end
+    EMBED_LOGGER(lib, libName)
+    return lib
+end
+
+---@param libName string The library name
+ABP_ACE_NEWLIB_RAW = function(libName)
+    local version = ABP_VERSION(libName)
+    local lib = LibStub:NewLibrary(unpack(version))
+    function lib:GetVersion() return version end
+    return lib
+end
 
 ---@param optionalLogName string The optional log name
-Embed_Logger = function(obj, optionalLogName)
+EMBED_LOGGER = function(obj, optionalLogName)
     getLogger():Embed(obj, optionalLogName)
 end
 
@@ -20,49 +79,3 @@ ABP_VERSION = function(libName)
     local major, minor = format(VERSION_FORMAT, libName), tonumber(("$Revision: 1 $"):match("%d+"))
     return { major, minor }
 end
-
-ABP_Globals = function()
-    local config = LibStub:GetLibrary(format(VERSION_FORMAT, 'Config'))
-    local settings = LibStub:GetLibrary(format(VERSION_FORMAT, 'Settings'))
-    local buttonUI = LibStub:GetLibrary(format(VERSION_FORMAT, 'ButtonUI'))
-    local buttonFactory = LibStub:GetLibrary(format(VERSION_FORMAT, 'ButtonFactory'))
-    return { config, settings, buttonUI, buttonFactory }
-end
-
----@param localLibBaseName string The local library base name
-ABP_GetLocalLib = function(localLibBaseName) return LibStub(format(VERSION_FORMAT, localLibBaseName)) end
-
----@param libName string The full Ace3 require library version string
-ABP_GetLib = function(libName) return LibStub(libName) end
-
-ABP_ACE = function()
-    return {
-        LibStub("AceDB-3.0"), LibStub("AceDBOptions-3.0"),
-             LibStub("AceConfig-3.0"), LibStub("AceConfigDialog-3.0")
-    }
-end
-
-ABP_ACE_CONSOLE = function()
-    return LibStub("AceConsole-3.0")
-end
-
----@param major string Major version
----@param minor string Minor version
-ABP_ACE_NEWLIB = function(libName)
-    local version = ABP_VERSION(libName)
-    local lib = LibStub:NewLibrary(unpack(version))
-    function lib:GetVersion() return version end
-    Embed_Logger(lib, libName)
-    return lib
-end
-
-ABP_ACE_NEWLIB_RAW = function(libName)
-    local version = ABP_VERSION(libName)
-    local lib = LibStub:NewLibrary(unpack(version))
-    function lib:GetVersion() return version end
-    return lib
-end
-
-
-
-
