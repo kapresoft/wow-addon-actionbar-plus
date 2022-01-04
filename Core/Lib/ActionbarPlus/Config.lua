@@ -4,23 +4,79 @@ local C = ABP_ACE_NEWLIB('Config')
 if not C then return end
 
 ---- ## Start Here ----
+local enabledFrames = { 'ActionbarPlusF1', 'ActionbarPlusF2' }
+local function IsFrameShown(frameIndex)
+    local f = _G[enabledFrames[frameIndex]]
+    return f:IsShown()
+end
+local function SetFrameState(frameIndex, isEnabled)
+    local f = _G[enabledFrames[frameIndex]]
+    if isEnabled then
+        f:ShowGroup()
+        return
+    end
+    f:HideGroup()
+end
 
-function C:GetOptions(handler)
+local function CreateSetterHandler(frameIndex, p)
+    return function(_, v)
+        local frameName = enabledFrames[frameIndex];
+        p.bars[frameName].enabled = v
+        if type(p.bars[frameName]) == 'nil' then p.bars[frameName] = {} end
+        SetFrameState(frameIndex, v)
+    end
+end
+
+local function CreateGetterHandler(frameIndex, p)
+    return function(_)
+        -- handle hiding in ButtonFactory
+        local frameName = enabledFrames[frameIndex];
+        if type(p.bars[frameName]) == 'nil' then p.bars[frameName] = {} end
+        local enabled = IsFrameShown(frameIndex)
+        p.bars[frameName].enabled = enabled
+        return enabled
+    end
+end
+
+function C:GetOptions(handler, profile)
     return {
         name = ADDON_NAME,
         handler = handler,
         type = "group",
         args = {
-            enabled = {
-                type = "toggle",
-                name = "Enable",
-                desc = format("Enable %s", ADDON_NAME),
-                order = 0,
-                get = function(_) return handler.profile.enabled end,
-                set = function(_, v)
-                    handler.profile.enabled = v
-                    if v then handler:Enable() else handler:Disable() end
-                end,
+            bar1 = {
+                type = 'group',
+                name = "Action Bar #1",
+                desc = "Action Bar #1 Settings",
+                order = 1,
+                args = {
+                    desc = { name = "Action Bar #1 Settings", type = "header", order = 0 },
+                    enabled = {
+                        type = "toggle",
+                        name = "Enable",
+                        desc = "Enable Action Bar #1",
+                        order = 1,
+                        get = CreateGetterHandler(1, profile),
+                        set = CreateSetterHandler(1, profile)
+                    }
+                }
+            },
+            bar2 = {
+                type = 'group',
+                name = "Action Bar #2",
+                desc = "Action Bar #2 Settings",
+                order = 2,
+                args = {
+                    desc = { name = "Action Bar #2 Settings", type = "header", order = 0 },
+                    enabled = {
+                        type = "toggle",
+                        name = "Enable",
+                        desc = "Enable Action Bar #2",
+                        order = 1,
+                        get = CreateGetterHandler(2, profile),
+                        set = CreateSetterHandler(2, profile)
+                    }
+                }
             }
         }
     }

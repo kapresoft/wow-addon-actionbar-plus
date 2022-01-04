@@ -1,5 +1,6 @@
 local _G = _G
-local tostring, format, unpack, pack, mod, lower = tostring, string.format, table.unpackIt, table.pack, math.fmod, string.lower
+local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
+local unpack, pack, mod = table.unpackIt, table.pack, math.fmod
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
@@ -29,13 +30,68 @@ end
 local function OnShowConfigTooltip(frame) C_Timer.After(1, function() ShowConfigTooltip(frame) end) end
 local function OnMouseDownFrame(_, mouseButton)
     F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
-    if IsShiftKeyDown() and lower(mouseButton) == 'leftbutton' then
+    if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
-    elseif lower(mouseButton) == 'rightbutton' then
+    elseif strlower(mouseButton) == 'rightbutton' then
         addon:OpenConfig()
-    elseif lower(mouseButton) == 'button5' then
+    elseif strlower(mouseButton) == 'button5' then
         StaticPopup_Show(CONFIRM_RELOAD_UI)
     end
+end
+
+local function GetFrame(frameName)
+    local f = _G[frameName]
+    if type(f) ~= 'table' then return end
+
+    f.buttons = {}
+
+    function f:Toggle()
+        if self:IsShown() then self:Hide(); return end
+        self:Show()
+    end
+
+    function f:ToggleGroup()
+        if #self.buttons > 0 then
+            local firstBtn = _G[self.buttons[1]]
+            if firstBtn:IsShown() then self:HideGroup()
+            else self:ShowButtons() end
+        end
+    end
+
+    function f:HideGroup()
+        self:Hide()
+        self:HideButtons()
+    end
+
+    function f:ShowGroup()
+        self:Show()
+        self:ShowButtons()
+    end
+
+    function f:ShowButtons()
+        for _, btnName in ipairs(self.buttons) do
+            _G[btnName]:Show()
+        end
+    end
+
+    function f:HideButtons()
+        for _, btnName in ipairs(self.buttons) do
+            _G[btnName]:Hide()
+        end
+    end
+
+    function f:AddButton(buttonName)
+        if type(buttonName) ~= 'string' then return end
+        tinsert(self.buttons, buttonName)
+    end
+
+    function f:GetButtonCount() return #self.buttons end
+
+    function f:GetButtons()
+        return self.buttons
+    end
+
+    return f
 end
 
 function F:OnAddonLoaded(_addon)
@@ -45,26 +101,23 @@ function F:OnAddonLoaded(_addon)
 end
 
 function F:CreateButtons(frameName, rowSize, colSize)
-    -- anchorFrame, rowNum, colNum, index, isFirstInRow
-    --local frameName = 'Anchor' .. baseId
-    --self:printf('frameName: %s', frameName)
-    --local f = CreateFrame('Frame', frameName, UIParent, 'FrameLayerTemplate')
-    local f = _G[frameName]
+    local f = GetFrame(frameName)
     f:SetWidth(colSize * buttonSize)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
     f:Show()
     self:AttachFrameEvents(f)
 
-    local count = rowSize * colSize
-    f.buttonCount = count
     local index = 0
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            self:CreateSingleButton(f, row, col, index)
+            local btnUI = self:CreateSingleButton(f, row, col, index)
         end
     end
+    self:log('Buttons Added for %s(%s): %s',
+            f:GetName(), f:GetButtonCount(), table.concatkv(f:GetButtons()))
+
     -- if not movable then hide
     --f:Hide()
     --local padding = 5 +  buttonSpacing
@@ -76,6 +129,7 @@ function F:CreateSingleButton(anchorFrame, rowNum, colNum, index)
     local btnName = format('%sButton%s', frameName, tostring(index))
     --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+    anchorFrame:AddButton(btnName)
     btnUI:SetFrameStrata(frameStrata)
 
     local padding = 2
@@ -86,6 +140,7 @@ function F:CreateSingleButton(anchorFrame, rowNum, colNum, index)
     local adjY =  (rowNum * buttonSize) + padding - topLeftAdjustY
     btnUI:SetPoint(TOPLEFT, anchorFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
+    return btnUI
 end
 
 function F:AttachFrameEvents(frame)

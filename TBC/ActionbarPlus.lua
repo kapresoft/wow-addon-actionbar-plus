@@ -57,6 +57,33 @@ function A:OpenConfig(_)
     ACECFGD:Open(ADDON_NAME)
 end
 
+-----@param isEnabled boolean Current enabled state
+--function A:SetAddonState(isEnabled)
+--    local enabledFrames = { 'ActionbarPlusF1', 'ActionbarPlusF2' }
+--    for _,fn in ipairs(enabledFrames) do
+--        local f = _G[fn]
+--        if type(f.ShowGroup) == 'function' then
+--            if isEnabled then f:ShowGroup()
+--            else f:HideGroup() end
+--        end
+--    end
+--end
+--
+--function A:SetAddonEnabledState(isEnabled)
+--    if isEnabled then self:Enable()
+--    else self:Disable() end
+--end
+
+function A:OnEnable()
+    self:log('Enabled..')
+    --self:SetAddonState(true)
+end
+
+function A:OnDisable()
+    self:log('Disabled..')
+    --self:SetAddonState(false)
+end
+
 function A:OnInitialize()
     -- Set up our database
     self.db = ACEDB:New("ABP_PLUS_DB")
@@ -65,9 +92,12 @@ function A:OnInitialize()
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
 
     self.profile = self.db.profile
-    self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
+    if type(self.profile.bars) ~= 'table' then self.profile.bars = {} end
 
-    local options = C:GetOptions(self)
+    --self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
+    --if type(self.profile.enabled) ~= boolean then self.profile.enabled = true end
+
+    local options = C:GetOptions(self, self.profile)
     -- Register options table and slash command
     ACECFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
     --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
