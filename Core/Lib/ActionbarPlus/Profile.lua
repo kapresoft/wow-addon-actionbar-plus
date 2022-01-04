@@ -70,7 +70,18 @@ function P:GetBar(frameIndex)
     return bar
 end
 
-function P:IsBarEnabled(profileIndex)
+function P:SetBarEnabledState(frameIndex, isEnabled)
+    local bar = self:GetBar(frameIndex)
+    bar.enabled = isEnabled
+end
 
+function P:IsBarEnabled(frameIndex)
+    local bar = self:GetBar(frameIndex)
+    return bar.enabled
+end
 
+function P:IsBarNameEnabled(frameName)
+    local bar = self.profile.bars[frameName]
+    if isNotTable(bar) then return false end
+    return bar.enabled
 end

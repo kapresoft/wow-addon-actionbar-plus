@@ -4,19 +4,22 @@ local unpack, pack, fmod = table.unpackIt, table.pack, math.fmod
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
+local PU = ProfileUtil
+
 local F = ABP_ACE_NEWLIB('ButtonFactory')
 if not F then return end
 
-local S, SM = ABP_BUTTON_FACTORY()
+local P, SM = ABP_BUTTON_FACTORY()
 local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local buttonSize = 40
 local frameStrata = 'LOW'
 
---- Initialized on Logger#OnAddonLoaded()
-F.addon = nil
-F.profile = nil
 
 ---- ## Start Here ----
+
+------ Initialized on Logger#OnAddonLoaded()
+F.addon = nil
+F.profile = nil
 
 local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 end
 local function ShowConfigTooltip(frame)
@@ -39,11 +42,31 @@ local function OnMouseDownFrame(_, mouseButton)
 end
 
 function F:OnAfterAddonLoaded()
-    self:CreateButtons('ActionbarPlusF1', 2, 6)
-    self:CreateButtons('ActionbarPlusF2', 6, 2)
+    local frameDetails = {
+        [1] = { rowSize = 2, colSize = 6 },
+        [2] = { rowSize = 6, colSize = 2 },
+        [3] = { rowSize = 3, colSize = 5 },
+        [4] = { rowSize = 2, colSize = 6 },
+        [5] = { rowSize = 2, colSize = 6 },
+        [6] = { rowSize = 2, colSize = 6 },
+        [7] = { rowSize = 2, colSize = 6 },
+        [8] = { rowSize = 2, colSize = 6 },
+    }
+    local frames = PU:GetAllFrameNames()
+    for i,f in ipairs(frames) do
+        local frameName = PU:GetFrameNameFromIndex(i)
+        local frameEnabled = P:IsBarNameEnabled(frameName)
+        self:log('frame(%s): %s enabled: %s', tostring(i), f, tostring(frameEnabled))
+        local config = frameDetails[i]
+        if frameEnabled then self:CreateButtons(frameName, config.rowSize, config.colSize) end
+    end
 end
 
 function F:CreateButtons(frameName, rowSize, colSize)
+    if not P:IsBarNameEnabled(frameName) then
+        return
+    end
+
     local f = FrameFactory:GetFrame(frameName)
     f:SetWidth(colSize * buttonSize)
     f:SetScale(1.0)

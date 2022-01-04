@@ -4,18 +4,26 @@ local C = ABP_ACE_NEWLIB('Config')
 if not C then return end
 
 ---- ## Start Here ----
+-- Profile initializedin OnAfterAddonLoaded()
+---@type Profile
+local P = nil
+
 local enabledFrames = { 'ActionbarPlusF1', 'ActionbarPlusF2' }
+
 local function IsFrameShown(frameIndex)
     local f = _G[enabledFrames[frameIndex]]
     return f:IsShown()
 end
+
 local function SetFrameState(frameIndex, isEnabled)
+    -- TODO: needs reload
     local f = _G[enabledFrames[frameIndex]]
     if isEnabled then
-        f:ShowGroup()
+        --f:ShowGroup()
+        P:SetBarEnabledState(frameIndex, isEnabled)
         return
     end
-    f:HideGroup()
+    --f:HideGroup()
 end
 
 local function CreateSetterHandler(frameIndex, p)
@@ -33,9 +41,14 @@ local function CreateGetterHandler(frameIndex, p)
         local frameName = enabledFrames[frameIndex];
         if type(p.bars[frameName]) == 'nil' then p.bars[frameName] = {} end
         local enabled = IsFrameShown(frameIndex)
-        p.bars[frameName].enabled = enabled
-        return enabled
+        --p.bars[frameName].enabled = enabled
+        --return enabled
+        return p.bars[frameName].enabled
     end
+end
+
+function C:OnAfterAddonLoaded()
+    P = ABP_PROFILE()
 end
 
 function C:GetOptions(handler, profile)
@@ -115,3 +128,4 @@ function C:CreateButtonDef(baseId, settings, handler)
 
     return buttonDef
 end
+
