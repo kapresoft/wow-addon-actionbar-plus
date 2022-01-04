@@ -29,7 +29,7 @@ local function ShowConfigTooltip(frame)
 end
 local function OnShowConfigTooltip(frame) C_Timer.After(1, function() ShowConfigTooltip(frame) end) end
 local function OnMouseDownFrame(_, mouseButton)
-    F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
+    --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
     if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
     elseif strlower(mouseButton) == 'rightbutton' then
