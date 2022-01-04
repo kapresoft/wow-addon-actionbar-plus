@@ -37,60 +37,7 @@ local function OnMouseDownFrame(_, mouseButton)
     end
 end
 
-local function GetFrame(frameName)
-    local f = _G[frameName]
-    if type(f) ~= 'table' then return end
 
-    f.buttons = {}
-
-    function f:Toggle()
-        if self:IsShown() then self:Hide(); return end
-        self:Show()
-    end
-
-    function f:ToggleGroup()
-        if #self.buttons > 0 then
-            local firstBtn = _G[self.buttons[1]]
-            if firstBtn:IsShown() then self:HideGroup()
-            else self:ShowButtons() end
-        end
-    end
-
-    function f:HideGroup()
-        self:Hide()
-        self:HideButtons()
-    end
-
-    function f:ShowGroup()
-        self:Show()
-        self:ShowButtons()
-    end
-
-    function f:ShowButtons()
-        for _, btnName in ipairs(self.buttons) do
-            _G[btnName]:Show()
-        end
-    end
-
-    function f:HideButtons()
-        for _, btnName in ipairs(self.buttons) do
-            _G[btnName]:Hide()
-        end
-    end
-
-    function f:AddButton(buttonName)
-        if type(buttonName) ~= 'string' then return end
-        tinsert(self.buttons, buttonName)
-    end
-
-    function f:GetButtonCount() return #self.buttons end
-
-    function f:GetButtons()
-        return self.buttons
-    end
-
-    return f
-end
 
 function F:OnAddonLoaded(_addon)
     addon = _addon
@@ -99,7 +46,7 @@ function F:OnAddonLoaded(_addon)
 end
 
 function F:CreateButtons(frameName, rowSize, colSize)
-    local f = GetFrame(frameName)
+    local f = FrameFactory:GetFrame(frameName)
     f:SetWidth(colSize * buttonSize)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)

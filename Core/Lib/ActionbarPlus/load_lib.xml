@@ -5,6 +5,7 @@
     <Script file="StringStruct.lua"/>
     <Script file="TableStruct.lua"/>
     <Script file="ButtonTypeStruct.lua"/>
+    <Script file="FrameFactory.lua"/>
 
     <Script file="Constants.lua"/>
     <Script file="Logger.lua"/>
