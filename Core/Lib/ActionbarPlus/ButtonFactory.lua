@@ -17,10 +17,7 @@ local addon = nil
 
 ---- ## Start Here ----
 
-local function isFirstButtonInRow(colSize, i)
-    return fmod(i - 1, colSize) == 0
-end
-
+local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 end
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
     GameTooltip:AddLine('Right-click to open config UI', 1, 1, 1)
@@ -30,6 +27,7 @@ end
 local function OnShowConfigTooltip(frame) C_Timer.After(1, function() ShowConfigTooltip(frame) end) end
 local function OnMouseDownFrame(_, mouseButton)
     --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
+    GameTooltip:Hide()
     if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
     elseif strlower(mouseButton) == 'rightbutton' then
