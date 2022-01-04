@@ -115,8 +115,8 @@ function F:CreateButtons(frameName, rowSize, colSize)
             local btnUI = self:CreateSingleButton(f, row, col, index)
         end
     end
-    self:log('Buttons Added for %s(%s): %s',
-            f:GetName(), f:GetButtonCount(), table.concatkv(f:GetButtons()))
+    --self:log('Buttons Added for %s(%s): %s',
+    --        f:GetName(), f:GetButtonCount(), table.concatkv(f:GetButtons()))
 
     -- if not movable then hide
     --f:Hide()

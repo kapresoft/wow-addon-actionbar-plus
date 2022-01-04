@@ -16,7 +16,7 @@ local function _EmbedLogger(obj, optionalLogName)
     function obj:Initialized()
         if type(self.GetVersion) ~= 'function' then return end
         local major, minor = unpack(self:GetVersion())
-        self:log(1, '%s.%s initialized', major, minor)
+        self:log(10, '%s.%s initialized', major, minor)
     end
 
     function obj:log(...)
