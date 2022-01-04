@@ -14,7 +14,7 @@ ABP = A
 
 local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ABP_ACE())
 local libModules = ABP_GLOBALS()
-local C, S, B, BF = unpack(libModules)
+local C, P, B, BF = unpack(libModules)
 EMBED_LOGGER(A, 'Core')
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
@@ -92,8 +92,9 @@ function A:OnInitialize()
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
 
     self.profile = self.db.profile
-    if type(self.profile.bars) ~= 'table' then self.profile.bars = {} end
+    P:Init(self.profile)
 
+    --if type(self.profile.bars) ~= 'table' then self.profile.bars = {} end
     --self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
     --if type(self.profile.enabled) ~= boolean then self.profile.enabled = true end
 
@@ -113,11 +114,15 @@ end
 -- #####################################################################################
 
 local function AddonLoaded()
-    for _, m in ipairs(libModules) do m:Initialized() end
-    BF:OnAddonLoaded(A)
+    for _, m in ipairs(libModules) do
+        m:Initialized{ handler = A, profile= A.profile }
+    end
     A:log("%s.%s initialized", MAJOR, MINOR)
 end
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
 frame:SetScript("OnEvent", AddonLoaded)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+-- Temp
+Profile = P

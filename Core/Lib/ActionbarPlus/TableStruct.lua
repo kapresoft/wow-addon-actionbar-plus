@@ -43,15 +43,6 @@ function table.slice (t, startIndex, stopIndex)
     return new
 end
 
-function table.print(t) print(table.concatkv(t)) end
-
-function table.println(t)
-    if type(t) ~= 'table' then return tostring(t) end
-    for k,v in pairs(t) do
-        print(string.format("%s: %s", tostring(k), table.println(v)))
-    end
-end
-
 function table.concatkv(t)
     if type(t) ~= 'table' then return tostring(t) end
     local s = '{ '
@@ -62,8 +53,50 @@ function table.concatkv(t)
     return s .. '} '
 end
 
+function table.getSortedKeys(t)
+    if type(t) ~= 'table' then return tostring(t) end
+    local keys = {}
+    for k in pairs(t) do table.insert(keys, k) end
+    table.sort(keys)
+    return keys
+end
+
+function table.concatkvs(t)
+    if type(t) ~= 'table' then return tostring(t) end
+    local keys = table.getSortedKeys(t)
+    local s = '{ '
+    for _, k in pairs(keys) do
+        local ko = k
+        if type(k) ~= 'number' then k = '"'..k..'"' end
+        s = s .. '['..k..'] = ' .. table.concatkvs(t[ko]) .. ','
+    end
+    return s .. '} '
+end
+
 function table.toString(t) return table.concatkv(t) end
+function table.toStringSorted(t) return table.concatkvs(t) end
 
 function table.pack(...)
     return { len = select("#", ...), ... }
 end
+
+function table.isTable(t) return type(t) == 'table' end
+function table.isNotTable(t) return not table.isTable(t) end
+
+function table.print(t) print(table.toString(t)) end
+function table.printkv(t) print(table.concatkv(t)) end
+
+function table.printkvs(t)
+    local keys = table.getSortedKeys(t)
+    for _, k in ipairs(keys) do print(k, t[k]) end
+end
+
+function table.println(t)
+    if type(t) ~= 'table' then return tostring(t) end
+    for k,v in pairs(t) do
+        print(string.format("%s: %s", tostring(k), table.println(v)))
+    end
+end
+
+function table.printG() table.printkvs(_G) end
+function table.printLoaded() table.printkvs(package.loaded) end

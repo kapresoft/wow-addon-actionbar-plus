@@ -1,6 +1,6 @@
 local _G = _G
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
-local unpack, pack, mod = table.unpackIt, table.pack, math.fmod
+local unpack, pack, fmod = table.unpackIt, table.pack, math.fmod
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
@@ -12,8 +12,9 @@ local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Backgro
 local buttonSize = 40
 local frameStrata = 'LOW'
 
---- Initialized on #OnAddonLoaded
-local addon = nil
+--- Initialized on Logger#OnAddonLoaded()
+F.addon = nil
+F.profile = nil
 
 ---- ## Start Here ----
 
@@ -31,16 +32,13 @@ local function OnMouseDownFrame(_, mouseButton)
     if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
     elseif strlower(mouseButton) == 'rightbutton' then
-        addon:OpenConfig()
+        F.addon:OpenConfig()
     elseif strlower(mouseButton) == 'button5' then
         StaticPopup_Show(CONFIRM_RELOAD_UI)
     end
 end
 
-
-
-function F:OnAddonLoaded(_addon)
-    addon = _addon
+function F:OnAfterAddonLoaded()
     self:CreateButtons('ActionbarPlusF1', 2, 6)
     self:CreateButtons('ActionbarPlusF2', 6, 2)
 end

@@ -15,7 +15,7 @@ local LibStub, format, unpack = LibStub, string.format, table.unpackIt
 local Module = {
     Logger = 'Logger',
     Config = 'Config',
-    Settings = 'Settings',
+    Profile = 'Profile',
     ButtonUI = 'ButtonUI',
     ButtonFactory = 'ButtonFactory'
 }
@@ -35,14 +35,15 @@ local LocalLibStub = function(localLibBaseName) return LibStub(format(VERSION_FO
 
 ABP_ACE_CONSOLE = function() return LibStub(AceModule.AceConsole) end
 ABP_SHARED_MEDIA = function() return LibStub(AceModule.LibSharedMedia) end
-ABP_BUTTON_FACTORY = function() return LocalLibStub(Module.Settings), ABP_SHARED_MEDIA() end
+ABP_BUTTON_FACTORY = function() return LocalLibStub(Module.Profile), ABP_SHARED_MEDIA() end
+ABP_PROFILE = function () return LocalLibStub(Module.Profile) end
 
 ABP_GLOBALS = function()
     local config = LocalLibStub(Module.Config)
-    local settings = LocalLibStub(Module.Settings)
+    local profile = LocalLibStub(Module.Profile)
     local buttonUI = LocalLibStub(Module.ButtonUI)
     local buttonFactory = LocalLibStub(Module.ButtonFactory)
-    return { config, settings, buttonUI, buttonFactory }
+    return { config, profile, buttonUI, buttonFactory }
 end
 
 ABP_ACE = function()
