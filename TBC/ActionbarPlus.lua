@@ -15,7 +15,7 @@ ABP = A
 local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(LibFactory:GetAddonAceLibs())
 local libModules = LibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
-LibFactory:EmbedLogger(A, 'Core')
+LibFactory:EmbedLogger(A)
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
