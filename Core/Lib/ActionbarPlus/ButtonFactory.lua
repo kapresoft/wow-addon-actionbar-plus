@@ -34,16 +34,19 @@ F.addon = nil
 F.profile = nil
 
 local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 end
+
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
     GameTooltip:AddLine('Right-click to open config UI for ' .. frame:GetName(), 1, 1, 1)
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
+
 local function OnShowConfigTooltip(frame)
     C_Timer.After(1, function() ShowConfigTooltip(frame) end)
     C_Timer.After(3, function() GameTooltip:Hide() end)
 end
+
 local function OnMouseDownFrame(_, mouseButton)
     --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
     GameTooltip:Hide()
