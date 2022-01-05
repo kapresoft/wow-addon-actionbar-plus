@@ -36,7 +36,7 @@ F.profile = nil
 local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 end
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
-    GameTooltip:AddLine('Right-click to open config UI', 1, 1, 1)
+    GameTooltip:AddLine('Right-click to open config UI for ' .. frame:GetName(), 1, 1, 1)
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
@@ -59,50 +59,44 @@ end
 function F:OnAfterInitialize()
     local frames = PU:GetAllFrameNames()
     for i,f in ipairs(frames) do
-        local frameName = PU:GetFrameNameFromIndex(i)
-        local frameEnabled = P:IsBarNameEnabled(frameName)
-        --self:log('frame(%s): %s enabled: %s', tostring(i), f, tostring(frameEnabled))
-        local config = frameDetails[i]
-        if frameEnabled then self:CreateButtons(frameName, config.rowSize, config.colSize) end
+        local frameEnabled = P:IsBarIndexEnabled(i)
+        self:log('%s enabled? %s', i, tostring(frameEnabled))
+        if frameEnabled then
+            local dragFrame = self:CreateDragFrame(i)
+            self:AttachFrameEvents(dragFrame)
+        end
     end
 end
 
-function F:CreateButtons(frameName, rowSize, colSize)
-    if not P:IsBarNameEnabled(frameName) then
-        return
-    end
-
-    local f = FrameFactory:GetFrame(frameName)
-    f:SetWidth(colSize * buttonSize)
+function F:CreateDragFrame(frameIndex)
+    -- TODO: config should be in profiles
+    local config = frameDetails[frameIndex]
+    local f = FrameFactory:GetFrame(frameIndex)
+    f:SetWidth(config.colSize * buttonSize)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
     f:Show()
-    self:AttachFrameEvents(f)
+    self:CreateButtons(f, config.rowSize, config.colSize)
+    f:MarkRendered()
+    return f
+end
 
+function F:CreateButtons(dragFrame, rowSize, colSize)
     local index = 0
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnUI = self:CreateSingleButton(f, row, col, index)
+            local btn = self:CreateSingleButton(dragFrame, row, col, index)
+            dragFrame:AddButton(btn:GetName())
         end
     end
-    f:MarkRendered()
-
-    --self:log('Buttons Added for %s(%s): %s',
-    --        f:GetName(), f:GetButtonCount(), table.concatkv(f:GetButtons()))
-
-    -- if not movable then hide
-    --f:Hide()
-    --local padding = 5 +  buttonSpacing
-    --f:SetSize(40 + adjX + padding, 40 + adjY + padding)
 end
 
-function F:CreateSingleButton(anchorFrame, rowNum, colNum, index)
-    local frameName = anchorFrame:GetName()
+function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
+    local frameName = dragFrame:GetName()
     local btnName = format('%sButton%s', frameName, tostring(index))
     --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-    anchorFrame:AddButton(btnName)
     btnUI:SetFrameStrata(frameStrata)
 
     local padding = 2
@@ -111,7 +105,7 @@ function F:CreateSingleButton(anchorFrame, rowNum, colNum, index)
     local topLeftAdjustY = buttonSize - 10
     local adjX = (colNum * buttonSize) + padding - topLeftAdjustX
     local adjY =  (rowNum * buttonSize) + padding - topLeftAdjustY
-    btnUI:SetPoint(TOPLEFT, anchorFrame, TOPLEFT, adjX, -adjY)
+    btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
     return btnUI
 end

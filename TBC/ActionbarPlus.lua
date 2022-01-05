@@ -17,12 +17,6 @@ local libModules = LibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
 LibFactory:EmbedLogger(A)
 
-StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
-    text = "Reload UI?", button1 = "Yes", button2 = "No",
-    timeout = 0, whileDead = true, hideOnEscape = true,
-    OnAccept = function() ReloadUI() end,
-    preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
-}
 
 function A:RegisterSlashCommands()
     self:RegisterChatCommand("abp", "OpenConfig")
@@ -40,7 +34,7 @@ function A:RegisterKeyBindings()
 end
 
 function A:OnProfileChanged()
-    --self:ConfirmReloadUI()
+    self:ConfirmReloadUI()
 end
 
 function A:ConfirmReloadUI()
@@ -48,7 +42,7 @@ function A:ConfirmReloadUI()
         ReloadUI()
         return
     end
-    StaticPopup_Show("CONFIRM_RELOAD_UI")
+    ShowReloadUIConfirmation()
 end
 
 function A:OpenConfig(_)

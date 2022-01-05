@@ -90,6 +90,10 @@ function P:IsBarEnabled(frameIndex)
     return bar.enabled
 end
 
+function P:IsBarIndexEnabled(frameIndex)
+    return self:IsBarNameEnabled(PU:GetFrameNameFromIndex(frameIndex))
+end
+
 function P:IsBarNameEnabled(frameName)
     local bar = self.profile.bars[frameName]
     if isNotTable(bar) then return false end

@@ -58,12 +58,19 @@ local function Embed(frame)
     function frame:MarkRendered()
         self.rendered = true
     end
+
+    function frame:GetFrameIndex()
+        return self.frameIndex
+    end
 end
 
-function FrameFactory:GetFrame(frameName)
+function FrameFactory:GetFrame(frameIndex)
+    local PU = ProfileUtil
+    local frameName = PU:GetFrameNameFromIndex(frameIndex)
     local f = _G[frameName]
     if type(f) ~= 'table' then return end
 
+    f.frameIndex = frameIndex
     Embed(f)
 
     return f
