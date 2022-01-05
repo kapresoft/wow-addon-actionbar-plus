@@ -25,9 +25,7 @@ StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
 }
 
 function A:RegisterSlashCommands()
-    --self:RegisterChatCommand("bbc", "OpenConfig")
-    --self:RegisterChatCommand("bb", "HandleBoxerCommands")
-    --self:RegisterChatCommand("boxer", "HandleBoxerCommands")
+    self:RegisterChatCommand("abp", "OpenConfig")
 end
 
 function A:RegisterKeyBindings()
@@ -121,6 +119,9 @@ end
 local function AddonLoaded()
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
     A:log("%s.%s initialized", MAJOR, MINOR)
+    A:printf('Available commands: /abp to open config dialog.')
+    A:printf('Right-click on the button drag frame to open config dialog.')
+    A:printf('More at https://kapresoft.com/wow-addon-actionbar-plus')
 end
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
