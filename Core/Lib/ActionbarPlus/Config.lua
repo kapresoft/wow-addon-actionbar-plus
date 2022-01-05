@@ -30,7 +30,7 @@ end
 local function CreateGetterHandler(frameIndex)
     return function(_)
         local f = FF:GetFrameByIndex(frameIndex)
-        return f:IsShownInConfig()
+        return f:IsShownInConfig(frameIndex)
     end
 end
 
@@ -50,6 +50,9 @@ end
 function C:CreateBarConfigArgsDef()
     local configArgs = {}
     local count = P:GetBarSize()
+    --local bars = P:GetBars()
+    --error(format('frames count: %s', tostring(count)))
+    --error(format('bars: %s', table.toString(bars)))
     for i=1,count do
         local key = 'bar' .. i
         configArgs[key] = C:CreateBarConfigDef(i)
@@ -77,5 +80,3 @@ function C:CreateBarConfigDef(frameIndex)
         }
     }
 end
-
-

@@ -59,6 +59,8 @@ end
 
 -- /run table.toString(Profile:GetBar(1))
 function P:GetBar(frameIndex)
+    assertMethodArgNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
+
     if isNotTable(self.profile.bars) then return end
     local frameName = PU:GetFrameNameFromIndex(frameIndex)
     local bar = self.profile.bars[frameName]

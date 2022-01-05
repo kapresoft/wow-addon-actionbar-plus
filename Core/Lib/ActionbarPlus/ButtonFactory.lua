@@ -61,6 +61,7 @@ end
 
 function F:OnAfterInitialize()
     local frames = PU:GetAllFrameNames()
+    --error(format('frames: %s', table.toString(frames)))
     for i,f in ipairs(frames) do
         local frameEnabled = P:IsBarIndexEnabled(i)
         local f = self:CreateActionbarGroup(i)
@@ -90,10 +91,35 @@ function F:CreateButtons(dragFrame, rowSize, colSize)
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btn = self:CreateSingleButton(dragFrame, row, col, index)
-            dragFrame:AddButton(btn:GetName())
+            local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
+            btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
+            dragFrame:AddButton(btnUI:GetName())
         end
     end
+end
+
+-- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
+--      This one is incorrect:  https://wowwiki-archive.fandom.com/wiki/API_GetCursorInfo
+-- spell: spellId=info1 bookType=info2 ?=info3
+-- item: itemId = info1, itemName/Link = info2
+-- macro: macro-index=info1
+function F:OnReceiveDrag(btnUI)
+    local actionType, info1, info2, info3 = GetCursorInfo()
+    self:log(1, 'Drag Received: %s',
+            { actionType=actionType,
+              info1=tostring(info1),
+              info2=tostring(info2),
+              info3=tostring(info3) })
+
+    if 'spell' == actionType then
+        local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
+        self:log('Spell Info: %s', spellInfo)
+    elseif 'item' == actionType then
+        local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
+        self:log('Item Info: %s', itemInfo)
+    end
+
+    ClearCursor()
 end
 
 function F:CreateSingleButton(dragFrame, rowNum, colNum, index)

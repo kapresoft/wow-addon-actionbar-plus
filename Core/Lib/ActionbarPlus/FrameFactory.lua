@@ -14,6 +14,7 @@ local function Embed(frame)
     end
 
     function frame:SetFrameState(frameIndex, isEnabled)
+        assertMethodArgNotNil(frameIndex, 'frameIndex', 'SetFrameState(frameIndex)')
         P:SetBarEnabledState(frameIndex, isEnabled)
         if isEnabled then
             if self.ShowGroup then self:ShowGroup() end
@@ -24,6 +25,7 @@ local function Embed(frame)
 
     -- Synchronize UI and Profile data
     function frame:IsShownInConfig(frameIndex)
+        assertMethodArgNotNil(frameIndex, 'frameIndex', 'IsShownInConfig(frameIndex)')
         local actualFrameIsShown = self:IsShown()
         P:SetBarEnabledState(frameIndex, actualFrameIsShown)
         return P:IsBarEnabled(frameIndex)
