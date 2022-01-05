@@ -78,15 +78,15 @@ end
 --    else self:Disable() end
 --end
 
+-- AceAddon Hook
 function A:OnEnable()
-    -- This works, but does not log
-    A:log('Enabled..')
+    -- Log or print() doesn't work here
     --_G['ActionbarPlusF1']:HideGroup()
 end
 
+-- AceAddon Hook
 function A:OnDisable()
-    self:log('Disabled..')
-    --self:SetAddonState(false)
+    -- Log or print() doesn't work here
 end
 
 function A:OnInitialize()
