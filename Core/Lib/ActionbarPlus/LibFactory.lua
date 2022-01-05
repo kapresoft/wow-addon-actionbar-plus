@@ -18,13 +18,16 @@ local AceModule = {
     AceDBOptions = 'AceDBOptions-3.0',
     AceConfig = 'AceConfig-3.0',
     AceConfigDialog = 'AceConfigDialog-3.0',
-    LibSharedMedia = 'LibSharedMedia-3.0'
+    AceHook = 'AceHook-3.0',
+    AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
 
 -- Lazy Loaded libs
 local logger = nil
 local libAceConsole = nil
 local libSharedMedia = nil
+local libProfile = nil
+local libAceHook = nil
 
 ---@return Logger
 function L:GetLogger()
@@ -110,11 +113,14 @@ function L:GetAceConsole()
 end
 
 function L:GetAceSharedMedia()
-    if not libSharedMedia then libSharedMedia =  LibStub(AceModule.LibSharedMedia) end
+    if not libSharedMedia then libSharedMedia =  LibStub(AceModule.AceLibSharedMedia) end
     return libSharedMedia
 end
 
-local libProfile = nil
+function L:GetAceHook()
+    if not libAceHook then libAceHook =  LibStub(AceModule.AceHook) end
+    return libAceHook
+end
 
 function L:GetProfile()
     if not libProfile then

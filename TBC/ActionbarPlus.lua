@@ -8,7 +8,7 @@ local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
-local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
+local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 if not A then return end
 ABP = A
 
@@ -57,6 +57,10 @@ function A:OpenConfig(_)
     ACECFGD:Open(ADDON_NAME)
 end
 
+function A:OnUpdate()
+    self:log('OnUpdate called...')
+end
+
 -----@param isEnabled boolean Current enabled state
 --function A:SetAddonState(isEnabled)
 --    local enabledFrames = { 'ActionbarPlusF1', 'ActionbarPlusF2' }
@@ -75,8 +79,9 @@ end
 --end
 
 function A:OnEnable()
-    self:log('Enabled..')
-    --self:SetAddonState(true)
+    -- This works, but does not log
+    A:log('Enabled..')
+    --_G['ActionbarPlusF1']:HideGroup()
 end
 
 function A:OnDisable()

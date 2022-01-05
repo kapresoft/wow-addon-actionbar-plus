@@ -60,9 +60,7 @@ end
 
 function C:OnAfterAddonLoaded()
     local bars = P:GetBars()
-    self:log('action-bars: %s', table.toString(bars))
     local count = P:GetBarSize()
-    self:log('action-bar count: %s', tostring(count))
 end
 
 function C:GetOptions()
