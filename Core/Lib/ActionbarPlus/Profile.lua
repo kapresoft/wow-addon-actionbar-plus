@@ -1,5 +1,6 @@
 local format, type, pairs, ipairs = string.format, type, pairs, ipairs
-local tostring, isTable, isNotTable, unpack, pack = tostring, table.isTable, table.isNotTable, table.unpackIt, table.pack
+local isTable, isNotTable, tsize = table.isTable, table.isNotTable, table.size
+local tostring, pack, unpack = tostring, table.pack, table.unpackIt
 
 local PU = ProfileUtil
 local P = LibFactory:NewAceLib('Profile')
@@ -67,6 +68,16 @@ function P:GetBar(frameIndex)
     end
 
     return bar
+end
+
+function P:GetBars()
+    return self.profile.bars
+end
+
+function P:GetBarSize()
+    local bars = P:GetBars()
+    if isNotTable(bars) then return 0 end
+    return tsize(bars)
 end
 
 function P:SetBarEnabledState(frameIndex, isEnabled)

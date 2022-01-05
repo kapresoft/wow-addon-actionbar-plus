@@ -51,6 +51,7 @@ local function Embed(libName, lib, version)
         local major, minor = unpack(version)
         self:log(10, '%s.%s initialized', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
+        if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end
 
     ---

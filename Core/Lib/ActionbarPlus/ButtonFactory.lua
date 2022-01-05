@@ -26,7 +26,7 @@ local frameDetails = {
     [5] = { rowSize = 2, colSize = 6 },
     [6] = { rowSize = 2, colSize = 6 },
     [7] = { rowSize = 2, colSize = 6 },
-    [8] = { rowSize = 2, colSize = 6 },
+    [8] = { rowSize = 3, colSize = 6 },
 }
 
 -- Initialized on Logger#OnAddonLoaded()

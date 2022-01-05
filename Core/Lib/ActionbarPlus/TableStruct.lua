@@ -1,3 +1,16 @@
+function table.size(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
+function table.members()
+    print('table members: ')
+    for key, _ in pairs(table) do
+        print(" " .. key);
+    end
+end
+
 function table.shallow_copy(t)
     local t2 = {}
     for k,v in pairs(t) do

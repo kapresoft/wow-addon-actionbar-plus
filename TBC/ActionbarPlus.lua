@@ -93,8 +93,11 @@ function A:OnInitialize()
 
     self.profile = self.db.profile
     P:Init(self.profile)
+    for _, module in ipairs(libModules) do
+        module:OnInitialize{ handler = A, profile= A.profile }
+    end
 
-    local options = C:GetOptions(self, self.profile)
+    local options = C:GetOptions()
     -- Register options table and slash command
     ACECFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
     --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
@@ -103,9 +106,6 @@ function A:OnInitialize()
     -- Get the option table for profiles
     options.args.profiles = ACEDBO:GetOptionsTable(self.db)
 
-    for _, module in ipairs(libModules) do
-        module:OnInitialize{ handler = A, profile= A.profile }
-    end
 
     self:RegisterSlashCommands()
     self:RegisterKeyBindings()
