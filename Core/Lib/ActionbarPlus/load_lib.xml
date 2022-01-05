@@ -6,9 +6,12 @@
     <Script file="TableStruct.lua"/>
     <Script file="ButtonTypeStruct.lua"/>
     <Script file="ProfileUtil.lua"/>
+
     <Script file="FrameFactory.lua"/>
+    <Script file="LibFactory.lua"/>
 
     <Script file="Constants.lua"/>
+
     <Script file="Logger.lua"/>
     <Script file="Config.lua"/>
     <Script file="Profile.lua"/>

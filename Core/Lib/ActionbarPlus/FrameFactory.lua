@@ -2,6 +2,7 @@ local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
 FrameFactory = {}
 
 local function Embed(frame)
+    frame.rendered = false
     frame.buttons = {}
 
     function frame:Toggle()
@@ -48,6 +49,14 @@ local function Embed(frame)
 
     function frame:GetButtons()
         return self.buttons
+    end
+
+    function frame:IsRendered()
+        return self.rendered
+    end
+
+    function frame:MarkRendered()
+        self.rendered = true
     end
 end
 

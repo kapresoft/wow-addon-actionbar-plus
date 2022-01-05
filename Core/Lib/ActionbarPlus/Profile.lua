@@ -2,8 +2,7 @@ local format, type, pairs, ipairs = string.format, type, pairs, ipairs
 local tostring, isTable, isNotTable, unpack, pack = tostring, table.isTable, table.isNotTable, table.unpackIt, table.pack
 
 local PU = ProfileUtil
-local ABP_ACE_NEWLIB = ABP_ACE_NEWLIB
-local P = ABP_ACE_NEWLIB('Profile')
+local P = LibFactory:NewAceLib('Profile')
 if not P then return end
 
 ---- ## Start Here ----
@@ -40,7 +39,7 @@ function P:Init(newProfile)
     end
 end
 
-function P:OnAfterAddonLoaded()
+function P:OnAfterInitialize()
     -- do nothing for now
 end
 

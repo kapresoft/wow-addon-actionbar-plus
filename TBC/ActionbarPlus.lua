@@ -4,7 +4,7 @@
 --- DateTime: 1/2/2022 5:43 PM
 ---
 local _G, unpack, format = _G, table.unpackIt, string.format
-local ADDON_NAME, LibStub, ABP_GLOBALS, ABP_ACE, EMBED_LOGGER  = ADDON_NAME, LibStub, ABP_GLOBALS, ABP_ACE, EMBED_LOGGER
+local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
@@ -12,10 +12,10 @@ local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEve
 if not A then return end
 ABP = A
 
-local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ABP_ACE())
-local libModules = ABP_GLOBALS()
+local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(LibFactory:GetAddonAceLibs())
+local libModules = LibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
-EMBED_LOGGER(A, 'Core')
+LibFactory:EmbedLogger(A, 'Core')
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
@@ -94,10 +94,6 @@ function A:OnInitialize()
     self.profile = self.db.profile
     P:Init(self.profile)
 
-    --if type(self.profile.bars) ~= 'table' then self.profile.bars = {} end
-    --self.profile.enabled = type(self.profile.enabled) ~= boolean and true or true
-    --if type(self.profile.enabled) ~= boolean then self.profile.enabled = true end
-
     local options = C:GetOptions(self, self.profile)
     -- Register options table and slash command
     ACECFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
@@ -107,6 +103,10 @@ function A:OnInitialize()
     -- Get the option table for profiles
     options.args.profiles = ACEDBO:GetOptionsTable(self.db)
 
+    for _, module in ipairs(libModules) do
+        module:OnInitialize{ handler = A, profile= A.profile }
+    end
+
     self:RegisterSlashCommands()
     self:RegisterKeyBindings()
 end
@@ -114,9 +114,7 @@ end
 -- #####################################################################################
 
 local function AddonLoaded()
-    for _, m in ipairs(libModules) do
-        m:Initialized{ handler = A, profile= A.profile }
-    end
+    for _, module in ipairs(libModules) do module:OnAddonLoaded() end
     A:log("%s.%s initialized", MAJOR, MINOR)
 end
 

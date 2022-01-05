@@ -3,13 +3,13 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 local unpack, pack, fmod = table.unpackIt, table.pack, math.fmod
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ABP_ACE_NEWLIB, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
+local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 local PU = ProfileUtil
 
-local F = ABP_ACE_NEWLIB('ButtonFactory')
+local F = LibFactory:NewAceLib('ButtonFactory')
 if not F then return end
 
-local P, SM = ABP_BUTTON_FACTORY()
+local P, SM = LibFactory:GetButtonFactoryLibs()
 local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local buttonSize = 40
 local frameStrata = 'LOW'
@@ -17,7 +17,19 @@ local frameStrata = 'LOW'
 
 ---- ## Start Here ----
 
------- Initialized on Logger#OnAddonLoaded()
+-- TODO: Load frame by index (from config toggle)
+local frameDetails = {
+    [1] = { rowSize = 2, colSize = 6 },
+    [2] = { rowSize = 6, colSize = 2 },
+    [3] = { rowSize = 3, colSize = 5 },
+    [4] = { rowSize = 2, colSize = 6 },
+    [5] = { rowSize = 2, colSize = 6 },
+    [6] = { rowSize = 2, colSize = 6 },
+    [7] = { rowSize = 2, colSize = 6 },
+    [8] = { rowSize = 2, colSize = 6 },
+}
+
+-- Initialized on Logger#OnAddonLoaded()
 F.addon = nil
 F.profile = nil
 
@@ -44,17 +56,7 @@ local function OnMouseDownFrame(_, mouseButton)
     end
 end
 
-function F:OnAfterAddonLoaded()
-    local frameDetails = {
-        [1] = { rowSize = 2, colSize = 6 },
-        [2] = { rowSize = 6, colSize = 2 },
-        [3] = { rowSize = 3, colSize = 5 },
-        [4] = { rowSize = 2, colSize = 6 },
-        [5] = { rowSize = 2, colSize = 6 },
-        [6] = { rowSize = 2, colSize = 6 },
-        [7] = { rowSize = 2, colSize = 6 },
-        [8] = { rowSize = 2, colSize = 6 },
-    }
+function F:OnAfterInitialize()
     local frames = PU:GetAllFrameNames()
     for i,f in ipairs(frames) do
         local frameName = PU:GetFrameNameFromIndex(i)
@@ -84,6 +86,8 @@ function F:CreateButtons(frameName, rowSize, colSize)
             local btnUI = self:CreateSingleButton(f, row, col, index)
         end
     end
+    f:MarkRendered()
+
     --self:log('Buttons Added for %s(%s): %s',
     --        f:GetName(), f:GetButtonCount(), table.concatkv(f:GetButtons()))
 

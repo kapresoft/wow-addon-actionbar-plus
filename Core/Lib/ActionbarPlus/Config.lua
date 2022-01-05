@@ -1,10 +1,14 @@
 local format, unpack, pack = string.format, table.unpackIt, table.pack
-local ADDON_NAME, ABP_ACE_NEWLIB = ADDON_NAME, ABP_ACE_NEWLIB
-local C = ABP_ACE_NEWLIB('Config')
+local ADDON_NAME = ADDON_NAME
+local C = LibFactory:NewAceLib('Config')
 if not C then return end
 
 ---- ## Start Here ----
--- Profile initializedin OnAfterAddonLoaded()
+-- Initializedin OnAddonLoaded() - See Logger
+C.profile = nil
+C.addon = nil
+
+-- Profile initialized in OnAfterInitialize()
 ---@type Profile
 local P = nil
 
@@ -47,8 +51,8 @@ local function CreateGetterHandler(frameIndex, p)
     end
 end
 
-function C:OnAfterAddonLoaded()
-    P = ABP_PROFILE()
+function C:OnAfterInitialize()
+    P = LibFactory:GetProfile()
 end
 
 function C:GetOptions(handler, profile)
@@ -90,6 +94,26 @@ function C:GetOptions(handler, profile)
                         set = CreateSetterHandler(2, profile)
                     }
                 }
+            }
+        }
+    }
+end
+
+function C:CreateBarConfigDef(frameIndex)
+    return {
+        type = 'group',
+        name = "Action Bar #1",
+        desc = "Action Bar #1 Settings",
+        order = 1,
+        args = {
+            desc = { name = "Action Bar #1 Settings", type = "header", order = 0 },
+            enabled = {
+                type = "toggle",
+                name = "Enable",
+                desc = "Enable Action Bar #1",
+                order = 1,
+                get = CreateGetterHandler(1, profile),
+                set = CreateSetterHandler(1, profile)
             }
         }
     }

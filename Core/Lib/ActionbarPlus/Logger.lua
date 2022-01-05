@@ -1,8 +1,8 @@
-local ABP_ACE_NEWLIB_RAW, ABP_ACE_CONSOLE, ABP_PREFIX, LOG_LEVEL = ABP_ACE_NEWLIB_RAW, ABP_ACE_CONSOLE, ABP_PREFIX, ABP_LOG_LEVEL
+local ABP_PREFIX, LOG_LEVEL = ABP_PREFIX, ABP_LOG_LEVEL
 local format, pack, unpack, sliceAndPack = string.format, table.pack, table.unpackIt, table.sliceAndPack
 local isNotTable, isTable, tableToString = table.isNotTable, table.isTable, table.toString
-local c = ABP_ACE_CONSOLE()
-local L = ABP_ACE_NEWLIB_RAW('Logger')
+local c = LibFactory:GetAceConsole()
+local L = LibFactory:NewPlainAceLib('Logger')
 if not L then return end
 
 ---@param obj table
@@ -13,29 +13,6 @@ local function _EmbedLogger(obj, optionalLogName)
     setmetatable(obj, {
         __tostring = function() return format(ABP_PREFIX, prefix)  end
     })
-
-    -- takes a vararg
-    -- obj:Initialized{ addon=<handler>, profile=<profiledb> }
-    function obj:Initialized(...)
-        local context = {...}
-        assert(type(self.GetVersion) == 'function', 'Object must define a GetVersion() method')
-        assert(isTable(context), 'The passed context is not a table')
-
-        self:OnAddonLoaded(unpack(context))
-
-        local major, minor = unpack(self:GetVersion())
-        self:log(10, '%s.%s initialized', major, minor)
-    end
-
-    -- TODO: Move this method somewhere else
-    -- Call: obj:OnAddonLoaded{ addon=nil, profile=nil }
-    function obj:OnAddonLoaded(context)
-        if isNotTable(context) then return end
-        self.addon = context.handler
-        self.profile = context.profile
-        self:log(50, 'addon: %s, profile: %s', tostring(self.addon), type(self.profile))
-        if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
-    end
 
     function obj:log(...)
         local args = pack(...)
