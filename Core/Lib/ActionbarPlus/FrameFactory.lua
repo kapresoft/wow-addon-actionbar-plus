@@ -1,13 +1,32 @@
 local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
 FrameFactory = {}
+local PU = nil
 
 local function Embed(frame)
+    local P = LibFactory:GetProfile()
+
     frame.rendered = false
     frame.buttons = {}
 
     function frame:Toggle()
         if self:IsShown() then self:Hide(); return end
         self:Show()
+    end
+
+    function frame:SetFrameState(frameIndex, isEnabled)
+        P:SetBarEnabledState(frameIndex, isEnabled)
+        if isEnabled then
+            if self.ShowGroup then self:ShowGroup() end
+            return
+        end
+        if self.HideGroup then self:HideGroup() end
+    end
+
+    -- Synchronize UI and Profile data
+    function frame:IsShownInConfig(frameIndex)
+        local actualFrameIsShown = self:IsShown()
+        P:SetBarEnabledState(frameIndex, actualFrameIsShown)
+        return P:IsBarEnabled(frameIndex)
     end
 
     function frame:ToggleGroup()
@@ -55,6 +74,10 @@ local function Embed(frame)
         return self.rendered
     end
 
+    function frame:IsNotRendered()
+        return not self:IsRendered()
+    end
+
     function frame:MarkRendered()
         self.rendered = true
     end
@@ -64,10 +87,22 @@ local function Embed(frame)
     end
 end
 
-function FrameFactory:GetFrame(frameIndex)
-    local PU = ProfileUtil
-    local frameName = PU:GetFrameNameFromIndex(frameIndex)
-    local f = _G[frameName]
+local function getProfileUtil()
+    if not PU then PU = ProfileUtil end
+    return PU
+end
+
+function FrameFactory:GetFrameByIndex(frameIndex)
+    local frameName = getProfileUtil():GetFrameNameFromIndex(frameIndex)
+    return _G[frameName]
+end
+
+function FrameFactory:IsFrameShownByIndex(frameIndex)
+    return self:GetFrameByIndex(frameIndex):IsShown()
+end
+
+function FrameFactory:CreateFrame(frameIndex)
+    local f = self:GetFrameByIndex(frameIndex)
     if type(f) ~= 'table' then return end
 
     f.frameIndex = frameIndex

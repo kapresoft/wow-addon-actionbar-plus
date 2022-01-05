@@ -37,7 +37,7 @@ local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 e
 
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
-    GameTooltip:AddLine('Right-click to open config UI for ' .. frame:GetName(), 1, 1, 1)
+    GameTooltip:AddLine('Right-click to open config UI for Actionbar ' .. frame:GetFrameIndex(), 1, 1, 1)
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
@@ -63,24 +63,25 @@ function F:OnAfterInitialize()
     local frames = PU:GetAllFrameNames()
     for i,f in ipairs(frames) do
         local frameEnabled = P:IsBarIndexEnabled(i)
-        self:log('%s enabled? %s', i, tostring(frameEnabled))
+        local f = self:CreateActionbarGroup(i)
         if frameEnabled then
-            local dragFrame = self:CreateDragFrame(i)
-            self:AttachFrameEvents(dragFrame)
+            f:ShowGroup()
+        else
+            f:HideGroup()
         end
     end
 end
 
-function F:CreateDragFrame(frameIndex)
+function F:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = frameDetails[frameIndex]
-    local f = FrameFactory:GetFrame(frameIndex)
+    local f = FrameFactory:CreateFrame(frameIndex)
     f:SetWidth(config.colSize * buttonSize)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
-    f:Show()
     self:CreateButtons(f, config.rowSize, config.colSize)
     f:MarkRendered()
+    self:AttachFrameEvents(f)
     return f
 end
 

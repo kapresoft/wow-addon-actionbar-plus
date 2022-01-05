@@ -24,6 +24,7 @@ local AceModule = {
 
 -- Lazy Loaded libs
 local logger = nil
+local libButtonFactory = nil
 local libAceConsole = nil
 local libSharedMedia = nil
 local libProfile = nil
@@ -94,10 +95,19 @@ end
 --- Usage: local C, P, B, BF = unpack(LibFactory:GetAddonLibs())
 function L:GetAddonStdLibs()
     local config = self:LocalLibStub(Module.Config)
-    local profile = self:LocalLibStub(Module.Profile)
+    local profile = self:GetProfile()
     local buttonUI = self:LocalLibStub(Module.ButtonUI)
-    local buttonFactory = self:LocalLibStub(Module.ButtonFactory)
+    local buttonFactory = self:GetButtonFactory()
     return { config, profile, buttonUI, buttonFactory }
+end
+
+-- Usage: P, SM = unpack(LibFactory:GetButtonFactoryLibs())
+function L:GetButtonFactoryLibs()
+    return self:GetProfile(), self:GetAceSharedMedia()
+end
+
+function L:GetConfigLibs()
+    return { self:GetProfile(), self:GetButtonFactory() }
 end
 
 function L:GetAddonAceLibs()
@@ -123,15 +133,13 @@ function L:GetAceHook()
 end
 
 function L:GetProfile()
-    if not libProfile then
-        libProfile = self:LocalLibStub(Module.Profile)
-    end
+    if not libProfile then libProfile = self:LocalLibStub(Module.Profile) end
     return libProfile
 end
 
--- Usage: P, SM = unpack(LibFactory:GetButtonFactoryLibs())
-function L:GetButtonFactoryLibs()
-    return self:GetProfile(), self:GetAceSharedMedia()
+function L:GetButtonFactory()
+    if not libButtonFactory then libButtonFactory = self:LocalLibStub(Module.ButtonFactory) end
+    return libButtonFactory
 end
 
 
