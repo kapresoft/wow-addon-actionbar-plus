@@ -9,7 +9,6 @@ ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
 CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 
 local ReloadUI = ReloadUI
-local format = string.format
 
 StaticPopupDialogs[CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
@@ -20,19 +19,4 @@ StaticPopupDialogs[CONFIRM_RELOAD_UI] = {
 
 function ShowReloadUIConfirmation()
     StaticPopup_Show(CONFIRM_RELOAD_UI)
-end
-
-function IsNil(a)
-    return 'nil' == type(a)
-end
-
-function IsNotNil(a)
-    return not IsNil(a)
-end
-
-function assertMethodArgNotNil(a, name, methodSignature)
-    --assert(IsNotNil(a), format('The method argument %s in %s should not be nil', name, methodSignature))
-    if IsNil(a) then
-        error(format('The method argument %s in %s should not be nil', name, methodSignature), 2)
-    end
 end

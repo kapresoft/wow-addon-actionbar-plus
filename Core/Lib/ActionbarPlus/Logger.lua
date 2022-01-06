@@ -65,6 +65,19 @@ local function _EmbedLogger(obj, optionalLogName)
         self:Print(format(unpack(newArgs)))
     end
 
+    -- Log a Pretty Formatted Object
+    -- self:logp(itemInfo)
+    -- self:logp("itemInfo", itemInfo)
+    function obj:logp(...)
+        local count = select('#', ...)
+        if count == 1 then
+            self:log(PrettyPrint.pformat(select(1, ...)))
+            return
+        end
+        local label, obj = select(1, ...)
+        self:log(label .. ': %s', PrettyPrint.pformat(obj))
+    end
+
     function obj:printf(...)
         local args = pack(...)
         if args.len <= 0 then error('No arguments passed') end
@@ -84,6 +97,7 @@ local function _EmbedLogger(obj, optionalLogName)
             return tostring(any)
         end
     end
+
 end
 
 ---@class Logger

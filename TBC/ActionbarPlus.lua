@@ -72,13 +72,15 @@ end
 
 -- AceAddon Hook
 function A:OnEnable()
-    -- Log or print() doesn't work here
+    -- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
     --_G['ActionbarPlusF1']:HideGroup()
+    A:log('OnEnable...')
 end
 
 -- AceAddon Hook
 function A:OnDisable()
-    -- Log or print() doesn't work here
+    -- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
+    A:log('OnDisable...')
 end
 
 function A:OnInitialize()

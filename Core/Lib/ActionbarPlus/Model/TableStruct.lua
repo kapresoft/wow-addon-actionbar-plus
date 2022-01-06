@@ -89,6 +89,15 @@ end
 function table.toString(t) return table.concatkv(t) end
 function table.toStringSorted(t) return table.concatkvs(t) end
 
+function table.toString2(t)
+    if type(t) ~= 'table' then return tostring(t) end
+    local s = '\n{'
+    for k,v in pairs(t) do
+        s = string.format("%s\n    %s: %s,", s, tostring(k), table.toString2(v))
+    end
+    return s .. '\n}'
+end
+
 function table.pack(...)
     return { len = select("#", ...), ... }
 end

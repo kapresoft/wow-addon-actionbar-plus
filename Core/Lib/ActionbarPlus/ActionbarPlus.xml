@@ -10,5 +10,6 @@
     <Script file="Profile.lua"/>
 
     <Include file="Buttons\_Buttons.xml"/>
+    <Include file='Developer\_Developer.xml'/>
 
 </Ui>

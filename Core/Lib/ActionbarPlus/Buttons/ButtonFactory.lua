@@ -1,6 +1,7 @@
 local _G = _G
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
 local unpack, pack, fmod = table.unpackIt, table.pack, math.fmod
+local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
@@ -92,7 +93,7 @@ function F:CreateButtons(dragFrame, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
-            btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
+            btnUI:SetScript("OnReceiveDrag", function(_) self.OnReceiveDrag(self, btnUI) end)
             dragFrame:AddButton(btnUI:GetName())
         end
     end
@@ -104,25 +105,29 @@ end
 -- item: itemId = info1, itemName/Link = info2
 -- macro: macro-index=info1
 function F:OnReceiveDrag(btnUI)
-
-
+    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
 
     local actionType, info1, info2, info3 = GetCursorInfo()
+    ClearCursor()
     self:log(1, 'Drag Received: %s',
             { actionType=actionType,
               info1=tostring(info1),
               info2=tostring(info2),
               info3=tostring(info3) })
 
-    if 'spell' == actionType then
-        local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
-        self:log('Spell Info: %s', spellInfo)
-    elseif 'item' == actionType then
-        local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
-        self:log('Item Info: %s', itemInfo)
-    end
+    local H = ReceiveDragEventHandler
+    if not H:CanHandle(actionType) then return end
+    local cursorInfo = { type = actionType, bookIndex = info1, bookType = info2, id = info3 }
+    H:Handle(btnUI, actionType, cursorInfo)
 
-    ClearCursor()
+    --if 'spell' == actionType then
+    --    local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
+    --    self:logp('Spell Info', spellInfo)
+    --elseif 'item' == actionType then
+    --    local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
+    --   self:logp('Item Info', itemInfo)
+    --end
+
 end
 
 function F:CreateSingleButton(dragFrame, rowNum, colNum, index)

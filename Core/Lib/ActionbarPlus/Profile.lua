@@ -1,6 +1,7 @@
 local format, type, pairs, ipairs = string.format, type, pairs, ipairs
 local isTable, isNotTable, tsize = table.isTable, table.isNotTable, table.size
 local tostring, pack, unpack = tostring, table.pack, table.unpackIt
+local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
 local PU = ProfileUtil
 local P = LibFactory:NewAceLib('Profile')
@@ -59,7 +60,7 @@ end
 
 -- /run table.toString(Profile:GetBar(1))
 function P:GetBar(frameIndex)
-    assertMethodArgNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
+    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 
     if isNotTable(self.profile.bars) then return end
     local frameName = PU:GetFrameNameFromIndex(frameIndex)
