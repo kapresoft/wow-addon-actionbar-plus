@@ -104,6 +104,9 @@ end
 -- item: itemId = info1, itemName/Link = info2
 -- macro: macro-index=info1
 function F:OnReceiveDrag(btnUI)
+
+
+
     local actionType, info1, info2, info3 = GetCursorInfo()
     self:log(1, 'Drag Received: %s',
             { actionType=actionType,

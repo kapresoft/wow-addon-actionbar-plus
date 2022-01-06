@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-    <Include file='Developer\load_developer.xml'/>
-    <Include file='General\load_general.xml'/>
-    <Include file='Lib\load_lib.xml'/>
+    <Include file='Developer\_Developer.xml'/>
+    <Include file='General\_General.xml'/>
+    <Include file='Lib\_Lib.xml'/>
 
 
 </Ui>

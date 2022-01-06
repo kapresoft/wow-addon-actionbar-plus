@@ -3,6 +3,7 @@
 
     <Script file="ButtonUI.lua"/>
     <Script file="ButtonFactory.lua"/>
+    <Script file="ReceiveDragEventHandler.lua"/>
 
     <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="LOW"
            hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true">
