@@ -93,7 +93,7 @@ function F:CreateButtons(dragFrame, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
-            btnUI:SetScript("OnReceiveDrag", function(_) self.OnReceiveDrag(self, btnUI) end)
+            btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
             dragFrame:AddButton(btnUI:GetName())
         end
     end
@@ -106,14 +106,11 @@ end
 -- macro: macro-index=info1
 function F:OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-
     local actionType, info1, info2, info3 = GetCursorInfo()
     ClearCursor()
-    self:log(1, 'Drag Received: %s',
-            { actionType=actionType,
-              info1=tostring(info1),
-              info2=tostring(info2),
-              info3=tostring(info3) })
+    if ABP_LOG_LEVEL > 10 then
+        self:logp('Drag Received', { actionType=actionType, info1=tostring(info1), info2=tostring(info2), info3=tostring(info3) })
+    end
 
     local H = ReceiveDragEventHandler
     if not H:CanHandle(actionType) then return end

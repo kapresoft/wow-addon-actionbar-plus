@@ -2,12 +2,13 @@ local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.Ass
 local format = string.format
 
 local H = {}
-LibFactory:GetLogger():Embed(H, 'RDEH')
+local logger = LibFactory:GetLogger()
+logger:Embed(H, 'RDEH')
 ReceiveDragEventHandler = H
 
 local smedia = LibFactory:GetAceSharedMedia()
 local noIconTexture = smedia:Fetch(smedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
-local highlightIconTexture = smedia:Fetch(smedia.MediaType.BACKGROUND, "Blizzard Parchment")
+local highlightIconTexture = smedia:Fetch(smedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
 
 local UNIT = 'unit'
 local A = {
@@ -21,19 +22,21 @@ local A = {
 
 local function ResetAttributes(btnUI)
     for _,v in pairs(A) do
-        H:log('Resetting Attribute: %s', v)
+        H:log(30, 'Resetting Attribute: %s', v)
         btnUI:SetAttribute(v, nil)
     end
 end
 
 local SpellHandler = {}
+logger:Embed(SpellHandler, 'RDHE::SpellHandler')
 ---@param spellCursorInfo table Structure `{ type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }`
 function SpellHandler:Handle(btnUI, spellCursorInfo)
-    H:log('XXXX btnUI', spellCursorInfo)
-    H:logp(format('Spell Cursor Info for Button (%s)', btnUI:GetName()), spellCursorInfo)
+    self:logp(format('Spell Cursor Info for Button (%s)', btnUI:GetName()), spellCursorInfo)
     if spellCursorInfo == nil or spellCursorInfo.id == nil then return end
     local spellInfo = _Spell:GetSpellInfo(spellCursorInfo.id)
-    H:logp('Spell Info', spellInfo)
+    self:logp('Spell Info', spellInfo)
+    PrettyPrint.setup({ wrap_array = false, wrap_string = false, indent_size=4, sort_keys=true, level_width=100 })
+
     self:SetSpellAttributes(btnUI, spellInfo)
 end
 
@@ -42,8 +45,6 @@ function SpellHandler:SetSpellAttributes(btnUI, spellInfo)
 
     btnUI:SetNormalTexture(spellInfo.icon)
     btnUI:SetHighlightTexture(highlightIconTexture)
-    H:log('btnUI: %s', type(btnUI))
-    H:logp('btnUI', btnUI)
     btnUI:SetAttribute(A.TYPE, 'spell')
     btnUI:SetAttribute(A.SPELL, spellInfo.id)
     btnUI:SetAttribute(A.UNIT2, 'focus')
@@ -81,7 +82,7 @@ function H:CanHandle(actionType)
     local handler = handlers[actionType]
     --local hasHandler = nil ~= handler and nil ~= handler.handle
     local hasHandler = IsNotNil(handler) and IsNotNil(handler.Handle)
-    self:log('CanHandle: %s', hasHandler)
+    --self:log('CanHandle: %s', hasHandler)
     return hasHandler
 end
 

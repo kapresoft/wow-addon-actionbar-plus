@@ -12,7 +12,9 @@ function S:GetSpellInfo(spellNameOrId)
     local name, _, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     if name then
         local subTextOrRank = GetSpellSubtext(spellNameOrId)
-        local spellInfo = { id = id, name = name, icon = icon, castTime = castTime,
+        local spellLink = GetSpellLink(spellNameOrId)
+        local spellInfo = { id = id, name = name, icon = icon,
+                            link=spellLink, castTime = castTime,
                             minRange = minRange, maxRange = maxRange, rank = subTextOrRank }
         spellInfo.label = spellInfo.name
         if IsNotBlank(spellInfo.rank) then
