@@ -6,6 +6,27 @@ local A = {}
 function A.IsNil(obj)
     return 'nil' == type(obj)
 end
+
+---@param obj table The object to check
+function A.IsNotNil(obj)
+    return not A.IsNil(obj)
+end
+
+--- Example:
+--- `if A.HasKey(obj, key) then doStuff() end`
+---@param obj table The object to check
+---@param key string The key to the object to check
+function A.HasKey(obj, key)
+    if type(obj) ~= 'table' then return false end
+    return 'nil' == type(obj[key])
+end
+
+--- Example:
+--- `if A.HasNoKey(obj, key) then return end`
+function A.HasNoKey(obj, key)
+    return not A.HasKey(obj, key)
+end
+
 -- Option #1
 -- 1: string format
 -- 2: args

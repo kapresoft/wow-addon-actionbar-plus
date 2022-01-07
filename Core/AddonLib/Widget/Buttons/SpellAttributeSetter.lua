@@ -15,7 +15,13 @@ function S:SetAttributes(btnUI, btnData)
     RWAttr(btnUI)
     local spellInfo = btnData[ButtonAttributes.SPELL]
     if type(spellInfo) ~= 'table' then return end
+    if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
+    local btnName = btnUI:GetName()
+    local abInfo = btnUI:GetActionbarInfo()
+    local p = { name=btnName, ab=abInfo, spell=spellInfo.name }
+    --self:logp('btnData', p)
+
     local spellIcon = TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
     btnUI:SetNormalTexture(spellIcon)

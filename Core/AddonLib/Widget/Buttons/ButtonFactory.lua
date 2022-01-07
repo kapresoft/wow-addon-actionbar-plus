@@ -7,7 +7,7 @@ local AssertThatMethodArgIsNotNil, AssertNotNil = Assert.AssertThatMethodArgIsNo
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
-local ADDON_LIB, WLIB, PU, H = AceLibAddonFactory, WidgetLibFactory, ProfileUtil, ReceiveDragEventHandler
+local ADDON_LIB, WLIB, H = AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler
 local FrameFactory,SpellAttributeSetter  = FrameFactory,SpellAttributeSetter
 
 local P = WidgetLibFactory:GetProfile()
@@ -22,18 +22,6 @@ local frameStrata = 'LOW'
 
 
 ---- ## Start Here ----
-
--- TODO: Load frame by index (from config toggle)
-local frameDetails = {
-    [1] = { rowSize = 2, colSize = 6 },
-    [2] = { rowSize = 6, colSize = 2 },
-    [3] = { rowSize = 3, colSize = 5 },
-    [4] = { rowSize = 2, colSize = 6 },
-    [5] = { rowSize = 2, colSize = 6 },
-    [6] = { rowSize = 2, colSize = 6 },
-    [7] = { rowSize = 2, colSize = 6 },
-    [8] = { rowSize = 3, colSize = 6 },
-}
 
 local AttributeSetters = {
     ['spell'] = SpellAttributeSetter,
@@ -78,7 +66,7 @@ local function Embed(btnUI)
 end
 
 function F:OnAfterInitialize()
-    local frames = PU:GetAllFrameNames()
+    local frames = P:GetAllFrameNames()
     --error(format('frames: %s', table.toString(frames)))
     for i,f in ipairs(frames) do
         local frameEnabled = P:IsBarIndexEnabled(i)
@@ -93,7 +81,7 @@ end
 
 function F:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
-    local config = frameDetails[frameIndex]
+    local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local f = FrameFactory(frameIndex)
     f:SetWidth(config.colSize * buttonSize)
     f:SetScale(1.0)
@@ -126,7 +114,12 @@ function F:SetButtonAttributes(btnUI)
     local actionbarInfo = btnUI:GetActionbarInfo()
     local btnName = btnUI:GetName()
     local btnData = P:GetButtonData(actionbarInfo.index, btnName)
+
+    --local key = actionbarInfo.name .. btnName
+    --local btnData = P.profile[key]
+
     if btnData == nil or btnData.type == nil then return end
+
 
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then

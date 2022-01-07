@@ -13,11 +13,10 @@ C.addon = nil
 ---@type Profile
 local P = nil
 local BF = nil
-local PU = nil
 local FF = nil
 
 function C:OnAfterInitialize()
-    PU, FF = ProfileUtil, FrameFactory
+    FF = FrameFactory
     P, BF = unpack(WidgetLibFactory:GetConfigLibs())
 end
 

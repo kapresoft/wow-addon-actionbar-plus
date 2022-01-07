@@ -1,10 +1,10 @@
 local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
-local WLIB, ProfileUtil, Assert = WidgetLibFactory, ProfileUtil, Assert
+local WLIB, Assert = WidgetLibFactory, Assert
 
 local F = {}
 FrameFactory = F
 
-local PU = nil
+local P = WidgetLibFactory:GetProfile()
 
 local function Embed(frame)
     local P = WLIB:GetProfile()
@@ -95,13 +95,13 @@ local function Embed(frame)
 
 end
 
-local function getProfileUtil()
-    if not PU then PU = ProfileUtil end
-    return PU
-end
+--local function getProfileUtil()
+--    if not P then P = WidgetLibFactory:GetProfile() end
+--    return P
+--end
 
 function F:GetFrameByIndex(frameIndex)
-    local frameName = getProfileUtil():GetFrameNameFromIndex(frameIndex)
+    local frameName = P:GetFrameNameByIndex(frameIndex)
     return _G[frameName]
 end
 

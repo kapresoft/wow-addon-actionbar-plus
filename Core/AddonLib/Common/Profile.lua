@@ -1,9 +1,10 @@
-local format, type, pairs, ipairs = string.format, type, pairs, ipairs
-local isTable, isNotTable, tsize = table.isTable, table.isNotTable, table.size
-local tostring, pack, unpack = tostring, table.pack, table.unpackIt
+local type, pairs, tostring = type, pairs, tostring
+local isTable, isNotTable, tsize, tinsert, tsort = table.isTable, table.isNotTable, table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-local ADDON_LIB, PU, Module = AceLibAddonFactory, ProfileUtil, Module
+-- local format = string.format
+--local pack, unpack = table.pack, table.unpackIt
 
+local ADDON_LIB, Module = AceLibAddonFactory, Module
 local P = ADDON_LIB:NewAceLib(Module.Profile)
 if not P then return end
 
@@ -59,6 +60,29 @@ end
 -- self.profile = profile
 
 -- ##########################################################################
+local FrameDetails = {
+    [1] = { rowSize = 2, colSize = 6 },
+    [2] = { rowSize = 6, colSize = 2 },
+    [3] = { rowSize = 3, colSize = 5 },
+    [4] = { rowSize = 2, colSize = 6 },
+    [5] = { rowSize = 2, colSize = 6 },
+    [6] = { rowSize = 2, colSize = 6 },
+    [7] = { rowSize = 2, colSize = 6 },
+    [8] = { rowSize = 3, colSize = 6 },
+}
+-- ##########################################################################
+
+P.maxFrames = 8
+P.baseFrameName = 'ActionbarPlusF'
+
+function P:GetFrameConfig()
+    return FrameDetails
+end
+
+function P:GetFrameConfigByIndex(frameIndex)
+    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetFrameConfigByIndex(frameIndex)')
+    return FrameDetails[frameIndex]
+end
 
 function P:GetTemplate()
     return {
@@ -97,8 +121,8 @@ end
 
 function P:CreateBarsTemplate()
     local bars = {}
-    for i=1, PU:GetMaxFrames() do
-        local frameName = PU:GetFrameNameFromIndex(i)
+    for i=1, self:GetMaxFrames() do
+        local frameName = self:GetFrameNameByIndex(i)
         bars[frameName] = {
             enabled = false,
             buttons = {}
@@ -113,7 +137,7 @@ function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 
     if isNotTable(self.profile.bars) then return end
-    local frameName = PU:GetFrameNameFromIndex(frameIndex)
+    local frameName = self:GetFrameNameByIndex(frameIndex)
     local bar = self.profile.bars[frameName]
     if isNotTable(bar) then
         self.profile.bars[frameName] = self:CreateBarsTemplate()
@@ -144,11 +168,35 @@ function P:IsBarEnabled(frameIndex)
 end
 
 function P:IsBarIndexEnabled(frameIndex)
-    return self:IsBarNameEnabled(PU:GetFrameNameFromIndex(frameIndex))
+    return self:IsBarNameEnabled(self:GetFrameNameByIndex(frameIndex))
 end
 
 function P:IsBarNameEnabled(frameName)
     local bar = self.profile.bars[frameName]
     if isNotTable(bar) then return false end
     return bar.enabled
+end
+
+function P:GetBaseFrameName() return self.baseFrameName end
+
+function P:GetFrameNameByIndex(frameIndex)
+    return self:GetBaseFrameName() .. tostring(frameIndex)
+end
+
+function P:GetAllFrameNames()
+    local fnames = {}
+    for i=1, #FrameDetails do
+        local fn = self:GetFrameNameByIndex(i)
+        tinsert(fnames, fn)
+    end
+    tsort(fnames)
+    return fnames
+end
+
+function P:GetAllActionBarSizeDetails()
+    return FrameDetails
+end
+
+function P:GetActionBarSizeDetailsByIndex(frameIndex)
+    return FrameDetails[frameIndex]
 end

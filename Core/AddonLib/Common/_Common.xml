@@ -9,7 +9,6 @@
 
     <Script file="Logger.lua"/>
     <Script file="Config.lua"/>
-    <Script file="ProfileUtil.lua"/>
     <Script file="Profile.lua"/>
 
 </Ui>
