@@ -2,9 +2,9 @@ local format, type, pairs, ipairs = string.format, type, pairs, ipairs
 local isTable, isNotTable, tsize = table.isTable, table.isNotTable, table.size
 local tostring, pack, unpack = tostring, table.pack, table.unpackIt
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-local LIB, PU, Module = AddonAceLibFactory, ProfileUtil, Module
+local ADDON_LIB, PU, Module = AceLibAddonFactory, ProfileUtil, Module
 
-local P = LIB:NewAceLib(Module.Profile)
+local P = ADDON_LIB:NewAceLib(Module.Profile)
 if not P then return end
 
 ---- ## Start Here ----

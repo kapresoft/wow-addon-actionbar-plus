@@ -1,6 +1,6 @@
 local LibStub, format, unpack = LibStub, string.format, table.unpackIt
 local assert, type, tonumber, isTable = assert, type, tonumber, table.isTable
-local ACELIB, ALIB, LF, Module = AceLibFactory, AddonAceLibFactory, ABPLogFactory, Module
+local ACELIB, ALIB, LF, Module = AceLibFactory, AceLibAddonFactory, ABPLogFactory, Module
 local L = {}
 LibFactory = L
 

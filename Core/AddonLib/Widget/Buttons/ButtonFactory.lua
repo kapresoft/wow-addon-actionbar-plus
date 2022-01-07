@@ -5,7 +5,7 @@ local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
-local ADDON_LIB, LIB, PU, Module = AddonAceLibFactory, LibFactory, ProfileUtil, Module
+local ADDON_LIB, LIB, PU, Module = AceLibAddonFactory, LibFactory, ProfileUtil, Module
 
 local F = ADDON_LIB:NewAceLib('ButtonFactory')
 if not F then return end

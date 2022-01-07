@@ -4,7 +4,7 @@ local VERSION_FORMAT = VERSION_FORMAT
 local LOGF = LogFactory
 
 local F = {}
-AddonAceLibFactory = F
+AceLibAddonFactory = F
 
 function F:GetAceLibVersionFormat() return VERSION_FORMAT end
 function F:LocalLibStub(localLibName) return LibStub(format(VERSION_FORMAT, localLibName)) end

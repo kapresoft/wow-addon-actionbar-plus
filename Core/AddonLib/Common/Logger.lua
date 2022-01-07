@@ -3,10 +3,10 @@ local format, pack, unpack, sliceAndPack = string.format, table.pack, table.unpa
 local type, select, tostring, error = type, select, tostring, error
 local pformat = PrettyPrint.pformat
 local isNotTable, isTable, tableToString = table.isNotTable, table.isTable, table.toString
-local ACELIB, LIB = AceLibFactory, AddonAceLibFactory
+local ACE_LIB, ADDON_LIB = AceLibFactory, AceLibAddonFactory
 
-local c = ACELIB:GetAceConsole()
-local L = LIB:NewPlainAceLib('Logger')
+local c = ACE_LIB:GetAceConsole()
+local L = ADDON_LIB:NewPlainAceLib('Logger')
 if not L then return end
 
 ---@param obj table
