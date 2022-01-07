@@ -1,12 +1,13 @@
 local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.AssertThatMethodArgIsNotNil, Assert.Throw
 local format = string.format
+local ACELIB, LOGF = AceLibFactory, LogFactory
 
 local H = {}
-local logger = LibFactory:GetLogger()
+local logger = LOGF:GetLogger()
 logger:Embed(H, 'RDEH')
 ReceiveDragEventHandler = H
 
-local smedia = LibFactory:GetAceSharedMedia()
+local smedia = ACELIB:GetAceSharedMedia()
 local noIconTexture = smedia:Fetch(smedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local highlightIconTexture = smedia:Fetch(smedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
 

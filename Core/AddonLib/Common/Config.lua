@@ -1,6 +1,8 @@
 local format, unpack, pack, tinsert = string.format, table.unpackIt, table.pack, table.insert
 local ADDON_NAME = ADDON_NAME
-local C = LibFactory:NewAceLib('Config')
+local LIB = AddonAceLibFactory
+
+local C = LIB:NewAceLib('Config')
 if not C then return end
 
 ---- ## Start Here ----

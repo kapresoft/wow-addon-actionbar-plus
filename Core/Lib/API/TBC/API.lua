@@ -1,6 +1,7 @@
 local _G = _G
 local format,IsNotBlank = string.format, string.IsNotBlank
-local CreateFrame, GetSpellSubtext, GetSpellInfo = CreateFrame, GetSpellSubtext, GetSpellInfo
+local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
+local CreateFrame  = CreateFrame
 
 local S = {}
 _Spell = S

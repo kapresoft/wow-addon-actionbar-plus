@@ -1,8 +1,12 @@
 local ABP_PREFIX, LOG_LEVEL = ABP_PREFIX, ABP_LOG_LEVEL
 local format, pack, unpack, sliceAndPack = string.format, table.pack, table.unpackIt, table.sliceAndPack
+local type, select, tostring, error = type, select, tostring, error
+local pformat = PrettyPrint.pformat
 local isNotTable, isTable, tableToString = table.isNotTable, table.isTable, table.toString
-local c = LibFactory:GetAceConsole()
-local L = LibFactory:NewPlainAceLib('Logger')
+local ACELIB, LIB = AceLibFactory, AddonAceLibFactory
+
+local c = ACELIB:GetAceConsole()
+local L = LIB:NewPlainAceLib('Logger')
 if not L then return end
 
 ---@param obj table
@@ -71,11 +75,11 @@ local function _EmbedLogger(obj, optionalLogName)
     function obj:logp(...)
         local count = select('#', ...)
         if count == 1 then
-            self:log(PrettyPrint.pformat(select(1, ...)))
+            self:log(pformat(select(1, ...)))
             return
         end
         local label, obj = select(1, ...)
-        self:log(label .. ': %s', PrettyPrint.pformat(obj))
+        self:log(label .. ': %s', pformat(obj))
     end
 
     function obj:printf(...)

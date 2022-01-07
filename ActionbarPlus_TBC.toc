@@ -15,5 +15,5 @@
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
 ## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus
 
-Core\load_core.xml
-TBC\load.xml
+Core\_Core.xml
+TBC\_ActionbarPlus.xml

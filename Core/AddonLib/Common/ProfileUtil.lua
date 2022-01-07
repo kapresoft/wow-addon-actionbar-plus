@@ -5,6 +5,7 @@ local P = {
     maxFrames = 8,
     baseFrameName = 'ActionbarPlusF'
 }
+-- TODO: Rename to ABProfileUtil
 ProfileUtil = P
 
 local SingleBarTemplate = {

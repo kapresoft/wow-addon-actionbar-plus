@@ -6,17 +6,17 @@
 local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
+local ACELIB = AceLibFactory
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 if not A then return end
 ABP = A
 
-local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(LibFactory:GetAddonAceLibs())
+local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ACELIB:GetAddonAceLibs())
 local libModules = LibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
-LibFactory:EmbedLogger(A)
-
+LogFactory:EmbedLogger(A)
 
 function A:RegisterSlashCommands()
     self:RegisterChatCommand("abp", "OpenConfig")

@@ -2,14 +2,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <Include file="Model\_Model.xml"/>
-    <Include file="Util\_Util.xml"/>
-
-    <Script file="Logger.lua"/>
-    <Script file="Config.lua"/>
-    <Script file="Profile.lua"/>
-
-    <Include file="Buttons\_Buttons.xml"/>
+    <Include file='Common\_Common.xml'/>
+    <Include file='Widget\_Widget.xml'/>
     <Include file='Developer\_Developer.xml'/>
 
 </Ui>
