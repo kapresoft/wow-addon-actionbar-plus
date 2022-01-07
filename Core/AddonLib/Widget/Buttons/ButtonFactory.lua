@@ -5,12 +5,12 @@ local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
-local ADDON_LIB, LIB, PU, Module = AceLibAddonFactory, LibFactory, ProfileUtil, Module
+local ADDON_LIB, WLIB, PU = AceLibAddonFactory, WidgetLibFactory, ProfileUtil
 
 local F = ADDON_LIB:NewAceLib('ButtonFactory')
 if not F then return end
 
-local P, SM = LIB:GetButtonFactoryLibs()
+local P, SM = WLIB:GetButtonFactoryLibs()
 local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local buttonSize = 40
 local frameStrata = 'LOW'

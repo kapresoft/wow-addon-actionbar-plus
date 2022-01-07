@@ -1,11 +1,14 @@
 local LibStub, format, unpack = LibStub, string.format, table.unpackIt
 local assert, type, tonumber, isTable = assert, type, tonumber, table.isTable
-local ACELIB, ALIB, LF, Module = AceLibFactory, AceLibAddonFactory, ABPLogFactory, Module
+local ACE_LIB, ADDON_LIB, Module = AceLibFactory, AceLibAddonFactory, Module
+local VERSION_FORMAT = VERSION_FORMAT
+
 local L = {}
-LibFactory = L
+WidgetLibFactory = L
 
 
 -- Lazy Loaded libs
+local logger = nil
 local libButtonFactory = nil
 local libProfile = nil
 
@@ -17,16 +20,16 @@ end
 
 --- Usage: local C, P, B, BF = unpack(LibFactory:GetAddonLibs())
 function L:GetAddonStdLibs()
-    local config = ALIB:LocalLibStub(Module.Config)
+    local config = ADDON_LIB:LocalLibStub(Module.Config)
     local profile = self:GetProfile()
-    local buttonUI = ALIB:LocalLibStub(Module.ButtonUI)
+    local buttonUI = ADDON_LIB:LocalLibStub(Module.ButtonUI)
     local buttonFactory = self:GetButtonFactory()
     return { config, profile, buttonUI, buttonFactory }
 end
 
 -- Usage: P, SM = unpack(LibFactory:GetButtonFactoryLibs())
 function L:GetButtonFactoryLibs()
-    return self:GetProfile(), ACELIB:GetAceSharedMedia()
+    return self:GetProfile(), ACE_LIB:GetAceSharedMedia()
 end
 
 function L:GetConfigLibs()
@@ -34,11 +37,11 @@ function L:GetConfigLibs()
 end
 
 function L:GetProfile()
-    if not libProfile then libProfile = ALIB:LocalLibStub(Module.Profile) end
+    if not libProfile then libProfile = ADDON_LIB:LocalLibStub(Module.Profile) end
     return libProfile
 end
 
 function L:GetButtonFactory()
-    if not libButtonFactory then libButtonFactory = ALIB:LocalLibStub(Module.ButtonFactory) end
+    if not libButtonFactory then libButtonFactory = ADDON_LIB:LocalLibStub(Module.ButtonFactory) end
     return libButtonFactory
 end

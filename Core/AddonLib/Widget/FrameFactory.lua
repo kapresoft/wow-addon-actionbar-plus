@@ -1,9 +1,10 @@
 local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
+local WLIB, Assert = WidgetLibFactory, Assert
 FrameFactory = {}
 local PU = nil
 
 local function Embed(frame)
-    local P = LibFactory:GetProfile()
+    local P = WLIB:GetProfile()
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
     frame.rendered = false

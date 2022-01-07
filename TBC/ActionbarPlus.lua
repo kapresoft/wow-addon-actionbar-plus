@@ -14,7 +14,7 @@ if not A then return end
 ABP = A
 
 local ACEDB, ACEDBO, ACECFG, ACECFGD = unpack(ACELIB:GetAddonAceLibs())
-local libModules = LibFactory:GetAddonStdLibs()
+local libModules = WidgetLibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
 LogFactory:EmbedLogger(A)
 

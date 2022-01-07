@@ -18,7 +18,7 @@ local FF = nil
 
 function C:OnAfterInitialize()
     PU, FF = ProfileUtil, FrameFactory
-    P, BF = unpack(LibFactory:GetConfigLibs())
+    P, BF = unpack(WidgetLibFactory:GetConfigLibs())
 end
 
 local function CreateSetterHandler(frameIndex)
