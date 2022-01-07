@@ -1,6 +1,8 @@
+if type(ABP_PLUS_DB) ~= "table" then ABP_PLUS_DB = {} end
 if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
+ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 
 AceModule = {
     AceConsole = 'AceConsole-3.0',
@@ -24,6 +26,7 @@ WidgetAttributes = {
     TYPE = 'type',
     UNIT = 'unit',
     SPELL = 'spell',
+    ITEM = 'item',
     MACRO_TEXT = "macrotext",
     MACRO = "macro",
 }

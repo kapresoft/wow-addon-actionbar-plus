@@ -17,7 +17,7 @@ end
 ---@param obj table The object to check
 ---@param key string The key to the object to check
 function A.HasKey(obj, key)
-    if type(obj) ~= 'table' then return false end
+    if type(obj) == 'nil' then return false end
     return 'nil' == type(obj[key])
 end
 

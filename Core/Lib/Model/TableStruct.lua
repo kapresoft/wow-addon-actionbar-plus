@@ -3,7 +3,10 @@ function table.size(t)
     for _ in pairs(t) do count = count + 1 end
     return count
 end
-
+function table.isEmpty(t)
+    if t == nil then return true end
+    return table.size(t) <= 0
+end
 function table.members()
     print('table members: ')
     for key, _ in pairs(table) do

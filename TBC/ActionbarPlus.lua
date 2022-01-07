@@ -83,15 +83,26 @@ function A:OnDisable()
     A:log('OnDisable...')
 end
 
+function A:InitDbDefaults()
+    local profileName = self.db:GetCurrentProfile()
+    local defaultProfile = P:CreateDefaultProfile(profileName)
+    local defaults = { profile =  defaultProfile }
+    self.db:RegisterDefaults(defaults)
+    self.profile = self.db.profile
+    if table.isEmpty(ABP_PLUS_DB.profiles[profileName]) then
+        ABP_PLUS_DB.profiles[profileName] = defaultProfile
+        --error(profileName .. ': ' .. table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
+    end
+end
+
 function A:OnInitialize()
     -- Set up our database
-    self.db = ACEDB:New("ABP_PLUS_DB")
+    self.db = ACEDB:New(ABP_PLUS_DB_NAME)
     self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+    self:InitDbDefaults()
 
-    self.profile = self.db.profile
-    P:Init(self.profile)
     for _, module in ipairs(libModules) do
         module:OnInitialize{ handler = A, profile= A.profile }
     end
@@ -104,7 +115,6 @@ function A:OnInitialize()
 
     -- Get the option table for profiles
     options.args.profiles = ACEDBO:GetOptionsTable(self.db)
-
 
     self:RegisterSlashCommands()
     self:RegisterKeyBindings()

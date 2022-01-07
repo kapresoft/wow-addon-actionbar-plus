@@ -60,16 +60,9 @@ end
 -- self.profile = profile
 
 -- ##########################################################################
-local FrameDetails = {
-    [1] = { rowSize = 2, colSize = 6 },
-    [2] = { rowSize = 6, colSize = 2 },
-    [3] = { rowSize = 3, colSize = 5 },
-    [4] = { rowSize = 2, colSize = 6 },
-    [5] = { rowSize = 2, colSize = 6 },
-    [6] = { rowSize = 2, colSize = 6 },
-    [7] = { rowSize = 2, colSize = 6 },
-    [8] = { rowSize = 3, colSize = 6 },
-}
+
+local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
+
 -- ##########################################################################
 
 P.maxFrames = 8
@@ -92,16 +85,18 @@ end
 
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
+    if not barData then return end
     local buttons = barData.buttons
-    --self:logp('buttons: ', buttons)
+    --if not buttons then return nil end
     local btnData = buttons[buttonName]
     if type(btnData) == 'table' then
+        --error(table.toStringSorted(btnData))
         return btnData
     end
     return nil
 end
 
-function P:Init(newProfile)
+function P:InitDELETEME(newProfile)
     assertProfile(newProfile)
 
     if type(newProfile.bars) ~= 'table' then
@@ -113,6 +108,10 @@ function P:Init(newProfile)
             newProfile.bars['buttons'] = {}
         end
     end
+end
+
+function P:CreateDefaultProfile(profileName)
+    return ProfileInitializer:InitNewProfile(profileName)
 end
 
 function P:OnAfterInitialize()
@@ -172,6 +171,7 @@ function P:IsBarIndexEnabled(frameIndex)
 end
 
 function P:IsBarNameEnabled(frameName)
+    if not self.profile.bars then return false end
     local bar = self.profile.bars[frameName]
     if isNotTable(bar) then return false end
     return bar.enabled
@@ -183,9 +183,13 @@ function P:GetFrameNameByIndex(frameIndex)
     return self:GetBaseFrameName() .. tostring(frameIndex)
 end
 
+function P:GetMaxFrames()
+    return #FrameDetails
+end
+
 function P:GetAllFrameNames()
     local fnames = {}
-    for i=1, #FrameDetails do
+    for i=1, self:GetMaxFrames() do
         local fn = self:GetFrameNameByIndex(i)
         tinsert(fnames, fn)
     end

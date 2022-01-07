@@ -41,7 +41,8 @@
 ---     wrap_string = true
 --- }
 local pprint = { VERSION = '0.1' }
-
+-- for WOW
+-- local io = { write = print }
 PrettyPrint = pprint
 
 local depth = 1
