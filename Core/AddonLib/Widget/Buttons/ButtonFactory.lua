@@ -1,11 +1,16 @@
 local _G = _G
-local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
-local unpack, pack, fmod = table.unpackIt, table.pack, math.fmod
-local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
+local tostring, format, strlower, tinsert, toStringSorted = tostring, string.format, string.lower, table.insert, table.toStringSorted
+local unpack, pack, fmod, pformat = table.unpackIt, table.pack, math.fmod, PrettyPrint
+local AssertThatMethodArgIsNotNil, AssertNotNil = Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil
+
 local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
-local ADDON_LIB, WLIB, PU = AceLibAddonFactory, WidgetLibFactory, ProfileUtil
+local ADDON_LIB, WLIB, PU, H = AceLibAddonFactory, WidgetLibFactory, ProfileUtil, ReceiveDragEventHandler
+local FrameFactory,SpellAttributeSetter  = FrameFactory,SpellAttributeSetter
+
+local P = WidgetLibFactory:GetProfile()
 
 local F = ADDON_LIB:NewAceLib('ButtonFactory')
 if not F then return end
@@ -28,6 +33,13 @@ local frameDetails = {
     [6] = { rowSize = 2, colSize = 6 },
     [7] = { rowSize = 2, colSize = 6 },
     [8] = { rowSize = 3, colSize = 6 },
+}
+
+local AttributeSetters = {
+    ['spell'] = SpellAttributeSetter,
+    ['item'] = nil,
+    ['macro'] = nil,
+    ['macrotext'] = nil
 }
 
 -- Initialized on Logger#OnAddonLoaded()
@@ -60,6 +72,11 @@ local function OnMouseDownFrame(_, mouseButton)
     end
 end
 
+
+local function Embed(btnUI)
+    -- TODO
+end
+
 function F:OnAfterInitialize()
     local frames = PU:GetAllFrameNames()
     --error(format('frames: %s', table.toString(frames)))
@@ -77,7 +94,7 @@ end
 function F:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = frameDetails[frameIndex]
-    local f = FrameFactory:CreateFrame(frameIndex)
+    local f = FrameFactory(frameIndex)
     f:SetWidth(config.colSize * buttonSize)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
@@ -93,45 +110,44 @@ function F:CreateButtons(dragFrame, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
+            self:SetButtonAttributes(btnUI)
             btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
             dragFrame:AddButton(btnUI:GetName())
         end
     end
 end
 
--- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
---      This one is incorrect:  https://wowwiki-archive.fandom.com/wiki/API_GetCursorInfo
--- spell: spellId=info1 bookType=info2 ?=info3
--- item: itemId = info1, itemName/Link = info2
--- macro: macro-index=info1
-function F:OnReceiveDrag(btnUI)
-    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-    local actionType, info1, info2, info3 = GetCursorInfo()
-    ClearCursor()
-    if ABP_LOG_LEVEL > 10 then
-        self:logp('Drag Received', { actionType=actionType, info1=tostring(info1), info2=tostring(info2), info3=tostring(info3) })
-    end
-
-    local H = ReceiveDragEventHandler
-    if not H:CanHandle(actionType) then return end
-    local cursorInfo = { type = actionType, bookIndex = info1, bookType = info2, id = info3 }
-    H:Handle(btnUI, actionType, cursorInfo)
-
-    --if 'spell' == actionType then
-    --    local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
-    --    self:logp('Spell Info', spellInfo)
-    --elseif 'item' == actionType then
-    --    local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
-    --   self:logp('Item Info', itemInfo)
-    --end
-
+function F:GetAttributesSetter(actionType)
+    AssertNotNil(actionType, 'actionType')
+    return AttributeSetters[actionType]
 end
 
+function F:SetButtonAttributes(btnUI)
+    local actionbarInfo = btnUI:GetActionbarInfo()
+    local btnName = btnUI:GetName()
+    local btnData = P:GetButtonData(actionbarInfo.index, btnName)
+    if btnData == nil or btnData.type == nil then return end
+
+    local setter = self:GetAttributesSetter(btnData.type)
+    if not setter then
+        self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
+        return
+    end
+    setter:SetAttributes(btnUI, btnData)
+end
+
+-- TODO: Move somewhere else
 function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local frameName = dragFrame:GetName()
     local btnName = format('%sButton%s', frameName, tostring(index))
     --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+
+    -- Custom
+    function btnUI:GetActionbarInfo()
+        return { name = frameName, index = dragFrame:GetFrameIndex() }
+    end
+
     btnUI:SetFrameStrata(frameStrata)
 
     local padding = 2
@@ -142,7 +158,38 @@ function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local adjY =  (rowNum * buttonSize) + padding - topLeftAdjustY
     btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
+
     return btnUI
+end
+
+-- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
+--      This one is incorrect:  https://wowwiki-archive.fandom.com/wiki/API_GetCursorInfo
+-- spell: spellId=info1 bookType=info2 ?=info3
+-- item: itemId = info1, itemName/Link = info2
+-- macro: macro-index=info1
+function F:OnReceiveDrag(btnUI)
+    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
+    -- TODO: Move to TBC/API
+    local actionType, info1, info2, info3 = GetCursorInfo()
+    ClearCursor()
+    local cursorData = { actionType=actionType, info1=tostring(info1), info2=tostring(info2), info3=tostring(info3) }
+    self:log(10, 'Drag Data: %s', toStringSorted(cursorData))
+
+    local cursorInfo = { type = actionType, bookIndex = info1, bookType = info2, id = info3 }
+    if not H:CanHandle(actionType) then
+        self:log('No handler found for type: %s %s', actionType, pformat('Cursor:', cursorInfo))
+        return
+    end
+    H:Handle(btnUI, actionType, cursorInfo)
+
+    --if 'spell' == actionType then
+    --    local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
+    --    self:logp('Spell Info', spellInfo)
+    --elseif 'item' == actionType then
+    --    local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
+    --   self:logp('Item Info', itemInfo)
+    --end
+
 end
 
 function F:AttachFrameEvents(frame)

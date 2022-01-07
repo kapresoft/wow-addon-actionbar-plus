@@ -9,6 +9,39 @@ if not P then return end
 
 ---- ## Start Here ----
 
+local SingleBarTemplate = {
+    enabled = false,
+    buttons = {}
+}
+
+local ProfileTemplate = {
+    ["bars"] = {
+        ["ActionbarPlusF1"] = {
+            ["enabled"] = false,
+            ["buttons"] = {
+                ['ActionbarPlusF1Button1'] = {
+                    ['type'] = 'spell',
+                    ['spell'] = {
+                        -- spellInfo
+                    }
+                }
+            }
+        },
+        ["ActionbarPlusF2"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF3"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF4"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF5"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF6"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF7"] = {["enabled"] = false, ["buttons"] = {}},
+        ["ActionbarPlusF8"] = {["enabled"] = false, ["buttons"] = {}},
+    }
+}
+
+---@see API#GetSpellinfo
+local ButtonTemplate = { ['type'] = nil, [ButtonAttributes.SPELL] = {} }
+
+---- ## Start Here ----
+
 local SPELL = { id = nil, name = nil, icon = nil, label = nil }
 local ITEM = { id = nil, name = nil, icon = nil, label = nil }
 local MACRO = { index = nil, name = nil, icon = nil }
@@ -26,6 +59,23 @@ end
 -- self.profile = profile
 
 -- ##########################################################################
+
+function P:GetTemplate()
+    return {
+        Button = ButtonTemplate
+    }
+end
+
+function P:GetButtonData(frameIndex, buttonName)
+    local barData = self:GetBar(frameIndex)
+    local buttons = barData.buttons
+    --self:logp('buttons: ', buttons)
+    local btnData = buttons[buttonName]
+    if type(btnData) == 'table' then
+        return btnData
+    end
+    return nil
+end
 
 function P:Init(newProfile)
     assertProfile(newProfile)

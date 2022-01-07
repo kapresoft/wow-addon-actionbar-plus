@@ -4,7 +4,7 @@ local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInf
 local CreateFrame  = CreateFrame
 
 local S = {}
-_Spell = S
+_API_Spell = S
 
 --- See:
 ---  * https://wowpedia.fandom.com/wiki/API_GetSpellInfo

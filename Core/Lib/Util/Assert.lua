@@ -1,4 +1,5 @@
-local format = string.format
+local select, error, type, format = select, error, type, string.format
+local unpack, pformat = table.unpackIt, PrettyPrint.pformat
 local A = {}
 
 ---@param obj table The object to check
@@ -52,9 +53,7 @@ function A.Throw(...)
         formatText = arg1
         formatArgs = { select(2, ...) }
     end
-    print('format:', formatText)
-    print('formatArgs:', table.toString(formatArgs))
-    error(format(formatText, table.unpack(formatArgs)), level)
+    error(format(formatText, unpack(formatArgs)), level)
 end
 
 ---@param obj table The object to check
@@ -69,6 +68,11 @@ end
 function A.AssertThatMethodArgIsNotNil(obj, paramName, methodSignature)
     if A.IsNotNil(obj) then return end
     error(format('The method argument %s in %s should not be nil', paramName, methodSignature), 2)
+end
+
+function A.AssertNotNil(obj, name)
+    if A.IsNotNil(obj) then return end
+    A.Throw(3, 'The following should not be nil: %s', name)
 end
 
 Assert = A

@@ -77,11 +77,13 @@ end
 function table.concatkvs(t)
     if type(t) ~= 'table' then return tostring(t) end
     local keys = table.getSortedKeys(t)
-    local s = '{ '
+    local s = '{ \n'
     for _, k in pairs(keys) do
         local ko = k
         if type(k) ~= 'number' then k = '"'..k..'"' end
-        s = s .. '['..k..'] = ' .. table.concatkvs(t[ko]) .. ','
+        if type(t[ko]) ~= 'function' then
+            s = s .. '['..k..'] = ' .. table.concatkvs(t[ko]) .. ','
+        end
     end
     return s .. '} '
 end

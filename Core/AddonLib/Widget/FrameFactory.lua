@@ -1,6 +1,9 @@
 local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
-local WLIB, Assert = WidgetLibFactory, Assert
-FrameFactory = {}
+local WLIB, ProfileUtil, Assert = WidgetLibFactory, ProfileUtil, Assert
+
+local F = {}
+FrameFactory = F
+
 local PU = nil
 
 local function Embed(frame)
@@ -9,6 +12,10 @@ local function Embed(frame)
 
     frame.rendered = false
     frame.buttons = {}
+
+    function frame:GetFrameIndex()
+        return self.frameIndex
+    end
 
     function frame:Toggle()
         if self:IsShown() then self:Hide(); return end
@@ -86,9 +93,6 @@ local function Embed(frame)
         self.rendered = true
     end
 
-    function frame:GetFrameIndex()
-        return self.frameIndex
-    end
 end
 
 local function getProfileUtil()
@@ -96,16 +100,16 @@ local function getProfileUtil()
     return PU
 end
 
-function FrameFactory:GetFrameByIndex(frameIndex)
+function F:GetFrameByIndex(frameIndex)
     local frameName = getProfileUtil():GetFrameNameFromIndex(frameIndex)
     return _G[frameName]
 end
 
-function FrameFactory:IsFrameShownByIndex(frameIndex)
+function F:IsFrameShownByIndex(frameIndex)
     return self:GetFrameByIndex(frameIndex):IsShown()
 end
 
-function FrameFactory:CreateFrame(frameIndex)
+function F:CreateFrame(frameIndex)
     local f = self:GetFrameByIndex(frameIndex)
     if type(f) ~= 'table' then return end
 
@@ -114,3 +118,9 @@ function FrameFactory:CreateFrame(frameIndex)
 
     return f
 end
+
+setmetatable(F, {
+    __call = function (_, ...)
+        return F:CreateFrame(...)
+    end
+})

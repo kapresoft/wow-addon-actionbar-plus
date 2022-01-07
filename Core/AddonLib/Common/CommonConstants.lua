@@ -16,6 +16,23 @@ Module = {
     Config = 'Config',
     Profile = 'Profile',
     ButtonUI = 'ButtonUI',
-    ButtonFactory = 'ButtonFactory'
+    ButtonFactory = 'ButtonFactory',
 }
 VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
+
+WidgetAttributes = {
+    TYPE = 'type',
+    UNIT = 'unit',
+    SPELL = 'spell',
+    MACRO_TEXT = "macrotext",
+    MACRO = "macro",
+}
+
+ButtonAttributes = {
+    SPELL = WidgetAttributes.SPELL,
+    UNIT = WidgetAttributes.UNIT,
+    UNIT2 = format("*%s2", WidgetAttributes.UNIT),
+    TYPE = WidgetAttributes.TYPE,
+    MACRO = WidgetAttributes.MACRO,
+    MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
+}

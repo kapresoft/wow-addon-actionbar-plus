@@ -40,6 +40,14 @@ local function Embed(libName, lib, version)
         self.profile = context.profile
         if type(self.OnAfterInitialize) == 'function' then self:OnAfterInitialize() end
     end
+
+    function lib:GetAddon()
+        return self.addon
+    end
+
+    function lib:GetProfile()
+        return self.profile
+    end
 end
 
 ---@return table A library instance with embedded methods

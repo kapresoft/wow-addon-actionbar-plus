@@ -13,6 +13,18 @@ function F:GetLogger()
     return logger
 end
 
-function F:EmbedLogger(obj)
-    self:GetLogger():Embed(obj)
+function F:EmbedLogger(obj, optionalLogName)
+    self:GetLogger():Embed(obj, optionalLogName)
 end
+
+function F:NewLogger(logName)
+    local _logger = {}
+    self:EmbedLogger(_logger, logName)
+    return _logger
+end
+
+setmetatable(F, {
+    __call = function (_, ...)
+        return F:NewLogger(...)
+    end
+})
