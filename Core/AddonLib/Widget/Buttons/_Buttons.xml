@@ -19,7 +19,7 @@
         <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeto="UIParent">
                 <Offset>
-                    <AbsDimension x="5" y="-5" />
+                    <AbsDimension x="5" y="-100" />
                 </Offset>
             </Anchor>
         </Anchors>

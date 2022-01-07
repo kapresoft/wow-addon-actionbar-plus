@@ -38,7 +38,7 @@ local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 e
 
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
-    GameTooltip:AddLine('Right-click to open config UI for Actionbar ' .. frame:GetFrameIndex(), 1, 1, 1)
+    GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', frame:GetFrameIndex(), 1, 1, 1))
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
