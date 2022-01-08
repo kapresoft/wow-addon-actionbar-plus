@@ -39,17 +39,15 @@ function S:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
     local type = btnData.type
     if not type then return end
-    if type ~= WidgetAttributes.SPELL then return end
-
-    GameTooltip:SetOwner(btnUI, "ANCHOR_TOPLEFT")
 
     local spellInfo = btnData[WidgetAttributes.SPELL]
-    --ABP:DBG('spellInfo', PrettyPrint.pformat(spellInfo))
     local link = spellInfo.link or spellInfo.label or spellInfo.name
+    --ABP:DBG('spellInfo', PrettyPrint.pformat(spellInfo))
+
+    GameTooltip:SetOwner(btnUI, "ANCHOR_TOPLEFT")
     GameTooltip:SetHyperlink(link)
     GameTooltip:AddLine('\n' .. spellInfo.label)
     GameTooltip:Show()
-    -- TODO: Support other types
 end
 
 function S:Validate(btnUI, btnData)
