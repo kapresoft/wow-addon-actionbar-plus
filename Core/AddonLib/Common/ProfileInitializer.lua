@@ -23,6 +23,20 @@ local ButtonDataTemplate = {
     [ATTR.MACRO_TEXT] = {},
 }
 
+local SPELL_TEMPLATE = {
+    spell = {
+        castTime = 3000,
+        icon = 134134,
+        id = 27101,
+        label = 'Conjure Mana Emerald',
+        link = '[Conjure Mana Emerald]',
+        maxRange = 0,
+        minRange = 0,
+        name = 'Conjure Mana Emerald',
+        rank = ''
+    }
+}
+
 local DEFAULT_PROFILE_DATA = {
     ["bars"] = {
         ["ActionbarPlusF1"] = {

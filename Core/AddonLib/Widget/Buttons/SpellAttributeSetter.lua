@@ -1,6 +1,7 @@
 local BATTR, RWAttr, TEXTURE_HIGHLIGHT = ButtonAttributes, ResetWidgetAttributes, TEXTURE_HIGHLIGHT
 local LOG = LogFactory
 local AssertNotNil = Assert.AssertNotNil
+local SPELL_API = _API_Spell
 local S = {}
 SpellAttributeSetter = S
 LOG:EmbedLogger(S, 'Widget::Buttons::SpellAttributeSetter')
@@ -29,6 +30,26 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(BATTR.TYPE, 'spell')
     btnUI:SetAttribute(BATTR.SPELL, spellInfo.id)
     btnUI:SetAttribute(BATTR.UNIT2, 'focus')
+
+    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
+end
+
+---@param link table The blizzard `GameTooltip` link
+function S:ShowTooltip(btnUI, btnData)
+    if not btnUI or not btnData then return end
+    local type = btnData.type
+    if not type then return end
+    if type ~= WidgetAttributes.SPELL then return end
+
+    GameTooltip:SetOwner(btnUI, "ANCHOR_TOPLEFT")
+
+    local spellInfo = btnData[WidgetAttributes.SPELL]
+    --ABP:DBG('spellInfo', PrettyPrint.pformat(spellInfo))
+    local link = spellInfo.link or spellInfo.label or spellInfo.name
+    GameTooltip:SetHyperlink(link)
+    GameTooltip:AddLine('\n' .. spellInfo.label)
+    GameTooltip:Show()
+    -- TODO: Support other types
 end
 
 function S:Validate(btnUI, btnData)

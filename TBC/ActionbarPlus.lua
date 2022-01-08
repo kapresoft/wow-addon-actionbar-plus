@@ -81,6 +81,14 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
 
 end
 
+function A:ShowDebugDialog(label, text)
+    debugDialog:SetTextContent(text)
+    debugDialog:SetStatusText(label)
+    debugDialog:Show()
+end
+
+function A:DBG(label, text) self:ShowDebugDialog(label, text) end
+
 function A:RegisterKeyBindings()
     --SetBindingClick("SHIFT-T", self:Info())
     --SetBindingClick("SHIFT-F1", BoxerButton3:GetName())

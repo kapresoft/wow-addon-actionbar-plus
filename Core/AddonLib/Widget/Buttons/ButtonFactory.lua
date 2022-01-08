@@ -120,6 +120,7 @@ function F:SetButtonAttributes(btnUI)
 
     if btnData == nil or btnData.type == nil then return end
 
+    btnUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then
@@ -151,7 +152,6 @@ function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local adjY =  (rowNum * buttonSize) + padding - topLeftAdjustY
     btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
-
     return btnUI
 end
 
