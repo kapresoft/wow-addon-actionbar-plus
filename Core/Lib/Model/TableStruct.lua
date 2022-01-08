@@ -1,3 +1,21 @@
+--- Trailing and Leading Trim
+local function Trim(s) return (s:gsub("^%s*(.-)%s*$", "%1")) end
+
+function table.parseSpaceSeparatedVar(text)
+    local rt = {}
+    for a in text:gmatch("%S+") do table.insert(rt, a) end
+    return rt
+end
+
+function table.parseCSV(text)
+    local rt = {}
+    for a,v in text:gmatch("([^,]+)") do
+        local a2 = Trim(a)
+        table.insert(rt, a2)
+    end
+    return rt
+end
+
 function table.size(t)
     local count = 0
     for _ in pairs(t) do count = count + 1 end

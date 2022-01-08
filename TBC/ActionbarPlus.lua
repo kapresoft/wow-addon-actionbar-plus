@@ -18,8 +18,67 @@ local libModules = WidgetLibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
 LogFactory:EmbedLogger(A)
 
+
+
 function A:RegisterSlashCommands()
     self:RegisterChatCommand("abp", "OpenConfig")
+    self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
+end
+
+local debugDialog = nil
+
+function A:CreateDebugPopupDialog()
+    local AceGUI = ACELIB:GetAceGUI()
+    local frame = AceGUI:Create("Frame")
+    frame:SetTitle("Debug Frame")
+    frame:SetStatusText('')
+    frame:SetCallback("OnClose", function(widget)
+        widget:SetTextContent('')
+        widget:SetStatusText('')
+    end)
+    frame:SetLayout("Flow")
+    --frame:SetWidth(800)
+
+    -- PrettyPrint.format(obj)
+    local editbox = AceGUI:Create("MultiLineEditBox")
+    editbox:SetLabel('')
+    editbox:SetText('')
+    editbox:SetFullWidth(true)
+    editbox:SetFullHeight(true)
+    frame:AddChild(editbox)
+    frame.editBox = editbox
+
+    function frame:SetTextContent(text)
+        self.editBox:SetText(text)
+    end
+
+    frame:Hide()
+    return frame
+end
+
+function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
+    --self:log('vars: ', spaceSeparatedArgs)
+    local vars = table.parseSpaceSeparatedVar(spaceSeparatedArgs)
+    if table.isEmpty(vars) then return end
+    local firstVar = vars[1]
+
+    if firstVar == '<profile>' then
+        local profileData = self:GetCurrentProfileData()
+        local strVal = PrettyPrint.pformat(profileData)
+        local profileName = self.db:GetCurrentProfile()
+        debugDialog:SetTextContent(strVal)
+        debugDialog:SetStatusText(format('Current Profile Data for [%s]', profileName))
+        debugDialog:Show()
+        return
+    end
+
+    local firstObj = _G[firstVar]
+    PrettyPrint.setup({ indent_size = 4, level_width = 120, show_all = true, depth_limit=5 })
+    local strVal = PrettyPrint.pformat(firstObj)
+    debugDialog:SetTextContent(strVal)
+    debugDialog:SetStatusText(format('Var: %s type: %s', firstVar, type(firstObj)))
+    debugDialog:Show()
+
 end
 
 function A:RegisterKeyBindings()
@@ -75,6 +134,7 @@ function A:OnEnable()
     -- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
     --_G['ActionbarPlusF1']:HideGroup()
     A:log('OnEnable...')
+    debugDialog = self:CreateDebugPopupDialog()
 end
 
 -- AceAddon Hook
@@ -93,6 +153,10 @@ function A:InitDbDefaults()
         ABP_PLUS_DB.profiles[profileName] = defaultProfile
         --error(profileName .. ': ' .. table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
     end
+end
+
+function A:GetCurrentProfileData()
+    return self.profile
 end
 
 function A:OnInitialize()

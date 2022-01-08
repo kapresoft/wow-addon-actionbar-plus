@@ -44,6 +44,9 @@ local pprint = { VERSION = '0.1' }
 -- for WOW
 -- local io = { write = print }
 PrettyPrint = pprint
+if type(io) ~= 'table' then
+    io = { write = print }
+end
 
 local depth = 1
 

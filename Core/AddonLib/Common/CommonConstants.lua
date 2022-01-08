@@ -11,6 +11,7 @@ AceModule = {
     AceConfig = 'AceConfig-3.0',
     AceConfigDialog = 'AceConfigDialog-3.0',
     AceHook = 'AceHook-3.0',
+    AceGUI = 'AceGUI-3.0',
     AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
 Module = {

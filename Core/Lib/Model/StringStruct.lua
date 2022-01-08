@@ -28,3 +28,24 @@ end
 function string.EqualsIgnoreCase(str1, str2)
     return string.lower(str1) == string.lower(str2)
 end
+
+-- remove trailing and leading whitespace from string.
+-- http://en.wikipedia.org/wiki/Trim_(programming)
+function string.trim(s)
+    -- from PiL2 20.4
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+-- remove leading whitespace from string.
+-- http://en.wikipedia.org/wiki/Trim_(programming)
+function string.ltrim(s)
+    return (s:gsub("^%s*", ""))
+end
+
+-- remove trailing whitespace from string.
+-- http://en.wikipedia.org/wiki/Trim_(programming)
+function string.rtrim(s)
+    local n = #s
+    while n > 0 and s:find("^%s", n) do n = n - 1 end
+    return s:sub(1, n)
+end

@@ -13,6 +13,7 @@ local libAceDB = nil
 local libAceDBOptions = nil
 local libAceConfigDialog = nil
 local libAceConfig = nil
+local libAceGUI = nil
 
 ---- TODO: Rename to AddonAceLib
 -----@return table A library instance with embedded methods
@@ -89,6 +90,10 @@ end
 function A:GetAceConfigDialog()
     libAceConfigDialog = self:LazyGetAceLib(libAceConfigDialog, AceModule.AceConfigDialog)
     return libAceConfigDialog
+end
+function A:GetAceGUI()
+    libAceGUI = self:LazyGetAceLib(libAceGUI, AceModule.AceGUI)
+    return libAceGUI
 end
 
 function A:GetAddonAceLibs()
