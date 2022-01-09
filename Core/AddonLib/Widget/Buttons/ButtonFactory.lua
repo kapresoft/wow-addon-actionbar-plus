@@ -1,9 +1,12 @@
 local _G = _G
 local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
-local unpack, pack, fmod, pformat = table.unpackIt, table.pack, math.fmod, PrettyPrint
+local unpack, pack, fmod, pformat = table.unpackIt, table.pack, math.fmod, PrettyPrint.pformat
 local AssertThatMethodArgIsNotNil, AssertNotNil = Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil
 local ADDON_LIB, WLIB, H = AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler
-local FrameFactory,SpellAttributeSetter  = FrameFactory,SpellAttributeSetter
+local FrameFactory, SpellAttributeSetter, ItemAttributeSetter,
+    MacroAttributeSetter, MacrotextAttributeSetter =
+    FrameFactory, SpellAttributeSetter, ItemAttributeSetter,
+    MacroAttributeSetter, MacrotextAttributeSetter
 
 local tostring, format, strlower, tinsert, toStringSorted =
         tostring, string.format, string.lower, table.insert, table.toStringSorted
@@ -32,9 +35,9 @@ local frameStrata = 'LOW'
 
 local AttributeSetters = {
     ['spell'] = SpellAttributeSetter,
-    ['item'] = nil,
-    ['macro'] = nil,
-    ['macrotext'] = nil
+    ['item'] = ItemAttributeSetter,
+    ['macro'] = MacroAttributeSetter,
+    ['macrotext'] = MacrotextAttributeSetter,
 }
 
 -- Initialized on Logger#OnAddonLoaded()
@@ -174,24 +177,11 @@ function F:OnReceiveDrag(btnUI)
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
     ClearCursor()
-    local cursorData = { actionType=actionType, info1=tostring(info1), info2=tostring(info2), info3=tostring(info3) }
-    self:log(10, 'Drag Data: %s', toStringSorted(cursorData))
+    local cursorInfo = { type = actionType, info1 = info1, info2 = info2, info3 = info3 }
+    self:log(10, 'Drag Event Cursor Info: %s', toStringSorted(cursorInfo))
 
-    local cursorInfo = { type = actionType, bookIndex = info1, bookType = info2, id = info3 }
-    if not H:CanHandle(actionType) then
-        self:log('No handler found for type: %s %s', actionType, pformat('Cursor:', cursorInfo))
-        return
-    end
+    if not H:CanHandle(actionType) then return end
     H:Handle(btnUI, actionType, cursorInfo)
-
-    --if 'spell' == actionType then
-    --    local spellInfo = { type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }
-    --    self:logp('Spell Info', spellInfo)
-    --elseif 'item' == actionType then
-    --    local itemInfo = { type = actionType, id=info1, name='TODO', link=info2 }
-    --   self:logp('Item Info', itemInfo)
-    --end
-
 end
 
 

@@ -5,8 +5,8 @@ LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
 local GameTooltip = GameTooltip
 
 local S = {}
-SpellAttributeSetter = S
-LOG:EmbedLogger(S, 'Widget::Buttons::SpellAttributeSetter')
+MacroAttributeSetter = S
+LOG:EmbedLogger(S, 'Widget::Buttons::MacroAttributeSetter')
 
 --- `['ActionbarPlusF1Button1'] = {
 ---     ['type'] = 'spell',

@@ -1,6 +1,6 @@
-local AssertNotNil = Assert.AssertNotNil
+local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
 local WLIB, ItemAttributeSetter = WidgetLibFactory, ItemAttributeSetter
-local ButtonAttributes, _API_Spell, IsNil = ButtonAttributes, _API_Spell, Assert.IsNil
+local ButtonAttributes, _API_Spell = ButtonAttributes, _API_Spell
 local LOG = LogFactory
 
 local P = WLIB:GetProfile()
@@ -9,14 +9,24 @@ local S = {}
 LOG:EmbedLogger(S, 'ItemDragEventHandler')
 ItemDragEventHandler = S
 
----@param itemCursorInfo table Structure `{ -- }`
-function S:Handle(btnUI, itemCursorInfo)
-    if itemCursorInfo == nil or itemCursorInfo.id == nil then return end
-    --local itemInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
-    message('TODO: Implement me')
-    local itemInfo = nil
-    if IsNil(itemInfo) then return end
-    --self:logp('spellInfo', spellInfo)
+--- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
+---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
+function S:Handle(btnUI, cursorInfo)
+    if not self:IsValid(btnUI, cursorInfo) then return end
+    local itemInfo = { type = cursorInfo.actionType,
+                       id = cursorInfo.info1, link = cursorInfo.info2 }
+    local itemName, itemLink,
+        itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+        itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+        expacID, setID, isCraftingReagent = GetItemInfo(itemInfo.id)
+    local itemInfo = {
+        id = itemInfo.id,
+        name = itemName,
+        icon = itemTexture,
+        link = itemLink,
+    }
+    --self:logp('itemInfo', itemInfo)
+    --ABP:DBG('ItemInfo', itemInfo)
 
     local actionbarInfo = btnUI:GetActionbarInfo()
     --self:logp('ActionBar', actionbarInfo)
@@ -24,9 +34,19 @@ function S:Handle(btnUI, itemCursorInfo)
     local barData = P:GetBar(actionbarInfo.index)
 
     local btnData = barData.buttons[btnName] or P:GetTemplate().Button
-    btnData.type = ButtonAttributes.ITEM
+    btnData.type = WidgetAttributes.ITEM
     btnData[btnData.type] = itemInfo
     barData.buttons[btnName] = btnData
+    --ABP:DBG('btnData', btnData)
 
     ItemAttributeSetter(btnUI, btnData)
+end
+
+function S:IsValid(btnUI, cursorInfo)
+    if table.isEmpty(cursorInfo) then return false end
+    if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
+        return false
+    end
+
+    return true
 end

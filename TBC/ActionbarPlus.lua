@@ -81,13 +81,17 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
 
 end
 
-function A:ShowDebugDialog(label, text)
+function A:ShowDebugDialog(label, obj)
+    local text = nil
+    if type(obj) ~= 'string' then
+        text = PrettyPrint.pformat(obj)
+    end
     debugDialog:SetTextContent(text)
     debugDialog:SetStatusText(label)
     debugDialog:Show()
 end
 
-function A:DBG(label, text) self:ShowDebugDialog(label, text) end
+function A:DBG(label, obj) self:ShowDebugDialog(label, obj) end
 
 function A:RegisterKeyBindings()
     --SetBindingClick("SHIFT-T", self:Info())

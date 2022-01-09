@@ -6,6 +6,7 @@
     <Script file="ItemAttributeSetter.lua"/>
     <Script file="MacroAttributeSetter.lua"/>
     <Script file="MacrotextAttributeSetter.lua"/>
+    <Script file="ItemDragEventHandler.lua"/>
     <Script file="SpellDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
 

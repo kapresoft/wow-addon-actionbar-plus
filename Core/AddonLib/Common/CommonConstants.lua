@@ -23,6 +23,10 @@ Module = {
 }
 VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
 
+UnitAttributes = {
+    FOCUS = 'focus'
+}
+
 WidgetAttributes = {
     TYPE = 'type',
     UNIT = 'unit',

@@ -37,6 +37,15 @@ local SPELL_TEMPLATE = {
     }
 }
 
+local ITEM_TEMPLATE = {
+    item = {
+        id = 20857,
+        name = 'Honey Bread',
+        icon = 133964,
+        link = '[Honey Bread]',
+    }
+}
+
 local DEFAULT_PROFILE_DATA = {
     ["bars"] = {
         ["ActionbarPlusF1"] = {

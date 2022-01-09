@@ -51,5 +51,6 @@ function H:Handle(btnUI, actionType, cursorInfo)
     if not self:CanHandle(actionType) then
         Throw('Handler not found for action-type: %s', actionType)
     end
+    --ABP:DBG('handler', {type=actionType, cursorInfo=cursorInfo})
     return handlers[actionType]:Handle(btnUI, cursorInfo)
 end
