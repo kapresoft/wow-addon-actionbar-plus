@@ -1,14 +1,21 @@
 local _G = _G
 local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
-local tostring, format, strlower, tinsert, toStringSorted = tostring, string.format, string.lower, table.insert, table.toStringSorted
 local unpack, pack, fmod, pformat = table.unpackIt, table.pack, math.fmod, PrettyPrint
 local AssertThatMethodArgIsNotNil, AssertNotNil = Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil
-
-local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE = CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
-local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show = GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 local ADDON_LIB, WLIB, H = AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler
 local FrameFactory,SpellAttributeSetter  = FrameFactory,SpellAttributeSetter
+
+local tostring, format, strlower, tinsert, toStringSorted =
+        tostring, string.format, string.lower, table.insert, table.toStringSorted
+local CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE =
+        CreateFrame, UIParent, SECURE_ACTION_BUTTON_TEMPLATE
+local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
+        GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
+        BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
+
+-- TODO: Move to config
+local INTERNAL_BUTTON_PADDING = 2
 
 local P = WidgetLibFactory:GetProfile()
 
@@ -19,6 +26,7 @@ local P, SM = WLIB:GetButtonFactoryLibs()
 local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local buttonSize = 40
 local frameStrata = 'LOW'
+local mouseEntered = true
 
 
 ---- ## Start Here ----
@@ -43,9 +51,12 @@ local function ShowConfigTooltip(frame)
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-local function OnShowConfigTooltip(frame)
-    C_Timer.After(1, function() ShowConfigTooltip(frame) end)
-    C_Timer.After(3, function() GameTooltip:Hide() end)
+local function OnLeaveFrame(_) mouseEntered = false end
+local function OnShowFrameTooltip(frame)
+    if (mouseEntered ~= false) then
+        ShowConfigTooltip(frame)
+        C_Timer.After(3, function() GameTooltip:Hide() end)
+    end
 end
 
 local function OnMouseDownFrame(_, mouseButton)
@@ -83,7 +94,7 @@ function F:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local f = FrameFactory(frameIndex)
-    f:SetWidth(config.colSize * buttonSize)
+    f:SetWidth((config.colSize * buttonSize) - INTERNAL_BUTTON_PADDING)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
     self:CreateButtons(f, config.rowSize, config.colSize)
@@ -144,12 +155,13 @@ function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
 
     btnUI:SetFrameStrata(frameStrata)
 
-    local padding = 2
-    btnUI:SetSize(buttonSize - padding, buttonSize - padding)
-    local topLeftAdjustX = buttonSize + padding - 1
-    local topLeftAdjustY = buttonSize - 10
-    local adjX = (colNum * buttonSize) + padding - topLeftAdjustX
-    local adjY =  (rowNum * buttonSize) + padding - topLeftAdjustY
+    btnUI:SetSize(buttonSize - INTERNAL_BUTTON_PADDING, buttonSize - INTERNAL_BUTTON_PADDING)
+    -- Reference point is BOTTOMLEFT of dragFrame
+    -- dragFrameBottomLeftAdjustX, dragFrameBottomLeftAdjustY adjustments from #dragFrame
+    local referenceFrameAdjustX = buttonSize
+    local referenceFrameAdjustY = 2
+    local adjX = (colNum * buttonSize) - referenceFrameAdjustX
+    local adjY =  (rowNum * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
     btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
     return btnUI
@@ -185,7 +197,9 @@ function F:OnReceiveDrag(btnUI)
 
 end
 
+
 function F:AttachFrameEvents(frame)
     frame:SetScript("OnMouseDown", OnMouseDownFrame)
-    frame:SetScript("OnEnter", OnShowConfigTooltip)
+    frame:SetScript("OnEnter", OnShowFrameTooltip)
+    frame:SetScript("OnLEave", OnLeaveFrame)
 end

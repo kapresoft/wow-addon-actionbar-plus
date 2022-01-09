@@ -142,7 +142,6 @@ function A:OnEnable()
     -- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
     --_G['ActionbarPlusF1']:HideGroup()
     A:log('OnEnable...')
-    debugDialog = self:CreateDebugPopupDialog()
 end
 
 -- AceAddon Hook
@@ -175,6 +174,7 @@ function A:OnInitialize()
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self:InitDbDefaults()
 
+    debugDialog = self:CreateDebugPopupDialog()
     for _, module in ipairs(libModules) do
         module:OnInitialize{ handler = A, profile= A.profile }
     end

@@ -49,3 +49,9 @@ function string.rtrim(s)
     while n > 0 and s:find("^%s", n) do n = n - 1 end
     return s:sub(1, n)
 end
+
+function string.replace(str, match, replacement)
+    if type(str) ~= 'string' then return nil end
+    return str:gsub("%" .. match, replacement)
+end
+

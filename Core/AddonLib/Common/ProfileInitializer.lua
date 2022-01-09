@@ -26,14 +26,14 @@ local ButtonDataTemplate = {
 local SPELL_TEMPLATE = {
     spell = {
         castTime = 3000,
-        icon = 134134,
-        id = 27101,
-        label = 'Conjure Mana Emerald',
-        link = '[Conjure Mana Emerald]',
+        icon = 132803,
+        id = 27090,
+        label = 'Conjure Water (Rank 9)',
+        link = '[Conjure Water]',
         maxRange = 0,
         minRange = 0,
-        name = 'Conjure Mana Emerald',
-        rank = ''
+        name = 'Conjure Water',
+        rank = 'Rank 9'
     }
 }
 

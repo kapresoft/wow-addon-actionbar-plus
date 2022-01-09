@@ -1,7 +1,8 @@
-local BATTR, RWAttr, TEXTURE_HIGHLIGHT = ButtonAttributes, ResetWidgetAttributes, TEXTURE_HIGHLIGHT
-local LOG = LogFactory
-local AssertNotNil = Assert.AssertNotNil
-local SPELL_API = _API_Spell
+local BATTR, RWAttr, TEXTURE_HIGHLIGHT =
+    ButtonAttributes, ResetWidgetAttributes, TEXTURE_HIGHLIGHT
+local LOG, AssertNotNil, format =
+        LogFactory, Assert.AssertNotNil, string.format
+
 local S = {}
 SpellAttributeSetter = S
 LOG:EmbedLogger(S, 'Widget::Buttons::SpellAttributeSetter')
@@ -44,10 +45,14 @@ function S:ShowTooltip(btnUI, btnData)
     local link = spellInfo.link or spellInfo.label or spellInfo.name
     --ABP:DBG('spellInfo', PrettyPrint.pformat(spellInfo))
 
+    local label = format("|cff71d5ff%s|r", spellInfo.label)
     GameTooltip:SetOwner(btnUI, "ANCHOR_TOPLEFT")
-    GameTooltip:SetHyperlink(link)
-    GameTooltip:AddLine('\n' .. spellInfo.label)
-    GameTooltip:Show()
+    GameTooltip:AddSpellByID(spellInfo.id)
+    -- Replace 'Spell' with 'Spell (Rank #Rank)'
+    if (string.IsNotBlank(spellInfo.rank)) then
+        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
+    end
+    --GameTooltip:AppendText(' ' .. string.replace(spellInfo.label, spellInfo.name, ''))
 end
 
 function S:Validate(btnUI, btnData)
