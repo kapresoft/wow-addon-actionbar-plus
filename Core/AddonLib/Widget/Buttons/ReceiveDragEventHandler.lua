@@ -2,7 +2,8 @@ local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.Ass
 local format = string.format
 local ACE_LIB, LOG, PrettyPrint, _API_Spell = AceLibFactory, LogFactory, PrettyPrint, _API_Spell
 local BATTR, TEXTURE_HIGHLIGHT = ButtonAttributes, TEXTURE_HIGHLIGHT
-local SpellDragEventHandler = SpellDragEventHandler
+local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler =
+    SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler
 
 local H = {}
 local l = LOG('RecvDragEH')
@@ -32,9 +33,9 @@ local MacroTextHandler = {
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {
     ['spell'] = SpellDragEventHandler,
-    ['item'] = ItemHandler,
-    ['macro'] = MacroHandler,
-    ['macrotext'] = MacroTextHandler
+    ['item'] = ItemDragEventHandler,
+    ['macro'] = MacroDragEventHandler,
+    ['macrotext'] = MacroDragEventHandler
 }
 
 function H:CanHandle(actionType)

@@ -26,7 +26,6 @@ local P, SM = WLIB:GetButtonFactoryLibs()
 local noIconTexture = SM:Fetch(SM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local buttonSize = 40
 local frameStrata = 'LOW'
-local mouseEntered = true
 
 
 ---- ## Start Here ----
@@ -51,12 +50,10 @@ local function ShowConfigTooltip(frame)
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-local function OnLeaveFrame(_) mouseEntered = false end
+local function OnLeaveFrame(_) GameTooltip:Hide() end
 local function OnShowFrameTooltip(frame)
-    if (mouseEntered ~= false) then
-        ShowConfigTooltip(frame)
-        C_Timer.After(3, function() GameTooltip:Hide() end)
-    end
+    ShowConfigTooltip(frame)
+    C_Timer.After(3, function() GameTooltip:Hide() end)
 end
 
 local function OnMouseDownFrame(_, mouseButton)

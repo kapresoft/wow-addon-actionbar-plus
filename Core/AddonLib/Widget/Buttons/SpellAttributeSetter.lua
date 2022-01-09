@@ -1,7 +1,8 @@
-local BATTR, RWAttr, TEXTURE_HIGHLIGHT =
-    ButtonAttributes, ResetWidgetAttributes, TEXTURE_HIGHLIGHT
-local LOG, AssertNotNil, format =
-        LogFactory, Assert.AssertNotNil, string.format
+local BATTR, RWAttr, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
+    ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+local LOG, AssertNotNil, format, IsNotBlank =
+        LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
+local GameTooltip = GameTooltip
 
 local S = {}
 SpellAttributeSetter = S
@@ -15,7 +16,7 @@ LOG:EmbedLogger(S, 'Widget::Buttons::SpellAttributeSetter')
 --- }`
 function S:SetAttributes(btnUI, btnData)
     RWAttr(btnUI)
-    local spellInfo = btnData[ButtonAttributes.SPELL]
+    local spellInfo = btnData[BATTR.SPELL]
     if type(spellInfo) ~= 'table' then return end
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
@@ -42,14 +43,10 @@ function S:ShowTooltip(btnUI, btnData)
     if not type then return end
 
     local spellInfo = btnData[WidgetAttributes.SPELL]
-    local link = spellInfo.link or spellInfo.label or spellInfo.name
-    --ABP:DBG('spellInfo', PrettyPrint.pformat(spellInfo))
-
-    local label = format("|cff71d5ff%s|r", spellInfo.label)
-    GameTooltip:SetOwner(btnUI, "ANCHOR_TOPLEFT")
+    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(spellInfo.id)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
-    if (string.IsNotBlank(spellInfo.rank)) then
+    if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
     end
     --GameTooltip:AppendText(' ' .. string.replace(spellInfo.label, spellInfo.name, ''))
