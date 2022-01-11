@@ -85,7 +85,7 @@ function A:CreateTexturePopupDialog()
     end)
     frame:SetLayout("Flow")
     --frame:SetWidth(700)
-    frame:SetHeight(700)
+    --frame:SetHeight(700)
     frame.iconsScrollFrame = nil
 
     local iconCategoryDropDown = AceGUI:Create("Dropdown")
@@ -143,9 +143,10 @@ function A:CreateTexturePopupDialog()
         onValueChanged(choice:GetValue())
     end)
 
+    local baseWidth = 500
     local iconDropDown = AceGUI:Create("Dropdown")
     iconDropDown:SetLabel("Icon:")
-    iconDropDown:SetWidth(500)
+    iconDropDown:SetWidth(baseWidth)
     iconDropDown:SetList({})
     iconDropDown:SetCallback("OnValueChanged", function(choice)
         -- choice is the drop-down list
@@ -169,7 +170,7 @@ function A:CreateTexturePopupDialog()
 
     local iconEditbox = AceGUI:Create("EditBox")
     iconEditbox:SetLabel("or Select Icon By ID or Texture Path:")
-    iconEditbox:SetWidth(500)
+    iconEditbox:SetWidth(baseWidth)
     iconEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
         local value = ICON_PREFIX .. text
         if type(tonumber(text)) == 'number' then
