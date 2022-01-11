@@ -6,9 +6,11 @@
 -- local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
-local ACELIB = AceLibFactory
+local pformat = PrettyPrint.pformat
+local ACELIB, MC = AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
 local macroIcons = nil
+local GetMacroItemIcons = GetMacroItemIcons
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
@@ -27,6 +29,8 @@ end
 
 local debugDialog = nil
 local textureDialog = nil
+
+A.categoryCache = {}
 
 function A:CreateDebugPopupDialog()
     local AceGUI = ACELIB:GetAceGUI()
@@ -61,10 +65,15 @@ function A:CreateDebugPopupDialog()
     return frame
 end
 
+
+function A:FetchMacroIcons()
+    if macroIcons == nil or table.isEmpty(macroIcons) then macroIcons = GetMacroItemIcons() end
+    return macroIcons
+end
+
 function A:CreateTexturePopupDialog()
-    local MC = MacroIconCategories
     local iconSize = 50
-    local defaultIcon = 'Interface/Icons/INV_Scroll_03'
+    local defaultIcon = TEXTURE_EMPTY
 
     local AceGUI = ACELIB:GetAceGUI()
     local frame = AceGUI:Create("Frame")
@@ -75,40 +84,63 @@ function A:CreateTexturePopupDialog()
         widget:SetStatusText('')
     end)
     frame:SetLayout("Flow")
-    --frame:SetWidth(600)
+    --frame:SetWidth(700)
     frame:SetHeight(700)
-
-    if macroIcons == nil then macroIcons = GetMacroItemIcons() end
+    frame.iconsScrollFrame = nil
 
     local iconCategoryDropDown = AceGUI:Create("Dropdown")
     iconCategoryDropDown:SetLabel("Category:")
-    --iconCategoryDropDown:SetWidth(500)
     iconCategoryDropDown:SetList(MC:GetDropDownItems())
     frame:AddChild(iconCategoryDropDown)
 
-    iconCategoryDropDown:SetCallback("OnValueChanged", function(choice)
-        local selectedCategory = choice:GetValue()
-        local categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
+    local ICON_PREFIX = 'Interface/Icons/'
+    local function toIconName(iconPath)
+        return string.replace(iconPath, ICON_PREFIX, '')
+    end
+
+    --self:DBG(macroIcons, 'Macro Icons')
+
+    local function onValueChanged(selectedCategory)
+        --print('selectedCategory', selectedCategory)
+        local categoryItems = A.categoryCache[selectedCategory]
+        if categoryItems == nil or table.isEmpty(categoryItems) then
+            self:log(1, 'Retrieving category items: %s', selectedCategory)
+            --self:DBG(macroIcons, 'Macro Icons')
+            categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
+            A.categoryCache[selectedCategory] = categoryItems
+        end
         --ABP:DBG(categoryItems, 'Category Items for: ' .. selectedCategory)
         frame:SetList(categoryItems)
-
-        --if frame.iconFrames then
-        --    for iconId, iconFrame in pairs(frame.iconFrames) do
-        --        print('release:', iconId)
-        --        --iconFrame:ClearAllPoints()
-        --        --iconFrame:SetParent(nil)
-        --        --iconFrame:Hide()
-        --        AceGUI:Release(iconFrame)
-        --    end
-        --end
-
-        frame.scrollframe:ReleaseChildren()
+        frame.iconsScrollFrame:ReleaseChildren()
         for iconId, iconPath in pairs(categoryItems) do
             local icon = AceGUI:Create("Icon")
             icon:SetImage(iconPath)
             icon:SetImageSize(iconSize, iconSize)
-            frame.scrollframe:AddChild(icon)
+            icon:SetRelativeWidth(0.09)
+            icon.iconDetails = {
+                id = iconId, path = iconPath,
+                getIconName = function() return toIconName(iconPath) end,
+                getTooltip = function()
+                    return format("%s (%s)", iconPath, iconId)
+                end,
+            }
+            icon:SetCallback('OnClick', function(widget)
+                frame:SetEnteredIcon(widget.iconDetails.path)
+                frame:SetIconPath(widget.iconDetails.id, widget.iconDetails.getIconName())
+            end)
+            icon:SetCallback('OnEnter', function(widget)
+                GameTooltip:SetOwner(widget.frame, ANCHOR_TOPLEFT)
+                GameTooltip:SetText(widget.iconDetails.getTooltip())
+            end)
+            icon:SetCallback('OnLeave', function(widget)
+                GameTooltip:Hide()
+            end)
+            frame.iconsScrollFrame:AddChild(icon)
         end
+    end
+
+    iconCategoryDropDown:SetCallback("OnValueChanged", function(choice)
+        onValueChanged(choice:GetValue())
     end)
 
     local iconDropDown = AceGUI:Create("Dropdown")
@@ -118,11 +150,11 @@ function A:CreateTexturePopupDialog()
     iconDropDown:SetCallback("OnValueChanged", function(choice)
         -- choice is the drop-down list
         -- frame:SetTextContent(PrettyPrint.pformat(choice))
-        local value = choice:GetValue()
-        local iconTextPath = ART_TEXTURES[tonumber(value)]
-        frame:SetSelectedIcon(value)
+        local iconId = choice:GetValue()
+        local iconTextPath = ART_TEXTURES[tonumber(iconId)]
+        frame:SetSelectedIcon(iconId)
         frame:SetEnteredIcon(iconTextPath)
-        frame:SetIconPath(value, iconTextPath)
+        frame:SetIconPath(iconId, toIconName(iconTextPath))
     end )
     frame:AddChild(iconDropDown)
 
@@ -139,7 +171,11 @@ function A:CreateTexturePopupDialog()
     iconEditbox:SetLabel("or Select Icon By ID or Texture Path:")
     iconEditbox:SetWidth(500)
     iconEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
-        frame:SetEnteredIcon(text)
+        local value = ICON_PREFIX .. text
+        if type(tonumber(text)) == 'number' then
+            value = text
+        end
+        frame:SetEnteredIcon(value)
     end)
     frame:AddChild(iconEditbox)
 
@@ -147,7 +183,6 @@ function A:CreateTexturePopupDialog()
     -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
     iconFrameByInput:SetImage(defaultIcon)
     iconFrameByInput:SetImageSize(iconSize, iconSize)
-    --iconFrameByInput:SetLabel('')
     frame:AddChild(iconFrameByInput)
 
     -- PrettyPrint.format(obj)
@@ -160,14 +195,15 @@ function A:CreateTexturePopupDialog()
     frame.editBox = editbox
 
 
-    local scrollframe = AceGUI:Create("ScrollFrame")
-    scrollframe:SetFullHeight(true)
-    scrollframe:SetFullWidth(true)
-    scrollframe:SetLayout("Flow")
-    frame:AddChild(scrollframe)
-    frame.scrollframe = scrollframe
-    --
-    --frame.scrollframe = scrollframe
+    local iconsScrollFrame = AceGUI:Create("ScrollFrame")
+    iconsScrollFrame:SetFullHeight(true)
+    iconsScrollFrame:SetFullWidth(true)
+    iconsScrollFrame:SetLayout("Flow")
+    frame:AddChild(iconsScrollFrame)
+    frame.iconsScrollFrame = iconsScrollFrame
+
+    -- ################################
+
     function frame:SetTextContent(text)
         self.editBox:SetText(text)
     end
@@ -187,6 +223,12 @@ function A:CreateTexturePopupDialog()
         iconDropDown:SetList(list)
     end
 
+    function frame:SetSelectedCategory(category)
+        iconCategoryDropDown:SetValue(category)
+        onValueChanged(category)
+    end
+
+    --frame:SetSelectedCategory('Misc')
     frame:Hide()
     return frame
 end
@@ -220,8 +262,8 @@ local function filter(iconList, categories)
 end
 
 function A:ShowTextureDialog()
-    if macroIcons == nil then macroIcons = GetMacroItemIcons() end
-    textureDialog:SetTextContent(PrettyPrint.pformat(macroIcons))
+    --if macroIcons == nil then macroIcons = GetMacroItemIcons() end
+    --textureDialog:SetTextContent(PrettyPrint.pformat(macroIcons))
     local list = {}
     local inventoryIcons = {}
 
@@ -365,6 +407,30 @@ function A:OnEnable()
     -- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
     --_G['ActionbarPlusF1']:HideGroup()
     A:log('OnEnable...')
+
+    A.categoryCache = MC:GetCategoriesCache()
+
+    local prefetch = false
+    if not prefetch then return end
+
+    local categories = MC:GetCategoryNames()
+    local routines = {}
+    self:log('Macro Icons Size: %s', #macroIcons)
+    for _, cat in ipairs(categories) do
+        local co = coroutine.create(function()
+            self:log('Prefetching <Misc> macro icon category')
+            --local category = 'Misc'
+            local categoryItems = MC:GetItemsByCategory(macroIcons, cat)
+            A.categoryCache[cat] = categoryItems
+            self:log('Done prefetching <Misc> macro icon category: %s', tostring(A.categoryCache[cat]))
+        end)
+        routines[cat] = co
+        coroutine.resume(co)
+    end
+
+    for _, cat in ipairs(categories) do
+        assert('dead' == coroutine.status(routines[cat]), 'Invalid coroutine status')
+    end
 end
 
 -- AceAddon Hook
@@ -414,6 +480,8 @@ function A:OnInitialize()
 
     self:RegisterSlashCommands()
     self:RegisterKeyBindings()
+
+    macroIcons = self:FetchMacroIcons()
 end
 
 -- ##################################################################################
