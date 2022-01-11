@@ -1,4 +1,5 @@
 local format, tostring, isTable, isNotTable = string.format, tostring, table.isTable, table.isNotTable
+local pformat = PrettyPrint.pformat
 local ATTR = WidgetAttributes
 
 local P = {}
@@ -12,7 +13,7 @@ local FrameDetails = {
     [5] = { rowSize = 2, colSize = 6 },
     [6] = { rowSize = 2, colSize = 6 },
     [7] = { rowSize = 2, colSize = 6 },
-    [8] = { rowSize = 3, colSize = 6 },
+    [8] = { rowSize = 4, colSize = 6 },
 }
 
 local ButtonDataTemplate = {
@@ -115,42 +116,33 @@ end
 
 function P:InitNewProfile()
     local profile = CreateNewProfile()
-    --PrettyPrint.setup({ indent_size = 2, level_width = 120, show_all = true })
-    for barName,_  in pairs(profile.bars) do
-        self:CreateButtonsTemplate(profile, barName)
+    for i=1, #FrameDetails do
+        self:InitializeActionbar(profile, i)
     end
-    --print('DEFAULT_PROFILE_DATA: ' .. PrettyPrint.pformat(DEFAULT_PROFILE_DATA))
-    --print('DEFAULT_PROFILE_DATA: ', table.toStringSorted(DEFAULT_PROFILE_DATA))
     return profile
 end
 
-function P:CreateButtonsTemplate(profile, barName)
-    local buttons = profile.bars[barName]
-    for i=1, #FrameDetails do
-        local btnName = format('%sButton%s', barName, tostring(i))
-        local btnData = buttons[btnName]
-        self:CreateSingleButtonTemplate(profile, barName, btnName)
-        buttons[btnName] = btnData
+function P:InitializeActionbar(profile, barIndex)
+    local barName = 'ActionbarPlusF' .. barIndex
+    local frameSpec = FrameDetails[barIndex]
+    local btnCount = frameSpec.colSize * frameSpec.rowSize
+    for btnIndex=1,btnCount do
+        self:InitializeButtons(profile, barName, btnIndex)
     end
-    --print('Buttons: ', table.toStringSorted(buttons))
-    --print('Buttons: ', PrettyPrint.pformat(buttons))
-    return buttons
 end
 
-function P:CreateSingleButtonTemplate(profile, barName, btnName)
-    --error(table.toStringSorted(DEFAULT_PROFILE_DATA.bars))
-    local buttonsKey = 'buttons'
-    local buttons = profile.bars[barName][buttonsKey]
-    local btnData = buttons[btnName]
-    if isNotTable(btnData) then
-        btnData = ButtonDataTemplate
-    end
+function P:InitializeButtons(profile, barName, btnIndex)
+    local btnName = format('%sButton%s', barName, btnIndex)
+    local btn = self:CreateSingleButtonTemplate()
+    profile.bars[barName].buttons[btnName] = btn
+end
+
+function P:CreateSingleButtonTemplate()
+    local b = ButtonDataTemplate
     local keys = { ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT }
     for _,k in ipairs(keys) do
-        if isNotTable(btnData[k]) then btnData[k] = {} end
+        if isNotTable(b[k]) then b[k] = {} end
     end
-    profile.bars[barName][buttonsKey][btnName] = btnData
-    --print(format('%s btnData: ', btnName), PrettyPrint.pformat(DEFAULT_PROFILE_DATA.bars[barName][btnName]))
     return b
 end
 
