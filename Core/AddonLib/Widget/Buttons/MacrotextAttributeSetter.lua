@@ -1,4 +1,4 @@
-local BATTR, RWAttr, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
+local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
 ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local LOG, AssertNotNil, format, IsNotBlank =
 LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
@@ -8,13 +8,25 @@ local S = {}
 MacrotextAttributeSetter = S
 LOG:EmbedLogger(S, 'Widget::Buttons::MacrotextAttributeSetter')
 
---- `['ActionbarPlusF1Button1'] = {
----     ['type'] = 'spell',
----     ['spell'] = {
----         -- spellInfo
----     }
+--- Macrotext Info:
+--- `{
+---
 --- }`
 function S:SetAttributes(btnUI, btnData)
+    RWAttr(btnUI)
+
+    local macroTextInfo = btnData[WAttr.MACRO_TEXT]
+    if type(macroTextInfo) ~= 'table' then return end
+    if not macroTextInfo.id then return end
+
+    -- macro body
+
+    AssertNotNil(macroTextInfo.id, 'btnData[item].macroInfo.id')
+
+    local icon = TEXTURE_EMPTY
+    if macroTextInfo.icon then icon = macroTextInfo.icon end
+    btnUI:SetNormalTexture(icon)
+    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
 
 end
 
@@ -24,14 +36,9 @@ function S:ShowTooltip(btnUI, btnData)
     local type = btnData.type
     if not type then return end
 
-    --local spellInfo = btnData[WidgetAttributes.SPELL]
-    --GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
-    --GameTooltip:AddSpellByID(spellInfo.id)
-    ---- Replace 'Spell' with 'Spell (Rank #Rank)'
-    --if (IsNotBlank(spellInfo.rank)) then
-    --    GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
-    --end
-    --GameTooltip:AppendText(' ' .. string.replace(spellInfo.label, spellInfo.name, ''))
+    local macroTextInfo = btnData[WAttr.MACRO_TEXT]
+    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:AddSpellByID(macroTextInfo.id)
 end
 
 setmetatable(S, {

@@ -3,10 +3,12 @@
 --- Created by tony.
 --- DateTime: 1/2/2022 5:43 PM
 ---
-local _G, unpack, format = _G, table.unpackIt, string.format
+-- local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
 local ACELIB = AceLibFactory
+local ART_TEXTURES = ART_TEXTURES
+local macroIcons = nil
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
@@ -18,14 +20,13 @@ local libModules = WidgetLibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
 LogFactory:EmbedLogger(A)
 
-
-
 function A:RegisterSlashCommands()
     self:RegisterChatCommand("abp", "OpenConfig")
     self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
 end
 
 local debugDialog = nil
+local textureDialog = nil
 
 function A:CreateDebugPopupDialog()
     local AceGUI = ACELIB:GetAceGUI()
@@ -51,9 +52,220 @@ function A:CreateDebugPopupDialog()
     function frame:SetTextContent(text)
         self.editBox:SetText(text)
     end
+    function frame:SetIcon(iconPathOrId)
+        if not iconPathOrId then return end
+        self.iconFrame:SetImage(iconPathOrId)
+    end
 
     frame:Hide()
     return frame
+end
+
+function A:CreateTexturePopupDialog()
+    local MC = MacroIconCategories
+    local iconSize = 50
+    local defaultIcon = 'Interface/Icons/INV_Scroll_03'
+
+    local AceGUI = ACELIB:GetAceGUI()
+    local frame = AceGUI:Create("Frame")
+    frame:SetTitle("Macro Icons")
+    frame:SetStatusText('')
+    frame:SetCallback("OnClose", function(widget)
+        widget:SetTextContent('')
+        widget:SetStatusText('')
+    end)
+    frame:SetLayout("Flow")
+    --frame:SetWidth(600)
+    frame:SetHeight(700)
+
+    if macroIcons == nil then macroIcons = GetMacroItemIcons() end
+
+    local iconCategoryDropDown = AceGUI:Create("Dropdown")
+    iconCategoryDropDown:SetLabel("Category:")
+    --iconCategoryDropDown:SetWidth(500)
+    iconCategoryDropDown:SetList(MC:GetDropDownItems())
+    frame:AddChild(iconCategoryDropDown)
+
+    iconCategoryDropDown:SetCallback("OnValueChanged", function(choice)
+        local selectedCategory = choice:GetValue()
+        local categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
+        --ABP:DBG(categoryItems, 'Category Items for: ' .. selectedCategory)
+        frame:SetList(categoryItems)
+
+        --if frame.iconFrames then
+        --    for iconId, iconFrame in pairs(frame.iconFrames) do
+        --        print('release:', iconId)
+        --        --iconFrame:ClearAllPoints()
+        --        --iconFrame:SetParent(nil)
+        --        --iconFrame:Hide()
+        --        AceGUI:Release(iconFrame)
+        --    end
+        --end
+
+        frame.scrollframe:ReleaseChildren()
+        for iconId, iconPath in pairs(categoryItems) do
+            local icon = AceGUI:Create("Icon")
+            icon:SetImage(iconPath)
+            icon:SetImageSize(iconSize, iconSize)
+            frame.scrollframe:AddChild(icon)
+        end
+    end)
+
+    local iconDropDown = AceGUI:Create("Dropdown")
+    iconDropDown:SetLabel("Icon:")
+    iconDropDown:SetWidth(500)
+    iconDropDown:SetList({})
+    iconDropDown:SetCallback("OnValueChanged", function(choice)
+        -- choice is the drop-down list
+        -- frame:SetTextContent(PrettyPrint.pformat(choice))
+        local value = choice:GetValue()
+        local iconTextPath = ART_TEXTURES[tonumber(value)]
+        frame:SetSelectedIcon(value)
+        frame:SetEnteredIcon(iconTextPath)
+        frame:SetIconPath(value, iconTextPath)
+    end )
+    frame:AddChild(iconDropDown)
+
+    local iconFrameByDropDown = AceGUI:Create("Icon")
+    -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
+    iconFrameByDropDown:SetImage(defaultIcon)
+    iconFrameByDropDown:SetImageSize(iconSize, iconSize)
+    --iconFrameByDropDown:SetLabel("''")
+    --ic:SetAttribute('type', 'spell')
+    --ic:SetAttribute('spell', 'Cooking')
+    frame:AddChild(iconFrameByDropDown)
+
+    local iconEditbox = AceGUI:Create("EditBox")
+    iconEditbox:SetLabel("or Select Icon By ID or Texture Path:")
+    iconEditbox:SetWidth(500)
+    iconEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
+        frame:SetEnteredIcon(text)
+    end)
+    frame:AddChild(iconEditbox)
+
+    local iconFrameByInput = AceGUI:Create("Icon")
+    -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
+    iconFrameByInput:SetImage(defaultIcon)
+    iconFrameByInput:SetImageSize(iconSize, iconSize)
+    --iconFrameByInput:SetLabel('')
+    frame:AddChild(iconFrameByInput)
+
+    -- PrettyPrint.format(obj)
+    local editbox = AceGUI:Create("MultiLineEditBox")
+    editbox:SetLabel('')
+    editbox:SetText('')
+    editbox:SetFullWidth(true)
+    --editbox:SetFullHeight(true)
+    --frame:AddChild(editbox)
+    frame.editBox = editbox
+
+
+    local scrollframe = AceGUI:Create("ScrollFrame")
+    scrollframe:SetFullHeight(true)
+    scrollframe:SetFullWidth(true)
+    scrollframe:SetLayout("Flow")
+    frame:AddChild(scrollframe)
+    frame.scrollframe = scrollframe
+    --
+    --frame.scrollframe = scrollframe
+    function frame:SetTextContent(text)
+        self.editBox:SetText(text)
+    end
+    function frame:SetSelectedIcon(iconPathOrId)
+        if not iconPathOrId then return end
+        iconFrameByDropDown:SetImage(iconPathOrId)
+    end
+    function frame:SetEnteredIcon(iconPathOrId)
+        if not iconPathOrId then return end
+        iconFrameByInput:SetImage(iconPathOrId)
+    end
+    function frame:SetIconPath(iconId, iconPath)
+        iconEditbox:SetText(iconPath)
+        frame:SetStatusText(format("%s (%s)", iconPath, iconId))
+    end
+    function frame:SetList(list)
+        iconDropDown:SetList(list)
+    end
+
+    frame:Hide()
+    return frame
+end
+
+local function listContains(list, path)
+    for _,v in ipairs(list) do
+        local matchText = '_' .. string.lower(v)
+        if string.find(string.lower(path), matchText) then 
+            print('match: path:', path, 'v', v)
+            return true 
+        end
+    end
+    return false
+end
+
+local function filter(iconList, categories)
+    local list = {}
+    for _,iconId in ipairs(iconList) do
+        local path = ART_TEXTURES[iconId]
+        if path ~= nil then
+            -- print('insert', path)
+            if not listContains(categories, path) then
+                table.insert(list, {
+                    id = iconId,
+                    path = path
+                })
+            end
+        end
+    end
+    return list
+end
+
+function A:ShowTextureDialog()
+    if macroIcons == nil then macroIcons = GetMacroItemIcons() end
+    textureDialog:SetTextContent(PrettyPrint.pformat(macroIcons))
+    local list = {}
+    local inventoryIcons = {}
+
+    -- local categories = {
+    --     'chest',
+    --     'helmet',
+    --     'holiday',
+    --     'ingot',
+    --     'jewelry',
+    --     'weapon', 'ore', 'shoulder', 'drink', 'ammo', 'sword', 'wand'
+    -- }
+    -- local customList = filter(macroIcons, categories)
+    -- print('customList size:', #customList)
+    -- A:DBG(customList)
+    -- if true then return end
+
+    -- for _,iconId in ipairs(macroIcons) do
+    --     local path = TEXTURE_PATHS[iconId]
+    --     if path ~= nil then
+    --         -- print('insert', path)
+    --         if string.find(string.lower(path), "chest") then
+    --             print('spell:', path)
+    --             table.insert(inventoryIcons, iconId)
+    --         end
+    --     end
+    -- end
+    -- self:log('inv (%s): %s', #inventoryIcons, PrettyPrint.pformat(inventoryIcons))
+    -- self:log('inv size: %s', #inventoryIcons)
+    local selectedMacroIcons = table.slice(macroIcons, 1, 1000)
+    -- local selectedMacroIcons = inventoryIcons
+
+    -- local selectedMacroIcons = macroIcons
+    --self:log('macroIconsSize: %s', #macroIcons)
+
+    --for _,iconId in ipairs(selectedMacroIcons) do
+    --    local iconIdText = tostring(iconId)
+    --    local path = ART_TEXTURES[iconId]
+    --    if not path then path = iconIdText end
+    --    local label = format('%s (%s)', path, iconIdText)
+    --    list[iconIdText] = label
+    --end
+    --textureDialog:SetList(list)
+    textureDialog:Show()
+
 end
 
 function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
@@ -81,17 +293,24 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
 
 end
 
-function A:ShowDebugDialog(label, obj)
+function A:ShowDebugDialog(obj, optionalLabel)
     local text = nil
+    local label = optionalLabel or ''
     if type(obj) ~= 'string' then
         text = PrettyPrint.pformat(obj)
+    else
+        text = tostring(nil)
     end
     debugDialog:SetTextContent(text)
     debugDialog:SetStatusText(label)
     debugDialog:Show()
 end
 
-function A:DBG(label, obj) self:ShowDebugDialog(label, obj) end
+function A:DBG(obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel) end
+function A:TI()
+    -- local macroIcons = GetMacroItemIcons()
+    -- self:ShowTextureDialog(macroIcons, 'Macro Icons')
+end
 
 function A:RegisterKeyBindings()
     --SetBindingClick("SHIFT-T", self:Info())
@@ -179,6 +398,7 @@ function A:OnInitialize()
     self:InitDbDefaults()
 
     debugDialog = self:CreateDebugPopupDialog()
+    textureDialog = self:CreateTexturePopupDialog()
     for _, module in ipairs(libModules) do
         module:OnInitialize{ handler = A, profile= A.profile }
     end
@@ -196,7 +416,7 @@ function A:OnInitialize()
     self:RegisterKeyBindings()
 end
 
--- #####################################################################################
+-- ##################################################################################
 
 local function AddonLoaded()
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
