@@ -6,11 +6,13 @@
 -- local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
+local PrettyPrint = PrettyPrint
 local format, pformat = string.format, PrettyPrint.pformat
 local ACELIB, MC = AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
-local macroIcons = nil
 local GetMacroItemIcons = GetMacroItemIcons
+local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
+local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
@@ -22,19 +24,26 @@ local libModules = WidgetLibFactory:GetAddonStdLibs()
 local C, P, B, BF = unpack(libModules)
 LogFactory:EmbedLogger(A)
 
+-- ### Local Vars
+
+local macroIcons = nil
+local debugDialog = nil
+local textureDialog = nil
+
 function A:RegisterSlashCommands()
     self:RegisterChatCommand("abp", "OpenConfig")
     self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
 end
-
-local debugDialog = nil
-local textureDialog = nil
 
 A.categoryCache = {}
 
 function A:CreateDebugPopupDialog()
     local AceGUI = ACELIB:GetAceGUI()
     local frame = AceGUI:Create("Frame")
+    -- The following makes the "Escape" close the window
+    _G[DEBUG_DIALOG_GLOBAL_FRAME_NAME] = frame.frame
+    table.insert(UISpecialFrames, DEBUG_DIALOG_GLOBAL_FRAME_NAME)
+
     frame:SetTitle("Debug Frame")
     frame:SetStatusText('')
     frame:SetCallback("OnClose", function(widget)
@@ -78,6 +87,11 @@ function A:CreateTexturePopupDialog()
 
     local AceGUI = ACELIB:GetAceGUI()
     local frame = AceGUI:Create("Frame")
+
+    -- The following makes the "Escape" close the window
+    _G[TEXTURE_DIALOG_GLOBAL_FRAME_NAME] = frame.frame
+    table.insert(UISpecialFrames, TEXTURE_DIALOG_GLOBAL_FRAME_NAME)
+
     frame:SetTitle("Macro Icons")
     frame:SetStatusText('')
     frame:SetCallback("OnClose", function(widget)
@@ -320,12 +334,7 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
     local firstVar = vars[1]
 
     if firstVar == '<profile>' then
-        local profileData = self:GetCurrentProfileData()
-        local strVal = PrettyPrint.pformat(profileData)
-        local profileName = self.db:GetCurrentProfile()
-        debugDialog:SetTextContent(strVal)
-        debugDialog:SetStatusText(format('Current Profile Data for [%s]', profileName))
-        debugDialog:Show()
+        self:HandleSlashCommand_ShowProfile()
         return
     end
 
@@ -336,6 +345,16 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
     debugDialog:SetStatusText(format('Var: %s type: %s', firstVar, type(firstObj)))
     debugDialog:Show()
 
+end
+
+function A:HandleSlashCommand_ShowProfile()
+    PrettyPrint.setup({ show_all = true } )
+    local profileData = self:GetCurrentProfileData()
+    local strVal = PrettyPrint.pformat(profileData)
+    local profileName = self.db:GetCurrentProfile()
+    debugDialog:SetTextContent(strVal)
+    debugDialog:SetStatusText(format('Current Profile Data for [%s]', profileName))
+    debugDialog:Show()
 end
 
 function A:ShowDebugDialog(obj, optionalLabel)
