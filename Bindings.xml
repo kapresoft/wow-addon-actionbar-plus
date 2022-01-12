@@ -1,0 +1,18 @@
+<Bindings>
+    <Binding name="ABP_ACTIONBAR1_BUTTON1" category="ADDONS" header="ABP_ACTIONBAR1">Binding_ActionBar1();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON2" category="ADDONS">Binding_ActionBar2();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON3" category="ADDONS">Binding_ActionBar3();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON4" category="ADDONS">Binding_ActionBar4();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON5" category="ADDONS">Binding_ActionBar5();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON6" category="ADDONS">Binding_ActionBar6();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON7" category="ADDONS">Binding_ActionBar7();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON8" category="ADDONS">Binding_ActionBar8();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON9" category="ADDONS">Binding_ActionBar9();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON10" category="ADDONS">Binding_ActionBar10();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON11" category="ADDONS">Binding_ActionBar11();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON12" category="ADDONS">Binding_ActionBar12();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON13" category="ADDONS">Binding_ActionBar13();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON14" category="ADDONS">Binding_ActionBar14();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON15" category="ADDONS">Binding_ActionBar15();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON16" category="ADDONS">Binding_ActionBar16();</Binding>
+</Bindings>

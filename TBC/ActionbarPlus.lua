@@ -112,6 +112,9 @@ function A:CreateTexturePopupDialog()
         --ABP:DBG(categoryItems, 'Category Items for: ' .. selectedCategory)
         frame:SetList(categoryItems)
         frame.iconsScrollFrame:ReleaseChildren()
+
+        -- TODO: Toggle Children by Category (Cache)
+
         for iconId, iconPath in pairs(categoryItems) do
             local icon = AceGUI:Create("Icon")
             icon:SetImage(iconPath)
@@ -200,6 +203,24 @@ function A:CreateTexturePopupDialog()
     iconsScrollFrame:SetFullHeight(true)
     iconsScrollFrame:SetFullWidth(true)
     iconsScrollFrame:SetLayout("Flow")
+
+    --function iconsScrollFrame:HasChildren()
+    --    return false
+    --end
+    --function iconsScrollFrame:SetVisibleState(self, isVisible)
+    --    local children = self.children
+    --    print('children:', children)
+    --    for i = 1, #children do
+    --        --AceGUI:Hide(children[i])
+    --        if isVisible then
+    --            children[i].frame:Show()
+    --        else
+    --            children[i].frame:Hide()
+    --        end
+    --        --children[i] = nil
+    --    end
+    --end
+
     frame:AddChild(iconsScrollFrame)
     frame.iconsScrollFrame = iconsScrollFrame
 
@@ -486,6 +507,14 @@ function A:OnInitialize()
 end
 
 -- ##################################################################################
+
+function Binding_ActionBar1()
+    ABP:DBG(ABP.profile, 'Current Profile')
+end
+
+function Binding_ActionBar2()
+    ABP:ShowTextureDialog()
+end
 
 local function AddonLoaded()
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
