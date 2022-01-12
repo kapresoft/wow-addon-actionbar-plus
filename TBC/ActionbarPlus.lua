@@ -50,6 +50,7 @@ function A:CreateDebugPopupDialog()
     editbox:SetText('')
     editbox:SetFullWidth(true)
     editbox:SetFullHeight(true)
+    editbox.button:Hide()
     frame:AddChild(editbox)
     frame.editBox = editbox
 
