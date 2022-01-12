@@ -6,7 +6,7 @@
 -- local _G, unpack, format = _G, table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
-local pformat = PrettyPrint.pformat
+local format, pformat = string.format, PrettyPrint.pformat
 local ACELIB, MC = AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
 local macroIcons = nil
@@ -81,7 +81,6 @@ function A:CreateTexturePopupDialog()
     frame:SetTitle("Macro Icons")
     frame:SetStatusText('')
     frame:SetCallback("OnClose", function(widget)
-        widget:SetTextContent('')
         widget:SetStatusText('')
     end)
     frame:SetLayout("Flow")
@@ -99,18 +98,13 @@ function A:CreateTexturePopupDialog()
         return string.replace(iconPath, ICON_PREFIX, '')
     end
 
-    --self:DBG(macroIcons, 'Macro Icons')
-
     local function onValueChanged(selectedCategory)
-        --print('selectedCategory', selectedCategory)
         local categoryItems = A.categoryCache[selectedCategory]
         if categoryItems == nil or table.isEmpty(categoryItems) then
-            self:log(1, 'Retrieving category items: %s', selectedCategory)
-            --self:DBG(macroIcons, 'Macro Icons')
+            --self:log(1, 'Retrieving category items: %s', selectedCategory)
             categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
             A.categoryCache[selectedCategory] = categoryItems
         end
-        --ABP:DBG(categoryItems, 'Category Items for: ' .. selectedCategory)
         frame:SetList(categoryItems)
         frame.iconsScrollFrame:ReleaseChildren()
 
@@ -164,7 +158,6 @@ function A:CreateTexturePopupDialog()
     frame:AddChild(iconDropDown)
 
     local iconFrameByDropDown = AceGUI:Create("Icon")
-    -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
     iconFrameByDropDown:SetImage(defaultIcon)
     iconFrameByDropDown:SetImageSize(iconSize, iconSize)
     --iconFrameByDropDown:SetLabel("''")
@@ -189,16 +182,6 @@ function A:CreateTexturePopupDialog()
     iconFrameByInput:SetImage(defaultIcon)
     iconFrameByInput:SetImageSize(iconSize, iconSize)
     frame:AddChild(iconFrameByInput)
-
-    -- PrettyPrint.format(obj)
-    local editbox = AceGUI:Create("MultiLineEditBox")
-    editbox:SetLabel('')
-    editbox:SetText('')
-    editbox:SetFullWidth(true)
-    --editbox:SetFullHeight(true)
-    --frame:AddChild(editbox)
-    frame.editBox = editbox
-
 
     local iconsScrollFrame = AceGUI:Create("ScrollFrame")
     iconsScrollFrame:SetFullHeight(true)
@@ -227,9 +210,6 @@ function A:CreateTexturePopupDialog()
 
     -- ################################
 
-    function frame:SetTextContent(text)
-        self.editBox:SetText(text)
-    end
     function frame:SetSelectedIcon(iconPathOrId)
         if not iconPathOrId then return end
         iconFrameByDropDown:SetImage(iconPathOrId)
@@ -509,6 +489,65 @@ end
 
 -- ##################################################################################
 
+function getBindingByName(bindingName)
+    local bindCount = GetNumBindings()
+    if bindCount <=0 then return nil end
+
+    for i = 1, bindCount do
+        local command,cat,key1,key2 = GetBinding(i)
+        if bindingName == command then
+            return { name = command, category = cat, key1 = key1, key2 = key2 }
+        end
+    end
+    return nil
+end
+
+function getBarBindings(beginsWith)
+    local bindCount = GetNumBindings()
+    if bindCount <=0 then return nil end
+
+    --print('beginsWith:', beginsWith)
+    -- key: name, value: binding obj
+    local bindings = {}
+    for i = 1, bindCount do
+        local command,cat,key1,key2 = GetBinding(i)
+        --print('bindingName: ', command)
+        if string.find(command, beginsWith) then
+            local value = { name = command, category = cat, key1 = key1, key2 = key2 }
+            local keyName = 'BINDING_NAME_' .. command
+            local key = _G[keyName]
+            if key then
+                bindings[key] = value
+            end
+        end
+    end
+    return bindings
+end
+
+local function BindActions()
+    local barIndex = 1
+    local buttonIndex = 3
+    local nameFormat = format('ABP_ACTIONBAR1_BUTTON3', barnIndex, buttonIndex)
+    local frameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
+
+    local bindingNames = getBarBindings('ABP_ACTIONBAR1')
+    --ABP:DBG(bindingNames, 'Binding Names')
+    local button3Binding = bindingNames[BINDING_NAME_ABP_ACTIONBAR1_BUTTON3]
+    --print('Binding[ABP_ACTIONBAR1_BUTTON3]', pformat(button3Binding))
+    if button3Binding then
+        if button3Binding.key1 then
+            local button3 = 'ActionbarPlusF1Button3'
+            ClearOverrideBindings(_G[button3]);
+            SetOverrideBindingClick(_G[button3], true, button3Binding.key1, button3)
+            -- TODO: Does not respond after binding change event, need to add a listener to event UPDATE_BINDINGS
+            if button3Binding.key2 then
+                SetOverrideBindingClick(_G[button3], true, button3Binding.key2, button3)
+            end
+        end
+    end
+    --LoadBindings(1);
+end
+
 function Binding_ActionBar1()
     ABP:DBG(ABP.profile, 'Current Profile')
 end
@@ -517,17 +556,47 @@ function Binding_ActionBar2()
     ABP:ShowTextureDialog()
 end
 
-local function AddonLoaded()
+function Binding_ActionBar3(...)
+    --local bindings = getBarBindings('ABP_ACTIONBAR1')
+    --ABP:DBG(bindings, 'Key Bindings')
+    BindActions()
+end
+
+local function BindingUpdated(frame, event)
+    --PrettyPrint.setup({ show_all = true })
+    --print('frame', frame:GetName(), 'event', event, 'arg3', arg3)
+    --LoadBindings(1)
+    --ABP:DBG(frame, 'frame')
+    BindActions()
+end
+
+local function AddonLoaded(frame, event)
+
+    if (event == 'UPDATE_BINDINGS') then
+        BindingUpdated(frame, event)
+        return
+    end
+
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
     A:log("%s.%s initialized", MAJOR, MINOR)
     A:printf('Available commands: /abp to open config dialog.')
     A:printf('Right-click on the button drag frame to open config dialog.')
     A:printf('More at https://kapresoft.com/wow-addon-actionbar-plus')
+
+    BindActions()
+
 end
+
+
 
 local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
 frame:SetScript("OnEvent", AddonLoaded)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent('UPDATE_BINDINGS')
 
+--local bindingFrame = CreateFrame("Frame", ADDON_NAME .. "BindingFrame", UIParent)
+--bindingFrame:SetScript("OnEvent", BindingUpdated)
+--bindingFrame:RegisterEvent('UPDATE_BINDINGS')
 -- Temp
-Profile = P
+--Profile = P
+

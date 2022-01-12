@@ -1,5 +1,5 @@
 <Bindings>
-    <Binding name="ABP_ACTIONBAR1_BUTTON1" category="ADDONS" header="ABP_ACTIONBAR1">Binding_ActionBar1();</Binding>
+    <Binding name="ABP_ACTIONBAR1_BUTTON1" category="ADDONS" header="ABP_HEADER_ACTIONBAR1">Binding_ActionBar1();</Binding>
     <Binding name="ABP_ACTIONBAR1_BUTTON2" category="ADDONS">Binding_ActionBar2();</Binding>
     <Binding name="ABP_ACTIONBAR1_BUTTON3" category="ADDONS">Binding_ActionBar3();</Binding>
     <Binding name="ABP_ACTIONBAR1_BUTTON4" category="ADDONS">Binding_ActionBar4();</Binding>

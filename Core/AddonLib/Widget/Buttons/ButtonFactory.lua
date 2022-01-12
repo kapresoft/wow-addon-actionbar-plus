@@ -164,8 +164,23 @@ function F:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local adjY =  (rowNum * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
     btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
+
+    --if btnName == 'ActionbarPlusF1Button3' then
+    --    self:Bind()
+    --end
+
     return btnUI
 end
+
+--function F:Bind()
+--    local button3Binding = getBindingByName('ABP_ACTIONBAR1_BUTTON3')
+--    print('Binding[ABP_ACTIONBAR1_BUTTON3]', pformat(button3Binding))
+--    local button3 = 'ActionbarPlusF1Button3'
+--    SetBindingClick(button3Binding.key1, button3)
+--    if button3Binding.key2 then
+--        SetBindingClick(button3Binding.key2, button3)
+--    end
+--end
 
 -- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
 --      This one is incorrect:  https://wowwiki-archive.fandom.com/wiki/API_GetCursorInfo
