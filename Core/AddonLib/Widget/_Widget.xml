@@ -5,7 +5,7 @@
     <Script file="MacroIconCategories.lua"/>
     <Script file="WidgetConstants.lua"/>
     <Script file="WidgetLibFactory.lua"/>
-    <Script file="FrameFactory.lua"/>
+    <Script file="MacroTextureDialog.lua"/>
 
     <Include file="Buttons\_Buttons.xml"/>
 

@@ -3,9 +3,9 @@ local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
 local unpack, pack, fmod, pformat = table.unpackIt, table.pack, math.fmod, PrettyPrint.pformat
 local AssertThatMethodArgIsNotNil, AssertNotNil = Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil
 local ADDON_LIB, WLIB, H = AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler
-local FrameFactory, SpellAttributeSetter, ItemAttributeSetter,
+local ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter,
     MacroAttributeSetter, MacrotextAttributeSetter =
-    FrameFactory, SpellAttributeSetter, ItemAttributeSetter,
+    ABP_ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter,
     MacroAttributeSetter, MacrotextAttributeSetter
 
 local tostring, format, strlower, tinsert, toStringSorted =
@@ -93,7 +93,7 @@ end
 function F:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
-    local f = FrameFactory(frameIndex)
+    local f = ButtonFrameFactory(frameIndex)
     f:SetWidth((config.colSize * buttonSize) - INTERNAL_BUTTON_PADDING)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)

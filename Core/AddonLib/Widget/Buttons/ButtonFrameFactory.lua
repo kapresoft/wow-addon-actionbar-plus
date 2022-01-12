@@ -2,7 +2,7 @@ local _G, type, ipairs, tinsert = _G, type, ipairs, table.insert
 local WLIB, Assert = WidgetLibFactory, Assert
 
 local F = {}
-FrameFactory = F
+ABP_ButtonFrameFactory = F
 
 local P = WidgetLibFactory:GetProfile()
 

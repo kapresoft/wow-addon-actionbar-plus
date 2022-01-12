@@ -22,6 +22,15 @@ StaticPopupDialogs[CONFIRM_RELOAD_UI] = {
     preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
 }
 
+--_G[TEXTURE_DIALOG_GLOBAL_FRAME_NAME] = frame.frame
+--table.insert(UISpecialFrames, TEXTURE_DIALOG_GLOBAL_FRAME_NAME)
+function ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
+    local frame = frameInstance
+    if frameInstance.frame then frame = frameInstance.frame end
+    setglobal(frameName, frame)
+    table.insert(UISpecialFrames, frameName)
+end
+
 function ShowReloadUIConfirmation()
     StaticPopup_Show(CONFIRM_RELOAD_UI)
 end

@@ -2,7 +2,9 @@ local LibStub, VERSION_FORMAT, Module = LibStub, VERSION_FORMAT, Module
 local format = string.format
 
 F = {}
+-- TODO: Deprecate LogFactory
 LogFactory = F
+ABP_LogFactory = F
 
 local logger = nil
 

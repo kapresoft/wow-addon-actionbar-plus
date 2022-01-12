@@ -2,6 +2,7 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
     <Script file="ButtonUI.lua"/>
+    <Script file="ButtonFrameFactory.lua"/>
     <Script file="SpellAttributeSetter.lua"/>
     <Script file="ItemAttributeSetter.lua"/>
     <Script file="MacroAttributeSetter.lua"/>
@@ -9,7 +10,6 @@
     <Script file="ItemDragEventHandler.lua"/>
     <Script file="SpellDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
-
     <Script file="ButtonFactory.lua"/>
 
     <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="LOW"

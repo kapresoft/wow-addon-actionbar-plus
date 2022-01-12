@@ -16,7 +16,7 @@ local BF = nil
 local FF = nil
 
 function C:OnAfterInitialize()
-    FF = FrameFactory
+    FF = ABP_ButtonFrameFactory
     P, BF = unpack(WidgetLibFactory:GetConfigLibs())
 end
 
