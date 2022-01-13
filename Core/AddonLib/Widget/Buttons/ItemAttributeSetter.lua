@@ -6,7 +6,7 @@ local GameTooltip = GameTooltip
 
 local S = {}
 ItemAttributeSetter = S
-LOG:EmbedLogger(S, 'Widget::Buttons::ItemAttributeSetter')
+LOG:EmbedLogger(S, 'ItemAttributeSetter')
 
 --- Item Info:
 --- `{
@@ -45,8 +45,4 @@ function S:ShowTooltip(btnUI, btnData)
 
 end
 
-setmetatable(S, {
-    __call = function (_, ...)
-        return S:SetAttributes(...)
-    end
-})
+S.mt.__call = S.SetAttributes

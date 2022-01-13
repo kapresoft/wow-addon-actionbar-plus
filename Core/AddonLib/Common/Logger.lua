@@ -4,9 +4,10 @@ local type, select, tostring, error = type, select, tostring, error
 local pformat = PrettyPrint.pformat
 local isNotTable, isTable, tableToString = table.isNotTable, table.isTable, table.toString
 local ACE_LIB, ADDON_LIB = AceLibFactory, AceLibAddonFactory
+local AceUtil = ABP_AceUtil
 
-local c = ACE_LIB:GetAceConsole()
-local L = ADDON_LIB:NewPlainAceLib('Logger')
+local c = AceUtil:GetAceConsole()
+local L = AceUtil:NewPlainAceLib('Logger')
 if not L then return end
 
 ---@param obj table
@@ -14,9 +15,9 @@ if not L then return end
 local function _EmbedLogger(obj, optionalLogName)
     local prefix = ''
     if type(optionalLogName) == 'string' then prefix = '::' .. optionalLogName end
-    setmetatable(obj, {
-        __tostring = function() return format(ABP_PREFIX, prefix)  end
-    })
+    if type(obj.mt) ~= 'table' then obj.mt = {} end
+    obj.mt = { __tostring = function() return format(ABP_PREFIX, prefix)  end }
+    setmetatable(obj, obj.mt)
 
     function obj:log(...)
         local args = pack(...)

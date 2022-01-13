@@ -6,7 +6,7 @@ local GameTooltip = GameTooltip
 
 local S = {}
 MacrotextAttributeSetter = S
-LOG:EmbedLogger(S, 'Widget::Buttons::MacrotextAttributeSetter')
+LOG:EmbedLogger(S, 'MacrotextAttributeSetter')
 
 --- Macrotext Info:
 --- `{
@@ -41,8 +41,4 @@ function S:ShowTooltip(btnUI, btnData)
     GameTooltip:AddSpellByID(macroTextInfo.id)
 end
 
-setmetatable(S, {
-    __call = function (_, ...)
-        return S:SetAttributes(...)
-    end
-})
+S.mt.__call = S.SetAttributes

@@ -1,32 +1,38 @@
-local LibStub, VERSION_FORMAT, Module = LibStub, VERSION_FORMAT, Module
-local format = string.format
+---@param LIB table LibStub
+---@param VF table VERSION_FORMAT
+---@param M table Module
+local __def = function(LIB, VF, M, isNotTable)
 
-F = {}
+    local format = string.format
+
+    local F = {}
+
+    local logger = nil
+
+    function F:GetLogger()
+        if not logger then
+            return LIB(format(VF, M.Logger))
+        end
+        return logger
+    end
+
+    function F:EmbedLogger(obj, optionalLogName)
+        self:GetLogger():Embed(obj, optionalLogName)
+    end
+
+    function F:NewLogger(logName)
+        local _logger = {}
+        self:EmbedLogger(_logger, logName)
+        return _logger
+    end
+
+    if isNotTable(F.mt) then F.mt = {} end
+    F.mt.__call = F.NewLogger
+    setmetatable(F, F.mt)
+
+    return F
+end
+
+ABP_LogFactory = __def(LibStub, VERSION_FORMAT, Module, table.isNotTable)
 -- TODO: Deprecate LogFactory
-LogFactory = F
-ABP_LogFactory = F
-
-local logger = nil
-
-function F:GetLogger()
-    if not logger then
-        return LibStub(format(VERSION_FORMAT, Module.Logger))
-    end
-    return logger
-end
-
-function F:EmbedLogger(obj, optionalLogName)
-    self:GetLogger():Embed(obj, optionalLogName)
-end
-
-function F:NewLogger(logName)
-    local _logger = {}
-    self:EmbedLogger(_logger, logName)
-    return _logger
-end
-
-setmetatable(F, {
-    __call = function (_, ...)
-        return F:NewLogger(...)
-    end
-})
+LogFactory = ABP_LogFactory
