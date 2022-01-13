@@ -12,7 +12,6 @@ local LogFactory, ACELIB, MC = ABP_LogFactory, AceLibFactory, MacroIconCategorie
 local ART_TEXTURES = ART_TEXTURES
 local TextureDialog = ABP_MacroTextureDialog
 local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
---local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
 
 local MAJOR, MINOR = ADDON_NAME .. '-1.0', 1 -- Bump minor on changes
 local A = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
@@ -434,6 +433,7 @@ function A:OnInitialize()
     self:InitDbDefaults()
 
     debugDialog = self:CreateDebugPopupDialog()
+    ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, debugDialog.frame)
 
     for _, module in ipairs(libModules) do
         module:OnInitialize{ handler = A, profile= A.profile }
