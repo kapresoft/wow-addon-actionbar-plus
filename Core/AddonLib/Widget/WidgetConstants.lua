@@ -2,7 +2,8 @@ local ACE_LIB = AceLibFactory
 local ReloadUI = ReloadUI
 local SHARED_MEDIA = ACE_LIB:GetAceSharedMedia()
 local BATTR = ButtonAttributes
-local l = LogFactory('WidgetConstants')
+local LOG = ABP_LogFactory
+local l = LOG('WidgetConstants')
 
 -- #########################################################
 

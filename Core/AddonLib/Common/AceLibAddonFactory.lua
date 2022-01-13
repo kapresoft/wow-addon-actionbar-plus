@@ -1,7 +1,7 @@
 local LibStub, format, unpack = LibStub, string.format, table.unpackIt
 local assert, type, tonumber, isTable = assert, type, tonumber, table.isTable
 local VERSION_FORMAT = VERSION_FORMAT
-local LOGF = LogFactory
+local LOGF = ABP_LogFactory
 
 local F = {}
 AceLibAddonFactory = F

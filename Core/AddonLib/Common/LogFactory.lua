@@ -34,5 +34,3 @@ local __def = function(LIB, VF, M, isNotTable)
 end
 
 ABP_LogFactory = __def(LibStub, VERSION_FORMAT, Module, table.isNotTable)
--- TODO: Deprecate LogFactory
-LogFactory = ABP_LogFactory

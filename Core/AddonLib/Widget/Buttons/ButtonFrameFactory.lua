@@ -130,4 +130,4 @@ local __def = function(_G, LOG, WLIB, Assert)
     return F
 end
 
-ABP_ButtonFrameFactory = __def(_G, LogFactory, WidgetLibFactory, Assert)
+ABP_ButtonFrameFactory = __def(_G, ABP_LogFactory, WidgetLibFactory, Assert)

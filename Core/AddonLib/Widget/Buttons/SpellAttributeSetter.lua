@@ -65,7 +65,7 @@ end
 
 -- TODO: Rename to ABP_SpellAttributeSetter
 SpellAttributeSetter = __def(
-        LogFactory, ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, UnitAttributes,
+        ABP_LogFactory, ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, UnitAttributes,
         GameTooltip,
         Assert.AssertNotNil, string.format, string.IsNotBlank,
         TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT

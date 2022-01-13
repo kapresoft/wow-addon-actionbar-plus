@@ -1,7 +1,7 @@
 local AssertNotNil = Assert.AssertNotNil
 local WLIB, SpellAttributeSetter = WidgetLibFactory, SpellAttributeSetter
 local ButtonAttributes, _API_Spell = ButtonAttributes, _API_Spell
-local LOG = LogFactory
+local LOG = ABP_LogFactory
 
 local P = WLIB:GetProfile()
 

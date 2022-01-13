@@ -1,7 +1,7 @@
 local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
 ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local LOG, AssertNotNil, format, IsNotBlank =
-LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
+ABP_LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
 local GameTooltip = GameTooltip
 
 local S = {}

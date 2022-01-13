@@ -1,6 +1,6 @@
 local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.AssertThatMethodArgIsNotNil, Assert.Throw
 local format = string.format
-local ACE_LIB, LOG, PrettyPrint, _API_Spell = AceLibFactory, LogFactory, PrettyPrint, _API_Spell
+local ACE_LIB, LOG, PrettyPrint, _API_Spell = AceLibFactory, ABP_LogFactory, PrettyPrint, _API_Spell
 local BATTR, TEXTURE_HIGHLIGHT = ButtonAttributes, TEXTURE_HIGHLIGHT
 local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler =
     SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler
