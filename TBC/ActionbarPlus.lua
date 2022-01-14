@@ -39,9 +39,7 @@ function A:CreateDebugPopupDialog()
     local AceGUI = ACELIB:GetAceGUI()
     local frame = AceGUI:Create("Frame")
     -- The following makes the "Escape" close the window
-    _G[DEBUG_DIALOG_GLOBAL_FRAME_NAME] = frame.frame
-    table.insert(UISpecialFrames, DEBUG_DIALOG_GLOBAL_FRAME_NAME)
-
+    ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, frame)
     frame:SetTitle("Debug Frame")
     frame:SetStatusText('')
     frame:SetCallback("OnClose", function(widget)
