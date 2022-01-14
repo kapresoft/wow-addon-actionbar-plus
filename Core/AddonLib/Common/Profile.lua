@@ -1,8 +1,9 @@
 local type, pairs, tostring = type, pairs, tostring
-local isTable, isNotTable, tsize, tinsert, tsort = table.isTable, table.isNotTable, table.size, table.insert, table.sort
+local isTable, isNotTable, tsize, tinsert, tsort
+    = ABP_Table.isTable, ABP_Table.isNotTable, ABP_Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 -- local format = string.format
---local pack, unpack = table.pack, table.unpackIt
+--local pack, unpack = table.pack, ABP_Table.unpackIt
 
 local ADDON_LIB, Module = AceLibAddonFactory, Module
 local P = ADDON_LIB:NewAceLib(Module.Profile)
@@ -90,7 +91,7 @@ function P:GetButtonData(frameIndex, buttonName)
     --if not buttons then return nil end
     local btnData = buttons[buttonName]
     if type(btnData) == 'table' then
-        --error(table.toStringSorted(btnData))
+        --error(ABP_Table.toStringSorted(btnData))
         return btnData
     end
     return nil
@@ -131,7 +132,7 @@ function P:CreateBarsTemplate()
     return bars
 end
 
--- /run table.toString(Profile:GetBar(1))
+-- /run ABP_Table.toString(Profile:GetBar(1))
 function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 

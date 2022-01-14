@@ -1,4 +1,5 @@
-local format, tostring, isTable, isNotTable = string.format, tostring, table.isTable, table.isNotTable
+local format, tostring, isTable, isNotTable, shallow_copy =
+    string.format, tostring, ABP_Table.isTable, ABP_Table.isNotTable, ABP_Table.shallow_copy
 local pformat = PrettyPrint.pformat
 local ATTR = WidgetAttributes
 
@@ -111,7 +112,7 @@ function P:GetAllActionBarSizeDetails()
 end
 
 local function CreateNewProfile()
-    return table.shallow_copy(DEFAULT_PROFILE_DATA)
+    return shallow_copy(DEFAULT_PROFILE_DATA)
 end
 
 function P:InitNewProfile()

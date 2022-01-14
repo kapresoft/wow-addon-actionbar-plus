@@ -33,4 +33,4 @@ local __def = function(LIB, VF, M, isNotTable)
     return F
 end
 
-ABP_LogFactory = __def(LibStub, VERSION_FORMAT, Module, table.isNotTable)
+ABP_LogFactory = __def(LibStub, VERSION_FORMAT, Module, ABP_Table.isNotTable)

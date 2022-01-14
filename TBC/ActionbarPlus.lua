@@ -3,11 +3,11 @@
 --- Created by tony.
 --- DateTime: 1/2/2022 5:43 PM
 ---
--- local _G, unpack, format = _G, table.unpackIt, string.format
+-- local _G, unpack, format = _G, ABP_Table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
 local PrettyPrint = PrettyPrint
-local format, pformat = string.format, PrettyPrint.pformat
+local format, pformat, isEmpty = string.format, PrettyPrint.pformat, ABP_Table.isEmpty
 local LogFactory, ACELIB, MC = ABP_LogFactory, AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
 local TextureDialog = ABP_MacroTextureDialog
@@ -283,7 +283,7 @@ end
 function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
     --self:log('vars: ', spaceSeparatedArgs)
     local vars = table.parseSpaceSeparatedVar(spaceSeparatedArgs)
-    if table.isEmpty(vars) then return end
+    if isEmpty(vars) then return end
     local firstVar = vars[1]
 
     if firstVar == '<profile>' then
@@ -414,9 +414,9 @@ function A:InitDbDefaults()
     local defaults = { profile =  defaultProfile }
     self.db:RegisterDefaults(defaults)
     self.profile = self.db.profile
-    if table.isEmpty(ABP_PLUS_DB.profiles[profileName]) then
+    if isEmpty(ABP_PLUS_DB.profiles[profileName]) then
         ABP_PLUS_DB.profiles[profileName] = defaultProfile
-        --error(profileName .. ': ' .. table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
+        --error(profileName .. ': ' .. ABP_Table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
     end
 end
 

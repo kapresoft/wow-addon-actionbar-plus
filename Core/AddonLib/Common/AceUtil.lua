@@ -5,6 +5,8 @@ local __def = function(LIB, versionFormat, unpack)
     local format, tonumber = string.format, tonumber
     local C = {}
 
+    local libAceConsole = nil
+
     function C:GetAceLibVersion(libName)
         local major, minor = format(versionFormat, libName), tonumber(("$Revision: 1 $"):match("%d+"))
         return { major, minor }
@@ -30,4 +32,4 @@ local __def = function(LIB, versionFormat, unpack)
     return C
 end
 
-ABP_AceUtil = __def(LibStub, VERSION_FORMAT, table.unpackIt)
+ABP_AceUtil = __def(LibStub, VERSION_FORMAT, ABP_Table.unpackIt)

@@ -74,7 +74,7 @@ local __def = function(
 
     function F:OnAfterInitialize()
         local frames = P:GetAllFrameNames()
-        --error(format('frames: %s', table.toString(frames)))
+        --error(format('frames: %s', ABP_Table.toString(frames)))
         for i,f in ipairs(frames) do
             local frameEnabled = P:IsBarIndexEnabled(i)
             local f = self:CreateActionbarGroup(i)
@@ -208,7 +208,7 @@ local __def = function(
 end
 
 __def(
-        table.unpackIt, table.toStringSorted,
+        ABP_Table.unpackIt, ABP_Table.toStringSorted,
         AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler,
         ABP_ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter, MacroAttributeSetter, MacrotextAttributeSetter,
         Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil, PrettyPrint.pformat,

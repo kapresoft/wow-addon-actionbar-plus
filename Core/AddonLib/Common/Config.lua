@@ -1,4 +1,4 @@
-local format, unpack, pack, tinsert = string.format, table.unpackIt, table.pack, table.insert
+local format, unpack, pack, tinsert = string.format, ABP_Table.unpackIt, table.pack, table.insert
 local ADDON_LIB, ADDON_NAME = AceLibAddonFactory, ADDON_NAME
 
 local C = ADDON_LIB:NewAceLib('Config')
@@ -52,7 +52,7 @@ function C:CreateBarConfigArgsDef()
     local count = P:GetBarSize()
     --local bars = P:GetBars()
     --error(format('frames count: %s', tostring(count)))
-    --error(format('bars: %s', table.toString(bars)))
+    --error(format('bars: %s', ABP_Table.toString(bars)))
     for i=1,count do
         local key = 'bar' .. i
         configArgs[key] = C:CreateBarConfigDef(i)

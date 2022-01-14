@@ -1,8 +1,8 @@
 local ABP_PREFIX, LOG_LEVEL = ABP_PREFIX, ABP_LOG_LEVEL
-local format, pack, unpack, sliceAndPack = string.format, table.pack, table.unpackIt, table.sliceAndPack
+local format, pack, unpack, sliceAndPack = string.format, ABP_Table.pack, ABP_Table.unpackIt, ABP_Table.sliceAndPack
 local type, select, tostring, error = type, select, tostring, error
 local pformat = PrettyPrint.pformat
-local isNotTable, isTable, tableToString = table.isNotTable, table.isTable, table.toString
+local isNotTable, isTable, tableToString = ABP_Table.isNotTable, ABP_Table.isTable, ABP_Table.toString
 local ACE_LIB, ADDON_LIB = AceLibFactory, AceLibAddonFactory
 local AceUtil = ABP_AceUtil
 

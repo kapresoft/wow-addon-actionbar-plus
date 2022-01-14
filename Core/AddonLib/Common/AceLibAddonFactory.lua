@@ -1,5 +1,5 @@
-local LibStub, format, unpack = LibStub, string.format, table.unpackIt
-local assert, type, tonumber, isTable = assert, type, tonumber, table.isTable
+local LibStub, format, unpack = LibStub, string.format, ABP_Table.unpackIt
+local assert, type, tonumber, isTable = assert, type, tonumber, ABP_Table.isTable
 local VERSION_FORMAT = VERSION_FORMAT
 local LOGF = ABP_LogFactory
 
