@@ -189,9 +189,12 @@ local __def = function(
         local actionType, info1, info2, info3 = GetCursorInfo()
         ClearCursor()
         local cursorInfo = { type = actionType, info1 = info1, info2 = info2, info3 = info3 }
-        self:log(10, 'Drag Event Cursor Info: %s', toStringSorted(cursorInfo))
+        self:log(1, 'Drag Event Cursor Info: %s', toStringSorted(cursorInfo))
 
-        if not H:CanHandle(actionType) then return end
+        if not H:CanHandle(actionType) then
+            self:log(1, 'No handler found for action type: %s', actionType)
+            return
+        end
         H:Handle(btnUI, actionType, cursorInfo)
     end
 

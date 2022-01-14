@@ -9,11 +9,21 @@ local S = {}
 LOG:EmbedLogger(S, 'MacroDragEventHandler')
 MacroDragEventHandler = S
 
----@param macroCursorInfo table Structure `{ -- }`
-function S:Handle(btnUI, macroCursorInfo)
-    if macroCursorInfo == nil or macroCursorInfo.id == nil then return end
+function S:IsMacrotext(macroInfo)
+    return macroInfo.type == 'macrotext'
+end
+
+---@param cursorInfo table Structure `{ -- }`
+function S:Handle(btnUI, cursorInfo)
+    local macroInfo = { type = cursorInfo.type, macroIndex = cursorInfo.info1 }
+    self:log('TODO: Handle macro:  %s', PrettyPrint.pformat(macroInfo))
+    if self:IsMacrotext(macroInfo) then
+        self:HandleMacrotext(btnUI, cursorInfo)
+        return
+    end
+
+    if macroInfo == nil or macroInfo.macroIndex == nil then return end
     --local itemInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
-    message('TODO: Implement me')
     local macroInfo = nil
     if IsNil(macroInfo) then return end
     --self:logp('spellInfo', spellInfo)
@@ -29,4 +39,8 @@ function S:Handle(btnUI, macroCursorInfo)
     barData.buttons[btnName] = btnData
 
     MacroAttributeSetter(btnUI, btnData)
+end
+
+function S:HandleMacrotext(btnUI, cursorInfo)
+
 end

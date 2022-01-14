@@ -13,7 +13,7 @@ ItemDragEventHandler = S
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
 function S:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end
-    local itemInfo = { type = cursorInfo.actionType,
+    local itemInfo = { type = cursorInfo.type,
                        id = cursorInfo.info1, link = cursorInfo.info2 }
     local itemName, itemLink,
         itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,

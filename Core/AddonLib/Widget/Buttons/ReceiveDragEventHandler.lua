@@ -6,30 +6,10 @@ local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler =
     SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler
 
 local H = {}
-local l = LOG('RecvDragEH')
+LOG:EmbedLogger(H, 'ReceiveDragEventHandler')
 
 ReceiveDragEventHandler = H
 
-local ItemHandler = {
-    Handle = function(self, btnUI, cursorInfo)
-        l:log('item drag received: %s', btnUI:GetName())
-    end
-
-}
-
-local MacroHandler = {
-    Handle = function(self, btnUI, cursorInfo)
-        l:log('macro drag received: %s', btnUI:GetName())
-
-    end
-}
-
-local MacroTextHandler = {
-    Handle = function(self, btnUI, cursorInfo)
-        l:log('macrotext drag received: %s', btnUI:GetName())
-
-    end
-}
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {
     ['spell'] = SpellDragEventHandler,
@@ -41,6 +21,7 @@ local handlers = {
 function H:CanHandle(actionType)
     local handler = handlers[actionType]
     local hasHandler = IsNotNil(handler) and IsNotNil(handler.Handle)
+    self:log(10, 'Can handle? %s type: %s', hasHandler, actionType)
     return hasHandler
 end
 

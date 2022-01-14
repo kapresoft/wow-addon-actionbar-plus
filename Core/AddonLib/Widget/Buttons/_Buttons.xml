@@ -9,6 +9,7 @@
     <Script file="MacrotextAttributeSetter.lua"/>
     <Script file="ItemDragEventHandler.lua"/>
     <Script file="SpellDragEventHandler.lua"/>
+    <Script file="MacroDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
 
