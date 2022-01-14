@@ -4,7 +4,23 @@ local Categories = {
     'Boots', 'Box', 'Bracer', 'Cask', 'Chest', 'Crate', 'Crown', 'DataCrystal', 'DiabloStone',
     'Drink', 'Egg', 'Elemental', 'Enchant', 'Fishing', 'Food', 'Fabric', 'Feather', 'Gauntlets',
     'Gizmo', 'Hammer', 'Helmet', 'Holiday', 'Ingot', 'Jewelcrafting', 'Jewelry',
-    'Letter', 'Mace', 'Mask', 'Musket', 'Misc', 'Mushroom', 'Netherwhelp', 'Offhand',
+    'Letter', 'Mace', 'Mask', 'Musket',
+    'Misc - Bag',
+    'Misc - Bandana/Basket/Birdbeck',
+    'Misc - Bandage/Beer/Bomb',
+    'Misc - Bone/Book/Branch',
+    'Misc - Candle-Cape',
+    'Misc - Cauldron-Coin',
+    'Misc - Comb-DragonKite',
+    'Misc - Drum-Fish',
+    'Misc - Flower-Gem',
+    'Misc - Gift-Herb',
+    'Misc - Hook-Missile',
+    'Misc - MonsterClaw-OrnateBox',
+    'Misc - Pelt-Quiver',
+    'Misc - Ribbon-Wrench',
+    'Misc - Trinkets/Apexis',
+    'Mushroom', 'Netherwhelp', 'Offhand',
     'Ore', 'Pants', 'Pick', 'Poison', 'Potion', 'Qiraj', 'Relics', 'Rod', 'Rose', 'Scroll',
     'Scarab', 'Shield', 'Shirt', 'Spear', 'Shoulder', 'Staff', 'Stone', 'Spear', 'SummerFest',
     'Sword', 'ThrowingAxe', 'ThrowingKnife', 'Torch', 'TradeskillItem', 'Trinket', 'Valentine',
@@ -1455,7 +1471,7 @@ C.categoriesCache = {
         [133568] = 'Interface/Icons/INV_Mask_05',
         [133569] = 'Interface/Icons/INV_Mask_06'
     },
-    Misc = {
+    ['Misc - Trinkets/Apexis'] = {
         [133570] = 'Interface/Icons/INV_Misc_AhnQirajTrinket_01',
         [133571] = 'Interface/Icons/INV_Misc_AhnQirajTrinket_02',
         [133572] = 'Interface/Icons/INV_Misc_AhnQirajTrinket_03',
@@ -1464,6 +1480,8 @@ C.categoriesCache = {
         [133575] = 'Interface/Icons/INV_Misc_AhnQirajTrinket_06',
         [133594] = 'Interface/Icons/INV_Misc_Apexis_Crystal',
         [133595] = 'Interface/Icons/INV_Misc_Apexis_Shard',
+    },
+    ['Misc - Bag'] = {
         [133622] = 'Interface/Icons/INV_Misc_Bag_01',
         [133623] = 'Interface/Icons/INV_Misc_Bag_02',
         [133624] = 'Interface/Icons/INV_Misc_Bag_03',
@@ -1511,6 +1529,16 @@ C.categoriesCache = {
         [133668] = 'Interface/Icons/INV_Misc_Bag_HerbPouch',
         [133669] = 'Interface/Icons/INV_Misc_Bag_SatchelofCenarius',
         [133670] = 'Interface/Icons/INV_Misc_Bag_Soulbag',
+    },
+    ['Misc - Bandana/Basket/Birdbeck'] = {
+        [133693] = 'Interface/Icons/INV_Misc_Bandana_01',
+        [133694] = 'Interface/Icons/INV_Misc_Bandana_03',
+        [133695] = 'Interface/Icons/INV_Misc_Basket_01',
+        [133706] = 'Interface/Icons/INV_Misc_Bell_01',
+        [133707] = 'Interface/Icons/INV_Misc_Birdbeck_01',
+        [133708] = 'Interface/Icons/INV_Misc_Birdbeck_02',
+    },
+    ['Misc - Bandage/Beer/Bomb'] = {
         [133671] = 'Interface/Icons/INV_Misc_Bandage_01',
         [133672] = 'Interface/Icons/INV_Misc_Bandage_02',
         [133673] = 'Interface/Icons/INV_Misc_Bandage_03',
@@ -1533,9 +1561,6 @@ C.categoriesCache = {
         [133690] = 'Interface/Icons/INV_Misc_Bandage_20',
         [133691] = 'Interface/Icons/INV_Misc_Bandage_Netherweave',
         [133692] = 'Interface/Icons/INV_Misc_Bandage_Netherweave_Heavy',
-        [133693] = 'Interface/Icons/INV_Misc_Bandana_01',
-        [133694] = 'Interface/Icons/INV_Misc_Bandana_03',
-        [133695] = 'Interface/Icons/INV_Misc_Basket_01',
         [133696] = 'Interface/Icons/INV_Misc_Beer_01',
         [133697] = 'Interface/Icons/INV_MISC_BEER_02',
         [133698] = 'Interface/Icons/INV_Misc_Beer_03',
@@ -1546,9 +1571,6 @@ C.categoriesCache = {
         [133703] = 'Interface/Icons/INV_Misc_Beer_08',
         [133704] = 'Interface/Icons/INV_Misc_Beer_09',
         [133705] = 'Interface/Icons/INV_Misc_Beer_10',
-        [133706] = 'Interface/Icons/INV_Misc_Bell_01',
-        [133707] = 'Interface/Icons/INV_Misc_Birdbeck_01',
-        [133708] = 'Interface/Icons/INV_Misc_Birdbeck_02',
         [133709] = 'Interface/Icons/INV_Misc_Bomb_01',
         [133710] = 'Interface/Icons/INV_Misc_Bomb_02',
         [133711] = 'Interface/Icons/INV_Misc_Bomb_03',
@@ -1558,6 +1580,8 @@ C.categoriesCache = {
         [133715] = 'Interface/Icons/INV_Misc_Bomb_07',
         [133716] = 'Interface/Icons/INV_Misc_Bomb_08',
         [133717] = 'Interface/Icons/INV_Misc_Bomb_09',
+    },
+    ['Misc - Bone/Book/Branch'] = {
         [133718] = 'Interface/Icons/INV_Misc_Bone_01',
         [133719] = 'Interface/Icons/INV_Misc_Bone_02',
         [133720] = 'Interface/Icons/INV_Misc_Bone_03',
@@ -1589,6 +1613,8 @@ C.categoriesCache = {
         [133746] = 'Interface/Icons/INV_Misc_Book_14',
         [133747] = 'Interface/Icons/INV_Misc_Book_15',
         [133749] = 'Interface/Icons/INV_Misc_Branch_01',
+    },
+    ['Misc - Candle-Cape'] = {
         [133750] = 'Interface/Icons/INV_Misc_Candle_01',
         [133751] = 'Interface/Icons/INV_Misc_Candle_02',
         [133752] = 'Interface/Icons/INV_Misc_Candle_03',
@@ -1617,6 +1643,8 @@ C.categoriesCache = {
         [133775] = 'Interface/Icons/INV_Misc_Cape_Naxxramas_01',
         [133776] = 'Interface/Icons/INV_Misc_Cape_Naxxramas_02',
         [133777] = 'Interface/Icons/INV_Misc_Cape_Naxxramas_03',
+    },
+    ['Misc - Cauldron-Coin'] = {
         [133778] = 'Interface/Icons/INV_Misc_Cauldron_Arcane',
         [133779] = 'Interface/Icons/INV_Misc_Cauldron_Fire',
         [133780] = 'Interface/Icons/INV_Misc_Cauldron_Frost',
@@ -1638,6 +1666,8 @@ C.categoriesCache = {
         [133796] = 'Interface/Icons/INV_Misc_Coin_13',
         [133797] = 'Interface/Icons/INV_Misc_Coin_14',
         [133798] = 'Interface/Icons/INV_Misc_Coin_15',
+    },
+    ['Misc - Comb-DragonKite'] = {
         [133800] = 'Interface/Icons/INV_Misc_Comb_01',
         [133801] = 'Interface/Icons/INV_Misc_Comb_02',
         [133802] = 'Interface/Icons/INV_Misc_Crop_01',
@@ -1679,6 +1709,8 @@ C.categoriesCache = {
         [133838] = 'Interface/Icons/INV_Misc_DragonKite_02',
         [133839] = 'Interface/Icons/INV_Misc_DragonKite_03',
         [133840] = 'Interface/Icons/INV_Misc_DragonKite_04',
+    },
+    ['Misc - Drum-Fish'] = {
         [133841] = 'Interface/Icons/INV_Misc_Drum_01',
         [133842] = 'Interface/Icons/INV_Misc_Drum_02',
         [133843] = 'Interface/Icons/INV_Misc_Drum_03',
@@ -1773,6 +1805,8 @@ C.categoriesCache = {
         [133935] = 'Interface/Icons/INV_Misc_Fish_Turtle_01',
         [133936] = 'Interface/Icons/INV_Misc_Fish_Turtle_02',
         [133937] = 'Interface/Icons/INV_Misc_Fish_Turtle_03',
+    },
+    ['Misc - Flower-Gem'] = {
         [133938] = 'Interface/Icons/INV_Misc_Flower_01',
         [133939] = 'Interface/Icons/INV_Misc_Flower_02',
         [133940] = 'Interface/Icons/INV_Misc_Flower_03',
@@ -1858,6 +1892,8 @@ C.categoriesCache = {
         [134137] = 'Interface/Icons/INV_Misc_Gem_Topaz_03',
         [134138] = 'Interface/Icons/INV_Misc_Gem_Variety_01',
         [134139] = 'Interface/Icons/INV_Misc_Gem_Variety_02',
+    },
+    ['Misc - Gift-Herb'] = {
         [134140] = 'Interface/Icons/INV_Misc_Gift_01',
         [134141] = 'Interface/Icons/INV_Misc_Gift_02',
         [134142] = 'Interface/Icons/INV_Misc_Gift_03',
@@ -1936,6 +1972,8 @@ C.categoriesCache = {
         [134220] = 'Interface/Icons/INV_Misc_Herb_Ragveil',
         [134221] = 'Interface/Icons/INV_Misc_Herb_SansamRoot',
         [134223] = 'Interface/Icons/INV_Misc_Herb_Terrocone',
+    },
+    ['Misc - Hook-Missile'] = {
         [134226] = 'Interface/Icons/INV_MISC_HOOK_01',
         [134227] = 'Interface/Icons/INV_Misc_Horn_01',
         [134228] = 'Interface/Icons/INV_Misc_Horn_02',
@@ -2000,6 +2038,8 @@ C.categoriesCache = {
         [134291] = 'Interface/Icons/INV_Misc_MissileSmallCluster_Red',
         [134292] = 'Interface/Icons/INV_Misc_MissileSmallCluster_White',
         [134293] = 'Interface/Icons/INV_Misc_MissileSmallCluster_Yellow',
+    },
+    ['Misc - MonsterClaw-OrnateBox'] = {
         [134294] = 'Interface/Icons/INV_Misc_MonsterClaw_01',
         [134295] = 'Interface/Icons/INV_Misc_MonsterClaw_02',
         [134296] = 'Interface/Icons/INV_Misc_MonsterClaw_03',
@@ -2051,6 +2091,8 @@ C.categoriesCache = {
         [134342] = 'Interface/Icons/INV_Misc_Organ_05',
         [134343] = 'Interface/Icons/INV_Misc_Organ_06',
         [134344] = 'Interface/Icons/INV_Misc_OrnateBox',
+    },
+    ['Misc - Pelt-Quiver'] = {
         [134345] = 'Interface/Icons/INV_Misc_Pelt_01',
         [134346] = 'Interface/Icons/INV_Misc_Pelt_02',
         [134347] = 'Interface/Icons/INV_Misc_Pelt_03',
@@ -2115,6 +2157,8 @@ C.categoriesCache = {
         [134408] = 'Interface/Icons/INV_Misc_Quiver_08',
         [134409] = 'Interface/Icons/INV_Misc_Quiver_09',
         [134410] = 'Interface/Icons/INV_Misc_Quiver_10',
+    },
+    ['Misc - Ribbon-Wrench'] = {
         [134411] = 'Interface/Icons/INV_Misc_Ribbon_01',
         [134412] = 'Interface/Icons/INV_Misc_Root_01',
         [134413] = 'Interface/Icons/INV_Misc_Root_02',
@@ -3310,6 +3354,7 @@ C.categoriesCache = {
         [135723] = 'Interface/Icons/INV_ZulGurubTrinket'
     }
 }
+
 function C:GetCategoriesCache() return self.categoriesCache end
 
 MacroIconCategories = C

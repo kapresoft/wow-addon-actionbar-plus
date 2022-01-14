@@ -57,6 +57,7 @@ local __def = function(LogFactory, GameTooltip,
         frame.iconsScrollFrame = nil
 
         local iconCategoryDropDown = AceGUI:Create("Dropdown")
+        iconCategoryDropDown:SetWidth(250)
         iconCategoryDropDown:SetLabel("Category:")
         iconCategoryDropDown:SetList(MC:GetDropDownItems())
         frame:AddChild(iconCategoryDropDown)
