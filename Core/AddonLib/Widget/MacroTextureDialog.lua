@@ -1,7 +1,7 @@
 -- Dialog for Macro Textures
 
 local __def = function(LogFactory, GameTooltip,
-                       ACELIB, MC,
+                       ACELIB, MC, Table,
                        ConfigureFrameToCloseOnEscapeKey,
                        GetMacroItemIcons, ART_TEXTURES,
                        TEXTURE_EMPTY, ANCHOR_TOPLEFT)
@@ -67,7 +67,7 @@ local __def = function(LogFactory, GameTooltip,
 
         local function onValueChanged(selectedCategory)
             local categoryItems = categoryCache[selectedCategory]
-            if categoryItems == nil or table.isEmpty(categoryItems) then
+            if categoryItems == nil or Table.isEmpty(categoryItems) then
                 --self:log(1, 'Retrieving category items: %s', selectedCategory)
                 categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
                 categoryCache[selectedCategory] = categoryItems
@@ -229,7 +229,7 @@ local __def = function(LogFactory, GameTooltip,
 end
 
 ABP_MacroTextureDialog = __def(ABP_LogFactory, GameTooltip,
-        AceLibFactory, MacroIconCategories,
+        AceLibFactory, MacroIconCategories, ABP_Table,
         ConfigureFrameToCloseOnEscapeKey,
         GetMacroItemIcons, ART_TEXTURES,
         TEXTURE_EMPTY, ANCHOR_TOPLEFT)
