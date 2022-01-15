@@ -14,7 +14,7 @@ local __def = function(LogFactory, GameTooltip,
     -- ### Local Vars
 
     local ICON_PREFIX = 'Interface/Icons/'
-    local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
+    local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
     local thisDialog = nil
     local categoryCache = nil

@@ -43,7 +43,7 @@ end
 function C:GetOptions()
     return {
         name = ADDON_NAME, handler = C.addon, type = "group",
-        args = C:CreateBarConfigArgsDef()
+        args = C:CreateBarConfigArgsDef(),
     }
 end
 
