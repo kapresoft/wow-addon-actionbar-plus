@@ -1,5 +1,5 @@
 local _G = _G
-local format,IsNotBlank = string.format, string.IsNotBlank
+local format, IsNotBlank = string.format, ABP_String.IsNotBlank
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local CreateFrame  = CreateFrame
 
