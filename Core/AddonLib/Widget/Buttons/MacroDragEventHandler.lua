@@ -1,7 +1,10 @@
 local AssertNotNil = Assert.AssertNotNil
 local WLIB, MacroAttributeSetter = WidgetLibFactory, MacroAttributeSetter
 local ButtonAttributes, _API_Spell, IsNil = ButtonAttributes, _API_Spell, Assert.IsNil
+local pformat = PrettyPrint.pformat
 local LOG = ABP_LogFactory
+-- TODO: Move to API
+local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
 
 local P = WLIB:GetProfile()
 
@@ -15,21 +18,22 @@ end
 
 ---@param cursorInfo table Structure `{ -- }`
 function S:Handle(btnUI, cursorInfo)
-    local macroInfo = { type = cursorInfo.type, macroIndex = cursorInfo.info1 }
-    self:log('TODO: Handle macro:  %s', PrettyPrint.pformat(macroInfo))
+    self:log(10, 'cursorInfo: %s', cursorInfo)
+    if cursorInfo == nil or cursorInfo.info1 == nil then return end
+    local macroInfo = self:GetMacroInfo(cursorInfo)
+    self:log(10, 'macroInfo: %s', pformat(macroInfo))
+    --DEVT:EvalObject(macroInfo, 'macroInfo')
+
     if self:IsMacrotext(macroInfo) then
         self:HandleMacrotext(btnUI, cursorInfo)
         return
     end
-
-    if macroInfo == nil or macroInfo.macroIndex == nil then return end
-    --local itemInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
-    local macroInfo = nil
     if IsNil(macroInfo) then return end
-    --self:logp('spellInfo', spellInfo)
 
+    --- ActionBarInfo `{ index = 2, name = 'ActionbarPlusF2' }`
     local actionbarInfo = btnUI:GetActionbarInfo()
-    --self:logp('ActionBar', actionbarInfo)
+    -- DEVT:EvalObject(actionbarInfo, 'actionbarInfo')
+
     local btnName = btnUI:GetName()
     local barData = P:GetBar(actionbarInfo.index)
 
@@ -39,6 +43,28 @@ function S:Handle(btnUI, cursorInfo)
     barData.buttons[btnName] = btnData
 
     MacroAttributeSetter(btnUI, btnData)
+end
+
+--- {
+---     body = '/run message(GetXPExhaustion())\n',
+---     icon = 132096,
+---     macroIndex = 1,
+---     name = '#GetRestedXP',
+---     type = 'macro'
+--- }
+---@param cursorInfo table Cursor Info `{ type='type', info1='macroIndex' }`
+function S:GetMacroInfo(cursorInfo)
+    local macroIndex = cursorInfo.info1
+    local macroName, macroIconId, macroBody, isLocal = GetMacroInfo(macroIndex)
+    local macroInfo = {
+        type = cursorInfo.type,
+        macroIndex = macroIndex,
+        name = macroName, icon = macroIconId, body = macroBody,
+        isLocal = isLocal,
+    }
+
+
+    return macroInfo
 end
 
 function S:HandleMacrotext(btnUI, cursorInfo)

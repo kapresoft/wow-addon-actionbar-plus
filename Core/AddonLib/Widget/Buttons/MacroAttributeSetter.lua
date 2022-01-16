@@ -9,22 +9,25 @@ MacroAttributeSetter = S
 LOG:EmbedLogger(S, 'MacroAttributeSetter')
 
 --- Macro Info:
---- `{
---- }`
+--- {
+---     body = '/run message(GetXPExhaustion())\n',
+---     icon = 132096,
+---     macroIndex = 1,
+---     name = '#GetRestedXP',
+---     type = 'macro'
+--- }
 function S:SetAttributes(btnUI, btnData)
     RWAttr(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
-    if type(macroInfo) ~= 'table' then return end
-    if not macroInfo.id then return end
-
-    AssertNotNil(macroInfo.id, 'btnData[item].macroInfo.id')
-
     local icon = TEXTURE_EMPTY
     if macroInfo.icon then icon = macroInfo.icon end
+    btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
+    btnUI:SetAttribute(WAttr.MACRO, macroInfo.name)
     btnUI:SetNormalTexture(icon)
     btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
 
+    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
 end
 
 ---@param link table The blizzard `GameTooltip` link
@@ -35,7 +38,10 @@ function S:ShowTooltip(btnUI, btnData)
 
     local macroInfo = btnData[WAttr.MACRO]
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
-    GameTooltip:AddSpellByID(macroInfo.id)
+    ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
+
+    local macroLabel = ' |cfd5a5a5a(Macro)|r'
+    GameTooltip:SetText(macroInfo.name .. macroLabel)
 end
 
 S.mt.__call = S.SetAttributes
