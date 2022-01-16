@@ -1,12 +1,13 @@
 -- Dialog for Macro Textures
 
 local __def = function(LogFactory, GameTooltip,
-                       ACELIB, MC, Table,
+                       ACELIB, MC, Table, String,
                        ConfigureFrameToCloseOnEscapeKey,
                        GetMacroItemIcons, ART_TEXTURES,
                        TEXTURE_EMPTY, ANCHOR_TOPLEFT)
 
     local type, tonumber = type, tonumber
+    local replace = String.replace
 
     local D = {}
     LogFactory:EmbedLogger(D, '::TextureDialog')
@@ -63,7 +64,7 @@ local __def = function(LogFactory, GameTooltip,
         frame:AddChild(iconCategoryDropDown)
 
         local function toIconName(iconPath)
-            return string.replace(iconPath, ICON_PREFIX, '')
+            return replace(iconPath, ICON_PREFIX, '')
         end
 
         local function onValueChanged(selectedCategory)
@@ -230,7 +231,7 @@ local __def = function(LogFactory, GameTooltip,
 end
 
 ABP_MacroTextureDialog = __def(ABP_LogFactory, GameTooltip,
-        AceLibFactory, MacroIconCategories, ABP_Table,
+        AceLibFactory, MacroIconCategories, ABP_Table, ABP_String,
         ConfigureFrameToCloseOnEscapeKey,
         GetMacroItemIcons, ART_TEXTURES,
         TEXTURE_EMPTY, ANCHOR_TOPLEFT)
