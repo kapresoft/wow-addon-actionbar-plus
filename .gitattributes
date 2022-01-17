@@ -6,3 +6,4 @@
 # Git will always convert line endings to CRLF on checkout.
 # You should use this for files that must keep CRLF endings, even on OSX or Linux.
 # text eol=crlf
+text eol=lf
