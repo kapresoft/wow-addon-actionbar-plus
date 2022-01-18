@@ -4,6 +4,16 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
 ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 
+ABP_CommonConstants = {
+    GetLogLevel = function()
+        return ABP_LOG_LEVEL
+    end,
+    ---@param level number The log level between 1 and 100
+    SetLogLevel = function(level)
+        ABP_LOG_LEVEL = level or 1
+    end
+}
+
 AceModule = {
     AceConsole = 'AceConsole-3.0',
     AceDB = 'AceDB-3.0',

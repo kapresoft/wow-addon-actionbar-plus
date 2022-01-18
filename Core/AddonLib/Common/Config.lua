@@ -1,5 +1,6 @@
 local format, unpack, pack, tinsert = string.format, ABP_Table.unpackIt, table.pack, table.insert
 local ADDON_LIB, ADDON_NAME = AceLibAddonFactory, ADDON_NAME
+local GetLogLevel,SetLogLevel = ABP_CommonConstants.GetLogLevel, ABP_CommonConstants.SetLogLevel
 
 local C = ADDON_LIB:NewAceLib('Config')
 if not C then return end
@@ -44,6 +45,7 @@ function C:GetOptions()
     return {
         name = ADDON_NAME, handler = C.addon, type = "group",
         args = C:CreateBarConfigArgsDef(),
+
     }
 end
 
@@ -57,6 +59,29 @@ function C:CreateBarConfigArgsDef()
         local key = 'bar' .. i
         configArgs[key] = C:CreateBarConfigDef(i)
     end
+
+    configArgs.debugging = {
+        type = "group",
+        name = "Debugging",
+        desc = "Debug Settings",
+        order = 3,
+        args = {
+            desc = { name = " Debugging Configuration ", type = "header", order = 0 },
+            log_level = {
+                type = 'range',
+                order = 1,
+                step = 5,
+                min = 0,
+                max = 100,
+                width = 1.2,
+                name = 'Log Level',
+                desc = 'Higher log levels generate for console logs.',
+                get = function(_) return GetLogLevel() end,
+                set = function(_, v) SetLogLevel(v) end,
+            },
+        },
+    }
+
     return configArgs
 end
 

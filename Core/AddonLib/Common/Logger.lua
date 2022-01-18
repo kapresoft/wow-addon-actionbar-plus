@@ -1,9 +1,8 @@
-local ABP_PREFIX, LOG_LEVEL = ABP_PREFIX, ABP_LOG_LEVEL
+local ABP_PREFIX = ABP_PREFIX
+local GetLogLevel = ABP_CommonConstants.GetLogLevel
 local format, pack, unpack, sliceAndPack = string.format, ABP_Table.pack, ABP_Table.unpackIt, ABP_Table.sliceAndPack
 local type, select, tostring, error = type, select, tostring, error
-local pformat = PrettyPrint.pformat
-local isNotTable, isTable, tableToString = ABP_Table.isNotTable, ABP_Table.isTable, ABP_Table.toString
-local ACE_LIB, ADDON_LIB = AceLibFactory, AceLibAddonFactory
+local pformat, tableToString = PrettyPrint.pformat, ABP_Table.toString
 local AceUtil = ABP_AceUtil
 
 local c = AceUtil:GetAceConsole()
@@ -19,13 +18,20 @@ local function _EmbedLogger(obj, optionalLogName)
     obj.mt = { __tostring = function() return format(ABP_PREFIX, prefix)  end }
     setmetatable(obj, obj.mt)
 
+    ---@param level number The level configured by the log function call
+    local function ShouldLog(level)
+        assert(type(level) == 'number', 'Level should be a number between 1 and 100')
+        if not (GetLogLevel() >= level) then return false end
+        return true
+    end
+
     function obj:log(...)
         local args = pack(...)
         if args.len == 1 then
             self:Print(self:ArgToString(args[1]))
             return
         end
-        local level = 1
+        local level = 0
         local startIndex = 1
         if type(args[1]) == 'number' then
             level = args[1]
@@ -34,7 +40,8 @@ local function _EmbedLogger(obj, optionalLogName)
         if type(args[startIndex]) ~= 'string' then
             error(format('Argument #%s requires a string.format text', startIndex))
         end
-        if LOG_LEVEL < level then return end
+        if not ShouldLog(level) then return end
+
         --print(format('startIndex: %s level: %s', startIndex, level))
         args = sliceAndPack({...}, startIndex)
         local newArgs = {}
@@ -47,7 +54,7 @@ local function _EmbedLogger(obj, optionalLogName)
 
     function obj:logn(...)
         local args = pack(...)
-        local level = 1
+        local level = 0
         local startIndex = 1
         if type(args[1]) == 'number' then
             level = args[1]
@@ -56,7 +63,9 @@ local function _EmbedLogger(obj, optionalLogName)
         if type(args[startIndex]) ~= 'string' then
             error(format('Argument #%s requires a string.format text', startIndex))
         end
-        if LOG_LEVEL < level then return end
+        if not ShouldLog(level) then return end
+
+        --if LOG_LEVEL < level then return end
         --print(format('startIndex: %s level: %s', startIndex, level))
         args = sliceAndPack({...}, startIndex)
         local newArgs = {}

@@ -3,7 +3,7 @@
 ---
 ---@type table ButtonFactory
 local __def = function(
-        unpack, toStringSorted,
+        String, unpack, toStringSorted,
         ADDON_LIB, WLIB, H,
         ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter, MacroAttributeSetter, MacrotextAttributeSetter,
         AssertThatMethodArgIsNotNil, AssertNotNil, pformat,
@@ -188,16 +188,29 @@ local __def = function(
         -- TODO: Move to TBC/API
         local actionType, info1, info2, info3 = GetCursorInfo()
         ClearCursor()
-        local cursorInfo = { type = actionType, info1 = info1, info2 = info2, info3 = info3 }
-        self:log(1, 'Drag Event Cursor Info: %s', toStringSorted(cursorInfo))
+
+        local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+        if not self:IsValidDragSource(cursorInfo) then return end
 
         if not H:CanHandle(actionType) then
-            self:log(1, 'No handler found for action type: %s', actionType)
+            self:log(5, 'No handler found for action type: %s', actionType)
             return
         end
+
         H:Handle(btnUI, actionType, cursorInfo)
     end
 
+    function F:IsValidDragSource(cursorInfo)
+        self:log(5, 'OnReceiveDrag Cursor-Info: %s', toStringSorted(cursorInfo))
+        if String.IsBlank(cursorInfo.type) then
+            -- This can happen if a chat tab or others is dragged into
+            -- the action bar.
+            self:log(5, 'Received drag event with invalid cursor info. Skipping...')
+            return false
+        end
+
+        return true
+    end
 
     function F:AttachFrameEvents(frame)
         frame:SetScript("OnMouseDown", OnMouseDownFrame)
@@ -208,7 +221,7 @@ local __def = function(
 end
 
 __def(
-        ABP_Table.unpackIt, ABP_Table.toStringSorted,
+        ABP_String, ABP_Table.unpackIt, ABP_Table.toStringSorted,
         AceLibAddonFactory, WidgetLibFactory, ReceiveDragEventHandler,
         ABP_ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter, MacroAttributeSetter, MacrotextAttributeSetter,
         Assert.AssertThatMethodArgIsNotNil, Assert.AssertNotNil, PrettyPrint.pformat,
