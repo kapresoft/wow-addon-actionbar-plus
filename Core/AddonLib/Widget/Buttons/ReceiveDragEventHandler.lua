@@ -24,8 +24,6 @@ function H:CleanupProfile(btnUI, actionType)
     for _, at in ipairs(otherTypes) do
         btnData[at] = {}
     end
-
-    ABP:DBG(btnData, 'Updated Btn Data')
 end
 
 function H:CanHandle(actionType)
