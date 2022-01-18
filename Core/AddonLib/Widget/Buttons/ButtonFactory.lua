@@ -191,12 +191,6 @@ local __def = function(
 
         local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
         if not self:IsValidDragSource(cursorInfo) then return end
-
-        if not H:CanHandle(actionType) then
-            self:log(5, 'No handler found for action type: %s', actionType)
-            return
-        end
-
         H:Handle(btnUI, actionType, cursorInfo)
     end
 

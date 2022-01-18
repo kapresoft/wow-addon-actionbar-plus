@@ -2,7 +2,8 @@ local ABP_PREFIX = ABP_PREFIX
 local GetLogLevel = ABP_CommonConstants.GetLogLevel
 local format, pack, unpack, sliceAndPack = string.format, ABP_Table.pack, ABP_Table.unpackIt, ABP_Table.sliceAndPack
 local type, select, tostring, error = type, select, tostring, error
-local pformat, tableToString = PrettyPrint.pformat, ABP_Table.toString
+local Table, String = ABP_Table, ABP_String
+local pformat, tableToString, sreplace = PrettyPrint.pformat, Table.toStringSorted, String.replace
 local AceUtil = ABP_AceUtil
 
 local c = AceUtil:GetAceConsole()
@@ -42,13 +43,12 @@ local function _EmbedLogger(obj, optionalLogName)
         end
         if not ShouldLog(level) then return end
 
-        --print(format('startIndex: %s level: %s', startIndex, level))
         args = sliceAndPack({...}, startIndex)
         local newArgs = {}
         for i=1,args.len do
-            newArgs[i] = self:ArgToString(args[i])
+            local formatSafe = i > 1
+            newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
-        --c:Print(prefix, format(unpack(newArgs)))
         self:Printf(format(unpack(newArgs)))
     end
 
@@ -105,11 +105,15 @@ local function _EmbedLogger(obj, optionalLogName)
         self:Print(format(unpack(newArgs)))
     end
 
-    function obj:ArgToString(any)
-        if type(any) == 'table' then return tableToString(any)
-        else
-            return tostring(any)
+    ---Convert arguments to string
+    ---@param optionalStringFormatSafe boolean Set to true to escape '%' characters used by string.forma
+    function obj:ArgToString(any, optionalStringFormatSafe)
+        local text
+        if type(any) == 'table' then text = tableToString(any) else text = tostring(any) end
+        if optionalStringFormatSafe == true then
+            return sreplace(text, '%', '$')
         end
+        return text
     end
 
 end

@@ -21,7 +21,7 @@ local handlers = {
 function H:CanHandle(actionType)
     local handler = handlers[actionType]
     local hasHandler = IsNotNil(handler) and IsNotNil(handler.Handle)
-    self:log(10, 'Can handle? %s type: %s', hasHandler, actionType)
+    self:log(10, 'Can handle drag event from [%s]? %s', actionType, hasHandler)
     return hasHandler
 end
 

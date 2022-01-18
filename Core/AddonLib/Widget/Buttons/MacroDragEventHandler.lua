@@ -5,6 +5,7 @@ local pformat = PrettyPrint.pformat
 local LOG = ABP_LogFactory
 -- TODO: Move to API
 local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
+local pformat = PrettyPrint.pformat
 
 local P = WLIB:GetProfile()
 
@@ -21,7 +22,9 @@ function S:Handle(btnUI, cursorInfo)
     self:log(10, 'cursorInfo: %s', cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
-    self:log(10, 'macroInfo: %s', pformat(macroInfo))
+    -- replace %s in macros, has log format issues
+    local macroInfoText = ABP_String.replace(pformat(macroInfo), '%s', '$s')
+    self:log(10, 'macroInfo: %s', macroInfoText)
     --DEVT:EvalObject(macroInfo, 'macroInfo')
 
     if self:IsMacrotext(macroInfo) then
