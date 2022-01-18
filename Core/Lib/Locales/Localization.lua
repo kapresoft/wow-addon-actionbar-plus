@@ -6,7 +6,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ActionbarPlus")
 
 -- General
 ABP_TITLE                                    = "ActionbarPlus"
-ABP_CATEGORY                                 = "AddOn/" .. ABP_TITLE
+ABP_CATEGORY                                 = "AddOns/" .. ABP_TITLE
 
 -- Key binding localization text
 BINDING_HEADER_ABP                           = ABP_TITLE

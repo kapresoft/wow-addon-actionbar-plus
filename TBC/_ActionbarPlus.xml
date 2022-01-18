@@ -2,6 +2,6 @@
 ..\FrameXML\UI.xsd">
 
     <!--    Temp -->
-    <Script file="ActionbarPlus.lua"/>
+    <Script file="..\Core\ActionbarPlus.lua"/>
 
 </Ui>
