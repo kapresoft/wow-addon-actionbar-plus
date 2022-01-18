@@ -520,6 +520,10 @@ setmetatable(pprint, {
 })
 
 -- Defaults
-PrettyPrint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=100 })
+pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=100 })
+
+function pprint:_ShowAll()
+    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=100, show_all=true })
+end
 
 --return pprint

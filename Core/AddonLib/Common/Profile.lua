@@ -198,6 +198,16 @@ function P:GetAllFrameNames()
     return fnames
 end
 
+function P:GetButtonsByIndex(frameIndex)
+
+    local barData = self:GetBar(frameIndex)
+    if barData then
+        return barData.buttons
+    end
+
+    return nil
+end
+
 function P:GetAllActionBarSizeDetails()
     return FrameDetails
 end

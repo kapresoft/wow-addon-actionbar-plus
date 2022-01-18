@@ -1,9 +1,7 @@
 local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.AssertThatMethodArgIsNotNil, Assert.Throw
-local format = string.format
-local ACE_LIB, LOG, PrettyPrint, _API_Spell = AceLibFactory, ABP_LogFactory, PrettyPrint, _API_Spell
-local BATTR, TEXTURE_HIGHLIGHT = ButtonAttributes, TEXTURE_HIGHLIGHT
 local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler =
     SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler
+local LOG, AT = ABP_LogFactory, ABP_ActionType
 
 local H = {}
 LOG:EmbedLogger(H, 'ReceiveDragEventHandler')
@@ -17,6 +15,18 @@ local handlers = {
     ['macro'] = MacroDragEventHandler,
     ['macrotext'] = MacroDragEventHandler
 }
+
+function H:CleanupProfile(btnUI, actionType)
+    local btnData = btnUI:GetProfileButtonData()
+    if not btnData then return end
+
+    local otherTypes = AT:GetOtherTypes(actionType)
+    for _, at in ipairs(otherTypes) do
+        btnData[at] = {}
+    end
+
+    ABP:DBG(btnData, 'Updated Btn Data')
+end
 
 function H:CanHandle(actionType)
     local handler = handlers[actionType]
@@ -32,6 +42,8 @@ function H:Handle(btnUI, actionType, cursorInfo)
     if not self:CanHandle(actionType) then
         Throw('Handler not found for action-type: %s', actionType)
     end
-    --ABP:DBG('handler', {type=actionType, cursorInfo=cursorInfo})
-    return handlers[actionType]:Handle(btnUI, cursorInfo)
+
+    handlers[actionType]:Handle(btnUI, cursorInfo)
+
+    self:CleanupProfile(btnUI, actionType)
 end

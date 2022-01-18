@@ -33,7 +33,7 @@ function S.ToString(o)
 end
 
 function S.EqualsIgnoreCase(str1, str2)
-    return S.lower(str1) == S.lower(str2)
+    return string.lower(str1) == string.lower(str2)
 end
 
 -- remove trailing and leading whitespace from string.

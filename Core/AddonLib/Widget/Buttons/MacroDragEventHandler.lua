@@ -51,7 +51,7 @@ end
 --- {
 ---     body = '/run message(GetXPExhaustion())\n',
 ---     icon = 132096,
----     macroIndex = 1,
+---     index = 1,
 ---     name = '#GetRestedXP',
 ---     type = 'macro'
 --- }
@@ -61,7 +61,7 @@ function S:GetMacroInfo(cursorInfo)
     local macroName, macroIconId, macroBody, isLocal = GetMacroInfo(macroIndex)
     local macroInfo = {
         type = cursorInfo.type,
-        macroIndex = macroIndex,
+        index = macroIndex,
         name = macroName, icon = macroIconId, body = macroBody,
         isLocal = isLocal,
     }
