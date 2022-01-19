@@ -3,6 +3,7 @@ if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
 ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
+VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
 
 ABP_CommonConstants = {
     GetLogLevel = function()
@@ -24,6 +25,7 @@ AceModule = {
     AceGUI = 'AceGUI-3.0',
     AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
+
 Module = {
     Logger = 'Logger',
     Config = 'Config',
@@ -31,7 +33,6 @@ Module = {
     ButtonUI = 'ButtonUI',
     ButtonFactory = 'ButtonFactory',
 }
-VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
 
 UnitAttributes = {
     FOCUS = 'focus'

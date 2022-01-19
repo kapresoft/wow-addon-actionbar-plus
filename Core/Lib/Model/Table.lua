@@ -155,5 +155,4 @@ end
 function T.printG() T.printkvs(_G) end
 function T.printLoaded() T.printkvs(package.loaded) end
 
--- ## wrapper methods
 
