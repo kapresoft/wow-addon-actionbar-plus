@@ -1,14 +1,34 @@
 local ABP_PREFIX = ABP_PREFIX
-local GetLogLevel = ABP_CommonConstants.GetLogLevel
-local format, pack, unpack, sliceAndPack = string.format, ABP_Table.pack, ABP_Table.unpackIt, ABP_Table.sliceAndPack
+local PrettyPrint, Table, String = ABP_PrettyPrint, ABP_Table, ABP_String
+local format, pack, unpack, sliceAndPack = string.format, Table.pack, Table.unpackIt, Table.sliceAndPack
 local type, select, tostring, error = type, select, tostring, error
-local Table, String = ABP_Table, ABP_String
-local pformat, tableToString, sreplace = PrettyPrint.pformat, Table.toStringSorted, String.replace
-local AceUtil = ABP_AceUtil
+local setmetatable = setmetatable
+local pformat, sreplace = PrettyPrint.pformat, String.replace
+local LibStub = LibStub
 
-local c = AceUtil:GetAceConsole()
-local L = AceUtil:NewPlainAceLib('Logger')
+local C = LibStub('AceConsole-3.0')
+local MAJOR, MINOR = 'ActionbarPlus-Logger-1.0', tonumber(("$Revision: 1 $"):match("%d+"))
+local L = LibStub:NewLibrary(MAJOR, MINOR)
 if not L then return end
+
+---@param level number The level configured by the log function call
+local function ShouldLog(level)
+    assert(type(level) == 'number', 'Level should be a number between 1 and 100')
+    local function GetLogLevel() return ABP_LOG_LEVEL end
+    if GetLogLevel() >= level then return true end
+    return false
+end
+
+local DEFAULT_FORMATTER = {
+    format = function(o)
+        local fn = Table.toStringSorted
+        if type(pformat) == 'function' then fn = pformat end
+        return fn(o)
+    end
+}
+local TABLE_FORMATTER = {
+    format = function(o) return Table.toStringSorted(o, false) end
+}
 
 ---@param obj table
 ---@param optionalLogName string The optional logger name
@@ -19,14 +39,77 @@ local function _EmbedLogger(obj, optionalLogName)
     obj.mt = { __tostring = function() return format(ABP_PREFIX, prefix)  end }
     setmetatable(obj, obj.mt)
 
-    ---@param level number The level configured by the log function call
-    local function ShouldLog(level)
-        assert(type(level) == 'number', 'Level should be a number between 1 and 100')
-        if not (GetLogLevel() >= level) then return false end
-        return true
+    local formatter = DEFAULT_FORMATTER
+
+    function obj:format(obj)
+        return formatter.format(obj)
+    end
+    function obj:LogWithTableFormatter()
+        formatter = TABLE_FORMATTER
+        return self
+    end
+    function obj:LogAll()
+        PrettyPrint:_ShowAll()
+        return self
+    end
+    function obj:T() return self:LogWithTableFormatter() end
+    function obj:A() return self:LogAll() end
+
+    -- 1: log('String') or log(N, 'String')
+    -- 2: log('String', obj) or log(N, 'String', obj)
+    -- 3: log('String', arg1, arg2, etc...) or log(N, 'String', arg1, arg2, etc...)
+    -- Where N = 1 to 100
+    function obj:log(...)
+        local args = pack(...)
+        local level = 0
+        local startIndex = 1
+        local len = args.len
+
+        if type(args[1]) == 'number' then
+            level = args[1]
+            startIndex = 2
+            len = len - 1
+        end
+        if len <= 0 then return end
+
+        -- level=10 LOG_LEVEL=5  --> Don't log
+        -- level=10 LOG_LEVEL=10  --> Do Log
+        -- level=10 LOG_LEVEL=11  --> Do Log
+        --if LOG_LEVEL >= level then log it end
+
+        if not ShouldLog(level) then return end
+
+        if len == 1 then
+            local singleArg = args[startIndex]
+            if type(singleArg) == 'string' then
+                self:Print(self:ArgToString(singleArg))
+                return
+            end
+            self:Print(self:format(singleArg))
+            return
+        end
+
+        if type(args[startIndex]) ~= 'string' then
+            error(format('Argument #%s requires a string.format text', startIndex))
+        end
+
+        --if len == 2 then
+        --    local textFormat = args[startIndex]
+        --    local o = args[startIndex + 1]
+        --    self:Printf(format(textFormat, self:format(o)))
+        --    return
+        --end
+
+        args = sliceAndPack({...}, startIndex)
+        local newArgs = {}
+        for i=1,args.len do
+            local formatSafe = i > 1
+            newArgs[i] = self:ArgToString(args[i], formatSafe)
+        end
+        self:Printf(format(unpack(newArgs)))
     end
 
-    function obj:log(...)
+    function obj:logOrig(...)
         local args = pack(...)
         if args.len == 1 then
             self:Print(self:ArgToString(args[1]))
@@ -52,33 +135,6 @@ local function _EmbedLogger(obj, optionalLogName)
         self:Printf(format(unpack(newArgs)))
     end
 
-    function obj:logn(...)
-        local args = pack(...)
-        local level = 0
-        local startIndex = 1
-        if type(args[1]) == 'number' then
-            level = args[1]
-            startIndex = 2
-        end
-        if type(args[startIndex]) ~= 'string' then
-            error(format('Argument #%s requires a string.format text', startIndex))
-        end
-        if not ShouldLog(level) then return end
-
-        --if LOG_LEVEL < level then return end
-        --print(format('startIndex: %s level: %s', startIndex, level))
-        args = sliceAndPack({...}, startIndex)
-        local newArgs = {}
-        for i=1,args.len do
-            local nl = '\n   '
-            if i == 1 then nl = '' end
-            local el = args[i]
-            if type(el) == 'table' then newArgs[i] = nl .. tableToString(el)
-            else newArgs[i] = nl .. tostring(el) end
-        end
-        self:Print(format(unpack(newArgs)))
-    end
-
     -- Log a Pretty Formatted Object
     -- self:logp(itemInfo)
     -- self:logp("itemInfo", itemInfo)
@@ -92,24 +148,19 @@ local function _EmbedLogger(obj, optionalLogName)
         self:log(label .. ': %s', pformat(obj))
     end
 
-    function obj:printf(...)
-        local args = pack(...)
-        if args.len <= 0 then error('No arguments passed') end
-        local formatText = args[1]
-        if type(formatText) ~= 'string' then error('First argument must be a string.format string') end
-        local newArgs = {}
-        for i=1,args.len do
-            local el = args[i]
-            newArgs[i] = self:ArgToString(el)
-        end
-        self:Print(format(unpack(newArgs)))
+    -- Backwards compat
+    function obj:logf(...) self:log(...) end
+    -- Backwards compat
+    -- Example print('String value')
+    function obj:print(...)
+        self:Print(...)
     end
 
     ---Convert arguments to string
     ---@param optionalStringFormatSafe boolean Set to true to escape '%' characters used by string.forma
     function obj:ArgToString(any, optionalStringFormatSafe)
         local text
-        if type(any) == 'table' then text = tableToString(any) else text = tostring(any) end
+        if type(any) == 'table' then text = self:format(any) else text = tostring(any) end
         if optionalStringFormatSafe == true then
             return sreplace(text, '%', '$')
         end
@@ -122,7 +173,7 @@ end
 ---@param obj table
 ---@param optionalLogName string The optional log name
 function L:Embed(obj, optionalLogName)
-    c:Embed(obj)
+    C:Embed(obj)
     _EmbedLogger(obj, optionalLogName)
 end
 

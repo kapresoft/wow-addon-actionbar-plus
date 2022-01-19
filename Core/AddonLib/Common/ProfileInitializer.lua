@@ -1,5 +1,5 @@
-local format, tostring, isTable, isNotTable, shallow_copy =
-    string.format, tostring, ABP_Table.isTable, ABP_Table.isNotTable, ABP_Table.shallow_copy
+local PrettyPrint = ABP_PrettyPrint
+local format, isNotTable, shallow_copy = string.format, ABP_Table.isNotTable, ABP_Table.shallow_copy
 local pformat = PrettyPrint.pformat
 local ATTR = WidgetAttributes
 

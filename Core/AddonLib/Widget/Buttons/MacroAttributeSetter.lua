@@ -1,6 +1,7 @@
+local LOG, PrettyPrint = ABP_LogFactory, ABP_PrettyPrint
 local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
 ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
-local LOG, pformat = ABP_LogFactory, PrettyPrint.pformat
+local pformat = PrettyPrint.pformat
 local GameTooltip = GameTooltip
 local P = WidgetLibFactory:GetProfile()
 local S = {}

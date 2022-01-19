@@ -102,10 +102,12 @@ function T.getSortedKeys(t)
     return keys
 end
 
-function T.concatkvs(t)
+function T.concatkvs(t, optionalAddNewline)
+    local addNewLine = optionalAddNewline or false
     if type(t) ~= 'table' then return tostring(t) end
     local keys = T.getSortedKeys(t)
-    local s = '{ \n'
+    local s = '{ '
+    if addNewLine then s = s .. '\n' end
     for _, k in pairs(keys) do
         local ko = k
         if type(k) ~= 'number' then k = '"'..k..'"' end
@@ -117,7 +119,7 @@ function T.concatkvs(t)
 end
 
 function T.toString(t) return T.concatkv(t) end
-function T.toStringSorted(t) return T.concatkvs(t) end
+function T.toStringSorted(t, optionalAddNewline) return T.concatkvs(t, optionalAddNewline) end
 
 function T.toString2(t)
     if type(t) ~= 'table' then return tostring(t) end

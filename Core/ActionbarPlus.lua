@@ -6,7 +6,7 @@
 -- local _G, unpack, format = _G, ABP_Table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
-local PrettyPrint = PrettyPrint
+local PrettyPrint = ABP_PrettyPrint
 local format, pformat, isEmpty = string.format, PrettyPrint.pformat, ABP_Table.isEmpty
 local LogFactory, ACELIB, MC = ABP_LogFactory, AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
@@ -49,7 +49,7 @@ function A:CreateDebugPopupDialog()
     frame:SetLayout("Flow")
     --frame:SetWidth(800)
 
-    -- PrettyPrint.format(obj)
+    -- ABP_PrettyPrint.format(obj)
     local editbox = AceGUI:Create("MultiLineEditBox")
     editbox:SetLabel('')
     editbox:SetText('')
@@ -158,7 +158,7 @@ end
 --    iconDropDown:SetList({})
 --    iconDropDown:SetCallback("OnValueChanged", function(choice)
 --        -- choice is the drop-down list
---        -- frame:SetTextContent(PrettyPrint.pformat(choice))
+--        -- frame:SetTextContent(ABP_PrettyPrint.pformat(choice))
 --        local iconId = choice:GetValue()
 --        local iconTextPath = ART_TEXTURES[tonumber(iconId)]
 --        frame:SetSelectedIcon(iconId)
@@ -290,8 +290,8 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
     end
 
     local firstObj = _G[firstVar]
-    PrettyPrint.setup({ indent_size = 4, level_width = 120, show_all = true, depth_limit=5 })
-    local strVal = PrettyPrint.pformat(firstObj)
+    PrettyPrint._ShowAll()
+    local strVal = pformat(firstObj)
     debugDialog:SetTextContent(strVal)
     debugDialog:SetStatusText(format('Var: %s type: %s', firstVar, type(firstObj)))
     debugDialog:Show()
@@ -299,9 +299,9 @@ function A:SlashCommand_CheckVariable(spaceSeparatedArgs)
 end
 
 function A:HandleSlashCommand_ShowProfile()
-    PrettyPrint.setup({ show_all = true } )
+    PrettyPrint._ShowAll()
     local profileData = self:GetCurrentProfileData()
-    local strVal = PrettyPrint.pformat(profileData)
+    local strVal = pformat(profileData)
     local profileName = self.db:GetCurrentProfile()
     debugDialog:SetTextContent(strVal)
     debugDialog:SetStatusText(format('Current Profile Data for [%s]', profileName))
@@ -543,13 +543,13 @@ local function AddonLoaded(frame, event)
     end
 
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
+    local console = LibStub('AceConsole-3.0')
     A:log("%s.%s initialized", MAJOR, MINOR)
-    A:printf('Available commands: /abp to open config dialog.')
-    A:printf('Right-click on the button drag frame to open config dialog.')
-    A:printf('More at https://kapresoft.com/wow-addon-actionbar-plus')
+    A:print('Available commands: /abp to open config dialog.')
+    A:print('Right-click on the button drag frame to open config dialog.')
+    A:print('More at https://kapresoft.com/wow-addon-actionbar-plus')
 
     BindActions()
-
 end
 
 

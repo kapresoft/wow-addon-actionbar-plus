@@ -41,12 +41,6 @@
 ---     wrap_string = true
 --- }
 local pprint = { VERSION = '0.1' }
--- for WOW
--- local io = { write = print }
-PrettyPrint = pprint
-if type(io) ~= 'table' then
-    io = { write = print }
-end
 
 local depth = 1
 
@@ -519,11 +513,22 @@ setmetatable(pprint, {
     end
 })
 
--- Defaults
-pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=100 })
+--------------------------------------------------
+------------- ## My Modifications ## -------------
+--------------------------------------------------
 
-function pprint:_ShowAll()
-    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=100, show_all=true })
+-- for World of Warcraft
+if type(io) ~= 'table' then io = { write = print } end
+
+function pprint:_DefaultSetup()
+    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, show_all=false })
 end
 
---return pprint
+function pprint:_ShowAll()
+    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, show_all=true })
+end
+
+pprint:_DefaultSetup()
+
+ABP_PrettyPrint = pprint
+

@@ -1,11 +1,11 @@
-local AssertNotNil = Assert.AssertNotNil
-local WLIB, MacroAttributeSetter = WidgetLibFactory, MacroAttributeSetter
-local ButtonAttributes, _API_Spell, IsNil = ButtonAttributes, _API_Spell, Assert.IsNil
+local LOG, PrettyPrint = ABP_LogFactory, ABP_PrettyPrint
 local pformat = PrettyPrint.pformat
-local LOG = ABP_LogFactory
+local WLIB, MacroAttributeSetter = WidgetLibFactory, MacroAttributeSetter
+local AssertNotNil = Assert.AssertNotNil
+local ButtonAttributes, _API_Spell, IsNil = ButtonAttributes, _API_Spell, Assert.IsNil
+
 -- TODO: Move to API
 local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
-local pformat = PrettyPrint.pformat
 
 local P = WLIB:GetProfile()
 
