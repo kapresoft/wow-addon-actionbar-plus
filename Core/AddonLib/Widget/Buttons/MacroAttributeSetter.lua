@@ -1,4 +1,4 @@
-local LOG, PrettyPrint = ABP_LogFactory, ABP_PrettyPrint
+local LOG, PrettyPrint = ABP_LogFactory, AceLibAddonFactory:GetPrettyPrint()
 local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
 ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local pformat = PrettyPrint.pformat

@@ -1,4 +1,4 @@
-local LOG, PrettyPrint = ABP_LogFactory, ABP_PrettyPrint
+local LOG, PrettyPrint = ABP_LogFactory, AceLibAddonFactory:GetPrettyPrint()
 local pformat = PrettyPrint.pformat
 local WLIB, MacroAttributeSetter = WidgetLibFactory, MacroAttributeSetter
 local AssertNotNil = Assert.AssertNotNil

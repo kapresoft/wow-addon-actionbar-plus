@@ -1,10 +1,10 @@
+local LibStub = LibStub
 local ABP_PREFIX = ABP_PREFIX
-local PrettyPrint, Table, String = ABP_PrettyPrint, ABP_Table, ABP_String
+local PrettyPrint, Table, String = LibStub('ActionbarPlus-PrettyPrint-1.0'), ABP_Table, ABP_String
 local format, pack, unpack, sliceAndPack = string.format, Table.pack, Table.unpackIt, Table.sliceAndPack
 local type, select, tostring, error = type, select, tostring, error
 local setmetatable = setmetatable
 local pformat, sreplace = PrettyPrint.pformat, String.replace
-local LibStub = LibStub
 
 local C = LibStub('AceConsole-3.0')
 local MAJOR, MINOR = 'ActionbarPlus-Logger-1.0', tonumber(("$Revision: 1 $"):match("%d+"))

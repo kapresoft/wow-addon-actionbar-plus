@@ -1,5 +1,7 @@
 local select, error, type, format = select, error, type, string.format
-local unpack, pformat = ABP_Table.unpackIt, ABP_PrettyPrint.pformat
+local LibStub = LibStub
+local PrettyPrint = LibStub('ActionbarPlus-PrettyPrint-1.0')
+local unpack, pformat = ABP_Table.unpackIt, PrettyPrint.pformat
 local A = {}
 
 ---@param obj table The object to check

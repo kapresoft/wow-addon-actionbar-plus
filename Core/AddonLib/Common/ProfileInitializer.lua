@@ -1,4 +1,4 @@
-local PrettyPrint = ABP_PrettyPrint
+local PrettyPrint = AceLibAddonFactory:GetPrettyPrint()
 local format, isNotTable, shallow_copy = string.format, ABP_Table.isNotTable, ABP_Table.shallow_copy
 local pformat = PrettyPrint.pformat
 local ATTR = WidgetAttributes

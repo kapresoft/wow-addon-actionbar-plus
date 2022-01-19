@@ -2,7 +2,7 @@
 --- Button Factory
 ---
 ---@type table ButtonFactory
-local PrettyPrint = ABP_PrettyPrint
+local PrettyPrint = AceLibAddonFactory:GetPrettyPrint()
 local String, unpack, toStringSorted,
     ADDON_LIB, WLIB, H,
     ButtonFrameFactory, SpellAttributeSetter, ItemAttributeSetter, MacroAttributeSetter, MacrotextAttributeSetter,

@@ -40,7 +40,13 @@
 ---     wrap_array = true,
 ---     wrap_string = true
 --- }
-local pprint = { VERSION = '0.1' }
+
+local LibStub = LibStub
+local MAJOR, MINOR = 'ActionbarPlus-PrettyPrint-1.0', tonumber(("$Revision: 1 $"):match("%d+"))
+local pprint = LibStub:NewLibrary(MAJOR, MINOR)
+if not pprint then return end
+
+--local pprint = { VERSION = '0.1' }
 
 local depth = 1
 
@@ -530,5 +536,5 @@ end
 
 pprint:_DefaultSetup()
 
-ABP_PrettyPrint = pprint
+--ABP_PrettyPrint = pprint
 

@@ -5,6 +5,7 @@ local LOGF = ABP_LogFactory
 
 local F = {}
 AceLibAddonFactory = F
+local prettyPrintLib
 
 function F:GetAceLibVersionFormat() return VERSION_FORMAT end
 function F:LocalLibStub(localLibName) return LibStub(format(VERSION_FORMAT, localLibName)) end
@@ -12,6 +13,11 @@ function F:LocalLibStub(localLibName) return LibStub(format(VERSION_FORMAT, loca
 function F:GetAceLibVersion(libName)
     local major, minor = format(VERSION_FORMAT, libName), tonumber(("$Revision: 1 $"):match("%d+"))
     return { major, minor }
+end
+
+function F:GetPrettyPrint()
+    prettyPrintLib = self:LazyGetLocalAceLib(prettyPrintLib, 'PrettyPrint')
+    return prettyPrintLib
 end
 
 local function Embed(libName, lib, version)

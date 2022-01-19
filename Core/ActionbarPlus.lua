@@ -6,7 +6,7 @@
 -- local _G, unpack, format = _G, ABP_Table.unpackIt, string.format
 local ADDON_NAME, LibStub  = ADDON_NAME, LibStub
 local StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown = StaticPopupDialogs, StaticPopup_Show, ReloadUI, IsShiftKeyDown
-local PrettyPrint = ABP_PrettyPrint
+local PrettyPrint = AceLibAddonFactory:GetPrettyPrint()
 local format, pformat, isEmpty = string.format, PrettyPrint.pformat, ABP_Table.isEmpty
 local LogFactory, ACELIB, MC = ABP_LogFactory, AceLibFactory, MacroIconCategories
 local ART_TEXTURES = ART_TEXTURES
