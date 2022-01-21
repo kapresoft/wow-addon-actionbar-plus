@@ -1,20 +1,23 @@
---- Trailing and Leading Trim
-local function Trim(s) return (s:gsub("^%s*(.-)%s*$", "%1")) end
-
+-- ## External -------------------------------------------------
 local table, unpack = table, unpack
 
--- #############################################################
-local T = {}
-ABP_Table = T
--- ###################### Start Here ###########################
+-- ## Local ----------------------------------------------------
+local LibStub = __K_Core:LibPack()
+---@class Table
+local _L = LibStub:NewLibrary('Table')
 
-function T.parseSpaceSeparatedVar(text)
+-- ## Functions ------------------------------------------------
+
+---Trim Trailing and Leading Trim
+local function Trim(s) return (s:gsub("^%s*(.-)%s*$", "%1")) end
+
+function _L.parseSpaceSeparatedVar(text)
     local rt = {}
     for a in text:gmatch("%S+") do table.insert(rt, a) end
     return rt
 end
 
-function T.parseCSV(text)
+function _L.parseCSV(text)
     local rt = {}
     for a,v in text:gmatch("([^,]+)") do
         local a2 = Trim(a)
@@ -23,23 +26,23 @@ function T.parseCSV(text)
     return rt
 end
 
-function T.size(t)
+function _L.size(t)
     local count = 0
     for _ in pairs(t) do count = count + 1 end
     return count
 end
-function T.isEmpty(t)
+function _L.isEmpty(t)
     if t == nil then return true end
-    return T.size(t) <= 0
+    return _L.size(t) <= 0
 end
-function T.members()
+function _L.members()
     print('table members: ')
-    for key, _ in pairs(T) do
+    for key, _ in pairs(_L) do
         print(" " .. key);
     end
 end
 
-function T.shallow_copy(t)
+function _L.shallow_copy(t)
     local t2 = {}
     for k,v in pairs(t) do
         t2[k] = v
@@ -47,7 +50,7 @@ function T.shallow_copy(t)
     return t2
 end
 
-function T.append(source, target)
+function _L.append(source, target)
     local t2 = target or {}
     for k,v in pairs(source) do
         if t2[k] == nil then
@@ -57,24 +60,24 @@ function T.append(source, target)
     return t2
 end
 
-function T.sliceAndPack(t, startIndex)
-    local sliced = T.slice(t, startIndex)
+function _L.sliceAndPack(t, startIndex)
+    local sliced = _L.slice(t, startIndex)
     if type(unpack) ~= 'nil' then
-        return T.pack(unpack(sliced))
+        return _L.pack(unpack(sliced))
     end
-    return T.pack(T.unpackIt(sliced))
+    return _L.pack(_L.unpackIt(sliced))
 end
 
 ---Fail-safe unpack
 ---@param t table The table to unpack
-function T.unpackIt(t)
+function _L.unpackIt(t)
     if type(unpack) == 'function' then
         return unpack(t)
     end
     return table.unpack(t)
 end
 
-function T.slice (t, startIndex, stopIndex)
+function _L.slice (t, startIndex, stopIndex)
     local pos, new = 1, {}
     if not stopIndex then stopIndex = #t end
     for i = startIndex, stopIndex do
@@ -84,17 +87,17 @@ function T.slice (t, startIndex, stopIndex)
     return new
 end
 
-function T.concatkv(t)
+function _L.concatkv(t)
     if type(t) ~= 'table' then return tostring(t) end
     local s = '{ '
     for k,v in pairs(t) do
         if type(k) ~= 'number' then k = '"'..k..'"' end
-        s = s .. '['..k..'] = ' .. T.concatkv(v) .. ','
+        s = s .. '['..k..'] = ' .. _L.concatkv(v) .. ','
     end
     return s .. '} '
 end
 
-function T.getSortedKeys(t)
+function _L.getSortedKeys(t)
     if type(t) ~= 'table' then return tostring(t) end
     local keys = {}
     for k in pairs(t) do table.insert(keys, k) end
@@ -102,57 +105,55 @@ function T.getSortedKeys(t)
     return keys
 end
 
-function T.concatkvs(t, optionalAddNewline)
+function _L.concatkvs(t, optionalAddNewline)
     local addNewLine = optionalAddNewline or false
     if type(t) ~= 'table' then return tostring(t) end
-    local keys = T.getSortedKeys(t)
+    local keys = _L.getSortedKeys(t)
     local s = '{ '
     if addNewLine then s = s .. '\n' end
     for _, k in pairs(keys) do
         local ko = k
         if type(k) ~= 'number' then k = '"'..k..'"' end
         if type(t[ko]) ~= 'function' then
-            s = s .. '['..k..'] = ' .. T.concatkvs(t[ko]) .. ','
+            s = s .. '['..k..'] = ' .. _L.concatkvs(t[ko]) .. ','
         end
     end
     return s .. '} '
 end
 
-function T.toString(t) return T.concatkv(t) end
-function T.toStringSorted(t, optionalAddNewline) return T.concatkvs(t, optionalAddNewline) end
+function _L.toString(t) return _L.concatkv(t) end
+function _L.toStringSorted(t, optionalAddNewline) return _L.concatkvs(t, optionalAddNewline) end
 
-function T.toString2(t)
+function _L.toString2(t)
     if type(t) ~= 'table' then return tostring(t) end
     local s = '\n{'
     for k,v in pairs(t) do
-        s = string.format("%s\n    %s: %s,", s, tostring(k), T.toString2(v))
+        s = string.format("%s\n    %s: %s,", s, tostring(k), _L.toString2(v))
     end
     return s .. '\n}'
 end
 
-function T.pack(...)
+function _L.pack(...)
     return { len = select("#", ...), ... }
 end
 
-function T.isTable(t) return type(t) == 'table' end
-function T.isNotTable(t) return not T.isTable(t) end
+function _L.isTable(t) return type(t) == 'table' end
+function _L.isNotTable(t) return not _L.isTable(t) end
 
-function T.print(t) print(T.toString(t)) end
-function T.printkv(t) print(T.concatkv(t)) end
+function _L.print(t) print(_L.toString(t)) end
+function _L.printkv(t) print(_L.concatkv(t)) end
 
-function T.printkvs(t)
-    local keys = T.getSortedKeys(t)
+function _L.printkvs(t)
+    local keys = _L.getSortedKeys(t)
     for _, k in ipairs(keys) do print(k, t[k]) end
 end
 
-function T.println(t)
+function _L.println(t)
     if type(t) ~= 'table' then return tostring(t) end
     for k,v in pairs(t) do
-        print(string.format("%s: %s", tostring(k), T.println(v)))
+        print(string.format("%s: %s", tostring(k), _L.println(v)))
     end
 end
 
-function T.printG() T.printkvs(_G) end
-function T.printLoaded() T.printkvs(package.loaded) end
-
-
+function _L.printG() _L.printkvs(_G) end
+function _L.printLoaded() _L.printkvs(package.loaded) end

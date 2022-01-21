@@ -1,30 +1,24 @@
+-- ## External -------------------------------------------------
+local GetItemInfo = GetItemInfo
+
+-- ## Local ----------------------------------------------------
+-- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, LibGlobals
+local LibStub, M, Assert, P, LSM, W, CC = ABP_WidgetConstants:LibPack()
+
 local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
-local WLIB, ItemAttributeSetter = WidgetLibFactory, ItemAttributeSetter
-local ButtonAttributes, _API_Spell = ButtonAttributes, _API_Spell
-local LOG = ABP_LogFactory
+local ItemAttributeSetter = W:ItemAttributeSetter()
+local WidgetAttributes = CC.WidgetAttributes
 
-local P = WLIB:GetProfile()
+---@class ItemDragEventHandler
+local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
 
-local S = {}
-LOG:EmbedLogger(S, 'ItemDragEventHandler')
-ItemDragEventHandler = S
-
+-- ## Functions ------------------------------------------------
 --- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
-function S:Handle(btnUI, cursorInfo)
+function _L:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end
-    local itemInfo = { type = cursorInfo.type,
-                       id = cursorInfo.info1, link = cursorInfo.info2 }
-    local itemName, itemLink,
-        itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-        itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-        expacID, setID, isCraftingReagent = GetItemInfo(itemInfo.id)
-    local itemInfo = {
-        id = itemInfo.id,
-        name = itemName,
-        icon = itemTexture,
-        link = itemLink,
-    }
+    local item = self:GetItemDetails(cursorInfo.info1)
+    local itemInfo = { id = item.id, name = item.name, icon = item.icon, link = item.link, }
     --self:logp('itemInfo', itemInfo)
     --ABP:DBG('ItemInfo', itemInfo)
 
@@ -42,7 +36,15 @@ function S:Handle(btnUI, cursorInfo)
     ItemAttributeSetter(btnUI, btnData)
 end
 
-function S:IsValid(btnUI, cursorInfo)
+function _L:GetItemDetails(itemId)
+    local itemName, itemLink,
+    itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+    itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+    expacID, setID, isCraftingReagent = GetItemInfo(itemCursor.id)
+    return { id = itemId, name = itemName, link = itemLink, icon = itemTexture }
+end
+
+function _L:IsValid(btnUI, cursorInfo)
     if table.isEmpty(cursorInfo) then return false end
     if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
         return false

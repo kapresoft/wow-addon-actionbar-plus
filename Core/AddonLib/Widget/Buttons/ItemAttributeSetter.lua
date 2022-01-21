@@ -1,12 +1,21 @@
-local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
-ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
-local LOG, AssertNotNil, format, IsNotBlank =
-ABP_LogFactory, Assert.AssertNotNil, string.format, string.IsNotBlank
+-- ## External -------------------------------------------------
 local GameTooltip = GameTooltip
+local format = string.format
 
-local S = {}
-ItemAttributeSetter = S
-LOG:EmbedLogger(S, 'ItemAttributeSetter')
+-- ## Local ----------------------------------------------------
+
+-- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, LibGlobals
+local LibStub, M, Assert, P, LSM, W = ABP_WidgetConstants:LibPack()
+local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+local BATTR, WAttr = W:LibPack_WidgetAttributes()
+
+local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+local AssertNotNil, IsNotBlank = Assert.AssertNotNil, String.IsNotBlank
+
+-- ## Functions ------------------------------------------------
+
+---@class ItemAttributeSetter
+local _L = LibStub:NewLibrary(M.ItemAttributeSetter, 1)
 
 --- Item Info:
 --- `{
@@ -15,8 +24,8 @@ LOG:EmbedLogger(S, 'ItemAttributeSetter')
 ---   icon = 133964,
 ---   link = '[Honey Bread]',
 --- }`
-function S:SetAttributes(btnUI, btnData)
-    RWAttr(btnUI)
+function _L:SetAttributes(btnUI, btnData)
+    W:ResetWidgetAttributes(btnUI)
 
     local itemInfo = btnData[WAttr.ITEM]
     if type(itemInfo) ~= 'table' then return end
@@ -34,7 +43,7 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
 end
 
-function S:ShowTooltip(btnUI, btnData)
+function _L:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
     local type = btnData.type
     if not type then return end
@@ -45,4 +54,4 @@ function S:ShowTooltip(btnUI, btnData)
 
 end
 
-S.mt.__call = S.SetAttributes
+_L.mt.__call = _L.SetAttributes

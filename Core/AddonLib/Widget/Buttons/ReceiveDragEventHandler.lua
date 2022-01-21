@@ -1,12 +1,14 @@
-local IsNotNil, AssertThatMethodArgIsNotNil, Throw = Assert.IsNotNil, Assert.AssertThatMethodArgIsNotNil, Assert.Throw
-local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler =
-    SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler
-local LOG, AT = ABP_LogFactory, ABP_ActionType
+-- ## External -------------------------------------------------
 
-local H = {}
-LOG:EmbedLogger(H, 'ReceiveDragEventHandler')
+-- ## Local ----------------------------------------------------
+local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
+local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = W:LibPack_DragEventHandlers()
 
-ReceiveDragEventHandler = H
+local IsNotNil, AssertThatMethodArgIsNotNil, Throw = A.IsNotNil, A.AssertThatMethodArgIsNotNil, A.Throw
+local AT = ABP_ActionType
+
+---@class ReceiveDragEventHandler
+local _L = LibStub:NewLibrary(M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {
@@ -16,7 +18,8 @@ local handlers = {
     ['macrotext'] = MacroDragEventHandler
 }
 
-function H:CleanupProfile(btnUI, actionType)
+-- ## Functions ------------------------------------------------
+function _L:CleanupProfile(btnUI, actionType)
     local btnData = btnUI:GetProfileButtonData()
     if not btnData then return end
 
@@ -26,14 +29,14 @@ function H:CleanupProfile(btnUI, actionType)
     end
 end
 
-function H:CanHandle(actionType)
+function _L:CanHandle(actionType)
     local handler = handlers[actionType]
     local hasHandler = IsNotNil(handler) and IsNotNil(handler.Handle)
     self:log(10, 'Can handle drag event from [%s]? %s', actionType, hasHandler)
     return hasHandler
 end
 
-function H:Handle(btnUI, actionType, cursorInfo)
+function _L:Handle(btnUI, actionType, cursorInfo)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
     AssertThatMethodArgIsNotNil(actionType, 'actionType', 'Handle(btnUI, actionType)')
 

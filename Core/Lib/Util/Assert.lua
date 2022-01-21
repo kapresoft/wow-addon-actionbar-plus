@@ -1,32 +1,32 @@
 local select, error, type, format = select, error, type, string.format
-local LibStub = LibStub
-local PrettyPrint = LibStub('ActionbarPlus-PrettyPrint-1.0')
-local unpack, pformat = ABP_Table.unpackIt, PrettyPrint.pformat
-local A = {}
+local LibStub = __K_Core:LibPack()
+
+---@class Assert
+local _L = LibStub:NewLibrary('Assert')
 
 ---@param obj table The object to check
-function A.IsNil(obj)
+function _L.IsNil(obj)
     return 'nil' == type(obj)
 end
 
 ---@param obj table The object to check
-function A.IsNotNil(obj)
-    return not A.IsNil(obj)
+function _L.IsNotNil(obj)
+    return not _L.IsNil(obj)
 end
 
 --- Example:
 --- `if A.HasKey(obj, key) then doStuff() end`
 ---@param obj table The object to check
 ---@param key string The key to the object to check
-function A.HasKey(obj, key)
+function _L.HasKey(obj, key)
     if type(obj) == 'nil' then return false end
     return 'nil' == type(obj[key])
 end
 
 --- Example:
 --- `if A.HasNoKey(obj, key) then return end`
-function A.HasNoKey(obj, key)
-    return not A.HasKey(obj, key)
+function _L.HasNoKey(obj, key)
+    return not _L.HasKey(obj, key)
 end
 
 -- Option #1
@@ -36,7 +36,7 @@ end
 -- 1: level
 -- 2: string format
 -- 3: args
-function A.Throw(...)
+function _L.Throw(...)
     local count = select('#', ...)
     if count == 0 then error('Arguments required') end
 
@@ -80,22 +80,20 @@ function A.Throw(...)
 end
 
 ---@param obj table The object to check
-function A.IsNotNil(obj)
-    return not A.IsNil(obj)
+function _L.IsNotNil(obj)
+    return not _L.IsNil(obj)
 end
 
 --- Example:  AssertMethodArgNotNil(obj, 'name', 'OpenConfig(name)')
 ---@param obj The object to assert
 ---@param paramName string The name of the object
 ---@param methodSignature string The method signature
-function A.AssertThatMethodArgIsNotNil(obj, paramName, methodSignature)
-    if A.IsNotNil(obj) then return end
+function _L.AssertThatMethodArgIsNotNil(obj, paramName, methodSignature)
+    if _L.IsNotNil(obj) then return end
     error(format('The method argument %s in %s should not be nil', paramName, methodSignature), 2)
 end
 
-function A.AssertNotNil(obj, name)
-    if A.IsNotNil(obj) then return end
-    A.Throw(3, 'The following should not be nil: %s', name)
+function _L.AssertNotNil(obj, name)
+    if _L.IsNotNil(obj) then return end
+    _L.Throw(3, 'The following should not be nil: %s', name)
 end
-
-Assert = A

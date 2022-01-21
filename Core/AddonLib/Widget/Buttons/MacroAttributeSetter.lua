@@ -1,12 +1,16 @@
-local LOG, PrettyPrint = ABP_LogFactory, AceLibAddonFactory:GetPrettyPrint()
-local BATTR, RWAttr, WAttr, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
-ButtonAttributes, ResetWidgetAttributes, WidgetAttributes, TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
-local pformat = PrettyPrint.pformat
 local GameTooltip = GameTooltip
-local P = WidgetLibFactory:GetProfile()
-local S = {}
-MacroAttributeSetter = S
-LOG:EmbedLogger(S, 'MacroAttributeSetter')
+
+local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
+
+local PrettyPrint, Table, String, L = ABP_LibGlobals:LibPackUtils()
+local pformat = PrettyPrint.pformat
+
+local BATTR, WAttr = W:LibPack_WidgetAttributes()
+local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+
+---@class MacroAttributeSetter
+local _L = LibStub:NewLibrary(M.MacroAttributeSetter)
+
 
 --- Macro Info:
 --- {
@@ -16,8 +20,8 @@ LOG:EmbedLogger(S, 'MacroAttributeSetter')
 ---     name = '#GetRestedXP',
 ---     type = 'macro'
 --- }
-function S:SetAttributes(btnUI, btnData)
-    RWAttr(btnUI)
+function _L:SetAttributes(btnUI, btnData)
+    W:ResetWidgetAttributes(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
     local icon = TEXTURE_EMPTY
@@ -34,7 +38,7 @@ function S:SetAttributes(btnUI, btnData)
 end
 
 ---@param link table The blizzard `GameTooltip` link
-function S:ShowTooltip(btnUI, btnData)
+function _L:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
     local type = btnData.type
     if not type then return end
@@ -47,12 +51,12 @@ function S:ShowTooltip(btnUI, btnData)
     GameTooltip:SetText(macroInfo.name .. macroLabel)
 end
 
-S.mt.__call = S.SetAttributes
+_L.mt.__call = _L.SetAttributes
 
 -- ## ------------ EVENTS --------------
 
 local function OnMacrosUpdated(frame, event)
-    S:log(10, 'Frame: %s', frame:GetName())
+    _L:log(10, 'Frame: %s', frame:GetName())
     local buttons = P:GetButtonsByIndex(2)
     --print(ABP:DBG(buttons, 'Buttons #2'))
     --PrettyPrint:_ShowAll()

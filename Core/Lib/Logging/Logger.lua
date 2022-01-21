@@ -1,13 +1,19 @@
+local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
+local _, _, logPrefix = __K_Core:GetAddonInfo()
+--local LibStub = __K_Core:LibPack()
 local LibStub = LibStub
-local ABP_PREFIX = ABP_PREFIX
-local PrettyPrint, Table, String = LibStub('ActionbarPlus-PrettyPrint-1.0'), ABP_Table, ABP_String
-local format, pack, unpack, sliceAndPack = string.format, Table.pack, Table.unpackIt, Table.sliceAndPack
-local type, select, tostring, error = type, select, tostring, error
-local setmetatable = setmetatable
-local pformat, sreplace = PrettyPrint.pformat, String.replace
 
-local C = LibStub('AceConsole-3.0')
-local MAJOR, MINOR = 'ActionbarPlus-Logger-1.0', tonumber(("$Revision: 1 $"):match("%d+"))
+local format, pack, unpack, sliceAndPack = string.format, Table.pack, Table.unpackIt, Table.sliceAndPack
+local type, select, tostring, error, setmetatable = type, select, tostring, error, setmetatable
+local sreplace = String.replace
+
+--local LibStub = LibStub
+
+local C = LibStub('AceConsole-3.0', true)
+
+local MAJOR, MINOR =  'ActionbarPlus-Logger-1.0', format("$Revision: %s $", 1)
+---@class Logger
 local L = LibStub:NewLibrary(MAJOR, MINOR)
 if not L then return end
 
@@ -36,7 +42,7 @@ local function _EmbedLogger(obj, optionalLogName)
     local prefix = ''
     if type(optionalLogName) == 'string' then prefix = '::' .. optionalLogName end
     if type(obj.mt) ~= 'table' then obj.mt = {} end
-    obj.mt = { __tostring = function() return format(ABP_PREFIX, prefix)  end }
+    obj.mt = { __tostring = function() return format(logPrefix, prefix)  end }
     setmetatable(obj, obj.mt)
 
     local formatter = DEFAULT_FORMATTER
@@ -169,7 +175,7 @@ local function _EmbedLogger(obj, optionalLogName)
 
 end
 
----@class Logger
+---Embed on a generic object
 ---@param obj table
 ---@param optionalLogName string The optional log name
 function L:Embed(obj, optionalLogName)
@@ -177,4 +183,11 @@ function L:Embed(obj, optionalLogName)
     _EmbedLogger(obj, optionalLogName)
 end
 
-
+---Embed in a registered object module
+---@see LibGlobals#EmbedNewLib for the available fields
+function L:EmbedModule(obj)
+    assert(obj ~= null and type(obj.GetModuleName) == 'function',
+            'The passed object is not a valid module object.')
+    C:Embed(obj)
+    _EmbedLogger(obj, obj:GetModuleName())
+end

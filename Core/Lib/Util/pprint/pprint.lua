@@ -42,8 +42,11 @@
 --- }
 
 local LibStub = LibStub
-local MAJOR, MINOR = 'ActionbarPlus-PrettyPrint-1.0', tonumber(("$Revision: 1 $"):match("%d+"))
-local pprint = LibStub:NewLibrary(MAJOR, MINOR)
+
+---@class PrettyPrint
+local pprint = LibStub:NewLibrary('ActionbarPlus-PrettyPrint-1.0', 1)
+ABP_PrettyPrint = pprint
+
 if not pprint then return end
 
 --local pprint = { VERSION = '0.1' }

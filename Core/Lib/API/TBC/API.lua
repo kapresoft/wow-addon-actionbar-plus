@@ -1,7 +1,6 @@
-local _G = _G
-local format, IsNotBlank = string.format, ABP_String.IsNotBlank
+local _, _, String = ABP_LibGlobals:LibPackUtils()
+local format, IsNotBlank = string.format, String.IsNotBlank
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
-local CreateFrame  = CreateFrame
 
 local S = {}
 _API_Spell = S
