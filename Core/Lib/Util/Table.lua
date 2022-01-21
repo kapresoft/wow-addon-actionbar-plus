@@ -62,20 +62,20 @@ end
 
 function _L.sliceAndPack(t, startIndex)
     local sliced = _L.slice(t, startIndex)
-    if type(unpack) ~= 'nil' then
-        return _L.pack(unpack(sliced))
-    end
-    return _L.pack(_L.unpackIt(sliced))
+    return _L.pack(_L.unpack(sliced))
 end
 
 ---Fail-safe unpack
 ---@param t table The table to unpack
-function _L.unpackIt(t)
-    if type(unpack) == 'function' then
-        return unpack(t)
-    end
+function _L.unpack(t)
+    if type(unpack) == 'function' then return unpack(t) end
     return table.unpack(t)
 end
+
+---Backwards compat
+---@deprecated
+---@see Table#unpack
+function _L.unpackIt(t) return _L.unpack(t) end
 
 function _L.slice (t, startIndex, stopIndex)
     local pos, new = 1, {}

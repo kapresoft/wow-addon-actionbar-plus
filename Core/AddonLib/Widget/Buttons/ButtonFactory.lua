@@ -221,6 +221,3 @@ function L:AttachFrameEvents(frame)
     frame:SetScript("OnEnter", OnShowFrameTooltip)
     frame:SetScript("OnLEave", OnLeaveFrame)
 end
-
-
-

@@ -1,21 +1,77 @@
-local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
-local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
-local _, _, logPrefix = __K_Core:GetAddonInfo()
---local LibStub = __K_Core:LibPack()
+-- ## External -------------------------------------------------
 local LibStub = LibStub
+---@type pformat
+local pformat = pformat
+local format, tableUnpack = string.format, table.unpack
+local _, versionFormat, logPrefix = __K_Core:GetAddonInfo()
+local major, minor =  format(versionFormat, 'Logger'), 1
 
-local format, pack, unpack, sliceAndPack = string.format, Table.pack, Table.unpackIt, Table.sliceAndPack
 local type, select, tostring, error, setmetatable = type, select, tostring, error, setmetatable
-local sreplace = String.replace
-
---local LibStub = LibStub
 
 local C = LibStub('AceConsole-3.0', true)
+-- ## Local ----------------------------------------------------
 
-local MAJOR, MINOR =  'ActionbarPlus-Logger-1.0', format("$Revision: %s $", 1)
 ---@class Logger
-local L = LibStub:NewLibrary(MAJOR, MINOR)
+local L = LibStub:NewLibrary(major, minor)
 if not L then return end
+
+-- ## Functions ------------------------------------------------
+---@class LogUtil
+local _U = { }
+
+function _U.getSortedKeys(t)
+    if type(t) ~= 'table' then return tostring(t) end
+    local keys = {}
+    for k in pairs(t) do table.insert(keys, k) end
+    table.sort(keys)
+    return keys
+end
+
+---@param t table The table to format
+function _U.format(t, optionalAddNewline)
+    local addNewLine = optionalAddNewline or false
+    if type(t) ~= 'table' then return tostring(t) end
+    local keys = _U.getSortedKeys(t)
+    local s = '{ '
+    if addNewLine then s = s .. '\n' end
+    for _, k in pairs(keys) do
+        local ko = k
+        if type(k) ~= 'number' then k = '"'..k..'"' end
+        if type(t[ko]) ~= 'function' then
+            s = s .. '['..k..'] = ' .. _U.format(t[ko]) .. ','
+        end
+    end
+    return s .. '} '
+end
+
+function _U.s_replace(str, match, replacement)
+    if type(str) ~= 'string' then return nil end
+    return str:gsub("%" .. match, replacement)
+end
+
+function _U.t_pack(...) return { len = select("#", ...), ... } end
+
+---Fail-safe unpack
+---@param t table The table to unpack
+function _U.t_unpack(t)
+    if type(unpack) == 'function' then return unpack(t) end
+    return tableUnpack(t)
+end
+
+function _U.t_sliceAndPack(t, startIndex)
+    local sliced = _U.slice(t, startIndex)
+    return _U.t_pack(_U.t_unpack(sliced))
+end
+
+function _U.slice(t, startIndex, stopIndex)
+    local pos, new = 1, {}
+    if not stopIndex then stopIndex = #t end
+    for i = startIndex, stopIndex do
+        new[pos] = t[i]
+        pos = pos + 1
+    end
+    return new
+end
 
 ---@param level number The level configured by the log function call
 local function ShouldLog(level)
@@ -27,14 +83,12 @@ end
 
 local DEFAULT_FORMATTER = {
     format = function(o)
-        local fn = Table.toStringSorted
-        if type(pformat) == 'function' then fn = pformat end
+        local fn = _U.format
+        if type(pformat) ~= 'nil' then fn = pformat end
         return fn(o)
     end
 }
-local TABLE_FORMATTER = {
-    format = function(o) return Table.toStringSorted(o, false) end
-}
+local TABLE_FORMATTER = { format = function(o) return _U.format(o, false) end }
 
 ---@param obj table
 ---@param optionalLogName string The optional logger name
@@ -47,26 +101,32 @@ local function _EmbedLogger(obj, optionalLogName)
 
     local formatter = DEFAULT_FORMATTER
 
-    function obj:format(obj)
-        return formatter.format(obj)
-    end
-    function obj:LogWithTableFormatter()
-        formatter = TABLE_FORMATTER
-        return self
-    end
-    function obj:LogAll()
-        PrettyPrint:_ShowAll()
-        return self
-    end
-    function obj:T() return self:LogWithTableFormatter() end
-    function obj:A() return self:LogAll() end
+    function obj:format(obj) return formatter.format(obj) end
+    ---### Usage
+    ---Log with table key-value output.
+    ---```
+    ---log:T():log(obj)
+    ---```
+    function obj:T() formatter = TABLE_FORMATTER; return self end
+    ---### Usage
+    ---Log with "All fields".
+    ---```
+    ---log:A():log(obj)
+    ---```
+    function obj:A() formatter = { format = function(o) return pformat:Default():pformat(o) end }; return self end
+    ---### Usage
+    ---Log with default formatter.
+    ---```
+    ---log:D():log(obj)
+    ---```
+    function obj:D() formatter = DEFAULT_FORMATTER; return self end
 
     -- 1: log('String') or log(N, 'String')
     -- 2: log('String', obj) or log(N, 'String', obj)
     -- 3: log('String', arg1, arg2, etc...) or log(N, 'String', arg1, arg2, etc...)
     -- Where N = 1 to 100
     function obj:log(...)
-        local args = pack(...)
+        local args = _U.t_pack(...)
         local level = 0
         local startIndex = 1
         local len = args.len
@@ -106,17 +166,17 @@ local function _EmbedLogger(obj, optionalLogName)
         --    return
         --end
 
-        args = sliceAndPack({...}, startIndex)
+        args = _U.t_sliceAndPack({...}, startIndex)
         local newArgs = {}
         for i=1,args.len do
             local formatSafe = i > 1
             newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
-        self:Printf(format(unpack(newArgs)))
+        self:Printf(format(_U.t_unpack(newArgs)))
     end
 
     function obj:logOrig(...)
-        local args = pack(...)
+        local args = _U.t_pack(...)
         if args.len == 1 then
             self:Print(self:ArgToString(args[1]))
             return
@@ -132,13 +192,13 @@ local function _EmbedLogger(obj, optionalLogName)
         end
         if not ShouldLog(level) then return end
 
-        args = sliceAndPack({...}, startIndex)
+        args = _U.t_sliceAndPack({...}, startIndex)
         local newArgs = {}
         for i=1,args.len do
             local formatSafe = i > 1
             newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
-        self:Printf(format(unpack(newArgs)))
+        self:Printf(format(_U.t_unpack(newArgs)))
     end
 
     -- Log a Pretty Formatted Object
@@ -168,7 +228,7 @@ local function _EmbedLogger(obj, optionalLogName)
         local text
         if type(any) == 'table' then text = self:format(any) else text = tostring(any) end
         if optionalStringFormatSafe == true then
-            return sreplace(text, '%', '$')
+            return _U.s_replace(text, '%', '$')
         end
         return text
     end
@@ -186,7 +246,7 @@ end
 ---Embed in a registered object module
 ---@see LibGlobals#EmbedNewLib for the available fields
 function L:EmbedModule(obj)
-    assert(obj ~= null and type(obj.GetModuleName) == 'function',
+    assert(obj ~= nil and type(obj.GetModuleName) == 'function',
             'The passed object is not a valid module object.')
     C:Embed(obj)
     _EmbedLogger(obj, obj:GetModuleName())

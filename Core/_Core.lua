@@ -108,7 +108,7 @@ end
 function _S:EmbedLoggerIfAvailable(o)
     local logger = self:GetLogger()
     if not logger then return end
-    logger:Embed(o, o:GetModuleName())
+    logger:EmbedModule(o)
 end
 
 ---@return Logger
@@ -195,42 +195,37 @@ end
 ---```
 function _L:InitPrettyPrint()
 
-    local function Embed(o)
-        local pp = o.wrapped
-        ---@return PrettyPrint
-        function o:Default()
-            pp.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
-                         show_all=false, show_function = false })
-            return self;
-        end
-
-        ---Configured to show all
-        ---@return PrettyPrint
-        function o:A()
-            pp.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
-                         show_all=true, show_function = true, depth_limit = true })
-            return self;
-        end
-
-        ---@return PrettyPrint
-        function o:pformat(obj, option, printer)
-            local str = pp.pformat(obj, option, printer)
-            o:Default(o)
-            return str
-        end
-
-        o.mt = {
-            __call = function (_, ...)
-                return o.pformat(o, ...)
-            end
-        }
-        setmetatable(o, o.mt)
-    end
-
     ---@type PrettyPrint
     local pprint = LibStub(_S:GetMajorVersion('PrettyPrint'))
-    pformat = { wrapped = pprint }
-    Embed(pformat)
+    ---@class pformat
+    local o = { wrapped = pprint }
+    ---@type pformat
+    pformat = o
+
+    ---@return pformat
+    function o:Default()
+        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
+                   show_all=false, show_function = false })
+        return self;
+    end
+
+    ---Configured to show all
+    ---@return pformat
+    function o:A()
+        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
+                   show_all=true, show_function = true, depth_limit = true })
+        return self;
+    end
+
+    ---@return string
+    function o:pformat(obj, option, printer)
+        local str = pprint.pformat(obj, option, printer)
+        o:Default(o)
+        return str
+    end
+    o.mt = { __call = function (_, ...) return o.pformat(o, ...) end }
+    setmetatable(o, o.mt)
+
     self:SetGlobal('PrettyPrint', pformat)
 end
 
