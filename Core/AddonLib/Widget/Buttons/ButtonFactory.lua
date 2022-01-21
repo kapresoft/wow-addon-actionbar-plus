@@ -12,13 +12,12 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 -- ## Local ----------------------------------------------------
 local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
-local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 
 local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
     SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
-
 
 -- TODO: Move to config
 local INTERNAL_BUTTON_PADDING = 2
@@ -206,7 +205,7 @@ function L:OnReceiveDrag(btnUI)
 end
 
 function L:IsValidDragSource(cursorInfo)
-    self:log(5, 'OnReceiveDrag Cursor-Info: %s', toStringSorted(cursorInfo))
+    self:log(5, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if String.IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.

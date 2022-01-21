@@ -5,7 +5,10 @@ local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
 
+local _G = _G
 local pkg = 'ActionbarPlus'
+local shortName = 'ABP'
+local globalVarPrefix = shortName .. '_'
 local versionFormat = pkg .. '-%s-1.0'
 
 -- ## ----------------------------------------------------------
@@ -16,6 +19,8 @@ local versionFormat = pkg .. '-%s-1.0'
 ---@class LocalLibStub
 local _S = {
     package = pkg,
+    shortName = shortName,
+    globalVarPrefix = globalVarPrefix,
     logPrefix = '|cfdffffff{{|r|cfd2db9fb' .. pkg .. '|r|cfdfbeb2d%s|r|cfdffffff}}|r',
     versionFormat = versionFormat
 }
@@ -117,20 +122,6 @@ local _L = {}
 
 -- ## Functions ------------------------------------------------
 
-local function _SetGlobal(obj, packageName, moduleName)
-    assert(obj ~= nil,
-            'Object to be globally defined is required. Got: ' .. type(obj))
-    assert(type(packageName) == 'string',
-            'Package-Name is a required string. Got: ' .. type(packageName))
-    assert(type(moduleName) == 'string',
-            'Module-Name is a required string. Got: ' .. type(moduleName))
-
-    local varName = format('%s_%s__', packageName, moduleName)
-    --print('Global var:', varName)
-    _G[varName] = obj
-end
-
-
 ---Library creation and retrieval functions
 ---### New Library
 ---```
@@ -165,20 +156,67 @@ function _L:GetAddonInfo()
     return _S.package, _S.versionFormat, _S.logPrefix
 end
 
----Expects the following object structure
+---Sets the global var name with the Addon short-name prefix
 ---```
----local package = {
----    __info = { name = 'Logging', package = { name='ActionbarPlus', shortName='ABP' }, }
----}
----// Call
----SetGlobal(package)
+---Example: This sets an ABP_MyVar
+---Core:SetGlobal('MyVar', 'This is my var')
 ---```
-function _L:SetGlobal(obj)
-    local pkgInfo = obj.__pkg
-    assert(type(pkgInfo) == 'table',
-            'Object info __pkg field must be defined. Got: ' .. type(pkgInfo))
-    _SetGlobal(obj, pkgInfo.package.shortName, pkgInfo.name)
+function _L:SetGlobal(varName, obj)
+    _G[_S.globalVarPrefix .. varName] = obj
 end
+
+---### Syntax:
+---```
+--- // Default Setup without functions being shown
+--- local str = pformat(obj)
+--- local str = pformat:Default()(obj)
+--- // Shows functions, etc.
+--- local str = pformat:A():pformat(obj)
+---```
+function _L:InitPrettyPrint()
+
+    local function Embed(o)
+        local pp = o.wrapped
+        ---@return PrettyPrint
+        function o:Default()
+            pp.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
+                         show_all=false, show_function = false })
+            return self;
+        end
+
+        ---Configured to show all
+        ---@return PrettyPrint
+        function o:A()
+            pp.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
+                         show_all=true, show_function = true, depth_limit = true })
+            return self;
+        end
+
+        ---@return PrettyPrint
+        function o:pformat(obj, option, printer)
+            local str = pp.pformat(obj, option, printer)
+            o:Default(o)
+            return str
+        end
+
+        o.mt = {
+            __call = function (_, ...)
+                return o.pformat(o, ...)
+            end
+        }
+        setmetatable(o, o.mt)
+    end
+
+    ---@type PrettyPrint
+    local pprint = LibStub(_S:GetMajorVersion('PrettyPrint'))
+    pformat = { wrapped = pprint }
+    Embed(pformat)
+    self:SetGlobal('PrettyPrint', pformat)
+end
+
+function _L:Init() self:InitPrettyPrint() end
+
+_L:Init()
 
 ---@type Core
 __K_Core = _L

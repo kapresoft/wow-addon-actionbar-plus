@@ -4,11 +4,12 @@ local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
 
 -- ## Local ----------------------------------------------------
 local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
-local pformat = PrettyPrint.pformat
 
-local LibStub, M, _, P, _, W, CC = ABP_WidgetConstants:LibPack()
+local LibStub, M, A, P, _, W, CC = ABP_WidgetConstants:LibPack()
 local MacroAttributeSetter = W:MacroAttributeSetter()
 local ButtonAttributes = CC.ButtonAttributes
+
+local s_replace, IsNil = String.replace, A.IsNil
 
 ---@class MacroDragEventHandler
 local _L = LibStub:NewLibrary(M.MacroDragEventHandler)
@@ -24,7 +25,7 @@ function _L:Handle(btnUI, cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues
-    local macroInfoText = ABP_String.replace(pformat(macroInfo), '%s', '$s')
+    local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
     self:log(10, 'macroInfo: %s', macroInfoText)
     --DEVT:EvalObject(macroInfo, 'macroInfo')
 

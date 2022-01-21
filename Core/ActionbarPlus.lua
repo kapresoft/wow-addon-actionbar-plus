@@ -135,10 +135,10 @@ end
 function A:OpenConfig(_) ACE_CFGD:Open(ADDON_NAME) end
 function A:OnUpdate() self:log('OnUpdate called...') end
 --- ### AceAddon Hook
-function A:OnEnable() A:log('OnEnable...') end
+--function A:OnEnable() A:log('OnEnable...') end
 --- ### AceAddon Hook
 --- Log or print() doesn't work with ElvUI; works when ElvUI is disabled
-function A:OnDisable() A:log('OnDisable...') end
+--function A:OnDisable() A:log('OnDisable...') end
 function A:OnProfileChanged() self:ConfirmReloadUI() end
 
 function A:InitDbDefaults()
