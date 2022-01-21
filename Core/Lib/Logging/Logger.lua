@@ -2,7 +2,9 @@
 local LibStub = LibStub
 ---@type pformat
 local pformat = pformat
+assert(pformat ~= nil, 'PrettyFormatter pformat is required')
 local format, tableUnpack = string.format, table.unpack
+
 local _, versionFormat, logPrefix = __K_Core:GetAddonInfo()
 local major, minor =  format(versionFormat, 'Logger'), 1
 
