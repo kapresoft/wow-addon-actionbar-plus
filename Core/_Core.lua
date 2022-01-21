@@ -167,10 +167,11 @@ end
 ---```
 ---@param libName string The library name -- i.e. 'Logger', 'Assert', etc...
 ---@param revisionNumber number The revision number.  This should be a positive number.
----@return string, number The major, minor version info. Example: ```ActionbarPlus-Logger-1.0, 1```
+---@return string, number, string The major, minor, logPrefix. Example: ```ActionbarPlus-Logger-1.0, 1, <log-prefix>```
 ---@see LocalLibStub#GetLibVersionUnpacked
 function _L:GetLibVersion(libName, revisionNumber)
-    return _S:GetLibVersionUnpacked(libName, revisionNumber)
+    local major, minor = _S:GetLibVersionUnpacked(libName, revisionNumber)
+    return major, minor, _S.logPrefix
 end
 
 ---@return Logger

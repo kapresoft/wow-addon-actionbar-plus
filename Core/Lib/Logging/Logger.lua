@@ -5,14 +5,12 @@ local pformat = pformat
 assert(pformat ~= nil, 'PrettyFormatter pformat is required')
 local format, tableUnpack = string.format, table.unpack
 
-local _, versionFormat, logPrefix = __K_Core:GetAddonInfo()
-local major, minor =  format(versionFormat, 'Logger'), 1
-
 local type, select, tostring, error, setmetatable = type, select, tostring, error, setmetatable
 
 local C = LibStub('AceConsole-3.0', true)
 -- ## Local ----------------------------------------------------
 
+local major, minor, logPrefix = __K_Core:GetLibVersion('Logger', 1)
 ---@class Logger
 local L = LibStub:NewLibrary(major, minor)
 if not L then return end
