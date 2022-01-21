@@ -59,7 +59,14 @@ function _S:GetMajorVersion(libName)
     return format(self.versionFormat, libName)
 end
 
+---### Usage:
+---```
+---local major, minor = Core:GetLibVersionUnpacked('Logger', 1)
+---```
+---@param libName string The library name -- i.e. 'Logger', 'Assert', etc...
 ---@param revisionNumber number The revision number.  This should be a positive number.
+---@return string, number The major, minor version info. Example: ```ActionbarPlus-Logger-1.0, 1```
+---@see Core#GetLibVersion
 function _S:GetLibVersionUnpacked(libName, revisionNumber)
     local revNumber = revisionNumber or 1
     local revisionString = format("$Revision: %s $", revNumber)
@@ -105,10 +112,8 @@ function _S:EmbedLoggerIfAvailable(o)
 end
 
 ---@return Logger
-function _S:GetLogger()
-    local loggerName = self:GetMajorVersion('Logger')
-    return LibStub(loggerName, true)
-end
+---@see Core#GetLogger
+function _S:GetLogger() return LibStub(self:GetMajorVersion('Logger'), true) end
 
 _S.mt = { __call = function (_, ...) return _S:GetLibrary(...) end }
 setmetatable(_S, _S.mt)
@@ -155,6 +160,21 @@ function _L:LibStub() return _S end
 function _L:GetAddonInfo()
     return _S.package, _S.versionFormat, _S.logPrefix
 end
+
+---### Usage:
+---```
+---local major, minor = Core:GetLibVersion('Logger', 1)
+---```
+---@param libName string The library name -- i.e. 'Logger', 'Assert', etc...
+---@param revisionNumber number The revision number.  This should be a positive number.
+---@return string, number The major, minor version info. Example: ```ActionbarPlus-Logger-1.0, 1```
+---@see LocalLibStub#GetLibVersionUnpacked
+function _L:GetLibVersion(libName, revisionNumber)
+    return _S:GetLibVersionUnpacked(libName, revisionNumber)
+end
+
+---@return Logger
+function _L:GetLogger() return _S:GetLogger() end
 
 ---Sets the global var name with the Addon short-name prefix
 ---```

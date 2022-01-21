@@ -1,16 +1,15 @@
 -- ## External -------------------------------------------------
-local LibStub = __K_Core:LibPack()
+local LibStub = LibStub
+local logger = __K_Core:GetLogger()
 
 -- ## Local ----------------------------------------------------
 
 ---@class LogFactory
-local _L = LibStub:NewLibrary('LogFactory')
-local logger = LibStub('Logger')
+local major, minor = __K_Core:GetLibVersion('LogFactory', 1)
+local _L = LibStub:NewLibrary(major, minor)
+
 
 -- ## Functions ------------------------------------------------
-
-
--- ## Methods -------------------------------------------------
 
 ---@return LogFactory
 function _L:GetLogger() return logger end
