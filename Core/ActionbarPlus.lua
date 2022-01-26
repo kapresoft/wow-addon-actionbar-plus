@@ -535,7 +535,8 @@ local function BindingUpdated(frame, event)
     BindActions()
 end
 
-local function AddonLoaded(frame, event)
+local function AddonLoaded(self, event, ...)
+    local isLogin, isReload = ...
 
     if (event == 'UPDATE_BINDINGS') then
         BindingUpdated(frame, event)
@@ -543,12 +544,14 @@ local function AddonLoaded(frame, event)
     end
 
     for _, module in ipairs(libModules) do module:OnAddonLoaded() end
+    BindActions()
+    if not isLogin then return end
+
+    --A:log(5, 'IsLogin: %s IsReload: %s', isLogin, isReload)
     A:log("%s.%s initialized", MAJOR, MINOR)
     A:printf('Available commands: /abp to open config dialog.')
     A:printf('Right-click on the button drag frame to open config dialog.')
     A:printf('More at https://kapresoft.com/wow-addon-actionbar-plus')
-
-    BindActions()
 
 end
 

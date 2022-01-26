@@ -1,4 +1,5 @@
 local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
+local Table = ABP_Table
 local WLIB, ItemAttributeSetter = WidgetLibFactory, ItemAttributeSetter
 local ButtonAttributes, _API_Spell = ButtonAttributes, _API_Spell
 local LOG = ABP_LogFactory
@@ -43,7 +44,7 @@ function S:Handle(btnUI, cursorInfo)
 end
 
 function S:IsValid(btnUI, cursorInfo)
-    if table.isEmpty(cursorInfo) then return false end
+    if Table.isEmpty(cursorInfo) then return false end
     if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
         return false
     end
