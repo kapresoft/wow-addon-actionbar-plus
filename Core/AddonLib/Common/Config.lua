@@ -14,6 +14,7 @@ if not _L then return end
 _L.profile = nil
 _L.addon = nil
 
+---@type Profile
 local P
 local BF
 local FF

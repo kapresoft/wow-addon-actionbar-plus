@@ -1,3 +1,4 @@
+-- TODO: Delete? not being used
 local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
 
 local LibStub, format, unpack = LibStub, string.format, Table.unpackIt
@@ -25,7 +26,7 @@ local function Embed(libName, lib, version)
 
     function lib:OnAddonLoaded()
         local major, minor = self:GetVersionUnpacked()
-        self:log(10, '%s.%s initialized', major, minor)
+        self:log(10, '%s.%s initialized yyyy', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end

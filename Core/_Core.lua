@@ -83,7 +83,7 @@ function _S:Embed(o, name, major, minor)
 
     ---@return void
     function o:OnAddonLoaded()
-        self:log(10, '%s.%s initialized', major, minor)
+        self:log(10, '%s.%s initialized xxxx', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end
@@ -98,8 +98,8 @@ function _S:Embed(o, name, major, minor)
     ---@return void
     function o:OnInitialize(context)
         --assert(isTable(context), 'The passed context is not a table')
-        self.addon = context.handler
-        self.profile = context.profile
+        self.addon = context.addon
+        self.profile = context.addon.profile
         if type(self.OnAfterInitialize) == 'function' then self:OnAfterInitialize() end
     end
     self:EmbedLoggerIfAvailable(o)

@@ -89,6 +89,7 @@ function _L:GetLogLevel() return ABP_LOG_LEVEL end
 ---@param level number The log level between 1 and 100
 function _L:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
 
+---@return WidgetLibFactory
 function _L:GetWidgetLibFactory() return self:Get(Module.WidgetLibFactory) end
 
 function _L:Get(...)
