@@ -41,7 +41,7 @@ function _L:GetItemDetails(itemId)
     local itemName, itemLink,
     itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
     itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-    expacID, setID, isCraftingReagent = GetItemInfo(itemCursor.id)
+    expacID, setID, isCraftingReagent = GetItemInfo(itemId)
     return { id = itemId, name = itemName, link = itemLink, icon = itemTexture }
 end
 
