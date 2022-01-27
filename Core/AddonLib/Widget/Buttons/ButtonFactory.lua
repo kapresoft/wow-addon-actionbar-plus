@@ -165,6 +165,11 @@ local __def = function(
         --    self:Bind()
         --end
 
+        btnUI:HookScript('OnClick', function(self, button, down)
+            print('CreateSingleButton]]: Clicked:', pformat(button), 'Down:', down)
+            print('CreateSingleButton]]: Self:', pformat(self:GetActionbarInfo()))
+        end)
+
         return btnUI
     end
 
