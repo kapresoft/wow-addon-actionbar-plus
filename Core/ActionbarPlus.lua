@@ -70,16 +70,17 @@ local function BindActions()
     --ABP:DBG(bindingNames, 'Binding Names')
     local button3Binding = bindingNames[BINDING_NAME_ABP_ACTIONBAR1_BUTTON3]
     --print('Binding[ABP_ACTIONBAR1_BUTTON3]', pformat(button3Binding))
-    if button3Binding and button3Binding.key1 then
-        local button3 = 'ActionbarPlusF1Button3'
-        local btnUI = _G[button3]
-        if btnUI then
-            ClearOverrideBindings(btnUI)
-            SetOverrideBindingClick(btnUI, true, button3Binding.key1, button3)
-            -- TODO: Does not respond after binding change event, need to add a listener to event UPDATE_BINDINGS
-            if button3Binding.key2 then
-                SetOverrideBindingClick(btnUI, true, button3Binding.key2, button3)
-            end
+    if not (button3Binding and button3Binding.key1) then return end
+    local button3 = 'ActionbarPlusF1Button3'
+    local btnUI = _G[button3]
+    if btnUI then
+        ClearOverrideBindings(btnUI)
+        SetOverrideBindingClick(btnUI, true, button3Binding.key1, button3)
+        ABP:log(40, 'Button: %s OverrideBindingClick: %s', button3, button3Binding.key1)
+        -- TODO: Does not respond after binding change event, need to add a listener to event UPDATE_BINDINGS
+        if button3Binding.key2 then
+            ABP:log(40, 'Button: %s OverrideBindingClick: %s', button3, button3Binding.key2)
+            SetOverrideBindingClick(btnUI, true, button3Binding.key2, button3)
         end
     end
     --LoadBindings(1);
@@ -100,10 +101,7 @@ function Binding_ActionBar3(...)
 end
 
 local function BindingUpdated(frame, event)
-    --PrettyPrint.setup({ show_all = true })
-    --print('frame', frame:GetName(), 'event', event, 'arg3', arg3)
-    --LoadBindings(1)
-    --ABP:DBG(frame, 'frame')
+    --ABP:log(20, 'BindingUpdated: %s Frame:%s', event, frame:GetName())
     BindActions()
 end
 

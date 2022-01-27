@@ -83,21 +83,18 @@ function _S:Embed(o, name, major, minor)
 
     ---@return void
     function o:OnAddonLoaded()
-        self:log(10, '%s.%s initialized xxxx', major, minor)
+        self:log(20, '%s.%s loaded', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end
 
     ---
-    --- `lib:OnInitialized{ addon=<handler>, profile=<profiledb> }`
-    --- @param context @vararg table A vararg parameter
-    ---
-    --- Example:
-    ---
-    ---`{ addon=<handler>, profile=<profiledb> }`
+    ---AceAddon lifecycle template method
+    ---### Example Call:
+    ---```[Addon]:OnInitialized{ addon=ABP }```
+    ---@param context @vararg table A vararg parameter. ```{ addon=addon }```
     ---@return void
     function o:OnInitialize(context)
-        --assert(isTable(context), 'The passed context is not a table')
         self.addon = context.addon
         self.profile = context.addon.profile
         if type(self.OnAfterInitialize) == 'function' then self:OnAfterInitialize() end
