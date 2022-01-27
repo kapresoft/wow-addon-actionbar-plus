@@ -48,6 +48,11 @@ local ButtonTemplate = { ['type'] = nil, [ButtonAttributes.SPELL] = {} }
 
 ---- ## Start Here ----
 
+---@class ProfileConfigNames
+local ConfigNames = {
+    ['lock_actionbars'] = 'lock_actionbars'
+}
+
 local SPELL = { id = nil, name = nil, icon = nil, label = nil }
 local ITEM = { id = nil, name = nil, icon = nil, label = nil }
 local MACRO = { index = nil, name = nil, icon = nil }
@@ -219,3 +224,11 @@ end
 function P:GetActionBarSizeDetailsByIndex(frameIndex)
     return FrameDetails[frameIndex]
 end
+
+---@return boolean True if the action bar is locked
+function P:IsLockActionBars()
+    return self.profile[ConfigNames.lock_actionbars]
+end
+
+---@return ProfileConfigNames
+function P:GetConfigNames() return ConfigNames end

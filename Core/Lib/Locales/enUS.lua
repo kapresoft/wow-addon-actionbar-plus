@@ -5,6 +5,7 @@
     
 ]]--
 
+---@class Localization
 local L = LibStub("AceLocale-3.0"):NewLocale("ActionbarPlus", "enUS", true);
 
 L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]  = 'Bar 1 - Button 1'
@@ -23,3 +24,6 @@ L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON13"] = 'Bar 1 - Button 13'
 L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON14"] = 'Bar 1 - Button 14'
 L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON15"] = 'Bar 1 - Button 15'
 L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON16"] = 'Bar 1 - Button 16'
+
+L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']  = 'Lock Actionbars with SHIFT key'
+L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']  = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'

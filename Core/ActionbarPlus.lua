@@ -211,7 +211,7 @@ local methods = {
         debugDialog:SetStatusText(label)
         debugDialog:Show()
     end,
-    ['DBG'] = function(obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel)  end,
+    ['DBG'] = function(self, obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel)  end,
     ['RegisterKeyBindings'] = function(self)
         --SetBindingClick("SHIFT-T", self:Info())
         --SetBindingClick("SHIFT-F1", BoxerButton3:GetName())

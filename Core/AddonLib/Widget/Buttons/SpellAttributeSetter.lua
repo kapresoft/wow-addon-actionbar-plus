@@ -16,12 +16,18 @@ local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
 
 -- ## Functions ------------------------------------------------
 
---- `['ActionbarPlusF1Button1'] = {
----     ['type'] = 'spell',
----     ['spell'] = {
----         -- spellInfo
----     }
---- }`
+---### Button Data Example
+---
+---```lua
+---['ActionbarPlusF1Button1'] = {
+---   ['type'] = 'spell',
+---   ['spell'] = {
+---       -- spellInfo
+---   }
+---}
+---```
+---@param btnUI table The UIFrame
+---@param btnData table The button data
 function _L:SetAttributes(btnUI, btnData)
     W:ResetWidgetAttributes(btnUI)
 
@@ -30,10 +36,6 @@ function _L:SetAttributes(btnUI, btnData)
     if type(spellInfo) ~= 'table' then return end
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
-    --local btnName = btnUI:GetName()
-    --local abInfo = btnUI:GetActionbarInfo()
-    --local p = { name=btnName, ab=abInfo, spell=spellInfo.name }
-    --self:logp('btnData', p)
 
     local spellIcon = TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
@@ -47,7 +49,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:RegisterForDrag('LeftButton')
     btnUI:SetScript("OnDragStart", function(_btnUI)
-        if not IsShiftKeyDown() then return end
+        if P:IsLockActionBars() and not IsShiftKeyDown() then return end
         _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
         PickupSpell(spellInfo.id)
         W:ResetWidgetAttributes(_btnUI)
