@@ -110,11 +110,6 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
     end
 end
 
-function L:GetAttributesSetter(actionType)
-    AssertNotNil(actionType, 'actionType')
-    return AttributeSetters[actionType]
-end
-
 function L:SetButtonAttributes(btnUI)
     local actionbarInfo = btnUI:GetActionbarInfo()
     local btnName = btnUI:GetName()
@@ -142,15 +137,20 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
-    --{
-    --    index = 2, name = 'ActionbarPlusF2',
-    --    button = { index = 8, name = 'ActionbarPlusF2Button8' },
-    --}
+    ---```
+    ---{
+    ---    index = 2, name = 'ActionbarPlusF2',
+    ---    button = { index = 8, name = 'ActionbarPlusF2Button8' },
+    ---}
+    ---```
+    ---@return ActionBarInfo
     function btnUI:GetActionbarInfo()
-        return {
+        ---@class ActionBarInfo
+        local info = {
             name = frameName, index = dragFrame:GetFrameIndex(),
             button = { name = btnName, index = index },
         }
+        return info
     end
 
     function btnUI:GetProfileButtonData()
@@ -171,9 +171,12 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     btnUI:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
     btnUI:SetNormalTexture(noIconTexture)
 
-    --if btnName == 'ActionbarPlusF1Button3' then
-    --    self:Bind()
-    --end
+    -- We need OnClick for all buttons
+    btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
+        local actionType, info1, info2, info3 = GetCursorInfo()
+        if String.IsBlank(actionType) then return end
+        L:OnReceiveDrag(_btnUI)
+    end)
 
     return btnUI
 end
@@ -200,12 +203,12 @@ function L:OnReceiveDrag(btnUI)
     ClearCursor()
 
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+    self:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not self:IsValidDragSource(cursorInfo) then return end
     H:Handle(btnUI, actionType, cursorInfo)
 end
 
 function L:IsValidDragSource(cursorInfo)
-    self:log(5, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if String.IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
@@ -220,4 +223,9 @@ function L:AttachFrameEvents(frame)
     frame:SetScript("OnMouseDown", OnMouseDownFrame)
     frame:SetScript("OnEnter", OnShowFrameTooltip)
     frame:SetScript("OnLEave", OnLeaveFrame)
+end
+
+function L:GetAttributesSetter(actionType)
+    AssertNotNil(actionType, 'actionType')
+    return AttributeSetters[actionType]
 end

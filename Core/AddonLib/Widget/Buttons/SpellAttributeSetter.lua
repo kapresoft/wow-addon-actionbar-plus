@@ -7,7 +7,9 @@ local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
 local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
-local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
+
+local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT = ABP_WidgetConstants:GetButtonTextures()
 
 ---@class SpellAttributeSetter
 local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
@@ -23,6 +25,7 @@ local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
 function _L:SetAttributes(btnUI, btnData)
     W:ResetWidgetAttributes(btnUI)
 
+    ---@type SpellInfo
     local spellInfo = btnData[WAttr.SPELL]
     if type(spellInfo) ~= 'table' then return end
     if not spellInfo.id then return end
@@ -41,6 +44,20 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
+
+    btnUI:RegisterForDrag('LeftButton')
+    btnUI:SetScript("OnDragStart", function(_btnUI)
+        _L:log(10, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
+        PickupSpell(spellInfo.id)
+        W:ResetWidgetAttributes(_btnUI)
+        btnData[WAttr.SPELL] = {}
+        btnUI:SetNormalTexture(TEXTURE_EMPTY)
+        btnUI:SetScript("OnEnter", nil)
+        --if IsShiftKeyDown() then
+            --_btnUI:ResetAttributes()
+        --end
+    end)
+
 end
 
 ---@param link table The blizzard `GameTooltip` link

@@ -3,7 +3,7 @@
 -- ## Local ----------------------------------------------------
 local LibStub, M, Assert, P, _, W, CC = ABP_WidgetConstants:LibPack()
 local SpellAttributeSetter = W:SpellAttributeSetter()
-local WidgetAttributes = CC.WidgetAttributes
+local WAttr = CC.WidgetAttributes
 local _API_Spell = _API_Spell
 
 ---@class SpellDragEventHandler
@@ -19,6 +19,7 @@ function _L:Handle(btnUI, cursorInfo)
                               id = cursorInfo.info3,
                               bookIndex = cursorInfo.info1,
                               bookType = cursorInfo.info2 }
+
     local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
     if Assert.IsNil(spellInfo) then return end
 
@@ -27,8 +28,14 @@ function _L:Handle(btnUI, cursorInfo)
     local barData = P:GetBar(actionbarInfo.index)
     local btnData = barData.buttons[btnName] or P:GetTemplate().Button
 
-    btnData.type = WidgetAttributes.SPELL
-    btnData[WidgetAttributes.SPELL] = spellInfo
+    local btnDataOld = btnData[WAttr.SPELL]
+    if btnDataOld and btnDataOld.id then
+        PickupSpell(btnDataOld.id)
+        self:log('Existing spell: %s', btnDataOld.id)
+    end
+
+    btnData.type = WAttr.SPELL
+    btnData[WAttr.SPELL] = spellInfo
     barData.buttons[btnName] = btnData
 
     SpellAttributeSetter(btnUI, btnData)

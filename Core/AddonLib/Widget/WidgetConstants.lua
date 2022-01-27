@@ -59,6 +59,11 @@ function _L:LibPack()
     return LibStub, M, Assert, Profile, LibSharedMedia, WidgetLibFactory, ABP_CommonConstants, G
 end
 
+---@return string, string TEXTURE_EMPTY and TEXTURE_HIGHLIGHT
+function _L:GetButtonTextures()
+    return TEXTURE_EMPTY, TEXTURE_HIGHLIGHT
+end
+
 ---@return WidgetLibFactory
 function _L:LibPack_WidgetFactory() return LibStub(M.WidgetLibFactory) end
 
