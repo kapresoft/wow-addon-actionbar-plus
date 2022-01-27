@@ -65,7 +65,7 @@ function _L:GetButtonFactoryLibs() return self:GetProfile(), sharedMedia end
 ---```
 ---local Profile, ButtonFactory = WidgetLibFactory:GetConfigLibPack()
 ---```
----@return Profile, ButtonFrameFactory, ButtonFrameFactory
+---@return Profile, ButtonFactory, ButtonFrameFactory
 function _L:LibPack_Config()
     return self:GetProfile(), self:GetButtonFactory(), self:GetButtonFrameFactory() end
 

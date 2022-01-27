@@ -286,7 +286,6 @@ local methods = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-
 local function NewInstance()
     local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
     frame:SetScript("OnEvent", OnAddonLoaded)
@@ -310,6 +309,5 @@ local function NewInstance()
     return A
 end
 
----@type ActionbarPlus
 ABP = NewInstance()
 
