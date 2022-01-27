@@ -1,5 +1,6 @@
 -- ## External -------------------------------------------------
 local GetItemInfo = GetItemInfo
+local _, Table = ABP_LibGlobals:LibPackUtils()
 
 -- ## Local ----------------------------------------------------
 -- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, LibGlobals
@@ -45,7 +46,7 @@ function _L:GetItemDetails(itemId)
 end
 
 function _L:IsValid(btnUI, cursorInfo)
-    if table.isEmpty(cursorInfo) then return false end
+    if Table.isEmpty(cursorInfo) then return false end
     if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
         return false
     end
