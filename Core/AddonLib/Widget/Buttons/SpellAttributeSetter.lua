@@ -47,15 +47,13 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:RegisterForDrag('LeftButton')
     btnUI:SetScript("OnDragStart", function(_btnUI)
-        _L:log(10, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
+        if not IsShiftKeyDown() then return end
+        _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
         PickupSpell(spellInfo.id)
         W:ResetWidgetAttributes(_btnUI)
         btnData[WAttr.SPELL] = {}
         btnUI:SetNormalTexture(TEXTURE_EMPTY)
         btnUI:SetScript("OnEnter", nil)
-        --if IsShiftKeyDown() then
-            --_btnUI:ResetAttributes()
-        --end
     end)
 
 end

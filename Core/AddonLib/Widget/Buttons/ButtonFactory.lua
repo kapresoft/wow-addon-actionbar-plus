@@ -173,8 +173,9 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
 
     -- We need OnClick for all buttons
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
-        local actionType, info1, info2, info3 = GetCursorInfo()
+        local actionType = GetCursorInfo()
         if String.IsBlank(actionType) then return end
+        L:log(20, 'HookScript| Actionbar: %s', pformat(_btnUI:GetActionbarInfo()))
         L:OnReceiveDrag(_btnUI)
     end)
 

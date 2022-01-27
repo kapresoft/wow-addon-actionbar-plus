@@ -28,10 +28,11 @@ function _L:Handle(btnUI, cursorInfo)
     local barData = P:GetBar(actionbarInfo.index)
     local btnData = barData.buttons[btnName] or P:GetTemplate().Button
 
+    -- Dragging over a button with an existing spell
     local btnDataOld = btnData[WAttr.SPELL]
     if btnDataOld and btnDataOld.id then
         PickupSpell(btnDataOld.id)
-        self:log('Existing spell: %s', btnDataOld.id)
+        self:log(10, 'Button has existing spell: %s', btnDataOld.id)
     end
 
     btnData.type = WAttr.SPELL
