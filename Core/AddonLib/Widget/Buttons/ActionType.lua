@@ -1,12 +1,16 @@
-local String = ABP_String
+local LibStub = __K_Core:LibPack()
+---@type String
+local String = LibStub('String')
 local tinsert, ipairs = table.insert, ipairs
 
+---@class ActionType
 local AT = {
     SPELL = 'spell',
     ITEM = 'item',
     MACRO = 'macro',
     MACRO_TEXT = 'macrotext',
 }
+---@type ActionType
 ABP_ActionType = AT
 
 -- ## Start Here ##

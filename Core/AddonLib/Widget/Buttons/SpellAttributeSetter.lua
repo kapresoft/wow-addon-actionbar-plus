@@ -1,18 +1,20 @@
---- Spell Attributes Setter
----@param RWAttr table ResetWidgetAttributes
-local LOG, BATTR, RWAttr, WAttr, UAttr,
-    GameTooltip, AssertNotNil, format, IsNotBlank,
-    TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT =
-            ABP_LogFactory, ButtonAttributes, ResetWidgetAttributes,
-            WidgetAttributes, UnitAttributes,
-            GameTooltip, Assert.AssertNotNil, string.format, ABP_String.IsNotBlank,
-            TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+-- ## External -------------------------------------------------
+local format = string.format
+local GameTooltip = GameTooltip
 
--- #############################################################
-local S = {}
-LOG:EmbedLogger(S, 'SpellAttributeSetter')
-SpellAttributeSetter = S
--- ###################### Start Here ###########################
+-- ## Local ----------------------------------------------------
+local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
+local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
+local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
+local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
+local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
+
+local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT = ABP_WidgetConstants:GetButtonTextures()
+
+---@class SpellAttributeSetter
+local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
+
+-- ## Functions ------------------------------------------------
 
 --- `['ActionbarPlusF1Button1'] = {
 ---     ['type'] = 'spell',
@@ -20,8 +22,10 @@ SpellAttributeSetter = S
 ---         -- spellInfo
 ---     }
 --- }`
-function S:SetAttributes(btnUI, btnData)
-    RWAttr(btnUI)
+function _L:SetAttributes(btnUI, btnData)
+    W:ResetWidgetAttributes(btnUI)
+
+    ---@type SpellInfo
     local spellInfo = btnData[WAttr.SPELL]
     if type(spellInfo) ~= 'table' then return end
     if not spellInfo.id then return end
@@ -37,13 +41,25 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
-    btnUI:SetAttribute(BATTR.UNIT2, UAttr.FOCUS)
+    btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
+
+    btnUI:RegisterForDrag('LeftButton')
+    btnUI:SetScript("OnDragStart", function(_btnUI)
+        if not IsShiftKeyDown() then return end
+        _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
+        PickupSpell(spellInfo.id)
+        W:ResetWidgetAttributes(_btnUI)
+        btnData[WAttr.SPELL] = {}
+        btnUI:SetNormalTexture(TEXTURE_EMPTY)
+        btnUI:SetScript("OnEnter", nil)
+    end)
+
 end
 
 ---@param link table The blizzard `GameTooltip` link
-function S:ShowTooltip(btnUI, btnData)
+function _L:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
     local type = btnData.type
     if not type then return end
@@ -58,5 +74,5 @@ function S:ShowTooltip(btnUI, btnData)
 end
 
 --- So that we can call with SetAttributes(btnUI)
-S.mt.__call = S.SetAttributes
+_L.mt.__call = _L.SetAttributes
 

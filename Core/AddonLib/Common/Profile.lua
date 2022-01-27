@@ -1,12 +1,16 @@
 local type, pairs, tostring = type, pairs, tostring
-local isTable, isNotTable, tsize, tinsert, tsort
-    = ABP_Table.isTable, ABP_Table.isNotTable, ABP_Table.size, table.insert, table.sort
-local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
--- local format = string.format
---local pack, unpack = table.pack, ABP_Table.unpackIt
+local LibStub, M = ABP_LibGlobals:LibPack()
+local _, Table = ABP_LibGlobals:LibPackUtils()
+local Assert = LibStub(M.Assert)
+local ButtonAttributes = ABP_CommonConstants.ButtonAttributes
 
-local ADDON_LIB, Module = AceLibAddonFactory, Module
-local P = ADDON_LIB:NewAceLib(Module.Profile)
+local isTable, isNotTable, tsize, tinsert, tsort
+    = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
+local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+local ProfileInitializer = LibStub(M.ProfileInitializer)
+
+---@class Profile
+local P = LibStub:NewLibrary(M.Profile)
 if not P then return end
 
 ---- ## Start Here ----

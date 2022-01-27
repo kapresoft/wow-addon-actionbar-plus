@@ -1,29 +1,31 @@
-local LOG, PrettyPrint = ABP_LogFactory, AceLibAddonFactory:GetPrettyPrint()
-local pformat = PrettyPrint.pformat
-local WLIB, MacroAttributeSetter = WidgetLibFactory, MacroAttributeSetter
-local AssertNotNil = Assert.AssertNotNil
-local ButtonAttributes, _API_Spell, IsNil = ButtonAttributes, _API_Spell, Assert.IsNil
-
+-- ## External -------------------------------------------------
 -- TODO: Move to API
 local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
 
-local P = WLIB:GetProfile()
+-- ## Local ----------------------------------------------------
+local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
 
-local S = {}
-LOG:EmbedLogger(S, 'MacroDragEventHandler')
-MacroDragEventHandler = S
+local LibStub, M, A, P, _, W, CC = ABP_WidgetConstants:LibPack()
+local MacroAttributeSetter = W:MacroAttributeSetter()
+local ButtonAttributes = CC.ButtonAttributes
 
-function S:IsMacrotext(macroInfo)
+local s_replace, IsNil = String.replace, A.IsNil
+
+---@class MacroDragEventHandler
+local _L = LibStub:NewLibrary(M.MacroDragEventHandler)
+
+-- ## Functions ------------------------------------------------
+function _L:IsMacrotext(macroInfo)
     return macroInfo.type == 'macrotext'
 end
 
 ---@param cursorInfo table Structure `{ -- }`
-function S:Handle(btnUI, cursorInfo)
+function _L:Handle(btnUI, cursorInfo)
     self:log(10, 'cursorInfo: %s', cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues
-    local macroInfoText = ABP_String.replace(pformat(macroInfo), '%s', '$s')
+    local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
     self:log(10, 'macroInfo: %s', macroInfoText)
     --DEVT:EvalObject(macroInfo, 'macroInfo')
 
@@ -56,7 +58,7 @@ end
 ---     type = 'macro'
 --- }
 ---@param cursorInfo table Cursor Info `{ type='type', info1='macroIndex' }`
-function S:GetMacroInfo(cursorInfo)
+function _L:GetMacroInfo(cursorInfo)
     local macroIndex = cursorInfo.info1
     local macroName, macroIconId, macroBody, isLocal = GetMacroInfo(macroIndex)
     local macroInfo = {
@@ -70,6 +72,6 @@ function S:GetMacroInfo(cursorInfo)
     return macroInfo
 end
 
-function S:HandleMacrotext(btnUI, cursorInfo)
+function _L:HandleMacrotext(btnUI, cursorInfo)
 
 end

@@ -1,24 +1,28 @@
-local format, unpack, pack, tinsert = string.format, ABP_Table.unpackIt, table.pack, table.insert
-local ADDON_LIB, ADDON_NAME = AceLibAddonFactory, ADDON_NAME
-local GetLogLevel,SetLogLevel = ABP_CommonConstants.GetLogLevel, ABP_CommonConstants.SetLogLevel
+-- ## External -------------------------------------------------
+local format = string.format
 
-local C = ADDON_LIB:NewAceLib('Config')
-if not C then return end
+-- ## Local ----------------------------------------------------
+local LibStub, M, G = ABP_LibGlobals:LibPack()
+local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
+local unpack = Table.unpackIt
 
----- ## Start Here ----
+---@class Config
+local _L = LibStub:NewLibrary(M.Config)
+if not _L then return end
+
 -- Initializedin OnAddonLoaded() - See Logger
-C.profile = nil
-C.addon = nil
+_L.profile = nil
+_L.addon = nil
 
--- Profile initialized in OnAfterInitialize()
----@type Profile
-local P = nil
-local BF = nil
-local FF = nil
+local P
+local BF
+local FF
 
-function C:OnAfterInitialize()
-    FF = ABP_ButtonFrameFactory
-    P, BF = unpack(WidgetLibFactory:GetConfigLibs())
+-- ## Functions ------------------------------------------------
+
+function _L:OnAfterInitialize()
+    local W = G:GetWidgetLibFactory()
+    P, BF, FF = W:LibPack_Config()
 end
 
 local function CreateSetterHandler(frameIndex)
@@ -35,21 +39,21 @@ local function CreateGetterHandler(frameIndex)
     end
 end
 
-function C:OnAfterAddonLoaded()
+function _L:OnAfterAddonLoaded()
     local bars = P:GetBars()
     local count = P:GetBarSize()
 end
 
 -- Main Entry Point to config dialog
-function C:GetOptions()
+function _L:GetOptions()
     return {
-        name = ADDON_NAME, handler = C.addon, type = "group",
-        args = C:CreateBarConfigArgsDef(),
+        name = G.addonName, handler = _L.addon, type = "group",
+        args = _L:CreateBarConfigArgsDef(),
 
     }
 end
 
-function C:CreateBarConfigArgsDef()
+function _L:CreateBarConfigArgsDef()
     local configArgs = {}
     local count = P:GetBarSize()
     --local bars = P:GetBars()
@@ -57,7 +61,7 @@ function C:CreateBarConfigArgsDef()
     --error(format('bars: %s', ABP_Table.toString(bars)))
     for i=1,count do
         local key = 'bar' .. i
-        configArgs[key] = C:CreateBarConfigDef(i)
+        configArgs[key] = _L:CreateBarConfigDef(i)
     end
 
     configArgs.debugging = {
@@ -76,8 +80,8 @@ function C:CreateBarConfigArgsDef()
                 width = 1.2,
                 name = 'Log Level',
                 desc = 'Higher log levels generate for console logs.',
-                get = function(_) return GetLogLevel() end,
-                set = function(_, v) SetLogLevel(v) end,
+                get = function(_) return G:GetLogLevel() end,
+                set = function(_, v) G:SetLogLevel(v) end,
             },
         },
     }
@@ -85,7 +89,7 @@ function C:CreateBarConfigArgsDef()
     return configArgs
 end
 
-function C:CreateBarConfigDef(frameIndex)
+function _L:CreateBarConfigDef(frameIndex)
     local configName = format('Action Bar #%s', tostring(frameIndex))
     return {
         type = 'group',

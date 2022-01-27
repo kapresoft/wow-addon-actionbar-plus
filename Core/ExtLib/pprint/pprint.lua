@@ -41,9 +41,12 @@
 ---     wrap_string = true
 --- }
 
+---@type LibStub
 local LibStub = LibStub
-local MAJOR, MINOR = 'ActionbarPlus-PrettyPrint-1.0', tonumber(("$Revision: 1 $"):match("%d+"))
-local pprint = LibStub:NewLibrary(MAJOR, MINOR)
+
+---@class PrettyPrint
+local pprint = LibStub:NewLibrary('ActionbarPlus-PrettyPrint-1.0', 1)
+
 if not pprint then return end
 
 --local pprint = { VERSION = '0.1' }
@@ -526,15 +529,7 @@ setmetatable(pprint, {
 -- for World of Warcraft
 if type(io) ~= 'table' then io = { write = print } end
 
-function pprint:_DefaultSetup()
-    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, show_all=false })
-end
 
-function pprint:_ShowAll()
-    self.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, show_all=true })
-end
-
-pprint:_DefaultSetup()
 
 --ABP_PrettyPrint = pprint
 

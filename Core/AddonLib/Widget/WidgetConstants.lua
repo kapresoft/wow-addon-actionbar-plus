@@ -1,9 +1,13 @@
-local ACE_LIB = AceLibFactory
 local ReloadUI = ReloadUI
-local SHARED_MEDIA = ACE_LIB:GetAceSharedMedia()
 local BATTR = ButtonAttributes
 local LOG = ABP_LogFactory
-local l = LOG('WidgetConstants')
+
+local LibStub, M, G = ABP_LibGlobals:LibPack()
+---@type AceLibFactory
+local AceLibFactory = LibStub('AceLibFactory')
+local LibSharedMedia = AceLibFactory:GetAceSharedMedia()
+local LogFactory = LibStub(M.LogFactory)
+local l = LogFactory('WidgetConstants')
 
 -- #########################################################
 
@@ -13,8 +17,14 @@ TOPLEFT = 'TOPLEFT'
 BOTTOMLEFT = 'BOTTOMLEFT'
 ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
 CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
-TEXTURE_EMPTY = SHARED_MEDIA:Fetch(SHARED_MEDIA.MediaType.BACKGROUND, "Blizzard Dialog Background")
-TEXTURE_HIGHLIGHT = SHARED_MEDIA:Fetch(SHARED_MEDIA.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
+TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
+TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
+
+---@class WidgetConstants
+local _L = {}
+---@type WidgetConstants
+ABP_WidgetConstants = _L
+
 
 StaticPopupDialogs[CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
@@ -43,9 +53,17 @@ end
 --    return _logger
 --end
 
-function ResetWidgetAttributes(btnUI)
-    for _,v in pairs(BATTR) do
-        l:log(50, 'Resetting Attribute: %s', v)
-        btnUI:SetAttribute(v, nil)
-    end
+---@return LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
+function _L:LibPack()
+    local WidgetLibFactory, Assert, Profile = G:Get(M.WidgetLibFactory, M.Assert, M.Profile)
+    return LibStub, M, Assert, Profile, LibSharedMedia, WidgetLibFactory, ABP_CommonConstants, G
 end
+
+---@return string, string TEXTURE_EMPTY and TEXTURE_HIGHLIGHT
+function _L:GetButtonTextures()
+    return TEXTURE_EMPTY, TEXTURE_HIGHLIGHT
+end
+
+---@return WidgetLibFactory
+function _L:LibPack_WidgetFactory() return LibStub(M.WidgetLibFactory) end
+

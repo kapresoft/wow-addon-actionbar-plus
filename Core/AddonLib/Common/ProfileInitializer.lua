@@ -1,10 +1,18 @@
-local PrettyPrint = AceLibAddonFactory:GetPrettyPrint()
-local format, isNotTable, shallow_copy = string.format, ABP_Table.isNotTable, ABP_Table.shallow_copy
-local pformat = PrettyPrint.pformat
-local ATTR = WidgetAttributes
+-- ## External -------------------------------------------------
+local format = string.format
 
-local P = {}
-ProfileInitializer = P
+-- ## Local ----------------------------------------------------
+local LibGlobals = ABP_LibGlobals
+local ATTR = ABP_CommonConstants.WidgetAttributes
+
+local PrettyPrint, Table, String = LibGlobals:LibPackUtils()
+local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
+local LibStub, M, _ = LibGlobals:LibPack()
+
+-- ## Functions ------------------------------------------------
+
+---@class ProfileInitializer
+local P = LibStub:NewLibrary(M.ProfileInitializer, 1)
 
 local FrameDetails = {
     [1] = { rowSize = 2, colSize = 6 },
@@ -146,6 +154,3 @@ function P:CreateSingleButtonTemplate()
     end
     return b
 end
-
-
-

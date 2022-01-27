@@ -1,7 +1,7 @@
-local format, unpack, pack = string.format, ABP_Table.unpackIt, table.pack
-local LIB, Module = AceLibAddonFactory, Module
+local LibStub, M = ABP_LibGlobals:LibPack()
 
-local B = LIB:NewAceLib('ButtonUI')
+---@class ButtonUI
+local B = LibStub:NewLibrary(M.ButtonUI, 1)
 if not B then return end
 
 ---- ## Start Here ----
