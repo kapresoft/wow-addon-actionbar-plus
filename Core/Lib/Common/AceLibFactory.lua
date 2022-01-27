@@ -61,5 +61,3 @@ function _L:GetAceGUI() return libAceGUI end
 function _L:GetAddonAceLibs()
     return self:GetAceDB(), self:GetAceDBOptions(), self:GetAceConfig(), self:GetAceConfigDialog()
 end
-
-

@@ -3,15 +3,18 @@
 local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
 local LibStub, M, G = ABP_LibGlobals:LibPack()
 
+
 local type, tonumber = type, tonumber
 local replace = String.replace
 
-local GameTooltip, ACELIB, MC,
+local GameTooltip, MC,
     ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
     TEXTURE_EMPTY, ANCHOR_TOPLEFT =
-        GameTooltip, AceLibFactory, MacroIconCategories,
+        GameTooltip, MacroIconCategories,
         ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
         TEXTURE_EMPTY, ANCHOR_TOPLEFT
+
+local ACELIB = ABP_LibGlobals:LibPack_AceLibFactory()
 
 -- ## Local ----------------------------------------------------
 

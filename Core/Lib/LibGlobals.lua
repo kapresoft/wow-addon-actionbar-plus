@@ -72,7 +72,12 @@ function _L:LibPack_NewAddon()
     return LibStub, Module, AceLibFactory, WidgetLibFactory, ProfileInitializer, _L
 end
 
----@return pformat,ToStringSorted
+---@return AceLibFactory
+function _L:LibPack_AceLibFactory()
+    return self:Get(Module.AceLibFactory)
+end
+
+---@return pformat, function
 function _L:LibPackPrettyPrint()
     local PrettyPrint, Table = self:Get(Module.PrettyPrint, Module.Table)
     return PrettyPrint.pformat, Table.ToStringSorted
