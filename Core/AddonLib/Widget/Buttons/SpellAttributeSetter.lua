@@ -51,6 +51,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:RegisterForDrag('LeftButton')
     btnUI:SetScript("OnDragStart", function(_btnUI)
+        if InCombatLockdown() then return end
         if P:IsLockActionBars() and not IsShiftKeyDown() then return end
         _btnUI:ClearCooldown()
         _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
@@ -109,31 +110,29 @@ local waitFrame = nil;
 ---#### Source
 ---* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
 local function ABP_wait(delay, func, ...)
-    if (type(delay)~="number" or type(func)~="function") then
-    return false;
-    end
+    if (type(delay)~="number" or type(func)~="function") then return false end
     if (waitFrame == nil) then
         waitFrame = CreateFrame("Frame", "WaitFrame", UIParent);
         waitFrame:SetScript("onUpdate", function (self, elapse)
-            local count = #waitTable;
-            local i = 1;
+            local count = #waitTable
+            local i = 1
             while (i<=count) do
-                local waitRecord = tremove(waitTable, i);
-                local d = tremove(waitRecord, 1);
-                local f = tremove(waitRecord, 1);
-                local p = tremove(waitRecord, 1);
+                local waitRecord = tremove(waitTable, i)
+                local d = tremove(waitRecord, 1)
+                local f = tremove(waitRecord, 1)
+                local p = tremove(waitRecord, 1)
                 if(d>elapse) then
-                    tinsert(waitTable,i,{d-elapse, f, p});
-                    i = i + 1;
+                    tinsert(waitTable,i,{d-elapse, f, p})
+                    i = i + 1
                 else
-                    count = count - 1;
-                    f(unpack(p));
+                    count = count - 1
+                    f(unpack(p))
                 end
             end
-        end );
+        end)
     end
-    tinsert(waitTable,{delay, func,{...}});
-    return true;
+    tinsert(waitTable,{delay, func,{...}})
+    return true
 end
 
 --- TODO: Fire an AceEvent?
@@ -168,6 +167,7 @@ local function OnEvent(frame, event, ...)
 
     local function updateCooldown()
         local info = _API_Spell:GetSpellCooldown(spellID)
+        -- Don't update cooldown on instant cast spells
         if info.duration <= 0 then
             if logCooldown then
                 _L:log('%s[%s][%s] <<SKIPPED>>', spell.name, spellID, evt)
