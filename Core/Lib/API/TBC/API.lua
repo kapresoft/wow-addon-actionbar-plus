@@ -44,3 +44,13 @@ function S:GetSpellInfo(spellNameOrId)
     end
     return nil
 end
+
+---@return SpellCooldown
+function S:GetSpellCooldown(spellID, optionalSpellName)
+    local start, duration, enabled, modRate = GetSpellCooldown(spellID);
+    ---@class SpellCooldown
+    local info = {
+        spell = { id=spellID, name=optionalSpellName },
+        start = start, duration = duration, enabled = enabled, modRate = modRate }
+    return info
+end

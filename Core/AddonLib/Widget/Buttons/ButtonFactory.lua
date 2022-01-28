@@ -137,6 +137,36 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
+    local cdFrameName = btnName .. 'CDFrame'
+    local cdFrame = CreateFrame("Cooldown", cdFrameName, btnUI,  "CooldownFrameTemplate")
+    cdFrame:SetAllPoints(btnUI)
+    cdFrame:SetSwipeColor(1, 1, 1)
+    btnUI.cooldownFrame = cdFrame
+    --error('cdFrame: ' .. pformat:A():pformat(cdFrame))
+    --cdFrame:SetCooldown(GetTime(), 20)
+
+    function btnUI:ClearCooldown()
+        self.cooldownFrame:Clear()
+        self.cooldownFrame:Hide()
+    end
+
+    function btnUI:SetCooldown(optionalInfo)
+        local info = optionalInfo or self.cooldownFrame.info
+        self:SetCooldownInfo(info)
+        self.cooldownFrame:SetCooldown(info.start, info.duration)
+        L:log('Cooldown success: %s', pformat(info))
+    end
+
+    function btnUI:SetCooldownInfo(cooldownInfo)
+        if not cooldownInfo then return end
+        self.cooldownFrame.info = cooldownInfo
+    end
+
+    function btnUI:ResumeCooldown()
+        self:ClearCooldown()
+        self:SetCooldown()
+    end
+
     ---```
     ---{
     ---    index = 2, name = 'ActionbarPlusF2',
@@ -173,6 +203,18 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
 
     -- We need OnClick for all buttons
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
+
+        --if _btnUI.cooldownFrame.spellInfo then
+        --    local spellInfo = _btnUI.cooldownFrame.spellInfo
+        --    local start, duration, enabled = GetSpellCooldown(spellInfo.id);
+        --    local info = { start = start, duration = duration, enabled = enabled }
+        --    L:log('cooldown info: %s', pformat(info))
+        --    _btnUI:SetCooldownInfo(info)
+        --    _btnUI:SetCooldown()
+        --    L:log('cooldown set done: %s', spellInfo.name)
+        --end
+
+
         local actionType = GetCursorInfo()
         if String.IsBlank(actionType) then return end
         L:log(20, 'HookScript| Actionbar: %s', pformat(_btnUI:GetActionbarInfo()))
