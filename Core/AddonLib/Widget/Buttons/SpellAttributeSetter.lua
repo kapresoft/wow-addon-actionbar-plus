@@ -67,6 +67,8 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
         local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
+        --if info.start == 0 then info.start = GetTime() end
+        --if info.duration == 0 then info.duration = 1.5 end
         _L:log('Clicked: %s', pformat(info))
         if 1 == info.enabled then
             _btnUI:SetCooldown(info)
