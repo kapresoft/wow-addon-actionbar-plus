@@ -154,7 +154,7 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
         local info = optionalInfo or self.cooldownFrame.info
         self:SetCooldownInfo(info)
         self.cooldownFrame:SetCooldown(info.start, info.duration)
-        L:log('Cooldown success: %s', pformat(info))
+        --L:log('Cooldown success: %s', pformat(info))
     end
 
     function btnUI:SetCooldownInfo(cooldownInfo)
