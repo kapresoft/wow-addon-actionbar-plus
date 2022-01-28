@@ -143,10 +143,10 @@ local function OnEvent(frame, event, ...)
     local btnUI = cooldowns[spellID]
     if not btnUI then return end
 
-    local info1 = _API_Spell:GetSpellCooldown(spellID)
-    _L:log('CD#1: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info1.spell.name,
-            info1.spell.id, info1.duration, info1.start, info1.modRate, info1.enabled)
-    btnUI:SetCooldown(info1)
+    --local info1 = _API_Spell:GetSpellCooldown(spellID)
+    --_L:log('CD#1: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info1.spell.name,
+    --        info1.spell.id, info1.duration, info1.start, info1.modRate, info1.enabled)
+    --btnUI:SetCooldown(info1)
 
     local function updateCooldown()
         local info = _API_Spell:GetSpellCooldown(spellID)
@@ -155,10 +155,12 @@ local function OnEvent(frame, event, ...)
                 info.spell.id, info.duration, info.start, info.modRate)
     end
 
-    local info = _API_Spell:GetSpellCooldown(spellID)
-    local delay = info.modRate + 0.2
-    _L:log('Delay: %s', delay)
-    ABP_wait(delay, updateCooldown)
+    --Update #1: When clicked (and Global CD)
+    updateCooldown()
+
+    --Update #2: Spell Cooldown
+    --info.modRate is always 1 somehow
+    ABP_wait(1.2, updateCooldown)
 
 end
 
