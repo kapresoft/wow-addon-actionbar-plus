@@ -60,23 +60,19 @@ function _L:SetAttributes(btnUI, btnData)
         btnUI:SetNormalTexture(TEXTURE_EMPTY)
         btnUI:SetScript("OnEnter", nil)
     end)
-    btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
-        _L:log(10, 'Clicked spell: %s', spellInfo.name)
-        cooldowns[spellInfo.id] = _btnUI
-    end)
 
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
-        local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
-        --if info.start == 0 then info.start = GetTime() end
-        --if info.duration == 0 then info.duration = 1.5 end
-        _L:log('Clicked: %s', pformat(info))
-        if 1 == info.enabled then
-            _btnUI:SetCooldown(info)
-        end
+        cooldowns[spellInfo.id] = _btnUI
+        --local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
+        --_L:log('Clicked: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info.spell.name,
+        --        info.spell.id, info.duration, info.start, info.modRate, info.enabled)
+        --if 1 == info.enabled then
+        --    _btnUI:SetCooldown(info)
+        --end
     end)
 
     local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
-    if 1 == info.enabled then
+    if 1 == info.enabled and info.start > 0 then
         btnUI:SetCooldown(info)
     end
 
@@ -140,19 +136,28 @@ local function OnEvent(frame, event, ...)
     --print('event:', event)
     if (event ~= 'UNIT_SPELLCAST_SUCCEEDED') then return end
     local unitTarget, castGUID, spellID = ...
-    _L:log('Event: %s args: %s', event, pformat({...}))
+    if unitTarget ~= 'player' then return end
+    --_L:log('Event: %s args: %s', event, pformat({...}))
+    _L:log('SpellCast Event: spellId=%s', spellID)
 
     local btnUI = cooldowns[spellID]
     if not btnUI then return end
 
+    local info1 = _API_Spell:GetSpellCooldown(spellID)
+    _L:log('CD#1: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info1.spell.name,
+            info1.spell.id, info1.duration, info1.start, info1.modRate, info1.enabled)
+    btnUI:SetCooldown(info1)
 
     local function updateCooldown()
         local info = _API_Spell:GetSpellCooldown(spellID)
         btnUI:SetCooldown(info)
+        _L:log('SetCooldown: %s[%s] duration=%s start=%s, modRate=%s', info.spell.name,
+                info.spell.id, info.duration, info.start, info.modRate)
     end
 
     local info = _API_Spell:GetSpellCooldown(spellID)
     local delay = info.modRate + 0.2
+    _L:log('Delay: %s', delay)
     ABP_wait(delay, updateCooldown)
 
 end
