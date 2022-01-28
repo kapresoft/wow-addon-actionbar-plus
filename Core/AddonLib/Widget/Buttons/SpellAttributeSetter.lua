@@ -63,12 +63,17 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
         cooldowns[spellInfo.id] = _btnUI
-        --local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
+        local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
+        _btnUI:SetCooldown(info)
+
+        --_L:log("### Cooldown #1: %s", Table.toStringSorted(info))
+
         --_L:log('Clicked: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info.spell.name,
         --        info.spell.id, info.duration, info.start, info.modRate, info.enabled)
         --if 1 == info.enabled then
         --    _btnUI:SetCooldown(info)
         --end
+
     end)
 
     local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
@@ -133,12 +138,25 @@ end
 
 --- TODO: Fire an AceEvent?
 local function OnEvent(frame, event, ...)
-    --print('event:', event)
-    if (event ~= 'UNIT_SPELLCAST_SUCCEEDED') then return end
-    local unitTarget, castGUID, spellID = ...
-    if unitTarget ~= 'player' then return end
+    if not (event == 'UNIT_SPELLCAST_SUCCEEDED' or event == 'UNIT_SPELLCAST_SENT') then return end
+
+    local unit, unitTarget, target, castGUID, spellID
+    local evt = 'SUCCEEDED'
+    if event == 'UNIT_SPELLCAST_SENT' then
+        evt = 'SENT'
+        unit, target, castGUID, spellID = ...
+    else
+        unitTarget, castGUID, spellID = ...
+    end
+    --if unitTarget ~= 'player' then return end
     --_L:log('Event: %s args: %s', event, pformat({...}))
-    _L:log('SpellCast Event: spellId=%s', spellID)
+    local spell = _API_Spell:GetSpellInfo(spellID)
+    local logEvent = false
+    local logCooldown = true
+    if logEvent then
+        _L:log('SpellCast event=%s spell=%s[%s] unitTarget=%s target=%s',
+                evt, spell.name, spellID, unitTarget or '', target or '')
+    end
 
     local btnUI = cooldowns[spellID]
     if not btnUI then return end
@@ -150,20 +168,34 @@ local function OnEvent(frame, event, ...)
 
     local function updateCooldown()
         local info = _API_Spell:GetSpellCooldown(spellID)
+        if info.duration <= 0 then
+            if logCooldown then
+                _L:log('%s[%s][%s] <<SKIPPED>>', spell.name, spellID, evt)
+            end
+            return
+        end
         btnUI:SetCooldown(info)
-        _L:log('SetCooldown: %s[%s] duration=%s start=%s, modRate=%s', info.spell.name,
-                info.spell.id, info.duration, info.start, info.modRate)
+        if logCooldown then
+            _L:log('%s[%s][%s]\n%s', spell.name, spellID, evt, Table.toStringSorted(info))
+            if evt == 'SUCCEEDED' then _L:log('') end
+        end
     end
 
     --Update #1: When clicked (and Global CD)
-    updateCooldown()
+    --updateCooldown()
 
     --Update #2: Spell Cooldown
     --info.modRate is always 1 somehow
-    ABP_wait(1.2, updateCooldown)
+    --ABP_wait(0, updateCooldown)
 
+    if event == 'UNIT_SPELLCAST_SENT' then
+        updateCooldown()
+    else
+        ABP_wait(0, updateCooldown)
+    end
 end
 
 local frame = CreateFrame("Frame", "ABP_SpellAttributesSetterFrame", UIParent)
 frame:SetScript("OnEvent", OnEvent)
 frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+frame:RegisterEvent("UNIT_SPELLCAST_SENT")
