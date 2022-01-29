@@ -17,6 +17,52 @@ local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
 
 -- ## Functions ------------------------------------------------
 
+local waitTable = {};
+local waitFrame = nil;
+
+---#### Source
+---* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
+local function ABP_wait(delay, func, ...)
+    if (type(delay)~="number" or type(func)~="function") then return false end
+    if (waitFrame == nil) then
+        waitFrame = CreateFrame("Frame", "WaitFrame", UIParent);
+        waitFrame:SetScript("onUpdate", function (self, elapse)
+            local count = #waitTable
+            local i = 1
+            while (i<=count) do
+                local waitRecord = tremove(waitTable, i)
+                local d = tremove(waitRecord, 1)
+                local f = tremove(waitRecord, 1)
+                local p = tremove(waitRecord, 1)
+                if(d>elapse) then
+                    tinsert(waitTable,i,{d-elapse, f, p})
+                    i = i + 1
+                else
+                    count = count - 1
+                    f(unpack(p))
+                end
+            end
+        end)
+    end
+    tinsert(waitTable,{delay, func,{...}})
+    return true
+end
+
+---@param link table The blizzard `GameTooltip` link
+function _L:ShowTooltip(btnUI, btnData)
+    if not btnUI or not btnData then return end
+    local type = btnData.type
+    if not type then return end
+
+    local spellInfo = btnData[WAttr.SPELL]
+    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:AddSpellByID(spellInfo.id)
+    -- Replace 'Spell' with 'Spell (Rank #Rank)'
+    if (IsNotBlank(spellInfo.rank)) then
+        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
+    end
+end
+
 ---### Button Data Example
 ---
 ---```lua
@@ -64,17 +110,6 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
         cooldowns[spellInfo.id] = _btnUI
-        local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
-        _btnUI:SetCooldown(info)
-
-        --_L:log("### Cooldown #1: %s", Table.toStringSorted(info))
-
-        --_L:log('Clicked: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info.spell.name,
-        --        info.spell.id, info.duration, info.start, info.modRate, info.enabled)
-        --if 1 == info.enabled then
-        --    _btnUI:SetCooldown(info)
-        --end
-
     end)
 
     local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
@@ -84,60 +119,14 @@ function _L:SetAttributes(btnUI, btnData)
 
 end
 
----@param link table The blizzard `GameTooltip` link
-function _L:ShowTooltip(btnUI, btnData)
-    if not btnUI or not btnData then return end
-    local type = btnData.type
-    if not type then return end
-
-    local spellInfo = btnData[WAttr.SPELL]
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
-    GameTooltip:AddSpellByID(spellInfo.id)
-    -- Replace 'Spell' with 'Spell (Rank #Rank)'
-    if (IsNotBlank(spellInfo.rank)) then
-        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
-    end
-end
-
---- So that we can call with SetAttributes(btnUI)
-_L.mt.__call = _L.SetAttributes
-
-
-
-local waitTable = {};
-local waitFrame = nil;
-
----#### Source
----* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
-local function ABP_wait(delay, func, ...)
-    if (type(delay)~="number" or type(func)~="function") then return false end
-    if (waitFrame == nil) then
-        waitFrame = CreateFrame("Frame", "WaitFrame", UIParent);
-        waitFrame:SetScript("onUpdate", function (self, elapse)
-            local count = #waitTable
-            local i = 1
-            while (i<=count) do
-                local waitRecord = tremove(waitTable, i)
-                local d = tremove(waitRecord, 1)
-                local f = tremove(waitRecord, 1)
-                local p = tremove(waitRecord, 1)
-                if(d>elapse) then
-                    tinsert(waitTable,i,{d-elapse, f, p})
-                    i = i + 1
-                else
-                    count = count - 1
-                    f(unpack(p))
-                end
-            end
-        end)
-    end
-    tinsert(waitTable,{delay, func,{...}})
-    return true
-end
-
 --- TODO: Fire an AceEvent?
 local function OnEvent(frame, event, ...)
     if not (event == 'UNIT_SPELLCAST_SUCCEEDED' or event == 'UNIT_SPELLCAST_SENT') then return end
+    --if not event == 'UNIT_SPELLCAST_SUCCEEDED' then return end
+
+    local logEvent = true
+    local logCooldown = true
+
 
     local unit, unitTarget, target, castGUID, spellID
     local evt = 'SUCCEEDED'
@@ -150,8 +139,6 @@ local function OnEvent(frame, event, ...)
     --if unitTarget ~= 'player' then return end
     --_L:log('Event: %s args: %s', event, pformat({...}))
     local spell = _API_Spell:GetSpellInfo(spellID)
-    local logEvent = false
-    local logCooldown = true
     if logEvent then
         _L:log('SpellCast event=%s spell=%s[%s] unitTarget=%s target=%s',
                 evt, spell.name, spellID, unitTarget or '', target or '')
@@ -199,3 +186,7 @@ local frame = CreateFrame("Frame", "ABP_SpellAttributesSetterFrame", UIParent)
 frame:SetScript("OnEvent", OnEvent)
 frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 frame:RegisterEvent("UNIT_SPELLCAST_SENT")
+
+
+--- So that we can call with SetAttributes(btnUI)
+_L.mt.__call = _L.SetAttributes

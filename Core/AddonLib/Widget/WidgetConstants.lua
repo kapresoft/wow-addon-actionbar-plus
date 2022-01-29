@@ -1,6 +1,4 @@
 local ReloadUI = ReloadUI
-local BATTR = ButtonAttributes
-local LOG = ABP_LogFactory
 
 local LibStub, M, G = ABP_LibGlobals:LibPack()
 ---@type AceLibFactory

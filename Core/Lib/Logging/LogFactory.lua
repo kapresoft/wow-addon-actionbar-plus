@@ -4,8 +4,8 @@ local logger = __K_Core:GetLogger()
 
 -- ## Local ----------------------------------------------------
 
----@class LogFactory
 local major, minor = __K_Core:GetLibVersion('LogFactory', 1)
+---@class LogFactory
 local _L = LibStub:NewLibrary(major, minor)
 
 
