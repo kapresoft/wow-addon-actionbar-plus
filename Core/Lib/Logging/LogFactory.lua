@@ -31,5 +31,3 @@ end
 if type(_L.mt) ~= 'table' then _L.mt = {} end
 _L.mt.__call = _L.NewLogger
 setmetatable(_L, _L.mt)
-
-

@@ -76,7 +76,12 @@ end
 ---@param btnUI table The UIFrame
 ---@param btnData table The button data
 function _L:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+    --error('btnData: ' .. pformat(btnData))
+    --ABP:DBG(btnWidget.button, 'button')
+    --ABP:DBG(btnWidget.widget.buttonAttributes, 'btnWidget')
+    --error('btnUI: ' .. pformat(btnUI))
+
+    btnUI.widget:ResetWidgetAttributes()
 
     ---@type SpellInfo
     local spellInfo = btnData[WAttr.SPELL]
@@ -92,21 +97,21 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
-    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
-    btnUI.cooldownFrame.spellInfo = spellInfo
+    --btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
+    --btnUI.cooldownFrame.spellInfo = spellInfo
 
     btnUI:RegisterForDrag('LeftButton')
-    btnUI:SetScript("OnDragStart", function(_btnUI)
-        if InCombatLockdown() then return end
-        if P:IsLockActionBars() and not IsShiftKeyDown() then return end
-        _btnUI:ClearCooldown()
-        _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
-        PickupSpell(spellInfo.id)
-        W:ResetWidgetAttributes(_btnUI)
-        btnData[WAttr.SPELL] = {}
-        btnUI:SetNormalTexture(TEXTURE_EMPTY)
-        btnUI:SetScript("OnEnter", nil)
-    end)
+    --btnUI:SetScript("OnDragStart", function(_btnUI)
+    --    if InCombatLockdown() then return end
+    --    if P:IsLockActionBars() and not IsShiftKeyDown() then return end
+    --    _btnUI:ClearCooldown()
+    --    _L:log(20, 'DragStarted| Actionbar-Info: %s', pformat(_btnUI:GetActionbarInfo()))
+    --    PickupSpell(spellInfo.id)
+    --    W:ResetWidgetAttributes(_btnUI)
+    --    btnData[WAttr.SPELL] = {}
+    --    btnUI:SetNormalTexture(TEXTURE_EMPTY)
+    --    btnUI:SetScript("OnEnter", nil)
+    --end)
 
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
         cooldowns[spellInfo.id] = _btnUI
@@ -114,7 +119,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     local info = _API_Spell:GetSpellCooldown(spellInfo.id, spellInfo.name)
     if 1 == info.enabled and info.start > 0 then
-        btnUI:SetCooldown(info)
+        btnUI.widget:SetCooldown(info)
     end
 
 end
@@ -126,7 +131,8 @@ local function OnEvent(frame, event, ...)
 
     local logEvent = true
     local logCooldown = true
-
+    local logSpellDetails = false
+    local toStringSorted = Table.toStringSorted
 
     local unit, unitTarget, target, castGUID, spellID
     local evt = 'SUCCEEDED'
@@ -140,8 +146,14 @@ local function OnEvent(frame, event, ...)
     --_L:log('Event: %s args: %s', event, pformat({...}))
     local spell = _API_Spell:GetSpellInfo(spellID)
     if logEvent then
-        _L:log('SpellCast event=%s spell=%s[%s] unitTarget=%s target=%s',
-                evt, spell.name, spellID, unitTarget or '', target or '')
+        local add = ''
+        if evt == 'SUCCEEDED' and logSpellDetails then
+            local info = _API_Spell:GetSpellCooldown(spellID)
+            add = add .. format('\n   CD:: %s', toStringSorted(info))
+            add = add .. format('\n   Spell:: %s', toStringSorted(spell))
+        end
+        _L:log('SpellCast::%s %s[%s] unitTarget=%s target=%s%s',
+                evt, spell.name, spellID, unitTarget or '', target or '', add)
     end
 
     local btnUI = cooldowns[spellID]
@@ -157,13 +169,13 @@ local function OnEvent(frame, event, ...)
         -- Don't update cooldown on instant cast spells
         if info.duration <= 0 then
             if logCooldown then
-                _L:log('%s[%s][%s] <<SKIPPED>>', spell.name, spellID, evt)
+                _L:log('%s[%s]::%s <<Instant Cast>>\n%s', spell.name, spellID, evt, toStringSorted(info))
             end
             return
         end
-        btnUI:SetCooldown(info)
+        btnUI.widget:SetCooldown(info)
         if logCooldown then
-            _L:log('%s[%s][%s]\n%s', spell.name, spellID, evt, Table.toStringSorted(info))
+            _L:log('%s[%s]::%s\n%s', spell.name, spellID, evt, toStringSorted(info))
             if evt == 'SUCCEEDED' then _L:log('') end
         end
     end

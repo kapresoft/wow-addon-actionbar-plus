@@ -19,6 +19,8 @@ local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil,
 local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
     SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
+local BTN = ABP_WidgetConstants:LibPack_ButtonUIFactory()
+
 -- TODO: Move to config
 local INTERNAL_BUTTON_PADDING = 2
 
@@ -65,11 +67,6 @@ local function OnMouseDownFrame(_, mouseButton)
     end
 end
 
-
-local function Embed(btnUI)
-    -- TODO
-end
-
 function L:OnAfterInitialize()
     local frames = P:GetAllFrameNames()
     --error(format('frames: %s', ABP_Table.toString(frames)))
@@ -102,10 +99,11 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
-            self:SetButtonAttributes(btnUI)
-            btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
-            dragFrame:AddButton(btnUI:GetName())
+            --local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
+            local btnWidget = BTN:Create(dragFrame, row, col, index)
+            self:SetButtonAttributes(btnWidget)
+            --btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
+            dragFrame:AddButton(btnWidget:GetName())
         end
     end
 end
@@ -113,21 +111,23 @@ end
 function L:SetButtonAttributes(btnUI)
     local actionbarInfo = btnUI:GetActionbarInfo()
     local btnName = btnUI:GetName()
-    local btnData = P:GetButtonData(actionbarInfo.index, btnName)
+    --local btnData = P:GetButtonData(actionbarInfo.index, btnName)
+    local btnData = btnUI:GetConfig()
 
     --local key = actionbarInfo.name .. btnName
     --local btnData = P.profile[key]
 
     if btnData == nil or btnData.type == nil then return end
 
-    btnUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    -- TODO
+    --btnUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then
         self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
         return
     end
-    setter:SetAttributes(btnUI, btnData)
+    setter:SetAttributes(btnUI.button, btnData)
 end
 
 -- TODO: Move somewhere else
@@ -251,6 +251,7 @@ function L:OnReceiveDrag(btnUI)
     H:Handle(btnUI, actionType, cursorInfo)
 end
 
+---@deprecated
 function L:IsValidDragSource(cursorInfo)
     if String.IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into

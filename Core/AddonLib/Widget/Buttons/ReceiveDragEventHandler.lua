@@ -20,7 +20,7 @@ local handlers = {
 
 -- ## Functions ------------------------------------------------
 function _L:CleanupProfile(btnUI, actionType)
-    local btnData = btnUI:GetProfileButtonData()
+    local btnData = btnUI.widget:GetConfig()
     if not btnData then return end
 
     local otherTypes = AT:GetOtherTypes(actionType)

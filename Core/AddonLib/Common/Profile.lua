@@ -2,12 +2,17 @@ local type, pairs, tostring = type, pairs, tostring
 local LibStub, M = ABP_LibGlobals:LibPack()
 local _, Table = ABP_LibGlobals:LibPackUtils()
 local Assert = LibStub(M.Assert)
-local ButtonAttributes = ABP_CommonConstants.ButtonAttributes
+local CC = ABP_CommonConstants
+local BAttr = CC.ButtonAttributes
+local WAttr = CC.WidgetAttributes
 
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 local ProfileInitializer = LibStub(M.ProfileInitializer)
+
+local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
+
 
 ---@class Profile
 local P = LibStub:NewLibrary(M.Profile)
@@ -44,7 +49,7 @@ local ProfileTemplate = {
 }
 
 ---@see API#GetSpellinfo
-local ButtonTemplate = { ['type'] = nil, [ButtonAttributes.SPELL] = {} }
+local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
 ---- ## Start Here ----
 
@@ -60,6 +65,7 @@ local MACROTEXT = { name = nil, icon = nil, body = nil }
 local DETAILS = { spell = SPELL, item = ITEM, macro = MACRO, macrotext = MACROTEXT }
 local TOOLTIP = { text = nil, link = nil }
 local BUTTON = { type = nil, name = nil, icon = nil, macrotext = nil, tooltip = TOOLTIP, details = DETAILS }
+
 
 local function assertProfile(p)
     assert(isTable(p), "profile is not a table")
@@ -99,11 +105,18 @@ function P:GetButtonData(frameIndex, buttonName)
     local buttons = barData.buttons
     --if not buttons then return nil end
     local btnData = buttons[buttonName]
-    if type(btnData) == 'table' then
-        --error(ABP_Table.toStringSorted(btnData))
-        return btnData
+    if type(buttons[buttonName]) ~= 'table' then
+        buttons[buttonName] = self:GetTemplate()
     end
-    return nil
+    return buttons[buttonName]
+end
+
+local function GetButtonWidgetInfo(widget) return widget.frame:GetFrameIndex(), widget.button:GetName() end
+function P:GetButtonDataFromWidget(widget) return self:GetButtonData(GetButtonWidgetInfo(widget)) end
+function P:ResetButtonData(widget)
+    local btnData = self:GetButtonDataFromWidget(widget)
+    for _, a in ipairs(ActionType) do btnData[a] = {} end
+    btnData[WAttr.TYPE] = WAttr.SPELL
 end
 
 function P:InitDELETEME(newProfile)

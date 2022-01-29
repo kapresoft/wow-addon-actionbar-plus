@@ -23,10 +23,11 @@ function _L:Handle(btnUI, cursorInfo)
     local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
     if Assert.IsNil(spellInfo) then return end
 
-    local actionbarInfo = btnUI:GetActionbarInfo()
-    local btnName = btnUI:GetName()
-    local barData = P:GetBar(actionbarInfo.index)
-    local btnData = barData.buttons[btnName] or P:GetTemplate().Button
+    --local actionbarInfo = btnUI.widget:GetActionbarInfo()
+    --local btnName = btnUI:GetName()
+    --local barData = P:GetBar(actionbarInfo.index)
+    --local btnData = barData.buttons[btnName] or P:GetTemplate().Button
+    local btnData = btnUI.widget:GetConfig()
 
     -- Dragging over a button with an existing spell
     local btnDataOld = btnData[WAttr.SPELL]
@@ -37,7 +38,7 @@ function _L:Handle(btnUI, cursorInfo)
 
     btnData.type = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo
-    barData.buttons[btnName] = btnData
+    --barData.buttons[btnName] = btnData
 
     SpellAttributeSetter(btnUI, btnData)
 end
