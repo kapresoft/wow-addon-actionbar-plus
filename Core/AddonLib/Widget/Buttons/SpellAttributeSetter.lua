@@ -9,7 +9,7 @@ local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
 local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
 local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
 
-local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT = ABP_WidgetConstants:GetButtonTextures()
+local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
 local cooldowns = {}
 
 ---@class SpellAttributeSetter
@@ -124,24 +124,42 @@ function _L:SetAttributes(btnUI, btnData)
 
 end
 
+local function SupportsEvent(event)
+    local supports = false
+    local supportedEvents = { 'UNIT_SPELLCAST_SUCCEEDED', 'UNIT_SPELLCAST_SENT',
+                              'UNIT_SPELLCAST_INTERRUPTED', 'UNIT_SPELLCAST_FAILED' }
+
+    for _, evt in ipairs(supportedEvents) do
+        if evt == event then return true end
+    end
+
+    return supports
+end
+
 --- TODO: Fire an AceEvent?
 local function OnEvent(frame, event, ...)
-    if not (event == 'UNIT_SPELLCAST_SUCCEEDED' or event == 'UNIT_SPELLCAST_SENT') then return end
+    _L:log('event: %s', event)
+    if not SupportsEvent(event) then return end
+
+    --if not (event == 'UNIT_SPELLCAST_SUCCEEDED' or event == 'UNIT_SPELLCAST_SENT') then return end
     --if not event == 'UNIT_SPELLCAST_SUCCEEDED' then return end
 
     local logEvent = true
     local logCooldown = true
-    local logSpellDetails = false
+    local logSpellDetails = true
     local toStringSorted = Table.toStringSorted
 
     local unit, unitTarget, target, castGUID, spellID
-    local evt = 'SUCCEEDED'
+    local evt = event:gsub('UNIT_SPELLCAST_', '')
     if event == 'UNIT_SPELLCAST_SENT' then
-        evt = 'SENT'
         unit, target, castGUID, spellID = ...
     else
         unitTarget, castGUID, spellID = ...
     end
+
+    local btnUI = cooldowns[spellID]
+    if not btnUI then return end
+
     --if unitTarget ~= 'player' then return end
     --_L:log('Event: %s args: %s', event, pformat({...}))
     local spell = _API_Spell:GetSpellInfo(spellID)
@@ -156,13 +174,14 @@ local function OnEvent(frame, event, ...)
                 evt, spell.name, spellID, unitTarget or '', target or '', add)
     end
 
-    local btnUI = cooldowns[spellID]
-    if not btnUI then return end
-
-    --local info1 = _API_Spell:GetSpellCooldown(spellID)
-    --_L:log('CD#1: %s[%s] duration=%s start=%s, modRate=%s, enabled=%s', info1.spell.name,
-    --        info1.spell.id, info1.duration, info1.start, info1.modRate, info1.enabled)
-    --btnUI:SetCooldown(info1)
+    if evt == 'SENT' then
+        btnUI:SetHighlightTexture(TEXTURE_CASTING)
+        btnUI:LockHighlight()
+    else
+        btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+        btnUI:UnlockHighlight()
+        btnUI.widget:ClearCooldown()
+    end
 
     local function updateCooldown()
         local info = _API_Spell:GetSpellCooldown(spellID)
@@ -198,6 +217,11 @@ local frame = CreateFrame("Frame", "ABP_SpellAttributesSetterFrame", UIParent)
 frame:SetScript("OnEvent", OnEvent)
 frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 frame:RegisterEvent("UNIT_SPELLCAST_SENT")
+
+frame:RegisterEvent("UNIT_SPELLCAST_START")
+frame:RegisterEvent("UNIT_SPELLCAST_FAILED")
+frame:RegisterEvent("UNIT_SPELLCAST_STOP")
+frame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 
 
 --- So that we can call with SetAttributes(btnUI)

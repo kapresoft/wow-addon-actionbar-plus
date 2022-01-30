@@ -17,6 +17,7 @@ ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
 CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
 TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
+TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock")
 
 ---@class WidgetConstants
 local _L = {}
@@ -59,7 +60,7 @@ end
 
 ---@return string, string TEXTURE_EMPTY and TEXTURE_HIGHLIGHT
 function _L:GetButtonTextures()
-    return TEXTURE_EMPTY, TEXTURE_HIGHLIGHT
+    return TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING
 end
 
 ---@return WidgetLibFactory

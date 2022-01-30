@@ -205,7 +205,7 @@ local methods = {
         if type(obj) ~= 'string' then
             text = PrettyPrint.pformat(obj)
         else
-            text = tostring(nil)
+            text = obj
         end
         debugDialog:SetTextContent(text)
         debugDialog:SetStatusText(label)
