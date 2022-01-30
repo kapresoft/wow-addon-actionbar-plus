@@ -21,6 +21,8 @@ local _L = NewLibrary('AceLibFactory', 1)
 local libAceConsole = LibStub(AceModule.AceConsole)
 ---@class LibSharedMedia
 local libSharedMedia = LibStub(AceModule.AceLibSharedMedia)
+---@class AceEvent
+local libAceEvent = LibStub(AceModule.AceEvent)
 ---@class AceHook
 local libAceHook = LibStub(AceModule.AceHook)
 ---@class AceDB
@@ -38,6 +40,8 @@ local libAceGUI = LibStub(AceModule.AceGUI)
 ---@return
 ---@return AceConsole
 function _L:GetAceConsole() return libAceConsole end
+---@return AceEvent
+function _L:GetAceEvent() return libAceEvent end
 ---@return LibSharedMedia
 function _L:GetAceSharedMedia() return libSharedMedia end
 ---@return AceHook
@@ -61,3 +65,4 @@ function _L:GetAceGUI() return libAceGUI end
 function _L:GetAddonAceLibs()
     return self:GetAceDB(), self:GetAceDBOptions(), self:GetAceConfig(), self:GetAceConfigDialog()
 end
+
