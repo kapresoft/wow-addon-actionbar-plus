@@ -14,6 +14,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 
 -- Local APIs
 local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
+local AceGUI = LibStub(M.AceLibFactory):GetAceGUI()
+
 local CC = ABP_CommonConstants
 local WAttr = CC.WidgetAttributes
 local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
@@ -39,6 +41,23 @@ local INTERNAL_BUTTON_PADDING = 2
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+
+local function RegisterWidget(widget, name)
+    assert(widget ~= nil)
+    assert(name ~= nil)
+
+    local WidgetBase = AceGUI.WidgetBase
+    widget.userdata = {}
+    widget.events = {}
+    widget.base = WidgetBase
+    widget.frame.obj = widget
+    local mt = {
+        __tostring = function() return name  end,
+        __index = WidgetBase
+    }
+    setmetatable(widget, mt)
+    return widget
+end
 
 local function ShowTooltip(btnUI)
     if not btnUI then return end
@@ -123,7 +142,7 @@ local methods = {
     ---@return ActionBarInfo
     ['GetActionbarInfo'] = function(self)
         local index = self.index
-        local dragFrame = self.frame;
+        local dragFrame = self.dragFrame;
         local frameName = dragFrame:GetName()
         local btnName = format('%sButton%s', frameName, tostring(index))
 
@@ -172,9 +191,9 @@ local function NewLibrary()
     local _L = LibStub:NewLibrary(M.ButtonUI, 1)
 
     ---@return ButtonUI
-    function _L:Create(dragFrame, rowNum, colNum, index)
+    function _L:Create(dragFrame, rowNum, colNum, btnIndex)
         local frameName = dragFrame:GetName()
-        local btnName = format('%sButton%s', frameName, tostring(index))
+        local btnName = format('%sButton%s', frameName, tostring(btnIndex))
         --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
         local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
         --error('button: ' .. button:GetName())
@@ -200,24 +219,23 @@ local function NewLibrary()
         cooldown:SetSwipeColor(1, 1, 1)
         --button.cooldownFrame = cooldown
 
-        local mt = { __tostring = function() return 'ButtonUIWidget'  end }
         local widget = {
             p = p,
-            frame = dragFrame,
+            frameIndex = dragFrame:GetFrameIndex(),
+            buttonName = btnName,
+            dragFrame = dragFrame,
             button = button,
+            frame = button,
             cooldown = cooldown,
             cooldownInfo = nil,
             frameStrata = 'LOW',
             buttonSize = 40,
             buttonAttributes = CC.ButtonAttributes,
         }
-        setmetatable(widget, mt)
-
         dragFrame.widget, button.widget, cooldown.widget = widget, widget, widget
         for method, func in pairs(methods) do widget[method] = func end
 
-        --error('widget:' .. pformat(widget))
-        return widget
+        return RegisterWidget(widget, btnName .. '::Widget')
     end
 
     return _L

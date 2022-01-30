@@ -111,8 +111,7 @@ function P:GetButtonData(frameIndex, buttonName)
     return buttons[buttonName]
 end
 
-local function GetButtonWidgetInfo(widget) return widget.frame:GetFrameIndex(), widget.button:GetName() end
-function P:GetButtonDataFromWidget(widget) return self:GetButtonData(GetButtonWidgetInfo(widget)) end
+function P:GetButtonDataFromWidget(widget) return self:GetButtonData(widget.frameIndex, widget.buttonName) end
 function P:ResetButtonData(widget)
     local btnData = self:GetButtonDataFromWidget(widget)
     for _, a in ipairs(ActionType) do btnData[a] = {} end
