@@ -36,7 +36,7 @@ function _L:Handle(btnUI, cursorInfo)
     if IsNil(macroInfo) then return end
 
     --- ActionBarInfo `{ index = 2, name = 'ActionbarPlusF2' }`
-    local actionbarInfo = btnUI:GetActionbarInfo()
+    local actionbarInfo = btnUI.widget:GetActionbarInfo()
     -- DEVT:EvalObject(actionbarInfo, 'actionbarInfo')
 
     local btnName = btnUI:GetName()
