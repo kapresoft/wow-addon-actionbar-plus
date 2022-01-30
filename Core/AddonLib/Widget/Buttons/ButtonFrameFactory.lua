@@ -120,8 +120,8 @@ end
 function _L:CreateFrame(frameIndex)
     local FrameBackdrop = {
         ---@see LibSharedMedia
-        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
-        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Parchment"),
+        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
+        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Parchment"),
         --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
         --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Chat Bubble"),
         --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Dialog"),
