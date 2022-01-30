@@ -15,7 +15,9 @@
     <Script file="ButtonFactory.lua"/>
 
     <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="LOW"
-           hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true">
+           hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true"
+           inherits="BackdropTemplate" mixin="BackdropTemplateMixin"
+            >
         <Scripts>
             <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
             <OnDragStart>self:StartMoving();</OnDragStart>

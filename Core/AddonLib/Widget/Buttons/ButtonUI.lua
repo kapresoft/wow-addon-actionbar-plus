@@ -32,7 +32,7 @@ local frameStrata = 'LOW'
 
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI = SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI
-local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT
+local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT = ABP_WidgetConstants:GetButtonTextures()
 
 -- TODO: Move to config
@@ -114,6 +114,8 @@ local function OnReceiveDrag(btn)
     p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
     H:Handle(btn, actionType, cursorInfo)
+
+    btn.widget:Fire('OnReceiveDrag')
 end
 
 local function OnEnter(self) ShowTooltip(self) end
@@ -194,6 +196,7 @@ local function NewLibrary()
     function _L:Create(dragFrame, rowNum, colNum, btnIndex)
         local frameName = dragFrame:GetName()
         local btnName = format('%sButton%s', frameName, tostring(btnIndex))
+
         --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
         local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
         --error('button: ' .. button:GetName())
@@ -202,10 +205,20 @@ local function NewLibrary()
         -- Reference point is BOTTOMLEFT of dragFrame
         -- dragFrameBottomLeftAdjustX, dragFrameBottomLeftAdjustY adjustments from #dragFrame
         local referenceFrameAdjustX = buttonSize
-        local referenceFrameAdjustY = 2
-        local adjX = (colNum * buttonSize) - referenceFrameAdjustX
-        local adjY =  (rowNum * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
-        button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, adjX, -adjY)
+        local referenceFrameAdjustY = 3
+        --local adjX = (colNum * buttonSize) - referenceFrameAdjustX
+        --local widthAdj = (colNum * buttonSize) - referenceFrameAdjustX + INTERNAL_BUTTON_PADDING
+        --local height =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
+        --local heightAdj =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
+        local widthPaddingAdj = dragFrame.padding
+        local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
+        local widthAdj = ((colNum-1) * buttonSize) + widthPaddingAdj
+        local heightAdj = ((rowNum-1) * buttonSize) + heightPaddingAdj
+
+        --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX, -adjY)
+        --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX + dragFrame.halfPadding, -adjY - dragFrame.halfPadding)
+        local frameCenterAdjust = 5
+        button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
         button:SetNormalTexture(noIconTexture)
         button:HookScript('OnClick', OnClick)
         button:SetScript('OnEnter', OnEnter)
@@ -242,3 +255,76 @@ local function NewLibrary()
 end
 
 NewLibrary()
+
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+local methodsx = {
+    ["OnAcquire"] = function(self)
+        -- restore default values
+        self:SetHeight(24)
+        self:SetWidth(200)
+        self:SetDisabled(false)
+        self:SetAutoWidth(false)
+        self:SetText()
+    end,
+
+    -- ["OnRelease"] = nil,
+
+    ["SetText"] = function(self, text)
+        self.text:SetText(text)
+        if self.autoWidth then
+            self:SetWidth(self.text:GetStringWidth() + 30)
+        end
+    end,
+
+    ["SetAutoWidth"] = function(self, autoWidth)
+        self.autoWidth = autoWidth
+        if self.autoWidth then
+            self:SetWidth(self.text:GetStringWidth() + 30)
+        end
+    end,
+
+    ["SetDisabled"] = function(self, disabled)
+        self.disabled = disabled
+        if disabled then
+            self.frame:Disable()
+        else
+            self.frame:Enable()
+        end
+    end
+}
+
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
+
+local Type, Version = "ActionButton", 1
+local function Constructor()
+    local name = "AceGUI30Button" .. AceGUI:GetNextWidgetNum(Type)
+    local frame = CreateFrame("Button", name, UIParent, "UIPanelButtonTemplate")
+    frame:Hide()
+
+    frame:EnableMouse(true)
+
+    local text = frame:GetFontString()
+    text:ClearAllPoints()
+    text:SetPoint("TOPLEFT", 15, -1)
+    text:SetPoint("BOTTOMRIGHT", -15, 1)
+    text:SetJustifyV("MIDDLE")
+
+    local widget = {
+        text  = text,
+        frame = frame,
+        type  = Type
+    }
+    for method, func in pairs(methodsx) do
+        widget[method] = func
+    end
+
+    return AceGUI:RegisterAsWidget(widget)
+end
+
+AceGUI:RegisterWidgetType(Type, Constructor, Version)
+

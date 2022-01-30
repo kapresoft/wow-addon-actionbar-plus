@@ -5,7 +5,7 @@
 local _G = _G
 local type, ipairs, tinsert = type, ipairs, table.insert
 -- ## Local ----------------------------------------------------
-local LibStub, M = ABP_LibGlobals:LibPack()
+local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
 ---@type WidgetLibFactory
 local W = LibStub(M.WidgetLibFactory)
@@ -118,11 +118,25 @@ function _L:IsFrameShownByIndex(frameIndex)
 end
 
 function _L:CreateFrame(frameIndex)
-    local f = self:GetFrameByIndex(frameIndex)
-    if type(f) ~= 'table' then return end
+    local FrameBackdrop = {
+        ---@see LibSharedMedia
+        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
+        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Parchment"),
+        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
+        --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Chat Bubble"),
+        --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Dialog"),
+        tile = false, tileSize = 26, edgeSize = 0,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
+    }
 
+    local f = self:GetFrameByIndex(frameIndex)
+    f:SetBackdrop(FrameBackdrop)
+
+    --local f = self:CreateFrameByIndex(frameIndex)
+    if type(f) ~= 'table' then return end
     f.frameIndex = frameIndex
     Embed(f)
+
 
     return f
 end

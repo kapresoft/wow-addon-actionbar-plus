@@ -138,15 +138,15 @@ end
 
 --- TODO: Fire an AceEvent?
 local function OnEvent(frame, event, ...)
-    _L:log('event: %s', event)
+    --_L:log('event: %s', event)
     if not SupportsEvent(event) then return end
 
     --if not (event == 'UNIT_SPELLCAST_SUCCEEDED' or event == 'UNIT_SPELLCAST_SENT') then return end
     --if not event == 'UNIT_SPELLCAST_SUCCEEDED' then return end
 
-    local logEvent = true
-    local logCooldown = true
-    local logSpellDetails = true
+    local logEvent = false
+    local logCooldown = false
+    local logSpellDetails = false
     local toStringSorted = Table.toStringSorted
 
     local unit, unitTarget, target, castGUID, spellID

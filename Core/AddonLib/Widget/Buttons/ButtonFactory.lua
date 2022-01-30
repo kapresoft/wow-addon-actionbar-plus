@@ -85,9 +85,19 @@ function L:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local f = BFF(frameIndex)
-    f:SetWidth((config.colSize * buttonSize) - INTERNAL_BUTTON_PADDING)
+    f.dragHandleHeight = 5
+    f.padding = 2
+    f.halfPadding = f.padding/2
+    --f:SetWidth((config.colSize * buttonSize) - INTERNAL_BUTTON_PADDING)
     f:SetScale(1.0)
     f:SetFrameStrata(frameStrata)
+    --f.widthAdjust = config.colSize * INTERNAL_BUTTON_PADDING
+    --f.heightAdjust = config.rowSize * INTERNAL_BUTTON_PADDING
+    local widthAdj = f.padding
+    local heightAdj = f.padding + f.dragHandleHeight
+    f:SetWidth(config.colSize * buttonSize + widthAdj)
+    f:SetHeight(config.rowSize * buttonSize + heightAdj)
+
     self:CreateButtons(f, config.rowSize, config.colSize)
     f:MarkRendered()
     self:AttachFrameEvents(f)
@@ -101,6 +111,9 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
             index = index + 1
             --local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
             local btnWidget = BTN:Create(dragFrame, row, col, index)
+            btnWidget:SetCallback("OnReceiveDrag", function(widget)
+                print('Received drag: ' .. tostring(e))
+            end)
             self:SetButtonAttributes(btnWidget)
             --btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
             dragFrame:AddButton(btnWidget:GetName())
