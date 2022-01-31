@@ -13,7 +13,6 @@ local ProfileInitializer = LibStub(M.ProfileInitializer)
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
-
 ---@class Profile
 local P = LibStub:NewLibrary(M.Profile)
 if not P then return end
@@ -227,6 +226,27 @@ function P:GetButtonsByIndex(frameIndex)
     end
 
     return nil
+end
+
+local _buttons = {
+    spells = {
+       ['12345'] = 'Button1',
+       ['12345'] = 'Button2'
+    },
+    items = {},
+    macros = {}
+}
+
+function P:FindButtonsBySpellById(spellId)
+    local buttons = {}
+    for barName, bar in pairs(self:GetBars()) do
+        for buttonName, button in pairs(bar.buttons) do
+            if 'spell' == button.type and button.spell and spellId == button.spell.id then
+                buttons[buttonName] = button.spell
+            end
+        end
+    end
+    return buttons
 end
 
 function P:GetAllActionBarSizeDetails()

@@ -280,6 +280,7 @@ local methods = {
         self:RegisterKeyBindings()
 
         --macroIcons = self:FetchMacroIcons()
+        ABP_buttons = P:FindButtonsBySpellById(30016)
     end
 }
 

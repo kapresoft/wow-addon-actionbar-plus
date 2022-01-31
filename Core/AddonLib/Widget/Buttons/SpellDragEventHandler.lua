@@ -36,7 +36,7 @@ function _L:Handle(btnUI, cursorInfo)
         self:log(10, 'Button has existing spell: %s', btnDataOld.id)
     end
 
-    btnData.type = WAttr.SPELL
+    btnData[WAttr.TYPE] = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo
     --barData.buttons[btnName] = btnData
 

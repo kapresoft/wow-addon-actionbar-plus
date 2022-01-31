@@ -2,6 +2,7 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
     <Script file="ActionType.lua"/>
+    <Script file="ButtonData.lua"/>
     <Script file="ButtonUI.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="SpellAttributeSetter.lua"/>

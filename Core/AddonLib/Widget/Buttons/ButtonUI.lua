@@ -13,8 +13,12 @@ local pack, fmod = table.pack, math.fmod
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
 
 -- Local APIs
-local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
-local AceGUI = LibStub(M.AceLibFactory):GetAceGUI()
+local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
+local AceEvent, AceGUI = G:LibPack_AceLibrary()
+local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
+
+local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
+local toStringSorted = Table.toStringSorted
 
 local CC = ABP_CommonConstants
 local WAttr = CC.WidgetAttributes
@@ -33,7 +37,7 @@ local frameStrata = 'LOW'
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI = SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI
 local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
-local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT = ABP_WidgetConstants:GetButtonTextures()
+local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
 
 -- TODO: Move to config
 local INTERNAL_BUTTON_PADDING = 2
@@ -41,6 +45,36 @@ local INTERNAL_BUTTON_PADDING = 2
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+local waitTable = {};
+local waitFrame = nil;
+
+---#### Source
+---* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
+local function ABP_wait(delay, func, ...)
+    if (type(delay)~="number" or type(func)~="function") then return false end
+    if (waitFrame == nil) then
+        waitFrame = CreateFrame("Frame", "WaitFrame", UIParent);
+        waitFrame:SetScript("onUpdate", function (self, elapse)
+            local count = #waitTable
+            local i = 1
+            while (i<=count) do
+                local waitRecord = tremove(waitTable, i)
+                local d = tremove(waitRecord, 1)
+                local f = tremove(waitRecord, 1)
+                local p = tremove(waitRecord, 1)
+                if(d>elapse) then
+                    tinsert(waitTable,i,{d-elapse, f, p})
+                    i = i + 1
+                else
+                    count = count - 1
+                    f(unpack(p))
+                end
+            end
+        end)
+    end
+    tinsert(waitTable,{delay, func,{...}})
+    return true
+end
 
 local function RegisterWidget(widget, name)
     assert(widget ~= nil)
@@ -74,6 +108,40 @@ local function ShowTooltip(btnUI)
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
     end
+end
+
+---@param btnUI ButtonUI
+---@param spell SpellInfo
+local function updateCooldown(btnUI, event, spell)
+    --local evt = event:gsub('UNIT_SPELLCAST_', '')
+    ---@type ButtonUIWidget
+    local widget = btnUI.widget
+    local logCooldown = true
+    local info = _API_Spell:GetSpellCooldown(spell.id, spell.name)
+    --p:log('info: %s', toStringSorted(info))
+    -- Don't update cooldown on instant cast spells
+    if info.duration <= 0 then
+        if logCooldown then
+            --widget:SetCooldown(info)
+            p:log('%s[%s]::%s <<Instant Cast>>\n%s', spell.name, spell.id, event, toStringSorted(info))
+        end
+        return
+    end
+    widget:SetCooldown(info)
+
+    if logCooldown then
+        p:log('%s[%s]::%s\n%s', spell.name, spell.id, event, toStringSorted(info))
+        if evt == 'OnSpellCastSucceeded' then p:log('') end
+    end
+end
+
+local function RegisterCallbacks(widget)
+    widget:SetCallback('OnSpellCastSent', function(_widget, event, spell)
+        updateCooldown(_widget.button, event, spell)
+    end)
+    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, spell)
+        ABP_wait(0, function()  updateCooldown(_widget.button, event, spell) end)
+    end)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -141,7 +209,9 @@ local function WidgetMethods(widget)
 
     ---Get Profile Button Config Data
     function widget:GetConfig()
-        return self.profile:GetButtonData(self.frameIndex, self.buttonName)
+        --return ButtonDataBuilder:Create(self.button)
+        --return self.profile:GetButtonData(self.frameIndex, self.buttonName)
+        return self.buttonData:GetData()
     end
 
     function widget:ResetConfig()
@@ -186,6 +256,7 @@ local function WidgetMethods(widget)
 
     function widget:SetCooldownDelegate(start, duration)
         self.cooldown:SetCooldown(start, duration)
+        p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
     end
 
     function widget:SetCooldownInfo(cooldownInfo)
@@ -213,6 +284,7 @@ local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
 ---@param btnIndex number The button numeric index
 ---@return ButtonUIWidget
 function _B:Create(dragFrame, rowNum, colNum, btnIndex)
+
     local frameName = dragFrame:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
@@ -244,6 +316,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     button:SetScript('OnLeave', OnLeave)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript('OnDragStart', OnDragStart)
+    button:RegisterForDrag('LeftButton')
 
     local cdFrameName = btnName .. 'CDFrame'
     ---@class Cooldown
@@ -278,13 +351,20 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
         ---@type table
         buttonAttributes = CC.ButtonAttributes,
     }
-    dragFrame.widget, button.widget, cooldown.widget = widget, widget, widget
+    ---@type ButtonData
+    local buttonData = ButtonDataBuilder:Create(widget)
+    widget.buttonData =  buttonData
+
+    dragFrame.widget, button.widget, cooldown.widget, buttonData.widget = widget, widget, widget, widget
 
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
 
     ---@type ButtonUIWidget
-    return RegisterWidget(widget, btnName .. '::Widget')
+    RegisterWidget(widget, btnName .. '::Widget')
+    RegisterCallbacks(widget)
+
+    return widget
 end
 
 --[[-----------------------------------------------------------------------------

@@ -100,7 +100,6 @@ function _L:SetAttributes(btnUI, btnData)
     --btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
     --btnUI.cooldownFrame.spellInfo = spellInfo
 
-    btnUI:RegisterForDrag('LeftButton')
     --btnUI:SetScript("OnDragStart", function(_btnUI)
     --    if InCombatLockdown() then return end
     --    if P:IsLockActionBars() and not IsShiftKeyDown() then return end
@@ -113,6 +112,7 @@ function _L:SetAttributes(btnUI, btnData)
     --    btnUI:SetScript("OnEnter", nil)
     --end)
 
+    -- TODO: Remove
     btnUI:HookScript('OnClick', function(_btnUI, mouseButton, down)
         cooldowns[spellInfo.id] = _btnUI
     end)
@@ -213,24 +213,24 @@ local function OnEvent(frame, event, ...)
     end
 end
 
-local frame = CreateFrame("Frame", "ABP_SpellAttributesSetterFrame", UIParent)
-frame:SetScript("OnEvent", OnEvent)
-frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-frame:RegisterEvent("UNIT_SPELLCAST_SENT")
-
-frame:RegisterEvent("UNIT_SPELLCAST_START")
-frame:RegisterEvent("UNIT_SPELLCAST_FAILED")
-frame:RegisterEvent("UNIT_SPELLCAST_STOP")
-frame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+--local frame = CreateFrame("Frame", "ABP_SpellAttributesSetterFrame", UIParent)
+--frame:SetScript("OnEvent", OnEvent)
+--frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+--frame:RegisterEvent("UNIT_SPELLCAST_SENT")
+--
+--frame:RegisterEvent("UNIT_SPELLCAST_START")
+--frame:RegisterEvent("UNIT_SPELLCAST_FAILED")
+--frame:RegisterEvent("UNIT_SPELLCAST_STOP")
+--frame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 
 
 --- So that we can call with SetAttributes(btnUI)
 _L.mt.__call = _L.SetAttributes
 
-local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
-AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', function(event, ...)
-    local unit, unitTarget, castGUID, spellID = ...
-    local spell = _API_Spell:GetSpellInfo(spellID)
-    --print('unit:',unit, 'target:', target or '<>', format("%s[%s]", spell.name, spellID))
-    _L:log(30, '%s[%s]  Unit=%s, Target=%s', spell.name, spellID, unit, unitTarget or '<None>')
-end)
+--local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
+--AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', function(event, ...)
+--    local unit, unitTarget, castGUID, spellID = ...
+--    local spell = _API_Spell:GetSpellInfo(spellID)
+--    --print('unit:',unit, 'target:', target or '<>', format("%s[%s]", spell.name, spellID))
+--    _L:log(30, '%s[%s]  Unit=%s, Target=%s', spell.name, spellID, unit, unitTarget or '<None>')
+--end)

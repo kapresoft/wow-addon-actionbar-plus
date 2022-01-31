@@ -26,6 +26,7 @@ local Module = {
     Config = 'Config',
     Profile = 'Profile',
     ButtonUI = 'ButtonUI',
+    ButtonDataBuilder = 'ButtonDataBuilder',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     MacroTextureDialog = 'MacroTextureDialog',
@@ -83,6 +84,15 @@ function _L:LibPack_NewAddon()
             Module.AceLibFactory, Module.WidgetLibFactory, Module.ProfileInitializer)
     return LibStub, Module, AceLibFactory, WidgetLibFactory, ProfileInitializer, _L
 end
+---### Usage
+---```
+---local LibStub, M, P, LogFactory = ABP_LibGlobals:LibPack_NewLibrary()
+---```
+---@return LocalLibStub, Module, Profile, LogFactory
+function _L:LibPack_NewLibrary()
+    local Profile, LogFactory = self:Get(Module.Profile, Module.LogFactory)
+    return LibStub, Module, Profile, LogFactory
+end
 
 ---@return AceEvent, AceGUI
 function _L:LibPack_AceLibrary()
@@ -91,6 +101,10 @@ function _L:LibPack_AceLibrary()
     return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI()
 end
 
+---### Usage:
+---```
+---local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+---```
 ---@return pformat, function
 function _L:LibPackPrettyPrint()
     local PrettyPrint, Table = self:Get(Module.PrettyPrint, Module.Table)
@@ -102,6 +116,11 @@ function _L:LibPackUtils()
     local PrettyPrint, Table, String, LogFactory = self:Get(
             Module.PrettyPrint, Module.Table, Module.String, Module.LogFactory)
     return PrettyPrint, Table, String, LogFactory
+end
+
+---@return ButtonDataBuilder
+function _L:LibPack_ButtonDataBuilder()
+    return self:Get(Module.ButtonDataBuilder)
 end
 
 function _L:GetLogLevel() return ABP_LOG_LEVEL end

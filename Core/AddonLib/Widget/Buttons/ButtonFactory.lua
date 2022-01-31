@@ -20,6 +20,7 @@ local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIR
     SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
+local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
 
 -- TODO: Move to config
 local INTERNAL_BUTTON_PADDING = 2
@@ -38,9 +39,10 @@ local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['m
 L.addon = nil
 L.profile = nil
 
--- ## Functions ------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 
-local function isFirstButtonInRow(colSize, i) return fmod(i - 1, colSize) == 0 end
 
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
@@ -48,6 +50,12 @@ local function ShowConfigTooltip(frame)
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
+
+
+
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
 
 local function OnLeaveFrame(_) GameTooltip:Hide() end
 local function OnShowFrameTooltip(frame)
@@ -67,6 +75,58 @@ local function OnMouseDownFrame(_, mouseButton)
     end
 end
 
+local function OnSpellCastSent(event, ...)
+    --L:log('OnSpellCastSent:: %s', btnUI)
+
+    local unit, unitTarget, castGUID, spellID = ...
+    --
+    --btnUI:SetHighlightTexture(TEXTURE_CASTING)
+    --btnUI:LockHighlight()
+    --
+    --updateCooldown(btnUI, event, spellID)
+
+    --local btnUI = findButtonBySpellId(spellID)
+    --btnUI.widget:Fire('OnSpellCastSent')
+
+    local buttons = P:FindButtonsBySpellById(spellID)
+    --print('btnsize:', Table.size(buttons))
+    ---@param spell SpellInfo
+    for btnName, spell in pairs(buttons) do
+        local btnUI = _G[btnName]
+        if btnUI and btnUI.widget then
+            btnUI.widget:Fire('OnSpellCastSent', spell)
+            --L:log('OnSpellCastSent:: Fired Event[%s]: %s(%s)', btnName, spell.name, spell.id)
+        end
+    end
+    --L:log('OnSpellCastSent::Buttons: %s', pformat(buttons))
+end
+
+local function OnSpellCastSucceeded(event, ...)
+    --L:log('OnSpellCastSucceeded:: %s', btnUI)
+    local unitTarget, castGUID, spellID = ...
+
+    --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+    --btnUI:UnlockHighlight()
+    --btnUI.widget:ClearCooldown()
+    --
+    --ABP_wait(0, function() updateCooldown(btnUI, event, spellID)  end)
+    --local btnUI = findButtonBySpellId(spellID)
+    --btnUI.widget:Fire('OnSpellCastSucceeded')
+    local buttons = P:FindButtonsBySpellById(spellID)
+    --print('btnsize:', Table.size(buttons))
+    ---@param spell SpellInfo
+    for btnName, spell in pairs(buttons) do
+        local btnUI = _G[btnName]
+        if btnUI and btnUI.widget then
+            btnUI.widget:Fire('OnSpellCastSucceeded', spell)
+            --L:log('OnSpellCastSucceeded:: Fired Event[%s]: %s(%s)', btnName, spell.name, spell.id)
+        end
+    end
+end
+
+
+
+
 function L:OnAfterInitialize()
     local frames = P:GetAllFrameNames()
     --error(format('frames: %s', ABP_Table.toString(frames)))
@@ -79,6 +139,9 @@ function L:OnAfterInitialize()
             f:HideGroup()
         end
     end
+
+    AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', OnSpellCastSent)
+    AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
 end
 
 function L:CreateActionbarGroup(frameIndex)
@@ -121,11 +184,12 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
     end
 end
 
-function L:SetButtonAttributes(btnUI)
-    local actionbarInfo = btnUI:GetActionbarInfo()
-    local btnName = btnUI:GetName()
+---@param btnWidget ButtonUIWidget
+function L:SetButtonAttributes(btnWidget)
+    local actionbarInfo = btnWidget:GetActionbarInfo()
+    local btnName = btnWidget:GetName()
     --local btnData = P:GetButtonData(actionbarInfo.index, btnName)
-    local btnData = btnUI:GetConfig()
+    local btnData = btnWidget:GetConfig()
 
     --local key = actionbarInfo.name .. btnName
     --local btnData = P.profile[key]
@@ -140,7 +204,7 @@ function L:SetButtonAttributes(btnUI)
         self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
         return
     end
-    setter:SetAttributes(btnUI.button, btnData)
+    setter:SetAttributes(btnWidget.button, btnData)
 end
 
 -- TODO: Move somewhere else
@@ -166,10 +230,11 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     end
 
     function btnUI:SetCooldown(optionalInfo)
+        L:log('XXXXXX Cooldown... XXXXXXX')
         local info = optionalInfo or self.cooldownFrame.info
         self:SetCooldownInfo(info)
         self.cooldownFrame:SetCooldown(info.start, info.duration)
-        --L:log('Cooldown success: %s', pformat(info))
+        L:log('Cooldown success: %s', pformat(info))
     end
 
     function btnUI:SetCooldownInfo(cooldownInfo)
