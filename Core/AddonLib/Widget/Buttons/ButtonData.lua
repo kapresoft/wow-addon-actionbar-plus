@@ -25,6 +25,9 @@ local function ApplyMethods(bd)
         return self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
     end
 
+    function bd:IsLockActionBars()
+        return self.profile:IsLockActionBars()
+    end
 end
 
 

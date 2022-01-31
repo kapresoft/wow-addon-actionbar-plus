@@ -3,8 +3,8 @@ ActionButton.lua
 -------------------------------------------------------------------------------]]
 
 -- WoW APIs
-local ClearCursor, GetCursorInfo, CreateFrame, UIParent =
-ClearCursor, GetCursorInfo, CreateFrame, UIParent
+local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
+    PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
 GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 
@@ -164,16 +164,16 @@ local function SetButtonLayout(widget, rowNum, colNum)
     local buttonPadding = widget.buttonPadding
     local frameStrata = widget.frameStrata
     local button = widget.button
-    local dragFrame = widget.dragFrame
+    local dragFrameWidget = widget.dragFrame
 
-    local widthPaddingAdj = dragFrame.padding
-    local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
+    local widthPaddingAdj = dragFrameWidget.padding
+    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
     local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
     local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
 
     button:SetFrameStrata(frameStrata)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
+    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ local function OnDragStart(btnUI)
     local w = btnUI.widget
 
     if InCombatLockdown() then return end
-    if w.profile:IsLockActionBars() and not IsShiftKeyDown() then return end
+    if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
     w:ClearCooldown()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
     local btnData = btnUI.widget:GetConfig()
@@ -242,8 +242,6 @@ local function WidgetMethods(widget)
 
     ---Get Profile Button Config Data
     function widget:GetConfig()
-        --return ButtonDataBuilder:Create(self.button)
-        --return self.profile:GetButtonData(self.frameIndex, self.buttonName)
         return self.buttonData:GetData()
     end
 
@@ -311,14 +309,15 @@ Builder Methods
 local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
 
 ---Creates a new ButtonUI
----@param dragFrame table The drag frame this button is attached to
+---@param dragFrameWidget FrameWidget The drag frame this button is attached to
 ---@param rowNum number The row number
 ---@param colNum number The column number
 ---@param btnIndex number The button numeric index
 ---@return ButtonUIWidget
-function _B:Create(dragFrame, rowNum, colNum, btnIndex)
+function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
-    local frameName = dragFrame:GetName()
+    local dragFrame = dragFrameWidget.frame
+    local frameName = dragFrameWidget:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
     ---@class ButtonFrame
@@ -330,7 +329,6 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     button:SetScript('OnEnter', OnEnter)
     button:SetScript('OnLeave', OnLeave)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
-    button:SetScript('OnDragStart', OnDragStart)
     button:RegisterForDrag('LeftButton')
 
     ---@class Cooldown
@@ -345,11 +343,11 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
         ---@type Profile
         profile = P,
         ---@type number
-        frameIndex = dragFrame:GetFrameIndex(),
+        frameIndex = dragFrameWidget:GetFrameIndex(),
         --@type string
         buttonName = btnName,
         ---@type Frame
-        dragFrame = dragFrame,
+        dragFrame = dragFrameWidget,
         ---@type ButtonUI
         button = button,
         ---@type ButtonUI
@@ -361,7 +359,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
         ---@type string
         frameStrata = 'LOW',
         ---@type number
-        buttonSize = 40,
+        buttonSize = dragFrameWidget.buttonSize,
         ---@type number
         buttonPadding = 2,
         ---@type table
@@ -371,7 +369,13 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     local buttonData = ButtonDataBuilder:Create(widget)
     widget.buttonData =  buttonData
 
-    dragFrame.widget, button.widget, cooldown.widget, buttonData.widget = widget, widget, widget, widget
+    -- TODO: Temp. Only Support Spell for now
+    local btnData = buttonData:GetData()
+    if 'spell' == btnData.type then
+        button:SetScript('OnDragStart', OnDragStart)
+    end
+
+    button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
