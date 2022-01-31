@@ -89,15 +89,19 @@ local function IsValidDragSource(cursorInfo)
 
     return true
 end
+---@param btnUI ButtonFrame
 local function OnDragStart(btnUI)
+    ---@type ButtonUIWidget
+    local w = btnUI.widget
+
     if InCombatLockdown() then return end
-    if P:IsLockActionBars() and not IsShiftKeyDown() then return end
-    btnUI.widget:ClearCooldown()
+    if w.profile:IsLockActionBars() and not IsShiftKeyDown() then return end
+    w:ClearCooldown()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
     local btnData = btnUI.widget:GetConfig()
     local spellInfo = btnData[WAttr.SPELL]
     PickupSpell(spellInfo.id)
-    btnUI.widget:ResetConfig()
+    w:ResetConfig()
     btnUI:SetNormalTexture(TEXTURE_EMPTY)
     btnUI:SetScript("OnEnter", nil)
 end
@@ -128,21 +132,25 @@ local function OnClick(btn, mouseButton, down)
 end
 
 --[[-----------------------------------------------------------------------------
-Methods
+Widget Methods
 -------------------------------------------------------------------------------]]
--- ButtonUI:Factory():NewButton(dragFrame, rowNum, colNum, index)
--- ButtonUI:Factory():FromButton(btnUI)
---- Widget Methods
----@class ButtonUI ButtonUIWidget methods
-local methods = {
-    ['GetName'] = function(self) return self.button:GetName() end,
-    ['GetConfig'] = function(self) return P:GetButtonDataFromWidget(self) end,
-    ['ResetConfig'] = function(self)
+---@param widget ButtonUIWidget
+local function WidgetMethods(widget)
+
+    function widget:GetName() return self.button:GetName() end
+
+    ---Get Profile Button Config Data
+    function widget:GetConfig()
+        return self.profile:GetButtonData(self.frameIndex, self.buttonName)
+    end
+
+    function widget:ResetConfig()
         P:ResetButtonData(self)
         self:ResetWidgetAttributes()
-    end,
+    end
+
     ---@return ActionBarInfo
-    ['GetActionbarInfo'] = function(self)
+    function widget:GetActionbarInfo()
         local index = self.index
         local dragFrame = self.dragFrame;
         local frameName = dragFrame:GetName()
@@ -154,102 +162,139 @@ local methods = {
             button = { name = btnName, index = index },
         }
         return info
-    end,
+    end
+
     ---@deprecated Use #GetConfig()
-    ['GetProfileButtonData'] = function(self)
+    function widget:GetProfileButtonData()
         local info = self:GetActionbarInfo()
-        if not info then return nil end
+        if not info then
+            return nil
+        end
         return P:GetButtonData(info.index, info.button.name)
-    end,
-    ['ClearCooldown'] = function(self)
+    end
+
+    function widget:ClearCooldown()
         self:SetCooldownDelegate(0, 0)
-    end,
-    ['SetCooldown'] = function(self, optionalInfo)
+    end
+
+    function widget:SetCooldown(optionalInfo)
         local cd = optionalInfo or self.cooldownInfo
         if not cd then return end
         self:SetCooldownInfo(cd)
         self:SetCooldownDelegate(cd.start, cd.duration)
-    end,
-    ['SetCooldownDelegate'] = function(self, start, duration)
+    end
+
+    function widget:SetCooldownDelegate(start, duration)
         self.cooldown:SetCooldown(start, duration)
-    end,
-    ['SetCooldownInfo'] = function(self, cooldownInfo)
+    end
+
+    function widget:SetCooldownInfo(cooldownInfo)
         if not cooldownInfo then return end
         self.cooldownInfo = cooldownInfo
-    end,
-    ['ResetWidgetAttributes'] = function(self)
-        for _,v in pairs(self.buttonAttributes) do
+    end
+
+    function widget:ResetWidgetAttributes()
+        for _, v in pairs(self.buttonAttributes) do
             self.button:SetAttribute(v, nil)
         end
-    end,
-}
+    end
+end
+
+--[[-----------------------------------------------------------------------------
+Builder Methods
+-------------------------------------------------------------------------------]]
+---@class ButtonUIWidgetBuilder
+local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
+
+---Creates a new ButtonUI
+---@param dragFrame table The drag frame this button is attached to
+---@param rowNum number The row number
+---@param colNum number The column number
+---@param btnIndex number The button numeric index
+---@return ButtonUIWidget
+function _B:Create(dragFrame, rowNum, colNum, btnIndex)
+    local frameName = dragFrame:GetName()
+    local btnName = format('%sButton%s', frameName, tostring(btnIndex))
+
+    ---@class ButtonFrame
+    local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+    button:SetFrameStrata(frameStrata)
+    button:SetSize(buttonSize - INTERNAL_BUTTON_PADDING, buttonSize - INTERNAL_BUTTON_PADDING)
+
+    -- Reference point is BOTTOMLEFT of dragFrame
+    -- dragFrameBottomLeftAdjustX, dragFrameBottomLeftAdjustY adjustments from #dragFrame
+    local referenceFrameAdjustX = buttonSize
+    local referenceFrameAdjustY = 3
+    --local adjX = (colNum * buttonSize) - referenceFrameAdjustX
+    --local widthAdj = (colNum * buttonSize) - referenceFrameAdjustX + INTERNAL_BUTTON_PADDING
+    --local height =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
+    --local heightAdj =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
+    local widthPaddingAdj = dragFrame.padding
+    local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
+    local widthAdj = ((colNum-1) * buttonSize) + widthPaddingAdj
+    local heightAdj = ((rowNum-1) * buttonSize) + heightPaddingAdj
+
+    --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX, -adjY)
+    --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX + dragFrame.halfPadding, -adjY - dragFrame.halfPadding)
+    local frameCenterAdjust = 5
+    button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
+    button:SetNormalTexture(noIconTexture)
+    button:HookScript('OnClick', OnClick)
+    button:SetScript('OnEnter', OnEnter)
+    button:SetScript('OnLeave', OnLeave)
+    button:SetScript('OnReceiveDrag', OnReceiveDrag)
+    button:SetScript('OnDragStart', OnDragStart)
+
+    local cdFrameName = btnName .. 'CDFrame'
+    local cooldown = CreateFrame("Cooldown", cdFrameName, button,  "CooldownFrameTemplate")
+    cooldown:SetAllPoints(button)
+    cooldown:SetSwipeColor(1, 1, 1)
+
+    ---@class ButtonUIWidget
+    local widget = {
+        ---@type Logger
+        p = p,
+        ---@type Profile
+        profile = P,
+        ---@type number
+        frameIndex = dragFrame:GetFrameIndex(),
+        --@type string
+        buttonName = btnName,
+        ---@type Frame
+        dragFrame = dragFrame,
+        ---@type ButtonUI
+        button = button,
+        ---@type ButtonUI
+        frame = button,
+        ---@type Cooldown
+        cooldown = cooldown,
+        ---@type table
+        cooldownInfo = nil,
+        ---@type string
+        frameStrata = 'LOW',
+        ---@type number
+        buttonSize = 40,
+        ---@type table
+        buttonAttributes = CC.ButtonAttributes,
+    }
+    dragFrame.widget, button.widget, cooldown.widget = widget, widget, widget
+
+    --for method, func in pairs(methods) do widget[method] = func end
+    WidgetMethods(widget)
+
+    ---@type ButtonUIWidget
+    return RegisterWidget(widget, btnName .. '::Widget')
+end
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 local function NewLibrary()
 
-    ---@class ButtonUIFactory
+    ---@class ButtonUI
     local _L = LibStub:NewLibrary(M.ButtonUI, 1)
 
-    ---@return ButtonUI
-    function _L:Create(dragFrame, rowNum, colNum, btnIndex)
-        local frameName = dragFrame:GetName()
-        local btnName = format('%sButton%s', frameName, tostring(btnIndex))
-
-        --self:printf('frame name: %s button: %s index: %s', frameName, btnName, index)
-        local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-        --error('button: ' .. button:GetName())
-        button:SetFrameStrata(frameStrata)
-        button:SetSize(buttonSize - INTERNAL_BUTTON_PADDING, buttonSize - INTERNAL_BUTTON_PADDING)
-        -- Reference point is BOTTOMLEFT of dragFrame
-        -- dragFrameBottomLeftAdjustX, dragFrameBottomLeftAdjustY adjustments from #dragFrame
-        local referenceFrameAdjustX = buttonSize
-        local referenceFrameAdjustY = 3
-        --local adjX = (colNum * buttonSize) - referenceFrameAdjustX
-        --local widthAdj = (colNum * buttonSize) - referenceFrameAdjustX + INTERNAL_BUTTON_PADDING
-        --local height =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
-        --local heightAdj =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
-        local widthPaddingAdj = dragFrame.padding
-        local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
-        local widthAdj = ((colNum-1) * buttonSize) + widthPaddingAdj
-        local heightAdj = ((rowNum-1) * buttonSize) + heightPaddingAdj
-
-        --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX, -adjY)
-        --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX + dragFrame.halfPadding, -adjY - dragFrame.halfPadding)
-        local frameCenterAdjust = 5
-        button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
-        button:SetNormalTexture(noIconTexture)
-        button:HookScript('OnClick', OnClick)
-        button:SetScript('OnEnter', OnEnter)
-        button:SetScript('OnLeave', OnLeave)
-        button:SetScript('OnReceiveDrag', OnReceiveDrag)
-        button:SetScript('OnDragStart', OnDragStart)
-
-        local cdFrameName = btnName .. 'CDFrame'
-        local cooldown = CreateFrame("Cooldown", cdFrameName, button,  "CooldownFrameTemplate")
-        cooldown:SetAllPoints(button)
-        cooldown:SetSwipeColor(1, 1, 1)
-        --button.cooldownFrame = cooldown
-
-        local widget = {
-            p = p,
-            frameIndex = dragFrame:GetFrameIndex(),
-            buttonName = btnName,
-            dragFrame = dragFrame,
-            button = button,
-            frame = button,
-            cooldown = cooldown,
-            cooldownInfo = nil,
-            frameStrata = 'LOW',
-            buttonSize = 40,
-            buttonAttributes = CC.ButtonAttributes,
-        }
-        dragFrame.widget, button.widget, cooldown.widget = widget, widget, widget
-        for method, func in pairs(methods) do widget[method] = func end
-
-        return RegisterWidget(widget, btnName .. '::Widget')
-    end
+    function _L:WidgetBuilder() return _B end
 
     return _L
 end

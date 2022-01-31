@@ -230,11 +230,8 @@ _L.mt.__call = _L.SetAttributes
 local AceLibFactory = ABP_LibGlobals:LibPack_AceLibFactory()
 local AceEvent = AceLibFactory:GetAceEvent()
 AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', function(event, ...)
-    print('AceEvent::', tostring(event))
-    --print('    :', pformat(...))
-    print('    :', Table.toStringSorted({...}))
     local unit, unitTarget, castGUID, spellID = ...
     local spell = _API_Spell:GetSpellInfo(spellID)
     --print('unit:',unit, 'target:', target or '<>', format("%s[%s]", spell.name, spellID))
-    _L:log('%s[%s]  Unit=%s, Target=%s', spell.name, spellID, unit, unitTarget or '<None>')
+    _L:log(30, '%s[%s]  Unit=%s, Target=%s', spell.name, spellID, unit, unitTarget or '<None>')
 end)

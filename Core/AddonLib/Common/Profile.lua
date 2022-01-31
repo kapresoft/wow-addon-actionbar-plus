@@ -111,9 +111,9 @@ function P:GetButtonData(frameIndex, buttonName)
     return buttons[buttonName]
 end
 
-function P:GetButtonDataFromWidget(widget) return self:GetButtonData(widget.frameIndex, widget.buttonName) end
+---@param widget ButtonUIWidget
 function P:ResetButtonData(widget)
-    local btnData = self:GetButtonDataFromWidget(widget)
+    local btnData = widget:GetConfig()
     for _, a in ipairs(ActionType) do btnData[a] = {} end
     btnData[WAttr.TYPE] = WAttr.SPELL
 end

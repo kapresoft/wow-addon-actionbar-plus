@@ -19,7 +19,7 @@ local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil,
 local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
     SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
-local BTN = ABP_WidgetConstants:LibPack_ButtonUIFactory()
+local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 
 -- TODO: Move to config
 local INTERNAL_BUTTON_PADDING = 2
@@ -110,7 +110,7 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             --local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
-            local btnWidget = BTN:Create(dragFrame, row, col, index)
+            local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
             btnWidget:SetCallback("OnReceiveDrag", function(widget)
                 print('Received drag: ' .. tostring(e))
             end)
@@ -144,6 +144,7 @@ function L:SetButtonAttributes(btnUI)
 end
 
 -- TODO: Move somewhere else
+---@unused
 function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local frameName = dragFrame:GetName()
     local btnName = format('%sButton%s', frameName, tostring(index))
@@ -151,6 +152,7 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
     local cdFrameName = btnName .. 'CDFrame'
+    ---@class Cooldown
     local cdFrame = CreateFrame("Cooldown", cdFrameName, btnUI,  "CooldownFrameTemplate")
     cdFrame:SetAllPoints(btnUI)
     cdFrame:SetSwipeColor(1, 1, 1)
@@ -188,7 +190,7 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     ---```
     ---@return ActionBarInfo
     function btnUI:GetActionbarInfo()
-        ---@class ActionBarInfo
+        ---class ActionBarInfo
         local info = {
             name = frameName, index = dragFrame:GetFrameIndex(),
             button = { name = btnName, index = index },
