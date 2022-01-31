@@ -10,6 +10,7 @@ local format = string.format
 
 -- Local APIs
 local LibStub, M, P, LogFactory = ABP_LibGlobals:LibPack_NewLibrary()
+local WAttr = ABP_CommonConstants.WidgetAttributes
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -23,6 +24,10 @@ local function ApplyMethods(bd)
 
     function bd:GetData()
         return self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
+    end
+
+    function bd:IsActionTypeSpell()
+        return self:GetData().type == WAttr.SPELL
     end
 
     function bd:IsLockActionBars()

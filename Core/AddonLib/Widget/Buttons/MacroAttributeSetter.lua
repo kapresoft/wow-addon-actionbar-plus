@@ -48,7 +48,7 @@ function _L:ShowTooltip(btnUI, btnData)
     ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
 
     local macroLabel = ' |cfd5a5a5a(Macro)|r'
-    GameTooltip:SetText(macroInfo.name .. macroLabel)
+    if macroInfo.name then GameTooltip:SetText(macroInfo.name .. macroLabel) end
 end
 
 _L.mt.__call = _L.SetAttributes

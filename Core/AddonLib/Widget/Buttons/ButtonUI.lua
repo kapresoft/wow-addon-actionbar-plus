@@ -189,7 +189,7 @@ local function IsValidDragSource(cursorInfo)
 
     return true
 end
----@param btnUI ButtonFrame
+---@param btnUI ButtonUI
 local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
@@ -198,7 +198,12 @@ local function OnDragStart(btnUI)
     if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
     w:ClearCooldown()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
+
     local btnData = btnUI.widget:GetConfig()
+
+    -- TODO: Temp. Skip non-spell stuff for now
+    if btnData.type ~= WAttr.SPELL then return end
+
     local spellInfo = btnData[WAttr.SPELL]
     PickupSpell(spellInfo.id)
     w:ResetConfig()
@@ -207,10 +212,10 @@ local function OnDragStart(btnUI)
     btnUI.widget:Fire('OnDragStart')
 end
 
+---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
-    local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
-
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
+
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
     ClearCursor()
@@ -218,7 +223,9 @@ local function OnReceiveDrag(btnUI)
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
     p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
-    H:Handle(btnUI, actionType, cursorInfo)
+
+    local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
+    dragEventHandler:Handle(btnUI, actionType, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
@@ -300,6 +307,16 @@ local function WidgetMethods(widget)
             self.button:SetAttribute(v, nil)
         end
     end
+
+    function widget:HasActionAssigned()
+        local d = self.buttonData:GetData()
+        local type = d.type
+        if String:IsBlank(type) then return false end
+        local spellDetails = d[type]
+        if Table.size(spellDetails) <= 0 then return false end
+        return true
+    end
+
 end
 
 --[[-----------------------------------------------------------------------------
@@ -316,11 +333,10 @@ local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
 ---@return ButtonUIWidget
 function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
-    local dragFrame = dragFrameWidget.frame
     local frameName = dragFrameWidget:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
-    ---@class ButtonFrame
+    ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
     button:SetNormalTexture(noIconTexture)
@@ -328,6 +344,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:HookScript('OnClick', OnClick)
     button:SetScript('OnEnter', OnEnter)
     button:SetScript('OnLeave', OnLeave)
+    button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:RegisterForDrag('LeftButton')
 
@@ -370,10 +387,10 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     widget.buttonData =  buttonData
 
     -- TODO: Temp. Only Support Spell for now
-    local btnData = buttonData:GetData()
-    if 'spell' == btnData.type then
-        button:SetScript('OnDragStart', OnDragStart)
-    end
+    --local btnData = buttonData:GetData()
+    --if String:IsNotBlank(btnData.type) and 'spell' == btnData.type then
+    --    button:SetScript('OnDragStart', OnDragStart)
+    --end
 
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
@@ -393,7 +410,6 @@ New Instance
 -------------------------------------------------------------------------------]]
 local function NewLibrary()
 
-    ---@class ButtonUI
     local _L = LibStub:NewLibrary(M.ButtonUI, 1)
 
     function _L:WidgetBuilder() return _B end

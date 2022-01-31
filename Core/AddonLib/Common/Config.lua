@@ -24,14 +24,14 @@ Support functions
 local function CreateFrameStateSetterHandler(frameIndex)
     return function(_, v)
         local f = FF:GetFrameByIndex(frameIndex)
-        f:SetFrameState(frameIndex, v)
+        f.widget:SetFrameState(frameIndex, v)
     end
 end
 
 local function CreateFrameStateGetterHandler(frameIndex)
     return function(_)
         local f = FF:GetFrameByIndex(frameIndex)
-        return f:IsShownInConfig(frameIndex)
+        return f.widget:IsShownInConfig(frameIndex)
     end
 end
 

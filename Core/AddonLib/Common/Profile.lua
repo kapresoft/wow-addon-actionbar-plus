@@ -114,7 +114,7 @@ end
 function P:ResetButtonData(widget)
     local btnData = widget:GetConfig()
     for _, a in ipairs(ActionType) do btnData[a] = {} end
-    btnData[WAttr.TYPE] = WAttr.SPELL
+    btnData[WAttr.TYPE] = ''
 end
 
 function P:InitDELETEME(newProfile)

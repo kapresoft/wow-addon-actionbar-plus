@@ -139,7 +139,7 @@ function _L:CreateFrame(frameIndex)
     ---@class FrameWidget
     local widget = {
         frameIndex = frameIndex,
-        buttonSize = 40,
+        buttonSize = 35,
         dragHandleHeight = 5,
         padding = 2,
         frameStrata = 'LOW',
