@@ -31,16 +31,11 @@ local IsNotBlank = String.IsNotBlank
 local p = LogFactory:NewLogger('ButtonUI')
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
-local buttonSize = 40
-local frameStrata = 'LOW'
 
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI = SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI
 local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
-
--- TODO: Move to config
-local INTERNAL_BUTTON_PADDING = 2
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -76,6 +71,8 @@ local function ABP_wait(delay, func, ...)
     return true
 end
 
+---@param widget ButtonUIWidget
+---@param name string The widget name.
 local function RegisterWidget(widget, name)
     assert(widget ~= nil)
     assert(name ~= nil)
@@ -90,7 +87,6 @@ local function RegisterWidget(widget, name)
         __index = WidgetBase
     }
     setmetatable(widget, mt)
-    return widget
 end
 
 local function ShowTooltip(btnUI)
@@ -158,6 +154,26 @@ local function RegisterCallbacks(widget)
     widget:SetCallback("OnReceiveDrag", function(self, event)
         p:log('%s:: %s', event, tostring(self))
     end)
+end
+
+---@param widget ButtonUIWidget
+---@param rowNum number The row number
+---@param colNum number The column number
+local function SetButtonLayout(widget, rowNum, colNum)
+    local buttonSize = widget.buttonSize
+    local buttonPadding = widget.buttonPadding
+    local frameStrata = widget.frameStrata
+    local button = widget.button
+    local dragFrame = widget.dragFrame
+
+    local widthPaddingAdj = dragFrame.padding
+    local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
+    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
+    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
+
+    button:SetFrameStrata(frameStrata)
+    button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
+    button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -307,26 +323,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
 
     ---@class ButtonFrame
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-    button:SetFrameStrata(frameStrata)
-    button:SetSize(buttonSize - INTERNAL_BUTTON_PADDING, buttonSize - INTERNAL_BUTTON_PADDING)
 
-    -- Reference point is BOTTOMLEFT of dragFrame
-    -- dragFrameBottomLeftAdjustX, dragFrameBottomLeftAdjustY adjustments from #dragFrame
-    local referenceFrameAdjustX = buttonSize
-    local referenceFrameAdjustY = 3
-    --local adjX = (colNum * buttonSize) - referenceFrameAdjustX
-    --local widthAdj = (colNum * buttonSize) - referenceFrameAdjustX + INTERNAL_BUTTON_PADDING
-    --local height =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
-    --local heightAdj =  ((rowNum-1) * buttonSize) + INTERNAL_BUTTON_PADDING - referenceFrameAdjustY
-    local widthPaddingAdj = dragFrame.padding
-    local heightPaddingAdj = dragFrame.padding + dragFrame.dragHandleHeight
-    local widthAdj = ((colNum-1) * buttonSize) + widthPaddingAdj
-    local heightAdj = ((rowNum-1) * buttonSize) + heightPaddingAdj
-
-    --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX, -adjY)
-    --button:SetPoint(BOTTOMLEFT, dragFrame, TOPLEFT, adjX + dragFrame.halfPadding, -adjY - dragFrame.halfPadding)
-    local frameCenterAdjust = 5
-    button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
     button:SetNormalTexture(noIconTexture)
     button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
     button:HookScript('OnClick', OnClick)
@@ -336,9 +333,8 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     button:SetScript('OnDragStart', OnDragStart)
     button:RegisterForDrag('LeftButton')
 
-    local cdFrameName = btnName .. 'CDFrame'
     ---@class Cooldown
-    local cooldown = CreateFrame("Cooldown", cdFrameName, button,  "CooldownFrameTemplate")
+    local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
 
@@ -366,6 +362,8 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
         frameStrata = 'LOW',
         ---@type number
         buttonSize = 40,
+        ---@type number
+        buttonPadding = 2,
         ---@type table
         buttonAttributes = CC.ButtonAttributes,
     }
@@ -377,6 +375,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
 
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
+    SetButtonLayout(widget, rowNum, colNum)
 
     ---@type ButtonUIWidget
     RegisterWidget(widget, btnName .. '::Widget')

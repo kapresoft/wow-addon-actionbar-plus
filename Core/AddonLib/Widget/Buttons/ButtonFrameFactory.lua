@@ -133,6 +133,11 @@ function _L:CreateFrame(frameIndex)
     local f = self:GetFrameByIndex(frameIndex)
     f:SetBackdrop(FrameBackdrop)
 
+    ---@class FrameWidget
+    local widget = {
+
+    }
+
     --local f = self:CreateFrameByIndex(frameIndex)
     if type(f) ~= 'table' then return end
     f.frameIndex = frameIndex

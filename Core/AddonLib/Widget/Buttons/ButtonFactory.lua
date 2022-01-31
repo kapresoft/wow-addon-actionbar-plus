@@ -14,7 +14,7 @@ local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 
-local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
+local ButtonFrameFactory, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
     SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
@@ -130,7 +130,7 @@ end
 function L:OnAfterInitialize()
     local frames = P:GetAllFrameNames()
     --error(format('frames: %s', ABP_Table.toString(frames)))
-    for i,f in ipairs(frames) do
+    for i,_ in ipairs(frames) do
         local frameEnabled = P:IsBarIndexEnabled(i)
         local f = self:CreateActionbarGroup(i)
         if frameEnabled then
@@ -147,7 +147,7 @@ end
 function L:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
-    local f = BFF(frameIndex)
+    local f = ButtonFrameFactory(frameIndex)
     f.dragHandleHeight = 5
     f.padding = 2
     f.halfPadding = f.padding/2
