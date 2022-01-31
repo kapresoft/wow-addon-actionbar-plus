@@ -152,6 +152,12 @@ local function RegisterCallbacks(widget)
         _widget:ClearCooldown()
         ABP_wait(0, function()  updateCooldown(_widget.button, event, spell) end)
     end)
+    widget:SetCallback('OnDragStart', function(self, event)
+        p:log('%s:: %s', event, tostring(self))
+    end)
+    widget:SetCallback("OnReceiveDrag", function(self, event)
+        p:log('%s:: %s', event, tostring(self))
+    end)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -182,12 +188,13 @@ local function OnDragStart(btnUI)
     w:ResetConfig()
     btnUI:SetNormalTexture(TEXTURE_EMPTY)
     btnUI:SetScript("OnEnter", nil)
+    btnUI.widget:Fire('OnDragStart')
 end
 
-local function OnReceiveDrag(btn)
+local function OnReceiveDrag(btnUI)
     local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 
-    AssertThatMethodArgIsNotNil(btn, 'btnUI', 'OnReceiveDrag(btnUI)')
+    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
     ClearCursor()
@@ -195,9 +202,9 @@ local function OnReceiveDrag(btn)
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
     p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
-    H:Handle(btn, actionType, cursorInfo)
+    H:Handle(btnUI, actionType, cursorInfo)
 
-    btn.widget:Fire('OnReceiveDrag')
+    btnUI.widget:Fire('OnReceiveDrag')
 end
 
 local function OnEnter(self) ShowTooltip(self) end
