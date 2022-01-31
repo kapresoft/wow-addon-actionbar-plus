@@ -246,6 +246,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     button:SetScript('OnDragStart', OnDragStart)
 
     local cdFrameName = btnName .. 'CDFrame'
+    ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", cdFrameName, button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)

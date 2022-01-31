@@ -152,7 +152,7 @@ function L:CreateSingleButton(dragFrame, rowNum, colNum, index)
     local btnUI = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
     local cdFrameName = btnName .. 'CDFrame'
-    ---@class Cooldown
+    ---@type Cooldown
     local cdFrame = CreateFrame("Cooldown", cdFrameName, btnUI,  "CooldownFrameTemplate")
     cdFrame:SetAllPoints(btnUI)
     cdFrame:SetSwipeColor(1, 1, 1)
