@@ -23,7 +23,7 @@ function _L:Handle(btnUI, cursorInfo)
     --self:logp('itemInfo', itemInfo)
     --ABP:DBG('ItemInfo', itemInfo)
 
-    local actionbarInfo = btnUI:GetActionbarInfo()
+    local actionbarInfo = btnUI.widget:GetActionbarInfo()
     --self:logp('ActionBar', actionbarInfo)
     local btnName = btnUI:GetName()
     local barData = P:GetBar(actionbarInfo.index)
