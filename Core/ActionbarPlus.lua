@@ -16,7 +16,7 @@ local TextureDialog = W:GetMacroTextureDialog()
 --if not A then return end
 --LogFactory:EmbedLogger(A)
 
-local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = AceLibFactory:GetAddonAceLibs()
+local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = ABP_LibGlobals:LibPack_AceAddonLibs()
 local C, P, BF = W:LibPack_AddonLibs()
 local libModules = { C, P, BF }
 local debugDialog

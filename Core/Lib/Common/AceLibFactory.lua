@@ -57,12 +57,3 @@ function _L:GetAceConfigDialog() return libAceConfigDialog end
 ---@return AceGUI
 function _L:GetAceGUI() return libAceGUI end
 
----### Usage:
----```
----local AceDB, AceDBOptions, AceConfig, AceConfigDialog = AceLibFactory:GetAddonAceLibs()
----```
----@return AceDB, AceDBOptions, AceConfig, AceConfigDialog
-function _L:GetAddonAceLibs()
-    return self:GetAceDB(), self:GetAceDBOptions(), self:GetAceConfig(), self:GetAceConfigDialog()
-end
-

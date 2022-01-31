@@ -227,8 +227,7 @@ frame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 --- So that we can call with SetAttributes(btnUI)
 _L.mt.__call = _L.SetAttributes
 
-local AceLibFactory = ABP_LibGlobals:LibPack_AceLibFactory()
-local AceEvent = AceLibFactory:GetAceEvent()
+local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
 AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', function(event, ...)
     local unit, unitTarget, castGUID, spellID = ...
     local spell = _API_Spell:GetSpellInfo(spellID)

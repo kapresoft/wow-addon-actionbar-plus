@@ -53,6 +53,8 @@ local _L = {
 ---@type LibGlobals
 ABP_LibGlobals = _L
 
+---@return AceLibFactory
+local function GetAceLibFactory() return _L:Get(Module.AceLibFactory)  end
 
 ---```
 ---Example:
@@ -60,6 +62,16 @@ ABP_LibGlobals = _L
 ---```
 ---@return LocalLibStub, Module, LibGlobals
 function _L:LibPack() return LibStub, Module, _L end
+
+---### Usage:
+---```
+---local AceDB, AceDBOptions, AceConfig, AceConfigDialog = AceLibFactory:GetAddonAceLibs()
+---```
+---@return AceDB, AceDBOptions, AceConfig, AceConfigDialog
+function _L:LibPack_AceAddonLibs()
+    local alf = GetAceLibFactory()
+    return alf:GetAceDB(), alf:GetAceDBOptions(), alf:GetAceConfig(), alf:GetAceConfigDialog()
+end
 
 ---### Get New Addon LibPack
 ---```
@@ -72,9 +84,11 @@ function _L:LibPack_NewAddon()
     return LibStub, Module, AceLibFactory, WidgetLibFactory, ProfileInitializer, _L
 end
 
----@return AceLibFactory
-function _L:LibPack_AceLibFactory()
-    return self:Get(Module.AceLibFactory)
+---@return AceEvent, AceGUI
+function _L:LibPack_AceLibrary()
+    ---@type AceLibFactory
+    local AceLibFactory = self:Get(Module.AceLibFactory)
+    return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI()
 end
 
 ---@return pformat, function

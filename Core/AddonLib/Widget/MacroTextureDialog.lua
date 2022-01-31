@@ -14,7 +14,7 @@ local GameTooltip, MC,
         ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
         TEXTURE_EMPTY, ANCHOR_TOPLEFT
 
-local ACELIB = ABP_LibGlobals:LibPack_AceLibFactory()
+local AceEvent, AceGUI = ABP_LibGlobals:LibPack_AceAddonLibs()
 
 -- ## Local ----------------------------------------------------
 
@@ -48,7 +48,6 @@ function _L:CreateTexturePopupDialog()
     local iconSize = 50
     local defaultIcon = TEXTURE_EMPTY
 
-    local AceGUI = ACELIB:GetAceGUI()
     local frame = AceGUI:Create("Frame")
 
     self:FetchMacroIcons()
