@@ -116,13 +116,12 @@ local function updateCooldown(btnUI, event, spell)
     --local evt = event:gsub('UNIT_SPELLCAST_', '')
     ---@type ButtonUIWidget
     local widget = btnUI.widget
-    local logCooldown = true
+    local logCooldown = false
     local info = _API_Spell:GetSpellCooldown(spell.id, spell.name)
     --p:log('info: %s', toStringSorted(info))
     -- Don't update cooldown on instant cast spells
     if info.duration <= 0 then
         if logCooldown then
-            --widget:SetCooldown(info)
             p:log('%s[%s]::%s <<Instant Cast>>\n%s', spell.name, spell.id, event, toStringSorted(info))
         end
         return
@@ -131,15 +130,26 @@ local function updateCooldown(btnUI, event, spell)
 
     if logCooldown then
         p:log('%s[%s]::%s\n%s', spell.name, spell.id, event, toStringSorted(info))
-        if evt == 'OnSpellCastSucceeded' then p:log('') end
+        if event == 'OnSpellCastSucceeded' then p:log('') end
     end
 end
 
 local function RegisterCallbacks(widget)
+    ---@param _widget ButtonUIWidget
+    ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSent', function(_widget, event, spell)
+        local btnUI = _widget.button
+        btnUI:SetHighlightTexture(TEXTURE_CASTING)
+        btnUI:LockHighlight()
         updateCooldown(_widget.button, event, spell)
     end)
+    ---@param _widget ButtonUIWidget
+    ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, spell)
+        local btnUI = _widget.button
+        btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+        btnUI:UnlockHighlight()
+        _widget:ClearCooldown()
         ABP_wait(0, function()  updateCooldown(_widget.button, event, spell) end)
     end)
 end
@@ -256,7 +266,7 @@ local function WidgetMethods(widget)
 
     function widget:SetCooldownDelegate(start, duration)
         self.cooldown:SetCooldown(start, duration)
-        p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
+        --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
     end
 
     function widget:SetCooldownInfo(cooldownInfo)
@@ -311,6 +321,7 @@ function _B:Create(dragFrame, rowNum, colNum, btnIndex)
     local frameCenterAdjust = 5
     button:SetPoint(TOPLEFT, dragFrame, TOPLEFT, widthAdj, -heightAdj)
     button:SetNormalTexture(noIconTexture)
+    button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
     button:HookScript('OnClick', OnClick)
     button:SetScript('OnEnter', OnEnter)
     button:SetScript('OnLeave', OnLeave)
