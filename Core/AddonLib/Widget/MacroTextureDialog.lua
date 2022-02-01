@@ -14,7 +14,7 @@ local GameTooltip, MC,
         ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
         TEXTURE_EMPTY, ANCHOR_TOPLEFT
 
-local AceEvent, AceGUI = ABP_LibGlobals:LibPack_AceAddonLibs()
+local _, AceGUI = ABP_LibGlobals:LibPack_AceLibrary()
 
 -- ## Local ----------------------------------------------------
 
