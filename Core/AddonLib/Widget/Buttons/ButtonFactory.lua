@@ -64,8 +64,9 @@ local function OnShowFrameTooltip(frame)
     C_Timer.After(3, function() GameTooltip:Hide() end)
 end
 
-local function OnMouseDownFrame(_, mouseButton)
+local function OnMouseDownFrame(frameHandle, mouseButton)
     --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
+    frameHandle.widget.frame:StartMoving()
     GameTooltip:Hide()
     if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
@@ -341,8 +342,10 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
+--TODO: Move to frame
 function L:AttachFrameEvents(frameWidget)
-    local frame = frameWidget.frame
+    local frame = frameWidget.frameHandle
+    frame:SetScript("OnMouseDown", OnMouseDownFrame)
     frame:SetScript("OnMouseDown", OnMouseDownFrame)
     frame:SetScript("OnEnter", OnShowFrameTooltip)
     frame:SetScript("OnLEave", OnLeaveFrame)

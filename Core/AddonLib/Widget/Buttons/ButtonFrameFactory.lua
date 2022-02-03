@@ -131,31 +131,64 @@ function _L:CreateFrame(frameIndex)
         tile = false, tileSize = 26, edgeSize = 0,
         insets = { left = 0, right = 0, top = 0, bottom = 0 }
     }
+    local FrameHandleBackdrop = {
+        ---@see LibSharedMedia
+        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
+        tile = false, tileSize = 26, edgeSize = 0,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
+    }
 
     ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
-    f:SetBackdrop(FrameBackdrop)
+
+    local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    --fh:SetToplevel(true)
 
     ---@class FrameWidget
     local widget = {
         frameIndex = frameIndex,
         buttonSize = 35,
-        dragHandleHeight = 5,
+        frameHandleHeight = 3,
+        dragHandleHeight = 0,
         padding = 2,
         frameStrata = 'LOW',
-        frame = f
+        frame = f,
+        frameHandle = fh
     }
     widget.frame = f
-    f.widget = widget
+    f.widget, fh.widget = widget, widget
 
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
 
     --local halfPadding = widget.padding/2
     local widthAdj = widget.padding
     local heightAdj = widget.padding + widget.dragHandleHeight
-    f:SetWidth((config.colSize * widget.buttonSize) + widthAdj)
+    local frameWidth = (config.colSize * widget.buttonSize) + widthAdj
+    f:SetWidth(frameWidth)
     f:SetHeight((config.rowSize * widget.buttonSize) + heightAdj)
     f:SetFrameStrata(widget.frameStrata)
+    f:SetBackdrop(FrameBackdrop)
+    f:SetBackdropColor(0, 0, 0, 1)
+
+    fh:SetBackdrop(FrameHandleBackdrop)
+    --fh:SetBackdropColor(0.92, 0.96, 0.26, 0.2)
+    -- yellow
+    --fh:SetBackdropColor(0.92, 0.96, 0.26, 0.5)
+    -- orange
+    fh:SetBackdropColor(235/255, 152/255, 45/255, 0.5)
+    fh:SetWidth(frameWidth)
+    fh:EnableMouse(true)
+    fh:SetMovable(true)
+    fh:SetResizable(true)
+    fh:SetHeight(widget.frameHandleHeight)
+    fh:SetFrameStrata(widget.frameStrata)
+    fh:SetPoint("BOTTOM", f, "TOP", 0, 1)
+    fh:SetScript("OnLoad", function() self:RegisterForDrag("LeftButton"); end)
+    fh:SetScript("OnMouseDown", function() print('mouse down'); f:StartMoving(); end)
+    fh:SetScript("OnMouseUp", function() f:StopMovingOrSizing(); end)
+    fh:SetScript("OnDragStart", function() f:StartMoving();  end)
+    fh:SetScript("OnDragStop", function() f:StopMovingOrSizing(); end)
+    fh:Show()
 
     WidgetMethods(widget)
 
