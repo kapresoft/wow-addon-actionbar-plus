@@ -1,8 +1,16 @@
--- ## External -------------------------------------------------
-local format = string.format
-local GameTooltip = GameTooltip
+-- Wow APIs
+local GameTooltip, CreateFrame = GameTooltip, CreateFrame
+local UIParent = UIParent
 
--- ## Local ----------------------------------------------------
+-- Lua APIs
+local format = string.format
+local tinsert, tremove = table.insert, table.remove
+local unpack = unpack
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+
 local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
@@ -10,12 +18,13 @@ local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
 local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
 
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
-local cooldowns = {}
 
 ---@class SpellAttributeSetter
 local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
 
--- ## Functions ------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 
 local waitTable = {};
 local waitFrame = nil;
@@ -47,6 +56,10 @@ local function ABP_wait(delay, func, ...)
     tinsert(waitTable,{delay, func,{...}})
     return true
 end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 
 ---@param link table The blizzard `GameTooltip` link
 function _L:ShowTooltip(btnUI, btnData)
@@ -96,4 +109,3 @@ end
 
 --- So that we can call with SetAttributes(btnUI)
 _L.mt.__call = _L.SetAttributes
-
