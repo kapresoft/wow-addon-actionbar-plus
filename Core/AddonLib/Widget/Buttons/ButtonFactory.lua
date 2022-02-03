@@ -346,7 +346,6 @@ end
 function L:AttachFrameEvents(frameWidget)
     local frame = frameWidget.frameHandle
     frame:SetScript("OnMouseDown", OnMouseDownFrame)
-    frame:SetScript("OnMouseDown", OnMouseDownFrame)
     frame:SetScript("OnEnter", OnShowFrameTooltip)
     frame:SetScript("OnLEave", OnLeaveFrame)
 end

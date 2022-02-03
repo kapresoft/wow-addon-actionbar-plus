@@ -148,7 +148,7 @@ function _L:CreateFrame(frameIndex)
     local widget = {
         frameIndex = frameIndex,
         buttonSize = 35,
-        frameHandleHeight = 3,
+        frameHandleHeight = 4,
         dragHandleHeight = 0,
         padding = 2,
         frameStrata = 'LOW',
@@ -175,7 +175,7 @@ function _L:CreateFrame(frameIndex)
     -- yellow
     --fh:SetBackdropColor(0.92, 0.96, 0.26, 0.5)
     -- orange
-    fh:SetBackdropColor(235/255, 152/255, 45/255, 0.5)
+    fh:SetBackdropColor(235/255, 152/255, 45/255, 1)
     fh:SetWidth(frameWidth)
     fh:EnableMouse(true)
     fh:SetMovable(true)
@@ -184,7 +184,8 @@ function _L:CreateFrame(frameIndex)
     fh:SetFrameStrata(widget.frameStrata)
     fh:SetPoint("BOTTOM", f, "TOP", 0, 1)
     fh:SetScript("OnLoad", function() self:RegisterForDrag("LeftButton"); end)
-    fh:SetScript("OnMouseDown", function() print('mouse down'); f:StartMoving(); end)
+    -- TODO: Overridden in ButtonFactory, will migrate it here
+    -- fh:SetScript("OnMouseDown", function() f:StartMoving(); end)
     fh:SetScript("OnMouseUp", function() f:StopMovingOrSizing(); end)
     fh:SetScript("OnDragStart", function() f:StartMoving();  end)
     fh:SetScript("OnDragStop", function() f:StopMovingOrSizing(); end)
