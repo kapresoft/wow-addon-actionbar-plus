@@ -86,10 +86,13 @@ end
 ---   }
 ---}
 ---```
----@param btnUI table The UIFrame
+---@param btnUI ButtonUI The UIFrame
 ---@param btnData table The button data
 function _L:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes()
+
+    -- TODO: replace
+    --local btnData = btnUI.widget:GetConfig()
 
     ---@type SpellInfo
     local spellInfo = btnData[WAttr.SPELL]

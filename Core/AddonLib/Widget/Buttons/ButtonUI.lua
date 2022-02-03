@@ -113,7 +113,7 @@ local function updateCooldown(btnUI, event, spell)
     ---@type ButtonUIWidget
     local widget = btnUI.widget
     local logCooldown = false
-    local info = _API_Spell:GetSpellCooldown(spell.id, spell.name)
+    local info = _API_Spell:GetSpellCooldown(spell.id, spell)
     --p:log('info: %s', toStringSorted(info))
     -- Don't update cooldown on instant cast spells
     if info.duration <= 0 then

@@ -1,6 +1,13 @@
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local format, IsNotBlank = string.format, String.IsNotBlank
+-- Wow APIs
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
+local GetSpellCooldown = GetSpellCooldown
+
+-- Lua APIs
+local format = string.format
+
+-- Local APIs
+local _, _, String = ABP_LibGlobals:LibPackUtils()
+local IsNotBlank = String.IsNotBlank
 
 ---@class API_Spell
 local S = {}
@@ -45,6 +52,17 @@ function S:GetSpellInfo(spellNameOrId)
     return nil
 end
 
+---@return SpellCooldownDetails
+function S:GetSpellCooldownDetails(spellID, optionalSpell)
+    local spell = optionalSpell or self:GetSpellInfo(spellID)
+    if spell == nil then error("Spell not found: " .. spellID) end
+    local start, duration, enabled, modRate = GetSpellCooldown(spellID);
+    local cooldown = { start = start, duration = duration, enabled = enabled, modRate = modRate }
+    ---@class SpellCooldownDetails
+    local details = { spell = spell, cooldown = cooldown }
+    return details
+end
+
 ---@return SpellCooldown
 function S:GetSpellCooldown(spellID, optionalSpellName)
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
@@ -53,4 +71,14 @@ function S:GetSpellCooldown(spellID, optionalSpellName)
         spell = { id=spellID, name=optionalSpellName },
         start = start, duration = duration, enabled = enabled, modRate = modRate }
     return info
+end
+
+---@return SpellCooldownDetails
+function S:GSCD(spellID, optionalSpell)
+    return S:GetSpellCooldownDetails(spellID, optionalSpell)
+end
+
+---@return SpellCooldown
+function S:GSC(spellID, optionalSpellName)
+    return S:GetSpellCooldown(spellID, optionalSpellName)
 end

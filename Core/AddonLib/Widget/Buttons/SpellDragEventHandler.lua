@@ -30,6 +30,8 @@ function _L:Handle(btnUI, cursorInfo)
     local btnData = btnUI.widget:GetConfig()
 
     -- Dragging over a button with an existing spell
+    -- TODO: Could be dragging over an existing spell, item, macro or macrotext
+    -- Add PickupItem() or PickupMacro()
     local btnDataOld = btnData[WAttr.SPELL]
     if btnDataOld and btnDataOld.id then
         PickupSpell(btnDataOld.id)

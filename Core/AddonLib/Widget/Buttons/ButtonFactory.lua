@@ -126,7 +126,24 @@ local function OnSpellCastSucceeded(event, ...)
     end
 end
 
+---This event is fired immediately whenever you cast a spell, as well as
+---every second while you channel spells.
+---### See Also:
+--- https://wowpedia.fandom.com/wiki/SPELL_UPDATE_COOLDOWN
+local function OnSpellUpdateCooldown(event)
+    L:log(50, 'Triggered: %s', event)
+end
 
+---Fired when the cooldown for an actionbar or inventory slot starts or
+---stops. Also fires when you log into a new area.
+---### See Also:
+---https://wowpedia.fandom.com/wiki/ACTIONBAR_UPDATE_COOLDOWN
+local function OnActionbarUpdateCooldown(event)
+    -- also fired on: refresh, new zone
+    L:log(50, 'Triggered: %s', event)
+    -- iterate through all buttons and fire an event
+    -- handle cooldown in Ace SetCallback()
+end
 
 
 function L:OnAfterInitialize()
@@ -144,6 +161,8 @@ function L:OnAfterInitialize()
 
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', OnSpellCastSent)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
+    AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
+    AceEvent:RegisterEvent('ACTIONBAR_UPDATE_COOLDOWN', OnActionbarUpdateCooldown)
 end
 
 function L:CreateActionbarGroup(frameIndex)
