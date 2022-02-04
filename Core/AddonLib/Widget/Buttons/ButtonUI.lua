@@ -375,7 +375,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         cooldownInfo = nil,
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
         ---@type string
-        frameStrata = 'HIGH',
+        frameStrata = 'MEDIUM',
         ---@type number
         buttonSize = dragFrameWidget.buttonSize,
         ---@type number
