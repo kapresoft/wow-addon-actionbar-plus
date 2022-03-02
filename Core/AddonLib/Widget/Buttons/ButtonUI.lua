@@ -149,10 +149,10 @@ local function RegisterCallbacks(widget)
         ABP_wait(0, function()  updateCooldown(_widget.button, event, spell) end)
     end)
     widget:SetCallback('OnDragStart', function(self, event)
-        p:log('%s:: %s', event, tostring(self))
+        p:log(50, '%s:: %s', event, tostring(self))
     end)
     widget:SetCallback("OnReceiveDrag", function(self, event)
-        p:log('%s:: %s', event, tostring(self))
+        p:log(50, '%s:: %s', event, tostring(self))
     end)
 end
 
