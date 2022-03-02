@@ -43,4 +43,4 @@ luac.out
 /.idea/
 /.history/
 /.vscode/
-/Core/ExtLib/Ace3.prev/
+/Core/ExtLib/.Ace3.*
