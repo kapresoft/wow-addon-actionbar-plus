@@ -1,10 +1,12 @@
 -- ## External -------------------------------------------------
 
 -- ## Local ----------------------------------------------------
-local LibStub, M, Assert, P, _, W, CC = ABP_WidgetConstants:LibPack()
+local WC = ABP_WidgetConstants
+local LibStub, M, Assert, _, _, W, CC = WC:LibPack()
 local SpellAttributeSetter = W:SpellAttributeSetter()
 local WAttr = CC.WidgetAttributes
 local _API_Spell = _API_Spell
+local PH = ABP_PickupHandler
 
 ---@class SpellDragEventHandler
 local _L = LibStub:NewLibrary(M.SpellDragEventHandler)
@@ -23,24 +25,10 @@ function _L:Handle(btnUI, cursorInfo)
     local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
     if Assert.IsNil(spellInfo) then return end
 
-    --local actionbarInfo = btnUI.widget:GetActionbarInfo()
-    --local btnName = btnUI:GetName()
-    --local barData = P:GetBar(actionbarInfo.index)
-    --local btnData = barData.buttons[btnName] or P:GetTemplate().Button
     local btnData = btnUI.widget:GetConfig()
-
-    -- Dragging over a button with an existing spell
-    -- TODO: Could be dragging over an existing spell, item, macro or macrotext
-    -- Add PickupItem() or PickupMacro()
-    local btnDataOld = btnData[WAttr.SPELL]
-    if btnDataOld and btnDataOld.id then
-        PickupSpell(btnDataOld.id)
-        self:log(10, 'Button has existing spell: %s', btnDataOld.id)
-    end
-
+    PH:PickupExisting(btnData)
     btnData[WAttr.TYPE] = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo
-    --barData.buttons[btnName] = btnData
 
     SpellAttributeSetter(btnUI, btnData)
 end

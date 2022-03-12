@@ -8,7 +8,8 @@ local LibStub, M, Assert, P, LSM, W, CC = ABP_WidgetConstants:LibPack()
 
 local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
 local ItemAttributeSetter = W:ItemAttributeSetter()
-local WidgetAttributes = CC.WidgetAttributes
+local WAttr = CC.WidgetAttributes
+local PH = ABP_PickupHandler
 
 ---@class ItemDragEventHandler
 local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
@@ -29,10 +30,9 @@ function _L:Handle(btnUI, cursorInfo)
     local barData = P:GetBar(actionbarInfo.index)
 
     local btnData = barData.buttons[btnName] or P:GetTemplate().Button
-    btnData.type = WidgetAttributes.ITEM
-    btnData[btnData.type] = itemInfo
-    barData.buttons[btnName] = btnData
-    --ABP:DBG('btnData', btnData)
+    PH:PickupExisting(btnData)
+    btnData.type = WAttr.ITEM
+    btnData[WAttr.ITEM] = itemInfo
 
     ItemAttributeSetter(btnUI, btnData)
 end

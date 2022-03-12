@@ -1,7 +1,9 @@
 local ReloadUI = ReloadUI
 
 local LibStub, M, G = ABP_LibGlobals:LibPack()
+
 ---@type AceLibFactory
+local CC = ABP_CommonConstants
 local AceLibFactory = LibStub('AceLibFactory')
 local LibSharedMedia = AceLibFactory:GetAceSharedMedia()
 local LogFactory = LibStub(M.LogFactory)

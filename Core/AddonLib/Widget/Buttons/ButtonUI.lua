@@ -1,18 +1,20 @@
 --[[-----------------------------------------------------------------------------
-ActionButton.lua
+WoW Vars
 -------------------------------------------------------------------------------]]
-
--- WoW APIs
 local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
     PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
 GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 
--- Lua APIs
+--[[-----------------------------------------------------------------------------
+LUA Vars
+-------------------------------------------------------------------------------]]
 local pack, fmod = table.pack, math.fmod
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
 
--- Local APIs
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local AceEvent, AceGUI = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
@@ -26,6 +28,7 @@ local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 --local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local IsNotBlank = String.IsNotBlank
+local PH = ABP_PickupHandler
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
@@ -200,16 +203,14 @@ local function OnDragStart(btnUI)
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
     local btnData = btnUI.widget:GetConfig()
+    PH:Pickup(btnData)
 
-    -- TODO: Temp. Skip non-spell stuff for now
-    if btnData.type ~= WAttr.SPELL then return end
-
-    local spellInfo = btnData[WAttr.SPELL]
-    PickupSpell(spellInfo.id)
     w:ResetConfig()
     btnUI:SetNormalTexture(TEXTURE_EMPTY)
     btnUI:SetScript("OnEnter", nil)
     btnUI.widget:Fire('OnDragStart')
+
+    -- TODO NEXT: Handle Drag-And-Drop for Macro and Item
 end
 
 ---@param btnUI ButtonUI

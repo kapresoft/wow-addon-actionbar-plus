@@ -3,11 +3,14 @@
 local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
 
 -- ## Local ----------------------------------------------------
-local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
-
-local LibStub, M, A, P, _, W, CC = ABP_WidgetConstants:LibPack()
+local _, _, String = ABP_LibGlobals:LibPackUtils()
+local WC = ABP_WidgetConstants
+local LibStub, M, A, P, _, W, CC = WC:LibPack()
 local MacroAttributeSetter = W:MacroAttributeSetter()
-local ButtonAttributes = CC.ButtonAttributes
+local WAttr = CC.WidgetAttributes
+local PH = ABP_PickupHandler
+
+-- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
 
 local s_replace, IsNil = String.replace, A.IsNil
 
@@ -35,17 +38,10 @@ function _L:Handle(btnUI, cursorInfo)
     end
     if IsNil(macroInfo) then return end
 
-    --- ActionBarInfo `{ index = 2, name = 'ActionbarPlusF2' }`
-    local actionbarInfo = btnUI.widget:GetActionbarInfo()
-    -- DEVT:EvalObject(actionbarInfo, 'actionbarInfo')
-
-    local btnName = btnUI:GetName()
-    local barData = P:GetBar(actionbarInfo.index)
-
-    local btnData = barData.buttons[btnName] or P:GetTemplate().Button
-    btnData.type = ButtonAttributes.MACRO
-    btnData[btnData.type] = macroInfo
-    barData.buttons[btnName] = btnData
+    local btnData = btnUI.widget:GetConfig()
+    PH:PickupExisting(btnData)
+    btnData[WAttr.TYPE] = WAttr.MACRO
+    btnData[WAttr.MACRO] = macroInfo
 
     MacroAttributeSetter(btnUI, btnData)
 end

@@ -3,6 +3,7 @@
 
     <Script file="ActionType.lua"/>
     <Script file="ButtonData.lua"/>
+    <Script file="PickupHandler.lua"/>
     <Script file="ButtonUI.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="SpellAttributeSetter.lua"/>

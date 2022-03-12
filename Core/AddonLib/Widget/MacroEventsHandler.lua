@@ -132,45 +132,6 @@ local function HandleChangedMacros(btnName, btnData)
 
     if changed then btnWidget:Fire('OnMacroChanged') end
     _L:log(15, 'HandleMacro[%s] Changed? %s', btnName, changed)
-
-    --if macroData.name == name then
-    --    if macroData.icon ~= icon then
-    --        _L:log(15, '%s::icon changed: %s', btnName, toStringSorted({ old=macroData.icon, new=icon }))
-    --        macroData.icon = icon
-    --        changed = true
-    --    end
-    --    if macroData.body ~= body then
-    --        _L:log(15, '%s::body changed: %s', btnName, toStringSorted({ old=macroData.body, new=body }))
-    --        macroData.body = body
-    --        changed = true
-    --    end
-    --    if changed then btnWidget:Fire('OnMacroChanged') end
-    --elseif macroData.name ~= name and macroData.body == body then
-    --    local d = { name={old=macroData.name, new=name}, icon={old=macroData.icon, new=icon} }
-    --    _L:log(15, '%s::name or icon changed: %s', btnName, toStringSorted(d))
-    --    changed = true
-    --    macroData.name = name
-    --    macroData.icon = icon
-    --else
-    --    local macroIndex = GetMacroIndexByName(macroData.name)
-    --    if macroIndex ~= 0 then
-    --        -- index and icon change
-    --        name, icon, body = GetMacroInfo(macroIndex)
-    --        if macroData.name == name then
-    --            local d = { index={ old=macroData.index, new=macroIndex}, name=name, icon=icon, body=body }
-    --            _L:log(15, '%s::index changed: %s', btnName, toStringSorted(d))
-    --            macroData.index = macroIndex
-    --            macroData.icon = icon
-    --            changed = true
-    --        end
-    --    else
-    --        -- else match by body
-    --        changed = HandleNameIconIndexChange(btnWidget, btnName, btnData)
-    --    end
-    --end
-    --if changed then btnWidget:Fire('OnMacroChanged') end
-    --_L:log(15, 'HandleMacro[%s] Changed? %s', btnName, changed)
-
 end
 
 function OnMacroUpdate()
