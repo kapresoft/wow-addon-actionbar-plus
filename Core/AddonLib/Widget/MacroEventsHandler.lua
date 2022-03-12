@@ -126,6 +126,12 @@ local function HandleChangedMacros(btnName, btnData)
                 macroData.icon = macroDetails.icon
                 macroData.index = macroDetails.index
                 changed = true
+            else
+                -- Save macro in the future?
+                macroData.name = nil
+                macroData.icon = nil
+                macroData.index = nil
+                changed = true
             end
         end
     end
