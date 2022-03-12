@@ -249,6 +249,32 @@ function P:FindButtonsBySpellById(spellId)
     return buttons
 end
 
+---@param btnType string spell, macro, item
+function P:FindButtonsByType(btnType)
+    local buttons = {}
+    for _, bar in pairs(self:GetBars()) do
+        for buttonName, button in pairs(bar.buttons) do
+            if btnType == button.type then
+                buttons[buttonName] = button
+            end
+        end
+    end
+    return buttons
+end
+
+--local function findChangedMacroBars()
+--    local changed = {
+--        { barName = nil, macros = {} }
+--    }
+--    local bars = P:GetBars()
+--    for k, v in pairs(bars) do
+--        local buttons = v.buttons
+--        local btnc = Table.size(buttons)
+--        _L:log('%s::Count: %s', k, btnc)
+--    end
+--    return changed
+--end
+
 function P:GetAllActionBarSizeDetails()
     return FrameDetails
 end

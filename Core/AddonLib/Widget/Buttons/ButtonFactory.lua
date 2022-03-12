@@ -188,6 +188,12 @@ function L:CreateActionbarGroup(frameIndex)
     return f
 end
 
+local function OnMacroChanged(btnWidget)
+    --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
+    L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
+    L:SetButtonAttributes(btnWidget)
+end
+
 function L:CreateButtons(dragFrame, rowSize, colSize)
     local index = 0
     for row=1, rowSize do
@@ -196,6 +202,8 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
             --local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
             local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
             self:SetButtonAttributes(btnWidget)
+            -- event { change: icon|name|index|body }
+            btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
             --btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
             dragFrame:AddButton(btnWidget:GetName())
         end

@@ -22,8 +22,26 @@ Methods
 ---@param bd ButtonData
 local function ApplyMethods(bd)
 
+    local function removeElement(tbl, value)
+        for i, v in ipairs(tbl) do
+            if v == value then tbl[i] = nil end
+        end
+    end
+
+    local function CleanupTypeData(bd)
+        if bd == nil or bd.type == nil then return end
+        local btnTypes = { 'spell', 'macro', 'item'}
+        removeElement(btnTypes, bd.type)
+        for _, v in ipairs(btnTypes) do
+            if v ~= nil then bd[v] = {} end
+        end
+    end
+
     function bd:GetData()
-        return self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
+        local bd = self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
+        -- self cleanup
+        CleanupTypeData(bd)
+        return bd
     end
 
     function bd:IsActionTypeSpell()

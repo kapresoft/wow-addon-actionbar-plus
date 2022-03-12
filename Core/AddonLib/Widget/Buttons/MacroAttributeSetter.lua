@@ -53,17 +53,3 @@ end
 
 _L.mt.__call = _L.SetAttributes
 
--- ## ------------ EVENTS --------------
-
---local function OnMacrosUpdated(frame, event)
---    _L:log(10, 'Frame: %s', frame:GetName())
---    local buttons = P:GetButtonsByIndex(2)
---    --print(ABP:DBG(buttons, 'Buttons #2'))
---    --PrettyPrint:_ShowAll()
---    --ABP:DBG( ABP_ActionType:GetOtherTypes('ITEM'), 'Other Types')
---end
---
---local frame = CreateFrame("Frame", "ABP_MacroAttributeSetterFrame", UIParent)
---frame:SetScript("OnEvent", OnMacrosUpdated)
---frame:RegisterEvent("PLAYER_ENTERING_WORLD")
---frame:RegisterEvent('UPDATE_MACROS')
