@@ -22,16 +22,10 @@ local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIR
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
 
--- TODO: Move to config
---local INTERNAL_BUTTON_PADDING = 2
-
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
 if not L then return end
 
---local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
---local buttonSize = 40
---local frameStrata = 'LOW'
 
 local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['macrotext'] = MTAS, }
 
@@ -42,8 +36,6 @@ L.profile = nil
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-
-
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
@@ -52,7 +44,11 @@ local function ShowConfigTooltip(frame)
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-
+local function OnMacroChanged(btnWidget)
+    --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
+    L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
+    L:SetButtonAttributes(btnWidget)
+end
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -78,17 +74,7 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
 end
 
 local function OnSpellCastSent(event, ...)
-    --L:log('OnSpellCastSent:: %s', btnUI)
-
-    local unit, unitTarget, castGUID, spellID = ...
-    --
-    --btnUI:SetHighlightTexture(TEXTURE_CASTING)
-    --btnUI:LockHighlight()
-    --
-    --updateCooldown(btnUI, event, spellID)
-
-    --local btnUI = findButtonBySpellId(spellID)
-    --btnUI.widget:Fire('OnSpellCastSent')
+    local _, _, _, spellID = ...
 
     local buttons = P:FindButtonsBySpellById(spellID)
     --print('btnsize:', Table.size(buttons))
@@ -170,29 +156,10 @@ function L:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local f = ButtonFrameFactory(frameIndex)
-    --f.dragHandleHeight = 5
-    --f.padding = 2
-    --f.halfPadding = f.padding/2
-    --f:SetWidth((config.colSize * buttonSize) - INTERNAL_BUTTON_PADDING)
-    --f:SetScale(1.0)
-    --f:SetFrameStrata(frameStrata)
-    ----f.widthAdjust = config.colSize * INTERNAL_BUTTON_PADDING
-    ----f.heightAdjust = config.rowSize * INTERNAL_BUTTON_PADDING
-    --local widthAdj = f.padding
-    --local heightAdj = f.padding + f.dragHandleHeight
-    --f:SetWidth(config.colSize * buttonSize + widthAdj)
-    --f:SetHeight(config.rowSize * buttonSize + heightAdj)
-
     self:CreateButtons(f, config.rowSize, config.colSize)
     f:MarkRendered()
     self:AttachFrameEvents(f)
     return f
-end
-
-local function OnMacroChanged(btnWidget)
-    --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
-    L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
-    L:SetButtonAttributes(btnWidget)
 end
 
 function L:CreateButtons(dragFrame, rowSize, colSize)
@@ -200,12 +167,9 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            --local btnUI = self:CreateSingleButton(dragFrame, row, col, index)
             local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
             self:SetButtonAttributes(btnWidget)
-            -- event { change: icon|name|index|body }
             btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-            --btnUI:SetScript("OnReceiveDrag", function(_btnUI) self.OnReceiveDrag(self, _btnUI) end)
             dragFrame:AddButton(btnWidget:GetName())
         end
     end
@@ -213,19 +177,8 @@ end
 
 ---@param btnWidget ButtonUIWidget
 function L:SetButtonAttributes(btnWidget)
-    local actionbarInfo = btnWidget:GetActionbarInfo()
-    local btnName = btnWidget:GetName()
-    --local btnData = P:GetButtonData(actionbarInfo.index, btnName)
     local btnData = btnWidget:GetConfig()
-
-    --local key = actionbarInfo.name .. btnName
-    --local btnData = P.profile[key]
-
     if btnData == nil or String.IsBlank(btnData.type) then return end
-
-    -- TODO
-    --btnUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
-
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then
         self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
@@ -251,7 +204,6 @@ function L:OnReceiveDrag(btnUI)
     H:Handle(btnUI, actionType, cursorInfo)
 end
 
----@deprecated
 function L:IsValidDragSource(cursorInfo)
     if String.IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
@@ -263,7 +215,6 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
---TODO: Move to frame
 function L:AttachFrameEvents(frameWidget)
     local frame = frameWidget.frameHandle
     frame:SetScript("OnMouseDown", OnMouseDownFrame)
