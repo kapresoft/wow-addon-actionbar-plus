@@ -26,9 +26,9 @@ function _L:Handle(btnUI, cursorInfo)
                               id = cursorInfo.info3,
                               bookIndex = cursorInfo.info1,
                               bookType = cursorInfo.info2 }
-    self:log('SpellCursorInfo: %s', toStringSorted(spellCursorInfo))
+    self:log(50, 'SpellCursorInfo: %s', toStringSorted(spellCursorInfo))
     local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
-    self:log('GetSpellInfo: %s', toStringSorted(spellInfo))
+    self:log(50, 'GetSpellInfo: %s', toStringSorted(spellInfo))
     if Assert.IsNil(spellInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()

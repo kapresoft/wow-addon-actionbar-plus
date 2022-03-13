@@ -93,12 +93,12 @@ local function OnSpellCastSucceeded(event, ...)
     local _, _, spellID = ...
     local buttons = P:FindButtonsBySpellById(spellID)
     ---@param spell SpellInfo
-    for btnName, spell in pairs(buttons) do
-        local btnUI = _G[btnName]
-        if btnUI and btnUI.widget then
-            btnUI.widget:Fire('OnSpellCastSucceeded', spell)
-        end
-    end
+    --for btnName, spell in pairs(buttons) do
+    --    local btnUI = _G[btnName]
+    --    if btnUI and btnUI.widget then
+    --        btnUI.widget:Fire('OnSpellCastSucceeded', spell)
+    --    end
+    --end
 
     -- iterate through all buttons and fire an event
     -- handle cooldown in Ace SetCallback()
@@ -117,20 +117,9 @@ local function OnSpellCastSucceeded(event, ...)
             if btnData.type == 'spell' then
                 local spellInfo = btnData['spell']
                 if String.IsNotBlank(spellInfo.id) then
-                    if spellInfo.id ~= spellID then
-                        local cooldownMS, gcdMS = GetSpellBaseCooldown(spellInfo.id)
-                        local cd = _API_Spell:GetSpellCooldown(spellInfo.id)
-                        local now = GetTime()
-                        local timeCd = cd.start + cooldownMS
-                        local afterCd = now + cooldownMS
-                        L:log("spell: %s duration=%s now=%s timeCd=%s afterCd=%s BGCD=%s",
-                        spellInfo.name, cd.duration, now, timeCd, afterCd, pformat({cooldownMS, gcdMS}))
-                        --L:log('basecd: %s, cd: %s spellInfo: %s',
-                        --        pformat({cooldownMS, gcdMS}), Table.toStringSorted(cd), spellInfo.name)
-                        if gcdMS > 0 and afterCd >= timeCd then
-                            btnUI:SetCooldownDelegate(now, gcdMS/1000)
-                        end
-                    end
+                    if spellID == spellInfo.id then
+                        btnUI:Fire('OnSpellCastSucceeded', spellInfo)
+                    else btnUI:RefreshCooldown() end
                 end
             end
         end
