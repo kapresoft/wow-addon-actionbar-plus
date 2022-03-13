@@ -167,12 +167,17 @@ function L:CreateButtons(dragFrame, rowSize, colSize)
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
-            self:SetButtonAttributes(btnWidget)
-            btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
+            local btnWidget = self:CreateSingleButton(dragFrame, row, col, index)
             dragFrame:AddButton(btnWidget:GetName())
         end
     end
+end
+
+function L:CreateSingleButton(dragFrame, row, col, index)
+    local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
+    self:SetButtonAttributes(btnWidget)
+    btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
+    return btnWidget
 end
 
 ---@param btnWidget ButtonUIWidget
