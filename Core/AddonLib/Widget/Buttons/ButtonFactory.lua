@@ -74,34 +74,21 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
-local function UpdateCooldowns(event, spellID)
+local function UpdateCooldowns(event, spellID, _delay)
+    local delay = _delay or 0
     local barFrames = P:GetAllFrameWidgets()
     for _, f in ipairs(barFrames) do
         ---@type FrameWidget
         local fw = f
-        --L:log(1, "Frame #%s: %s", fw:GetName(), fw:GetButtonCount())
         for _, btnName in ipairs(fw:GetButtons()) do
             ---@type ButtonUIWidget
             local btnUI = _G[btnName].widget
-            --btnUI.widget:Fire('OnSpellCastSent', spell)
             local btnData = btnUI:GetConfig()
-            if btnData.type == 'spell' then
-                local spellInfo = btnData['spell']
-                if String.IsNotBlank(spellInfo.id) then
-                    if event ~= 'OnSpellCastFailed' then
-                        --if spellID == spellInfo.id then
-                        --    --btnUI:Fire(event)
-                        --end
-                        --btnUI:Fire(event)
-                        btnUI:RefreshCooldown()
-                    else
-                        if spellID == spellInfo.id then
-                            btnUI:Fire(event)
-                        else
-                            Wait:wait(0.1, function() btnUI:RefreshCooldown() end)
-                        end
-                    end
-                end
+            if btnData.type == 'spell'  then
+                btnUI:Fire(event)
+                if delay > 0 then
+                    Wait:wait(delay, function() btnUI:RefreshCooldown() end)
+                else btnUI:RefreshCooldown() end
             end
         end
     end
@@ -109,17 +96,20 @@ end
 
 --- Var Args: `unit, target, castGUID, spellID`
 local function OnSpellCastSent(event, ...)
+    local _, _, _, spellID = ...
     UpdateCooldowns('OnSpellCastSent', spellID)
 end
 
 --- Var Args: `unitTarget, castGUID, spellID`
 local function OnSpellCastSucceeded(event, ...)
+    local _, _, spellID = ...
     UpdateCooldowns('OnSpellCastSucceeded', spellID)
 end
 
 --- Var Args: unitTarget, castGUID, spellID
 local function OnSpellCastFailed(event, ...)
-    UpdateCooldowns('OnSpellCastFailed', spellID)
+    local _, _, spellID = ...
+    UpdateCooldowns('OnSpellCastFailed', spellID, 0.1)
 end
 
 ---This event is fired immediately whenever you cast a spell, as well as

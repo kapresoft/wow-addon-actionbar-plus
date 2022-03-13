@@ -15,7 +15,7 @@ local waitFrame = nil;
 function _L:wait(delay, func, ...)
     if (type(delay)~="number" or type(func)~="function") then return false end
     if (waitFrame == nil) then
-        waitFrame = CreateFrame("Frame", "WaitFrameX", UIParent);
+        waitFrame = CreateFrame("Frame", "ABP_WaitFrame", UIParent);
         waitFrame:SetScript("onUpdate", function (self, elapse)
             local count = #waitTable
             local i = 1
