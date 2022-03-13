@@ -94,11 +94,11 @@ function _L:LibPack_NewLibrary()
     return LibStub, Module, Profile, LogFactory
 end
 
----@return AceEvent, AceGUI
+---@return AceEvent, AceGUI, AceHook
 function _L:LibPack_AceLibrary()
     ---@type AceLibFactory
     local AceLibFactory = self:Get(Module.AceLibFactory)
-    return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI()
+    return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 end
 
 ---### Usage:

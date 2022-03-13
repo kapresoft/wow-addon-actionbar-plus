@@ -16,7 +16,7 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local AceEvent, AceGUI = G:LibPack_AceLibrary()
+local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
 
 local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
@@ -233,9 +233,9 @@ end
 
 local function OnLeave(_) GameTooltip:Hide() end
 local function OnClick(btn, mouseButton, down)
+    p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     local actionType = GetCursorInfo()
     if String.IsBlank(actionType) then return end
-    p:log(20, 'HookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     OnReceiveDrag(btn)
 end
 
@@ -338,10 +338,9 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-
     button:SetNormalTexture(noIconTexture)
     button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
-    button:HookScript('OnClick', OnClick)
+    AceHook:SecureHookScript(button, 'OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript('OnLeave', OnLeave)
