@@ -231,7 +231,6 @@ local function OnReceiveDrag(btnUI)
     btnUI.widget:Fire('OnReceiveDrag')
 end
 
-local function OnEnter(self) ShowTooltip(self) end
 local function OnLeave(_) GameTooltip:Hide() end
 local function OnClick(btn, mouseButton, down)
     local actionType = GetCursorInfo()
@@ -318,11 +317,6 @@ local function WidgetMethods(widget)
         return true
     end
 
-    function widget:UpdateTooltip()
-        self.button:SetScript('OnEnter', OnEnter)
-        self.button:SetScript('OnLeave', OnLeave)
-    end
-
 end
 
 --[[-----------------------------------------------------------------------------
@@ -350,6 +344,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:HookScript('OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
+    button:SetScript('OnLeave', OnLeave)
+
     button:RegisterForDrag('LeftButton')
 
     ---@class Cooldown
@@ -395,7 +391,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
-    widget:UpdateTooltip()
     SetButtonLayout(widget, rowNum, colNum)
 
     ---@type ButtonUIWidget

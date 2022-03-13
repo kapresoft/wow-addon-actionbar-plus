@@ -159,6 +159,7 @@ function L:OnAfterInitialize()
         end
     end
 
+    -- TODO NEXT: Refactor to Widget/SpellEventsHandler
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', OnSpellCastSent)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
     AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)

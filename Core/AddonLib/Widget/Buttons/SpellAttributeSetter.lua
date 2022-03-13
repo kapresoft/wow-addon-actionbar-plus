@@ -111,6 +111,23 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.name)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
+    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
+end
+
+function _L:ShowTooltip(btnUI)
+    if not btnUI then return end
+    local btnData = btnUI.widget:GetConfig()
+    if not btnData then return end
+    if String.IsBlank(btnData.type) then return end
+
+    local spellInfo = btnData[WAttr.SPELL]
+    if not spellInfo.id then return end
+    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:AddSpellByID(spellInfo.id)
+    -- Replace 'Spell' with 'Spell (Rank #Rank)'
+    if (IsNotBlank(spellInfo.rank)) then
+        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
+    end
 end
 
 --- So that we can call with SetAttributes(btnUI)

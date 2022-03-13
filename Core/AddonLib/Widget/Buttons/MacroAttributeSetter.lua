@@ -31,17 +31,16 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetNormalTexture(icon)
     btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
 
-    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
-
-    --Cleanup
+    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
 
 end
 
 ---@param link table The blizzard `GameTooltip` link
-function _L:ShowTooltip(btnUI, btnData)
-    if not btnUI or not btnData then return end
-    local type = btnData.type
-    if not type then return end
+function _L:ShowTooltip(btnUI)
+    if not btnUI then return end
+    local btnData = btnUI.widget:GetConfig()
+    if not btnData then return end
+    if String.IsBlank(btnData.type) then return end
 
     local macroInfo = btnData[WAttr.MACRO]
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)

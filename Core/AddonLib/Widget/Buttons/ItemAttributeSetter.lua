@@ -40,18 +40,18 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemInfo.name)
-    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI, btnData)  end)
+    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
 end
 
-function _L:ShowTooltip(btnUI, btnData)
-    if not btnUI or not btnData then return end
-    local type = btnData.type
-    if not type then return end
+function _L:ShowTooltip(btnUI)
+    if not btnUI then return end
+    local btnData = btnUI.widget:GetConfig()
+    if not btnData then return end
+    if String.IsBlank(btnData.type) then return end
 
     local itemInfo = btnData[WAttr.ITEM]
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
     GameTooltip:SetItemByID(itemInfo.id)
-
 end
 
 _L.mt.__call = _L.SetAttributes
