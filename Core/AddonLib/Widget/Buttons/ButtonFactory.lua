@@ -21,7 +21,8 @@ local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIR
 
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
-
+---@type Wait
+local Wait = ABP_Wait
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
 if not L then return end
@@ -73,38 +74,8 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
---- Var Args: `unit, target, castGUID, spellID`
-local function OnSpellCastSent(event, ...)
-    --L:log('OnSpellCastSent:: %s', pformat({...}))
-    local _, _, _, spellID = ...
-    local buttons = P:FindButtonsBySpellById(spellID)
-    ---@param spell SpellInfo
-    for btnName, spell in pairs(buttons) do
-        local btnUI = _G[btnName]
-        if btnUI and btnUI.widget then
-            btnUI.widget:Fire('OnSpellCastSent', spell)
-        end
-    end
-end
-
---- Var Args: `unitTarget, castGUID, spellID`
-local function OnSpellCastSucceeded(event, ...)
-    --L:log('OnSpellCastSucceeded:: %s', pformat({...}))
-    local _, _, spellID = ...
-    local buttons = P:FindButtonsBySpellById(spellID)
-    ---@param spell SpellInfo
-    --for btnName, spell in pairs(buttons) do
-    --    local btnUI = _G[btnName]
-    --    if btnUI and btnUI.widget then
-    --        btnUI.widget:Fire('OnSpellCastSucceeded', spell)
-    --    end
-    --end
-
-    -- iterate through all buttons and fire an event
-    -- handle cooldown in Ace SetCallback()
+local function UpdateCooldowns(event, spellID)
     local barFrames = P:GetAllFrameWidgets()
-    --TODO: Call GetSpellInfo('GCD Spell') to get the actual global cooldown
-    local globalCooldownInSeconds = 1.5
     for _, f in ipairs(barFrames) do
         ---@type FrameWidget
         local fw = f
@@ -117,27 +88,38 @@ local function OnSpellCastSucceeded(event, ...)
             if btnData.type == 'spell' then
                 local spellInfo = btnData['spell']
                 if String.IsNotBlank(spellInfo.id) then
-                    if spellID == spellInfo.id then
-                        btnUI:Fire('OnSpellCastSucceeded', spellInfo)
-                    else btnUI:RefreshCooldown() end
+                    if event ~= 'OnSpellCastFailed' then
+                        --if spellID == spellInfo.id then
+                        --    --btnUI:Fire(event)
+                        --end
+                        --btnUI:Fire(event)
+                        btnUI:RefreshCooldown()
+                    else
+                        if spellID == spellInfo.id then
+                            btnUI:Fire(event)
+                        else
+                            Wait:wait(0.1, function() btnUI:RefreshCooldown() end)
+                        end
+                    end
                 end
             end
         end
     end
 end
 
+--- Var Args: `unit, target, castGUID, spellID`
+local function OnSpellCastSent(event, ...)
+    UpdateCooldowns('OnSpellCastSent', spellID)
+end
+
+--- Var Args: `unitTarget, castGUID, spellID`
+local function OnSpellCastSucceeded(event, ...)
+    UpdateCooldowns('OnSpellCastSucceeded', spellID)
+end
+
 --- Var Args: unitTarget, castGUID, spellID
 local function OnSpellCastFailed(event, ...)
-    --L:log('OnSpellCastFailed:: %s', pformat({...}))
-    local _, _, spellID = ...
-    local buttons = P:FindButtonsBySpellById(spellID)
-    ---@param spell SpellInfo
-    for btnName, spell in pairs(buttons) do
-        local btnUI = _G[btnName]
-        if btnUI and btnUI.widget then
-            btnUI.widget:Fire('OnSpellCastFailed', spell)
-        end
-    end
+    UpdateCooldowns('OnSpellCastFailed', spellID)
 end
 
 ---This event is fired immediately whenever you cast a spell, as well as

@@ -32,6 +32,8 @@ local PH = ABP_PickupHandler
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
+---@type Wait
+local Wait = ABP_Wait
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 
@@ -43,40 +45,6 @@ local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:Ge
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-local waitTable = {};
-local waitFrame = nil;
-
----#### Source
----* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
----
----@param delay number The amount of time to wait (in seconds) before the provided (Can be decimal, i.e. 0.5 for 1/2 a second)
----@param func function The function to run once the wait delay is over.
----@param vararg any list of any additional parameters (of any assorted type) to pass to the provided function when it is triggered.
-local function ABP_wait(delay, func, ...)
-    if (type(delay)~="number" or type(func)~="function") then return false end
-    if (waitFrame == nil) then
-        waitFrame = CreateFrame("Frame", "WaitFrame", UIParent);
-        waitFrame:SetScript("onUpdate", function (self, elapse)
-            local count = #waitTable
-            local i = 1
-            while (i<=count) do
-                local waitRecord = tremove(waitTable, i)
-                local d = tremove(waitRecord, 1)
-                local f = tremove(waitRecord, 1)
-                local p = tremove(waitRecord, 1)
-                if(d>elapse) then
-                    tinsert(waitTable,i,{d-elapse, f, p})
-                    i = i + 1
-                else
-                    count = count - 1
-                    f(unpack(p))
-                end
-            end
-        end)
-    end
-    tinsert(waitTable,{delay, func,{...}})
-    return true
-end
 
 ---@param widget ButtonUIWidget
 ---@param name string The widget name.
@@ -115,10 +83,9 @@ end
 
 ---@param btnUI ButtonUI
 ---@param spell SpellInfo
-local function updateCooldown(btnUI, event, spell)
+local function updateCooldown(widget, event, spell)
     --local evt = event:gsub('UNIT_SPELLCAST_', '')
     ---@type ButtonUIWidget
-    local widget = btnUI.widget
     local logCooldown = false
     local info = _API_Spell:GetSpellCooldown(spell.id, spell)
     --p:log('info: %s', toStringSorted(info))
@@ -140,31 +107,37 @@ end
 local function RegisterCallbacks(widget)
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
-    widget:SetCallback('OnSpellCastSent', function(_widget, event, spell)
+    widget:SetCallback('OnSpellCastSent', function(_widget, event)
         local btnUI = _widget.button
+        local btnData = _widget:GetConfig()
+        local spell = btnData['spell']
+
         btnUI:SetHighlightTexture(TEXTURE_CASTING)
         btnUI:LockHighlight()
         --local cd = _API_Spell:GetSpellCooldown(spell.id, spell)
         --p:log('spell: %s cooldown: %s', spell.name, pformat(cd))
-        updateCooldown(_widget.button, event, spell)
+        updateCooldown(_widget, event, spell)
         _widget:Fire('OnAfterSpellCastSent', spell)
     end)
 
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
-    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, spell)
+    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event)
         local btnUI = _widget.button
+        local btnData = _widget:GetConfig()
+        local spell = btnData['spell']
+
         btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
         btnUI:UnlockHighlight()
         _widget:ClearCooldown()
-        ABP_wait(0, function()
-            updateCooldown(_widget.button, event, spell)
+        Wait:wait(0, function()
+            updateCooldown(_widget, event, spell)
             _widget:Fire('OnAfterSpellCastSucceeded', spell)
         end)
     end)
-    widget:SetCallback('OnSpellCastFailed', function(_widget, event, spell)
-        p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
-        ABP_wait(0.1, function()
+    widget:SetCallback('OnSpellCastFailed', function(_widget, event, ...)
+        p:log(1, '%s:: Spell=%s', event, pformat{...})
+        Wait:wait(0.1, function()
             _widget:ClearCooldown()
             _widget:RefreshCooldown()
         end)
