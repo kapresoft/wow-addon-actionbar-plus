@@ -232,7 +232,7 @@ local function OnReceiveDrag(btnUI)
 end
 
 local function OnEnter(self) ShowTooltip(self) end
-local function OnLeave(self) GameTooltip:Hide() end
+local function OnLeave(_) GameTooltip:Hide() end
 local function OnClick(btn, mouseButton, down)
     local actionType = GetCursorInfo()
     if String.IsBlank(actionType) then return end
@@ -318,6 +318,11 @@ local function WidgetMethods(widget)
         return true
     end
 
+    function widget:UpdateTooltip()
+        self.button:SetScript('OnEnter', OnEnter)
+        self.button:SetScript('OnLeave', OnLeave)
+    end
+
 end
 
 --[[-----------------------------------------------------------------------------
@@ -343,8 +348,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:SetNormalTexture(noIconTexture)
     button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
     button:HookScript('OnClick', OnClick)
-    button:SetScript('OnEnter', OnEnter)
-    button:SetScript('OnLeave', OnLeave)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:RegisterForDrag('LeftButton')
@@ -392,6 +395,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
+    widget:UpdateTooltip()
     SetButtonLayout(widget, rowNum, colNum)
 
     ---@type ButtonUIWidget

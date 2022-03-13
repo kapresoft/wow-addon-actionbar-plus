@@ -45,6 +45,7 @@ function _L:Handle(btnUI, actionType, cursorInfo)
     end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
+    btnUI.widget:UpdateTooltip()
 
     self:CleanupProfile(btnUI, actionType)
 end

@@ -11,7 +11,9 @@ local PH = ABP_PickupHandler
 ---@class SpellDragEventHandler
 local _L = LibStub:NewLibrary(M.SpellDragEventHandler)
 
--- ## Functions ------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 
 ---spellCursorInfo `{ type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }`
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
