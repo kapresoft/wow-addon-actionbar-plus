@@ -218,6 +218,20 @@ function P:GetAllFrameNames()
     return fnames
 end
 
+---@return table
+function P:GetAllFrameWidgets()
+    local fnames = {}
+    for i=1, self:GetMaxFrames() do
+        local fn = self:GetFrameNameByIndex(i)
+        tinsert(fnames, fn)
+    end
+    tsort(fnames)
+
+    local frames = {}
+    for _, f in ipairs(fnames) do tinsert(frames, _G[f].widget) end
+    return frames
+end
+
 function P:GetButtonsByIndex(frameIndex)
 
     local barData = self:GetBar(frameIndex)
@@ -227,15 +241,6 @@ function P:GetButtonsByIndex(frameIndex)
 
     return nil
 end
-
-local _buttons = {
-    spells = {
-       ['12345'] = 'Button1',
-       ['12345'] = 'Button2'
-    },
-    items = {},
-    macros = {}
-}
 
 function P:FindButtonsBySpellById(spellId)
     local buttons = {}

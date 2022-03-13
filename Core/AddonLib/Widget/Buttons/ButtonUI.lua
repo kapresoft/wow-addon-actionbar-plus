@@ -48,6 +48,10 @@ local waitFrame = nil;
 
 ---#### Source
 ---* [https://wowwiki-archive.fandom.com/wiki/USERAPI_wait]
+---
+---@param delay number The amount of time to wait (in seconds) before the provided (Can be decimal, i.e. 0.5 for 1/2 a second)
+---@param func function The function to run once the wait delay is over.
+---@param vararg any list of any additional parameters (of any assorted type) to pass to the provided function when it is triggered.
 local function ABP_wait(delay, func, ...)
     if (type(delay)~="number" or type(func)~="function") then return false end
     if (waitFrame == nil) then
@@ -141,7 +145,9 @@ local function RegisterCallbacks(widget)
         btnUI:SetHighlightTexture(TEXTURE_CASTING)
         btnUI:LockHighlight()
         updateCooldown(_widget.button, event, spell)
+        _widget:Fire('OnAfterSpellCastSent', spell)
     end)
+
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, spell)
@@ -149,13 +155,28 @@ local function RegisterCallbacks(widget)
         btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
         btnUI:UnlockHighlight()
         _widget:ClearCooldown()
-        ABP_wait(0, function()  updateCooldown(_widget.button, event, spell) end)
+        ABP_wait(0, function()
+            updateCooldown(_widget.button, event, spell)
+            _widget:Fire('OnAfterSpellCastSucceeded', spell)
+        end)
+    end)
+    widget:SetCallback('OnSpellCastFailed', function(_widget, event, spell)
+        p:log(1, '%s:: %s(%s)', event, spell.name, spell.id)
+        ABP_wait(0.1, function()
+            _widget:ClearCooldown()
+        end)
     end)
     widget:SetCallback('OnDragStart', function(self, event)
         p:log(50, '%s:: %s', event, tostring(self))
     end)
     widget:SetCallback("OnReceiveDrag", function(self, event)
         p:log(50, '%s:: %s', event, tostring(self))
+    end)
+    widget:SetCallback('OnAfterSpellCastSent', function(_widget, event, spell)
+        p:log(1, '%s:: %s(%s)', event, spell.name, spell.id)
+    end)
+    widget:SetCallback('OnAfterSpellCastSucceeded', function(_widget, event, spell)
+        p:log(1, '%s:: %s(%s)', event, spell.name, spell.id)
     end)
 end
 
@@ -213,6 +234,7 @@ local function OnDragStart(btnUI)
     -- TODO NEXT: Handle Drag-And-Drop for Macro and Item
 end
 
+--- Used with `button:RegisterForDrag('LeftButton')`
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
@@ -287,6 +309,17 @@ local function WidgetMethods(widget)
 
     function widget:SetCooldown(optionalInfo)
         local cd = optionalInfo or self.cooldownInfo
+        if not cd then return end
+        self:SetCooldownInfo(cd)
+        self:SetCooldownDelegate(cd.start, cd.duration)
+    end
+
+    function widget:RefreshCooldown()
+        local btnData = self:GetConfig()
+        if btnData.type ~= 'spell' and Table.isEmpty(btnData['spell']) then return end
+        local spell = btnData['spell']
+        if String.IsBlank(spell.id) then return end
+        local cd = _API_Spell:GetSpellCooldown(spell.id, spell)
         if not cd then return end
         self:SetCooldownInfo(cd)
         self:SetCooldownDelegate(cd.start, cd.duration)

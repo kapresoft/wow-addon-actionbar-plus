@@ -73,41 +73,80 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
+--- Var Args: `unit, target, castGUID, spellID`
 local function OnSpellCastSent(event, ...)
+    --L:log('OnSpellCastSent:: %s', pformat({...}))
     local _, _, _, spellID = ...
-
     local buttons = P:FindButtonsBySpellById(spellID)
-    --print('btnsize:', Table.size(buttons))
     ---@param spell SpellInfo
     for btnName, spell in pairs(buttons) do
         local btnUI = _G[btnName]
         if btnUI and btnUI.widget then
             btnUI.widget:Fire('OnSpellCastSent', spell)
-            --L:log('OnSpellCastSent:: Fired Event[%s]: %s(%s)', btnName, spell.name, spell.id)
         end
     end
-    --L:log('OnSpellCastSent::Buttons: %s', pformat(buttons))
 end
 
+--- Var Args: `unitTarget, castGUID, spellID`
 local function OnSpellCastSucceeded(event, ...)
-    --L:log('OnSpellCastSucceeded:: %s', btnUI)
-    local unitTarget, castGUID, spellID = ...
-
-    --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
-    --btnUI:UnlockHighlight()
-    --btnUI.widget:ClearCooldown()
-    --
-    --ABP_wait(0, function() updateCooldown(btnUI, event, spellID)  end)
-    --local btnUI = findButtonBySpellId(spellID)
-    --btnUI.widget:Fire('OnSpellCastSucceeded')
+    --L:log('OnSpellCastSucceeded:: %s', pformat({...}))
+    local _, _, spellID = ...
     local buttons = P:FindButtonsBySpellById(spellID)
-    --print('btnsize:', Table.size(buttons))
     ---@param spell SpellInfo
     for btnName, spell in pairs(buttons) do
         local btnUI = _G[btnName]
         if btnUI and btnUI.widget then
             btnUI.widget:Fire('OnSpellCastSucceeded', spell)
-            --L:log('OnSpellCastSucceeded:: Fired Event[%s]: %s(%s)', btnName, spell.name, spell.id)
+        end
+    end
+
+    -- iterate through all buttons and fire an event
+    -- handle cooldown in Ace SetCallback()
+    local barFrames = P:GetAllFrameWidgets()
+    --TODO: Call GetSpellInfo('GCD Spell') to get the actual global cooldown
+    local globalCooldownInSeconds = 1.5
+    for _, f in ipairs(barFrames) do
+        ---@type FrameWidget
+        local fw = f
+        --L:log(1, "Frame #%s: %s", fw:GetName(), fw:GetButtonCount())
+        for _, btnName in ipairs(fw:GetButtons()) do
+            ---@type ButtonUIWidget
+            local btnUI = _G[btnName].widget
+            --btnUI.widget:Fire('OnSpellCastSent', spell)
+            local btnData = btnUI:GetConfig()
+            if btnData.type == 'spell' then
+                local spellInfo = btnData['spell']
+                if String.IsNotBlank(spellInfo.id) then
+                    if spellInfo.id ~= spellID then
+                        local cooldownMS, gcdMS = GetSpellBaseCooldown(spellInfo.id)
+                        local cd = _API_Spell:GetSpellCooldown(spellInfo.id)
+                        local now = GetTime()
+                        local timeCd = cd.start + cooldownMS
+                        local afterCd = now + cooldownMS
+                        L:log("spell: %s duration=%s now=%s timeCd=%s afterCd=%s BGCD=%s",
+                        spellInfo.name, cd.duration, now, timeCd, afterCd, pformat({cooldownMS, gcdMS}))
+                        --L:log('basecd: %s, cd: %s spellInfo: %s',
+                        --        pformat({cooldownMS, gcdMS}), Table.toStringSorted(cd), spellInfo.name)
+                        if gcdMS > 0 and afterCd >= timeCd then
+                            btnUI:SetCooldownDelegate(now, gcdMS/1000)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+--- Var Args: unitTarget, castGUID, spellID
+local function OnSpellCastFailed(event, ...)
+    --L:log('OnSpellCastFailed:: %s', pformat({...}))
+    local _, _, spellID = ...
+    local buttons = P:FindButtonsBySpellById(spellID)
+    ---@param spell SpellInfo
+    for btnName, spell in pairs(buttons) do
+        local btnUI = _G[btnName]
+        if btnUI and btnUI.widget then
+            btnUI.widget:Fire('OnSpellCastFailed', spell)
         end
     end
 end
@@ -117,6 +156,7 @@ end
 ---### See Also:
 --- https://wowpedia.fandom.com/wiki/SPELL_UPDATE_COOLDOWN
 local function OnSpellUpdateCooldown(event)
+    -- TODO NEXT: Update all button cooldowns
     L:log(50, 'Triggered: %s', event)
 end
 
@@ -127,8 +167,6 @@ end
 local function OnActionbarUpdateCooldown(event)
     -- also fired on: refresh, new zone
     L:log(50, 'Triggered: %s', event)
-    -- iterate through all buttons and fire an event
-    -- handle cooldown in Ace SetCallback()
 end
 
 
@@ -148,6 +186,7 @@ function L:OnAfterInitialize()
     -- TODO NEXT: Refactor to Widget/SpellEventsHandler
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', OnSpellCastSent)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
+    AceEvent:RegisterEvent('UNIT_SPELLCAST_FAILED', OnSpellCastFailed)
     AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
     AceEvent:RegisterEvent('ACTIONBAR_UPDATE_COOLDOWN', OnActionbarUpdateCooldown)
 end
@@ -162,21 +201,24 @@ function L:CreateActionbarGroup(frameIndex)
     return f
 end
 
-function L:CreateButtons(dragFrame, rowSize, colSize)
+function L:CreateButtons(frameWidget, rowSize, colSize)
     local index = 0
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnWidget = self:CreateSingleButton(dragFrame, row, col, index)
-            dragFrame:AddButton(btnWidget:GetName())
+            local btnWidget = self:CreateSingleButton(frameWidget, row, col, index)
+            frameWidget:AddButton(btnWidget:GetName())
         end
     end
 end
 
+-- TODO NEXT: Register Buttons so we can fire button events
+--      for all buttons, btn:Fire('OnCooldown') on click
 function L:CreateSingleButton(dragFrame, row, col, index)
     local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
+    btnWidget:RefreshCooldown()
     return btnWidget
 end
 

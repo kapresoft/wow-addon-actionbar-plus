@@ -3,6 +3,9 @@
 -- ## Local ----------------------------------------------------
 local WC = ABP_WidgetConstants
 local LibStub, M, Assert, _, _, W, CC = WC:LibPack()
+local _, Table = ABP_LibGlobals:LibPackUtils()
+local toStringSorted = Table.toStringSorted
+
 local SpellAttributeSetter = W:SpellAttributeSetter()
 local WAttr = CC.WidgetAttributes
 local _API_Spell = _API_Spell
@@ -23,8 +26,9 @@ function _L:Handle(btnUI, cursorInfo)
                               id = cursorInfo.info3,
                               bookIndex = cursorInfo.info1,
                               bookType = cursorInfo.info2 }
-
+    self:log('SpellCursorInfo: %s', toStringSorted(spellCursorInfo))
     local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
+    self:log('GetSpellInfo: %s', toStringSorted(spellInfo))
     if Assert.IsNil(spellInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()
