@@ -48,7 +48,7 @@ local function RegisterCallbacks(widget)
         local sourceEvent, spellID, delay = ...
         delay = delay or 0
 
-        local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
+        --local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
         --p:log('%s: %s params=%s', fw:GetName(), event, toStringSorted(params))
 
         for _, btnName in ipairs(fw:GetButtons()) do
