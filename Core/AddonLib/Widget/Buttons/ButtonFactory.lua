@@ -111,6 +111,9 @@ local function OnActionbarUpdateCooldown(event)
     L:log(50, 'Triggered: %s', event)
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 
 function L:OnAfterInitialize()
     local frames = P:GetAllFrameNames()
