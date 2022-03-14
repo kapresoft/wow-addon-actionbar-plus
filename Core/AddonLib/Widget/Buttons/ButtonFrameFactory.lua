@@ -4,14 +4,72 @@
 -- ## External -------------------------------------------------
 local _G = _G
 local type, ipairs, tinsert = type, ipairs, table.insert
--- ## Local ----------------------------------------------------
-local LibStub, M, Assert, P, LSM = ABP_WidgetConstants:LibPack()
 
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local LibStub, M, Assert, P, LSM, _, _, G = ABP_WidgetConstants:LibPack()
+local _, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+local _, AceGUI = G:LibPack_AceLibrary()
+local toStringSorted = Table.toStringSorted
 ---@class ButtonFrameFactory
 local _L = LibStub:NewLibrary(M.ButtonFrameFactory)
 
--- ## Functions ------------------------------------------------
+---@type LogFactory
+local p = LogFactory:NewLogger('ButtonFrameFactory')
+---@type Wait
+local Wait = ABP_Wait
 
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+---@param widget FrameWidget
+---@param name string The widget name.
+local function RegisterWidget(widget, name)
+    assert(widget ~= nil)
+    assert(name ~= nil)
+
+    local WidgetBase = AceGUI.WidgetBase
+    widget.userdata = {}
+    widget.events = {}
+    widget.base = WidgetBase
+    widget.frame.obj = widget
+    local mt = {
+        __tostring = function() return name  end,
+        __index = WidgetBase
+    }
+    setmetatable(widget, mt)
+end
+
+local function RegisterCallbacks(widget)
+
+    ---@param fw FrameWidget
+    widget:SetCallback('OnRefreshCooldowns', function(fw, event, ...)
+        local sourceEvent, spellID, delay = ...
+        delay = delay or 0
+
+        local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
+        --p:log('%s: %s params=%s', fw:GetName(), event, toStringSorted(params))
+
+        for _, btnName in ipairs(fw:GetButtons()) do
+            ---@type ButtonUIWidget
+            local btnUI = _G[btnName].widget
+            local btnData = btnUI:GetConfig()
+            if btnData.type == 'spell'  then
+                btnUI:Fire(sourceEvent)
+                if delay > 0 then
+                    Wait:wait(delay, function() btnUI:RefreshCooldown() end)
+                else btnUI:RefreshCooldown() end
+            end
+        end
+
+    end)
+
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 ---@param widget FrameWidget
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
@@ -191,10 +249,11 @@ function _L:CreateFrame(frameIndex)
     fh:SetScript("OnDragStop", function() f:StopMovingOrSizing(); end)
     fh:Show()
 
+    RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
+    RegisterCallbacks(widget)
 
     return widget
 end
 
 _L.mt.__call = _L.CreateFrame
-

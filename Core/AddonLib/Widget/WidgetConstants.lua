@@ -54,7 +54,10 @@ end
 --    return _logger
 --end
 
---- TODO: Move to LibGlobals
+--- ### Example
+---```
+---local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
+---```
 ---@return LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
 function _L:LibPack()
     local WidgetLibFactory, Assert, Profile = G:Get(M.WidgetLibFactory, M.Assert, M.Profile)

@@ -94,6 +94,10 @@ function _L:LibPack_NewLibrary()
     return LibStub, Module, Profile, LogFactory
 end
 
+---### Example
+---```
+---local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
+---```
 ---@return AceEvent, AceGUI, AceHook
 function _L:LibPack_AceLibrary()
     ---@type AceLibFactory
@@ -111,6 +115,10 @@ function _L:LibPackPrettyPrint()
     return PrettyPrint.pformat, Table.ToStringSorted
 end
 
+--- ### Usage
+---```
+---local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+---```
 ---@return PrettyPrint, Table, String, LogFactory
 function _L:LibPackUtils()
     local PrettyPrint, Table, String, LogFactory = self:Get(

@@ -406,7 +406,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     WidgetMethods(widget)
     SetButtonLayout(widget, rowNum, colNum)
 
-    ---@type ButtonUIWidget
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
 

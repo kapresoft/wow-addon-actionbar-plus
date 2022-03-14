@@ -2,27 +2,22 @@
 --- Button Factory
 ---
 -- ## External -------------------------------------------------
-local ClearCursor, GetCursorInfo, CreateFrame, UIParent =
-    ClearCursor, GetCursorInfo, CreateFrame, UIParent
+local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local pack, fmod = table.pack, math.fmod
-local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
+local format, strlower = tostring, string.lower
 
 -- ## Local ----------------------------------------------------
-local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
-local PrettyPrint, Table, String = ABP_LibGlobals:LibPackUtils()
+local LibStub, M, A, P, _, W = ABP_WidgetConstants:LibPack()
+local _, _, String = ABP_LibGlobals:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 
 local ButtonFrameFactory, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
-local SECURE_ACTION_BUTTON_TEMPLATE, TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI =
-    SECURE_ACTION_BUTTON_TEMPLATE, BOTTOMLEFT, TOPLEFT, ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
+local ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
----@type Wait
-local Wait = ABP_Wait
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
 if not L then return end
@@ -74,40 +69,26 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
-local function UpdateCooldowns(event, spellID, _delay)
-    local delay = _delay or 0
+local function UpdateCooldowns(event, spellID, delay)
     local barFrames = P:GetAllFrameWidgets()
-    for _, f in ipairs(barFrames) do
-        ---@type FrameWidget
-        local fw = f
-        for _, btnName in ipairs(fw:GetButtons()) do
-            ---@type ButtonUIWidget
-            local btnUI = _G[btnName].widget
-            local btnData = btnUI:GetConfig()
-            if btnData.type == 'spell'  then
-                btnUI:Fire(event)
-                if delay > 0 then
-                    Wait:wait(delay, function() btnUI:RefreshCooldown() end)
-                else btnUI:RefreshCooldown() end
-            end
-        end
-    end
+    ---@param f FrameWidget
+    for _, f in ipairs(barFrames) do f:Fire('OnRefreshCooldowns', event, spellID, delay) end
 end
 
 --- Var Args: `unit, target, castGUID, spellID`
-local function OnSpellCastSent(event, ...)
+local function OnSpellCastSent(_, ...)
     local _, _, _, spellID = ...
     UpdateCooldowns('OnSpellCastSent', spellID)
 end
 
 --- Var Args: `unitTarget, castGUID, spellID`
-local function OnSpellCastSucceeded(event, ...)
+local function OnSpellCastSucceeded(_, ...)
     local _, _, spellID = ...
     UpdateCooldowns('OnSpellCastSucceeded', spellID)
 end
 
 --- Var Args: unitTarget, castGUID, spellID
-local function OnSpellCastFailed(event, ...)
+local function OnSpellCastFailed(_, ...)
     local _, _, spellID = ...
     UpdateCooldowns('OnSpellCastFailed', spellID, 0.1)
 end
