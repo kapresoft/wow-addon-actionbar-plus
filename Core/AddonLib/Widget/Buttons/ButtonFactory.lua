@@ -5,7 +5,7 @@
 local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local format, strlower = tostring, string.lower
+local format, strlower = string.format, string.lower
 
 -- ## Local ----------------------------------------------------
 local LibStub, M, A, P, _, W = ABP_WidgetConstants:LibPack()
