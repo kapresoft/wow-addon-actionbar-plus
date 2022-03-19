@@ -30,6 +30,7 @@ local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 local IsNotBlank = String.IsNotBlank
 local PH = ABP_PickupHandler
 
+local CD_CACHE = {}
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
 ---@type Wait
@@ -64,94 +65,41 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
---local function ShowTooltip(btnUI)
---    if not btnUI then return end
---    local btnData = btnUI.widget:GetConfig()
---    if not btnData then return end
---    local type = btnData.type
---    if not type then return end
---
---    local spellInfo = btnData[WAttr.SPELL]
---    if not spellInfo.id then return end
---    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
---    GameTooltip:AddSpellByID(spellInfo.id)
---    -- Replace 'Spell' with 'Spell (Rank #Rank)'
---    if (IsNotBlank(spellInfo.rank)) then
---        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
---    end
---end
-
----@param btnUI ButtonUI
----@param spell SpellInfo
-local function UpdateCooldown(widget, event, spell)
-    --local evt = event:gsub('UNIT_SPELLCAST_', '')
-    ---@type ButtonUIWidget
-    local logCooldown = false
-    if String.IsBlank(spell.id) then return end
-    local info = _API_Spell:GetSpellCooldown(spell.id, spell)
-    -- Don't update cooldown on instant cast spells
-    if info.duration <= 0 then
-        if logCooldown then
-            p:log('%s[%s]::%s <<Instant Cast>>\n%s', spell.name, spell.id, event, toStringSorted(info))
-        end
-        return
-    end
-    -- TODO: Last
-    widget:RefreshCooldown()
-    --widget:SetCooldown(info)
-
-    if logCooldown then
-        p:log('%s[%s]::%s\n%s', spell.name, spell.id, event, toStringSorted(info))
-        if event == 'OnSpellCastSucceeded' then p:log('') end
-    end
-end
-
 local function RegisterCallbacks(widget)
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSent', function(_widget, event)
+        local spell = _widget:GetSpellData()
+        if not spell then return end
         local btnUI = _widget.button
-        local btnData = _widget:GetConfig()
-        local spell = btnData['spell']
-        if type(spell) ~= 'table' or String.IsBlank(spell.id) then return end
 
-        btnUI:SetHighlightTexture(TEXTURE_CASTING)
-        btnUI:LockHighlight()
-        --local cd = _API_Spell:GetSpellCooldown(spell.id, spell)
-        --p:log('spell: %s cooldown: %s', spell.name, pformat(cd))
-        UpdateCooldown(_widget, event, spell)
+        --btnUI:SetHighlightTexture(TEXTURE_CASTING)
+        --btnUI:LockHighlight()
+        _widget:UpdateCooldown()
         _widget:Fire('OnAfterSpellCastSent', spell)
     end)
 
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSucceeded', function(_widget, event)
+        local spell = _widget:GetSpellData()
+        if not spell then return end
         local btnUI = _widget.button
-        local btnData = _widget:GetConfig()
-        local spell = btnData['spell']
-        if type(spell) ~= 'table' or String.IsBlank(spell.id) then return end
 
-        btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
-        btnUI:UnlockHighlight()
-        _widget:ClearCooldown()
-        Wait:wait(0, function()
-            UpdateCooldown(_widget, event, spell)
-            _widget:Fire('OnAfterSpellCastSucceeded', spell)
-        end)
+        --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+        --btnUI:UnlockHighlight()
+        _widget:UpdateCooldown()
+        _widget:Fire('OnAfterSpellCastSucceeded', spell)
     end)
     widget:SetCallback('OnSpellCastFailed', function(_widget, event, ...)
-        --p:log(1, '%s:: Spell=%s', event, pformat{...})
-        Wait:wait(0.1, function()
-            _widget:ClearCooldown()
-            _widget:RefreshCooldown()
-        end)
+        _widget:UpdateCooldown()
     end)
     widget:SetCallback('OnDragStart', function(self, event)
         p:log(50, '%s:: %s', event, tostring(self))
     end)
     widget:SetCallback("OnReceiveDrag", function(_widget, event)
         p:log(50, '%s:: %s', event, tostring(self))
-        _widget:RefreshCooldown()
+        _widget:UpdateCooldown()
     end)
     widget:SetCallback('OnAfterSpellCastSent', function(_widget, event, spell)
         p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
@@ -255,6 +203,14 @@ local function WidgetMethods(widget)
         return self.buttonData:GetData()
     end
 
+    function widget:GetSpellData()
+        local btnData = self:GetConfig()
+        if btnData.type ~= 'spell' and Table.isEmpty(btnData['spell']) then return nil end
+        local spell = btnData['spell']
+        if String.IsBlank(spell.id) then return nil end
+        return spell
+    end
+
     function widget:ResetConfig()
         P:ResetButtonData(self)
         self:ResetWidgetAttributes()
@@ -288,27 +244,32 @@ local function WidgetMethods(widget)
         self:SetCooldownDelegate(0, 0)
     end
 
-    function widget:SetCooldown(optionalInfo)
-        local cd = optionalInfo or self.cooldownInfo
-        if not cd then return end
-        self:SetCooldownInfo(cd)
-        self:SetCooldownDelegate(cd.start, cd.duration)
-    end
-
-    function widget:RefreshCooldown()
-        local btnData = self:GetConfig()
-        if btnData.type ~= 'spell' and Table.isEmpty(btnData['spell']) then return end
-        local spell = btnData['spell']
-        if String.IsBlank(spell.id) then return end
-        local cd = _API_Spell:GetSpellCooldown(spell.id, spell)
-        if not cd then return end
-        self:SetCooldownInfo(cd)
-        self:SetCooldownDelegate(cd.start, cd.duration)
-    end
+    --function widget:SetCooldown(optionalInfo)
+    --    local cd = optionalInfo or self.cooldownInfo
+    --    if not cd then return end
+    --    self:SetCooldownInfo(cd)
+    --    self:SetCooldownDelegate(cd.start, cd.duration)
+    --end
 
     function widget:SetCooldownDelegate(start, duration)
         self.cooldown:SetCooldown(start, duration)
         --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
+    end
+
+    function widget:UpdateCooldown()
+        ---@type SpellCooldown
+        local cd = self:GetSpellCooldown()
+        if not cd then return end
+        -- Instant cast spells have zero duration, skip
+        if cd.duration <= 0 then return end
+        self.cooldown:SetCooldown(cd.start, cd.duration)
+        --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), cd.start, cd.duration)
+    end
+
+    function widget:GetSpellCooldown()
+        local spell = self:GetSpellData()
+        if not spell then return end
+        return _API_Spell:GetSpellCooldown(spell.id, spell)
     end
 
     function widget:SetCooldownInfo(cooldownInfo)

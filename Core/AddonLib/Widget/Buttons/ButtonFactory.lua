@@ -69,37 +69,41 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
-local function UpdateCooldowns(event, spellID, delay)
+local function UpdateCooldowns(event, spellID)
     local barFrames = P:GetAllFrameWidgets()
     ---@param f FrameWidget
-    for _, f in ipairs(barFrames) do f:Fire('OnRefreshCooldowns', event, spellID, delay) end
+    for _, f in ipairs(barFrames) do f:Fire('OnRefreshCooldowns', event, spellID) end
 end
 
 --- Var Args: `unit, target, castGUID, spellID`
 local function OnSpellCastSent(_, ...)
     local _, _, _, spellID = ...
-    UpdateCooldowns('OnSpellCastSent', spellID)
+    --P:log('OnSpellCastSent: %s [%s]', spellID, {...})
+    --UpdateCooldowns('OnSpellCastSent', spellID)
 end
 
 --- Var Args: `unitTarget, castGUID, spellID`
 local function OnSpellCastSucceeded(_, ...)
     local _, _, spellID = ...
+    --P:log('OnSpellCastSucceeded: %s [%s]', spellID, {...})
     UpdateCooldowns('OnSpellCastSucceeded', spellID)
 end
 
 --- Var Args: unitTarget, castGUID, spellID
 local function OnSpellCastFailed(_, ...)
     local _, _, spellID = ...
-    UpdateCooldowns('OnSpellCastFailed', spellID, 0.1)
+    --P:log('OnSpellCastFailed: %s [%s]', spellID, {...})
+    UpdateCooldowns('OnSpellCastFailed', spellID)
 end
 
 ---This event is fired immediately whenever you cast a spell, as well as
 ---every second while you channel spells.
 ---### See Also:
 --- https://wowpedia.fandom.com/wiki/SPELL_UPDATE_COOLDOWN
-local function OnSpellUpdateCooldown(event)
+local function OnSpellUpdateCooldown(event, ...)
     -- TODO NEXT: Update all button cooldowns
-    L:log(50, 'Triggered: %s', event)
+    --L:log(1, 'OnSpellUpdateCooldown')
+    UpdateCooldowns('OnSpellCastSent')
 end
 
 ---Fired when the cooldown for an actionbar or inventory slot starts or
@@ -133,7 +137,7 @@ function L:OnAfterInitialize()
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_FAILED', OnSpellCastFailed)
     AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
-    AceEvent:RegisterEvent('ACTIONBAR_UPDATE_COOLDOWN', OnActionbarUpdateCooldown)
+    --AceEvent:RegisterEvent('ACTIONBAR_UPDATE_COOLDOWN', OnActionbarUpdateCooldown)
 end
 
 function L:CreateActionbarGroup(frameIndex)
@@ -160,10 +164,11 @@ end
 -- TODO NEXT: Register Buttons so we can fire button events
 --      for all buttons, btn:Fire('OnCooldown') on click
 function L:CreateSingleButton(dragFrame, row, col, index)
+    ---@type ButtonUIWidget
     local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-    btnWidget:RefreshCooldown()
+    btnWidget:UpdateCooldown()
     return btnWidget
 end
 

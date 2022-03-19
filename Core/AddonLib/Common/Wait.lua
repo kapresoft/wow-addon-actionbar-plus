@@ -1,3 +1,4 @@
+--TBD: Don't use. has issues
 local LibStub = __K_Core:LibPack()
 local LogFactory = LibStub('LogFactory')
 local UIParent, CreateFrame = UIParent, CreateFrame
@@ -7,7 +8,7 @@ local _L = {}
 ---@type Wait
 ABP_Wait = _L
 
-local p = LogFactory:NewLogger('Wait')
+--local p = LogFactory:NewLogger('Wait')
 
 local waitTable = {};
 local waitFrame = nil;

@@ -45,22 +45,15 @@ local function RegisterCallbacks(widget)
 
     ---@param fw FrameWidget
     widget:SetCallback('OnRefreshCooldowns', function(fw, event, ...)
-        local sourceEvent, spellID, delay = ...
+        local sourceEvent, spellID = ...
         delay = delay or 0
-
         --local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
         --p:log('%s: %s params=%s', fw:GetName(), event, toStringSorted(params))
-
         for _, btnName in ipairs(fw:GetButtons()) do
             ---@type ButtonUIWidget
             local btnUI = _G[btnName].widget
             local btnData = btnUI:GetConfig()
-            if btnData.type == 'spell'  then
-                btnUI:Fire(sourceEvent)
-                if delay > 0 then
-                    Wait:wait(delay, function() btnUI:RefreshCooldown() end)
-                else btnUI:RefreshCooldown() end
-            end
+            if btnData.type == 'spell' then btnUI:Fire(sourceEvent) end
         end
 
     end)
