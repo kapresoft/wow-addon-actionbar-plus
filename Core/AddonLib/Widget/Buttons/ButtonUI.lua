@@ -149,7 +149,7 @@ local function OnDragStart(btnUI)
 
     if InCombatLockdown() then return end
     if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
-    w:ClearCooldown()
+    w:ResetCooldown()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
     local btnData = btnUI.widget:GetConfig()
@@ -240,18 +240,11 @@ local function WidgetMethods(widget)
         return P:GetButtonData(info.index, info.button.name)
     end
 
-    function widget:ClearCooldown()
-        self:SetCooldownDelegate(0, 0)
+    function widget:ResetCooldown()
+        self:SetCooldown(0, 0)
     end
 
-    --function widget:SetCooldown(optionalInfo)
-    --    local cd = optionalInfo or self.cooldownInfo
-    --    if not cd then return end
-    --    self:SetCooldownInfo(cd)
-    --    self:SetCooldownDelegate(cd.start, cd.duration)
-    --end
-
-    function widget:SetCooldownDelegate(start, duration)
+    function widget:SetCooldown(start, duration)
         self.cooldown:SetCooldown(start, duration)
         --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
     end
@@ -259,22 +252,21 @@ local function WidgetMethods(widget)
     function widget:UpdateCooldown()
         ---@type SpellCooldown
         local cd = self:GetSpellCooldown()
-        if not cd then return end
+        if not cd or cd.enabled == 0 then return end
         -- Instant cast spells have zero duration, skip
-        if cd.duration <= 0 then return end
-        self.cooldown:SetCooldown(cd.start, cd.duration)
+        if cd.duration <= 0 then
+            self:ResetCooldown()
+            return
+        end
+        self:SetCooldown(cd.start, cd.duration)
         --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), cd.start, cd.duration)
+        --p:log('Cooldown[%s]: %s', self:GetName(), cd)
     end
 
     function widget:GetSpellCooldown()
         local spell = self:GetSpellData()
         if not spell then return end
         return _API_Spell:GetSpellCooldown(spell.id, spell)
-    end
-
-    function widget:SetCooldownInfo(cooldownInfo)
-        if not cooldownInfo then return end
-        self.cooldownInfo = cooldownInfo
     end
 
     function widget:ResetWidgetAttributes()

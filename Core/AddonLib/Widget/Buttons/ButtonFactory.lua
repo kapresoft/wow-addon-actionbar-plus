@@ -92,7 +92,7 @@ end
 --- Var Args: unitTarget, castGUID, spellID
 local function OnSpellCastFailed(_, ...)
     local _, _, spellID = ...
-    --P:log('OnSpellCastFailed: %s [%s]', spellID, {...})
+    --P:log(5, 'OnSpellCastFailed: %s [%s]', spellID, {...})
     UpdateCooldowns('OnSpellCastFailed', spellID)
 end
 

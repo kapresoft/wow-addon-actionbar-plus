@@ -64,12 +64,16 @@ function S:GetSpellCooldownDetails(spellID, optionalSpell)
 end
 
 ---@return SpellCooldown
-function S:GetSpellCooldown(spellID, optionalSpellName)
+function S:GetSpellCooldown(spellID, optionalSpell)
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
     ---@class SpellCooldown
     local info = {
-        spell = { id=spellID, name=optionalSpellName },
+        spell = { id=spellID },
         start = start, duration = duration, enabled = enabled, modRate = modRate }
+    if optionalSpell then
+        info.spell.details = optionalSpell
+        info.spell.name = optionalSpell.name
+    end
     return info
 end
 
