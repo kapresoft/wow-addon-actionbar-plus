@@ -133,7 +133,7 @@ function L:OnAfterInitialize()
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_FAILED', OnSpellCastFailed)
     AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
-    AceEvent:RegisterEvent('BAG_UPDATE', OnBagUpdate)
+    AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
 function L:CreateActionbarGroup(frameIndex)
