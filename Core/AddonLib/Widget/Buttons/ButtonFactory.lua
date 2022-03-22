@@ -110,7 +110,7 @@ end
 --end
 
 local function OnBagUpdate(_, ...)
-    FireFrameEvent('OnRefreshItems', 'OnBagUpdate', ...)
+    FireFrameEvent('OnRefreshItemCooldowns', 'OnBagUpdate', ...)
 end
 
 --[[-----------------------------------------------------------------------------

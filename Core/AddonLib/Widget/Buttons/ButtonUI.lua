@@ -33,6 +33,7 @@ local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil,
 local SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI = SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI
 local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
+local SPELL,ITEM,MACRO = 'spell','item','macro'
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -164,6 +165,15 @@ local function OnClick(btn, mouseButton, down)
     OnReceiveDrag(btn)
 end
 
+local function invalidButtonData(o, key)
+    if type(o) ~= 'table' then return true end
+    if type(o[key]) ~= 'nil' then
+        local d = o[key]
+        if type(d) == 'table' then return String.IsBlank(d['id']) end
+    end
+    return true
+end
+
 --[[-----------------------------------------------------------------------------
 Widget Methods
 -------------------------------------------------------------------------------]]
@@ -183,12 +193,54 @@ local function WidgetMethods(widget)
     end
     function widget:ClearText() self:SetText('') end
 
+    ---@return CooldownInfo
+    function widget:GetCooldownInfo()
+        local btnData = self:GetConfig()
+        if btnData == nil or String.IsBlank(btnData.type) then return nil end
+        local type = btnData.type
+
+        ---@class CooldownInfo
+        local cd = {
+            start=nil,
+            duration=nil,
+            enabled=0,
+            details = {}
+        }
+        if type == SPELL then
+            ---@type SpellCooldown
+            local spellCD = self:GetSpellCooldown()
+            if spellCD ~= nil then
+                cd.details = spellCD
+                cd.start = spellCD.start
+                cd.duration = spellCD.duration
+                cd.enabled = spellCD.enabled
+                return cd
+            end
+        elseif type == ITEM then
+            ---@type ItemCooldown
+            local itemCD = self:GetItemCooldown()
+            if itemCD ~= nil then
+                cd.details = itemCD
+                cd.start = itemCD.start
+                cd.duration = itemCD.duration
+                cd.enabled = itemCD.enabled
+                return cd
+            end
+        end
+
+        return nil
+    end
+
     function widget:GetSpellData()
         local btnData = self:GetConfig()
-        if btnData.type ~= 'spell' and Table.isEmpty(btnData['spell']) then return nil end
-        local spell = btnData['spell']
-        if String.IsBlank(spell.id) then return nil end
-        return spell
+        if invalidButtonData(btnData, SPELL) then return nil end
+        return btnData[SPELL]
+    end
+
+    function widget:GetItemData()
+        local btnData = self:GetConfig()
+        if invalidButtonData(btnData, ITEM) then return nil end
+        return btnData[ITEM]
     end
 
     function widget:ResetConfig()
@@ -229,7 +281,6 @@ local function WidgetMethods(widget)
 
     function widget:SetCooldown(start, duration)
         self.cooldown:SetCooldown(start, duration)
-        --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
     end
 
     function widget:UpdateState()
@@ -238,8 +289,7 @@ local function WidgetMethods(widget)
     end
 
     function widget:UpdateCooldown()
-        ---@type SpellCooldown
-        local cd = self:GetSpellCooldown()
+        local cd = self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end
         -- Instant cast spells have zero duration, skip
         if cd.duration <= 0 then
@@ -247,23 +297,28 @@ local function WidgetMethods(widget)
             return
         end
         self:SetCooldown(cd.start, cd.duration)
-        --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), cd.start, cd.duration)
-        --p:log('Cooldown[%s]: %s', self:GetName(), cd)
     end
 
     function widget:UpdateItemState()
         local btnData = self:GetConfig()
-        if btnData.type ~= 'item' and Table.isEmpty(btnData['item']) then return nil end
-        local itemInfo = _API:GetItemInfo(btnData.item.id)
-        --if itemInfo == nil then return end
+        if invalidButtonData(btnData, ITEM) then return end
+        local itemId = btnData.item.id
+        local itemInfo = _API:GetItemInfo(itemId)
         btnData.item.count = itemInfo.count
         if itemInfo then self:SetText(btnData.item.count) end
     end
 
+    ---@return SpellCooldown
     function widget:GetSpellCooldown()
         local spell = self:GetSpellData()
-        if not spell then return end
+        if not spell then return nil end
         return _API:GetSpellCooldown(spell.id, spell)
+    end
+    ---@return ItemCooldown
+    function widget:GetItemCooldown()
+        local item = self:GetItemData()
+        if not item then return nil end
+        return _API:GetItemCooldown(item.id, item)
     end
 
     function widget:ResetWidgetAttributes()

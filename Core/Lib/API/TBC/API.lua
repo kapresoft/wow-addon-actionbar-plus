@@ -103,11 +103,11 @@ end
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
 ---@return ItemCooldown
 function S:GetItemCooldown(itemId, optionalItem)
-    local start, duration, enable = GetItemCooldown(itemId)
+    local start, duration, enabled = GetItemCooldown(itemId)
     ---@class ItemCooldown
     local cd = {
         item = { id = itemId },
-        start=start, duration=duration, enable=enable
+        start=start, duration=duration, enabled=enabled
     }
     if optionalItem then
         cd.item.details = optionalItem

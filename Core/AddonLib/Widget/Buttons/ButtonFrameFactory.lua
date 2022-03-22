@@ -56,7 +56,7 @@ local function RegisterCallbacks(widget)
     end)
 
     ---@param fw FrameWidget
-    widget:SetCallback('OnRefreshItems', function(fw, event, ...)
+    widget:SetCallback('OnRefreshItemCooldowns', function(fw, event, ...)
         for _, btnName in ipairs(fw:GetButtons()) do
             ---@type ButtonUIWidget
             _G[btnName].widget:UpdateState()
