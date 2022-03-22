@@ -16,25 +16,16 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
+local _, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
 
-local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
-local toStringSorted = Table.toStringSorted
-
-local CC = ABP_CommonConstants
-local WAttr = CC.WidgetAttributes
-local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+local _, Table, String, LogFactory = G:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
---local BFF, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
-local IsNotBlank = String.IsNotBlank
+local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
 
-local CD_CACHE = {}
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
----@type Wait
-local Wait = ABP_Wait
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 
@@ -69,44 +60,33 @@ local function RegisterCallbacks(widget)
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
     widget:SetCallback('OnSpellCastSent', function(_widget, event)
-        local spell = _widget:GetSpellData()
-        if not spell then return end
-        local btnUI = _widget.button
-
-        --btnUI:SetHighlightTexture(TEXTURE_CASTING)
-        --btnUI:LockHighlight()
-        _widget:UpdateCooldown()
-        _widget:Fire('OnAfterSpellCastSent', spell)
+        _widget:UpdateState()
+        --_widget:Fire('OnAfterSpellCastSent', spell)
     end)
-
     ---@param _widget ButtonUIWidget
     ---@param spell SpellInfo
-    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event)
-        local spell = _widget:GetSpellData()
-        if not spell then return end
-        local btnUI = _widget.button
-
-        --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
-        --btnUI:UnlockHighlight()
-        _widget:UpdateCooldown()
-        _widget:Fire('OnAfterSpellCastSucceeded', spell)
+    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, ...)
+        --local spell = _widget:GetSpellData()
+        _widget:UpdateState()
+        --_widget:Fire('OnAfterSpellCastSucceeded', spell)
+        --p:log(1, '%s:: %s', event, {...})
     end)
     widget:SetCallback('OnSpellCastFailed', function(_widget, event, ...)
         _widget:UpdateCooldown()
     end)
     widget:SetCallback('OnDragStart', function(self, event)
-        p:log(50, '%s:: %s', event, tostring(self))
+        --p:log(50, '%s:: %s', event, tostring(self))
     end)
     widget:SetCallback("OnReceiveDrag", function(_widget, event)
-        p:log(50, '%s:: %s', event, tostring(self))
+        --p:log(50, '%s:: %s', event, tostring(self))
         _widget:UpdateCooldown()
     end)
-    widget:SetCallback('OnAfterSpellCastSent', function(_widget, event, spell)
-        p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
-    end)
-    widget:SetCallback('OnAfterSpellCastSucceeded', function(_widget, event, spell)
-        p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
-    end)
+    --widget:SetCallback('OnAfterSpellCastSent', function(_widget, event, spell)
+    --    --p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
+    --end)
+    --widget:SetCallback('OnAfterSpellCastSucceeded', function(_widget, event, spell)
+    --    --p:log(50, '%s:: %s(%s)', event, spell.name, spell.id)
+    --end)
 end
 
 ---@param widget ButtonUIWidget
@@ -129,11 +109,17 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
 end
 
+local function CreateFontString(button)
+    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
+    fs:SetPoint("BOTTOMRIGHT",-3, 2)
+    button.text = fs
+end
+
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
 local function IsValidDragSource(cursorInfo)
-    if String.IsBlank(cursorInfo.type) then
+    if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
         p:log(5, 'Received drag event with invalid cursor info. Skipping...')
@@ -149,7 +135,7 @@ local function OnDragStart(btnUI)
 
     if InCombatLockdown() then return end
     if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
-    w:ResetCooldown()
+    w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
     local btnData = btnUI.widget:GetConfig()
@@ -203,6 +189,12 @@ local function WidgetMethods(widget)
         return self.buttonData:GetData()
     end
 
+    function widget:SetText(text)
+        if text == nil then text = '' end
+        widget.button.text:SetText(text)
+    end
+    function widget:ClearText() self:SetText('') end
+
     function widget:GetSpellData()
         local btnData = self:GetConfig()
         if btnData.type ~= 'spell' and Table.isEmpty(btnData['spell']) then return nil end
@@ -240,13 +232,21 @@ local function WidgetMethods(widget)
         return P:GetButtonData(info.index, info.button.name)
     end
 
-    function widget:ResetCooldown()
-        self:SetCooldown(0, 0)
+    function widget:Reset()
+        self:ResetCooldown()
+        self:ClearText()
     end
+
+    function widget:ResetCooldown() self:SetCooldown(0, 0) end
 
     function widget:SetCooldown(start, duration)
         self.cooldown:SetCooldown(start, duration)
         --p:log('%s::SetCooldown start=%s end=%s', self:GetName(), start, duration)
+    end
+
+    function widget:UpdateState()
+        self:UpdateCooldown()
+        self:UpdateItemState()
     end
 
     function widget:UpdateCooldown()
@@ -263,10 +263,19 @@ local function WidgetMethods(widget)
         --p:log('Cooldown[%s]: %s', self:GetName(), cd)
     end
 
+    function widget:UpdateItemState()
+        local btnData = self:GetConfig()
+        if btnData.type ~= 'item' and Table.isEmpty(btnData['item']) then return nil end
+        local itemInfo = _API:GetItemInfo(btnData.item.id)
+        --if itemInfo == nil then return end
+        btnData.item.count = itemInfo.count
+        if itemInfo then self:SetText(btnData.item.count) end
+    end
+
     function widget:GetSpellCooldown()
         local spell = self:GetSpellData()
         if not spell then return end
-        return _API_Spell:GetSpellCooldown(spell.id, spell)
+        return _API:GetSpellCooldown(spell.id, spell)
     end
 
     function widget:ResetWidgetAttributes()
@@ -311,6 +320,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript('OnLeave', OnLeave)
+    CreateFontString(button)
+
 
     button:RegisterForDrag('LeftButton')
 

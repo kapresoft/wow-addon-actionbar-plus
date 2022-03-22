@@ -69,31 +69,24 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
-local function UpdateCooldowns(event, spellID)
-    local barFrames = P:GetAllFrameWidgets()
-    ---@param f FrameWidget
-    for _, f in ipairs(barFrames) do f:Fire('OnRefreshCooldowns', event, spellID) end
-end
-
---- Var Args: `unit, target, castGUID, spellID`
-local function OnSpellCastSent(_, ...)
-    local _, _, _, spellID = ...
-    --P:log('OnSpellCastSent: %s [%s]', spellID, {...})
-    --UpdateCooldowns('OnSpellCastSent', spellID)
+local function FireFrameEvent(event, sourceEvent, ...)
+    for _, f in ipairs(P:GetAllFrameWidgets()) do
+        f:Fire(event, sourceEvent, ...)
+    end
 end
 
 --- Var Args: `unitTarget, castGUID, spellID`
 local function OnSpellCastSucceeded(_, ...)
     local _, _, spellID = ...
     --P:log('OnSpellCastSucceeded: %s [%s]', spellID, {...})
-    UpdateCooldowns('OnSpellCastSucceeded', spellID)
+    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSucceeded', spellID)
 end
 
 --- Var Args: unitTarget, castGUID, spellID
 local function OnSpellCastFailed(_, ...)
     local _, _, spellID = ...
     --P:log(5, 'OnSpellCastFailed: %s [%s]', spellID, {...})
-    UpdateCooldowns('OnSpellCastFailed', spellID)
+    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastFailed', spellID)
 end
 
 ---This event is fired immediately whenever you cast a spell, as well as
@@ -103,16 +96,20 @@ end
 local function OnSpellUpdateCooldown(event, ...)
     -- TODO NEXT: Update all button cooldowns
     --L:log(1, 'OnSpellUpdateCooldown')
-    UpdateCooldowns('OnSpellCastSent')
+    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSent')
 end
 
 ---Fired when the cooldown for an actionbar or inventory slot starts or
 ---stops. Also fires when you log into a new area.
 ---### See Also:
 ---https://wowpedia.fandom.com/wiki/ACTIONBAR_UPDATE_COOLDOWN
-local function OnActionbarUpdateCooldown(event)
-    -- also fired on: refresh, new zone
-    L:log(50, 'Triggered: %s', event)
+--local function OnActionbarUpdateCooldown(event)
+--    -- also fired on: refresh, new zone
+--    L:log(50, 'Triggered: %s', event)
+--end
+
+local function OnBagUpdate(_, ...)
+    FireFrameEvent('OnRefreshItems', 'OnBagUpdate', ...)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -133,11 +130,10 @@ function L:OnAfterInitialize()
     end
 
     -- TODO NEXT: Refactor to Widget/SpellEventsHandler
-    AceEvent:RegisterEvent('UNIT_SPELLCAST_SENT', OnSpellCastSent)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
     AceEvent:RegisterEvent('UNIT_SPELLCAST_FAILED', OnSpellCastFailed)
     AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
-    --AceEvent:RegisterEvent('ACTIONBAR_UPDATE_COOLDOWN', OnActionbarUpdateCooldown)
+    AceEvent:RegisterEvent('BAG_UPDATE', OnBagUpdate)
 end
 
 function L:CreateActionbarGroup(frameIndex)

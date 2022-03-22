@@ -8,7 +8,7 @@ local toStringSorted = Table.toStringSorted
 
 local SpellAttributeSetter = W:SpellAttributeSetter()
 local WAttr = CC.WidgetAttributes
-local _API_Spell = _API_Spell
+local _API = _API
 local PH = ABP_PickupHandler
 
 ---@class SpellDragEventHandler
@@ -27,7 +27,8 @@ function _L:Handle(btnUI, cursorInfo)
                               bookIndex = cursorInfo.info1,
                               bookType = cursorInfo.info2 }
     self:log(50, 'SpellCursorInfo: %s', toStringSorted(spellCursorInfo))
-    local spellInfo = _API_Spell:GetSpellInfo(spellCursorInfo.id)
+    ---@type SpellInfo
+    local spellInfo = _API:GetSpellInfo(spellCursorInfo.id)
     self:log(50, 'GetSpellInfo: %s', toStringSorted(spellInfo))
     if Assert.IsNil(spellInfo) then return end
 

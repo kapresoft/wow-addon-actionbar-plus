@@ -1,6 +1,7 @@
 -- Wow APIs
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetSpellCooldown = GetSpellCooldown
+local GetItemInfo = GetItemInfo
 
 -- Lua APIs
 local format = string.format
@@ -12,7 +13,7 @@ local IsNotBlank = String.IsNotBlank
 ---@class API_Spell
 local S = {}
 ---@type API_Spell
-_API_Spell = S
+_API = S
 
 --- See:
 ---  * https://wowpedia.fandom.com/wiki/API_GetSpellInfo
@@ -75,6 +76,26 @@ function S:GetSpellCooldown(spellID, optionalSpell)
         info.spell.name = optionalSpell.name
     end
     return info
+end
+
+---@return ItemInfo
+function S:GetItemInfo(itemId)
+    local itemName, itemLink,
+    itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+    itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+    expacID, setID, isCraftingReagent = GetItemInfo(itemId)
+
+    local count = GetItemCount(itemId, false, true, true) or 0
+
+    ---@class ItemInfo
+    local itemInfo = { id = itemId, name = itemName, link = itemLink, icon = itemTexture,
+                       quality = itemQuality, level = itemLevel, minLevel = itemMinLevel,
+                       type = itemType, subType = itemSubType, stackCount = itemStackCount,
+                       count = count, equipLoc=itemEquipLoc, classID=classID,
+                       subclassID=subclassID, bindType=bindType,
+                       isCraftingReagent=isCraftingReagent }
+
+    return itemInfo
 end
 
 ---@return SpellCooldownDetails

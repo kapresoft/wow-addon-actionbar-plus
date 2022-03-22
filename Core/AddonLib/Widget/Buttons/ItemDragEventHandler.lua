@@ -2,14 +2,16 @@
 local GetItemInfo = GetItemInfo
 local _, Table = ABP_LibGlobals:LibPackUtils()
 
--- ## Local ----------------------------------------------------
--- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, LibGlobals
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 local LibStub, M, Assert, P, LSM, W, CC = ABP_WidgetConstants:LibPack()
 
 local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
 local ItemAttributeSetter = W:ItemAttributeSetter()
 local WAttr = CC.WidgetAttributes
 local PH = ABP_PickupHandler
+local _API = _API
 
 ---@class ItemDragEventHandler
 local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
@@ -19,9 +21,12 @@ local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
 function _L:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end
-    local item = self:GetItemDetails(cursorInfo.info1)
-    local itemInfo = { id = item.id, name = item.name, icon = item.icon, link = item.link, }
-    --self:logp('itemInfo', itemInfo)
+    --local item = self:GetItemDetails(cursorInfo.info1)
+    ---@type ItemInfo
+    local itemInfo = _API:GetItemInfo(cursorInfo.info1)
+    local itemData = { id = itemInfo.id, name = itemInfo.name, icon = itemInfo.icon,
+                       link = itemInfo.link, count = itemInfo.count }
+    --self:log('itemInfo: %s', itemInfo)
     --ABP:DBG('ItemInfo', itemInfo)
 
     local actionbarInfo = btnUI.widget:GetActionbarInfo()
@@ -32,7 +37,7 @@ function _L:Handle(btnUI, cursorInfo)
     local btnData = barData.buttons[btnName] or P:GetTemplate().Button
     PH:PickupExisting(btnData)
     btnData.type = WAttr.ITEM
-    btnData[WAttr.ITEM] = itemInfo
+    btnData[WAttr.ITEM] = itemData
 
     ItemAttributeSetter(btnUI, btnData)
 end

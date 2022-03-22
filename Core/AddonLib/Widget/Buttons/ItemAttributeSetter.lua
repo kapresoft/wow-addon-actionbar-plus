@@ -26,21 +26,27 @@ local _L = LibStub:NewLibrary(M.ItemAttributeSetter, 1)
 --- }`
 function _L:SetAttributes(btnUI, btnData)
     W:ResetWidgetAttributes(btnUI)
+    local itemData = btnData[WAttr.ITEM]
+    if type(itemData) ~= 'table' then return end
+    if not itemData.id then return end
 
-    local itemInfo = btnData[WAttr.ITEM]
-    if type(itemInfo) ~= 'table' then return end
-    if not itemInfo.id then return end
-
-    AssertNotNil(itemInfo.id, 'btnData[item].itemInfo.id')
+    AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
     local icon = TEXTURE_EMPTY
-    if itemInfo.icon then icon = itemInfo.icon end
+    if itemData.icon then icon = itemData.icon end
     btnUI:SetNormalTexture(icon)
     btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
-    btnUI:SetAttribute(WAttr.ITEM, itemInfo.name)
+    btnUI:SetAttribute(WAttr.ITEM, itemData.name)
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
+    --self:log('Item Attributes')
+
+    btnUI.widget:SetText(itemData.count)
+    --local fs = btnUI:CreateFontString(btnUI:GetName() .. 'FontString', nil, "SystemFont_Shadow_Med2")
+    --fs:SetText(tostring(itemData.count or 0))
+    --fs:SetPoint("BOTTOMRIGHT",-5, 5)
+    --btnUI.text = fs
 end
 
 function _L:ShowTooltip(btnUI)
