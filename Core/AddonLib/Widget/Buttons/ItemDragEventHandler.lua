@@ -22,12 +22,13 @@ local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
 function _L:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end
     --local item = self:GetItemDetails(cursorInfo.info1)
+    local itemId = cursorInfo.info1
     ---@type ItemInfo
-    local itemInfo = _API:GetItemInfo(cursorInfo.info1)
-    local itemData = { id = itemInfo.id, name = itemInfo.name, icon = itemInfo.icon,
+    local itemInfo = _API:GetItemInfo(itemId)
+    local itemData = { id = itemId, name = itemInfo.name, icon = itemInfo.icon,
                        link = itemInfo.link, count = itemInfo.count }
     --self:log('itemInfo: %s', itemInfo)
-    --ABP:DBG('ItemInfo', itemInfo)
+    --ABP:DBG({info=itemInfo, data=itemData})
 
     local actionbarInfo = btnUI.widget:GetActionbarInfo()
     --self:logp('ActionBar', actionbarInfo)
