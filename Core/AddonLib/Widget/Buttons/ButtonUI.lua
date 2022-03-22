@@ -57,27 +57,32 @@ local function RegisterWidget(widget, name)
 end
 
 local function RegisterCallbacks(widget)
+    -----@param _widget ButtonUIWidget
+    -----@param event 'OnSpellCastSent'
+    --widget:SetCallback('OnSpellCastSent', function(_widget)
+    --    _widget:UpdateState()
+    --end)
     ---@param _widget ButtonUIWidget
-    ---@param spell SpellInfo
-    widget:SetCallback('OnSpellCastSent', function(_widget, event)
+    ---@param event 'OnSpellUpdateCooldown'
+    widget:SetCallback('OnSpellUpdateCooldown', function(_widget)
+        p:log('Received: OnSpellUpdateCooldown')
         _widget:UpdateState()
         --_widget:Fire('OnAfterSpellCastSent', spell)
     end)
     ---@param _widget ButtonUIWidget
-    ---@param spell SpellInfo
-    widget:SetCallback('OnSpellCastSucceeded', function(_widget, event, ...)
+    widget:SetCallback('OnSpellCastSucceeded', function(_widget)
         --local spell = _widget:GetSpellData()
         _widget:UpdateState()
         --_widget:Fire('OnAfterSpellCastSucceeded', spell)
         --p:log(1, '%s:: %s', event, {...})
     end)
-    widget:SetCallback('OnSpellCastFailed', function(_widget, event, ...)
+    widget:SetCallback('OnSpellCastFailed', function(_widget)
         _widget:UpdateCooldown()
     end)
     widget:SetCallback('OnDragStart', function(self, event)
         --p:log(50, '%s:: %s', event, tostring(self))
     end)
-    widget:SetCallback("OnReceiveDrag", function(_widget, event)
+    widget:SetCallback("OnReceiveDrag", function(_widget)
         --p:log(50, '%s:: %s', event, tostring(self))
         _widget:UpdateCooldown()
     end)

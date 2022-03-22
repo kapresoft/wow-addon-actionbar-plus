@@ -1,7 +1,7 @@
 -- Wow APIs
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetSpellCooldown = GetSpellCooldown
-local GetItemInfo = GetItemInfo
+local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
 
 -- Lua APIs
 local format = string.format
@@ -10,9 +10,9 @@ local format = string.format
 local _, _, String = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank = String.IsNotBlank
 
----@class API_Spell
+---@class API
 local S = {}
----@type API_Spell
+---@type API
 _API = S
 
 --- See:
@@ -64,46 +64,61 @@ function S:GetSpellCooldownDetails(spellID, optionalSpell)
     return details
 end
 
+--- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
 ---@return SpellCooldown
 function S:GetSpellCooldown(spellID, optionalSpell)
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
     ---@class SpellCooldown
-    local info = {
+    local cd = {
         spell = { id=spellID },
         start = start, duration = duration, enabled = enabled, modRate = modRate }
     if optionalSpell then
-        info.spell.details = optionalSpell
-        info.spell.name = optionalSpell.name
+        cd.spell.details = optionalSpell
+        cd.spell.name = optionalSpell.name
     end
-    return info
+    return cd
 end
 
+--- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
+--- See: [GetItemInfoInstant](https://wowpedia.fandom.com/wiki/API_GetItemInfoInstant)
 ---@return ItemInfo
 function S:GetItemInfo(itemId)
     local itemName, itemLink,
-    itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-    itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-    expacID, setID, isCraftingReagent = GetItemInfo(itemId)
+        itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+        itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+        expacID, setID, isCraftingReagent = GetItemInfo(itemId)
 
     local count = GetItemCount(itemId, false, true, true) or 0
 
     ---@class ItemInfo
-    local itemInfo = { id = itemId, name = itemName, link = itemLink, icon = itemTexture,
+    local itemInfo = { id = itemID, name = itemName, link = itemLink, icon = itemTexture,
                        quality = itemQuality, level = itemLevel, minLevel = itemMinLevel,
                        type = itemType, subType = itemSubType, stackCount = itemStackCount,
                        count = count, equipLoc=itemEquipLoc, classID=classID,
                        subclassID=subclassID, bindType=bindType,
                        isCraftingReagent=isCraftingReagent }
-
     return itemInfo
 end
 
----@return SpellCooldownDetails
-function S:GSCD(spellID, optionalSpell)
-    return S:GetSpellCooldownDetails(spellID, optionalSpell)
+--- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
+---@return ItemCooldown
+function S:GetItemCooldown(itemId, optionalItem)
+    local start, duration, enable = GetItemCooldown(itemId)
+    ---@class ItemCooldown
+    local cd = {
+        item = { id = itemId },
+        start=start, duration=duration, enable=enable
+    }
+    if optionalItem then
+        cd.item.details = optionalItem
+        cd.item.name = optionalItem.name
+    end
+    return cd
 end
 
+---@return SpellCooldownDetails
+function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
 ---@return SpellCooldown
-function S:GSC(spellID, optionalSpellName)
-    return S:GetSpellCooldown(spellID, optionalSpellName)
-end
+function S:GSC(spellID, optionalSpellName) return S:GetSpellCooldown(spellID, optionalSpellName) end
+---@return ItemCooldown
+function S:GIC(itemId, optionalItem) return S:GetItemCooldown(itemId, optionalItem) end

@@ -96,7 +96,8 @@ end
 local function OnSpellUpdateCooldown(event, ...)
     -- TODO NEXT: Update all button cooldowns
     --L:log(1, 'OnSpellUpdateCooldown')
-    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSent')
+    --FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSent')
+    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellUpdateCooldown')
 end
 
 ---Fired when the cooldown for an actionbar or inventory slot starts or
