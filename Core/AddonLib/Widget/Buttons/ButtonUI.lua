@@ -65,7 +65,7 @@ local function RegisterCallbacks(widget)
     ---@param _widget ButtonUIWidget
     ---@param event 'OnSpellUpdateCooldown'
     widget:SetCallback('OnSpellUpdateCooldown', function(_widget)
-        p:log('Received: OnSpellUpdateCooldown')
+        --p:log('Received: OnSpellUpdateCooldown')
         _widget:UpdateState()
         --_widget:Fire('OnAfterSpellCastSent', spell)
     end)
