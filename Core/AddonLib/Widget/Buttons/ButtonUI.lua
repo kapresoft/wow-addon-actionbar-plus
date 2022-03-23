@@ -306,9 +306,9 @@ local function WidgetMethods(widget)
         local itemId = btnData.item.id
         local itemInfo = _API:GetItemInfo(itemId)
         if itemInfo == nil then return end
-        local stackCount = itemInfo.stackCount
+        local stackCount = itemInfo.stackCount or 1
         btnData.item.count = itemInfo.count
-        btnData.item.stackCount = stackCount or 1
+        btnData.item.stackCount = stackCount
         if stackCount > 1 then self:SetText(btnData.item.count) end
     end
 
