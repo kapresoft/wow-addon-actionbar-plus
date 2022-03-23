@@ -26,7 +26,7 @@ function _L:Handle(btnUI, cursorInfo)
     ---@type ItemInfo
     local itemInfo = _API:GetItemInfo(itemId)
     local itemData = { id = itemId, name = itemInfo.name, icon = itemInfo.icon,
-                       link = itemInfo.link, count = itemInfo.count }
+                       link = itemInfo.link, count = itemInfo.count, stackCount=itemInfo.stackCount }
     --self:log('itemInfo: %s', itemInfo)
     --ABP:DBG({info=itemInfo, data=itemData})
 
@@ -41,6 +41,7 @@ function _L:Handle(btnUI, cursorInfo)
     btnData[WAttr.ITEM] = itemData
 
     ItemAttributeSetter(btnUI, btnData)
+    btnUI.widget:UpdateItemState()
 end
 
 function _L:GetItemDetails(itemId)

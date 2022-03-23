@@ -40,13 +40,6 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemData.name)
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
-    --self:log('Item Attributes')
-
-    btnUI.widget:SetText(itemData.count)
-    --local fs = btnUI:CreateFontString(btnUI:GetName() .. 'FontString', nil, "SystemFont_Shadow_Med2")
-    --fs:SetText(tostring(itemData.count or 0))
-    --fs:SetPoint("BOTTOMRIGHT",-5, 5)
-    --btnUI.text = fs
 end
 
 function _L:ShowTooltip(btnUI)

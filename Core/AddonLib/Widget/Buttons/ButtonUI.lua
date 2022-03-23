@@ -300,12 +300,16 @@ local function WidgetMethods(widget)
     end
 
     function widget:UpdateItemState()
+        self:ClearText()
         local btnData = self:GetConfig()
         if invalidButtonData(btnData, ITEM) then return end
         local itemId = btnData.item.id
         local itemInfo = _API:GetItemInfo(itemId)
+        if itemInfo == nil then return end
+        local stackCount = itemInfo.stackCount
         btnData.item.count = itemInfo.count
-        if itemInfo then self:SetText(btnData.item.count) end
+        btnData.item.stackCount = stackCount or 1
+        if stackCount > 1 then self:SetText(btnData.item.count) end
     end
 
     ---@return SpellCooldown
