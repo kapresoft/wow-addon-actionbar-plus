@@ -149,8 +149,42 @@ local methods = {
                     name = "Enable",
                     desc = format("Enable %s", configName),
                     order = 1,
+                    width = "full",
                     get = CreateFrameStateGetterHandler(frameIndex),
                     set = CreateFrameStateSetterHandler(frameIndex)
+                },
+                button_width = {
+                    type = 'range',
+                    order = 2,
+                    step = 1,
+                    min = 20,
+                    max = 100,
+                    width = 1,
+                    name = 'Size (Width & Height)',
+                    desc = 'The width and height of a buttons',
+                    get = function(_) return 20 end,
+                },
+                rows = {
+                    type = 'range',
+                    order = 3,
+                    step = 1,
+                    min = 1,
+                    max = 10,
+                    width = 0.8,
+                    name = 'Rows',
+                    desc = 'The number of rows for the buttons',
+                    get = function(_) return 2 end,
+                },
+                cols = {
+                    type = 'range',
+                    order = 4,
+                    step = 1,
+                    min = 1,
+                    max = 10,
+                    width = 0.8,
+                    name = 'Columns',
+                    desc = 'The number of columns for the buttons',
+                    get = function(_) return 6 end,
                 }
             }
         }

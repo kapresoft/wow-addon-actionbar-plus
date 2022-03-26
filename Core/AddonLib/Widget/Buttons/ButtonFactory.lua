@@ -63,7 +63,7 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
         ReloadUI()
     elseif strlower(mouseButton) == 'rightbutton' then
-        L.addon:OpenConfig()
+        L.addon:OpenConfig(frameHandle.widget)
     elseif strlower(mouseButton) == 'button5' then
         StaticPopup_Show(CONFIRM_RELOAD_UI)
     end

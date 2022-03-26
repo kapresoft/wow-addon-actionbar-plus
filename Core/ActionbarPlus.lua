@@ -229,7 +229,15 @@ local methods = {
         end
         ShowReloadUIConfirmation()
     end,
-    ['OpenConfig'] = function(self) ACE_CFGD:Open(ADDON_NAME) end,
+    ['OpenConfig'] = function(self, sourceFrameWidget)
+        --select the frame config tab if possible
+        local optionsConfigPath = nil
+        if sourceFrameWidget ~= nil then optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex() end
+        if optionsConfigPath ~= nil then
+            ACE_CFGD:SelectGroup(ADDON_NAME, optionsConfigPath)
+        end
+        ACE_CFGD:Open(ADDON_NAME)
+    end,
     ['OnUpdate'] = function(self) self:log('OnUpdate called...') end,
     ['OnProfileChanged'] = function(self) self:ConfirmReloadUI() end,
     ['InitDbDefaults'] = function(self)
