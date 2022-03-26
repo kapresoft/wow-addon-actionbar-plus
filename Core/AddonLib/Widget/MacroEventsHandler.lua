@@ -150,7 +150,7 @@ end
 
 function OnAddonLoaded(frame, event, ...)
     if event == 'PLAYER_ENTERING_WORLD' then
-        _L:log(event)
+        _L:log(5, event)
         frame:RegisterEvent('UPDATE_MACROS')
     end
 
