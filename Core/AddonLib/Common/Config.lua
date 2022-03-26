@@ -129,6 +129,7 @@ local methods = {
         local count = P:GetBarSize()
         local bars = {}
         for i=1,count do
+            -- barN is the config path name used for OptionDialog#OpenConfig()
             local key = 'bar' .. i
             local barOrder = tonumber(tostring(order) .. tostring(i))
             bars[key] = self:CreateBarConfigDef(i, barOrder)
