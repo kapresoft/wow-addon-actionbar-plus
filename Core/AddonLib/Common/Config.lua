@@ -20,19 +20,29 @@ local FF
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
-
-local function CreateFrameStateSetterHandler(frameIndex)
+local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
+---@return BarData
+local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
+local function GetFrameStateSetterHandler(frameIndex)
     return function(_, v)
         local f = FF:GetFrameByIndex(frameIndex)
         f.widget:SetFrameState(frameIndex, v)
     end
 end
 
-local function CreateFrameStateGetterHandler(frameIndex)
+local function GetFrameStateGetterHandler(frameIndex)
     return function(_)
         local f = FF:GetFrameByIndex(frameIndex)
         return f.widget:IsShownInConfig(frameIndex)
     end
+end
+
+local function GetBarSizeGetterHandler(frameIndex)
+    return function(_) return GetBarConfig(frameIndex).widget.buttonSize or 36 end
+end
+
+local function GetBarSizeSetterHandler(frameIndex)
+    return function(_, v) GetBarConfig(frameIndex).widget.buttonSize = v end
 end
 
 local function PropertySetter(config, key, fallbackVal)
@@ -151,8 +161,8 @@ local methods = {
                     desc = format("Enable %s", configName),
                     order = 1,
                     width = "full",
-                    get = CreateFrameStateGetterHandler(frameIndex),
-                    set = CreateFrameStateSetterHandler(frameIndex)
+                    get = GetFrameStateGetterHandler(frameIndex),
+                    set = GetFrameStateSetterHandler(frameIndex)
                 },
                 button_width = {
                     type = 'range',
@@ -163,7 +173,8 @@ local methods = {
                     width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    get = function(_) return 20 end,
+                    get = GetBarSizeGetterHandler(frameIndex),
+                    set = GetBarSizeSetterHandler(frameIndex)
                 },
                 rows = {
                     type = 'range',

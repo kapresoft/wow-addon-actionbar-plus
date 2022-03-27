@@ -82,7 +82,8 @@ end
 ---@param rowNum number The row number
 ---@param colNum number The column number
 local function SetButtonLayout(widget, rowNum, colNum)
-    local buttonSize = widget.buttonSize
+    local barConfig = widget.dragFrame:GetConfig()
+    local buttonSize = barConfig.widget.buttonSize
     local buttonPadding = widget.buttonPadding
     local frameStrata = widget.frameStrata
     local button = widget.button
@@ -400,8 +401,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
         ---@type string
         frameStrata = 'MEDIUM',
-        ---@type number
-        buttonSize = dragFrameWidget.buttonSize,
         ---@type number
         buttonPadding = 2,
         ---@type table

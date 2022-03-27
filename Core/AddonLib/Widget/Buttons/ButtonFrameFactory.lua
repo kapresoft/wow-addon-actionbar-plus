@@ -6,6 +6,11 @@ local _G = _G
 local type, ipairs, tinsert = type, ipairs, table.insert
 
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, Assert, P, LSM, _, _, G = ABP_WidgetConstants:LibPack()
@@ -82,6 +87,11 @@ local function WidgetMethods(widget)
 
     function widget:GetFrameIndex()
         return self.frameIndex
+    end
+
+    ---@return BarData
+    function widget:GetConfig()
+        return P:GetBar(self.frameIndex)
     end
 
     function widget:Toggle()
@@ -196,6 +206,9 @@ function _L:CreateFrame(frameIndex)
 
     ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
+    local barConfig = P:GetBar(frameIndex)
+    --self:log('f[%s] enabled? %s', frameIndex, fc.enabled)
+    self:log('f[%s] buttonSize? %s', frameIndex, barConfig.widget)
 
     local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
     --fh:SetToplevel(true)
@@ -203,7 +216,7 @@ function _L:CreateFrame(frameIndex)
     ---@class FrameWidget
     local widget = {
         frameIndex = frameIndex,
-        buttonSize = 35,
+        options = barConfig.widget,
         frameHandleHeight = 4,
         dragHandleHeight = 0,
         padding = 2,
@@ -219,9 +232,9 @@ function _L:CreateFrame(frameIndex)
     --local halfPadding = widget.padding/2
     local widthAdj = widget.padding
     local heightAdj = widget.padding + widget.dragHandleHeight
-    local frameWidth = (config.colSize * widget.buttonSize) + widthAdj
+    local frameWidth = (config.colSize * widget.options.buttonSize) + widthAdj
     f:SetWidth(frameWidth)
-    f:SetHeight((config.rowSize * widget.buttonSize) + heightAdj)
+    f:SetHeight((config.rowSize * widget.options.buttonSize) + heightAdj)
     f:SetFrameStrata(widget.frameStrata)
     f:SetBackdrop(FrameBackdrop)
     f:SetBackdropColor(0, 0, 0, 1)

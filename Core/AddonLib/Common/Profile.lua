@@ -24,10 +24,25 @@ local SingleBarTemplate = {
     buttons = {}
 }
 
+---@class BarData
+local ProfileBarTemplate = {
+    ["enabled"] = false,
+    ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
+    ["buttons"] = {
+        ['ActionbarPlusF1Button1'] = {
+            ['type'] = 'spell',
+            ['spell'] = {
+                -- spellInfo
+            }
+        }
+    }
+}
+
 local ProfileTemplate = {
     ["bars"] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
             ["buttons"] = {
                 ['ActionbarPlusF1Button1'] = {
                     ['type'] = 'spell',
@@ -83,14 +98,14 @@ local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
 P.maxFrames = 8
 P.baseFrameName = 'ActionbarPlusF'
 
-function P:GetFrameConfig()
-    return FrameDetails
-end
+--function P:GetFrameConfig()
+--    return FrameDetails
+--end
 
-function P:GetFrameConfigByIndex(frameIndex)
-    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetFrameConfigByIndex(frameIndex)')
-    return FrameDetails[frameIndex]
-end
+--function P:GetFrameConfigByIndex(frameIndex)
+--    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetFrameConfigByIndex(frameIndex)')
+--    return FrameDetails[frameIndex]
+--end
 
 function P:GetTemplate()
     return {
@@ -153,6 +168,7 @@ function P:CreateBarsTemplate()
 end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
+---@return BarData
 function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 

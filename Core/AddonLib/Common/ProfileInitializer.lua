@@ -60,6 +60,7 @@ local DEFAULT_PROFILE_DATA = {
     ["bars"] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = true,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
             ["buttons"] = {
                 ["ActionbarPlusF1Button1"] = {
                     ["type"] = "spell",
@@ -79,36 +80,43 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF2"] = {
             ["enabled"] = true,
+            ["widget"] = { ["rowSize"] = 6, ["colSize"] = 2, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF3"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 3, ["colSize"] = 5, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF4"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF5"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF6"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF7"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF8"] = {
             ["enabled"] = false,
+            ["widget"] = { ["rowSize"] = 4, ["colSize"] = 6, ["buttonSize"] = 35 },
             ["buttons"] = {
             },
         },
