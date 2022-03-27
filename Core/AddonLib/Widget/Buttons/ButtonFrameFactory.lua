@@ -232,9 +232,9 @@ function _L:CreateFrame(frameIndex)
     --local halfPadding = widget.padding/2
     local widthAdj = widget.padding
     local heightAdj = widget.padding + widget.dragHandleHeight
-    local frameWidth = (config.colSize * widget.options.buttonSize) + widthAdj
+    local frameWidth = (widget.options.colSize * widget.options.buttonSize) + widthAdj
     f:SetWidth(frameWidth)
-    f:SetHeight((config.rowSize * widget.options.buttonSize) + heightAdj)
+    f:SetHeight((widget.options.rowSize * widget.options.buttonSize) + heightAdj)
     f:SetFrameStrata(widget.frameStrata)
     f:SetBackdrop(FrameBackdrop)
     f:SetBackdropColor(0, 0, 0, 1)

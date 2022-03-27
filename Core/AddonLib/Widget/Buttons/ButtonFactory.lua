@@ -140,8 +140,10 @@ end
 function L:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
+    local barConfig = P:GetBar(frameIndex)
+    local widget = barConfig.widget
     local f = ButtonFrameFactory(frameIndex)
-    self:CreateButtons(f, config.rowSize, config.colSize)
+    self:CreateButtons(f, widget.rowSize, widget.colSize)
     f:MarkRendered()
     self:AttachFrameEvents(f)
     return f

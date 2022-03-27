@@ -1,9 +1,17 @@
 --[[-----------------------------------------------------------------------------
-Config
+Lua Vars
 -------------------------------------------------------------------------------]]
-
--- Lua APIs
 local format = string.format
+
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_Show
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 
 -- ActionbarPlus APIs
 local LibStub, M, G = ABP_LibGlobals:LibPack()
@@ -20,6 +28,11 @@ local FF
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
+local function ConfirmAndReload()
+    if StaticPopup_Visible(CONFIRM_RELOAD_UI) == nil then return StaticPopup_Show(CONFIRM_RELOAD_UI) end
+    return false
+end
+
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
 ---@return BarData
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
@@ -37,12 +50,25 @@ local function GetFrameStateGetterHandler(frameIndex)
     end
 end
 
-local function GetBarSizeGetterHandler(frameIndex)
+local function GetButtonSizeGetterHandler(frameIndex)
     return function(_) return GetBarConfig(frameIndex).widget.buttonSize or 36 end
 end
 
-local function GetBarSizeSetterHandler(frameIndex)
+local function GetButtonSizeSetterHandler(frameIndex)
     return function(_, v) GetBarConfig(frameIndex).widget.buttonSize = v end
+end
+
+local function GetRowSizeGetterHandler(frameIndex)
+    return function(_) return GetBarConfig(frameIndex).widget.rowSize or 2 end
+end
+local function GetRowSizeSetterHandler(frameIndex)
+    return function(_, v) GetBarConfig(frameIndex).widget.rowSize = v end
+end
+local function GetColSizeGetterHandler(frameIndex)
+    return function(_) return GetBarConfig(frameIndex).widget.colSize or 6 end
+end
+local function GetColSizeSetterHandler(frameIndex)
+    return function(_, v) GetBarConfig(frameIndex).widget.colSize = v end
 end
 
 local function PropertySetter(config, key, fallbackVal)
@@ -173,8 +199,9 @@ local methods = {
                     width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    get = GetBarSizeGetterHandler(frameIndex),
-                    set = GetBarSizeSetterHandler(frameIndex)
+                    confirm = ConfirmAndReload,
+                    get = GetButtonSizeGetterHandler(frameIndex),
+                    set = GetButtonSizeSetterHandler(frameIndex)
                 },
                 rows = {
                     type = 'range',
@@ -185,7 +212,9 @@ local methods = {
                     width = 0.8,
                     name = 'Rows',
                     desc = 'The number of rows for the buttons',
-                    get = function(_) return 2 end,
+                    confirm = ConfirmAndReload,
+                    get = GetRowSizeGetterHandler(frameIndex),
+                    set = GetRowSizeSetterHandler(frameIndex)
                 },
                 cols = {
                     type = 'range',
@@ -196,7 +225,9 @@ local methods = {
                     width = 0.8,
                     name = 'Columns',
                     desc = 'The number of columns for the buttons',
-                    get = function(_) return 6 end,
+                    confirm = ConfirmAndReload,
+                    get = GetColSizeGetterHandler(frameIndex),
+                    set = GetColSizeSetterHandler(frameIndex)
                 }
             }
         }
