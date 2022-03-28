@@ -115,6 +115,9 @@ local function IsValidDragSource(cursorInfo)
         p:log(5, 'Received drag event with invalid cursor info. Skipping...')
         return false
     end
+    if not (cursorInfo.type == SPELL or cursorInfo.type == ITEM or cursorInfo.type == MACRO) then
+        return false
+    end
 
     return true
 end
@@ -146,11 +149,11 @@ local function OnReceiveDrag(btnUI)
 
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
-    ClearCursor()
 
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
     p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
+    ClearCursor()
 
     local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
     dragEventHandler:Handle(btnUI, actionType, cursorInfo)
