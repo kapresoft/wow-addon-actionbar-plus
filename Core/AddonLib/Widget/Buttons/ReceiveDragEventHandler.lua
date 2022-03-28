@@ -41,7 +41,9 @@ function _L:Handle(btnUI, actionType, cursorInfo)
     AssertThatMethodArgIsNotNil(actionType, 'actionType', 'Handle(btnUI, actionType)')
 
     if not self:CanHandle(actionType) then
-        Throw('Handler not found for action-type: %s', actionType)
+        --Throw('Handler not found for action-type: %s', actionType)
+        self:log(10, 'Handler not found for action-type: %s', actionType)
+        return
     end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
