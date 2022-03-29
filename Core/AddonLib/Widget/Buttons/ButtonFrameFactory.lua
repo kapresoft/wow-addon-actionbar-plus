@@ -207,8 +207,6 @@ function _L:CreateFrame(frameIndex)
     ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
     local barConfig = P:GetBar(frameIndex)
-    --self:log('f[%s] enabled? %s', frameIndex, fc.enabled)
-    self:log('f[%s] buttonSize? %s', frameIndex, barConfig.widget)
 
     local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
     --fh:SetToplevel(true)
