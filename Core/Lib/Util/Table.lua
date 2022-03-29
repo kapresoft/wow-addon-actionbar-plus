@@ -87,6 +87,31 @@ function _L.slice (t, startIndex, stopIndex)
     return new
 end
 
+---## Create Chunks from table
+---@param tbl table The array type table
+---@param _chunkSize number The chunk size
+function _L.chunkedArray(tbl, _chunkSize)
+    local ret = {}
+    local chunkIndex = 1
+    local chunkSize = _chunkSize
+    local i = 1
+    repeat
+        local chunks = {}
+        for j=1, chunkSize do
+            --chunks[j] = tbl[i]
+            local ci = i+j-1
+            table.insert(chunks, tbl[ci])
+        end
+        local lastIndex = i
+        i = i + chunkSize
+        if i > #tbl then chunkSize = #tbl - lastIndex end
+        table.insert(ret, chunks)
+        chunkIndex = chunkIndex + 1
+        --print(format('chunkIndex: %s chunkSize: %s tblSize: %s', chunkIndex, chunkSize, #tbl))
+    until (i > #tbl)
+    return ret
+end
+
 function _L.concatkv(t)
     if type(t) ~= 'table' then return tostring(t) end
     local s = '{ '

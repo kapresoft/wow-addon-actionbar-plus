@@ -1,53 +1,126 @@
--- Dialog for Macro Textures
--- ## External -------------------------------------------------
-local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-
-
+--[[-----------------------------------------------------------------------------
+Lua vars
+-------------------------------------------------------------------------------]]
 local type, tonumber = type, tonumber
-local replace = String.replace
 
-local GameTooltip, MC,
-    ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
-    TEXTURE_EMPTY, ANCHOR_TOPLEFT =
-        GameTooltip, MacroIconCategories,
-        ConfigureFrameToCloseOnEscapeKey, GetMacroItemIcons, ART_TEXTURES,
-        TEXTURE_EMPTY, ANCHOR_TOPLEFT
+--[[-----------------------------------------------------------------------------
+Blizzard vars
+-------------------------------------------------------------------------------]]
+local UIParent, CreateFrame, C_Timer = UIParent, CreateFrame, C_Timer
+local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
+local GameTooltip, ConfigureFrameToCloseOnEscapeKey = GameTooltip, ConfigureFrameToCloseOnEscapeKey
 
+--[[-----------------------------------------------------------------------------
+Local vars
+-------------------------------------------------------------------------------]]
+local _, Table, String = ABP_LibGlobals:LibPackUtils()
+local LibStub, M = ABP_LibGlobals:LibPack()
 local _, AceGUI = ABP_LibGlobals:LibPack_AceLibrary()
-
--- ## Local ----------------------------------------------------
+local MC = MacroIconCategories
+local ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT = ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+local replace = String.replace
+local ADDON_NAME = ADDON_NAME
 
 ---@class MacroTextureDialog
 local _L = LibStub:NewLibrary(M.MacroTextureDialog)
-
--- ### Local Vars
+---@type MacroTextureDialog
+ABP_MacroTextureDialog = _L
 
 local ICON_PREFIX = 'Interface/Icons/'
 local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
-local thisDialog = nil
-local categoryCache = nil
-local macroIcons = nil
+---@type MacroTextureDialogFrame
+local thisDialog
+local iconSize = 35
+local categoryCache
+local macroIcons
+local iconsLoaded = false
+local iconLoadTimer
 
--- ## Functions ------------------------------------------------
+local loadMacroIcons = true
+local loadItemIcons = false
+local loadIconChunkSize = 20
+local loadingTickerIncrementInSeconds = 2.0
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+---@param dlg MacroTextureDialogFrame
+local function CreateIcon(dlg, iconChunks, chunkCount, chunkIndex)
+    for _,iconId in ipairs(iconChunks) do
+        local icon = AceGUI:Create("Icon")
+        icon:SetImage(iconId)
+        icon:SetImageSize(iconSize, iconSize)
+        icon:SetRelativeWidth(0.06)
+        icon:SetCallback('OnClick', function()
+            dlg:SetSelectedIcon(iconId)
+            --dlg:Hide()
+        end)
+        dlg.iconsScrollFrame:AddChild(icon)
+    end
+    _L:log('Loading Icon Chunk[%s of %s] Loaded: %s', chunkIndex, chunkCount, #iconChunks)
+end
+
+local function LoadIconsIncrementally()
+    --_L:log('Icons Loaded: %s', iconsLoaded)
+    if iconsLoaded then return end
+
+    local dlg = _L:GetDialog()
+
+    local icons = {}
+    if loadMacroIcons then
+        local macIcons = GetMacroIcons()
+        icons = Table.append(macIcons, icons)
+    end
+    if loadItemIcons then
+        local itemIcons = GetMacroItemIcons()
+        icons = Table.append(itemIcons, icons)
+    end
+    _L:log('Loading %s icons in the background...', #icons)
+
+    dlg.iconsScrollFrame:ReleaseChildren()
+    local chunks = Table.chunkedArray(icons, loadIconChunkSize)
+    iconsLoaded = true
+    local chunkCount = #chunks
+    local chunkIndex = 1
+    iconLoadTimer = C_Timer.NewTicker(loadingTickerIncrementInSeconds, function()
+        local chunk = table.remove(chunks, 1)
+        if chunk ~= nil then
+            CreateIcon(dlg, chunk, chunkCount, chunkIndex)
+            chunkIndex = chunkIndex + 1
+        end
+        if #chunks <= 0 then
+            iconLoadTimer:Cancel()
+            _L:log('Done loading icons.')
+        end
+    end)
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 
 function _L:GetDialog()
     if thisDialog == nil then
-        self:log('Creating new MacroTextureDialog')
+        self:log('New MacroTextureDialog instance created.')
         thisDialog = self:CreateTexturePopupDialog()
     end
     return thisDialog
 end
 
-function _L:Show()
+---called via optionalCallbackFn(selectedValue)
+function _L:Show(closeOnSelect, optionalCallbackFn)
+    self.closeOnSelect = closeOnSelect or false
+    self.optionalCallbackFn = optionalCallbackFn
     self:GetDialog():Show()
 end
 
+
+---@return MacroTextureDialogFrame
 function _L:CreateTexturePopupDialog()
-    local iconSize = 50
     local defaultIcon = TEXTURE_EMPTY
 
+    ---@class MacroTextureDialogFrame
     local frame = AceGUI:Create("Frame")
 
     self:FetchMacroIcons()
@@ -65,88 +138,18 @@ function _L:CreateTexturePopupDialog()
     --frame:SetHeight(700)
     frame.iconsScrollFrame = nil
 
-    local iconCategoryDropDown = AceGUI:Create("Dropdown")
-    iconCategoryDropDown:SetWidth(250)
-    iconCategoryDropDown:SetLabel("Category:")
-    iconCategoryDropDown:SetList(MC:GetDropDownItems())
-    frame:AddChild(iconCategoryDropDown)
-
-    local function toIconName(iconPath)
-        return replace(iconPath, ICON_PREFIX, '')
-    end
-
-    local function onValueChanged(selectedCategory)
-        local categoryItems = categoryCache[selectedCategory]
-        if categoryItems == nil or Table.isEmpty(categoryItems) then
-            --self:log(1, 'Retrieving category items: %s', selectedCategory)
-            categoryItems = MC:GetItemsByCategory(macroIcons, selectedCategory)
-            categoryCache[selectedCategory] = categoryItems
-        end
-        frame:SetList(categoryItems)
-        frame.iconsScrollFrame:ReleaseChildren()
-
-        -- TODO: Toggle Children by Category (Cache)
-
-        for iconId, iconPath in pairs(categoryItems) do
-            local icon = AceGUI:Create("Icon")
-            icon:SetImage(iconPath)
-            icon:SetImageSize(iconSize, iconSize)
-            icon:SetRelativeWidth(0.09)
-            icon.iconDetails = {
-                id = iconId, path = iconPath,
-                getIconName = function()
-                    return toIconName(iconPath)
-                end,
-                getTooltip = function()
-                    return format("%s (%s)", iconPath, iconId)
-                end,
-            }
-            icon:SetCallback('OnClick', function(widget)
-                frame:SetEnteredIcon(widget.iconDetails.path)
-                frame:SetIconPath(widget.iconDetails.id, widget.iconDetails.getIconName())
-            end)
-            icon:SetCallback('OnEnter', function(widget)
-                GameTooltip:SetOwner(widget.frame, ANCHOR_TOPLEFT)
-                GameTooltip:SetText(widget.iconDetails.getTooltip())
-            end)
-            icon:SetCallback('OnLeave', function(widget)
-                GameTooltip:Hide()
-            end)
-            frame.iconsScrollFrame:AddChild(icon)
-        end
-    end
-
-    iconCategoryDropDown:SetCallback("OnValueChanged", function(choice)
-        onValueChanged(choice:GetValue())
-    end)
-
-    local baseWidth = 500
-    local iconDropDown = AceGUI:Create("Dropdown")
-    iconDropDown:SetLabel("Icon:")
-    iconDropDown:SetWidth(baseWidth)
-    iconDropDown:SetList({})
-    iconDropDown:SetCallback("OnValueChanged", function(choice)
-        -- choice is the drop-down list
-        -- frame:SetTextContent(PrettyPrint.pformat(choice))
-        local iconId = choice:GetValue()
-        local iconTextPath = ART_TEXTURES[tonumber(iconId)]
-        frame:SetSelectedIcon(iconId)
-        frame:SetEnteredIcon(iconTextPath)
-        frame:SetIconPath(iconId, toIconName(iconTextPath))
-    end)
-    frame:AddChild(iconDropDown)
-
-    local iconFrameByDropDown = AceGUI:Create("Icon")
-    iconFrameByDropDown:SetImage(defaultIcon)
-    iconFrameByDropDown:SetImageSize(iconSize, iconSize)
-    --iconFrameByDropDown:SetLabel("''")
-    --ic:SetAttribute('type', 'spell')
-    --ic:SetAttribute('spell', 'Cooking')
-    frame:AddChild(iconFrameByDropDown)
-
     local iconEditbox = AceGUI:Create("EditBox")
-    iconEditbox:SetLabel("or Select Icon By ID or Texture Path:")
-    iconEditbox:SetWidth(baseWidth)
+    iconEditbox:SetLabel("Selected Icon ID:")
+    iconEditbox:SetWidth(150)
+    --iconEditbox:SetCallback("OnEnterPressed", function(widget)
+    --    print('OnEnterPressed')
+    --    widget:HighlightText()
+    --end)
+    iconEditbox:SetCallback("OnEnter", function(widget, event, text)
+        widget:HighlightText()
+        widget:SetFocus()
+        _L:log('OnEnter: %s', type(widget.obj))
+    end)
     iconEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
         local value = ICON_PREFIX .. text
         if type(tonumber(text)) == 'number' then
@@ -156,68 +159,53 @@ function _L:CreateTexturePopupDialog()
     end)
     frame:AddChild(iconEditbox)
 
-    local iconFrameByInput = AceGUI:Create("Icon")
+    local iconPreview = AceGUI:Create("Icon")
     -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
-    iconFrameByInput:SetImage(defaultIcon)
-    iconFrameByInput:SetImageSize(iconSize, iconSize)
-    frame:AddChild(iconFrameByInput)
+    iconPreview:SetImage(defaultIcon)
+    iconPreview:SetImageSize(iconSize, iconSize)
+    iconPreview:SetWidth(iconSize + 20)
+    frame:AddChild(iconPreview)
 
     local iconsScrollFrame = AceGUI:Create("ScrollFrame")
     iconsScrollFrame:SetFullHeight(true)
     iconsScrollFrame:SetFullWidth(true)
     iconsScrollFrame:SetLayout("Flow")
 
-    --function iconsScrollFrame:HasChildren()
-    --    return false
-    --end
-    --function iconsScrollFrame:SetVisibleState(self, isVisible)
-    --    local children = self.children
-    --    print('children:', children)
-    --    for i = 1, #children do
-    --        --AceGUI:Hide(children[i])
-    --        if isVisible then
-    --            children[i].frame:Show()
-    --        else
-    --            children[i].frame:Hide()
-    --        end
-    --        --children[i] = nil
-    --    end
-    --end
-
     frame:AddChild(iconsScrollFrame)
     frame.iconsScrollFrame = iconsScrollFrame
 
     -- ################################
 
-    function frame:SetSelectedIcon(iconPathOrId)
-        if not iconPathOrId then
-            return
+    function frame:SetSelectedIcon(iconId)
+        if not iconId then return end
+        self:SetIconId(iconId)
+        iconPreview:SetImage(iconId)
+        _L:log('optionalCallbackFn: %s', _L.optionalCallbackFn)
+        if _L.optionalCallbackFn then
+            _L.optionalCallbackFn(iconId)
         end
-        iconFrameByDropDown:SetImage(iconPathOrId)
+        if _L.closeOnSelect then self:Hide() end
     end
     function frame:SetEnteredIcon(iconPathOrId)
         if not iconPathOrId then
             return
         end
-        iconFrameByInput:SetImage(iconPathOrId)
+        iconPreview:SetImage(iconPathOrId)
+        self:SetIconId(iconPathOrId)
     end
     function frame:SetIconPath(iconId, iconPath)
         iconEditbox:SetText(iconPath)
         frame:SetStatusText(format("%s (%s)", iconPath, iconId))
     end
-    function frame:SetList(list)
-        iconDropDown:SetList(list)
+    function frame:SetIconId(iconId)
+        iconEditbox:SetText(iconId)
+        frame:SetStatusText(iconId)
     end
 
-    function frame:SetSelectedCategory(category)
-        iconCategoryDropDown:SetValue(category)
-        onValueChanged(category)
-    end
-
-    --frame:SetSelectedCategory('Misc')
     frame:Hide()
     return frame
 end
+
 
 function _L:FetchCategoriesCache()
     if categoryCache or type(categoryCache) == 'table' then
@@ -231,7 +219,20 @@ function _L:FetchMacroIcons()
     if macroIcons or type(macroIcons) == 'table' then
         return
     end
+    --macroIcons = GetMacroIcons()
     macroIcons = GetMacroItemIcons()
     self:log(10, 'MacroIcons fetched')
 end
+
+--[[-----------------------------------------------------------------------------
+Frame
+-------------------------------------------------------------------------------]]
+local f = CreateFrame("Frame", ADDON_NAME .. "MacroTextureDialogFrame", UIParent)
+f:SetScript("OnEvent", function(self, event, ...)
+    if event ~= 'PLAYER_ENTERING_WORLD' then return end
+    --local isLogin, isReload = ...
+    --_L:log('isLogin=%s isReload=%s', isLogin, isReload)
+    C_Timer.After(5.0, function() LoadIconsIncrementally() end)
+end)
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
 
