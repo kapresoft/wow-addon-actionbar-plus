@@ -50,7 +50,14 @@ function _L.shallow_copy(t)
     return t2
 end
 
-function _L.append(source, target)
+function _L.mergeArray(t1,t2)
+    for i=1,#t2 do
+        t1[#t1+1] = t2[i]
+    end
+    return t1
+end
+
+function _L.mergeTable(source, target)
     local t2 = target or {}
     for k,v in pairs(source) do
         if t2[k] == nil then

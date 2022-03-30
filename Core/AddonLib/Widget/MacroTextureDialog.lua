@@ -31,72 +31,106 @@ local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
 ---@type MacroTextureDialogFrame
 local thisDialog
-local iconSize = 35
 local categoryCache
 local macroIcons
 local iconsLoaded = false
 local iconLoadTimer
-
-local loadMacroIcons = true
-local loadItemIcons = false
-local loadIconChunkSize = 20
-local loadingTickerIncrementInSeconds = 2.0
-
+local loadOptions = {
+    macro = {
+        enable = true,
+        loaded = false,
+        name = 'Macro',
+        incrementInSeconds = 1.0,
+        chunkSize = 50
+    },
+    item = {
+        enable = false,
+        loaded = false,
+        name = 'Item',
+        incrementInSeconds = 2.0,
+        chunkSize = 10
+    }
+}
+local dialogOptions = {
+    width = 750,
+    resizeable = true
+}
+local iconOptions = {
+    size = 38,
+    relativeWidth = 0.065
+}
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 ---@param dlg MacroTextureDialogFrame
-local function CreateIcon(dlg, iconChunks, chunkCount, chunkIndex)
+local function CreateIcon(dlg, name, iconChunks, chunkCount, chunkIndex)
     for _,iconId in ipairs(iconChunks) do
         local icon = AceGUI:Create("Icon")
         icon:SetImage(iconId)
-        icon:SetImageSize(iconSize, iconSize)
-        icon:SetRelativeWidth(0.06)
+        icon:SetImageSize(iconOptions.size, iconOptions.size)
+        icon:SetRelativeWidth(iconOptions.relativeWidth)
         icon:SetCallback('OnClick', function() dlg:SetSelectedIcon(iconId) end)
         icon:SetCallback('OnEnter', function() dlg:PreviewIcon(iconId) end)
         dlg.iconsScrollFrame:AddChild(icon)
     end
-    _L:log(10, 'Loading Icon Chunk[%s of %s] Loaded: %s', chunkIndex, chunkCount, #iconChunks)
+    --_L:log(10, 'Loading %s Icon Chunk[%s of %s]', name, chunkIndex, chunkCount)
+end
+
+local function MacroIconsSupplier()
+    if not loadOptions.macro.enable or loadOptions.macro.loaded then return end
+    local macIcons = GetMacroIcons()
+    --if #macIcons <= 0 then return end
+    --macIcons = Table.slice(macIcons, 1, 100)
+    return macIcons, loadOptions.macro
+end
+
+local function ItemIconsSupplier()
+    if not loadOptions.item.enable or loadOptions.item.loaded then return end
+    local icons = {}
+    local _itemIcons = GetMacroItemIcons()
+    for i,icon in ipairs(_itemIcons) do
+        --_L:log("%s: %s", i, icon)
+        if i % 2 == 0 then
+            table.insert(icons, icon)
+        end
+    end
+    --icons = Table.slice(icons, 1, 100)
+    return icons, loadOptions.item
+end
+
+function _L:LoadChunkIcons(iconSupplier)
+    local icons, options = iconSupplier()
+    if icons == nil or #icons <= 0 or options == nil then return end
+    if not options.enable or options.loaded then return end
+    local iconChunks = Table.chunkedArray(icons, options.chunkSize)
+    local chunkCount = #iconChunks
+    local chunkIndex = 1
+    _L:log(1, 'Loading[%s] %s Icons with Chunk Size [%s]', #icons, options.name, options.chunkSize)
+    local dlg = _L:GetDialog()
+    iconLoadTimer = C_Timer.NewTicker(options.incrementInSeconds, function()
+        local chunk = table.remove(iconChunks, 1)
+        if chunk ~= nil then
+            CreateIcon(dlg, options.name, chunk, chunkCount, chunkIndex)
+            chunkIndex = chunkIndex + 1
+        end
+        if #iconChunks <= 0 then
+            iconLoadTimer:Cancel()
+            options.loaded = true
+            _L:log(1, 'Done loading %s icons.', options.name)
+            self:LoadChunkIcons(ItemIconsSupplier)
+        end
+    end)
 end
 
 local function LoadIconsIncrementally()
-    if iconsLoaded then return end
-
-    local dlg = _L:GetDialog()
-
-    local icons = {}
-    if loadMacroIcons then
-        local macIcons = GetMacroIcons()
-        icons = Table.append(macIcons, icons)
-    end
-    if loadItemIcons then
-        local itemIcons = GetMacroItemIcons()
-        icons = Table.append(itemIcons, icons)
-    end
-    _L:log(1, 'Loading %s icons in the background...', #icons)
-
-    dlg.iconsScrollFrame:ReleaseChildren()
-    local chunks = Table.chunkedArray(icons, loadIconChunkSize)
-    iconsLoaded = true
-    local chunkCount = #chunks
-    local chunkIndex = 1
-    iconLoadTimer = C_Timer.NewTicker(loadingTickerIncrementInSeconds, function()
-        local chunk = table.remove(chunks, 1)
-        if chunk ~= nil then
-            CreateIcon(dlg, chunk, chunkCount, chunkIndex)
-            chunkIndex = chunkIndex + 1
-        end
-        if #chunks <= 0 then
-            iconLoadTimer:Cancel()
-            _L:log(1, 'Done loading icons.')
-        end
-    end)
+    _L:LoadChunkIcons(MacroIconsSupplier)
 end
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 
+---@return MacroTextureDialogFrame
 function _L:GetDialog()
     if thisDialog == nil then
         self:log(10, 'New MacroTextureDialog instance created.')
@@ -119,19 +153,20 @@ function _L:CreateTexturePopupDialog()
 
     ---@class MacroTextureDialogFrame
     local frame = AceGUI:Create("Frame")
+    frame:EnableResize(dialogOptions.resizeable)
 
-    self:FetchMacroIcons()
-    self:FetchCategoriesCache()
+    --self:FetchMacroIcons()
+    --self:FetchCategoriesCache()
 
     ConfigureFrameToCloseOnEscapeKey(TEXTURE_DIALOG_GLOBAL_FRAME_NAME, frame)
 
-    frame:SetTitle("Macro Icons")
+    frame:SetTitle("Choose an Icon")
     frame:SetStatusText('')
     frame:SetCallback("OnClose", function(widget)
         widget:SetStatusText('')
     end)
     frame:SetLayout("Flow")
-    --frame:SetWidth(700)
+    frame:SetWidth(dialogOptions.width)
     --frame:SetHeight(700)
     frame.iconsScrollFrame = nil
 
@@ -155,17 +190,25 @@ function _L:CreateTexturePopupDialog()
     local iconPreview = AceGUI:Create("Icon")
     -- ic:SetImage("Interface\\Icons\\inv_misc_note_05")
     iconPreview:SetImage(defaultIcon)
-    iconPreview:SetImageSize(iconSize, iconSize)
-    iconPreview:SetWidth(iconSize + 20)
+    iconPreview:SetImageSize(iconOptions.size, iconOptions.size)
+    iconPreview:SetWidth(iconOptions.size + 20)
     frame:AddChild(iconPreview)
+
+    local scrollContainer = AceGUI:Create("SimpleGroup")
+    scrollContainer:SetFullWidth(true)
+    scrollContainer:SetFullHeight(true) -- probably?
+    scrollContainer:SetLayout("Fill") -- important!
 
     local iconsScrollFrame = AceGUI:Create("ScrollFrame")
     iconsScrollFrame:SetFullHeight(true)
     iconsScrollFrame:SetFullWidth(true)
     iconsScrollFrame:SetLayout("Flow")
 
-    frame:AddChild(iconsScrollFrame)
+    frame:AddChild(scrollContainer)
+    scrollContainer:AddChild(iconsScrollFrame)
+
     frame.iconsScrollFrame = iconsScrollFrame
+
 
     -- ################################
 
