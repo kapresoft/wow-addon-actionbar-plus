@@ -28,8 +28,9 @@ function _L:SetAttributes(btnUI, btnData)
     if macroInfo.icon then icon = macroInfo.icon end
     btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
     btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
-    btnUI:SetNormalTexture(icon)
-    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+    --btnUI:SetNormalTexture(icon)
+    --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+    btnUI.widget:SetTextures(icon)
 
     btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
 

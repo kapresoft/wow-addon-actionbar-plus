@@ -64,12 +64,9 @@ function _L:SetAttributes(btnUI, btnData)
 
     local spellIcon = TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
-    btnUI:SetNormalTexture(spellIcon)
-    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+    btnUI.widget:SetTextures(spellIcon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
-    -- NOTE: Set spell by name (not ID) so it auto upgrades
-    -- Tooltip will show the correct rank
-    -- will need to auto update so refresh is not needed
+
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 

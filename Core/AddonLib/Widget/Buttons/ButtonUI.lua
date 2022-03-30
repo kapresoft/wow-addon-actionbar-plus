@@ -78,9 +78,9 @@ local function OnDragStart(btnUI)
 
     w:ResetConfig()
     btnUI:SetNormalTexture(TEXTURE_EMPTY)
+    btnUI.widget:ClearHighlight()
     btnUI:SetScript("OnEnter", nil)
     btnUI.widget:Fire('OnDragStart')
-
     -- TODO NEXT: Handle Drag-And-Drop for Macro and Item
 end
 
@@ -377,6 +377,14 @@ local function WidgetMethods(widget)
         return true
     end
 
+    function widget:ClearHighlight()
+        self.button:SetHighlightTexture(nil)
+    end
+
+    function widget:SetTextures(icon)
+        ABP_WidgetUtil:SetTextures(self, icon)
+    end
+
 end
 
 --[[-----------------------------------------------------------------------------
@@ -399,6 +407,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
     button:SetNormalTexture(noIconTexture)
+    --button:SetCheckedTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
     button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
     AceHook:SecureHookScript(button, 'OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)

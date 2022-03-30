@@ -34,8 +34,11 @@ function _L:SetAttributes(btnUI, btnData)
 
     local icon = TEXTURE_EMPTY
     if itemData.icon then icon = itemData.icon end
-    btnUI:SetNormalTexture(icon)
-    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+
+    btnUI.widget:SetTextures(icon)
+
+    --btnUI:SetNormalTexture(icon)
+    --btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemData.name)

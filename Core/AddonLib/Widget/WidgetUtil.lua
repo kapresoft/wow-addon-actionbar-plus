@@ -30,9 +30,24 @@ function _L:UpdateUsable(buttonWidget)
     if not normalTexture then return end
     -- energy based spells do not use 'notEnoughMana'
     if not isUsable then
-        normalTexture:SetVertexColor(0.5, 0.5, 0.5)
+        normalTexture:SetVertexColor(0.3, 0.3, 0.3)
     else
         normalTexture:SetVertexColor(1.0, 1.0, 1.0)
     end
 end
 
+function _L:SetTextures(btnWidget, icon)
+    local btnUI = btnWidget.button
+
+    -- DrawLayer is 'ARTWORK' by default for icons
+    btnUI:SetNormalTexture(icon)
+    btnUI:GetNormalTexture():SetAlpha(1.0)
+    btnUI:GetNormalTexture():SetBlendMode('DISABLE')
+
+    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT2)
+    btnUI:GetHighlightTexture():SetAlpha(1.0)
+
+    btnUI:SetPushedTexture(icon)
+    btnUI:GetPushedTexture():SetAlpha(0.5)
+
+end
