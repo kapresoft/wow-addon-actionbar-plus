@@ -30,7 +30,7 @@ function _L:UpdateUsable(buttonWidget)
     if not normalTexture then return end
     -- energy based spells do not use 'notEnoughMana'
     if not isUsable then
-        normalTexture:SetVertexColor(0.3, 0.3, 1.0)
+        normalTexture:SetVertexColor(0.5, 0.5, 0.5)
     else
         normalTexture:SetVertexColor(1.0, 1.0, 1.0)
     end
