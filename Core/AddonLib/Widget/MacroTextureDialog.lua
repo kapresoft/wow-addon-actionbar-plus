@@ -38,7 +38,7 @@ local iconsLoaded = false
 local iconLoadTimer
 
 local loadMacroIcons = true
-local loadItemIcons = true
+local loadItemIcons = false
 local loadIconChunkSize = 20
 local loadingTickerIncrementInSeconds = 2.0
 
