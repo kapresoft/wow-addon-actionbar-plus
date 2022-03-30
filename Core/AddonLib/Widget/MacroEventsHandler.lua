@@ -140,7 +140,7 @@ local function HandleChangedMacros(btnName, btnData)
     _L:log(15, 'HandleMacro[%s] Changed? %s', btnName, changed)
 end
 
-function OnMacroUpdate()
+local function OnMacroUpdate()
     local buttons = P:FindButtonsByType('macro')
     if Table.isEmpty(buttons) then return end
     for name, data in pairs(buttons) do
@@ -148,7 +148,7 @@ function OnMacroUpdate()
     end
 end
 
-function OnAddonLoaded(frame, event, ...)
+local function OnAddonLoaded(frame, event, ...)
     if event == 'PLAYER_ENTERING_WORLD' then
         _L:log(5, event)
         frame:RegisterEvent('UPDATE_MACROS')
