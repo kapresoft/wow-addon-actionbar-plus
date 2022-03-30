@@ -126,6 +126,12 @@ function _L:LibPackUtils()
     return PrettyPrint, Table, String, LogFactory
 end
 
+---@return Table, String
+function _L:LibPack_CommonUtils()
+    local Table, String = self:Get(Module.Table, Module.String)
+    return Table, String
+end
+
 ---@return ButtonDataBuilder
 function _L:LibPack_ButtonDataBuilder()
     return self:Get(Module.ButtonDataBuilder)

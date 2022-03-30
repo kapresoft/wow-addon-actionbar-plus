@@ -75,31 +75,6 @@ local function FireFrameEvent(event, sourceEvent, ...)
     end
 end
 
---- Var Args: `unitTarget, castGUID, spellID`
-local function OnSpellCastSucceeded(_, ...)
-    local _, _, spellID = ...
-    --P:log('OnSpellCastSucceeded: %s [%s]', spellID, {...})
-    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSucceeded', spellID)
-end
-
---- Var Args: unitTarget, castGUID, spellID
-local function OnSpellCastFailed(_, ...)
-    local _, _, spellID = ...
-    --P:log(5, 'OnSpellCastFailed: %s [%s]', spellID, {...})
-    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastFailed', spellID)
-end
-
----This event is fired immediately whenever you cast a spell, as well as
----every second while you channel spells.
----### See Also:
---- https://wowpedia.fandom.com/wiki/SPELL_UPDATE_COOLDOWN
-local function OnSpellUpdateCooldown(event, ...)
-    -- TODO NEXT: Update all button cooldowns
-    --L:log(1, 'OnSpellUpdateCooldown')
-    --FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellCastSent')
-    FireFrameEvent('OnRefreshSpellCooldowns', 'OnSpellUpdateCooldown')
-end
-
 ---Fired when the cooldown for an actionbar or inventory slot starts or
 ---stops. Also fires when you log into a new area.
 ---### See Also:
@@ -130,11 +105,7 @@ function L:OnAfterInitialize()
         end
     end
 
-    -- TODO NEXT: Refactor to Widget/SpellEventsHandler
-    AceEvent:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', OnSpellCastSucceeded)
-    AceEvent:RegisterEvent('UNIT_SPELLCAST_FAILED', OnSpellCastFailed)
-    AceEvent:RegisterEvent('SPELL_UPDATE_COOLDOWN', OnSpellUpdateCooldown)
-    AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
+    --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
 function L:CreateActionbarGroup(frameIndex)
@@ -167,7 +138,8 @@ function L:CreateSingleButton(dragFrame, row, col, index)
     local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-    btnWidget:UpdateCooldown()
+    btnWidget:UpdateState()
+    btnWidget:UpdateUsable()
     return btnWidget
 end
 

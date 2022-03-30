@@ -40,7 +40,7 @@ function _S:GetLibrary(libName, isAceLib)
     return LibStub(_S:GetLibVersionUnpacked(libName))
 end
 
-function _S:NewLibrary(libName)
+function _S:NewLibrary(libName, global)
     local major, minor = _S:GetLibVersionUnpacked(libName)
     local obj = LibStub:NewLibrary(major, minor)
     if type(obj.mt) ~= 'table' then obj.mt = {} end
@@ -48,6 +48,10 @@ function _S:NewLibrary(libName)
     setmetatable(obj, obj.mt)
 
     _S:Embed(obj, libName, major, minor)
+    if true == global then
+        obj:log('Setting global var: %s', __K_Core:GetGlobalVarName(libName))
+        __K_Core:SetGlobal(libName, obj)
+    end
     return obj
 end
 
@@ -140,7 +144,7 @@ local _L = {}
 ---```
 ---@return LocalLibStub, (fun(libName:string):table), (fun(addonName:string):table)
 function _L:LibPack()
-    local function NewLibrary(libName) return _S.NewLibrary(_S, libName) end
+    local function NewLibrary(libName, global) return _S.NewLibrary(_S, libName, global or false) end
     local function NewAddon(addonName) return _S.NewAddon(_S, addonName) end
     return _S, NewLibrary, NewAddon
 end
@@ -180,7 +184,12 @@ function _L:GetLogger() return _S:GetLogger() end
 ---Core:SetGlobal('MyVar', 'This is my var')
 ---```
 function _L:SetGlobal(varName, obj)
-    _G[_S.globalVarPrefix .. varName] = obj
+    _G[self:GetGlobalVarName(varName)] = obj
+    return obj
+end
+
+function _L:GetGlobalVarName(varName)
+    return _S.globalVarPrefix .. varName
 end
 
 ---### Syntax:

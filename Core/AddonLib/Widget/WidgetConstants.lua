@@ -20,6 +20,9 @@ CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
 TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
 TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock")
+ACTIONBAR_UPDATE_USABLE = 'ACTIONBAR_UPDATE_USABLE'
+ACTIONBAR_UPDATE_STATE = 'ACTIONBAR_UPDATE_STATE'
+BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED'
 
 ---@class WidgetConstants
 local _L = {}

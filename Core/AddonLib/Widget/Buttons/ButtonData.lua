@@ -28,20 +28,22 @@ local function ApplyMethods(bd)
         end
     end
 
-    local function CleanupTypeData(bd)
-        if bd == nil or bd.type == nil then return end
+    ---@param profileButton ProfileButton
+    local function CleanupTypeData(profileButton)
+        if profileButton == nil or profileButton.type == nil then return end
         local btnTypes = { 'spell', 'macro', 'item'}
-        removeElement(btnTypes, bd.type)
+        removeElement(btnTypes, profileButton.type)
         for _, v in ipairs(btnTypes) do
-            if v ~= nil then bd[v] = {} end
+            if v ~= nil then profileButton[v] = {} end
         end
     end
 
+    ---@return ProfileButton
     function bd:GetData()
-        local bd = self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
+        local profileButton = self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
         -- self cleanup
-        CleanupTypeData(bd)
-        return bd
+        CleanupTypeData(profileButton)
+        return profileButton
     end
 
     function bd:IsActionTypeSpell()

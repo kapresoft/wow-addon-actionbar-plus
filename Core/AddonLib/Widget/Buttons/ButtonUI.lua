@@ -18,6 +18,7 @@ Local Vars
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local _, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
+local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
 
 local _, Table, String, LogFactory = G:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
@@ -36,78 +37,19 @@ local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:Ge
 local SPELL,ITEM,MACRO = 'spell','item','macro'
 
 --[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-
----@param widget ButtonUIWidget
----@param name string The widget name.
-local function RegisterWidget(widget, name)
-    assert(widget ~= nil)
-    assert(name ~= nil)
-
-    local WidgetBase = AceGUI.WidgetBase
-    widget.userdata = {}
-    widget.events = {}
-    widget.base = WidgetBase
-    widget.frame.obj = widget
-    local mt = {
-        __tostring = function() return name  end,
-        __index = WidgetBase
-    }
-    setmetatable(widget, mt)
-end
-
-local function RegisterCallbacks(widget)
-    ---@param _widget ButtonUIWidget
-    widget:SetCallback('OnSpellUpdateCooldown', function(_widget)
-        _widget:UpdateState()
-        --_widget:Fire('OnAfterSpellCastSent', spell)
-    end)
-    ---@param _widget ButtonUIWidget
-    widget:SetCallback('OnSpellCastSucceeded', function(_widget)
-        _widget:UpdateState()
-    end)
-    widget:SetCallback('OnSpellCastFailed', function(_widget)
-        _widget:UpdateCooldown()
-    end)
-    widget:SetCallback('OnDragStart', function(self, event)
-        --p:log(50, '%s:: %s', event, tostring(self))
-    end)
-    widget:SetCallback("OnReceiveDrag", function(_widget)
-        _widget:UpdateCooldown()
-    end)
-end
-
----@param widget ButtonUIWidget
----@param rowNum number The row number
----@param colNum number The column number
-local function SetButtonLayout(widget, rowNum, colNum)
-    local barConfig = widget.dragFrame:GetConfig()
-    local buttonSize = barConfig.widget.buttonSize
-    local buttonPadding = widget.buttonPadding
-    local frameStrata = widget.frameStrata
-    local button = widget.button
-    local dragFrameWidget = widget.dragFrame
-
-    local widthPaddingAdj = dragFrameWidget.padding
-    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
-    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
-    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
-
-    button:SetFrameStrata(frameStrata)
-    button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
-end
-
-local function CreateFontString(button)
-    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint("BOTTOMRIGHT",-3, 2)
-    button.text = fs
-end
-
---[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
+---@param btnFrame ButtonUI
+local function OnEvent(btnFrame, event, ...)
+    local handlers = {
+        [BAG_UPDATE_DELAYED] = 'OnBagUpdateDelayed',
+        [ACTIONBAR_UPDATE_STATE] = 'OnUpdateButtonState',
+        [ACTIONBAR_UPDATE_USABLE] = 'OnUpdateButtonUsable'
+    }
+    --p:log("Event[%s] received.", event)
+    if handlers[event] then btnFrame.widget:Fire(handlers[event], event, ...) end
+end
+
 local function IsValidDragSource(cursorInfo)
     if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
@@ -178,6 +120,101 @@ local function invalidButtonData(o, key)
     return true
 end
 
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnUpdateButtonState(widget, event)
+    --p:log('Event[%s] recevied: %s', widget:GetName(), event)
+    widget:UpdateState()
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnUpdateButtonUsable(widget, event)
+    ABP_WidgetUtil:UpdateUsable(widget)
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnBagUpdateDelayed(widget, event)
+    widget:UpdateItemState()
+end
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+
+---@param widget ButtonUIWidget
+---@param name string The widget name.
+local function RegisterWidget(widget, name)
+    assert(widget ~= nil)
+    assert(name ~= nil)
+
+    local WidgetBase = AceGUI.WidgetBase
+    widget.userdata = {}
+    widget.events = {}
+    widget.base = WidgetBase
+    widget.frame.obj = widget
+    local mt = {
+        __tostring = function() return name  end,
+        __index = WidgetBase
+    }
+    setmetatable(widget, mt)
+end
+
+local function RegisterCallbacks(widget)
+
+    widget:RegisterEvent(ACTIONBAR_UPDATE_STATE, OnUpdateButtonState, widget)
+    widget:RegisterEvent(ACTIONBAR_UPDATE_USABLE, OnUpdateButtonUsable, widget)
+    widget:RegisterEvent(BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
+
+    --widget:SetCallback('OnDragStart', function(self, event)
+    --    --p:log(50, '%s:: %s', event, tostring(self))
+    --end)
+    widget:SetCallback("OnReceiveDrag", function(_widget)
+        _widget:UpdateCooldown()
+    end)
+    widget:SetCallback('OnUpdateButtonState', function(_widget)
+        OnUpdateButtonState(_widget)
+    end)
+    widget:SetCallback('OnUpdateButtonUsable', function(_widget)
+        OnUpdateButtonUsable(_widget)
+    end)
+    widget:SetCallback('OnBagUpdateDelayed', function(_widget)
+        OnBagUpdateDelayed(_widget)
+    end)
+    widget:SetCallback(BAG_UPDATE_DELAYED, function(_widget)
+        --OnBagUpdateDelayed(_widget)
+        p:log('event: %s', BAG_UPDATE_DELAYED)
+    end)
+end
+
+---@param widget ButtonUIWidget
+---@param rowNum number The row number
+---@param colNum number The column number
+local function SetButtonLayout(widget, rowNum, colNum)
+    local barConfig = widget.dragFrame:GetConfig()
+    local buttonSize = barConfig.widget.buttonSize
+    local buttonPadding = widget.buttonPadding
+    local frameStrata = widget.frameStrata
+    local button = widget.button
+    local dragFrameWidget = widget.dragFrame
+
+    local widthPaddingAdj = dragFrameWidget.padding
+    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
+    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
+    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
+
+    button:SetFrameStrata(frameStrata)
+    button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
+    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
+end
+
+local function CreateFontString(button)
+    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
+    fs:SetPoint("BOTTOMRIGHT",-3, 2)
+    button.text = fs
+end
+
 --[[-----------------------------------------------------------------------------
 Widget Methods
 -------------------------------------------------------------------------------]]
@@ -186,7 +223,8 @@ local function WidgetMethods(widget)
 
     function widget:GetName() return self.button:GetName() end
 
-    ---Get Profile Button Config Data
+    ---#### Get Profile Button Config Data
+    ---@return ProfileButton
     function widget:GetConfig()
         return self.buttonData:GetData()
     end
@@ -267,15 +305,6 @@ local function WidgetMethods(widget)
         return info
     end
 
-    ---@deprecated Use #GetConfig()
-    function widget:GetProfileButtonData()
-        local info = self:GetActionbarInfo()
-        if not info then
-            return nil
-        end
-        return P:GetButtonData(info.index, info.button.name)
-    end
-
     function widget:Reset()
         self:ResetCooldown()
         self:ClearText()
@@ -290,6 +319,10 @@ local function WidgetMethods(widget)
     function widget:UpdateState()
         self:UpdateCooldown()
         self:UpdateItemState()
+    end
+
+    function widget:UpdateUsable()
+        ABP_WidgetUtil:UpdateUsable(self)
     end
 
     function widget:UpdateCooldown()
@@ -371,9 +404,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript('OnLeave', OnLeave)
+    button:SetScript("OnEvent", OnEvent)
     CreateFontString(button)
-
-
     button:RegisterForDrag('LeftButton')
 
     ---@class Cooldown
@@ -409,6 +441,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         ---@type table
         buttonAttributes = CC.ButtonAttributes,
     }
+    AceEvent:Embed(widget)
+
     ---@type ButtonData
     local buttonData = ButtonDataBuilder:Create(widget)
     widget.buttonData =  buttonData

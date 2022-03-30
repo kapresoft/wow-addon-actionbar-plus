@@ -37,6 +37,21 @@ local ProfileBarTemplate = {
         }
     }
 }
+---@class ProfileButton
+local ProfileButtonTemplate = {
+    ['type'] = 'spell',
+    ["spell"] = {
+        ["minRange"] = 0,
+        ["id"] = 8232,
+        ["label"] = "Windfury Weapon |c00747474(Rank 1)|r",
+        ["name"] = "Windfury Weapon",
+        ["castTime"] = 0,
+        ["link"] = "|cff71d5ff|Hspell:8232:0|h[Windfury Weapon]|h|r",
+        ["maxRange"] = 0,
+        ["icon"] = 136018,
+        ["rank"] = "Rank 1",
+    }
+}
 
 local ProfileTemplate = {
     ["bars"] = {
@@ -113,6 +128,7 @@ function P:GetTemplate()
     }
 end
 
+---@return ProfileButton
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
     if not barData then return end
