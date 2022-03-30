@@ -38,7 +38,7 @@ local iconsLoaded = false
 local iconLoadTimer
 
 local loadMacroIcons = true
-local loadItemIcons = false
+local loadItemIcons = true
 local loadIconChunkSize = 20
 local loadingTickerIncrementInSeconds = 2.0
 
@@ -52,17 +52,14 @@ local function CreateIcon(dlg, iconChunks, chunkCount, chunkIndex)
         icon:SetImage(iconId)
         icon:SetImageSize(iconSize, iconSize)
         icon:SetRelativeWidth(0.06)
-        icon:SetCallback('OnClick', function()
-            dlg:SetSelectedIcon(iconId)
-            --dlg:Hide()
-        end)
+        icon:SetCallback('OnClick', function() dlg:SetSelectedIcon(iconId) end)
+        icon:SetCallback('OnEnter', function() dlg:PreviewIcon(iconId) end)
         dlg.iconsScrollFrame:AddChild(icon)
     end
-    _L:log('Loading Icon Chunk[%s of %s] Loaded: %s', chunkIndex, chunkCount, #iconChunks)
+    _L:log(10, 'Loading Icon Chunk[%s of %s] Loaded: %s', chunkIndex, chunkCount, #iconChunks)
 end
 
 local function LoadIconsIncrementally()
-    --_L:log('Icons Loaded: %s', iconsLoaded)
     if iconsLoaded then return end
 
     local dlg = _L:GetDialog()
@@ -76,7 +73,7 @@ local function LoadIconsIncrementally()
         local itemIcons = GetMacroItemIcons()
         icons = Table.append(itemIcons, icons)
     end
-    _L:log('Loading %s icons in the background...', #icons)
+    _L:log(1, 'Loading %s icons in the background...', #icons)
 
     dlg.iconsScrollFrame:ReleaseChildren()
     local chunks = Table.chunkedArray(icons, loadIconChunkSize)
@@ -91,7 +88,7 @@ local function LoadIconsIncrementally()
         end
         if #chunks <= 0 then
             iconLoadTimer:Cancel()
-            _L:log('Done loading icons.')
+            _L:log(1, 'Done loading icons.')
         end
     end)
 end
@@ -102,7 +99,7 @@ Methods
 
 function _L:GetDialog()
     if thisDialog == nil then
-        self:log('New MacroTextureDialog instance created.')
+        self:log(10, 'New MacroTextureDialog instance created.')
         thisDialog = self:CreateTexturePopupDialog()
     end
     return thisDialog
@@ -141,14 +138,10 @@ function _L:CreateTexturePopupDialog()
     local iconEditbox = AceGUI:Create("EditBox")
     iconEditbox:SetLabel("Selected Icon ID:")
     iconEditbox:SetWidth(150)
-    --iconEditbox:SetCallback("OnEnterPressed", function(widget)
-    --    print('OnEnterPressed')
-    --    widget:HighlightText()
-    --end)
+    ---### Selects and focuses on input box so user can cut or copy text
     iconEditbox:SetCallback("OnEnter", function(widget, event, text)
         widget:HighlightText()
         widget:SetFocus()
-        _L:log('OnEnter: %s', type(widget.obj))
     end)
     iconEditbox:SetCallback("OnEnterPressed", function(widget, event, text)
         local value = ICON_PREFIX .. text
@@ -180,11 +173,17 @@ function _L:CreateTexturePopupDialog()
         if not iconId then return end
         self:SetIconId(iconId)
         iconPreview:SetImage(iconId)
-        _L:log('optionalCallbackFn: %s', _L.optionalCallbackFn)
         if _L.optionalCallbackFn then
+            _L:log(10, 'optionalCallbackFn: %s', _L.optionalCallbackFn)
             _L.optionalCallbackFn(iconId)
         end
         if _L.closeOnSelect then self:Hide() end
+    end
+    function frame:PreviewIcon(iconId)
+        if not iconId then return end
+        if not _L.closeOnSelect then return end
+        self:SetIconId(iconId)
+        iconPreview:SetImage(iconId)
     end
     function frame:SetEnteredIcon(iconPathOrId)
         if not iconPathOrId then
