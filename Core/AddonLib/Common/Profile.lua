@@ -50,6 +50,21 @@ local ProfileButtonTemplate = {
         ["maxRange"] = 0,
         ["icon"] = 136018,
         ["rank"] = "Rank 1",
+    },
+    ["item"] = {
+        ["name"] = "Arcane Powder",
+        ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
+        ["id"] = 17020,
+        ["stackCount"] = 20,
+        ["icon"] = 133848,
+        ["count"] = 40,
+    },
+    ["macro"] = {
+        ["type"] = "macro",
+        ["index"] = 41,
+        ["name"] = "z#LOL",
+        ["icon"] = 132093,
+        ["body"] = "/lol\n",
     }
 }
 

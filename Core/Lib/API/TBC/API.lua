@@ -82,13 +82,13 @@ end
 --- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
 --- See: [GetItemInfoInstant](https://wowpedia.fandom.com/wiki/API_GetItemInfoInstant)
 ---@return ItemInfo
-function S:GetItemInfo(itemId)
+function S:GetItemInfo(itemID)
     local itemName, itemLink,
         itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
         itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-        expacID, setID, isCraftingReagent = GetItemInfo(itemId)
+        expacID, setID, isCraftingReagent = GetItemInfo(itemID)
 
-    local count = GetItemCount(itemId, false, true, true) or 0
+    local count = GetItemCount(itemID, false, true, true) or 0
 
     ---@class ItemInfo
     local itemInfo = { id = itemID, name = itemName, link = itemLink, icon = itemTexture,
@@ -98,6 +98,12 @@ function S:GetItemInfo(itemId)
                        subclassID=subclassID, bindType=bindType,
                        isCraftingReagent=isCraftingReagent }
     return itemInfo
+end
+
+---@return string, number
+function S:GetItemSpellInfo(itemIdNameOrLink)
+   local spellName, spellID = GetItemSpell(itemIdNameOrLink)
+   return spellName, spellID
 end
 
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)

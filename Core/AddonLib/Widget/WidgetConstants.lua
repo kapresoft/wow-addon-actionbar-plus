@@ -19,12 +19,19 @@ ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
 CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
 TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold")
-TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\ButtonHilight-Square]]
-TEXTURE_HIGHLIGHT3 = [[Interface\QuestFrame\UI-QuestTitleHighlight]]
+TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\WHITE8X8]]
+TEXTURE_HIGHLIGHT3 = [[Interface\Buttons\ButtonHilight-Square]]
+TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]]
 TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock")
 ACTIONBAR_UPDATE_USABLE = 'ACTIONBAR_UPDATE_USABLE'
 ACTIONBAR_UPDATE_STATE = 'ACTIONBAR_UPDATE_STATE'
 BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED'
+UNIT_SPELLCAST_START = 'UNIT_SPELLCAST_START'
+UNIT_SPELLCAST_STOP = 'UNIT_SPELLCAST_STOP'
+UNIT_SPELLCAST_SUCCEEDED = 'UNIT_SPELLCAST_SUCCEEDED'
+
+HIGHLIGHT_DRAW_LAYER = 'HIGHLIGHT'
+ARTWORK_DRAW_LAYER = 'ARTWORK'
 
 ---@class WidgetConstants
 local _L = {}
@@ -51,13 +58,6 @@ end
 function ShowReloadUIConfirmation()
     StaticPopup_Show(CONFIRM_RELOAD_UI)
 end
-
---local function logger()
---    if _logger == nil then
---        _logger = LogFactory('WidgetConstants')
---    end
---    return _logger
---end
 
 --- ### Example
 ---```

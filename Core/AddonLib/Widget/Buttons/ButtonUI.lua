@@ -24,6 +24,7 @@ local _, Table, String, LogFactory = G:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
+local WU = ABP_WidgetUtil
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
@@ -39,17 +40,6 @@ local SPELL,ITEM,MACRO = 'spell','item','macro'
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
----@param btnFrame ButtonUI
-local function OnEvent(btnFrame, event, ...)
-    local handlers = {
-        [BAG_UPDATE_DELAYED] = 'OnBagUpdateDelayed',
-        [ACTIONBAR_UPDATE_STATE] = 'OnUpdateButtonState',
-        [ACTIONBAR_UPDATE_USABLE] = 'OnUpdateButtonUsable'
-    }
-    --p:log("Event[%s] received.", event)
-    if handlers[event] then btnFrame.widget:Fire(handlers[event], event, ...) end
-end
-
 local function IsValidDragSource(cursorInfo)
     if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
@@ -123,20 +113,44 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonState(widget, event)
-    --p:log('Event[%s] recevied: %s', widget:GetName(), event)
+    --p:log('Event[%s] received: %s btnSpell=%s', widget:GetName(), event, widget:GetConfig()
     widget:UpdateState()
 end
 
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonUsable(widget, event)
-    ABP_WidgetUtil:UpdateUsable(widget)
+    WU:UpdateUsable(widget)
 end
 
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnBagUpdateDelayed(widget, event)
     widget:UpdateItemState()
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnSpellCastStart(widget, event, ...)
+    local unitTarget, castGUID, spellID = ...
+    if 'player' ~= unitTarget then return end
+    if widget:IsMatchingItemSpell(spellID) then
+        --local spellInfo = _API:GetSpellInfo(spellID)
+        --p:log('[%s]: %s[%s]', event, spellInfo.name, spellID)
+        widget:SetItemInUse()
+    end
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnSpellCastStop(widget, event, ...)
+    local unitTarget, castGUID, spellID = ...
+    if 'player' ~= unitTarget then return end
+    if widget:IsMatchingItemSpell(spellID) then
+        --local spellInfo = _API:GetSpellInfo(spellID)
+        --p:log('[%s]: %s[%s]', event, spellInfo.name, spellID)
+        widget:ResetHighlight()
+    end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -166,6 +180,8 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(ACTIONBAR_UPDATE_STATE, OnUpdateButtonState, widget)
     widget:RegisterEvent(ACTIONBAR_UPDATE_USABLE, OnUpdateButtonUsable, widget)
     widget:RegisterEvent(BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
+    widget:RegisterEvent(UNIT_SPELLCAST_START, OnSpellCastStart, widget)
+    widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
 
     --widget:SetCallback('OnDragStart', function(self, event)
     --    --p:log(50, '%s:: %s', event, tostring(self))
@@ -173,19 +189,19 @@ local function RegisterCallbacks(widget)
     widget:SetCallback("OnReceiveDrag", function(_widget)
         _widget:UpdateCooldown()
     end)
-    widget:SetCallback('OnUpdateButtonState', function(_widget)
-        OnUpdateButtonState(_widget)
-    end)
-    widget:SetCallback('OnUpdateButtonUsable', function(_widget)
-        OnUpdateButtonUsable(_widget)
-    end)
-    widget:SetCallback('OnBagUpdateDelayed', function(_widget)
-        OnBagUpdateDelayed(_widget)
-    end)
-    widget:SetCallback(BAG_UPDATE_DELAYED, function(_widget)
-        --OnBagUpdateDelayed(_widget)
-        p:log('event: %s', BAG_UPDATE_DELAYED)
-    end)
+    --widget:SetCallback('OnUpdateButtonState', function(_widget)
+    --    OnUpdateButtonState(_widget)
+    --end)
+    --widget:SetCallback('OnUpdateButtonUsable', function(_widget)
+    --    OnUpdateButtonUsable(_widget)
+    --end)
+    --widget:SetCallback('OnBagUpdateDelayed', function(_widget)
+    --    OnBagUpdateDelayed(_widget)
+    --end)
+    --widget:SetCallback(BAG_UPDATE_DELAYED, function(_widget)
+    --    --OnBagUpdateDelayed(_widget)
+    --    p:log('event: %s', BAG_UPDATE_DELAYED)
+    --end)
 end
 
 ---@param widget ButtonUIWidget
@@ -311,19 +327,12 @@ local function WidgetMethods(widget)
     end
 
     function widget:ResetCooldown() self:SetCooldown(0, 0) end
-
-    function widget:SetCooldown(start, duration)
-        self.cooldown:SetCooldown(start, duration)
-    end
-
+    function widget:SetCooldown(start, duration) self.cooldown:SetCooldown(start, duration) end
     function widget:UpdateState()
         self:UpdateCooldown()
         self:UpdateItemState()
     end
-
-    function widget:UpdateUsable()
-        ABP_WidgetUtil:UpdateUsable(self)
-    end
+    function widget:UpdateUsable() WU:UpdateUsable(self) end
 
     function widget:UpdateCooldown()
         local cd = self:GetCooldownInfo()
@@ -340,8 +349,8 @@ local function WidgetMethods(widget)
         self:ClearText()
         local btnData = self:GetConfig()
         if invalidButtonData(btnData, ITEM) then return end
-        local itemId = btnData.item.id
-        local itemInfo = _API:GetItemInfo(itemId)
+        local itemID = btnData.item.id
+        local itemInfo = _API:GetItemInfo(itemID)
         if itemInfo == nil then return end
         local stackCount = itemInfo.stackCount or 1
         btnData.item.count = itemInfo.count
@@ -377,13 +386,11 @@ local function WidgetMethods(widget)
         return true
     end
 
-    function widget:ClearHighlight()
-        self.button:SetHighlightTexture(nil)
-    end
-
-    function widget:SetTextures(icon)
-        ABP_WidgetUtil:SetTextures(self, icon)
-    end
+    function widget:ClearHighlight() self.button:SetHighlightTexture(nil) end
+    function widget:ResetHighlight() WU:ResetHighlight(self) end
+    function widget:SetTextures(icon) WU:SetTextures(self, icon) end
+    function widget:SetItemInUse() WU:SetItemInUse(self) end
+    function widget:IsMatchingItemSpell(spellID) return WU:IsMatchingItemSpell(self, spellID) end
 
 end
 
@@ -413,7 +420,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript('OnLeave', OnLeave)
-    button:SetScript("OnEvent", OnEvent)
     CreateFontString(button)
     button:RegisterForDrag('LeftButton')
 
