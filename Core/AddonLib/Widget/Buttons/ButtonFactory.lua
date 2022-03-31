@@ -138,8 +138,10 @@ function L:CreateSingleButton(dragFrame, row, col, index)
     local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-    btnWidget:UpdateState()
-    btnWidget:UpdateUsable()
+    C_Timer.After(2, function()
+        btnWidget:UpdateState()
+        btnWidget:UpdateUsable()
+    end)
     return btnWidget
 end
 
