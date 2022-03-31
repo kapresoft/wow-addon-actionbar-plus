@@ -49,11 +49,10 @@ function _L:SetSpellUsable(buttonWidget, isUsable)
 end
 
 ---@param btnWidget ButtonUIWidget
-function _L:SetItemInUse(btnWidget)
+function _L:SetHighlightInUse(btnWidget)
     local hlt = btnWidget.button:GetHighlightTexture()
     hlt:SetDrawLayer(ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
-    self:log('item in use')
 end
 
 function _L:ResetHighlight(btnWidget)
@@ -103,10 +102,19 @@ function _L:IsValidMacroProfile(profileButton)
             or IsBlank(profileButton.macro.name))
 end
 
+---@param btnWidget ButtonUIWidget
 function _L:IsMatchingItemSpell(btnWidget, eventItemSpellID)
     local btnProfile = btnWidget:GetConfig()
     if not self:IsValidItemProfile(btnProfile) then return end
     local _, btnItemSpellId = _API:GetItemSpellInfo(btnProfile.item.id)
     if eventItemSpellID == btnItemSpellId then return true end
+    return false
+end
+
+---@param btnWidget ButtonUIWidget
+function _L:IsMatchingSpell(btnWidget, eventSpellID)
+    local btnProfile = btnWidget:GetConfig()
+    if not self:IsValidSpellProfile(btnProfile) then return end
+    if eventSpellID == btnProfile.spell.id then return true end
     return false
 end

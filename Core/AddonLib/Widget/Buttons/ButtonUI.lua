@@ -134,10 +134,10 @@ end
 local function OnSpellCastStart(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    if widget:IsMatchingItemSpell(spellID) then
+    if widget:IsMatchingItemSpell(spellID) or widget:IsMatchingSpell(spellID) then
         --local spellInfo = _API:GetSpellInfo(spellID)
-        --p:log('[%s]: %s[%s]', event, spellInfo.name, spellID)
-        widget:SetItemInUse()
+        --p:log('Match[%s]: %s[%s]', event, spellInfo.name, spellID)
+        widget:SetHighlightInUse()
     end
 end
 
@@ -146,9 +146,8 @@ end
 local function OnSpellCastStop(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    if widget:IsMatchingItemSpell(spellID) then
-        --local spellInfo = _API:GetSpellInfo(spellID)
-        --p:log('[%s]: %s[%s]', event, spellInfo.name, spellID)
+    --p:log('Event[%s]: unitTarget=%s spellID=%s', event, unitTarget, spellID)
+    if widget:IsMatchingItemSpell(spellID) or widget:IsMatchingSpell(spellID) then
         widget:ResetHighlight()
     end
 end
@@ -389,9 +388,9 @@ local function WidgetMethods(widget)
     function widget:ClearHighlight() self.button:SetHighlightTexture(nil) end
     function widget:ResetHighlight() WU:ResetHighlight(self) end
     function widget:SetTextures(icon) WU:SetTextures(self, icon) end
-    function widget:SetItemInUse() WU:SetItemInUse(self) end
+    function widget:SetHighlightInUse() WU:SetHighlightInUse(self) end
     function widget:IsMatchingItemSpell(spellID) return WU:IsMatchingItemSpell(self, spellID) end
-
+    function widget:IsMatchingSpell(spellID) return WU:IsMatchingSpell(self, spellID) end
 end
 
 --[[-----------------------------------------------------------------------------
