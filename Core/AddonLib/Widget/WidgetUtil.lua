@@ -103,18 +103,19 @@ function _L:IsValidMacroProfile(profileButton)
 end
 
 ---@param btnWidget ButtonUIWidget
-function _L:IsMatchingItemSpell(btnWidget, eventItemSpellID)
-    local btnProfile = btnWidget:GetConfig()
-    if not self:IsValidItemProfile(btnProfile) then return end
-    local _, btnItemSpellId = _API:GetItemSpellInfo(btnProfile.item.id)
+---@param profileButton ProfileButton
+function _L:IsMatchingItemSpell(profileButton, eventItemSpellID)
+    --local profileButton = btnWidget:GetConfig()
+    if not self:IsValidItemProfile(profileButton) then return end
+    local _, btnItemSpellId = _API:GetItemSpellInfo(profileButton.item.id)
     if eventItemSpellID == btnItemSpellId then return true end
     return false
 end
 
 ---@param btnWidget ButtonUIWidget
-function _L:IsMatchingSpell(btnWidget, eventSpellID)
-    local btnProfile = btnWidget:GetConfig()
-    if not self:IsValidSpellProfile(btnProfile) then return end
-    if eventSpellID == btnProfile.spell.id then return true end
+function _L:IsMatchingSpell(profileButton, eventSpellID)
+    --local profileButton = btnWidget:GetConfig()
+    if not self:IsValidSpellProfile(profileButton) then return end
+    if eventSpellID == profileButton.spell.id then return true end
     return false
 end

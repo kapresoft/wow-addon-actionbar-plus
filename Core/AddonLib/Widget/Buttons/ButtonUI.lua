@@ -129,25 +129,31 @@ local function OnBagUpdateDelayed(widget, event)
     widget:UpdateItemState()
 end
 
+---#### Non-Instant Start-Cast Handler
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnSpellCastStart(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    if widget:IsMatchingItemSpell(spellID) or widget:IsMatchingSpell(spellID) then
+    local profileButton = widget:GetConfig()
+    if widget:IsMatchingItemSpell(profileButton, spellID)
+            or widget:IsMatchingSpell(profileButton, spellID) then
         --local spellInfo = _API:GetSpellInfo(spellID)
         --p:log('Match[%s]: %s[%s]', event, spellInfo.name, spellID)
         widget:SetHighlightInUse()
     end
 end
 
+---#### Non-Instant Stop-Cast Handler
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnSpellCastStop(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     --p:log('Event[%s]: unitTarget=%s spellID=%s', event, unitTarget, spellID)
-    if widget:IsMatchingItemSpell(spellID) or widget:IsMatchingSpell(spellID) then
+    local profileButton = widget:GetConfig()
+    if widget:IsMatchingItemSpell(profileButton, spellID)
+            or widget:IsMatchingSpell(profileButton, spellID) then
         widget:ResetHighlight()
     end
 end
@@ -389,8 +395,12 @@ local function WidgetMethods(widget)
     function widget:ResetHighlight() WU:ResetHighlight(self) end
     function widget:SetTextures(icon) WU:SetTextures(self, icon) end
     function widget:SetHighlightInUse() WU:SetHighlightInUse(self) end
-    function widget:IsMatchingItemSpell(spellID) return WU:IsMatchingItemSpell(self, spellID) end
-    function widget:IsMatchingSpell(spellID) return WU:IsMatchingSpell(self, spellID) end
+    function widget:IsMatchingItemSpell(profileButton, spellID)
+        return WU:IsMatchingItemSpell(profileButton, spellID)
+    end
+    function widget:IsMatchingSpell(profileButton, spellID)
+        return WU:IsMatchingSpell(profileButton, spellID)
+    end
 end
 
 --[[-----------------------------------------------------------------------------
