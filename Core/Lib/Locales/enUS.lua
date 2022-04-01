@@ -27,3 +27,5 @@ L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON16"] = 'Bar 1 - Button 16'
 
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']  = 'Lock Actionbars with SHIFT key'
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']  = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
+L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide Actionbars while in taxi'
+L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC']  = 'Hides the action bars while the player is in taxi; flying from one point to another.'

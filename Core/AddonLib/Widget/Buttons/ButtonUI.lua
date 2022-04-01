@@ -200,8 +200,10 @@ local function RegisterCallbacks(widget)
     --widget:SetCallback('OnDragStart', function(self, event)
     --    --p:log(50, '%s:: %s', event, tostring(self))
     --end)
+    ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
-        _widget:UpdateCooldown()
+        --_widget:UpdateCooldown()
+        _widget:UpdateStateDelayed(0.01)
     end)
 end
 
@@ -334,17 +336,14 @@ local function WidgetMethods(widget)
 
     function widget:ResetCooldown() self:SetCooldown(0, 0) end
     function widget:SetCooldown(start, duration) self.cooldown:SetCooldown(start, duration) end
+    function widget:UpdateUsable() WU:UpdateUsable(self) end
     function widget:UpdateState()
         self:UpdateCooldown()
         self:UpdateItemState()
+        self:UpdateUsable()
     end
-    function widget:UpdateUsable() WU:UpdateUsable(self) end
-
     function widget:UpdateStateDelayed(inSeconds)
-        C_Timer.After(inSeconds, function()
-            self:UpdateState()
-            self:UpdateUsable()
-        end)
+        C_Timer.After(inSeconds, function() self:UpdateState() end)
     end
 
     function widget:UpdateCooldown()

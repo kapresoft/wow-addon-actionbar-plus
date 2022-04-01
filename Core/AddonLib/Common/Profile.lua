@@ -9,6 +9,7 @@ local WAttr = CC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+---@type ProfileInitializer
 local ProfileInitializer = LibStub(M.ProfileInitializer)
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
@@ -102,7 +103,8 @@ local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
 ---@class ProfileConfigNames
 local ConfigNames = {
-    ['lock_actionbars'] = 'lock_actionbars'
+    ['lock_actionbars'] = 'lock_actionbars',
+    ['hide_when_taxi'] = 'hide_when_taxi'
 }
 
 local SPELL = { id = nil, name = nil, icon = nil, label = nil }

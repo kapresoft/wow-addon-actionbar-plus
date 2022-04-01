@@ -134,6 +134,15 @@ local methods = {
                     desc = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC,
                     get = PropertyGetter(self, PC.lock_actionbars, false),
                     set = PropertySetter(self, PC.lock_actionbars, false)
+                },
+                hide_while_taxi = {
+                    type = 'toggle',
+                    order = order + 2,
+                    width = 'full',
+                    name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
+                    desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
+                    get = PropertyGetter(self, PC.hide_when_taxi, false),
+                    set = PropertySetter(self, PC.hide_when_taxi, false)
                 }
             }
         }

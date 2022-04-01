@@ -57,6 +57,8 @@ local ITEM_TEMPLATE = {
 }
 
 local DEFAULT_PROFILE_DATA = {
+    ["lock_actionbars"] = false,
+    ["hide_when_taxi"] = true,
     ["bars"] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = true,
