@@ -67,11 +67,9 @@ local function OnDragStart(btnUI)
     PH:Pickup(btnData)
 
     w:SetButtonAsEmpty()
-    btnUI:SetNormalTexture(TEXTURE_EMPTY)
-    btnUI.widget:ClearHighlight()
     btnUI:SetScript("OnEnter", nil)
     btnUI.widget:Fire('OnDragStart')
-    -- TODO NEXT: Handle Drag-And-Drop for Macro and Item
+    -- TODO NEXT: Handle Drag-And-Drop for Macrotexts
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
@@ -495,10 +493,13 @@ end
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+---@return ButtonUILib
 local function NewLibrary()
 
+    ---@class ButtonUILib
     local _L = LibStub:NewLibrary(M.ButtonUI, 1)
 
+    ---@return ButtonUIWidgetBuilder
     function _L:WidgetBuilder() return _B end
 
     return _L

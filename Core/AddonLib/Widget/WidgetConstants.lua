@@ -78,5 +78,5 @@ end
 ---@return WidgetLibFactory
 function _L:LibPack_WidgetFactory() return LibStub(M.WidgetLibFactory) end
 
----@return ButtonUI
+---@return ButtonUILib
 function _L:LibPack_ButtonUI() return LibStub(M.ButtonUI) end

@@ -16,8 +16,10 @@ local ButtonFrameFactory, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
 local ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
+---@type ButtonUILib
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
+
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
 if not L then return end
@@ -40,9 +42,10 @@ local function ShowConfigTooltip(frame)
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
+---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
     --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
-    L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
+    --L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
     L:SetButtonAttributes(btnWidget)
 end
 
@@ -120,6 +123,7 @@ function L:CreateActionbarGroup(frameIndex)
     return f
 end
 
+---@param frameWidget FrameWidget
 function L:CreateButtons(frameWidget, rowSize, colSize)
     local index = 0
     for row=1, rowSize do
@@ -131,15 +135,11 @@ function L:CreateButtons(frameWidget, rowSize, colSize)
     end
 end
 
--- TODO NEXT: Register Buttons so we can fire button events
---      for all buttons, btn:Fire('OnCooldown') on click
-function L:CreateSingleButton(dragFrame, row, col, index)
-    ---@type ButtonUIWidget
-    local btnWidget = ButtonUI:WidgetBuilder():Create(dragFrame, row, col, index)
+---@param frameWidget FrameWidget
+function L:CreateSingleButton(frameWidget, row, col, index)
+    local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, index)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-    --btnWidget:UpdateState()
-    --btnWidget:UpdateUsable()
     btnWidget:UpdateStateDelayed(30)
     return btnWidget
 end
@@ -151,7 +151,7 @@ function L:SetButtonAttributes(btnWidget)
     if btnData == nil or String.IsBlank(btnData.type) then return end
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then
-        self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
+        --self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
         return
     end
     setter:SetAttributes(btnWidget.button, btnData)
