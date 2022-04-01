@@ -15,6 +15,9 @@ local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
 ---@class Profile
 local P = LibStub:NewLibrary(M.Profile)
+---@type Profile
+ABP_Profile = P
+
 if not P then return end
 
 ---- ## Start Here ----

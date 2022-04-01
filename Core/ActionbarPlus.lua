@@ -232,7 +232,9 @@ local methods = {
     ['OpenConfig'] = function(self, sourceFrameWidget)
         --select the frame config tab if possible
         local optionsConfigPath = nil
-        if sourceFrameWidget ~= nil then optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex() end
+        if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
+            optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
+        end
         if optionsConfigPath ~= nil then
             ACE_CFGD:SelectGroup(ADDON_NAME, optionsConfigPath)
         end

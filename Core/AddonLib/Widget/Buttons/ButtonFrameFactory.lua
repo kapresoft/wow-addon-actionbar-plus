@@ -117,6 +117,14 @@ local function WidgetMethods(widget)
         return P:IsBarEnabled(frameIndex)
     end
 
+    function widget:SetGroupState(isShown)
+        if isShown == true then
+            if self.ShowGroup then self:ShowGroup() end
+            return
+        end
+        if self.HideGroup then self:HideGroup() end
+    end
+
     function widget:ToggleGroup()
         if #self.buttons > 0 then
             local firstBtn = _G[self.buttons[1]]
@@ -213,6 +221,8 @@ function _L:CreateFrame(frameIndex)
 
     ---@class FrameWidget
     local widget = {
+        p = p,
+        profile = P,
         frameIndex = frameIndex,
         options = barConfig.widget,
         frameHandleHeight = 4,

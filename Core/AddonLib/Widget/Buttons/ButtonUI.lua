@@ -66,7 +66,7 @@ local function OnDragStart(btnUI)
     local btnData = btnUI.widget:GetConfig()
     PH:Pickup(btnData)
 
-    w:ResetConfig()
+    w:SetButtonAsEmpty()
     btnUI:SetNormalTexture(TEXTURE_EMPTY)
     btnUI.widget:ClearHighlight()
     btnUI:SetScript("OnEnter", nil)
@@ -113,7 +113,6 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonState(widget, event)
-    --p:log('Event[%s] received: %s btnSpell=%s', widget:GetName(), event, widget:GetConfig()
     widget:UpdateState()
 end
 
@@ -157,7 +156,17 @@ local function OnSpellCastStop(widget, event, ...)
         widget:ResetHighlight()
     end
 end
+local function OnPlayerControlLost(widget, event, ...)
+    local flying = UnitOnTaxi('player')
+    p:log('Event[%s] received flying=%s', event, flying)
+    WU:SetEnabledActionBarStates(false)
+end
 
+local function OnPlayerControlGained(widget, event, ...)
+    local flying = UnitOnTaxi('player')
+    p:log('Event[%s] received flying=%s', event, flying)
+    WU:SetEnabledActionBarStates(true)
+end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -187,6 +196,8 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
     widget:RegisterEvent(UNIT_SPELLCAST_START, OnSpellCastStart, widget)
     widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
+    widget:RegisterEvent(PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
+    widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
 
     --widget:SetCallback('OnDragStart', function(self, event)
     --    --p:log(50, '%s:: %s', event, tostring(self))
@@ -194,19 +205,6 @@ local function RegisterCallbacks(widget)
     widget:SetCallback("OnReceiveDrag", function(_widget)
         _widget:UpdateCooldown()
     end)
-    --widget:SetCallback('OnUpdateButtonState', function(_widget)
-    --    OnUpdateButtonState(_widget)
-    --end)
-    --widget:SetCallback('OnUpdateButtonUsable', function(_widget)
-    --    OnUpdateButtonUsable(_widget)
-    --end)
-    --widget:SetCallback('OnBagUpdateDelayed', function(_widget)
-    --    OnBagUpdateDelayed(_widget)
-    --end)
-    --widget:SetCallback(BAG_UPDATE_DELAYED, function(_widget)
-    --    --OnBagUpdateDelayed(_widget)
-    --    p:log('event: %s', BAG_UPDATE_DELAYED)
-    --end)
 end
 
 ---@param widget ButtonUIWidget
@@ -306,6 +304,11 @@ local function WidgetMethods(widget)
         return btnData[ITEM]
     end
 
+    function widget:SetButtonAsEmpty()
+        self:ResetConfig()
+        self:SetTextureAsEmpty()
+    end
+
     function widget:ResetConfig()
         P:ResetButtonData(self)
         self:ResetWidgetAttributes()
@@ -338,6 +341,13 @@ local function WidgetMethods(widget)
         self:UpdateItemState()
     end
     function widget:UpdateUsable() WU:UpdateUsable(self) end
+
+    function widget:UpdateStateDelayed(inSeconds)
+        C_Timer.After(inSeconds, function()
+            self:UpdateState()
+            self:UpdateUsable()
+        end)
+    end
 
     function widget:UpdateCooldown()
         local cd = self:GetCooldownInfo()
@@ -393,14 +403,12 @@ local function WidgetMethods(widget)
 
     function widget:ClearHighlight() self.button:SetHighlightTexture(nil) end
     function widget:ResetHighlight() WU:ResetHighlight(self) end
+    function widget:SetTextureAsEmpty() self:SetTextures(noIconTexture) end
     function widget:SetTextures(icon) WU:SetTextures(self, icon) end
-    function widget:SetHighlightInUse() WU:SetHighlightInUse(self) end
-    function widget:IsMatchingItemSpell(profileButton, spellID)
-        return WU:IsMatchingItemSpell(profileButton, spellID)
-    end
-    function widget:IsMatchingSpell(profileButton, spellID)
-        return WU:IsMatchingSpell(profileButton, spellID)
-    end
+    function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
+    function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
+    function widget:IsMatchingItemSpell(profileButton, spellID) return WU:IsMatchingItemSpell(profileButton, spellID) end
+    function widget:IsMatchingSpell(profileButton, spellID) return WU:IsMatchingSpell(profileButton, spellID) end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -422,9 +430,9 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-    button:SetNormalTexture(noIconTexture)
-    --button:SetCheckedTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
-    button:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+
+
+
     AceHook:SecureHookScript(button, 'OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
@@ -476,6 +484,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
     SetButtonLayout(widget, rowNum, colNum)
+    widget:SetTextures(noIconTexture)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
