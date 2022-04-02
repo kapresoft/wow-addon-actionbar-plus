@@ -156,13 +156,12 @@ local function OnSpellCastStop(widget, event, ...)
 end
 local function OnPlayerControlLost(widget, event, ...)
     local flying = UnitOnTaxi('player')
-    p:log('Event[%s] received flying=%s', event, flying)
     WU:SetEnabledActionBarStates(false)
 end
 
 local function OnPlayerControlGained(widget, event, ...)
     local flying = UnitOnTaxi('player')
-    p:log('Event[%s] received flying=%s', event, flying)
+    --p:log('Event[%s] received flying=%s', event, flying)
     WU:SetEnabledActionBarStates(true)
 end
 --[[-----------------------------------------------------------------------------
