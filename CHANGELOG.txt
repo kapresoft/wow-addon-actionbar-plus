@@ -1,0 +1,6 @@
+# 1.0.3-alpha
+- Vanilla interface version update
+- pkgmeta changes (changelog and license)
+
+# 1.0.2-alpha
+Initial Release
