@@ -1,14 +1,14 @@
 ## Interface: 20504
 ## Version: 1.0
-## Title: Actionbar|cff1784d1Plus|r
+## Title: Actionbar|cff1784d1Plus|r TBC
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: antonio@kapresoft.com
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE
-## SavedVariablesPerCharacter: ABP_CHARACTER_DB
+## SavedVariablesPerCharacter: ABP_LOG_LEVEL, ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
 
-## X-Min-Interface: 11401
+## X-Min-Interface: 20501
 ## X-LoadOn-Always: delayed
 ## X-Credits: antonio@kapresoft.com
 ## X-Category: ActionBars
@@ -24,4 +24,4 @@
 # /run print(select(4, GetBuildInfo()))
 
 Core\_Core.xml
-Retail\_ActionbarPlus.xml
+TBC\_ActionbarPlus.xml
