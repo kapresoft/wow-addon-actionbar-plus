@@ -1,6 +1,6 @@
-## Interface: 11401
+## Interface: 90200
 ## Version: 1.0
-## Title: Actionbar|cff1784d1Plus|r Classic
+## Title: Actionbar|cff1784d1Plus|r
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: antonio@kapresoft.com
 ## DefaultState: enabled
@@ -8,7 +8,7 @@
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
 
-## X-Min-Interface: 11401
+## X-Min-Interface: 90100
 ## X-LoadOn-Always: delayed
 ## X-Credits: antonio@kapresoft.com
 ## X-Category: ActionBars
@@ -23,5 +23,5 @@
 # To get the Interface/Build Info
 # /run print(select(4, GetBuildInfo()))
 
-Core\_Core.xml
-Vanilla\_ActionbarPlus.xml
+Core\_Core.xmlq
+Retail\_ActionbarPlus.xml
