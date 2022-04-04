@@ -4,19 +4,11 @@ enable-nolib-creation: no
 manual-changelog: CHANGELOG.txt
 license-output: LICENSE.txt
 
-externals:
-#  Core/ExtLib/Ace3/LibStub:
-#    url: https://www.curseforge.com/wow/addons/libstub
-#    tag:
-#  Core/ExtLib/Ace3/CallbackHandler-1.0:
-#    url: https://www.curseforge.com/wow/addons/callbackhandler
-#    tag:
-  Core/ExtLib/Ace3:
-    url: svn://repos.curseforge.com/wow/ace/trunk
-    tag: latest
-#  Core/ExtLib/LibSharedMedia-3.0:
-#    url: https://www.curseforge.com/wow/addons/libsharedmedia-3-0
-#    tag:
+required-dependencies
+  - ace3
+  - libstub
+  - callbackhandler
+  - libsharedmedia-3-0
 
 # Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
 #ignore:
