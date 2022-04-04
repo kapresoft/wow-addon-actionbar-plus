@@ -1,6 +1,6 @@
 ## Interface: 11401
 ## Version: 1.0
-## Title: Actionbar|cff1784d1Plus|r TBC
+## Title: Actionbar|cff1784d1Plus|r Classic
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: antonio@kapresoft.com
 ## DefaultState: enabled
