@@ -1,20 +1,3 @@
 <Bindings>
-    <Binding name="ABP_ACTIONBAR1_BUTTON1" category="BINDING_HEADER_ABP_CATEGORY" header="ABP_HEADER_ACTIONBAR1">
-        Binding_ActionBar1();
-    </Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON2" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar2();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON3" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar3();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON4" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar4();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON5" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar5();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON6" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar6();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON7" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar7();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON8" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar8();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON9" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar9();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON10" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar10();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON11" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar11();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON12" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar12();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON13" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar13();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON14" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar14();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON15" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar15();</Binding>
-    <Binding name="ABP_ACTIONBAR1_BUTTON16" category="BINDING_HEADER_ABP_CATEGORY">Binding_ActionBar16();</Binding>
+    <!-- Placeholder  -->
 </Bindings>
