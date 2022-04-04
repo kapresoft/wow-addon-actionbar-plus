@@ -37,7 +37,7 @@ local iconsLoaded = false
 local iconLoadTimer
 local loadOptions = {
     macro = {
-        enable = true,
+        enable = false,
         loaded = false,
         name = 'Macro',
         incrementInSeconds = 1.0,

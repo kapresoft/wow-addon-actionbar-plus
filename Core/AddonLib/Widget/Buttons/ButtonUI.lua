@@ -448,6 +448,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         ---@type Profile
         profile = P,
         ---@type number
+        index = btnIndex,
+        ---@type number
         frameIndex = dragFrameWidget:GetFrameIndex(),
         --@type string
         buttonName = btnName,
