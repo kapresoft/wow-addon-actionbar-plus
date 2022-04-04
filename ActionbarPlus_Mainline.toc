@@ -23,5 +23,5 @@
 # To get the Interface/Build Info
 # /run print(select(4, GetBuildInfo()))
 
-Core\_Core.xmlq
+Core\_Core.xml
 Retail\_ActionbarPlus.xml
