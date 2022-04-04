@@ -1,4 +1,4 @@
-## Interface: 11401
+## Interface: 20504
 ## Version: 1.0
 ## Title: Actionbar|cff1784d1Plus|r
 ## Notes: Actionbar Addon for World of Warcraft
