@@ -12,7 +12,7 @@ externals:
 #    url: https://www.curseforge.com/wow/addons/callbackhandler
 #    tag:
   Core/ExtLib/Ace3:
-    url: https://repos.curseforge.com/wow/ace/trunk
+    url: svn://repos.curseforge.com/wow/ace/trunk
     tag: latest
 #  Core/ExtLib/LibSharedMedia-3.0:
 #    url: https://www.curseforge.com/wow/addons/libsharedmedia-3-0
