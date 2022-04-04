@@ -1,4 +1,4 @@
-### 1.0.0.2-beta
+### 1.0.0.2-beta to 1.0.0.3-beta
 - Add dependencies to pkgmetada
 
 ### 1.0.3-alpha
