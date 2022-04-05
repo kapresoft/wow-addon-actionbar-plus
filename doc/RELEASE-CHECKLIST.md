@@ -23,7 +23,6 @@ $ git tag
 # create tag - note that the tag will be the `@project-version` in the ActionbarPlus*.toc files
 $ git tag 1.0.0
 
-
 # push tags
 $ git push --tags
 ```
