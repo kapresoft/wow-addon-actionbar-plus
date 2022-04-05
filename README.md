@@ -17,5 +17,5 @@
 
 ## Miscellaneous
 
-- [Contributing](doc/CONTRIBUTING)
-- [Release Checklist](doc/RELEASE-CHECKLIST)
+- [Contributing](doc/CONTRIBUTING.md)
+- [Release Checklist](doc/RELEASE-CHECKLIST.md)
