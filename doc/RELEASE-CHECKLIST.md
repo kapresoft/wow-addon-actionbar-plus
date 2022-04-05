@@ -32,6 +32,11 @@ $ git push --tags
 
 ## Post-Release
 
+### Edit New Uploaded File info in ActionbarPlus/files section
+- https://www.curseforge.com/wow/addons/actionbarplus/files
+- Manually apply new file to all other versions of wow
+  - hopefully this can be automated in pkgmeta.yaml in the future
+
 ### Verify Addon in CurseForge
 - Verify that the new version is showing in CurseForge app
 - Use an account that has the addon installed and upgrade to the new version. Note that WoW retail takes a little longer to publish
