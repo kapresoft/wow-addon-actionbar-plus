@@ -2,7 +2,7 @@
 - Removed `no-lib-strip` causing the libraries not to be declared after
 install and shows an error of 'PrettyPrint' not being available in WoW.
 
-### 1.0.0.2-beta to 1.0.0.3-beta
+### 1.0.0.2-beta to 1.0.0.4-beta
 - Add dependencies to pkgmetada
 
 ### 1.0.3-alpha
