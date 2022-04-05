@@ -1,3 +1,6 @@
+### 1.0.0.6-beta
+- Optional dependences to Ace3, LibStub and others so these libs are not included in the install
+
 ### 1.0.0.5-beta
 - Removed `no-lib-strip` causing the libraries not to be declared after
 install and shows an error of 'PrettyPrint' not being available in WoW.

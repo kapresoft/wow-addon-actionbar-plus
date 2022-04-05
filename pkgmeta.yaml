@@ -1,12 +1,12 @@
 package-as: ActionbarPlus
 # --------------------------
 license-output: LICENSE.txt
-enable-nolib-creation: no
+enable-nolib-creation: yes
 manual-changelog:
   filename: CHANGELOG.txt
   markup-type: markdown
 
-required-dependencies:
+optional-dependencies:
   - ace3
   - libstub
   - callbackhandler
