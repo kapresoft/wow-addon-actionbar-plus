@@ -6,11 +6,11 @@ manual-changelog:
   filename: CHANGELOG.txt
   markup-type: markdown
 
-optional-dependencies:
-  - ace3
-  - libstub
-  - callbackhandler
-  - libsharedmedia-3-0
+#optional-dependencies:
+#  - ace3
+#  - libstub
+#  - callbackhandler
+#  - libsharedmedia-3-0
 
 # Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
 #ignore:

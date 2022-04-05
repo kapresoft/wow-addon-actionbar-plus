@@ -1,4 +1,4 @@
-### 1.0.0.6-beta
+### 1.0.0.7-beta to 1.0.0.6-beta
 - Optional dependences to Ace3, LibStub and others so these libs are not included in the install
 
 ### 1.0.0.5-beta
