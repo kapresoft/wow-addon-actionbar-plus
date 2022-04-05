@@ -1,7 +1,6 @@
-### 1.0.0.9
+### 1.0.0.9-beta
 - version info fix
 - added additional docs (Release Checklist)
-- dropped '-beta' text from tag name
 
 ### 1.0.0.8-beta
 - Add CurseForge and Github Issues URL information to addon initial load message
