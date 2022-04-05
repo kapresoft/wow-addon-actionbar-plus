@@ -2,6 +2,19 @@
 if type(ABP_PLUS_DB) ~= "table" then ABP_PLUS_DB = {} end
 if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local format = string.format
+
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GetAddOnMetadata = GetAddOnMetadata
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 
 -- ## Start Here ---
 local Core = __K_Core
@@ -44,8 +57,11 @@ local Module = {
 
 ---@class LibGlobals
 local _L = {
+    -- use whole number if no longer in beta
     name = addonName,
     addonName = addonName,
+    version = GetAddOnMetadata(addonName, 'Version'),
+    versionText = GetAddOnMetadata(addonName, 'X-Github-Project-Version'),
     dbName = ABP_PLUS_DB_NAME,
     versionFormat = versionFormat,
     logPrefix = logPrefix,
@@ -157,3 +173,22 @@ end
 
 function _L:GetLogPrefix() return self.logPrefix end
 
+---### Addon Version Info
+---```Example:
+---local version, major = G:GetVersionInfo()
+---```
+---@return string, string The version text, major version of the addon.
+function _L:GetVersionInfo() return self.versionText, self.version end
+
+---### Addon URL Info
+---```Example:
+---local versionText, curseForge, githubIssues, githubRepo = G:GetAddonInfo()
+---```
+---@return string, string, string The version and URL info for curse forge, github issues, github repo
+function _L:GetAddonInfo()
+    local versionText = self.versionText
+    -- fallback
+    if versionText == '@project-version@' then versionText = addonName .. '-' .. self.version .. '.dev' end
+    return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
+                GetAddOnMetadata(addonName, 'X-Github-Repo')
+end

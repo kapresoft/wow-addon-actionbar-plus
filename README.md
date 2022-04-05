@@ -14,3 +14,8 @@
 ## Curseforge / Twitch
 
 - https://www.curseforge.com/wow/addons/actionbarplus
+
+## Miscellaneous
+
+- [Contributing](doc/CONTRIBUTING)
+- [Release Checklist](doc/RELEASE-CHECKLIST)
