@@ -6,6 +6,8 @@ manual-changelog:
   filename: CHANGELOG.txt
   markup-type: markdown
 
+# Declaring the following dependencies will make curse forge app install these 3rd-party
+# libraries. Need to figure out which is best (embedded or external).
 #optional-dependencies:
 #  - ace3
 #  - libstub

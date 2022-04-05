@@ -1,9 +1,16 @@
 # ActionbarPlus
+> A World of Warcraft Addon
 
-A World of Warcraft Addon
+## Actionbars Everywhere, Make you click happy
 
->Provides a Up to 8 additional highly configurable actionbars that can be configured as spells, items, macro and macrotext.
+## Description
 
-## Curseforge
+>ActionbarPlus provides a Up to 8 additional configurable actionbars that can be freely positioned around the game. They are convenient and allows you to have additional floating actionbars to enhance your gaming experience.
 
-https://www.curseforge.com/wow/addons/actionbarplus
+## Author Notes
+
+- Please submit bugs and feature requests at [Github/ActionbarPlus/issues](/../../issues)
+
+## Curseforge / Twitch
+
+- https://www.curseforge.com/wow/addons/actionbarplus

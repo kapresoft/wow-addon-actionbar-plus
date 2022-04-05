@@ -1,8 +1,18 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local ConfigureFrameToCloseOnEscapeKey = ConfigureFrameToCloseOnEscapeKey
 local ReloadUI, IsShiftKeyDown = ReloadUI, IsShiftKeyDown
+local GetAddOnMetadata = GetAddOnMetadata
+
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local unpack, format = unpack, string.format
--- ## Local ----------------------------------------------------
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 local LibStub, M, AceLibFactory, W, ProfileInitializer, G = ABP_LibGlobals:LibPack_NewAddon()
 local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
 local _, ToStringSorted = G:LibPackPrettyPrint()
@@ -24,6 +34,18 @@ local debugDialog
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
+
+---### Addon Info
+---```Example:
+---local curseForge, githubIssues, githubRepo = GetAddonInfo()
+---```
+---@return string, string, string The URL info for curse forge, github issues, github repo
+local function GetAddonInfo()
+    return
+    GetAddOnMetadata('ActionbarPlus', 'X-CurseForge'),
+    GetAddOnMetadata('ActionbarPlus', 'X-Github-Issues'),
+    GetAddOnMetadata('ActionbarPlus', 'X-Github-Repo')
+end
 
 function getBindingByName(bindingName)
     local bindCount = GetNumBindings()
@@ -119,12 +141,13 @@ local function OnAddonLoaded(frame, event, ...)
 
     if not isLogin then return end
 
-
+    local curseForge, githubIssues = GetAddonInfo()
     local MAJOR, MINOR = G.addonName .. '-1.0', 1 -- Bump minor on changes
     addon:log("%s.%s initialized", MAJOR, MINOR)
     addon:print('Available commands: /abp to open config dialog.')
     addon:print('Right-click on the button drag frame to open config dialog.')
-    addon:print('More at https://kapresoft.com/wow-addon-actionbar-plus')
+    addon:print('Curse Forge:', curseForge)
+    addon:print('Issues:', githubIssues)
 
 end
 
