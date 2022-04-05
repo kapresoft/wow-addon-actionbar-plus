@@ -1,3 +1,8 @@
+### 1.0.0.9
+- version info fix
+- added additional docs
+- dropped '-beta' text from tag name
+
 ### 1.0.0.8-beta
 - Add CurseForge and Github Issues URL information to addon initial load message
 
