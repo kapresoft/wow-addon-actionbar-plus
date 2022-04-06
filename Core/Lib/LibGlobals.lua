@@ -187,8 +187,9 @@ function _L:GetVersionInfo() return self.versionText, self.version end
 ---@return string, string, string The version and URL info for curse forge, github issues, github repo
 function _L:GetAddonInfo()
     local versionText = self.versionText
-    -- fallback
+    --@debug@
     if versionText == '@project-version@' then versionText = addonName .. '-' .. self.version .. '.dev' end
+    --@end-debug@
     return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
                 GetAddOnMetadata(addonName, 'X-Github-Repo')
 end
