@@ -1,3 +1,6 @@
+### 1.0.0.<future>
+- debug-only on internal tools
+
 ### 1.0.0.13-beta
 - Added @debug@ statements
 

@@ -147,7 +147,9 @@ Methods
 local methods = {
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand("abp", "OpenConfig")
+        --@debug@--
         self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
+        --@end-debug@--
     end,
     ['CreateDebugPopupDialog'] = function(self)
         local AceGUI = AceLibFactory:GetAceGUI()
