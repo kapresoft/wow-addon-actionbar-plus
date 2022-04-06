@@ -130,7 +130,7 @@ local function OnAddonLoaded(frame, event, ...)
     addon:OnAddonLoadedModules()
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
 
-    --if not isLogin then return end
+    if not isLogin then return end
 
     local versionText, curseForge, githubIssues = G:GetAddonInfo()
     addon:log("%s initialized", versionText)
