@@ -1,5 +1,7 @@
 ### 1.0.0.<future>
 - debug-only on internal tools
+- disable unused MacroIconCategories and ArtTextureID
+- MacroTextureDialog debug mode only
 
 ### 1.0.0.13-beta
 - Added @debug@ statements

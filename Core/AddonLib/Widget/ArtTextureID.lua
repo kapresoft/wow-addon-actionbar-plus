@@ -31473,4 +31473,4 @@ local A = {
 	[137234]="Interface/WorldStateFrame/WorldStateScoreFrame-TopLeft",
 	[137235]="Interface/WorldStateFrame/WorldStateScoreFrame-TopRight",
 }
-ART_TEXTURES = A
+ABP_ART_TEXTURES = A

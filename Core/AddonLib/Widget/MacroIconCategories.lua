@@ -3357,4 +3357,4 @@ C.categoriesCache = {
 
 function C:GetCategoriesCache() return self.categoriesCache end
 
-MacroIconCategories = C
+ABP_MacroIconCategories = C

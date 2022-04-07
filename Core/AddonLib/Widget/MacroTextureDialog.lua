@@ -16,7 +16,7 @@ Local vars
 local _, Table, String = ABP_LibGlobals:LibPackUtils()
 local LibStub, M = ABP_LibGlobals:LibPack()
 local _, AceGUI = ABP_LibGlobals:LibPack_AceLibrary()
-local MC = MacroIconCategories
+--local MC = ABP_MacroIconCategories
 local ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT = ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local replace = String.replace
 local ADDON_NAME = ADDON_NAME
@@ -41,7 +41,7 @@ local loadOptions = {
         loaded = false,
         name = 'Macro',
         incrementInSeconds = 1.0,
-        chunkSize = 50
+        chunkSize = 100
     },
     item = {
         enable = false,
@@ -248,14 +248,13 @@ function _L:CreateTexturePopupDialog()
     return frame
 end
 
-
-function _L:FetchCategoriesCache()
-    if categoryCache or type(categoryCache) == 'table' then
-        return
-    end
-    categoryCache = MC:GetCategoriesCache()
-    self:log(10, 'Macro icon categories cache fetched')
-end
+--function _L:FetchCategoriesCache()
+--    if categoryCache or type(categoryCache) == 'table' then
+--        return
+--    end
+--    categoryCache = MC:GetCategoriesCache()
+--    self:log(10, 'Macro icon categories cache fetched')
+--end
 
 function _L:FetchMacroIcons()
     if macroIcons or type(macroIcons) == 'table' then
