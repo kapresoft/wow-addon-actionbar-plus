@@ -1,4 +1,4 @@
-### 1.0.0.<future>
+### 1.0.0.14-beta
 - debug-only on internal tools
 - disable unused MacroIconCategories and ArtTextureID
 - MacroTextureDialog debug mode only
