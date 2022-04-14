@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local IsUsableSpell = IsUsableSpell
+local IsUsableSpell, C_Timer = IsUsableSpell, C_Timer
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -133,6 +133,14 @@ function _L:IsMatchingSpell(profileButton, eventSpellID)
     if not self:IsValidSpellProfile(profileButton) then return end
     if eventSpellID == profileButton.spell.id then return true end
     return false
+end
+
+function _L:SetEnabledActionBarStatesDelayed(isShown, delayInSec)
+    local actualDelayInSec = delayInSec
+    local showActionBars = isShown == true
+    if type(actualDelayInSec) ~= 'number' then actualDelayInSec = delayInSec end
+    if actualDelayInSec <= 0 then actualDelayInSec = 1 end
+    C_Timer.After(actualDelayInSec, function() self:SetEnabledActionBarStates(showActionBars) end)
 end
 
 ---@param isShown boolean Set to true to show action bar

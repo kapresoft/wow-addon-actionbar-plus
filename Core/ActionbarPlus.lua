@@ -2,8 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local ConfigureFrameToCloseOnEscapeKey = ConfigureFrameToCloseOnEscapeKey
-local ReloadUI, IsShiftKeyDown = ReloadUI, IsShiftKeyDown
-local GetAddOnMetadata = GetAddOnMetadata
+local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -19,17 +18,16 @@ local LibStub, M, AceLibFactory, W, ProfileInitializer, G = ABP_LibGlobals:LibPa
 local ADDON_NAME = G.addonName
 
 local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
-local _, ToStringSorted = G:LibPackPrettyPrint()
 local isEmpty = Table.isEmpty
 local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
 local TextureDialog = W:GetMacroTextureDialog()
+local WU = ABP_WidgetUtil
 
 -- ## Addon ----------------------------------------------------
 -----class ActionbarPlus
 --local A = LibStub:NewAddon(G.addonName)
 --if not A then return end
 --LogFactory:EmbedLogger(A)
-
 local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = ABP_LibGlobals:LibPack_AceAddonLibs()
 local C, P, BF = W:LibPack_AddonLibs()
 local libModules = { C, P, BF }
@@ -129,7 +127,11 @@ local function OnAddonLoaded(frame, event, ...)
     local addon = frame.obj
     addon:OnAddonLoadedModules()
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
-
+    if UnitOnTaxi('player') == true then
+        local hideWhenTaxi = P:IsHideWhenTaxi()
+        addon:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
+        WU:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
+    end
     if not isLogin then return end
 
     local versionText, curseForge, githubIssues = G:GetAddonInfo()

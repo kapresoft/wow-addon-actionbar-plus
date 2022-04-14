@@ -155,17 +155,17 @@ local function OnSpellCastStop(widget, event, ...)
     end
 end
 local function OnPlayerControlLost(widget, event, ...)
-    local flying = UnitOnTaxi('player')
-    WU:SetEnabledActionBarStates(false)
+    if not widget.buttonData:IsHideWhenTaxi() then return end
+    WU:SetEnabledActionBarStatesDelayed(false, 1)
 end
 
+---@param widget ButtonUIWidget
 local function OnPlayerControlGained(widget, event, ...)
-    local flying = UnitOnTaxi('player')
     --p:log('Event[%s] received flying=%s', event, flying)
-    C_Timer.After(2, function()
-        WU:SetEnabledActionBarStates(true)
-    end)
+    if not widget.buttonData:IsHideWhenTaxi() then return end
+    WU:SetEnabledActionBarStatesDelayed(true, 2)
 end
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
