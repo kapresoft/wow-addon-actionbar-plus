@@ -162,7 +162,9 @@ end
 local function OnPlayerControlGained(widget, event, ...)
     local flying = UnitOnTaxi('player')
     --p:log('Event[%s] received flying=%s', event, flying)
-    WU:SetEnabledActionBarStates(true)
+    C_Timer.After(2, function()
+        WU:SetEnabledActionBarStates(true)
+    end)
 end
 --[[-----------------------------------------------------------------------------
 Support Functions
