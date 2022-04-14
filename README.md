@@ -10,6 +10,7 @@
 ## Author Notes
 
 - Please submit bugs and feature requests at [Github/ActionbarPlus/issues](/../../issues)
+- [RoadMap](../../wiki/Roadmap)
 
 ## Curseforge / Twitch
 
@@ -19,3 +20,6 @@
 
 - [Contributing](doc/CONTRIBUTING.md)
 - [Release Checklist](doc/RELEASE-CHECKLIST.md)
+
+## Docs
+- [Getting Started](../../wiki/Getting-Started)
