@@ -1,8 +1,14 @@
 ### 1.0.0.14-beta
+
+#### General
 - debug-only on internal tools
 - disable unused MacroIconCategories and ArtTextureID
 - MacroTextureDialog debug mode only
-- Delay activation of actionbar after "player control gained" state.
+- Delay activation of actionbar on taxi events, i.e. flying.
+
+#### Fixed Issues
+- Hide-when-taxi: When disabled, should not hide action bars
+  * Issue: https://github.com/kapresoft/wow-addon-actionbar-plus/issues/2
 
 ### 1.0.0.13-beta
 - Added @debug@ statements

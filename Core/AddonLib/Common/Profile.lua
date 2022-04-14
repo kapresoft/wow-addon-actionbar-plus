@@ -342,7 +342,11 @@ end
 
 ---@return boolean True if the action bar is locked
 function P:IsLockActionBars()
-    return self.profile[ConfigNames.lock_actionbars]
+    return self.profile[ConfigNames.lock_actionbars] == true
+end
+
+function P:IsHideWhenTaxi()
+    return self.profile[ConfigNames.hide_when_taxi] == true
 end
 
 ---@return ProfileConfigNames
