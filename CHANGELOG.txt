@@ -2,7 +2,7 @@
 - debug-only on internal tools
 - disable unused MacroIconCategories and ArtTextureID
 - MacroTextureDialog debug mode only
-
+- Delay activation of actionbar after "player control gained" state.
 ### 1.0.0.13-beta
 - Added @debug@ statements
 
