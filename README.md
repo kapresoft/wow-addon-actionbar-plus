@@ -7,6 +7,8 @@
 
 >ActionbarPlus provides a Up to 8 additional configurable actionbars that can be freely positioned around the game. They are convenient and allow players to have additional floating actionbars to enhance your gaming experience.
 
+See [Getting Started](../../wiki/Getting-Started) for more details.
+
 ## Author Notes
 
 - Please submit bugs and feature requests at [Github/ActionbarPlus/issues](/../../issues)
