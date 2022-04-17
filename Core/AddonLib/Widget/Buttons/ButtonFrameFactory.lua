@@ -235,8 +235,6 @@ function _L:CreateFrame(frameIndex)
     widget.frame = f
     f.widget, fh.widget = widget, widget
 
-    local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
-
     --local halfPadding = widget.padding/2
     local widthAdj = widget.padding
     local heightAdj = widget.padding + widget.dragHandleHeight

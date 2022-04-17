@@ -1,5 +1,5 @@
 ### 1.0.0.16-beta (CURRENT)
-- <describe>
+- Process event updates on enabled buttons only
 
 ### 1.0.0.15-beta
 - Delay activation of actionbar on taxi events, i.e. flying.
