@@ -6,7 +6,7 @@
 
 ### 1.0.0.15-beta
 - Delay activation of actionbar on taxi events, i.e. flying.
-- Hide-when-taxi: When disabled, should not hide action bars (FIXED) [Issue #2](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/2)
+- Hide-when-taxi: When disabled, should not hide action bars [Issue #2](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/2)
 
 ### 1.0.0.14-beta
 
