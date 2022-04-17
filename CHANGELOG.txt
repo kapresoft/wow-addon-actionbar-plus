@@ -1,4 +1,4 @@
-### 1.0.0.16-beta (CURRENT)
+### 1.0.0.16-beta
 - Process event updates on enabled buttons only
 
 ### 1.0.0.15-beta
