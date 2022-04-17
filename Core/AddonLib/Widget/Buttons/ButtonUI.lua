@@ -111,18 +111,21 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonState(widget, event)
+    if not widget.button:IsShown() then return end
     widget:UpdateState()
 end
 
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonUsable(widget, event)
+    if not widget.button:IsShown() then return end
     WU:UpdateUsable(widget)
 end
 
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnBagUpdateDelayed(widget, event)
+    if not widget.button:IsShown() then return end
     widget:UpdateItemState()
 end
 
@@ -130,6 +133,8 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnSpellCastStart(widget, event, ...)
+    if not widget.button:IsShown() then return end
+
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     local profileButton = widget:GetConfig()
@@ -145,6 +150,8 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnSpellCastStop(widget, event, ...)
+    if not widget.button:IsShown() then return end
+
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     --p:log('Event[%s]: unitTarget=%s spellID=%s', event, unitTarget, spellID)
@@ -242,6 +249,7 @@ Widget Methods
 local function WidgetMethods(widget)
 
     function widget:GetName() return self.button:GetName() end
+    function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
     ---#### Get Profile Button Config Data
     ---@return ProfileButton
