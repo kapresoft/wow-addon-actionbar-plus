@@ -1,5 +1,5 @@
-### 1.0.0.17-beta <NEXT>
-- <description>
+### 1.0.0.17-beta
+- Macro rename fix [Issue #9](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/9)
 
 ### 1.0.0.16-beta
 - Process event updates on enabled buttons only [Issue #7](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/7)
