@@ -1,4 +1,4 @@
-### 1.0.0.18-beta
+### 1.0.0.19-beta
 - Bump WoW Vanilla Interface version update to 11403
 
 ### 1.0.0.17-beta

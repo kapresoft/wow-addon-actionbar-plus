@@ -1,4 +1,4 @@
-## Interface: 11402
+## Interface: 11403
 ## Version: 1.0
 ## Title: Actionbar|cff1784d1Plus|r Classic
 ## Notes: Actionbar Addon for World of Warcraft
@@ -8,7 +8,7 @@
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
 
-## X-Min-Interface: 11403
+## X-Min-Interface: 11401
 ## X-LoadOn-Always: delayed
 ## X-Credits: antonio@kapresoft.com
 ## X-Category: ActionBars
