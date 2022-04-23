@@ -46,7 +46,7 @@ end
 local function OnMacroChanged(btnWidget)
     --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
     --L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
-    L:SetButtonAttributes(btnWidget)
+    MAS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
 --[[-----------------------------------------------------------------------------

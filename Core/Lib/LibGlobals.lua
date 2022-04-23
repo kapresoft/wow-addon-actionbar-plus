@@ -53,6 +53,7 @@ local Module = {
     WidgetLibFactory = 'WidgetLibFactory',
     MacroAttributeSetter = 'MacroAttributeSetter',
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
+    MacroEventsHandler = 'MacroEventsHandler'
 }
 
 ---@class LibGlobals
@@ -159,6 +160,8 @@ function _L:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
 
 ---@return WidgetLibFactory
 function _L:GetWidgetLibFactory() return self:Get(Module.WidgetLibFactory) end
+---@return MacroEventsHandler
+function _L:GetMacroEventsHandler() return self:Get(Module.MacroEventsHandler) end
 
 function _L:Get(...)
     local libNames = {...}

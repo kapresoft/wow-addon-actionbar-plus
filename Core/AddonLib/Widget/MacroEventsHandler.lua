@@ -15,7 +15,9 @@ local ADDON_NAME = ADDON_NAME
 local LibStub, M, P, LogFactory = ABP_LibGlobals:LibPack_NewLibrary()
 local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
 local toStringSorted = Table.toStringSorted
-local _L = LibStub:NewLibrary('MacroEventsHandler')
+
+---@class MacroEventsHandler
+local _L = LibStub:NewLibrary(M.MacroEventsHandler)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -30,21 +32,20 @@ Support Functions
         ["body"] = "/moon\n",
     }
 ]]
--- get all action bars with type macro
--- iterate and GetMacroByIndex
---   index changed
---   name changed
---   icon changed
--- Update Change Macro Info
--- Update actionbar attributes
+
+
+---### Find first-matching macro by body
+---@return MacroDetails
+---@param matchingBody string The macro body to match
 local function findMacroByBody(matchingBody)
     local count = GetNumMacros()
     if count <= 0 then return nil end
     for macroIndex = 1, count do
         local name, icon, body = GetMacroInfo(macroIndex)
         if matchingBody == body then
-            print('found match')
-            return { name=name, icon=icon, index=macroIndex }
+            ---@class MacroDetails
+            local macroDetails = { name=name, icon=icon, index=macroIndex }
+            return macroDetails
         end
     end
     return nil
@@ -61,7 +62,7 @@ local function HandleNameIconIndexChange(btnWidget, btnName, btnData)
             name={old=macroData.name, new=changedMacro.name},
             icon={old=macroData.icon, new=changedMacro.icon},
         }
-        _L:log(10, 'Name,Icon,Index(%s) changed: %s', btnName, toStringSorted(d))
+        _L:log(15, 'Name,Icon,Index(%s) changed: %s', btnName, toStringSorted(d))
         macroData.name = changedMacro.name
         macroData.icon = changedMacro.icon
         macroData.index = changedMacro.index
@@ -77,67 +78,61 @@ local function HandleChangedMacros(btnName, btnData)
     local btnWidget = _G[btnName].widget
 
     local name, icon, body = GetMacroInfo(macroData.index)
-    local changed = false
+    local macroIndex = GetMacroIndexByName(macroData.name)
 
-    -- Name/Icon change UI only allows name and icon change
-    if name ~= nil and macroData.body == body then
-        if macroData.name == name and macroData.icon == icon then
-            -- body change
-            if macroData.body ~= body then
-                _L:log(15, '%s::body changed: %s', btnName, toStringSorted({ old=macroData.body, new=body }))
-                macroData.body = body
-                changed = true
-            end
-        else
-            -- name or icon change
-            if macroData.name ~= name then
-                _L:log(15, '%s::name changed: %s', btnName, toStringSorted({ old=macroData.name, new=name }))
-                macroData.name = name
-                changed = true
-            end
-            if macroData.icon ~= icon then
-                _L:log(15, '%s::icon changed: %s', btnName, toStringSorted({ old=macroData.icon, new=icon }))
-                macroData.icon = icon
-                changed = true
-            end
-        end
-    else
-        -- use-case: macro created or updated that affected the macro index
-        name, icon, body = GetMacroInfo(macroData.name)
-        if name ~= nil then
-            -- index change
-            local macroIndex = GetMacroIndexByName(macroData.name)
-            macroData.index = macroIndex
-            changed = true
-            -- icon changed
-            if macroData.icon ~= icon then
-                _L:log(15, '%s::icon changed: %s', btnName, toStringSorted({ old=macroData.icon, new=icon }))
-                macroData.icon = icon
-                changed = true
-            end
-        else
-            -- use-case: User changed name and/or icon that affected the macro index
-            -- only choice is to match by body
-            -- name(and index) and/or icon changed
+    local changed = false
+    local changeInfo = { type = '', old = '', new = '' }
+    if macroData.body ~= body and macroData.name == name and macroData.icon == icon then
+        -- body change
+        --_L:log(15, '%s::body changed: %s', btnName, toStringSorted({ old=macroData.body, new=body }))
+        changeInfo = { type = 'body', old = macroData.body, new = body }
+        macroData.body = body
+        changed = true
+    elseif macroData.name ~= name and macroData.icon == icon and macroData.body == body then
+        -- name change
+        --_L:log(15, '%s::name changed: %s', btnName, toStringSorted({ old=macroData.name, new=name }))
+        changeInfo = { type = 'name', old = macroData.name, new = name }
+        macroData.name = name
+        changed = true
+    elseif macroData.name ~= name and macroData.icon ~= icon and macroData.body == body then
+        -- name and icon change (from UI)
+        changeInfo = { type = 'name-and-icon',
+                       old = format('%s|%s', macroData.name, macroData.icon),
+                       new = format('%s|%s', name, icon) }
+        macroData.name = name
+        macroData.icon = icon
+        changed = true
+    elseif macroData.icon ~= icon and macroData.name == name and macroData.body == body then
+        -- name and icon change (from UI)
+        changeInfo = { type = 'icon', old = macroData.icon, new = icon }
+        macroData.icon = icon
+        changed = true
+    elseif macroIndex ~= macroData.index then
+            -- macro index changed due to
+            -- (1) New Macro Created that causes the index/position to change
+            -- (2) Macro renames that causes the index/position to change
             local macroDetails = findMacroByBody(macroData.body)
             if macroDetails ~= nil then
-                _L:log(15, '%s::name and/or icon changed', btnName)
-                macroData.name = macroDetails.name
-                macroData.icon = macroDetails.icon
-                macroData.index = macroDetails.index
-                changed = true
-            else
-                -- Save macro in the future?
-                macroData.name = nil
-                macroData.icon = nil
-                macroData.index = nil
-                changed = true
+                if macroData.name == macroDetails.name and macroData.icon == macroDetails.icon then
+                    changeInfo = { type = 'index', old = macroData.index, new = macroDetails.index }
+                    macroData.index = macroDetails.index
+                    changed = true
+                else
+                    changeInfo = { type = 'index-name-icon',
+                                   old = format('%s|%s|%s', macroData.index, macroData.name, macroData.icon),
+                                   new = format('%s|%s|%s', macroDetails.index, macroDetails.name, macroDetails.icon) }
+                    macroData.index = macroDetails.index
+                    macroData.name = macroDetails.name
+                    macroData.icon = macroDetails.icon
+                    changed = true
+                end
             end
-        end
     end
 
-    if changed then btnWidget:Fire('OnMacroChanged') end
-    _L:log(15, 'HandleMacro[%s] Changed? %s', btnName, changed)
+    if changed then
+        _L:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        btnWidget:Fire('OnMacroChanged')
+    end
 end
 
 local function OnMacroUpdate()
@@ -148,6 +143,9 @@ local function OnMacroUpdate()
     end
 end
 
+---### UPDATE_MACROS event fired when
+---1. Macro UI Updates
+---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
     if event == 'PLAYER_ENTERING_WORLD' then
         _L:log(5, event)
@@ -155,6 +153,7 @@ local function OnAddonLoaded(frame, event, ...)
     end
 
     if event == 'UPDATE_MACROS' then
+        _L:log(15, 'Event Received: %s', event)
         OnMacroUpdate()
     end
 end

@@ -273,6 +273,7 @@ local methods = {
     ['GetCurrentProfileData'] = function(self) return self.profile end,
     ['OnInitializeModules'] = function(self)
         for _, module in ipairs(libModules) do
+            -- self.profile set earlier; see _Core#OnInitialize
             module:OnInitialize{ addon = self }
         end
     end,
