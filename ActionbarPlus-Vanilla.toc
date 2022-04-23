@@ -8,7 +8,7 @@
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
 
-## X-Min-Interface: 11401
+## X-Min-Interface: 11403
 ## X-LoadOn-Always: delayed
 ## X-Credits: antonio@kapresoft.com
 ## X-Category: ActionBars
