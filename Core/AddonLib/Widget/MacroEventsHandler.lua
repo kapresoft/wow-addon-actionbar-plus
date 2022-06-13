@@ -38,20 +38,37 @@ Support Functions
 ---@return MacroDetails
 ---@param matchingBody string The macro body to match
 local function findMacroByBody(matchingBody)
-    local count = GetNumMacros()
-    if count <= 0 then return nil end
-    for macroIndex = 1, count do
+    -- Global Macros Max: 120
+    -- Per Character Max: 18  [Index starts at 121]
+    local globalMacroCount = 120
+    local globalMacroStartIndex = 1
+    local perCharMacroStartIndex = globalMacroCount + 1
+
+    local globalCount, perCharCount = GetNumMacros()
+    if globalCount <= 0 then return nil end
+    ---@class MacroDetails
+    local macroDetails = {}
+    for macroIndex = globalMacroStartIndex, globalCount do
         local name, icon, body = GetMacroInfo(macroIndex)
-        if matchingBody == body then
-            ---@class MacroDetails
-            local macroDetails = { name=name, icon=icon, index=macroIndex }
+        if name ~= nil and matchingBody == body then
+            macroDetails = { name=name, icon=icon, index=macroIndex, global=true }
+            return macroDetails
+        end
+    end
+
+    if perCharCount <= 0 then return nil end
+    local perCharMax = globalMacroCount + perCharCount
+    for macroIndex = perCharMacroStartIndex, perCharMax do
+        local name, icon, body = GetMacroInfo(macroIndex)
+        if name ~= nil and matchingBody == body then
+            macroDetails = { name=name, icon=icon, index= macroIndex, global=false }
             return macroDetails
         end
     end
     return nil
 end
 
-local function HandleNameIconIndexChange(btnWidget, btnName, btnData)
+--[[local function HandleNameIconIndexChange(btnWidget, btnName, btnData)
     local macroData = btnData.macro
     local changed = false
     -- name and index changed: find by body
@@ -70,7 +87,7 @@ local function HandleNameIconIndexChange(btnWidget, btnName, btnData)
     end
 
     return changed
-end
+end]]
 
 local function HandleChangedMacros(btnName, btnData)
     if btnData == nil or btnData.macro == nil or btnData.macro.index == nil then return false end
