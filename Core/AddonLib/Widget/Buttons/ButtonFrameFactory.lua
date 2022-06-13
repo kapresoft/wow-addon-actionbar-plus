@@ -1,9 +1,11 @@
 --
 -- ButtonFrameFactory
 --
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local _G = _G
-local type, ipairs, tinsert = type, ipairs, table.insert
+local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -22,8 +24,6 @@ local _L = LibStub:NewLibrary(M.ButtonFrameFactory)
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonFrameFactory')
----@type Wait
-local Wait = ABP_Wait
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -178,6 +178,37 @@ local function WidgetMethods(widget)
         self.rendered = true
     end
 
+    function widget:RefreshActionbarFrame()
+        local barData = self:GetBarData()
+        local rowSize = barData.widget.rowSize or 1
+        local colSize = barData.widget.colSize or 6
+        self:SetFrameDimensions()
+
+        local index = 0
+        local frameName = self:GetName()
+        for row=1, rowSize do
+            for col=1, colSize do
+                index = index + 1
+                local btnName = format('%sButton%s', frameName, tostring(index))
+                ---@type ButtonUIWidget
+                local btnWidget = _G[btnName].widget
+                btnWidget:Resize(row, col)
+            end
+        end
+    end
+
+    function widget:SetFrameDimensions()
+        local barData = self:GetBarData()
+        local widgetData = barData.widget
+        local f = self.frame
+        local frameHandle = self.frameHandle
+        local widthAdj = self.padding
+        local heightAdj = self.padding + self.dragHandleHeight
+        local frameWidth = (widgetData.colSize * widgetData.buttonSize) + widthAdj
+        frameHandle:SetWidth(frameWidth)
+        f:SetWidth(frameWidth)
+        f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
+    end
 end
 
 --local function getProfileUtil()
@@ -197,10 +228,8 @@ end
 function _L:CreateFrame(frameIndex)
     local FrameBackdrop = {
         ---@see LibSharedMedia
-        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
-        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Parchment"),
-        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
-        --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Chat Bubble"),
+        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
+        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
         --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Dialog"),
         tile = false, tileSize = 26, edgeSize = 0,
         insets = { left = 0, right = 0, top = 0, bottom = 0 }
@@ -214,8 +243,6 @@ function _L:CreateFrame(frameIndex)
 
     ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
-    local barConfig = P:GetBar(frameIndex)
-
     local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
     --fh:SetToplevel(true)
 
@@ -224,7 +251,8 @@ function _L:CreateFrame(frameIndex)
         p = p,
         profile = P,
         frameIndex = frameIndex,
-        options = barConfig.widget,
+        GetBarData = function() return P:GetBar(frameIndex) end,
+        --options = barData.widget,
         frameHandleHeight = 4,
         dragHandleHeight = 0,
         padding = 2,
@@ -235,23 +263,12 @@ function _L:CreateFrame(frameIndex)
     widget.frame = f
     f.widget, fh.widget = widget, widget
 
-    --local halfPadding = widget.padding/2
-    local widthAdj = widget.padding
-    local heightAdj = widget.padding + widget.dragHandleHeight
-    local frameWidth = (widget.options.colSize * widget.options.buttonSize) + widthAdj
-    f:SetWidth(frameWidth)
-    f:SetHeight((widget.options.rowSize * widget.options.buttonSize) + heightAdj)
     f:SetFrameStrata(widget.frameStrata)
     f:SetBackdrop(FrameBackdrop)
-    f:SetBackdropColor(0, 0, 0, 1)
+    f:SetBackdropColor(1/255, 1/255, 1/255, 1)
 
     fh:SetBackdrop(FrameHandleBackdrop)
-    --fh:SetBackdropColor(0.92, 0.96, 0.26, 0.2)
-    -- yellow
-    --fh:SetBackdropColor(0.92, 0.96, 0.26, 0.5)
-    -- orange
     fh:SetBackdropColor(235/255, 152/255, 45/255, 1)
-    fh:SetWidth(frameWidth)
     fh:EnableMouse(true)
     fh:SetMovable(true)
     fh:SetResizable(true)
@@ -269,6 +286,8 @@ function _L:CreateFrame(frameIndex)
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
     RegisterCallbacks(widget)
+
+    widget:SetFrameDimensions()
 
     return widget
 end

@@ -219,7 +219,9 @@ end
 ---@param rowNum number The row number
 ---@param colNum number The column number
 local function SetButtonLayout(widget, rowNum, colNum)
-    local barConfig = widget.dragFrame:GetConfig()
+    ---@type FrameWidget
+    local dragFrame = widget.dragFrame
+    local barConfig = dragFrame:GetConfig()
     local buttonSize = barConfig.widget.buttonSize
     local buttonPadding = widget.buttonPadding
     local frameStrata = widget.frameStrata
@@ -415,6 +417,12 @@ local function WidgetMethods(widget)
     function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
     function widget:IsMatchingItemSpell(profileButton, spellID) return WU:IsMatchingItemSpell(profileButton, spellID) end
     function widget:IsMatchingSpell(profileButton, spellID) return WU:IsMatchingSpell(profileButton, spellID) end
+
+    ---@param rowNum number
+    ---@param colNum number
+    function widget:Resize(rowNum, colNum)
+        SetButtonLayout(self, rowNum, colNum)
+    end
 end
 
 --[[-----------------------------------------------------------------------------

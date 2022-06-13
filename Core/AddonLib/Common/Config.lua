@@ -58,6 +58,14 @@ local function GetButtonSizeSetterHandler(frameIndex)
     return function(_, v) GetBarConfig(frameIndex).widget.buttonSize = v end
 end
 
+local function GetResizeButtonHandler(frameIndex)
+    return function(_, v)
+        GetButtonSizeSetterHandler(frameIndex)(nil, v)
+        ---@type FrameWidget
+        BF:RefreshActionbar(frameIndex)
+    end
+end
+
 local function GetRowSizeGetterHandler(frameIndex)
     return function(_) return GetBarConfig(frameIndex).widget.rowSize or 2 end
 end
@@ -208,9 +216,10 @@ local methods = {
                     width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    confirm = ConfirmAndReload,
+                    --confirm = ConfirmAndReload,
                     get = GetButtonSizeGetterHandler(frameIndex),
-                    set = GetButtonSizeSetterHandler(frameIndex)
+                    --set = GetButtonSizeSetterHandler(frameIndex)
+                    set = GetResizeButtonHandler(frameIndex)
                 },
                 rows = {
                     type = 'range',
