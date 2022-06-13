@@ -111,6 +111,10 @@ function L:OnAfterInitialize()
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
+function L:RefreshActionbar(frameIndex)
+    P:GetFrameWidgetByIndex(frameIndex):RefreshActionbarFrame()
+end
+
 function L:CreateActionbarGroup(frameIndex)
     -- TODO: config should be in profiles
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
