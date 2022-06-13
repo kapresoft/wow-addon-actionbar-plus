@@ -1,4 +1,4 @@
-### 1.0.0-FUTURE
+### 1.0.0.20
 - Enhancement work for resizing actionbar buttons [Issue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
 - Per Character Macro rename fix for [Issue #14](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/14)
 
