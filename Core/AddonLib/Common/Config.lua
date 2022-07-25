@@ -12,9 +12,23 @@ local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_S
 Local Vars
 -------------------------------------------------------------------------------]]
 local CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
+local LOCK_FRAME_DESC = [[
+
+
+Options:
+  Always: lock the frame at all times.
+  In-Combat: lock the frame during combat.
+
+Note: this option only prevents the frame from being moved and does not lock individual
+action items.
+]]
 
 -- ActionbarPlus APIs
 local LibStub, M, G = ABP_LibGlobals:LibPack()
+local _, _, _, LogFactory = ABP_LibGlobals:LibPackUtils()
+
+---@type LogFactory
+local p = LogFactory:NewLogger('Config')
 
 ---@type Profile
 local P
@@ -37,17 +51,19 @@ local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).
 ---@return BarData
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
 local function GetFrameStateSetterHandler(frameIndex)
+    return function(_, v) GetFrameWidget(frameIndex):SetFrameState(v) end
+end
+local function GetFrameStateGetterHandler(frameIndex)
+    return function(_) return GetFrameWidget(frameIndex):IsShownInConfig() end
+end
+local function GetLockStateSetterHandler(frameIndex)
     return function(_, v)
-        local f = FF:GetFrameByIndex(frameIndex)
-        f.widget:SetFrameState(frameIndex, v)
+        P:SetBarLockValue(frameIndex, v)
+        GetFrameWidget(frameIndex):SetLockedState()
     end
 end
-
-local function GetFrameStateGetterHandler(frameIndex)
-    return function(_)
-        local f = FF:GetFrameByIndex(frameIndex)
-        return f.widget:IsShownInConfig(frameIndex)
-    end
+local function GetLockStateGetterHandler(frameIndex)
+    return function(_) return P:GetBarLockValue(frameIndex) end
 end
 
 local function GetButtonSizeGetterHandler(frameIndex)
@@ -207,9 +223,10 @@ local methods = {
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
                 },
+                spacer1 = { type="description", name=" ", order=2 },
                 button_width = {
                     type = 'range',
-                    order = 2,
+                    order = 3,
                     step = 1,
                     min = 20,
                     max = 100,
@@ -223,7 +240,7 @@ local methods = {
                 },
                 rows = {
                     type = 'range',
-                    order = 3,
+                    order = 4,
                     step = 1,
                     min = 1,
                     max = 10,
@@ -236,7 +253,7 @@ local methods = {
                 },
                 cols = {
                     type = 'range',
-                    order = 4,
+                    order = 5,
                     step = 1,
                     min = 1,
                     max = 10,
@@ -246,6 +263,17 @@ local methods = {
                     confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
+                },
+                spacer2 = { type="description", name=" ", order=6 },
+                lock = {
+                    type = "select", style = "radio",
+                    values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
+                    name = "Lock Actionbar Frame?",
+                    desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),
+                    order = 7,
+                    width = .8,
+                    get = GetLockStateGetterHandler(frameIndex),
+                    set = GetLockStateSetterHandler(frameIndex)
                 }
             }
         }

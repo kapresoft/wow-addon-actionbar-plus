@@ -471,7 +471,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameIndex = dragFrameWidget:GetFrameIndex(),
         --@type string
         buttonName = btnName,
-        ---@type Frame
+        ---@type FrameWidget
         dragFrame = dragFrameWidget,
         ---@type ButtonUI
         button = button,
