@@ -1,5 +1,6 @@
 ### 1.0.0.21.FUTURE
 - Option to lock action bars [Issue #18](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/18)
+  - See doc: https://github.com/kapresoft/wow-addon-actionbar-plus/wiki/Release-1.0.0.21-Notes
 
 ### 1.0.0.20
 - Enhancement work for resizing actionbar buttons [Issue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
