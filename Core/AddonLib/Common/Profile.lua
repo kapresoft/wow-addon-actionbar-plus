@@ -31,6 +31,8 @@ local SingleBarTemplate = {
 ---@class BarData
 local ProfileBarTemplate = {
     ["enabled"] = false,
+    -- allowed values: {"", "always", "in-combat"}
+    ["locked"] = "",
     ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = {
@@ -237,6 +239,46 @@ end
 function P:IsBarEnabled(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar.enabled
+end
+
+function P:SetBarLockedState(frameIndex, isLocked)
+    local bar = self:GetBar(frameIndex)
+    --bar.locked = isLocked
+end
+
+function P:IsBarLocked(frameIndex)
+    local bar = self:GetBar(frameIndex)
+    --return bar.locked
+    return false
+end
+
+function P:GetBarLockValue(frameIndex)
+    local bar = self:GetBar(frameIndex)
+    return bar.locked or ''
+end
+
+---@param value string Allowed values are "always", "in-combat", or nil
+function P:SetBarLockValue(frameIndex, value)
+    local bar = self:GetBar(frameIndex)
+    local valueLower = string.lower(value or '')
+    if valueLower == 'always' or valueLower == 'in-combat' then
+        bar.locked = value
+        return bar.locked
+    end
+    bar.locked = ''
+    return bar.locked
+end
+
+function P:IsBarUnlocked(frameIndex)
+    return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil
+end
+
+function P:IsBarLockedInCombat(frameIndex)
+    return self:GetBarLockValue(frameIndex) == 'in-combat'
+end
+
+function P:IsBarLockedAlways(frameIndex)
+    return self:GetBarLockValue(frameIndex) == 'always'
 end
 
 function P:IsBarIndexEnabled(frameIndex)

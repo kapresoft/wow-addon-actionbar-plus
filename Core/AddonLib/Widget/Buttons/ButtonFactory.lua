@@ -120,9 +120,10 @@ function L:CreateActionbarGroup(frameIndex)
     local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
+    ---@type FrameWidget
     local f = ButtonFrameFactory(frameIndex)
     self:CreateButtons(f, widget.rowSize, widget.colSize)
-    f:MarkRendered()
+    f:SetInitialState()
     self:AttachFrameEvents(f)
     return f
 end

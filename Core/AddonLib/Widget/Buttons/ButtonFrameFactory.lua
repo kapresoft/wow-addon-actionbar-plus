@@ -17,7 +17,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, Assert, P, LSM, _, _, G = ABP_WidgetConstants:LibPack()
 local _, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
-local _, AceGUI = G:LibPack_AceLibrary()
+local AceEvent, AceGUI = G:LibPack_AceLibrary()
+
 local toStringSorted = Table.toStringSorted
 ---@class ButtonFrameFactory
 local _L = LibStub:NewLibrary(M.ButtonFrameFactory)
@@ -70,6 +71,16 @@ local function RegisterCallbacks(widget)
 
 end
 
+local function RegisterEvents(widget)
+    local C = ABP_WidgetConstants.C
+    ---@param w FrameWidget
+    local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
+    ---@param w FrameWidget
+    local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
+    widget:RegisterEvent(C.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
+    widget:RegisterEvent(C.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -99,7 +110,12 @@ local function WidgetMethods(widget)
         self:Show()
     end
 
-    function widget:SetFrameState(frameIndex, isEnabled)
+    function widget:IsLockedInCombat() return P:IsBarLockedInCombat(self:GetFrameIndex()) end
+    function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
+    function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
+
+    function widget:SetFrameState(isEnabled)
+        local frameIndex = self:GetFrameIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'SetFrameState(frameIndex)')
         P:SetBarEnabledState(frameIndex, isEnabled)
         if isEnabled then
@@ -110,7 +126,8 @@ local function WidgetMethods(widget)
     end
 
     -- Synchronize UI and Profile data
-    function widget:IsShownInConfig(frameIndex)
+    function widget:IsShownInConfig()
+        local frameIndex = self:GetFrameIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'IsShownInConfig(frameIndex)')
         local actualFrameIsShown = frame:IsShown()
         P:SetBarEnabledState(frameIndex, actualFrameIsShown)
@@ -132,6 +149,9 @@ local function WidgetMethods(widget)
             else self:ShowButtons() end
         end
     end
+
+    function widget:LockGroup() self.frameHandle:Hide() end
+    function widget:UnlockGroup() self.frameHandle:Show() end
 
     function widget:HideGroup()
         frame:Hide()
@@ -172,6 +192,20 @@ local function WidgetMethods(widget)
 
     function widget:IsNotRendered()
         return not self:IsRendered()
+    end
+
+    function widget:SetInitialState()
+        self:MarkRendered()
+        self:SetLockedState()
+    end
+
+    function widget:SetLockedState()
+        local frameIndex = self:GetFrameIndex()
+        if P:IsBarLockedAlways(frameIndex) then
+            self:LockGroup()
+        else P:IsBarUnlocked(frameIndex)
+            self:UnlockGroup()
+        end
     end
 
     function widget:MarkRendered()
@@ -216,6 +250,7 @@ end
 --    return P
 --end
 
+---@return Frame
 function _L:GetFrameByIndex(frameIndex)
     local frameName = P:GetFrameNameByIndex(frameIndex)
     return _G[frameName]
@@ -225,7 +260,7 @@ function _L:IsFrameShownByIndex(frameIndex)
     return self:GetFrameByIndex(frameIndex):IsShown()
 end
 
-function _L:CreateFrame(frameIndex)
+function _L:Constructor(frameIndex)
     local FrameBackdrop = {
         ---@see LibSharedMedia
         --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
@@ -260,6 +295,9 @@ function _L:CreateFrame(frameIndex)
         frame = f,
         frameHandle = fh
     }
+    -- Allows call to RegisterEvent
+    AceEvent:Embed(widget)
+
     widget.frame = f
     f.widget, fh.widget = widget, widget
 
@@ -286,10 +324,11 @@ function _L:CreateFrame(frameIndex)
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
     RegisterCallbacks(widget)
+    RegisterEvents(widget)
 
     widget:SetFrameDimensions()
 
     return widget
 end
 
-_L.mt.__call = _L.CreateFrame
+_L.mt.__call = _L.Constructor
