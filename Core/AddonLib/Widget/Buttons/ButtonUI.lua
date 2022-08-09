@@ -103,9 +103,18 @@ local function invalidButtonData(o, key)
     if type(o) ~= 'table' then return true end
     if type(o[key]) ~= 'nil' then
         local d = o[key]
-        if type(d) == 'table' then return String.IsBlank(d['id']) end
+        if type(d) == 'table' then return (String.IsBlank(d['id']) and String.IsBlank(d['index'])) end
     end
     return true
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnUpdateButtonCooldown(widget, event)
+    widget:UpdateCooldown()
+    local cd = widget:GetCooldownInfo();
+    if (cd == nil or cd.icon == nil or cd.type ~= MACRO) then return end
+    widget:SetCooldownTextures(cd.icon)
 end
 
 ---@param widget ButtonUIWidget
@@ -197,6 +206,7 @@ end
 
 local function RegisterCallbacks(widget)
 
+    widget:RegisterEvent(ACTIONBAR_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(ACTIONBAR_UPDATE_STATE, OnUpdateButtonState, widget)
     widget:RegisterEvent(ACTIONBAR_UPDATE_USABLE, OnUpdateButtonUsable, widget)
     widget:RegisterEvent(BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
@@ -210,7 +220,6 @@ local function RegisterCallbacks(widget)
     --end)
     ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
-        --_widget:UpdateCooldown()
         _widget:UpdateStateDelayed(0.01)
     end)
 end
@@ -253,12 +262,6 @@ local function WidgetMethods(widget)
     function widget:GetName() return self.button:GetName() end
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
-    ---#### Get Profile Button Config Data
-    ---@return ProfileButton
-    function widget:GetConfig()
-        return self.buttonData:GetData()
-    end
-
     function widget:SetText(text)
         if text == nil then text = '' end
         widget.button.text:SetText(text)
@@ -273,6 +276,7 @@ local function WidgetMethods(widget)
 
         ---@class CooldownInfo
         local cd = {
+            type=type,
             start=nil,
             duration=nil,
             enabled=0,
@@ -286,6 +290,16 @@ local function WidgetMethods(widget)
                 cd.start = spellCD.start
                 cd.duration = spellCD.duration
                 cd.enabled = spellCD.enabled
+                return cd
+            end
+        elseif type == MACRO then
+            local spellCD = self:GetMacroSpellCooldown();
+            if spellCD ~= nil then
+                cd.details = spellCD
+                cd.start = spellCD.start
+                cd.duration = spellCD.duration
+                cd.enabled = spellCD.enabled
+                cd.icon = spellCD.spell.icon
                 return cd
             end
         elseif type == ITEM then
@@ -303,16 +317,32 @@ local function WidgetMethods(widget)
         return nil
     end
 
-    function widget:GetSpellData()
+    ---#### Get Profile Button Config Data
+    ---@return ProfileButton
+    function widget:GetConfig()
+        return self.buttonData:GetData()
+    end
+    function widget:GetConfigActionbarData(type)
         local btnData = self:GetConfig()
-        if invalidButtonData(btnData, SPELL) then return nil end
-        return btnData[SPELL]
+        if invalidButtonData(btnData, type) then return nil end
+        return btnData[type]
     end
 
+    ---@return SpellData
+    function widget:GetSpellData()
+        return self:GetConfigActionbarData(SPELL)
+    end
+
+    ---@return ItemData
     function widget:GetItemData()
-        local btnData = self:GetConfig()
-        if invalidButtonData(btnData, ITEM) then return nil end
-        return btnData[ITEM]
+        return self:GetConfigActionbarData(ITEM)
+    end
+
+    ---@return MacroData
+    function widget:GetMacroData()
+        return self:GetConfigActionbarData(MACRO)
+        --local btnData = self:GetConfig()
+        --return btnData[MACRO];
     end
 
     function widget:SetButtonAsEmpty()
@@ -357,6 +387,10 @@ local function WidgetMethods(widget)
         C_Timer.After(inSeconds, function() self:UpdateState() end)
     end
 
+    function widget:UpdateCooldownDelayed(inSeconds)
+        C_Timer.After(inSeconds, function() self:UpdateCooldown() end)
+    end
+
     function widget:UpdateCooldown()
         local cd = self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end
@@ -394,6 +428,15 @@ local function WidgetMethods(widget)
         return _API:GetItemCooldown(item.id, item)
     end
 
+    ---@return SpellCooldown
+    function widget:GetMacroSpellCooldown()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+        local spellId = GetMacroSpell(macro.index)
+        if not spellId then return nil end
+        return _API:GetSpellCooldown(spellId)
+    end
+
     function widget:ResetWidgetAttributes()
         for _, v in pairs(self.buttonAttributes) do
             self.button:SetAttribute(v, nil)
@@ -413,6 +456,7 @@ local function WidgetMethods(widget)
     function widget:ResetHighlight() WU:ResetHighlight(self) end
     function widget:SetTextureAsEmpty() self:SetTextures(noIconTexture) end
     function widget:SetTextures(icon) WU:SetTextures(self, icon) end
+    function widget:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
     function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
     function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
     function widget:IsMatchingItemSpell(profileButton, spellID) return WU:IsMatchingItemSpell(profileButton, spellID) end
@@ -458,6 +502,13 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
+    cooldown:SetCountdownFont(GameFontHighlightSmallOutline:GetFont())
+    cooldown:SetDrawEdge(true)
+    --cooldown:SetSize(0, 0)
+    cooldown:SetEdgeScale(0.0)
+    cooldown:SetHideCountdownNumbers(false)
+    cooldown:SetUseCircularEdge(false)
+    cooldown:SetPoint('CENTER')
 
     ---@class ButtonUIWidget
     local widget = {
