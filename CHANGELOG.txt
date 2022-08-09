@@ -1,4 +1,4 @@
-### 1.0.0.22.FUTURE
+### 1.0.0.22
 
 - Support for macros with castsequence
   * Macros with conditional key modifiers (shift, ctrl, alt, etc) are still not supported due to WoW API Event limitations [Issue #19](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/19)
