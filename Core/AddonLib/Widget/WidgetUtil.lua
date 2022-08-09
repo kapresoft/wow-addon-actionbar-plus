@@ -31,39 +31,23 @@ Methods
 ---@param buttonWidget ButtonUIWidget
 function _L:UpdateUsable(buttonWidget)
     local cd = buttonWidget:GetCooldownInfo()
+    if (cd == nil or cd.details == nil or cd.details.spell == nil) then
+        return true
+    end
+
     local profileButton = buttonWidget:GetConfig()
     local isUsableSpell = true
     if profileButton.type == SPELL then
         isUsableSpell = self:IsUsableSpell(buttonWidget, cd)
-        self:SetSpellUsable(buttonWidget, isUsableSpell)
     elseif profileButton.type == MACRO then
         isUsableSpell = self:IsUsableMacro(buttonWidget, cd)
     end
-
-    --local spell = profileButton.spell
-    --if not spell then return end
-    --local spellID = spell.id
-    --if IsBlank(spellID) then return end
-    ---- TODO: Update usable for macros
-    --local isUsable, notEnoughMana = IsUsableSpell(spellID)
-    --self:log('Spell[%s]: IsUsable=%s notEnoughMana=%s', spell.name, isUsable, notEnoughMana)
-    -- Enable (1.0, 1.0, 1.0), Disabled (0.5, 0.5, 1.0)
-    --_G['ActionbarPlusF4Button1']:GetNormalTexture():SetVertexColor(0.5, 0.5, 1.0)
     self:SetSpellUsable(buttonWidget, isUsableSpell)
 end
 
 ---@param widget ButtonUIWidget
 ---@param cd CooldownInfo
 function _L:IsUsableSpell(widget, cd)
-    if (cd == nil or cd.details == nil
-            or cd.type ~= SPELL
-            or cd.details.spell == nil) then
-        return true
-    end
-
-    --local spell = profileButton.spell
-    --if not spell then return end
-    --local spellID = spell.id
     local spellID = cd.details.spell.id
     if IsBlank(spellID) then return true end
     return IsUsableSpell(spellID)
@@ -73,11 +57,6 @@ end
 ---@param widget ButtonUIWidget
 ---@param cd CooldownInfo
 function _L:IsUsableMacro(widget, cd)
-    if (cd == nil or cd.details == nil
-            or cd.type ~= MACRO
-            or cd.details.spell == nil) then
-        return true
-    end
     local spellID = cd.details.spell.id
     if IsBlank(spellID) then return true end
     return IsUsableSpell(spellID)
