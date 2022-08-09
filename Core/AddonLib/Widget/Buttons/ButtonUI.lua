@@ -111,12 +111,10 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnUpdateButtonCooldown(widget, event)
-    C_Timer.After(1, function()
-        widget:UpdateCooldown()
-        local cd = widget:GetCooldownInfo();
-        if (cd == nil or cd.icon == nil or cd.type ~= MACRO) then return end
-        widget:SetCooldownTextures(cd.icon)
-    end)
+    widget:UpdateCooldown()
+    local cd = widget:GetCooldownInfo();
+    if (cd == nil or cd.icon == nil or cd.type ~= MACRO) then return end
+    widget:SetCooldownTextures(cd.icon)
 end
 
 ---@param widget ButtonUIWidget
