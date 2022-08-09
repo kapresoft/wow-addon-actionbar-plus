@@ -43,35 +43,42 @@ local ProfileBarTemplate = {
         }
     }
 }
----@class ProfileButton
+
+---@class SpellData
+local SpellDataTemplate = {
+    ["minRange"] = 0,
+    ["id"] = 8232,
+    ["label"] = "Windfury Weapon |c00747474(Rank 1)|r",
+    ["name"] = "Windfury Weapon",
+    ["castTime"] = 0,
+    ["link"] = "|cff71d5ff|Hspell:8232:0|h[Windfury Weapon]|h|r",
+    ["maxRange"] = 0,
+    ["icon"] = 136018,
+    ["rank"] = "Rank 1"
+}
+---@class ItemData
+local ItemDataTemplate = {
+    ["name"] = "Arcane Powder",
+    ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
+    ["id"] = 17020,
+    ["stackCount"] = 20,
+    ["icon"] = 133848,
+    ["count"] = 40,
+}
+---@class MacroData
+local MacroDataTemplate = {
+    ["type"] = "macro",
+    ["index"] = 41,
+    ["name"] = "z#LOL",
+    ["icon"] = 132093,
+    ["body"] = "/lol\n",
+}
+------@class ProfileButton
 local ProfileButtonTemplate = {
     ['type'] = 'spell',
-    ["spell"] = {
-        ["minRange"] = 0,
-        ["id"] = 8232,
-        ["label"] = "Windfury Weapon |c00747474(Rank 1)|r",
-        ["name"] = "Windfury Weapon",
-        ["castTime"] = 0,
-        ["link"] = "|cff71d5ff|Hspell:8232:0|h[Windfury Weapon]|h|r",
-        ["maxRange"] = 0,
-        ["icon"] = 136018,
-        ["rank"] = "Rank 1",
-    },
-    ["item"] = {
-        ["name"] = "Arcane Powder",
-        ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
-        ["id"] = 17020,
-        ["stackCount"] = 20,
-        ["icon"] = 133848,
-        ["count"] = 40,
-    },
-    ["macro"] = {
-        ["type"] = "macro",
-        ["index"] = 41,
-        ["name"] = "z#LOL",
-        ["icon"] = 132093,
-        ["body"] = "/lol\n",
-    }
+    ["spell"] = SpellDataTemplate,
+    ["item"] = ItemDataTemplate,
+    ["macro"] = MacroDataTemplate,
 }
 
 local ProfileTemplate = {

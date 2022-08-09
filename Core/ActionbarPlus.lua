@@ -220,7 +220,7 @@ local methods = {
         local text = nil
         local label = optionalLabel or ''
         if type(obj) ~= 'string' then
-            text = PrettyPrint.pformat(obj)
+            text = pformat:A():pformat(obj)
         else
             text = obj
         end

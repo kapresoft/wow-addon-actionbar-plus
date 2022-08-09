@@ -67,14 +67,15 @@ end
 --- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
 ---@return SpellCooldown
 function S:GetSpellCooldown(spellID, optionalSpell)
+    --print(string.format('optionalSpell: %s', pformat(optionalSpell)))
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
+    local name, _, icon, _, _, _, _ = GetSpellInfo(spellID)
     ---@class SpellCooldown
     local cd = {
-        spell = { id=spellID },
+        spell = { name = name, id = spellID, icon = icon },
         start = start, duration = duration, enabled = enabled, modRate = modRate }
     if optionalSpell then
         cd.spell.details = optionalSpell
-        cd.spell.name = optionalSpell.name
     end
     return cd
 end
