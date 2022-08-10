@@ -1,3 +1,7 @@
+### 1.0.0.23
+
+- Enable for Wrath of the Lich King (3.4.0)
+
 ### 1.0.0.22
 
 - Support for conditional macros (castsequence and modifiers)
