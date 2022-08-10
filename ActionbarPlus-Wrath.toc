@@ -1,6 +1,6 @@
-## Interface: 20504
+## Interface: 30400
 ## Version: 1.0
-## Title: Actionbar|cff1784d1Plus|r TBC
+## Title: Actionbar|cff1784d1Plus|r WOTLK
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: antonio@kapresoft.com
 ## DefaultState: enabled
@@ -26,4 +26,4 @@
 # /dump select(4, GetBuildInfo())
 
 Core\_Core.xml
-TBC\_ActionbarPlus.xml
+Wrath\_ActionbarPlus.xml
