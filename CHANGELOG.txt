@@ -1,8 +1,8 @@
 ### 1.0.0.22
 
 - Support for conditional macros (castsequence and modifiers)
-  * Macros with conditional key modifiers (shift, ctrl, alt, etc) are still not supported due to WoW API Event limitations [Issue #19](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/19). The current workaround is to also add the macros in the blizzard action bars (in addition to ActionbarPlus action bars) so that the events that update the spell icons for these conditional macros are triggered.
-  * See screenshots and notes on pull request [PR #22 ](https://github.com/kapresoft/wow-addon-actionbar-plus/pull/22)
+- Updating icons for macros with conditional key modifiers (shift, ctrl, alt, etc) are still not supported due to WoW API Event limitations [Issue #19](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/19). The current workaround is to also add the macros in the blizzard action bars (in addition to ActionbarPlus action bars) so that the events that update the spell icons for these conditional macros are triggered.
+- See screenshots and notes on pull request [PR #22 ](https://github.com/kapresoft/wow-addon-actionbar-plus/pull/22)
 
 ### 1.0.0.21.1
 - TOC file interface version upgrade for wow retail
