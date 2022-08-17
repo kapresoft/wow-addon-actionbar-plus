@@ -49,7 +49,13 @@ function getBindingByName(bindingName)
     return nil
 end
 
-function getBarBindings(beginsWith)
+---@class BindingData
+local BindingDataTemplate = {
+    ["bar1-action1"] = { ["name"] = "<binding-name>", ["category"] = "<category>", ["key1"] = "<key-1>", ["key2"] = "<key-2>" },
+    ["bar1-action2"] = { ["name"] = "<binding-name>", ["category"] = "<category>", ["key1"] = "<key-1>", ["key2"] = "<key-2>" },
+}
+---@return BindingData
+function GetBarBindings(beginsWith)
     local bindCount = GetNumBindings()
     if bindCount <=0 then return nil end
 
@@ -77,7 +83,7 @@ local function BindActions()
     local nameFormat = format('ABP_ACTIONBAR1_BUTTON3', barnIndex, buttonIndex)
     local frameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
 
-    local bindingNames = getBarBindings('ABP_ACTIONBAR1')
+    local bindingNames = GetBarBindings('ABP_ACTIONBAR1')
     --ABP:DBG(bindingNames, 'Binding Names')
     local button3Binding = bindingNames[BINDING_NAME_ABP_ACTIONBAR1_BUTTON3]
     --print('Binding[ABP_ACTIONBAR1_BUTTON3]', pformat(button3Binding))
@@ -111,19 +117,14 @@ function Binding_ActionBar3(...)
     BindActions()
 end
 
-local function BindingUpdated(frame, event)
-    --ABP:log(20, 'BindingUpdated: %s Frame:%s', event, frame:GetName())
-    BindActions()
-end
-
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
-    if (event == 'UPDATE_BINDINGS') then
-        BindingUpdated(frame, event)
-        return
-    end
+    --if (event == 'UPDATE_BINDINGS') then
+    --    BindingUpdated(frame, event)
+    --    return
+    --end
 
-    BindActions()
+    --BindActions()
     local addon = frame.obj
     addon:OnAddonLoadedModules()
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
@@ -229,16 +230,6 @@ local methods = {
         debugDialog:Show()
     end,
     ['DBG'] = function(self, obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel)  end,
-    ['RegisterKeyBindings'] = function(self)
-        --SetBindingClick("SHIFT-T", self:Info())
-        --SetBindingClick("SHIFT-F1", BoxerButton3:GetName())
-        --SetBindingClick("ALT-CTRL-F1", BoxerButton1:GetName())
-
-        -- Warning: Replaces F5 keybinding in Wow Config
-        -- SetBindingClick("F5", BoxerButton3:GetName())
-        -- TODO: Configure Button 1 to be the Boxer Follow Button (or create an invisible one)
-        --SetBindingClick("SHIFT-R", BoxerButton1:GetName())
-    end,
     ['ConfirmReloadUI'] = function(self)
         if IsShiftKeyDown() then
             ReloadUI()
@@ -305,7 +296,8 @@ local methods = {
         options.args.profiles = ACE_DBO:GetOptionsTable(self.db)
 
         self:RegisterSlashCommands()
-        self:RegisterKeyBindings()
+        --C_Timer.After(5, function() self:RegisterKeyBindings() end)
+
     end
 }
 
@@ -316,7 +308,7 @@ local function NewInstance()
     local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
     frame:SetScript("OnEvent", OnAddonLoaded)
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    frame:RegisterEvent('UPDATE_BINDINGS')
+    --frame:RegisterEvent('UPDATE_BINDINGS')
 
     local properties = {
         frame = frame,
