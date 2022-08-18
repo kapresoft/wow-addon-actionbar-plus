@@ -23,6 +23,16 @@ if not P then return end
 
 ---- ## Start Here ----
 
+---These are the config names used by the UI
+---@see Config.lua
+---@class ProfileConfigNames
+local ConfigNames = {
+    ['lock_actionbars'] = 'lock_actionbars',
+    ['hide_when_taxi'] = 'hide_when_taxi',
+    ['show_button_index'] = 'show_button_index',
+    ['show_keybind_text'] = 'show_keybind_text',
+}
+
 local SingleBarTemplate = {
     enabled = false,
     buttons = {}
@@ -33,6 +43,10 @@ local ProfileBarTemplate = {
     ["enabled"] = false,
     -- allowed values: {"", "always", "in-combat"}
     ["locked"] = "",
+    -- shows the button index BOTTOMLEFT
+    ["show_button_index"] = true,
+    -- shows the keybind text TOP
+    ["show_keybind_text"] = true,
     ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = {
@@ -73,7 +87,7 @@ local MacroDataTemplate = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
-------@class ProfileButton
+---@class ProfileButton
 local ProfileButtonTemplate = {
     ['type'] = 'spell',
     ["spell"] = SpellDataTemplate,
@@ -81,20 +95,10 @@ local ProfileButtonTemplate = {
     ["macro"] = MacroDataTemplate,
 }
 
+---@class ProfileTemplate
 local ProfileTemplate = {
     ["bars"] = {
-        ["ActionbarPlusF1"] = {
-            ["enabled"] = false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
-            ["buttons"] = {
-                ['ActionbarPlusF1Button1'] = {
-                    ['type'] = 'spell',
-                    ['spell'] = {
-                        -- spellInfo
-                    }
-                }
-            }
-        },
+        ["ActionbarPlusF1"] = bar,
         ["ActionbarPlusF2"] = {["enabled"] = false, ["buttons"] = {}},
         ["ActionbarPlusF3"] = {["enabled"] = false, ["buttons"] = {}},
         ["ActionbarPlusF4"] = {["enabled"] = false, ["buttons"] = {}},
@@ -109,12 +113,6 @@ local ProfileTemplate = {
 local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
 ---- ## Start Here ----
-
----@class ProfileConfigNames
-local ConfigNames = {
-    ['lock_actionbars'] = 'lock_actionbars',
-    ['hide_when_taxi'] = 'hide_when_taxi'
-}
 
 local SPELL = { id = nil, name = nil, icon = nil, label = nil }
 local ITEM = { id = nil, name = nil, icon = nil, label = nil }
@@ -238,11 +236,14 @@ function P:GetBarSize()
     return tsize(bars)
 end
 
+---@param frameIndex number The frame index number
+---@param isEnabled boolean The enabled state
 function P:SetBarEnabledState(frameIndex, isEnabled)
     local bar = self:GetBar(frameIndex)
     bar.enabled = isEnabled
 end
 
+---@param frameIndex number The frame index number
 function P:IsBarEnabled(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar.enabled
@@ -253,17 +254,20 @@ function P:SetBarLockedState(frameIndex, isLocked)
     --bar.locked = isLocked
 end
 
+---@param frameIndex number The frame index number
 function P:IsBarLocked(frameIndex)
     local bar = self:GetBar(frameIndex)
     --return bar.locked
     return false
 end
 
+---@param frameIndex number The frame index number
 function P:GetBarLockValue(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar.locked or ''
 end
 
+---@param frameIndex number The frame index number
 ---@param value string Allowed values are "always", "in-combat", or nil
 function P:SetBarLockValue(frameIndex, value)
     local bar = self:GetBar(frameIndex)
@@ -297,6 +301,29 @@ function P:IsBarNameEnabled(frameName)
     local bar = self.profile.bars[frameName]
     if isNotTable(bar) then return false end
     return bar.enabled
+end
+
+---@param frameIndex number The frame index number
+---@param isEnabled boolean The enabled state
+function P:SetShowIndex(frameIndex, isEnabled)
+    self:GetBar(frameIndex).show_button_index = (isEnabled == true)
+end
+
+---@param frameIndex number The frame index number
+---@param isEnabled boolean The enabled state
+function P:SetShowKeybindText(frameIndex, isEnabled)
+    self:GetBar(frameIndex).show_keybind_text = (isEnabled == true)
+end
+
+---@param frameIndex number The frame index number
+---@return boolean
+function P:IsShowIndex(frameIndex)
+    return self:GetBar(frameIndex).show_button_index == true
+end
+
+---@param frameIndex number The frame index number
+function P:IsShowKeybindText(frameIndex)
+    return self:GetBar(frameIndex).show_keybind_text == true
 end
 
 function P:GetBaseFrameName() return self.baseFrameName end

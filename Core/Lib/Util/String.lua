@@ -63,5 +63,35 @@ end
 
 function _L.replace(str, match, replacement)
     if type(str) ~= 'string' then return nil end
-    return str:gsub("%" .. match, replacement)
+    return str:gsub(match, replacement)
+end
+
+---Example: local charCount = Count('hello world', 'l') ; returns 3
+---@param str string The string to search
+---@param pattern string The pattern to count
+function _L.Count(str, pattern)
+    return select(2, string.gsub(str, pattern, ""))
+end
+
+---@param index number The index to replace
+---@param str string The text where we are replacing the index value of
+---@param r string The replacement text
+function _L.ReplaceChar(index, str, r)
+    return str:sub(1, index - 1) .. r .. str:sub(index + 1)
+end
+
+---@param str string The text where we are replacing the index value of
+---@param r string The replacement text
+function _L.ReplaceAllCharButLast(str, r)
+    local c = _L.Count(str, r)
+    if c == 1 then return str end
+    local ret = str
+    for _ = 1, c - 1, 1
+    do
+        local index = ret:find(r)
+        if index >= 1 then
+            ret = _L.ReplaceChar(index, ret, '')
+        end
+    end
+    return ret
 end

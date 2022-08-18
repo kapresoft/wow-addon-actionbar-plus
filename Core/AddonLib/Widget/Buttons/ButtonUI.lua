@@ -4,7 +4,8 @@ WoW Vars
 local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
     PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
-GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+    GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local GameFontHighlightSmallOutline = GameFontHighlightSmallOutline
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -24,7 +25,7 @@ local _, Table, String, LogFactory = G:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
-local WU = ABP_WidgetUtil
+local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
@@ -182,6 +183,18 @@ local function OnPlayerControlGained(widget, event, ...)
     WU:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
+---@param widget ButtonUIWidget
+---@param event string Event name
+local function OnUpdateKeybindings(widget, event, ...)
+    local bindings = WU:GetBarBindings(widget:GetName())
+    if not bindings then return nil end
+    widget.bindings = bindings
+    if widget:HasKeybindings() then
+        p:log('bindings: %s', pformat(bindings))
+        widget.dragFrame:UpdateKeybindText()
+    end
+end
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -214,6 +227,7 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
     widget:RegisterEvent(PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
+    widget:RegisterEvent(UPDATE_BINDINGS, OnUpdateKeybindings, widget)
 
     --widget:SetCallback('OnDragStart', function(self, event)
     --    --p:log(50, '%s:: %s', event, tostring(self))
@@ -260,12 +274,33 @@ Widget Methods
 local function WidgetMethods(widget)
 
     function widget:GetName() return self.button:GetName() end
+    function widget:GetIndex() return self.index end
+    function widget:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
+
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
     function widget:SetText(text)
-        if text == nil then text = '' end
+        if String.IsBlank(text) then text = '' end
         widget.button.text:SetText(text)
     end
+    ---@param state boolean true will show the button index number
+    function widget:ShowIndex(state)
+        local text = ''
+        if true == state then text = widget.index end
+        widget.button.indexText:SetText(text)
+    end
+    ---@param state boolean true will show the button index number
+    function widget:ShowKeybindText(state)
+        local text = ''
+        if not self:HasKeybindings() then return text end
+        if true == state then
+            if self.bindings and self.bindings.key1Short then
+                text = self.bindings.key1Short
+            end
+        end
+        widget.button.keybindText:SetText(text)
+    end
+    function widget:HasKeybindings() return self.bindings ~= nil and String.IsNotBlank(self.bindings.key1) end
     function widget:ClearText() self:SetText('') end
 
     ---@return CooldownInfo
@@ -479,7 +514,7 @@ local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
 ---@param dragFrameWidget FrameWidget The drag frame this button is attached to
 ---@param rowNum number The row number
 ---@param colNum number The column number
----@param btnIndex number The button numeric index
+---@param btnIndex number The button index number
 ---@return ButtonUIWidget
 function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
@@ -489,7 +524,15 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
 
+    local indexText = button:CreateFontString(button, "OVERLAY", "GameFontHighlightSmall")
+    indexText:SetPoint("BOTTOMLEFT", 2, 2)
+    button.indexText = indexText
 
+    local keybindText = button:CreateFontString(button, "OVERLAY", "NumberFontNormalSmallGray")
+    keybindText:SetJustifyH("CENTER")
+    --keybindText:SetJustifyV("CENTER")
+    keybindText:SetPoint("TOP", 2, -2)
+    button.keybindText = keybindText
 
     AceHook:SecureHookScript(button, 'OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)
@@ -519,9 +562,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         ---@type number
         index = btnIndex,
         ---@type number
-        frameIndex = dragFrameWidget:GetFrameIndex(),
-        --@type string
+        frameIndex = dragFrameWidget:GetIndex(),
+        ---@type string
         buttonName = btnName,
+        ---@type BindingInfo
+        bindings = WU:GetBarBindings(btnName),
         ---@type FrameWidget
         dragFrame = dragFrameWidget,
         ---@type ButtonUI
