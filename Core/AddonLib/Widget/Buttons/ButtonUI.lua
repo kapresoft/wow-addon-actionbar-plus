@@ -183,6 +183,7 @@ local function OnPlayerControlGained(widget, event, ...)
     WU:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
+---Only Process visible action bars
 ---@param widget ButtonUIWidget
 ---@param event string Event name
 local function OnUpdateKeybindings(widget, event, ...)
@@ -190,7 +191,6 @@ local function OnUpdateKeybindings(widget, event, ...)
     if not bindings then return nil end
     widget.bindings = bindings
     if widget:IsParentFrameShown() then
-        --p:log(1, 'bindings: %s', pformat(bindings))
         widget.dragFrame:UpdateKeybindText()
     end
 end

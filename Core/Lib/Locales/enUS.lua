@@ -5,21 +5,40 @@
     
 ]]--
 
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local sformat = string.format
+
+--[[-----------------------------------------------------------------------------
+Defaults
+-------------------------------------------------------------------------------]]
+
+ABP_BAR_HEADER_FORMAT_DEFAULT               = '%s Bar #%s'
+ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT         = 'Bar #%s Action Button %s'
+
 ---@class Localization
 local L = LibStub("AceLocale-3.0"):NewLocale("ActionbarPlus", "enUS", true);
 
+
+--[[-----------------------------------------------------------------------------
+Localization
+-------------------------------------------------------------------------------]]
+
 for bar = 1,8,1
 do
-    for button = 1,20,1
+    for button = 1,50,1
     do
         -- Example: L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]  = 'Bar #1 Action Button 1'
-        local left = string.format('BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s', bar, button)
-        local right = string.format('Bar #%s Action Button %s', bar, button)
+        local left = sformat('BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s', bar, button)
+        local right = sformat(ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT, bar, button)
         L[left] = right
     end
 end
 
-L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']  = 'Lock Actionbars with SHIFT key'
-L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']  = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
+L['ABP_BUTTON_NAME_TEXT_FORMAT']                = ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT
+L['ABP_BAR_HEADER_FORMAT']                      = ABP_BAR_HEADER_FORMAT_DEFAULT
+L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']   = 'Lock Actionbars with SHIFT key'
+L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']   = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
 L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide Actionbars while in taxi'
 L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC']  = 'Hides the action bars while the player is in taxi; flying from one point to another.'
