@@ -20,6 +20,36 @@
     <Binding name="CLICK ActionbarPlusF1Button18:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
     <Binding name="CLICK ActionbarPlusF1Button19:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
     <Binding name="CLICK ActionbarPlusF1Button20:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button21:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button22:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button23:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button24:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button25:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button26:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button27:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button28:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button29:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button30:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button31:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button32:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button33:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button34:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button35:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button36:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button37:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button38:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button39:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button40:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button41:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button42:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button43:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button44:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button45:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button46:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button47:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button48:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button49:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
+    <Binding name="CLICK ActionbarPlusF1Button50:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
 
     <Binding name="CLICK ActionbarPlusF2Button1:LeftButton" category="BINDING_HEADER_ABP_CATEGORY" header="ABP_HEADER_ACTIONBAR2"/>
     <Binding name="CLICK ActionbarPlusF2Button2:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>

@@ -207,8 +207,8 @@ local function CreateIndexTextFontString(b)
     local fontName, fontHeight = fs:GetFont()
     fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
     --fs:SetFont(font, 9, "THICKOUTLINE")
-    --fs:SetTextColor(150/255, 150/255, 150/255)
-    fs:SetTextColor(200/255, 200/255, 200/255)
+    fs:SetTextColor(100/255, 100/255, 100/255)
+    --fs:SetTextColor(200/255, 200/255, 200/255)
     fs:SetPoint("BOTTOMLEFT", 4, 4)
     return fs
 end
