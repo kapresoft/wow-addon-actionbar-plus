@@ -2,7 +2,7 @@
 ## Version: 1.0
 ## Title: Actionbar|cff1784d1Plus|r Classic
 ## Notes: Actionbar Addon for World of Warcraft
-## Author: antonio@kapresoft.com
+## Author: kapresoft@gmail.com
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
