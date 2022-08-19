@@ -189,8 +189,8 @@ local function OnUpdateKeybindings(widget, event, ...)
     local bindings = WU:GetBarBindings(widget:GetName())
     if not bindings then return nil end
     widget.bindings = bindings
-    if widget:HasKeybindings() then
-        p:log('bindings: %s', pformat(bindings))
+    if widget:IsParentFrameShown() then
+        --p:log(1, 'bindings: %s', pformat(bindings))
         widget.dragFrame:UpdateKeybindText()
     end
 end
@@ -292,7 +292,10 @@ local function WidgetMethods(widget)
     ---@param state boolean true will show the button index number
     function widget:ShowKeybindText(state)
         local text = ''
-        if not self:HasKeybindings() then return text end
+        if not self:HasKeybindings() then
+            widget.button.keybindText:SetText(text)
+            return
+        end
         if true == state then
             if self.bindings and self.bindings.key1Short then
                 text = self.bindings.key1Short

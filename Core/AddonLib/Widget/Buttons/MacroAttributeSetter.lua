@@ -10,8 +10,7 @@ local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 
 local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
-local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
-local KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r'
+local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
 ---@class MacroAttributeSetter
 local _L = LibStub:NewLibrary(M.MacroAttributeSetter)
 
@@ -53,21 +52,17 @@ function _L:ShowTooltip(btnUI)
 
     if not (macroInfo.index or macroInfo.name) then return end
 
-    local bindings = w.bindings
-    macroLabel =  string.format(MACRO_WITH_SPELL_FORMAT, macroInfo.name)
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then
         GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
-        if w:HasKeybindings() then
-            GameTooltip:AddLine(sformat(KEYBIND_FORMAT, bindings.key1))
-        end
+        WU:AddKeybindingInfo(w)
         return
     end
     GameTooltip:AddSpellByID(spellId)
-    GameTooltip:AppendText('  |cfd03c2fc::|r ' .. macroLabel)
+    GameTooltip:AppendText(' ' .. sformat(MACRO_WITH_SPELL_FORMAT, macroInfo.name))
 
-    if w:HasKeybindings() then GameTooltip:AddLine(sformat(KEYBIND_FORMAT, bindings.key1)) end
+    WU:AddKeybindingInfo(w)
 end
 
 _L.mt.__call = _L.SetAttributes

@@ -163,7 +163,7 @@ local function WidgetMethods(widget)
         self:ShowKeybindText(self:IsShowKeybindText())
     end
 
-    ---@param applyFunction function Should be in format function(buttonWidget) {}
+    ---@param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
     function widget:ApplyForEachButtons(applyFunction)
         if #self.buttons <= 0 then return end
         -- `_` is the index
@@ -202,9 +202,12 @@ local function WidgetMethods(widget)
     end
 
     function widget:ShowButtons()
-        for _, btnName in ipairs(self.buttons) do
-            _G[btnName]:Show()
-        end
+        local isShowKeybindText = self:IsShowKeybindText()
+        ---@param btnWidget ButtonUIWidget
+        self:ApplyForEachButtons(function(btnWidget)
+            btnWidget:ShowKeybindText(isShowKeybindText)
+            btnWidget.button:Show()
+        end)
     end
 
     function widget:HideButtons()

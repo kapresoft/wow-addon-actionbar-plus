@@ -40,6 +40,11 @@ function _L.EqualsIgnoreCase(str1, str2)
     return string.lower(str1) == string.lower(str2)
 end
 
+---@param formatstring string The string format
+function _L.format(formatstring, ...)
+    return string.format(formatstring, ...)
+end
+
 -- remove trailing and leading whitespace from string.
 -- http://en.wikipedia.org/wiki/Trim_(programming)
 function _L.trim(s)

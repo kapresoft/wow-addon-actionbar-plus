@@ -1,11 +1,14 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local IsUsableSpell, C_Timer = IsUsableSpell, C_Timer
+local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 -- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
+local KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r'
+
 local _, String = ABP_LibGlobals:LibPack_CommonUtils()
 local _, M = ABP_LibGlobals:LibPack()
 local _, NewLibrary = __K_Core:LibPack()
@@ -231,4 +234,17 @@ function _L:GetBarBindings(btnName)
         end
     end
     return nil
+end
+
+---@param btnWidget ButtonUIWidget
+function _L:AddKeybindingInfo(btnWidget)
+    if not btnWidget:HasKeybindings() then return end
+    GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
+    GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+end
+
+function _L:AddItemKeybindingInfo(btnWidget)
+    if not btnWidget:HasKeybindings() then return end
+    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, btnWidget.bindings.key1))
+    --GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end
