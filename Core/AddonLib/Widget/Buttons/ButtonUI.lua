@@ -198,6 +198,29 @@ end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
+---@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
+---@param b ButtonUI The button UI
+local function CreateIndexTextFontString(b)
+    local font = LSM:Fetch(LSM.MediaType.FONT, LSM.DefaultMedia.font)
+    local fs = b:CreateFontString(b, "OVERLAY", "GameFontHighlightSmallOutline")
+    fs:SetFont(font, 9, "THICKOUTLINE")
+    fs:SetTextColor(150/255, 150/255, 150/255)
+    fs:SetPoint("BOTTOMLEFT", 4, 4)
+    return fs
+end
+
+---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
+---@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
+---@param b ButtonUI The button UI
+local function CreateKeybindTextFontString(b)
+    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
+    --local fontName, fontHeight, fontFlags = fs:GetFont()
+    --fs:SetFont(fontName, fontHeight, "OUTLINE")
+    fs:SetTextColor(200/255, 200/255, 200/255)
+    fs:SetPoint("TOP", 2, -2)
+    return fs
+end
 
 ---@param widget ButtonUIWidget
 ---@param name string The widget name.
@@ -526,16 +549,14 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+    button.indexText = CreateIndexTextFontString(button)
+    button.keybindText = CreateKeybindTextFontString(button)
 
-    local indexText = button:CreateFontString(button, "OVERLAY", "GameFontHighlightSmall")
-    indexText:SetPoint("BOTTOMLEFT", 2, 2)
-    button.indexText = indexText
-
-    local keybindText = button:CreateFontString(button, "OVERLAY", "NumberFontNormalSmallGray")
-    keybindText:SetJustifyH("CENTER")
-    --keybindText:SetJustifyV("CENTER")
-    keybindText:SetPoint("TOP", 2, -2)
-    button.keybindText = keybindText
+    --local keybindText = button:CreateFontString(button, "OVERLAY", "NumberFontNormalSmallGray")
+    --keybindText:SetJustifyH("CENTER")
+    ----keybindText:SetJustifyV("CENTER")
+    --keybindText:SetPoint("TOP", 2, -2)
+    --button.keybindText = keybindText
 
     AceHook:SecureHookScript(button, 'OnClick', OnClick)
     button:SetScript('OnDragStart', OnDragStart)
