@@ -203,9 +203,12 @@ Support Functions
 ---@param b ButtonUI The button UI
 local function CreateIndexTextFontString(b)
     local font = LSM:Fetch(LSM.MediaType.FONT, LSM.DefaultMedia.font)
-    local fs = b:CreateFontString(b, "OVERLAY", "GameFontHighlightSmallOutline")
-    fs:SetFont(font, 9, "THICKOUTLINE")
-    fs:SetTextColor(150/255, 150/255, 150/255)
+    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
+    local fontName, fontHeight = fs:GetFont()
+    fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
+    --fs:SetFont(font, 9, "THICKOUTLINE")
+    --fs:SetTextColor(150/255, 150/255, 150/255)
+    fs:SetTextColor(200/255, 200/255, 200/255)
     fs:SetPoint("BOTTOMLEFT", 4, 4)
     return fs
 end
