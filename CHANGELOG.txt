@@ -1,4 +1,4 @@
-### 1.0.0.24.FUTURE
+### 1.0.0.24
 
 - Keybind support for up to 50 ActionbarPlus buttons
 - New Options at the Actionbar level to (1) show button index (2) show button keybind text
