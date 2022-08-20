@@ -1,4 +1,4 @@
-## Interface: 90205
+## Interface: 90207
 ## Version: 1.0
 ## Title: Actionbar|cff1784d1Plus|r Retail
 ## Notes: Actionbar Addon for World of Warcraft
