@@ -71,6 +71,7 @@ local function RegisterCallbacks(widget)
 
 end
 
+---@param widget FrameWidget
 local function RegisterEvents(widget)
     local C = ABP_WidgetConstants.C
     ---@param w FrameWidget
@@ -96,13 +97,13 @@ local function WidgetMethods(widget)
         return widget.frame:GetName()
     end
 
-    function widget:GetFrameIndex()
-        return self.frameIndex
-    end
+    ---@deprecated Use self#GetIndex()
+    function widget:GetFrameIndex() return self:GetIndex() end
+    function widget:GetIndex() return self.index end
 
     ---@return BarData
     function widget:GetConfig()
-        return P:GetBar(self.frameIndex)
+        return P:GetBar(self:GetIndex())
     end
 
     function widget:Toggle()
@@ -115,7 +116,7 @@ local function WidgetMethods(widget)
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
 
     function widget:SetFrameState(isEnabled)
-        local frameIndex = self:GetFrameIndex()
+        local frameIndex = self:GetIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'SetFrameState(frameIndex)')
         P:SetBarEnabledState(frameIndex, isEnabled)
         if isEnabled then
@@ -127,11 +128,48 @@ local function WidgetMethods(widget)
 
     -- Synchronize UI and Profile data
     function widget:IsShownInConfig()
-        local frameIndex = self:GetFrameIndex()
+        local frameIndex = self:GetIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'IsShownInConfig(frameIndex)')
         local actualFrameIsShown = frame:IsShown()
         P:SetBarEnabledState(frameIndex, actualFrameIsShown)
         return P:IsBarEnabled(frameIndex)
+    end
+
+    function widget:IsShowIndex() return P:IsShowIndex(self:GetFrameIndex()) end
+    function widget:IsShowKeybindText() return P:IsShowKeybindText(self:GetFrameIndex()) end
+
+    ---@param state boolean true will show button indices
+    function widget:ShowButtonIndices(state)
+        local theState = (state == true)
+        self:GetConfig().show_button_index = theState
+        ---@param btn ButtonUIWidget
+        self:ApplyForEachButtons(function(btn)
+            --p:log('apply[%s]: %s', btn:GetName(), theState)
+            btn:ShowIndex(theState)
+        end)
+    end
+    ---@param state boolean true will show button indices
+    function widget:ShowKeybindText(state)
+        local theState = (state == true)
+        self:GetConfig().show_keybind_text = theState
+        ---@param btn ButtonUIWidget
+        self:ApplyForEachButtons(function(btn)
+            --p:log('ShowKeyBindText[%s]: %s', btn:GetName(), theState)
+            btn:ShowKeybindText(theState)
+        end)
+    end
+
+    function widget:UpdateKeybindText()
+        self:ShowKeybindText(self:IsShowKeybindText())
+    end
+
+    ---@param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    function widget:ApplyForEachButtons(applyFunction)
+        if #self.buttons <= 0 then return end
+        -- `_` is the index
+        for _, btnName in ipairs(self:GetButtons()) do
+            applyFunction(_G[btnName].widget)
+        end
     end
 
     function widget:SetGroupState(isShown)
@@ -164,9 +202,12 @@ local function WidgetMethods(widget)
     end
 
     function widget:ShowButtons()
-        for _, btnName in ipairs(self.buttons) do
-            _G[btnName]:Show()
-        end
+        local isShowKeybindText = self:IsShowKeybindText()
+        ---@param btnWidget ButtonUIWidget
+        self:ApplyForEachButtons(function(btnWidget)
+            btnWidget:ShowKeybindText(isShowKeybindText)
+            btnWidget.button:Show()
+        end)
     end
 
     function widget:HideButtons()
@@ -197,10 +238,12 @@ local function WidgetMethods(widget)
     function widget:SetInitialState()
         self:MarkRendered()
         self:SetLockedState()
+        self:ShowButtonIndices(self:IsShowIndex())
+        self:ShowKeybindText(self:IsShowKeybindText())
     end
 
     function widget:SetLockedState()
-        local frameIndex = self:GetFrameIndex()
+        local frameIndex = self:GetIndex()
         if P:IsBarLockedAlways(frameIndex) then
             self:LockGroup()
         else P:IsBarUnlocked(frameIndex)
@@ -285,6 +328,8 @@ function _L:Constructor(frameIndex)
     local widget = {
         p = p,
         profile = P,
+        index = frameIndex,
+        ---deprecated: Use index instead
         frameIndex = frameIndex,
         GetBarData = function() return P:GetBar(frameIndex) end,
         --options = barData.widget,

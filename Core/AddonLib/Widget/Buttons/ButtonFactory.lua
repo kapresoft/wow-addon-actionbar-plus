@@ -141,8 +141,9 @@ function L:CreateButtons(frameWidget, rowSize, colSize)
 end
 
 ---@param frameWidget FrameWidget
-function L:CreateSingleButton(frameWidget, row, col, index)
-    local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, index)
+---@param btnIndex number The button index number
+function L:CreateSingleButton(frameWidget, row, col, btnIndex)
+    local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
     self:SetButtonAttributes(btnWidget)
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)

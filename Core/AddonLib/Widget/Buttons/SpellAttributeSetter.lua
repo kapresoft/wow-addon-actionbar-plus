@@ -12,6 +12,7 @@ local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
 local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
+local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
 
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
@@ -75,7 +76,8 @@ end
 
 function _L:ShowTooltip(btnUI)
     if not btnUI then return end
-    local btnData = btnUI.widget:GetConfig()
+    local w = btnUI.widget
+    local btnData = w:GetConfig()
     if not btnData then return end
     if String.IsBlank(btnData.type) then return end
 
@@ -86,6 +88,7 @@ function _L:ShowTooltip(btnUI)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
+        WU:AddKeybindingInfo(w)
     end
 end
 

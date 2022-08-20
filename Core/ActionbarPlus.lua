@@ -16,6 +16,7 @@ Local Vars
 --
 local LibStub, M, AceLibFactory, W, ProfileInitializer, G = ABP_LibGlobals:LibPack_NewAddon()
 local ADDON_NAME = G.addonName
+local FRAME_NAME = ADDON_NAME .. "Frame"
 
 local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
 local isEmpty = Table.isEmpty
@@ -36,94 +37,46 @@ local debugDialog
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
-function getBindingByName(bindingName)
-    local bindCount = GetNumBindings()
-    if bindCount <=0 then return nil end
-
-    for i = 1, bindCount do
-        local command,cat,key1,key2 = GetBinding(i)
-        if bindingName == command then
-            return { name = command, category = cat, key1 = key1, key2 = key2 }
-        end
-    end
-    return nil
-end
-
-function getBarBindings(beginsWith)
-    local bindCount = GetNumBindings()
-    if bindCount <=0 then return nil end
-
-    --print('beginsWith:', beginsWith)
-    -- key: name, value: binding obj
-    local bindings = {}
-    for i = 1, bindCount do
-        local command,cat,key1,key2 = GetBinding(i)
-        --print('bindingName: ', command)
-        if string.find(command, beginsWith) then
-            local value = { name = command, category = cat, key1 = key1, key2 = key2 }
-            local keyName = 'BINDING_NAME_' .. command
-            local key = _G[keyName]
-            if key then
-                bindings[key] = value
-            end
-        end
-    end
-    return bindings
-end
-
-local function BindActions()
-    local barIndex = 1
-    local buttonIndex = 3
-    local nameFormat = format('ABP_ACTIONBAR1_BUTTON3', barnIndex, buttonIndex)
-    local frameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
-
-    local bindingNames = getBarBindings('ABP_ACTIONBAR1')
-    --ABP:DBG(bindingNames, 'Binding Names')
-    local button3Binding = bindingNames[BINDING_NAME_ABP_ACTIONBAR1_BUTTON3]
-    --print('Binding[ABP_ACTIONBAR1_BUTTON3]', pformat(button3Binding))
-    if not (button3Binding and button3Binding.key1) then return end
-    local button3 = 'ActionbarPlusF1Button3'
-    local btnUI = _G[button3]
-    if btnUI then
-        ClearOverrideBindings(btnUI)
-        SetOverrideBindingClick(btnUI, true, button3Binding.key1, button3)
-        ABP:log(40, 'Button: %s OverrideBindingClick: %s', button3, button3Binding.key1)
-        -- TODO: Does not respond after binding change event, need to add a listener to event UPDATE_BINDINGS
-        if button3Binding.key2 then
-            ABP:log(40, 'Button: %s OverrideBindingClick: %s', button3, button3Binding.key2)
-            SetOverrideBindingClick(btnUI, true, button3Binding.key2, button3)
-        end
-    end
-    --LoadBindings(1);
-end
-
-function Binding_ActionBar1()
-    ABP:DBG(ABP.profile, 'Current Profile')
-end
-
-function Binding_ActionBar2()
-    ABP:ShowTextureDialog()
-end
-
-function Binding_ActionBar3(...)
-    --local bindings = getBarBindings('ABP_ACTIONBAR1')
-    --ABP:DBG(bindings, 'Key Bindings')
-    BindActions()
-end
-
-local function BindingUpdated(frame, event)
-    --ABP:log(20, 'BindingUpdated: %s Frame:%s', event, frame:GetName())
-    BindActions()
-end
+---- TODO: Move to ABP_WidgetUtil
+--function getBindingByName(bindingName)
+--    local bindCount = GetNumBindings()
+--    if bindCount <=0 then return nil end
+--
+--    for i = 1, bindCount do
+--        local command,cat,key1,key2 = GetBinding(i)
+--        if bindingName == command then
+--            return { name = command, category = cat, key1 = key1, key2 = key2 }
+--        end
+--    end
+--    return nil
+--end
+--
+---- TODO: Move to ABP_WidgetUtil
+--function GetBarBindings(beginsWith)
+--    local bindCount = GetNumBindings()
+--    if bindCount <=0 then return nil end
+--
+--    --print('beginsWith:', beginsWith)
+--    -- key: name, value: binding obj
+--    local bindings = {}
+--    for i = 1, bindCount do
+--        local command,cat,key1,key2 = GetBinding(i)
+--        --print('bindingName: ', command)
+--        if string.find(command, beginsWith) then
+--            local value = { name = command, category = cat, key1 = key1, key2 = key2 }
+--            local keyName = 'BINDING_NAME_' .. command
+--            local key = _G[keyName]
+--            if key then
+--                bindings[key] = value
+--            end
+--        end
+--    end
+--    return bindings
+--end
 
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
-    if (event == 'UPDATE_BINDINGS') then
-        BindingUpdated(frame, event)
-        return
-    end
 
-    BindActions()
     local addon = frame.obj
     addon:OnAddonLoadedModules()
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
@@ -229,16 +182,6 @@ local methods = {
         debugDialog:Show()
     end,
     ['DBG'] = function(self, obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel)  end,
-    ['RegisterKeyBindings'] = function(self)
-        --SetBindingClick("SHIFT-T", self:Info())
-        --SetBindingClick("SHIFT-F1", BoxerButton3:GetName())
-        --SetBindingClick("ALT-CTRL-F1", BoxerButton1:GetName())
-
-        -- Warning: Replaces F5 keybinding in Wow Config
-        -- SetBindingClick("F5", BoxerButton3:GetName())
-        -- TODO: Configure Button 1 to be the Boxer Follow Button (or create an invisible one)
-        --SetBindingClick("SHIFT-R", BoxerButton1:GetName())
-    end,
     ['ConfirmReloadUI'] = function(self)
         if IsShiftKeyDown() then
             ReloadUI()
@@ -305,7 +248,8 @@ local methods = {
         options.args.profiles = ACE_DBO:GetOptionsTable(self.db)
 
         self:RegisterSlashCommands()
-        self:RegisterKeyBindings()
+        --C_Timer.After(5, function() self:RegisterKeyBindings() end)
+
     end
 }
 
@@ -313,10 +257,9 @@ local methods = {
 New Instance
 -------------------------------------------------------------------------------]]
 local function NewInstance()
-    local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
+    local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetScript("OnEvent", OnAddonLoaded)
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    frame:RegisterEvent('UPDATE_BINDINGS')
 
     local properties = {
         frame = frame,

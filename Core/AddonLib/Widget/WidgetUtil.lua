@@ -1,12 +1,16 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local IsUsableSpell, C_Timer = IsUsableSpell, C_Timer
+local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 -- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
+local KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r'
+
 local _, String = ABP_LibGlobals:LibPack_CommonUtils()
+local _, M = ABP_LibGlobals:LibPack()
 local _, NewLibrary = __K_Core:LibPack()
 local P = ABP_Profile
 
@@ -22,7 +26,7 @@ local SPELL,ITEM,MACRO = 'spell','item','macro'
 
 ---Creates a global var ABP_WidgetUtil
 ---@class WidgetUtil
-local _L = NewLibrary('WidgetUtil')
+local _L = NewLibrary(M.WidgetUtil)
 ---@type WidgetUtil
 ABP_WidgetUtil = _L
 --[[-----------------------------------------------------------------------------
@@ -188,4 +192,59 @@ function _L:SetEnabledActionBarStates(isShown)
             end
         end
     end
+end
+
+---@param bindingName string The keybind name (see Bindings.xml)
+function _L:ParseButtonName(bindingName)
+    local left = String.replace(bindingName, 'CLICK ', '')
+    return String.TrimAll(String.replace(left, ':LeftButton', ''))
+end
+
+---@class BindingInfo
+local BindingInfoTemplate = {
+    name = '<command-name>', btnName = '<button-name',
+    category = '<category>', key1 = '<key1>', key1Short = '<key1Short>', key2 = '<key2>'
+}
+
+---@param btnWidget ButtonUIWidget
+---@return BindingInfo
+function _L:GetBarBindings(btnName)
+    if String.IsBlank(btnName) then return nil end
+    local bindCount = GetNumBindings()
+    if bindCount <=0 then return nil end
+    for i = 1, bindCount do
+        local command,cat,key1,key2 = GetBinding(i)
+        local bindingBtnName = self:ParseButtonName(command)
+        --self:log('bindingName: %s', pformat({command, cat, key1 }))
+        --if string.find(command, beginsWith) then
+        --if string.find(cat, beginsWith) then
+        if btnName == bindingBtnName then
+            local key1Short = key1
+            if String.IsNotBlank(key1Short) then
+                key1Short = String.replace(key1Short, 'ALT', 'a')
+                key1Short = String.replace(key1Short, 'CTRL', 'c')
+                key1Short = String.replace(key1Short, 'SHIFT', 's')
+                key1Short = String.replace(key1Short, 'META', 'm')
+                key1Short = String.ReplaceAllCharButLast(key1Short, '-')
+            end
+            return {
+                name = command, btnName = btnName, category = cat,
+                key1 = key1, key1Short = key1Short, key2 = key2
+            }
+        end
+    end
+    return nil
+end
+
+---@param btnWidget ButtonUIWidget
+function _L:AddKeybindingInfo(btnWidget)
+    if not btnWidget:HasKeybindings() then return end
+    GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
+    GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+end
+
+function _L:AddItemKeybindingInfo(btnWidget)
+    if not btnWidget:HasKeybindings() then return end
+    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, btnWidget.bindings.key1))
+    --GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end

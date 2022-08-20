@@ -1,3 +1,9 @@
+### 1.0.0.24.FUTURE
+
+- Keybind support for up to 50 ActionbarPlus buttons
+- New Options at the Actionbar level to (1) show button index (2) show button keybind text
+- See doc: https://github.com/kapresoft/wow-addon-actionbar-plus/wiki/Release-1.0.0.24-Notes
+
 ### 1.0.0.23
 
 - Enable for Wrath of the Lich King (3.4.0)
@@ -16,7 +22,7 @@
   - See doc: https://github.com/kapresoft/wow-addon-actionbar-plus/wiki/Release-1.0.0.21-Notes
 
 ### 1.0.0.20
-- Enhancement work for resizing actionbar buttons [Issue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
+- Enhancement work for resizing actionbar buttons [I![](../../../../../../Users/tony/Desktop/Screen Shot 2022-08-19 at 3.56.59 PM.png)![](../../../../../../Users/tony/Desktop/Screen Shot 2022-08-19 at 3.59.32 PM.png)ssue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
 - Per Character Macro rename fix for [Issue #14](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/14)
 
 ### 1.0.0.19-beta

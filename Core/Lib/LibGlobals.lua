@@ -53,7 +53,8 @@ local Module = {
     WidgetLibFactory = 'WidgetLibFactory',
     MacroAttributeSetter = 'MacroAttributeSetter',
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
-    MacroEventsHandler = 'MacroEventsHandler'
+    MacroEventsHandler = 'MacroEventsHandler',
+    WidgetUtil = 'WidgetUtil',
 }
 
 ---@class LibGlobals
@@ -148,11 +149,10 @@ function _L:LibPack_CommonUtils()
     local Table, String = self:Get(Module.Table, Module.String)
     return Table, String
 end
-
 ---@return ButtonDataBuilder
-function _L:LibPack_ButtonDataBuilder()
-    return self:Get(Module.ButtonDataBuilder)
-end
+function _L:LibPack_ButtonDataBuilder() return self:Get(Module.ButtonDataBuilder) end
+---@return WidgetUtil
+function _L:LibPack_WidgetUtil() return self:Get(Module.WidgetUtil) end
 
 function _L:GetLogLevel() return ABP_LOG_LEVEL end
 ---@param level number The log level between 1 and 100

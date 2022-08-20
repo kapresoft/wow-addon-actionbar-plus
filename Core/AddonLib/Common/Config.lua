@@ -56,6 +56,18 @@ end
 local function GetFrameStateGetterHandler(frameIndex)
     return function(_) return GetFrameWidget(frameIndex):IsShownInConfig() end
 end
+local function GetShowButtonIndexStateGetterHandler(frameIndex)
+    return function(_) return GetFrameWidget(frameIndex):IsShowIndex() end
+end
+local function GetShowButtonIndexStateSetterHandler(frameIndex)
+    return function(_, v) GetFrameWidget(frameIndex):ShowButtonIndices(v) end
+end
+local function GetShowKeybindTextStateGetterHandler(frameIndex)
+    return function(_) return GetFrameWidget(frameIndex):IsShowKeybindText() end
+end
+local function GetShowKeybindTextStateSetterHandler(frameIndex)
+    return function(_, v) GetFrameWidget(frameIndex):ShowKeybindText(v) end
+end
 local function GetLockStateSetterHandler(frameIndex)
     return function(_, v)
         P:SetBarLockValue(frameIndex, v)
@@ -222,6 +234,24 @@ local methods = {
                     width = "full",
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
+                },
+                showIndex = {
+                    type = "toggle",
+                    name = "Show Button Numbers",
+                    desc = format("Show each button index on %s", configName),
+                    order = 1,
+                    width = "full",
+                    get = GetShowButtonIndexStateGetterHandler(frameIndex),
+                    set = GetShowButtonIndexStateSetterHandler(frameIndex)
+                },
+                showKeybindText = {
+                    type = "toggle",
+                    name = "Show Keybind Text",
+                    desc = format("Show each button keybind text on %s", configName),
+                    order = 1,
+                    width = "full",
+                    get = GetShowKeybindTextStateGetterHandler(frameIndex),
+                    set = GetShowKeybindTextStateSetterHandler(frameIndex)
                 },
                 spacer1 = { type="description", name=" ", order=2 },
                 button_width = {
