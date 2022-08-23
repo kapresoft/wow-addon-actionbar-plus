@@ -17,8 +17,14 @@ local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
 
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
 
----@class SpellAttributeSetter
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+---@class SpellAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
 local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
+---@type BaseAttributeSetter
+local Base = LibStub(M.BaseAttributeSetter)
+_L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -32,25 +38,16 @@ function _L:ShowTooltip(btnUI, btnData)
 
     local spellInfo = btnData[WAttr.SPELL]
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
-    GameTooltip:AddSpellByID(spellInfo.id)
+
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
     end
+    GameTooltip:AddSpellByID(spellInfo.id)
 end
 
----### Button Data Example
----
----```lua
----['ActionbarPlusF1Button1'] = {
----   ['type'] = 'spell',
----   ['spell'] = {
----       -- spellInfo
----   }
----}
----```
 ---@param btnUI ButtonUI The UIFrame
----@param btnData table The button data
+---@param btnData ProfileButton The button data
 function _L:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes()
 
@@ -71,7 +68,7 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
-    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
+    self:HandleGameTooltipCallbacks(btnUI)
 end
 
 function _L:ShowTooltip(btnUI)
@@ -88,7 +85,7 @@ function _L:ShowTooltip(btnUI)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
-        WU:AddKeybindingInfo(w)
+        --WU:AddKeybindingInfo(w)
     end
 end
 

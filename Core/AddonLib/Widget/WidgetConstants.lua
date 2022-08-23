@@ -34,10 +34,20 @@ UPDATE_BINDINGS = 'UPDATE_BINDINGS'
 PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST'
 PLAYER_CONTROL_GAINED = 'PLAYER_CONTROL_GAINED'
 
+---@class WidgetConstantsConstants
 local C = {
 
     PLAYER_REGEN_ENABLED = 'PLAYER_REGEN_ENABLED',
-    PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED'
+    PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED',
+
+}
+
+---@class WidgetConstantsEventNames
+local E = {
+
+    MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
+    ON_LEAVE = 'OnLeave',
+    ON_ENTER = 'OnEnter',
 
 }
 
@@ -47,6 +57,8 @@ ARTWORK_DRAW_LAYER = 'ARTWORK'
 ---@class WidgetConstants
 local _L = {}
 _L.C = C
+_L.E = E
+
 ---@type WidgetConstants
 ABP_WidgetConstants = _L
 

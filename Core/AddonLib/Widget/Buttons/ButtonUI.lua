@@ -26,6 +26,7 @@ local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
 local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local E = ABP_WidgetConstants.E
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
@@ -61,6 +62,12 @@ local function OnDragStart(btnUI)
 
     if InCombatLockdown() then return end
     if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
+    local dragKeyIsDown = WU:IsDragKeyDown()
+    if not dragKeyIsDown then return end
+    --
+    --btnUI:SetAttribute("type", "empty")
+    --p:log(1, 'OnDragStart| dragKeyIsDown: %s', dragKeyIsDown)
+    --if w.buttonData:IsLockActionBars() and not dragKeyIsDown then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
@@ -68,15 +75,15 @@ local function OnDragStart(btnUI)
     PH:Pickup(btnData)
 
     w:SetButtonAsEmpty()
-    btnUI:SetScript("OnEnter", nil)
     btnUI.widget:Fire('OnDragStart')
-    -- TODO NEXT: Handle Drag-And-Drop for Macrotexts
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
+    p:log('OnReceiveDrag')
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
+    --p:log('OnReceiveDrag|_state_type: %s', pformat(btnUI._state_type))
 
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
@@ -92,7 +99,52 @@ local function OnReceiveDrag(btnUI)
     btnUI.widget:Fire('OnReceiveDrag')
 end
 
-local function OnLeave(_) GameTooltip:Hide() end
+
+---@param widget ButtonUIWidget
+local function OnEventX(w, event)
+    if E.ON_LEAVE == event then
+        w.button:RegisterForClicks('AnyDown')
+    elseif E.ON_ENTER == event then
+        local dragKeyDown = WU:IsDragKeyDown()
+        w.button:RegisterForClicks(dragKeyDown and 'AnyUp' or 'AnyDown')
+    elseif E.MODIFIER_STATE_CHANGED == event then
+        w.button:RegisterForClicks(down == 1 and 'AnyUp' or 'AnyDown')
+    end
+end
+
+---@param widget ButtonUIWidget
+local function OnEnter(widget)
+    --local dragKeyDown = WU:IsDragKeyDown()
+    --p:log('OnEnter|dragKeyDown: %s', dragKeyDown)
+    --widget.button:RegisterForClicks(dragKeyDown and 'AnyUp' or 'AnyDown')
+    OnEventX(widget, E.ON_ENTER)
+
+    -- handle stuff before event
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, mouseButton, down)
+        p:log('OnEnter|MODIFIER_STATE_CHANGED: %s', w:GetName())
+        --local dragKeyIsDown = WU:IsDragKeyDown()
+        --if dragKeyIsDown then return end
+        --if w.button._state_type then
+        --    p:log('MODIFIER_STATE_CHANGED| dragKeyIsDown: %s', dragKeyIsDown)
+        --    w.button:SetAttribute("type", w.button._state_type)
+        --    w.button._state_type = nil
+        --end
+        local dragKeyDown = WU:IsDragKeyDown()
+        if dragKeyDown then
+            p:log('OnEnter|MODIFIER_STATE_CHANGED|dragKeyDown')
+            w.button:RegisterForClicks(down == 1 and 'AnyUp' or 'AnyDown')
+        end
+    end, widget)
+
+end
+
+---@param widget ButtonUIWidget
+local function OnLeave(widget)
+    -- handle stuff before event
+    widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+    OnEventX(widget, E.ON_LEAVE)
+    p:log('UnregisterEvent: MODIFIER_STATE_CHANGED')
+end
 local function OnClick(btn, mouseButton, down)
     p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     local actionType = GetCursorInfo()
@@ -243,6 +295,42 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
+---@param button ButtonUI
+local function RegisterScripts(button)
+    AceHook:SecureHookScript(button, 'OnClick', OnClick)
+
+    ---@param btn ButtonUI
+    button:SetScript("PreClick", function(btn, mouseButton, down)
+        local isDragKeyDown = WU:IsDragKeyDown()
+        if not isDragKeyDown then return end
+
+        p:log('PreClick: isDragKeyDown: %s mouseDown: %s', isDragKeyDown, down)
+        if not btn._state_type then
+            btn._state_type = btn:GetAttribute("type")
+            --btn:SetAttribute("type", "empty")
+        end
+        --p:log('_state_type: %s', btn._state_type)
+    end)
+
+    button:SetScript('OnDragStart', OnDragStart)
+    button:SetScript('OnReceiveDrag', OnReceiveDrag)
+
+    ---@param b ButtonUI
+    button:SetScript(E.ON_ENTER, function(b)
+        OnEnter(b.widget)
+        ---Receiver will get a func(widget, event) {}
+        b.widget:Fire(E.ON_ENTER)
+    end)
+    ---@param b ButtonUI
+    button:SetScript(E.ON_LEAVE, function(b)
+        OnLeave(b.widget)
+        ---Receiver will get a func(widget, event) {}
+        b.widget:Fire(E.ON_LEAVE)
+    end)
+
+
+end
+
 local function RegisterCallbacks(widget)
 
     widget:RegisterEvent(ACTIONBAR_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
@@ -255,11 +343,9 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(UPDATE_BINDINGS, OnUpdateKeybindings, widget)
 
-    --widget:SetCallback('OnDragStart', function(self, event)
-    --    --p:log(50, '%s:: %s', event, tostring(self))
-    --end)
     ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
+        p:log('SetCallback|OnReceiveDrag')
         _widget:UpdateStateDelayed(0.01)
     end)
 end
@@ -555,18 +641,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button.indexText = CreateIndexTextFontString(button)
     button.keybindText = CreateKeybindTextFontString(button)
 
-    --local keybindText = button:CreateFontString(button, "OVERLAY", "NumberFontNormalSmallGray")
-    --keybindText:SetJustifyH("CENTER")
-    ----keybindText:SetJustifyV("CENTER")
-    --keybindText:SetPoint("TOP", 2, -2)
-    --button.keybindText = keybindText
-
-    AceHook:SecureHookScript(button, 'OnClick', OnClick)
-    button:SetScript('OnDragStart', OnDragStart)
-    button:SetScript('OnReceiveDrag', OnReceiveDrag)
-    button:SetScript('OnLeave', OnLeave)
+    RegisterScripts(button)
     CreateFontString(button)
+
     button:RegisterForDrag('LeftButton')
+    button:RegisterForClicks("AnyDown")
 
     ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
@@ -627,7 +706,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
-
     return widget
 end
 

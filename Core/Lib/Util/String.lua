@@ -100,3 +100,14 @@ function _L.ReplaceAllCharButLast(str, r)
     end
     return ret
 end
+
+---@class BindingDetails
+local BindingDetailsTemplate = { action="<CLICK>", buttonName="<buttonName>", buttonPressed="<LeftButton>" }
+
+---@param bindingName string The keybind name (see Bindings.xml) Example: ```'CLICK ActionbarPlusF1Button1:LeftButton'```
+---@return BindingDetails
+function _L.ParseBindingDetails(bindingName)
+    local startIndexMatch, _, a,b,c = string.find(bindingName, "(.+%s)(%w+):(%a+)")
+    if not (startIndexMatch or b) then return nil end
+    return { action=_L.TrimAll(a), buttonName = _L.TrimAll(b), buttonPressed = _L.TrimAll(c) }
+end
