@@ -136,6 +136,18 @@ function L:OnAfterInitialize()
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
+function L:UpdateKeybindText()
+    local frames = P:GetAllFrameNames()
+    for i,name in ipairs(frames) do
+        local f = _G[name]
+        if f and f.widget then
+            ---@type FrameWidget
+            local fw = f.widget
+            if P:IsBarIndexEnabled(i) then fw:UpdateKeybindText() end
+        end
+    end
+end
+
 function L:RefreshActionbar(frameIndex)
     P:GetFrameWidgetByIndex(frameIndex):RefreshActionbarFrame()
 end

@@ -3,7 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local ConfigureFrameToCloseOnEscapeKey = ConfigureFrameToCloseOnEscapeKey
 local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
-
+local UIParent, CreateFrame = UIParent, CreateFrame
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -74,11 +74,22 @@ Support functions
 --    return bindings
 --end
 
+
+local function OnUpdateBindings(addon)
+    addon.barBindings = WU:GetBarBindingsMap()
+    if addon.barBindings then BF:UpdateKeybindText() end
+end
+
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
 
+    ---@type ActionbarPlus
     local addon = frame.obj
+
+    if event == addon.E.UPDATE_BINDINGS then return OnUpdateBindings(addon) end
+
     addon:OnAddonLoadedModules()
+
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
     if UnitOnTaxi('player') == true then
         local hideWhenTaxi = P:IsHideWhenTaxi()
@@ -236,6 +247,7 @@ local methods = {
         debugDialog = self:CreateDebugPopupDialog()
         ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, debugDialog.frame)
 
+        self.barBindings = WU:GetBarBindingsMap()
         self:OnInitializeModules()
 
         local options = C:GetOptions()
@@ -257,12 +269,17 @@ local methods = {
 New Instance
 -------------------------------------------------------------------------------]]
 local function NewInstance()
+    ---@type WidgetConstants
+    local WC = ABP_WidgetConstants
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetScript("OnEvent", OnAddonLoaded)
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    frame:RegisterEvent(WC.E.UPDATE_BINDINGS)
 
     local properties = {
         frame = frame,
+        WC = WC,
+        E = WC.E,
     }
 
     ---@class ActionbarPlus
@@ -279,4 +296,3 @@ local function NewInstance()
 end
 
 ABP = NewInstance()
-

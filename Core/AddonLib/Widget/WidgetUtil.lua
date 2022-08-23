@@ -200,6 +200,41 @@ local BindingInfoTemplate = {
     category = '<category>', key1 = '<key1>', key1Short = '<key1Short>', key2 = '<key2>'
 }
 
+---@return table The binding map with button names as the key
+---@param cached boolean Set to false to retrieve new values
+function _L:GetBarBindingsMap()
+    local barBindingsMap = {}
+    local bindCount = GetNumBindings()
+    if bindCount <=0 then return nil end
+    for i = 1, bindCount do
+        local command,cat,key1,key2 = GetBinding(i)
+        local bindingDetails = ParseBindingDetails(command)
+        if  bindingDetails then
+            local key1Short = key1
+            if IsNotBlank(key1Short) then
+                key1Short = String.replace(key1Short, 'ALT', 'a')
+                key1Short = String.replace(key1Short, 'CTRL', 'c')
+                key1Short = String.replace(key1Short, 'SHIFT', 's')
+                key1Short = String.replace(key1Short, 'META', 'm')
+                key1Short = String.ReplaceAllCharButLast(key1Short, '-')
+            end
+            barBindingsMap[bindingDetails.buttonName] = {
+                btnName = bindingDetails.buttonName, category = cat,
+                key1 = key1, key1Short = key1Short, key2 = key2,
+                details = { action = bindingDetails.action, buttonPressed = bindingDetails.buttonPressed }
+            }
+        end
+    end
+    return barBindingsMap
+end
+
+---@return BindingInfo
+---@param btnName string The button name
+function _L:GetBarBindingsXX(btnName)
+
+
+end
+
 ---@return BindingInfo
 ---@param btnName string The button name
 function _L:GetBarBindings(btnName)
@@ -241,12 +276,15 @@ end
 function _L:AddKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
     GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
-    GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+    local bindings = btnWidget:GetBindings()
+    if not bindings.key1 then return end
+    GameTooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end
 
 function _L:AddItemKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
-    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, btnWidget.bindings.key1))
+    local bindings = btnWidget:GetBindings()
+    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, bindings.key1))
 end
 
 function _L:IsDragKeyDown()

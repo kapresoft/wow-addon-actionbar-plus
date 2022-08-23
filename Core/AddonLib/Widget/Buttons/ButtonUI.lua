@@ -81,7 +81,6 @@ end
 --- Used with `button:RegisterForDrag('LeftButton')`
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
-    p:log('OnReceiveDrag')
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     --p:log('OnReceiveDrag|_state_type: %s', pformat(btnUI._state_type))
 
@@ -235,18 +234,6 @@ local function OnPlayerControlGained(widget, event, ...)
     WU:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
----Only Process visible action bars
----@param widget ButtonUIWidget
----@param event string Event name
-local function OnUpdateKeybindings(widget, event, ...)
-    local bindings = WU:GetBarBindings(widget:GetName())
-    if not bindings then return nil end
-    widget.bindings = bindings
-    if widget:IsParentFrameShown() then
-        widget.dragFrame:UpdateKeybindText()
-    end
-end
-
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -341,7 +328,6 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
     widget:RegisterEvent(PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
-    widget:RegisterEvent(UPDATE_BINDINGS, OnUpdateKeybindings, widget)
 
     ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
@@ -391,6 +377,11 @@ local function WidgetMethods(widget)
 
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
+    ---@type BindingInfo
+    function widget:GetBindings()
+        return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
+    end
+    ---@param text string
     function widget:SetText(text)
         if String.IsBlank(text) then text = '' end
         widget.button.text:SetText(text)
@@ -408,14 +399,20 @@ local function WidgetMethods(widget)
             widget.button.keybindText:SetText(text)
             return
         end
+
         if true == state then
-            if self.bindings and self.bindings.key1Short then
-                text = self.bindings.key1Short
+            local bindings = self:GetBindings()
+            if bindings and bindings.key1Short then
+                text = bindings.key1Short
             end
         end
         widget.button.keybindText:SetText(text)
     end
-    function widget:HasKeybindings() return self.bindings ~= nil and String.IsNotBlank(self.bindings.key1) end
+    function widget:HasKeybindings()
+        local b = self:GetBindings()
+        if not b then return false end
+        return b and String.IsNotBlank(b.key1)
+    end
     function widget:ClearText() self:SetText('') end
 
     ---@return CooldownInfo
@@ -661,6 +658,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUIWidget
     local widget = {
+        ---@type ActionbarPlus
+        addon = ABP,
         ---@type Logger
         p = p,
         ---@type Profile
@@ -671,8 +670,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameIndex = dragFrameWidget:GetIndex(),
         ---@type string
         buttonName = btnName,
-        ---@type BindingInfo
-        bindings = WU:GetBarBindings(btnName),
         ---@type FrameWidget
         dragFrame = dragFrameWidget,
         ---@type ButtonUI
@@ -720,7 +717,6 @@ local function NewLibrary()
 
     ---@return ButtonUIWidgetBuilder
     function _L:WidgetBuilder() return _B end
-
     return _L
 end
 
