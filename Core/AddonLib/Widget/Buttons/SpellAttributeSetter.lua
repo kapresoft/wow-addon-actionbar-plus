@@ -62,7 +62,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     local spellIcon = TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
-    btnUI.widget:SetTextures(spellIcon)
+    btnUI.widget:SetIcon(spellIcon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
 
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)

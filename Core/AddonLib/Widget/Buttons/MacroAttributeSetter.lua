@@ -1,4 +1,7 @@
-local GameTooltip, GetMacroSpell = GameTooltip, GetMacroSpell
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GameTooltip, GetMacroSpell, GetMacroItem = GameTooltip, GetMacroSpell, GetMacroItem
 
 local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
 
@@ -36,7 +39,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
     btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
-    btnUI.widget:SetTextures(icon)
+    btnUI.widget:SetIcon(icon)
 
     self:HandleGameTooltipCallbacks(btnUI)
 end
@@ -57,12 +60,15 @@ function _L:ShowTooltip(btnUI)
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then
-        GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
-        return
+        local _, itemLink = GetMacroItem(macroInfo.index)
+        if not itemLink then
+            GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
+            return
+        end
+        GameTooltip:SetHyperlink(itemLink)
     end
     GameTooltip:AddSpellByID(spellId)
     GameTooltip:AppendText(' ' .. sformat(MACRO_WITH_SPELL_FORMAT, macroInfo.name))
-
 end
 
 _L.mt.__call = _L.SetAttributes

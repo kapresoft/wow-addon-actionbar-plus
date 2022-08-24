@@ -161,7 +161,9 @@ local methods = {
             order = order or 999,
             args = {
                 desc = { name = " General Configuration ", type = "header", order = 0 },
+                -- TODO: Remove lock_actionbars; Addon now uses WOW's ActionBars / Pick Up Action Key Settings
                 lock_actionbars = {
+                    hidden = true,
                     type = 'toggle',
                     order = order + 1,
                     width = 'full',

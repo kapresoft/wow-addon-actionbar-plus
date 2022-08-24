@@ -6,6 +6,7 @@ local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
+local GetMacroItem, GetItemInfoInstant = GetMacroItem, GetItemInfoInstant
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -60,14 +61,7 @@ local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
 
-    if InCombatLockdown() then return end
-    if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
-    local dragKeyIsDown = WU:IsDragKeyDown()
-    if not dragKeyIsDown then return end
-    --
-    --btnUI:SetAttribute("type", "empty")
-    --p:log(1, 'OnDragStart| dragKeyIsDown: %s', dragKeyIsDown)
-    --if w.buttonData:IsLockActionBars() and not dragKeyIsDown then return end
+    if InCombatLockdown() or not WU:IsDragKeyDown() then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
@@ -355,6 +349,10 @@ local function WidgetMethods(widget)
 
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
+    function widget:IsTypeMacro() return MACRO == self:GetConfig().type end
+    function widget:IsTypeSpell() return SPELL == self:GetConfig().type end
+    function widget:IsTypeItem() return ITEM == self:GetConfig().type end
+
     ---@type BindingInfo
     function widget:GetBindings()
         return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
@@ -407,29 +405,58 @@ local function WidgetMethods(widget)
             enabled=0,
             details = {}
         }
-        if type == SPELL then
-            ---@type SpellCooldown
-            local spellCD = self:GetSpellCooldown()
-            if spellCD ~= nil then
-                cd.details = spellCD
-                cd.start = spellCD.start
-                cd.duration = spellCD.duration
-                cd.enabled = spellCD.enabled
-                return cd
-            end
-        elseif type == MACRO then
-            local spellCD = self:GetMacroSpellCooldown();
-            if spellCD ~= nil then
-                cd.details = spellCD
-                cd.start = spellCD.start
-                cd.duration = spellCD.duration
-                cd.enabled = spellCD.enabled
-                cd.icon = spellCD.spell.icon
-                return cd
-            end
-        elseif type == ITEM then
-            ---@type ItemCooldown
-            local itemCD = self:GetItemCooldown()
+        if type == SPELL then return self:GetSpellCooldown(cd)
+        elseif type == MACRO then return self:GetMacroCooldown(cd)
+        elseif type == ITEM then return self:GetItemCooldown(cd)
+        end
+        return nil
+    end
+
+    ---@param cd CooldownInfo The cooldown info
+    ---@return SpellCooldown
+    function widget:GetSpellCooldown(cd)
+        local spell = self:GetSpellData()
+        if not spell then return nil end
+        local spellCD = _API:GetSpellCooldown(spell.id, spell)
+        if spellCD ~= nil then
+            cd.details = spellCD
+            cd.start = spellCD.start
+            cd.duration = spellCD.duration
+            cd.enabled = spellCD.enabled
+            return cd
+        end
+        return nil
+    end
+
+    ---@param cd CooldownInfo The cooldown info
+    ---@return ItemCooldown
+    function widget:GetItemCooldown(cd)
+        local item = self:GetItemData()
+        if not item then return nil end
+        local itemCD = _API:GetItemCooldown(item.id, item)
+        if itemCD ~= nil then
+            cd.details = itemCD
+            cd.start = itemCD.start
+            cd.duration = itemCD.duration
+            cd.enabled = itemCD.enabled
+            return cd
+        end
+        return nil
+    end
+
+    ---@param cd CooldownInfo The cooldown info
+    function widget:GetMacroCooldown(cd)
+        local spellCD = self:GetMacroSpellCooldown();
+
+        if spellCD ~= nil then
+            cd.details = spellCD
+            cd.start = spellCD.start
+            cd.duration = spellCD.duration
+            cd.enabled = spellCD.enabled
+            cd.icon = spellCD.spell.icon
+            return cd
+        else
+            local itemCD = self:GetMacroItemCooldown()
             if itemCD ~= nil then
                 cd.details = itemCD
                 cd.start = itemCD.start
@@ -439,7 +466,28 @@ local function WidgetMethods(widget)
             end
         end
 
-        return nil
+        return nil;
+    end
+
+    ---@return SpellCooldown
+    function widget:GetMacroSpellCooldown()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+        local spellId = GetMacroSpell(macro.index)
+        if not spellId then return nil end
+        return _API:GetSpellCooldown(spellId)
+    end
+
+    ---@return ItemCooldown
+    function widget:GetMacroItemCooldown()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+
+        local itemName = GetMacroItem(macro.index)
+        if not itemName then return nil end
+
+        local itemID = GetItemInfoInstant(itemName)
+        return _API:GetItemCooldown(itemID)
     end
 
     ---#### Get Profile Button Config Data
@@ -540,28 +588,6 @@ local function WidgetMethods(widget)
         if stackCount > 1 then self:SetText(btnData.item.count) end
     end
 
-    ---@return SpellCooldown
-    function widget:GetSpellCooldown()
-        local spell = self:GetSpellData()
-        if not spell then return nil end
-        return _API:GetSpellCooldown(spell.id, spell)
-    end
-    ---@return ItemCooldown
-    function widget:GetItemCooldown()
-        local item = self:GetItemData()
-        if not item then return nil end
-        return _API:GetItemCooldown(item.id, item)
-    end
-
-    ---@return SpellCooldown
-    function widget:GetMacroSpellCooldown()
-        local macro = self:GetMacroData();
-        if not macro then return nil end
-        local spellId = GetMacroSpell(macro.index)
-        if not spellId then return nil end
-        return _API:GetSpellCooldown(spellId)
-    end
-
     function widget:ResetWidgetAttributes()
         for _, v in pairs(self.buttonAttributes) do
             self.button:SetAttribute(v, nil)
@@ -579,8 +605,8 @@ local function WidgetMethods(widget)
 
     function widget:ClearHighlight() self.button:SetHighlightTexture(nil) end
     function widget:ResetHighlight() WU:ResetHighlight(self) end
-    function widget:SetTextureAsEmpty() self:SetTextures(noIconTexture) end
-    function widget:SetTextures(icon) WU:SetTextures(self, icon) end
+    function widget:SetTextureAsEmpty() self:SetIcon(noIconTexture) end
+    function widget:SetIcon(icon) WU:SetIcon(self, icon) end
     function widget:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
     function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
     function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
@@ -677,7 +703,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --for method, func in pairs(methods) do widget[method] = func end
     WidgetMethods(widget)
     SetButtonLayout(widget, rowNum, colNum)
-    widget:SetTextures(noIconTexture)
+
+    WU:InitTextures(widget, noIconTexture)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
