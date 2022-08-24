@@ -10,7 +10,9 @@ Local Vars
 local KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r'
 
 local _, String = ABP_LibGlobals:LibPack_CommonUtils()
-local _, M = ABP_LibGlobals:LibPack()
+local _, M, G = ABP_LibGlobals:LibPack()
+local _, _, _, LogFactory = G:LibPackUtils()
+
 local _, NewLibrary = __K_Core:LibPack()
 local P = ABP_Profile
 
@@ -21,6 +23,9 @@ local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
 
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
+
+---@type LogFactory
+local p = LogFactory:NewLogger('WidgetUtil')
 
 local SPELL,ITEM,MACRO = 'spell','item','macro'
 
@@ -288,8 +293,12 @@ function _L:AddItemKeybindingInfo(btnWidget)
 end
 
 function _L:IsDragKeyDown()
+    -- 'NONE' if not specified
     local pickupAction = GetModifiedClick('PICKUPACTION')
-    local isDragKeyDown = pickupAction == 'SHIFT' and IsShiftKeyDown() or pickupAction == 'ALT' and IsAltKeyDown() or pickupAction == 'CTRL' and IsControlKeyDown()
+    pickupAction = pickupAction == 'NONE' and 'SHIFT' or pickupAction
+    local isDragKeyDown = pickupAction == 'SHIFT' and IsShiftKeyDown()
+            or pickupAction == 'ALT' and IsAltKeyDown()
+            or pickupAction == 'CTRL' and IsControlKeyDown()
     return isDragKeyDown
 end
 

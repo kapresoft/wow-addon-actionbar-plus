@@ -46,7 +46,7 @@ local function IsValidDragSource(cursorInfo)
     if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
-        p:log(5, 'Received drag event with invalid cursor info. Skipping...')
+        --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
     if not (cursorInfo.type == SPELL or cursorInfo.type == ITEM or cursorInfo.type == MACRO) then
