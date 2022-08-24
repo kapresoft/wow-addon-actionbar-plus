@@ -1,3 +1,7 @@
+### 1.0.0.26.FUTURE
+- Fix a bug crash when continuously dragging and dropping action button items ~ [Issue #29 - Fatal Error](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/29)
+- Fix macro item use cooldown i.e. `/use 14`; should now show the proper cooldown ~ [Issue #28 - Cooldown Count for Macros + Suggestion](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/28)
+
 ### 1.0.0.25
 - KeyDown is now the trigger for pressing an action with a keybind (was previously KeyUp)
 - The pickup action now utilizes the standard Pickup Action Key in the "Interface/ActionBars" settings [i.e., Shift, Alt, or Ctrl keys]. If 'None' is select, the default is 'Shift' key.

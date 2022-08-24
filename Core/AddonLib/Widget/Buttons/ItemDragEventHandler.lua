@@ -18,6 +18,7 @@ local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
 
 -- ## Functions ------------------------------------------------
 --- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
+---@param btnUI ButtonUI
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
 function _L:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end

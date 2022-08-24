@@ -3,6 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
+local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -87,12 +88,15 @@ function _L:ResetHighlight(btnWidget)
     self:SetHighlightDefault(btnWidget.button)
 end
 
----#### See Also
+---@param btnWidget ButtonUIWidget
+function _L:SetIcon(btnWidget, icon) btnWidget.button:SetNormalTexture(icon) end
+
+--- - Call this function once only; otherwise *CRASH* if called N times
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
 --- - [Texture:SetTexture()](https://wowpedia.fandom.com/wiki/API_Texture_SetTexture)
 --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
 ---@param btnWidget ButtonUIWidget
-function _L:SetTextures(btnWidget, icon)
+function _L:InitTextures(btnWidget, icon)
     local btnUI = btnWidget.button
 
     -- DrawLayer is 'ARTWORK' by default for icons
@@ -179,7 +183,8 @@ function _L:SetEnabledActionBarStatesDelayed(isShown, delayInSec)
     local showActionBars = isShown == true
     if type(actualDelayInSec) ~= 'number' then actualDelayInSec = delayInSec end
     if actualDelayInSec <= 0 then actualDelayInSec = 1 end
-    C_Timer.After(actualDelayInSec, function() self:SetEnabledActionBarStates(showActionBars) end)
+    --C_Timer.After(actualDelayInSec, function() self:SetEnabledActionBarStates(showActionBars) end)
+    self:SetEnabledActionBarStates(showActionBars)
 end
 
 ---@param isShown boolean Set to true to show action bar
@@ -233,11 +238,9 @@ function _L:GetBarBindingsMap()
     return barBindingsMap
 end
 
----@return BindingInfo
----@param btnName string The button name
-function _L:GetBarBindingsXX(btnName)
-
-
+---@param button ButtonUI
+function _L:IsTypeMacro(button)
+    return button and button.widget and button.widget:IsTypeMacro()
 end
 
 ---@return BindingInfo

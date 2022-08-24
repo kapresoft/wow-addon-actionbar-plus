@@ -39,22 +39,15 @@ Support Functions
 local function InitButtonGameTooltipHooks()
     ---For macros not using spells
     GameTooltip:HookScript("OnShow", function(tooltip, ...)
-        ---@type ButtonUI
-        local button = tooltip:GetOwner()
-        if not (button and button.widget) then return end
-        if button.widget:GetConfig().type ~= 'macro' then return end
+        if not WU:IsTypeMacro(tooltip:GetOwner()) then return end
         WU:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip, ...)
-        local button = tooltip:GetOwner()
-        if not (button and button.widget) then return end
-        if button.widget:GetConfig().type == 'macro' then
-            --WU:AddKeybindingInfo(button.widget)
-            return
-        end
+        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
         WU:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
+        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
         WU:SetupTooltipKeybindingInfo(tooltip)
     end)
 end
@@ -69,8 +62,6 @@ end
 
 ---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    --L:log(10, 'OnMacroChanged Event received: %s', btnWidget.buttonName)
-    --L:log(50, 'OnMacroChanged New Data: %s', pformat(btnWidget:GetConfig()))
     MAS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
