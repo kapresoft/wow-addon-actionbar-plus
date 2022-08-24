@@ -1,4 +1,4 @@
-### 1.0.0.25.FUTURE
+### 1.0.0.25
 - KeyDown is now the trigger for pressing an action with a keybind (was previously KeyUp)
 - The pickup action now utilizes the standard Pickup Action Key in the "Interface/ActionBars" settings [i.e., Shift, Alt, or Ctrl keys]. If 'None' is select, the default is 'Shift' key.
 - Fix slow keybinding logic
