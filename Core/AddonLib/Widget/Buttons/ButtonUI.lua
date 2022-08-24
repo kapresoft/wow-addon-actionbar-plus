@@ -5,7 +5,7 @@ local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
     PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local GameFontHighlightSmallOutline = GameFontHighlightSmallOutline
+local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -88,66 +88,51 @@ local function OnReceiveDrag(btnUI)
     local actionType, info1, info2, info3 = GetCursorInfo()
 
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
-    p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
+    --p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
+    ---@type ReceiveDragEventHandler
     local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
     dragEventHandler:Handle(btnUI, actionType, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
 
-
 ---@param widget ButtonUIWidget
-local function OnEventX(w, event)
+---@param down boolean true if the press is KeyDown
+local function RegisterForClicks(widget, event, down)
     if E.ON_LEAVE == event then
-        w.button:RegisterForClicks('AnyDown')
+        widget.button:RegisterForClicks('AnyDown')
     elseif E.ON_ENTER == event then
-        local dragKeyDown = WU:IsDragKeyDown()
-        w.button:RegisterForClicks(dragKeyDown and 'AnyUp' or 'AnyDown')
-    elseif E.MODIFIER_STATE_CHANGED == event then
-        w.button:RegisterForClicks(down == 1 and 'AnyUp' or 'AnyDown')
+        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
+        --p:log('MODIFIER_STATE_CHANGED| event: %s', event)
+        --p:log('MODIFIER_STATE_CHANGED| down: %s dkd: %s', tostring(down), WU:IsDragKeyDown())
+        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     end
 end
 
 ---@param widget ButtonUIWidget
 local function OnEnter(widget)
-    --local dragKeyDown = WU:IsDragKeyDown()
-    --p:log('OnEnter|dragKeyDown: %s', dragKeyDown)
-    --widget.button:RegisterForClicks(dragKeyDown and 'AnyUp' or 'AnyDown')
-    OnEventX(widget, E.ON_ENTER)
-
+    RegisterForClicks(widget, E.ON_ENTER)
     -- handle stuff before event
+    ---@param down boolean true if the press is KeyDown
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, mouseButton, down)
-        p:log('OnEnter|MODIFIER_STATE_CHANGED: %s', w:GetName())
-        --local dragKeyIsDown = WU:IsDragKeyDown()
-        --if dragKeyIsDown then return end
-        --if w.button._state_type then
-        --    p:log('MODIFIER_STATE_CHANGED| dragKeyIsDown: %s', dragKeyIsDown)
-        --    w.button:SetAttribute("type", w.button._state_type)
-        --    w.button._state_type = nil
-        --end
-        local dragKeyDown = WU:IsDragKeyDown()
-        if dragKeyDown then
-            p:log('OnEnter|MODIFIER_STATE_CHANGED|dragKeyDown')
-            w.button:RegisterForClicks(down == 1 and 'AnyUp' or 'AnyDown')
-        end
+        RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
     end, widget)
-
 end
 
 ---@param widget ButtonUIWidget
 local function OnLeave(widget)
-    -- handle stuff before event
     widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
-    OnEventX(widget, E.ON_LEAVE)
-    p:log('UnregisterEvent: MODIFIER_STATE_CHANGED')
+    RegisterForClicks(widget, E.ON_LEAVE)
 end
+
 local function OnClick(btn, mouseButton, down)
-    p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
-    local actionType = GetCursorInfo()
-    if String.IsBlank(actionType) then return end
+    --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
+    btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
 end
 
@@ -288,15 +273,10 @@ local function RegisterScripts(button)
 
     ---@param btn ButtonUI
     button:SetScript("PreClick", function(btn, mouseButton, down)
-        local isDragKeyDown = WU:IsDragKeyDown()
-        if not isDragKeyDown then return end
-
-        p:log('PreClick: isDragKeyDown: %s mouseDown: %s', isDragKeyDown, down)
-        if not btn._state_type then
-            btn._state_type = btn:GetAttribute("type")
-            --btn:SetAttribute("type", "empty")
-        end
-        --p:log('_state_type: %s', btn._state_type)
+        -- This prevents the button from being clicked
+        -- on sequential drag-and-drops (one after another)
+        if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+        RegisterForClicks(btn.widget, 'PreClick', down)
     end)
 
     button:SetScript('OnDragStart', OnDragStart)
@@ -315,7 +295,6 @@ local function RegisterScripts(button)
         b.widget:Fire(E.ON_LEAVE)
     end)
 
-
 end
 
 local function RegisterCallbacks(widget)
@@ -331,7 +310,6 @@ local function RegisterCallbacks(widget)
 
     ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
-        p:log('SetCallback|OnReceiveDrag')
         _widget:UpdateStateDelayed(0.01)
     end)
 end

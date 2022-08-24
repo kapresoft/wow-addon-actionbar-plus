@@ -70,6 +70,7 @@ local function ApplyBuilderMethods(builder)
     function builder:Create(widget)
         ---@class ButtonData
         local bd = {
+            ---@type Profile
             profile = P,
             widget = widget
         }

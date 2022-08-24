@@ -2,14 +2,18 @@
 Wow Vars
 -------------------------------------------------------------------------------]]
 local PickupSpell, PickupMacro, PickupItem = PickupSpell, PickupMacro, PickupItem
-
+local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local LibStub, M = ABP_LibGlobals:LibPack()
+local LibStub, M, G = ABP_LibGlobals:LibPack()
+local _, _, String = G:LibPackUtils()
+local IsNotBlank = String.IsNotBlank
+
 ---@type LogFactory
 local LogFactory = LibStub(M.LogFactory)
-local l = LogFactory('PickupHandler')
+
+local p = LogFactory('PickupHandler')
 ---@type Table
 local Table = LibStub(M.Table)
 ---@type WidgetAttributes
@@ -23,6 +27,11 @@ local _L = {}
 ---@type PickupHandler
 ABP_PickupHandler = _L
 
+function _L:IsPickingUpSomething()
+    local type = GetCursorInfo()
+    return IsNotBlank(type)
+end
+
 ---@param btnData ButtonData
 function _L:PickupExisting(btnData)
     if not Table.isEmpty(btnData[SPELL]) then
@@ -31,6 +40,8 @@ function _L:PickupExisting(btnData)
         PickupMacro(btnData[MACRO].index)
     elseif not Table.isEmpty(btnData[ITEM]) then
         PickupItem(btnData[ITEM].id)
+    else
+        p:log(20, "PickupExisting | no item picked up")
     end
 end
 
