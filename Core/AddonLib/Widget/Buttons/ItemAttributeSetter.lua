@@ -13,23 +13,13 @@ local _, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHO
 local AssertNotNil, _ = Assert.AssertNotNil, String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
-Support Functions
+New Instance
 -------------------------------------------------------------------------------]]
-local function InitGameTooltipHooks()
-    GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
-        ---@type ButtonUIWidget
-        local btnWidget = tooltip.widget
-        tooltip.widget = nil
-        if btnWidget then WU:AddKeybindingInfo(btnWidget) end
-        tooltip:Show()
-    end)
-end
-
---[[-----------------------------------------------------------------------------
-Class Definition
--------------------------------------------------------------------------------]]
----@class ItemAttributeSetter
+---@class ItemAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
 local _L = LibStub:NewLibrary(M.ItemAttributeSetter, 1)
+---@type BaseAttributeSetter
+local Base = LibStub(M.BaseAttributeSetter)
+_L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -55,8 +45,8 @@ function _L:SetAttributes(btnUI, btnData)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemData.name)
-    btnUI:SetScript("OnEnter", function(_btnUI) self:ShowTooltip(_btnUI)  end)
 
+    self:HandleGameTooltipCallbacks(btnUI)
 end
 
 ---@param btnUI ButtonUI
@@ -68,11 +58,11 @@ function _L:ShowTooltip(btnUI)
     if String.IsBlank(btnData.type) then return end
 
     ---@type ItemData
-    local itemInfo = btnData[WAttr.ITEM]
-    GameTooltip.widget = w
     GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
-    GameTooltip:SetItemByID(itemInfo.id)
-    --WU:AddItemKeybindingInfo(w)
+    local itemInfo = btnData[WAttr.ITEM]
+    if itemInfo and itemInfo.id then
+        GameTooltip:SetItemByID(itemInfo.id)
+    end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -80,4 +70,3 @@ Constructor Setup
 -------------------------------------------------------------------------------]]
 _L.mt.__call = _L.SetAttributes
 
-InitGameTooltipHooks()

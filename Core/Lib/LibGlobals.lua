@@ -45,6 +45,7 @@ local Module = {
     MacroTextureDialog = 'MacroTextureDialog',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
+    BaseAttributeSetter = 'BaseAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     SpellAttributeSetter = 'SpellAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',

@@ -19,6 +19,7 @@ local ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 ---@type ButtonUILib
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
+local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
@@ -34,6 +35,30 @@ L.profile = nil
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+--TODO: Move to ButtonFactory
+local function InitButtonGameTooltipHooks()
+    ---For macros not using spells
+    GameTooltip:HookScript("OnShow", function(tooltip, ...)
+        ---@type ButtonUI
+        local button = tooltip:GetOwner()
+        if not (button and button.widget) then return end
+        if button.widget:GetConfig().type ~= 'macro' then return end
+        WU:SetupTooltipKeybindingInfo(tooltip)
+    end)
+    GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip, ...)
+        local button = tooltip:GetOwner()
+        if not (button and button.widget) then return end
+        if button.widget:GetConfig().type == 'macro' then
+            --WU:AddKeybindingInfo(button.widget)
+            return
+        end
+        WU:SetupTooltipKeybindingInfo(tooltip)
+    end)
+    GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
+        WU:SetupTooltipKeybindingInfo(tooltip)
+    end)
+end
+
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
     GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
@@ -111,6 +136,18 @@ function L:OnAfterInitialize()
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
+function L:UpdateKeybindText()
+    local frames = P:GetAllFrameNames()
+    for i,name in ipairs(frames) do
+        local f = _G[name]
+        if f and f.widget then
+            ---@type FrameWidget
+            local fw = f.widget
+            if P:IsBarIndexEnabled(i) then fw:UpdateKeybindText() end
+        end
+    end
+end
+
 function L:RefreshActionbar(frameIndex)
     P:GetFrameWidgetByIndex(frameIndex):RefreshActionbarFrame()
 end
@@ -161,6 +198,16 @@ function L:SetButtonAttributes(btnWidget)
         return
     end
     setter:SetAttributes(btnWidget.button, btnData)
+
+    ----TODO:Move SetCallback to macro attribute setter
+    -----@param w ButtonUIWidget
+    --btnWidget:SetCallback("OnEnter", function(w)
+    --    L:log('SetCallback|OnEnter')
+    --    setter:ShowTooltip(w.button)
+    --end)
+    --btnWidget:SetCallback("OnLeave", function(w)
+    --    GameTooltip:Hide()
+    --end)
 end
 
 ---- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
@@ -202,3 +249,5 @@ function L:GetAttributesSetter(actionType)
     AssertNotNil(actionType, 'actionType')
     return AttributeSetters[actionType]
 end
+
+InitButtonGameTooltipHooks()

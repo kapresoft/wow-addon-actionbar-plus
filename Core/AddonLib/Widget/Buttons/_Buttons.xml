@@ -6,6 +6,7 @@
     <Script file="PickupHandler.lua"/>
     <Script file="ButtonUI.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
+    <Script file="BaseAttributeSetter.lua"/>
     <Script file="SpellAttributeSetter.lua"/>
     <Script file="ItemAttributeSetter.lua"/>
     <Script file="MacroAttributeSetter.lua"/>
@@ -21,9 +22,9 @@
            inherits="BackdropTemplate" mixin="BackdropTemplateMixin"
             >
         <Scripts>
-            <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
-            <OnDragStart>self:StartMoving();</OnDragStart>
-            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+<!--            <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>-->
+<!--            <OnDragStart>self:StartMoving();</OnDragStart>-->
+<!--            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>-->
         </Scripts>
         <Size x="200" y="15" />
         <Anchors>

@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
-
+local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -10,7 +10,9 @@ Local Vars
 local KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r'
 
 local _, String = ABP_LibGlobals:LibPack_CommonUtils()
-local _, M = ABP_LibGlobals:LibPack()
+local _, M, G = ABP_LibGlobals:LibPack()
+local _, _, _, LogFactory = G:LibPackUtils()
+
 local _, NewLibrary = __K_Core:LibPack()
 local P = ABP_Profile
 
@@ -20,7 +22,10 @@ local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
 
-local IsBlank = String.IsBlank
+local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
+
+---@type LogFactory
+local p = LogFactory:NewLogger('WidgetUtil')
 
 local SPELL,ITEM,MACRO = 'spell','item','macro'
 
@@ -194,33 +199,59 @@ function _L:SetEnabledActionBarStates(isShown)
     end
 end
 
----@param bindingName string The keybind name (see Bindings.xml)
-function _L:ParseButtonName(bindingName)
-    local left = String.replace(bindingName, 'CLICK ', '')
-    return String.TrimAll(String.replace(left, ':LeftButton', ''))
-end
-
 ---@class BindingInfo
 local BindingInfoTemplate = {
     name = '<command-name>', btnName = '<button-name',
     category = '<category>', key1 = '<key1>', key1Short = '<key1Short>', key2 = '<key2>'
 }
 
----@param btnWidget ButtonUIWidget
----@return BindingInfo
-function _L:GetBarBindings(btnName)
-    if String.IsBlank(btnName) then return nil end
+---@return table The binding map with button names as the key
+---@param cached boolean Set to false to retrieve new values
+function _L:GetBarBindingsMap()
+    local barBindingsMap = {}
     local bindCount = GetNumBindings()
     if bindCount <=0 then return nil end
     for i = 1, bindCount do
         local command,cat,key1,key2 = GetBinding(i)
-        local bindingBtnName = self:ParseButtonName(command)
-        --self:log('bindingName: %s', pformat({command, cat, key1 }))
-        --if string.find(command, beginsWith) then
-        --if string.find(cat, beginsWith) then
-        if btnName == bindingBtnName then
+        local bindingDetails = ParseBindingDetails(command)
+        if  bindingDetails then
             local key1Short = key1
-            if String.IsNotBlank(key1Short) then
+            if IsNotBlank(key1Short) then
+                key1Short = String.replace(key1Short, 'ALT', 'a')
+                key1Short = String.replace(key1Short, 'CTRL', 'c')
+                key1Short = String.replace(key1Short, 'SHIFT', 's')
+                key1Short = String.replace(key1Short, 'META', 'm')
+                key1Short = String.ReplaceAllCharButLast(key1Short, '-')
+            end
+            barBindingsMap[bindingDetails.buttonName] = {
+                btnName = bindingDetails.buttonName, category = cat,
+                key1 = key1, key1Short = key1Short, key2 = key2,
+                details = { action = bindingDetails.action, buttonPressed = bindingDetails.buttonPressed }
+            }
+        end
+    end
+    return barBindingsMap
+end
+
+---@return BindingInfo
+---@param btnName string The button name
+function _L:GetBarBindingsXX(btnName)
+
+
+end
+
+---@return BindingInfo
+---@param btnName string The button name
+function _L:GetBarBindings(btnName)
+    if IsBlank(btnName) then return nil end
+    local bindCount = GetNumBindings()
+    if bindCount <=0 then return nil end
+    for i = 1, bindCount do
+        local command,cat,key1,key2 = GetBinding(i)
+        local bindingDetails = ParseBindingDetails(command)
+        if  bindingDetails and btnName == bindingDetails.buttonName then
+            local key1Short = key1
+            if IsNotBlank(key1Short) then
                 key1Short = String.replace(key1Short, 'ALT', 'a')
                 key1Short = String.replace(key1Short, 'CTRL', 'c')
                 key1Short = String.replace(key1Short, 'SHIFT', 's')
@@ -236,15 +267,46 @@ function _L:GetBarBindings(btnName)
     return nil
 end
 
+function _L:SetupTooltipKeybindingInfo(tooltip)
+    local button = tooltip:GetOwner()
+    if not button then return end
+    local btnWidget = button.widget
+    if btnWidget then
+        self:AddKeybindingInfo(btnWidget)
+    end
+    tooltip:Show()
+end
+
 ---@param btnWidget ButtonUIWidget
 function _L:AddKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
     GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
-    GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+    local bindings = btnWidget:GetBindings()
+    if not bindings.key1 then return end
+    GameTooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end
 
 function _L:AddItemKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
-    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, btnWidget.bindings.key1))
-    --GameTooltip:AddDoubleLine('Keybind ::', btnWidget.bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+    local bindings = btnWidget:GetBindings()
+    GameTooltip:AppendText(String.format(KEYBIND_FORMAT, bindings.key1))
+end
+
+function _L:IsDragKeyDown()
+    -- 'NONE' if not specified
+    local pickupAction = GetModifiedClick('PICKUPACTION')
+    pickupAction = pickupAction == 'NONE' and 'SHIFT' or pickupAction
+    local isDragKeyDown = pickupAction == 'SHIFT' and IsShiftKeyDown()
+            or pickupAction == 'ALT' and IsAltKeyDown()
+            or pickupAction == 'CTRL' and IsControlKeyDown()
+    return isDragKeyDown
+end
+
+function _L:HideTooltipDelayed(delayInSec)
+    local actualDelayInSec = delayInSec
+    if not actualDelayInSec or actualDelayInSec < 0 then
+        GameTooltip:Hide()
+        return
+    end
+    C_Timer.After(actualDelayInSec, function() GameTooltip:Hide() end)
 end

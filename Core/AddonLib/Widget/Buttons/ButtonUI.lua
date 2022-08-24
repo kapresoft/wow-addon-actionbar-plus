@@ -5,7 +5,7 @@ local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
     PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
-local GameFontHighlightSmallOutline = GameFontHighlightSmallOutline
+local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -26,6 +26,7 @@ local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
 local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local E = ABP_WidgetConstants.E
 
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
@@ -45,7 +46,7 @@ local function IsValidDragSource(cursorInfo)
     if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
-        p:log(5, 'Received drag event with invalid cursor info. Skipping...')
+        --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
     if not (cursorInfo.type == SPELL or cursorInfo.type == ITEM or cursorInfo.type == MACRO) then
@@ -61,6 +62,12 @@ local function OnDragStart(btnUI)
 
     if InCombatLockdown() then return end
     if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
+    local dragKeyIsDown = WU:IsDragKeyDown()
+    if not dragKeyIsDown then return end
+    --
+    --btnUI:SetAttribute("type", "empty")
+    --p:log(1, 'OnDragStart| dragKeyIsDown: %s', dragKeyIsDown)
+    --if w.buttonData:IsLockActionBars() and not dragKeyIsDown then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
@@ -68,35 +75,64 @@ local function OnDragStart(btnUI)
     PH:Pickup(btnData)
 
     w:SetButtonAsEmpty()
-    btnUI:SetScript("OnEnter", nil)
     btnUI.widget:Fire('OnDragStart')
-    -- TODO NEXT: Handle Drag-And-Drop for Macrotexts
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
+    --p:log('OnReceiveDrag|_state_type: %s', pformat(btnUI._state_type))
 
     -- TODO: Move to TBC/API
     local actionType, info1, info2, info3 = GetCursorInfo()
 
     local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
-    p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
+    --p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
+    ---@type ReceiveDragEventHandler
     local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
     dragEventHandler:Handle(btnUI, actionType, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
 
-local function OnLeave(_) GameTooltip:Hide() end
+---@param widget ButtonUIWidget
+---@param down boolean true if the press is KeyDown
+local function RegisterForClicks(widget, event, down)
+    if E.ON_LEAVE == event then
+        widget.button:RegisterForClicks('AnyDown')
+    elseif E.ON_ENTER == event then
+        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
+        --p:log('MODIFIER_STATE_CHANGED| event: %s', event)
+        --p:log('MODIFIER_STATE_CHANGED| down: %s dkd: %s', tostring(down), WU:IsDragKeyDown())
+        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    end
+end
+
+---@param widget ButtonUIWidget
+local function OnEnter(widget)
+    RegisterForClicks(widget, E.ON_ENTER)
+    -- handle stuff before event
+    ---@param down boolean true if the press is KeyDown
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, mouseButton, down)
+        RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
+    end, widget)
+end
+
+---@param widget ButtonUIWidget
+local function OnLeave(widget)
+    widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+    RegisterForClicks(widget, E.ON_LEAVE)
+end
+
 local function OnClick(btn, mouseButton, down)
-    p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
-    local actionType = GetCursorInfo()
-    if String.IsBlank(actionType) then return end
+    --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
+    btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
 end
 
@@ -183,18 +219,6 @@ local function OnPlayerControlGained(widget, event, ...)
     WU:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
----Only Process visible action bars
----@param widget ButtonUIWidget
----@param event string Event name
-local function OnUpdateKeybindings(widget, event, ...)
-    local bindings = WU:GetBarBindings(widget:GetName())
-    if not bindings then return nil end
-    widget.bindings = bindings
-    if widget:IsParentFrameShown() then
-        widget.dragFrame:UpdateKeybindText()
-    end
-end
-
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -243,6 +267,36 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
+---@param button ButtonUI
+local function RegisterScripts(button)
+    AceHook:SecureHookScript(button, 'OnClick', OnClick)
+
+    ---@param btn ButtonUI
+    button:SetScript("PreClick", function(btn, mouseButton, down)
+        -- This prevents the button from being clicked
+        -- on sequential drag-and-drops (one after another)
+        if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+        RegisterForClicks(btn.widget, 'PreClick', down)
+    end)
+
+    button:SetScript('OnDragStart', OnDragStart)
+    button:SetScript('OnReceiveDrag', OnReceiveDrag)
+
+    ---@param b ButtonUI
+    button:SetScript(E.ON_ENTER, function(b)
+        OnEnter(b.widget)
+        ---Receiver will get a func(widget, event) {}
+        b.widget:Fire(E.ON_ENTER)
+    end)
+    ---@param b ButtonUI
+    button:SetScript(E.ON_LEAVE, function(b)
+        OnLeave(b.widget)
+        ---Receiver will get a func(widget, event) {}
+        b.widget:Fire(E.ON_LEAVE)
+    end)
+
+end
+
 local function RegisterCallbacks(widget)
 
     widget:RegisterEvent(ACTIONBAR_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
@@ -253,11 +307,7 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
     widget:RegisterEvent(PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
-    widget:RegisterEvent(UPDATE_BINDINGS, OnUpdateKeybindings, widget)
 
-    --widget:SetCallback('OnDragStart', function(self, event)
-    --    --p:log(50, '%s:: %s', event, tostring(self))
-    --end)
     ---@param _widget ButtonUIWidget
     widget:SetCallback("OnReceiveDrag", function(_widget)
         _widget:UpdateStateDelayed(0.01)
@@ -305,6 +355,11 @@ local function WidgetMethods(widget)
 
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
+    ---@type BindingInfo
+    function widget:GetBindings()
+        return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
+    end
+    ---@param text string
     function widget:SetText(text)
         if String.IsBlank(text) then text = '' end
         widget.button.text:SetText(text)
@@ -322,14 +377,20 @@ local function WidgetMethods(widget)
             widget.button.keybindText:SetText(text)
             return
         end
+
         if true == state then
-            if self.bindings and self.bindings.key1Short then
-                text = self.bindings.key1Short
+            local bindings = self:GetBindings()
+            if bindings and bindings.key1Short then
+                text = bindings.key1Short
             end
         end
         widget.button.keybindText:SetText(text)
     end
-    function widget:HasKeybindings() return self.bindings ~= nil and String.IsNotBlank(self.bindings.key1) end
+    function widget:HasKeybindings()
+        local b = self:GetBindings()
+        if not b then return false end
+        return b and String.IsNotBlank(b.key1)
+    end
     function widget:ClearText() self:SetText('') end
 
     ---@return CooldownInfo
@@ -555,18 +616,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button.indexText = CreateIndexTextFontString(button)
     button.keybindText = CreateKeybindTextFontString(button)
 
-    --local keybindText = button:CreateFontString(button, "OVERLAY", "NumberFontNormalSmallGray")
-    --keybindText:SetJustifyH("CENTER")
-    ----keybindText:SetJustifyV("CENTER")
-    --keybindText:SetPoint("TOP", 2, -2)
-    --button.keybindText = keybindText
-
-    AceHook:SecureHookScript(button, 'OnClick', OnClick)
-    button:SetScript('OnDragStart', OnDragStart)
-    button:SetScript('OnReceiveDrag', OnReceiveDrag)
-    button:SetScript('OnLeave', OnLeave)
+    RegisterScripts(button)
     CreateFontString(button)
+
     button:RegisterForDrag('LeftButton')
+    button:RegisterForClicks("AnyDown")
 
     ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
@@ -582,6 +636,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUIWidget
     local widget = {
+        ---@type ActionbarPlus
+        addon = ABP,
         ---@type Logger
         p = p,
         ---@type Profile
@@ -592,8 +648,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameIndex = dragFrameWidget:GetIndex(),
         ---@type string
         buttonName = btnName,
-        ---@type BindingInfo
-        bindings = WU:GetBarBindings(btnName),
         ---@type FrameWidget
         dragFrame = dragFrameWidget,
         ---@type ButtonUI
@@ -627,7 +681,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
-
     return widget
 end
 
@@ -642,7 +695,6 @@ local function NewLibrary()
 
     ---@return ButtonUIWidgetBuilder
     function _L:WidgetBuilder() return _B end
-
     return _L
 end
 
