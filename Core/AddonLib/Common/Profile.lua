@@ -27,6 +27,7 @@ if not P then return end
 ---@see Config.lua
 ---@class ProfileConfigNames
 local ConfigNames = {
+    ---@deprecated lock_actionbars is to be removed
     ['lock_actionbars'] = 'lock_actionbars',
     ['hide_when_taxi'] = 'hide_when_taxi',
     ['show_button_index'] = 'show_button_index',
@@ -411,6 +412,7 @@ function P:GetActionBarSizeDetailsByIndex(frameIndex)
     return FrameDetails[frameIndex]
 end
 
+---@deprecated No longer being used in preference of ActionBars / Pick Up Action Key
 ---@return boolean True if the action bar is locked
 function P:IsLockActionBars()
     return self.profile[ConfigNames.lock_actionbars] == true

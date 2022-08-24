@@ -61,14 +61,7 @@ local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
 
-    if InCombatLockdown() then return end
-    if w.buttonData:IsLockActionBars() and not IsShiftKeyDown() then return end
-    local dragKeyIsDown = WU:IsDragKeyDown()
-    if not dragKeyIsDown then return end
-    --
-    --btnUI:SetAttribute("type", "empty")
-    --p:log(1, 'OnDragStart| dragKeyIsDown: %s', dragKeyIsDown)
-    --if w.buttonData:IsLockActionBars() and not dragKeyIsDown then return end
+    if InCombatLockdown() or not WU:IsDragKeyDown() then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
