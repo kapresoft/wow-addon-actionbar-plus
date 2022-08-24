@@ -1,4 +1,4 @@
-### 1.0.0.26.FUTURE
+### 1.0.0.26
 - Fix a bug crash when continuously dragging and dropping action button items ~ [Issue #29 - Fatal Error](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/29)
 - Fix macro item use cooldown i.e. `/use 14`; should now show the proper cooldown ~ [Issue #28 - Cooldown Count for Macros + Suggestion](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/28)
 
