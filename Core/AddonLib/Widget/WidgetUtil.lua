@@ -238,9 +238,10 @@ function _L:GetBarBindingsMap()
     return barBindingsMap
 end
 
----@param button ButtonUI
-function _L:IsTypeMacro(button)
-    return button and button.widget and button.widget:IsTypeMacro()
+---@param frame ButtonUI In retail owner can be any frame; should be treated as a generic frame
+function _L:IsTypeMacro(frame)
+    if not (frame and frame.widget and frame.widget.buttonName) then return false end
+    return frame.widget:IsTypeMacro()
 end
 
 ---@return BindingInfo
