@@ -101,8 +101,6 @@ local function RegisterForClicks(widget, event, down)
     elseif E.ON_ENTER == event then
         widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        --p:log('MODIFIER_STATE_CHANGED| event: %s', event)
-        --p:log('MODIFIER_STATE_CHANGED| down: %s dkd: %s', tostring(down), WU:IsDragKeyDown())
         widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     end
 end
@@ -180,8 +178,6 @@ local function OnSpellCastStart(widget, event, ...)
     local profileButton = widget:GetConfig()
     if widget:IsMatchingItemSpell(profileButton, spellID)
             or widget:IsMatchingSpell(profileButton, spellID) then
-        --local spellInfo = _API:GetSpellInfo(spellID)
-        --p:log('Match[%s]: %s[%s]', event, spellInfo.name, spellID)
         widget:SetHighlightInUse()
     end
 end
@@ -194,7 +190,6 @@ local function OnSpellCastStop(widget, event, ...)
 
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    --p:log('Event[%s]: unitTarget=%s spellID=%s', event, unitTarget, spellID)
     local profileButton = widget:GetConfig()
     if widget:IsMatchingItemSpell(profileButton, spellID)
             or widget:IsMatchingSpell(profileButton, spellID) then
