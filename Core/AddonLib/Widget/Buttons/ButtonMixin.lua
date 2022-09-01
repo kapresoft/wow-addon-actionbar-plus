@@ -3,14 +3,15 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetMacroSpell, GetMacroItem, GetItemInfoInstant =
     GetMacroSpell, GetMacroItem, GetItemInfoInstant
-local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
-    GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
-
+local LSM = ABP_WidgetConstants:LibPack_AceLibFactory():GetAceSharedMedia()
+local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
+local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -24,14 +25,43 @@ local SPELL,ITEM,MACRO = 'spell','item','macro'
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
---
+---@param widget ButtonUIWidget
+---@param rowNum number The row number
+---@param colNum number The column number
+local function SetButtonLayout(widget, rowNum, colNum)
+    ---@type FrameWidget
+    local dragFrame = widget.dragFrame
+    local barConfig = dragFrame:GetConfig()
+    local buttonSize = barConfig.widget.buttonSize
+    local buttonPadding = widget.buttonPadding
+    local frameStrata = widget.frameStrata
+    local button = widget.button
+    local dragFrameWidget = widget.dragFrame
+
+    local widthPaddingAdj = dragFrameWidget.padding
+    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
+    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
+    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
+
+    button:SetFrameStrata(frameStrata)
+    button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
+    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
+end
+
 --[[-----------------------------------------------------------------------------
 New Instance
+self: widget
+button: widget.button
 -------------------------------------------------------------------------------]]
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
 local _L = LibStub:NewLibrary(M.ButtonMixin)
 G:Mixin(_L, G:LibPack_ButtonProfileMixin())
+
+function _L:Init()
+    SetButtonLayout(self, self.placement.rowNum, self.placement.colNum)
+    WU:InitTextures(self, noIconTexture)
+end
 
 function _L:_Button() return self.button end
 function _L:_Widget() return self end
@@ -273,7 +303,34 @@ function _L:GetActionbarInfo()
     return info
 end
 
+function _L:ClearHighlight() self.button:SetHighlightTexture(nil) end
+function _L:ResetHighlight() WU:ResetHighlight(self) end
+function _L:SetTextureAsEmpty() self:SetIcon(noIconTexture) end
+function _L:SetIcon(icon) WU:SetIcon(self, icon) end
+function _L:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
+function _L:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
+function _L:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
+
 ---@param spellID string The spellID to match
+---@param optionalProfileButton ProfileButton
+---@return boolean
+function _L:IsMatchingItemSpellID(spellID, optionalProfileButton)
+    return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
+end
+---@param spellID string The spellID to match
+---@param optionalProfileButton ProfileButton
+---@return boolean
+function _L:IsMatchingSpellID(spellID, optionalProfileButton)
+    return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
+end
+---@param spellID string The spellID to match
+---@param optionalProfileButton ProfileButton
+---@return boolean
+function _L:IsMatchingMacroSpellID(spellID, optionalProfileButton)
+    return WU:IsMatchingMacroSpellID(spellID, optionalProfileButton or self:GetConfig())
+end
+---@param spellID string The spellID to match
+---@return boolean
 function _L:IsMatchingMacroOrSpell(spellID)
     ---@type ProfileButton
     local conf = self:GetConfig()
@@ -287,4 +344,8 @@ function _L:IsMatchingMacroOrSpell(spellID)
 
     return false;
 end
+
+---@param rowNum number
+---@param colNum number
+function _L:Resize(rowNum, colNum) SetButtonLayout(self, rowNum, colNum) end
 

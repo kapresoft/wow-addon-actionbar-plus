@@ -7,7 +7,7 @@ local CC = ABP_CommonConstants
 local AceLibFactory = LibStub('AceLibFactory')
 local LibSharedMedia = AceLibFactory:GetAceSharedMedia()
 local LogFactory = LibStub(M.LogFactory)
-local l = LogFactory('WidgetConstants')
+local p = LogFactory('WidgetConstants')
 
 -- #########################################################
 
@@ -105,8 +105,16 @@ function _L:GetButtonTextures()
     return TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING
 end
 
+---@return AceLibFactory
+function _L:LibPack_AceLibFactory() return AceLibFactory end
+
 ---@return WidgetLibFactory
 function _L:LibPack_WidgetFactory() return LibStub(M.WidgetLibFactory) end
 
 ---@return ButtonUILib
 function _L:LibPack_ButtonUI() return LibStub(M.ButtonUI) end
+
+---### Example
+---local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
+---@return string, string, string
+function _L:LibPack_SpellItemMacro() return 'spell','item','macro' end

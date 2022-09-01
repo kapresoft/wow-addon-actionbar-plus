@@ -26,6 +26,7 @@ local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
 
 local _, Table, String, LogFactory = G:LibPackUtils()
 local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
 local WU = ABP_LibGlobals:LibPack_WidgetUtil()
@@ -34,13 +35,9 @@ local E = ABP_WidgetConstants.E
 ---@type LogFactory
 local p = LogFactory:NewLogger('ButtonUI')
 
-local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
-
-local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
-local SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI = SECURE_ACTION_BUTTON_TEMPLATE, CONFIRM_RELOAD_UI
-local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
-local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
-local SPELL,ITEM,MACRO = 'spell','item','macro'
+local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
+local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
+local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -328,29 +325,6 @@ local function RegisterCallbacks(widget)
 
 end
 
----@param widget ButtonUIWidget
----@param rowNum number The row number
----@param colNum number The column number
-local function SetButtonLayout(widget, rowNum, colNum)
-    ---@type FrameWidget
-    local dragFrame = widget.dragFrame
-    local barConfig = dragFrame:GetConfig()
-    local buttonSize = barConfig.widget.buttonSize
-    local buttonPadding = widget.buttonPadding
-    local frameStrata = widget.frameStrata
-    local button = widget.button
-    local dragFrameWidget = widget.dragFrame
-
-    local widthPaddingAdj = dragFrameWidget.padding
-    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
-    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
-    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
-
-    button:SetFrameStrata(frameStrata)
-    button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
-end
-
 local function CreateFontString(button)
     local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT",-3, 2)
@@ -361,38 +335,7 @@ end
 Widget Methods
 -------------------------------------------------------------------------------]]
 ---@param widget ButtonUIWidget
-local function WidgetMethods(widget)
-    G:Mixin(widget, G:LibPack_ButtonMixin())
-
-    function widget:ClearHighlight() self.button:SetHighlightTexture(nil) end
-    function widget:ResetHighlight() WU:ResetHighlight(self) end
-    function widget:SetTextureAsEmpty() self:SetIcon(noIconTexture) end
-    function widget:SetIcon(icon) WU:SetIcon(self, icon) end
-    function widget:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
-    function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
-    function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
-    ---@param spellID string The spellID to match
-    ---@param optionalProfileButton ProfileButton
-    function widget:IsMatchingItemSpellID(spellID, optionalProfileButton)
-        return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
-    end
-    ---@param spellID string The spellID to match
-    ---@param optionalProfileButton ProfileButton
-    function widget:IsMatchingSpellID(spellID, optionalProfileButton)
-        return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
-    end
-    ---@param spellID string The spellID to match
-    ---@param optionalProfileButton ProfileButton
-    function widget:IsMatchingMacroSpellID(spellID, optionalProfileButton)
-        return WU:IsMatchingMacroSpellID(spellID, optionalProfileButton or self:GetConfig())
-    end
-
-    ---@param rowNum number
-    ---@param colNum number
-    function widget:Resize(rowNum, colNum)
-        SetButtonLayout(self, rowNum, colNum)
-    end
-end
+local function ApplyMixins(widget) G:Mixin(widget, G:LibPack_ButtonMixin()) end
 
 --[[-----------------------------------------------------------------------------
 Builder Methods
@@ -465,23 +408,21 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         buttonPadding = 2,
         ---@type table
         buttonAttributes = CC.ButtonAttributes,
+        placement = { rowNum = rowNum, colNum = colNum },
     }
     AceEvent:Embed(widget)
 
     ---@type ButtonData
     local buttonData = ButtonDataBuilder:Create(widget)
     widget.buttonData =  buttonData
-
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
     --for method, func in pairs(methods) do widget[method] = func end
-    WidgetMethods(widget)
-    SetButtonLayout(widget, rowNum, colNum)
-
-    WU:InitTextures(widget, noIconTexture)
-
+    ApplyMixins(widget)
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
+    widget:Init()
+
     return widget
 end
 
