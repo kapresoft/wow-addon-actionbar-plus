@@ -6,7 +6,7 @@ local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local GetMacroItem, GetItemInfoInstant = GetMacroItem, GetItemInfoInstant
+local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -142,7 +142,7 @@ end
 local function OnUpdateButtonCooldown(widget, event)
     widget:UpdateCooldown()
     local cd = widget:GetCooldownInfo();
-    if (cd == nil or cd.icon == nil or cd.type ~= MACRO) then return end
+    if (cd == nil or cd.icon == nil) then return end
     widget:SetCooldownTextures(cd.icon)
 end
 
@@ -176,8 +176,8 @@ local function OnSpellCastStart(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     local profileButton = widget:GetConfig()
-    if widget:IsMatchingItemSpell(profileButton, spellID)
-            or widget:IsMatchingSpell(profileButton, spellID) then
+    if widget:IsMatchingItemSpellID(spellID, profileButton)
+            or widget:IsMatchingSpellID(spellID, profileButton) then
         widget:SetHighlightInUse()
     end
 end
@@ -191,8 +191,8 @@ local function OnSpellCastStop(widget, event, ...)
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     local profileButton = widget:GetConfig()
-    if widget:IsMatchingItemSpell(profileButton, spellID)
-            or widget:IsMatchingSpell(profileButton, spellID) then
+    if widget:IsMatchingItemSpellID(spellID, profileButton)
+            or widget:IsMatchingSpellID(spellID, profileButton) then
         widget:ResetHighlight()
     end
 end
@@ -288,19 +288,48 @@ end
 
 local function RegisterCallbacks(widget)
 
-    widget:RegisterEvent(ACTIONBAR_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(ACTIONBAR_UPDATE_STATE, OnUpdateButtonState, widget)
-    widget:RegisterEvent(ACTIONBAR_UPDATE_USABLE, OnUpdateButtonUsable, widget)
-    widget:RegisterEvent(BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
-    widget:RegisterEvent(UNIT_SPELLCAST_START, OnSpellCastStart, widget)
-    widget:RegisterEvent(UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
-    widget:RegisterEvent(PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
-    widget:RegisterEvent(PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
+    --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
+    --SPELL_UPDATE_ICON
+
+    widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
+    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnUpdateButtonUsable, widget)
+
+    widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
+    widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
+    widget:RegisterEvent(E.UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
+    widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
+    widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
 
     ---@param _widget ButtonUIWidget
-    widget:SetCallback("OnReceiveDrag", function(_widget)
+    widget:SetCallback(E.ON_RECEIVE_DRAG, function(_widget)
+        p:log('drag')
         _widget:UpdateStateDelayed(0.01)
     end)
+
+    ---@param _widget ButtonUIWidget
+    ---@param event string
+    widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, function(_widget, event, ...)
+        local castingUnit, target, castGUID, spellID = ...
+        if not ('player' == castingUnit and _widget:IsMatchingSpellID(spellID)) then return end
+        _widget.button:SetButtonState('NORMAL')
+    end, widget)
+
+    ---@param _widget ButtonUIWidget
+    ---@param event string
+    widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, function(_widget, event, ...)
+        --p:log('%s', event)
+        local unitTarget, castGUID, spellID = ...
+        if not 'player' == unitTarget then return end
+        if _widget:IsTypeMacro() and _widget:IsMatchingMacroSpellID(spellID) then
+            p:log('macro')
+            _widget.button:SetButtonState('NORMAL')
+            return
+        end
+        if _widget:IsMatchingSpellID(spellID) then return end
+        _widget.button:SetButtonState('NORMAL')
+        --p:log('spell')
+    end, widget)
+
 end
 
 ---@param widget ButtonUIWidget
@@ -473,6 +502,13 @@ local function WidgetMethods(widget)
         return _API:GetSpellCooldown(spellId)
     end
 
+    ---@return number The spellID for macro
+    function widget:GetMacroSpellId()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+        return GetMacroSpell(macro.index)
+    end
+
     ---@return ItemCooldown
     function widget:GetMacroItemCooldown()
         local macro = self:GetMacroData();
@@ -605,8 +641,15 @@ local function WidgetMethods(widget)
     function widget:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
     function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
     function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
-    function widget:IsMatchingItemSpell(profileButton, spellID) return WU:IsMatchingItemSpell(profileButton, spellID) end
-    function widget:IsMatchingSpell(profileButton, spellID) return WU:IsMatchingSpell(profileButton, spellID) end
+    function widget:IsMatchingItemSpellID(spellID, profileButton)
+        return WU:IsMatchingItemSpellID(spellID, profileButton or self:GetConfig())
+    end
+    function widget:IsMatchingSpellID(spellID, profileButton)
+        return WU:IsMatchingSpellID(spellID, profileButton or self:GetConfig())
+    end
+    function widget:IsMatchingMacroSpellID(spellID, profileButton)
+        return WU:IsMatchingMacroSpellID(spellID, profileButton or self:GetConfig())
+    end
 
     ---@param rowNum number
     ---@param colNum number
