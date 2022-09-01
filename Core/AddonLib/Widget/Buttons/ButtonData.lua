@@ -45,9 +45,6 @@ local function ApplyMethods(bd)
         CleanupTypeData(profileButton)
         return profileButton
     end
-    function bd:IsActionTypeSpell()
-        return self:GetData().type == WAttr.SPELL
-    end
     function bd:IsHideWhenTaxi()
         return self.profile:IsHideWhenTaxi()
     end

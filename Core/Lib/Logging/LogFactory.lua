@@ -15,10 +15,16 @@ local _L = LibStub:NewLibrary(major, minor)
 function _L:GetLogger() return logger end
 function _L:EmbedLogger(obj, optionalLogName) self:GetLogger():Embed(obj, optionalLogName) end
 
+---@class LoggerTemplate
+local LoggerTemplate = {}
+---@param format string The string format. Example: logger:log('hello: %s', 'world')
+function LoggerTemplate:log(format, ...)  end
+
+
 ---```
 ---local newLib = LogFactory:GetLogger('Assert', LibStub:NewLibrary(MINOR, MAJOR))
 ---```
----@return table A generic object with embedded AceConsole and Logger
+---@return LoggerTemplate A generic object with embedded AceConsole and Logger
 function _L:NewLogger(logName, optionalObj)
     local o = {}
     if type(optionalObj) == 'table' then

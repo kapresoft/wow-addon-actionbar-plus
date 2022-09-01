@@ -89,7 +89,10 @@ function _L:ResetHighlight(btnWidget)
 end
 
 ---@param btnWidget ButtonUIWidget
-function _L:SetIcon(btnWidget, icon) btnWidget.button:SetNormalTexture(icon) end
+function _L:SetIcon(btnWidget, icon)
+    btnWidget.button:SetNormalTexture(icon)
+    btnWidget.button:SetPushedTexture(icon)
+end
 
 --- - Call this function once only; otherwise *CRASH* if called N times
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
@@ -110,9 +113,8 @@ function _L:InitTextures(btnWidget, icon)
     local tex = btnUI:GetPushedTexture()
     tex:SetAlpha(pushedTextureInUseAlpha)
     local mask = btnUI:CreateMaskTexture()
-    --mask:SetAllPoints(tex)
-    mask:SetPoint("TOPLEFT", tex, "TOPLEFT", 2, -2)
-    mask:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", -2, 2)
+    mask:SetPoint("TOPLEFT", tex, "TOPLEFT", 3, -3)
+    mask:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", -3, 3)
     mask:SetTexture(pushedTextureMask, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     tex:AddMaskTexture(mask)
 end
@@ -160,9 +162,9 @@ function _L:IsValidMacroProfile(profileButton)
             or IsBlank(profileButton.macro.name))
 end
 
----@param btnWidget ButtonUIWidget
+---@param eventItemSpellID string
 ---@param profileButton ProfileButton
-function _L:IsMatchingItemSpell(profileButton, eventItemSpellID)
+function _L:IsMatchingItemSpellID(eventItemSpellID, profileButton)
     --local profileButton = btnWidget:GetConfig()
     if not self:IsValidItemProfile(profileButton) then return end
     local _, btnItemSpellId = _API:GetItemSpellInfo(profileButton.item.id)
@@ -170,11 +172,31 @@ function _L:IsMatchingItemSpell(profileButton, eventItemSpellID)
     return false
 end
 
----@param btnWidget ButtonUIWidget
-function _L:IsMatchingSpell(profileButton, eventSpellID)
-    --local profileButton = btnWidget:GetConfig()
+---@param eventSpellID string
+---@param profileButton ProfileButton
+function _L:IsMatchingSpellID(eventSpellID, profileButton)
     if not self:IsValidSpellProfile(profileButton) then return end
     if eventSpellID == profileButton.spell.id then return true end
+    return false
+end
+
+---@param widget ButtonUIWidget
+---@param spellName string The spell name
+---@param profileButton ProfileButton
+function _L:IsMatchingSpellName(widget, spellName, profileButton)
+    local s = profileButton or widget:GetConfig()
+    if not (s.spell and s.spell.name) then return false end
+    if not (s and spellName == s.spell.name) then return false end
+    return true
+end
+
+---@param eventSpellID string
+---@param profileButton ProfileButton
+function _L:IsMatchingMacroSpellID(eventSpellID, profileButton)
+    if not self:IsValidMacroProfile(profileButton) then return end
+    local macroSpellId =  GetMacroSpell(profileButton.macro.index)
+    if not macroSpellId then return false end
+    if eventSpellID == macroSpellId then return true end
     return false
 end
 
@@ -241,7 +263,7 @@ end
 ---@param frame ButtonUI In retail owner can be any frame; should be treated as a generic frame
 function _L:IsTypeMacro(frame)
     if not (frame and frame.widget and frame.widget.buttonName) then return false end
-    return frame.widget:IsTypeMacro()
+    return frame.widget:IsMacro()
 end
 
 ---@return BindingInfo

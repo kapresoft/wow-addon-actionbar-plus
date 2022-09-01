@@ -4,5 +4,6 @@
     <Script file="Assert.lua"/>
     <Script file="Table.lua"/>
     <Script file="String.lua"/>
+    <Script file="Mixin.lua"/>
 
 </Ui>

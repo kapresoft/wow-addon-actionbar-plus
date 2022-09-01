@@ -4,6 +4,8 @@
     <Script file="ActionType.lua"/>
     <Script file="ButtonData.lua"/>
     <Script file="PickupHandler.lua"/>
+    <Script file="ButtonProfileMixin.lua"/>
+    <Script file="ButtonMixin.lua"/>
     <Script file="ButtonUI.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="BaseAttributeSetter.lua"/>
