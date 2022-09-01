@@ -1,3 +1,7 @@
+### 1.0.0.28
+
+- Fix for 3-state spells like Hunter/Flare, Mage/Blizzard [Issue #34 - Cooking Fire Spell Icon disappears after click](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/34)
+
 ### 1.0.0.27
 - Fix for IsTypeMacro for retail
 - Tooltip fix introduced in 1.0.0.26
