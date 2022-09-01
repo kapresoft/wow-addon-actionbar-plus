@@ -149,9 +149,15 @@ function _L:LibPack()
     return _S, NewLibrary, NewAddon
 end
 
+---@return Mixin
+function _L:LibPack_Mixin() return _S:GetLibrary('Mixin') end
+
 ---@return LocalLibStub
 function _L:LibStub() return _S end
 
+---@see LogFactory
+---@return LoggerTemplate
+function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logName) end
 
 ---Package is also know as the "Addon Name"
 ---```

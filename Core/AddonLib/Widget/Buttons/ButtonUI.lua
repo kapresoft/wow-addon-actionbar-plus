@@ -18,6 +18,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
+local Mixin = __K_Core:LibPack_Mixin()
+
 local _, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
@@ -92,6 +94,10 @@ local function OnReceiveDrag(btnUI)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
+
+---Triggered by SetCallback('event', fn)
+---@param _widget ButtonUIWidget
+local function OnReceiveDragCallback(_widget) _widget:UpdateStateDelayed(0.01) end
 
 ---@param widget ButtonUIWidget
 ---@param down boolean true if the press is KeyDown
@@ -196,16 +202,40 @@ local function OnSpellCastStop(widget, event, ...)
         widget:ResetHighlight()
     end
 end
+
+---@param widget ButtonUIWidget
+---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
     WU:SetEnabledActionBarStatesDelayed(false, 1)
 end
 
 ---@param widget ButtonUIWidget
+---@param event string
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
     if not widget.buttonData:IsHideWhenTaxi() then return end
     WU:SetEnabledActionBarStatesDelayed(true, 2)
+end
+
+---@param widget ButtonUIWidget
+---@param event string
+local function OnSpellCastSent(_widget, event, ...)
+    local castingUnit, _, _, spellID = ...
+    if not 'player' == castingUnit then return end
+    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+
+    _widget.button:SetButtonState('NORMAL')
+end
+
+---@param _widget ButtonUIWidget
+---@param event string
+local function OnSpellCastFailedQuiet(_widget, event, ...)
+    local castingUnit, _, spellID = ...
+    if not 'player' == castingUnit then return end
+    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+
+    _widget.button:SetButtonState('NORMAL')
 end
 
 --[[-----------------------------------------------------------------------------
@@ -293,38 +323,17 @@ local function RegisterCallbacks(widget)
 
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnUpdateButtonUsable, widget)
-
     widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
+    widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
+    widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
 
-    ---@param _widget ButtonUIWidget
-    widget:SetCallback(E.ON_RECEIVE_DRAG, function(_widget)
-        p:log('drag')
-        _widget:UpdateStateDelayed(0.01)
-    end)
+    widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
 
-    ---@param _widget ButtonUIWidget
-    ---@param event string
-    widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, function(_widget, event, ...)
-        local castingUnit, target, castGUID, spellID = ...
-        if not ('player' == castingUnit and _widget:IsMatchingSpellID(spellID)) then return end
-        _widget.button:SetButtonState('NORMAL')
-    end, widget)
 
-    ---@param _widget ButtonUIWidget
-    ---@param event string
-    widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, function(_widget, event, ...)
-        --p:log('%s', event)
-        local unitTarget, castGUID, spellID = ...
-        if not 'player' == unitTarget then return end
-        if (_widget:IsTypeMacro() and _widget:IsMatchingMacroSpellID(spellID)) or _widget:IsMatchingSpellID(spellID) then
-            p:log('type: %s', _widget:IsTypeMacro() and 'macro' or 'spell',  _widget:GetName())
-            _widget.button:SetButtonState('NORMAL')
-        end
-    end, widget)
 
 end
 
@@ -362,10 +371,7 @@ Widget Methods
 -------------------------------------------------------------------------------]]
 ---@param widget ButtonUIWidget
 local function WidgetMethods(widget)
-
-    function widget:GetName() return self.button:GetName() end
-    function widget:GetIndex() return self.index end
-    function widget:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
+    G:Mixin(widget, G:LibPack_ButtonMixin())
 
     function widget:IsParentFrameShown() return self.dragFrame:IsShown() end
 
@@ -373,10 +379,6 @@ local function WidgetMethods(widget)
     function widget:IsTypeSpell() return SPELL == self:GetConfig().type end
     function widget:IsTypeItem() return ITEM == self:GetConfig().type end
 
-    ---@type BindingInfo
-    function widget:GetBindings()
-        return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
-    end
     ---@param text string
     function widget:SetText(text)
         if String.IsBlank(text) then text = '' end
@@ -637,14 +639,20 @@ local function WidgetMethods(widget)
     function widget:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
     function widget:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
     function widget:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
-    function widget:IsMatchingItemSpellID(spellID, profileButton)
-        return WU:IsMatchingItemSpellID(spellID, profileButton or self:GetConfig())
+    ---@param spellID string The spellID to match
+    ---@param optionalProfileButton ProfileButton
+    function widget:IsMatchingItemSpellID(spellID, optionalProfileButton)
+        return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
     end
-    function widget:IsMatchingSpellID(spellID, profileButton)
-        return WU:IsMatchingSpellID(spellID, profileButton or self:GetConfig())
+    ---@param spellID string The spellID to match
+    ---@param optionalProfileButton ProfileButton
+    function widget:IsMatchingSpellID(spellID, optionalProfileButton)
+        return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
     end
-    function widget:IsMatchingMacroSpellID(spellID, profileButton)
-        return WU:IsMatchingMacroSpellID(spellID, profileButton or self:GetConfig())
+    ---@param spellID string The spellID to match
+    ---@param optionalProfileButton ProfileButton
+    function widget:IsMatchingMacroSpellID(spellID, optionalProfileButton)
+        return WU:IsMatchingMacroSpellID(spellID, optionalProfileButton or self:GetConfig())
     end
 
     ---@param rowNum number
@@ -694,7 +702,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    ---@class ButtonUIWidget
+    ---@class ButtonUIWidget : ButtonMixin @ButtonUIWidget extends ButtonMixin
     local widget = {
         ---@type ActionbarPlus
         addon = ABP,

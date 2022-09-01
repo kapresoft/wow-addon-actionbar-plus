@@ -180,16 +180,6 @@ function _L:IsMatchingSpellID(eventSpellID, profileButton)
     return false
 end
 
----@param eventSpellID string
----@param profileButton ProfileButton
-function _L:IsMatchingMacroSpellID(eventSpellID, profileButton)
-    if not self:IsValidMacroProfile(profileButton) then return end
-    local macroSpellId =  GetMacroSpell(profileButton.macro.index)
-    if not macroSpellId then return false end
-    if eventSpellID == macroSpellId then return true end
-    return false
-end
-
 ---@param widget ButtonUIWidget
 ---@param spellName string The spell name
 ---@param profileButton ProfileButton
@@ -198,6 +188,16 @@ function _L:IsMatchingSpellName(widget, spellName, profileButton)
     if not (s.spell and s.spell.name) then return false end
     if not (s and spellName == s.spell.name) then return false end
     return true
+end
+
+---@param eventSpellID string
+---@param profileButton ProfileButton
+function _L:IsMatchingMacroSpellID(eventSpellID, profileButton)
+    if not self:IsValidMacroProfile(profileButton) then return end
+    local macroSpellId =  GetMacroSpell(profileButton.macro.index)
+    if not macroSpellId then return false end
+    if eventSpellID == macroSpellId then return true end
+    return false
 end
 
 function _L:SetEnabledActionBarStatesDelayed(isShown, delayInSec)

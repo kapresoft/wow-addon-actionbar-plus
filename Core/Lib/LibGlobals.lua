@@ -35,6 +35,10 @@ local Module = {
     String = 'String',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
+    -- Mixins
+    Mixin = 'Mixin',
+    ButtonMixin = 'ButtonMixin',
+    ButtonProfileMixin = 'ButtonProfileMixin',
     -- Addons
     Config = 'Config',
     Profile = 'Profile',
@@ -123,6 +127,17 @@ function _L:LibPack_AceLibrary()
     local AceLibFactory = self:Get(Module.AceLibFactory)
     return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 end
+
+---@param object any The target object
+---@return any The mixed-in object
+function _L:Mixin(object, ...) return self:LibPack_Mixin():Mixin(object, ...) end
+
+---@return Mixin
+function _L:LibPack_Mixin() return self:Get(Module.Mixin) end
+---@return ButtonProfileMixin
+function _L:LibPack_ButtonProfileMixin() return self:Get(Module.ButtonProfileMixin) end
+---@return ButtonMixin
+function _L:LibPack_ButtonMixin() return self:Get(Module.ButtonMixin) end
 
 ---### Usage:
 ---```
