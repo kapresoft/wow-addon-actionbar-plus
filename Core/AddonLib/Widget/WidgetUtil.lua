@@ -185,7 +185,7 @@ end
 function _L:IsMatchingMacroSpellID(eventSpellID, profileButton)
     if not self:IsValidMacroProfile(profileButton) then return end
     local macroSpellId =  GetMacroSpell(profileButton.macro.index)
-    p:log('%s = %s', eventSpellID, macroSpellId)
+    if not macroSpellId then return false end
     if eventSpellID == macroSpellId then return true end
     return false
 end

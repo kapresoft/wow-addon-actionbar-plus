@@ -320,14 +320,10 @@ local function RegisterCallbacks(widget)
         --p:log('%s', event)
         local unitTarget, castGUID, spellID = ...
         if not 'player' == unitTarget then return end
-        if _widget:IsTypeMacro() and _widget:IsMatchingMacroSpellID(spellID) then
-            p:log('macro')
+        if (_widget:IsTypeMacro() and _widget:IsMatchingMacroSpellID(spellID)) or _widget:IsMatchingSpellID(spellID) then
+            p:log('type: %s', _widget:IsTypeMacro() and 'macro' or 'spell',  _widget:GetName())
             _widget.button:SetButtonState('NORMAL')
-            return
         end
-        if _widget:IsMatchingSpellID(spellID) then return end
-        _widget.button:SetButtonState('NORMAL')
-        --p:log('spell')
     end, widget)
 
 end
