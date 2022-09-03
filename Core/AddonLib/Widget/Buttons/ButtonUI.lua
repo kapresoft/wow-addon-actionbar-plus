@@ -109,18 +109,42 @@ local function RegisterForClicks(widget, event, down)
 end
 
 ---@param widget ButtonUIWidget
+---@param down boolean true if the press is KeyDown
+local function OnModifierStateChanged(widget, down)
+    RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down)
+    if widget:IsMacro() then
+        C_Timer.After(0.05, function() widget:Fire('OnModifierStateChanged') end)
+    end
+end
+
+---@param widget ButtonUIWidget
+local function OnModifierStateChangedCallback(widget, event)
+    local scd = widget:GetMacroSpellCooldown()
+    if not (scd and scd.spell) then return end
+    --p:log('OnModifierStateChangedCallback: update cooldown: %s', scd.spell.name)
+    widget:SetIcon(scd.spell.icon)
+    widget:UpdateCooldown()
+end
+
+---@param widget ButtonUIWidget
 local function OnEnter(widget)
     RegisterForClicks(widget, E.ON_ENTER)
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+
     -- handle stuff before event
     ---@param down boolean true if the press is KeyDown
-    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, mouseButton, down)
-        RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
-    end, widget)
+    --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
+    --    RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
+    --end, widget)
 end
 
 ---@param widget ButtonUIWidget
 local function OnLeave(widget)
-    widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+    --RegisterMacroEvent(widget)
+    if not widget:IsMacro() then
+        --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+        widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+    end
     RegisterForClicks(widget, E.ON_LEAVE)
 end
 
@@ -166,7 +190,6 @@ end
 ---@param event string Event string
 local function OnSpellCastStart(widget, event, ...)
     if not widget.button:IsShown() then return end
-
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     local profileButton = widget:GetConfig()
@@ -208,12 +231,15 @@ end
 
 ---@param widget ButtonUIWidget
 ---@param event string
-local function OnSpellCastSent(_widget, event, ...)
+local function OnSpellCastSent(widget, event, ...)
     local castingUnit, _, _, spellID = ...
     if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
+    widget.button:SetButtonState('NORMAL')
 
-    _widget.button:SetButtonState('NORMAL')
+    C_Timer.After(0.5, function()
+        widget:Fire('OnAfterSpellCastSent')
+    end)
 end
 
 ---@param _widget ButtonUIWidget
@@ -304,6 +330,7 @@ local function RegisterScripts(button)
 
 end
 
+---@param w ButtonUIWidget
 local function RegisterCallbacks(widget)
 
     --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
@@ -318,10 +345,50 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
 
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
+    widget:SetCallback('OnModifierStateChanged', OnModifierStateChangedCallback)
+
+    --------------------------------------------
+    ---@param w ButtonUIWidget
+    --widget:SetCallback('OnAfterSpellCastSent', function(w, event)
+    --    if w:IsMacro() then
+    --        local msc = w:GetMacroSpellCooldown()
+    --        if msc then
+    --            local c = w:GetConfig()
+    --            p:log('macro[%s]: %s/%s', c.macro.name, msc.spell.id, msc.spell.name)
+    --        end
+    --    end
+    --end)
+    --if widget:GetName() == "ActionbarPlusF1Button12" then
+    --    p:log('Registered: %s', widget:GetName())
+    --    ---@param w ButtonUIWidget
+    --    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
+    --        --local c = w:GetConfig()
+    --        --if not (IsShiftKeyDown() and down == 1) then return end
+    --        C_Timer.After(0.05, function()
+    --            w:Fire('OnModifierStateChanged')
+    --        end)
+    --    end, widget)
+    --end
 
 
+    -----SPELL_UPDATE_ICON Event fires once on login
+    -----@see SpellBookDocumentation.lua
+    -----@param w ButtonUIWidget
+    --widget:RegisterEvent('SPELL_UPDATE_ICON', function(w, event)
+    --    p:log('%s', event)
+    --end, widget)
+
+    ---@param w ButtonUIWidget
+    --widget:RegisterEvent('UNIT_SPELLCAST_START', function(w, event, ...)
+    --    local castingUnit, _, spellID = ...
+    --    if not (castingUnit == 'player' and w:IsMatchingSpellID(spellID)) then return end
+    --    --p:log('spellInfo: %s', s)
+    --    --local s = _API:GetSpellInfo(spellID)
+    --    p:log('%s: castingUnit: %s spellID: %s', event, castingUnit, spellID)
+    --end, widget)
 
 end
 
@@ -362,8 +429,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     RegisterScripts(button)
     CreateFontString(button)
 
-    button:RegisterForDrag('LeftButton')
-    button:RegisterForClicks("AnyDown")
+    button:RegisterForDrag("LeftButton", "RightButton");
+    button:RegisterForClicks("AnyDown");
 
     ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
@@ -442,3 +509,16 @@ end
 
 NewLibrary()
 
+--local function OnEvent(self, event, key, down)
+--    --if down == 1 then
+--    --    print("pressed in", key)
+--    --end
+--    local macroIndex = 121
+--    local spellID = GetMacroSpell(macroIndex)
+--    p:log('key: %s shift: %s down: %s spellID: %s', key, IsShiftKeyDown(), down, tostring(spellID))
+--
+--end
+--
+--local f = CreateFrame("Frame")
+--f:RegisterEvent("MODIFIER_STATE_CHANGED")
+--f:SetScript("OnEvent", OnEvent)
