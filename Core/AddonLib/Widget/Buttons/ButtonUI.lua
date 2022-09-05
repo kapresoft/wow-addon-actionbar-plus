@@ -1,12 +1,9 @@
 --[[-----------------------------------------------------------------------------
 WoW Vars
 -------------------------------------------------------------------------------]]
-local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
-    PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
-local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
-    GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local ClearCursor, GetCursorInfo, CreateFrame, UIParent = ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
+local  C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -18,7 +15,7 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local Mixin = __K_Core:LibPack_Mixin()
+local WidgetMixin = W:GetWidgetMixin()
 
 local _, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
@@ -55,6 +52,17 @@ local function IsValidDragSource(cursorInfo)
 
     return true
 end
+
+---@param btn ButtonUI
+---@param key string The key clicked
+---@param down boolean true if the press is KeyDown
+local function OnPreClick(btn, key, down)
+    -- This prevents the button from being clicked
+    -- on sequential drag-and-drops (one after another)
+    if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+    RegisterForClicks(btn.widget, 'PreClick', down)
+end
+
 ---@param btnUI ButtonUI
 local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
@@ -127,7 +135,7 @@ local function OnModifierStateChangedCallback(widget, event)
 end
 
 ---@param widget ButtonUIWidget
-local function OnEnter(widget)
+local function OnBeforeEnter(widget)
     RegisterForClicks(widget, E.ON_ENTER)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
 
@@ -137,9 +145,8 @@ local function OnEnter(widget)
     --    RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
     --end, widget)
 end
-
 ---@param widget ButtonUIWidget
-local function OnLeave(widget)
+local function OnBeforeLeave(widget)
     --RegisterMacroEvent(widget)
     if not widget:IsMacro() then
         --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
@@ -147,8 +154,26 @@ local function OnLeave(widget)
     end
     RegisterForClicks(widget, E.ON_LEAVE)
 end
+---@param btn ButtonUI
+function OnEnter(btn)
+    OnBeforeEnter(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_ENTER)
+end
+---@param btn ButtonUI
+function OnEnter(btn)
+    OnBeforeEnter(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_ENTER)
+end
+---@param btn ButtonUI
+function OnLeave(btn)
+    OnBeforeLeave(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_LEAVE)
+end
 
-local function OnClick(btn, mouseButton, down)
+local function OnClick_SecureHookScript(btn, mouseButton, down)
     --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
@@ -255,33 +280,6 @@ end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
-local function CreateIndexTextFontString(b)
-    local font = LSM:Fetch(LSM.MediaType.FONT, LSM.DefaultMedia.font)
-    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
-    local fontName, fontHeight = fs:GetFont()
-    fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
-    --fs:SetFont(font, 9, "THICKOUTLINE")
-    fs:SetTextColor(100/255, 100/255, 100/255)
-    --fs:SetTextColor(200/255, 200/255, 200/255)
-    fs:SetPoint("BOTTOMLEFT", 4, 4)
-    return fs
-end
-
----Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
-local function CreateKeybindTextFontString(b)
-    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
-    --local fontName, fontHeight, fontFlags = fs:GetFont()
-    --fs:SetFont(fontName, fontHeight, "OUTLINE")
-    fs:SetTextColor(200/255, 200/255, 200/255)
-    fs:SetPoint("TOP", 2, -2)
-    return fs
-end
-
 ---@param widget ButtonUIWidget
 ---@param name string The widget name.
 local function RegisterWidget(widget, name)
@@ -302,31 +300,13 @@ end
 
 ---@param button ButtonUI
 local function RegisterScripts(button)
-    AceHook:SecureHookScript(button, 'OnClick', OnClick)
+    AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
-    ---@param btn ButtonUI
-    button:SetScript("PreClick", function(btn, mouseButton, down)
-        -- This prevents the button from being clicked
-        -- on sequential drag-and-drops (one after another)
-        if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
-        RegisterForClicks(btn.widget, 'PreClick', down)
-    end)
-
+    button:SetScript("PreClick", OnPreClick)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
-
-    ---@param b ButtonUI
-    button:SetScript(E.ON_ENTER, function(b)
-        OnEnter(b.widget)
-        ---Receiver will get a func(widget, event) {}
-        b.widget:Fire(E.ON_ENTER)
-    end)
-    ---@param b ButtonUI
-    button:SetScript(E.ON_LEAVE, function(b)
-        OnLeave(b.widget)
-        ---Receiver will get a func(widget, event) {}
-        b.widget:Fire(E.ON_LEAVE)
-    end)
+    button:SetScript(E.ON_ENTER, OnEnter)
+    button:SetScript(E.ON_LEAVE, OnLeave)
 
 end
 
@@ -347,55 +327,9 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
 
+    -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
-    widget:SetCallback('OnModifierStateChanged', OnModifierStateChangedCallback)
-
-    --------------------------------------------
-    ---@param w ButtonUIWidget
-    --widget:SetCallback('OnAfterSpellCastSent', function(w, event)
-    --    if w:IsMacro() then
-    --        local msc = w:GetMacroSpellCooldown()
-    --        if msc then
-    --            local c = w:GetConfig()
-    --            p:log('macro[%s]: %s/%s', c.macro.name, msc.spell.id, msc.spell.name)
-    --        end
-    --    end
-    --end)
-    --if widget:GetName() == "ActionbarPlusF1Button12" then
-    --    p:log('Registered: %s', widget:GetName())
-    --    ---@param w ButtonUIWidget
-    --    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
-    --        --local c = w:GetConfig()
-    --        --if not (IsShiftKeyDown() and down == 1) then return end
-    --        C_Timer.After(0.05, function()
-    --            w:Fire('OnModifierStateChanged')
-    --        end)
-    --    end, widget)
-    --end
-
-
-    -----SPELL_UPDATE_ICON Event fires once on login
-    -----@see SpellBookDocumentation.lua
-    -----@param w ButtonUIWidget
-    --widget:RegisterEvent('SPELL_UPDATE_ICON', function(w, event)
-    --    p:log('%s', event)
-    --end, widget)
-
-    ---@param w ButtonUIWidget
-    --widget:RegisterEvent('UNIT_SPELLCAST_START', function(w, event, ...)
-    --    local castingUnit, _, spellID = ...
-    --    if not (castingUnit == 'player' and w:IsMatchingSpellID(spellID)) then return end
-    --    --p:log('spellInfo: %s', s)
-    --    --local s = _API:GetSpellInfo(spellID)
-    --    p:log('%s: castingUnit: %s spellID: %s', event, castingUnit, spellID)
-    --end, widget)
-
-end
-
-local function CreateFontString(button)
-    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint("BOTTOMRIGHT",-3, 2)
-    button.text = fs
+    widget:SetCallback(E.ON_MODIFIER_STATE_CHANGED, OnModifierStateChangedCallback)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -409,6 +343,7 @@ Builder Methods
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder
 local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
+    WidgetMixin:Mixin(_B)
 
 ---Creates a new ButtonUI
 ---@param dragFrameWidget FrameWidget The drag frame this button is attached to
@@ -423,11 +358,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-    button.indexText = CreateIndexTextFontString(button)
-    button.keybindText = CreateKeybindTextFontString(button)
+    button.indexText = self:CreateIndexTextFontString(button)
+    button.keybindText = self:CreateKeybindTextFontString(button)
 
     RegisterScripts(button)
-    CreateFontString(button)
+    self:CreateFontString(button)
 
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown");
@@ -508,17 +443,3 @@ local function NewLibrary()
 end
 
 NewLibrary()
-
---local function OnEvent(self, event, key, down)
---    --if down == 1 then
---    --    print("pressed in", key)
---    --end
---    local macroIndex = 121
---    local spellID = GetMacroSpell(macroIndex)
---    p:log('key: %s shift: %s down: %s spellID: %s', key, IsShiftKeyDown(), down, tostring(spellID))
---
---end
---
---local f = CreateFrame("Frame")
---f:RegisterEvent("MODIFIER_STATE_CHANGED")
---f:SetScript("OnEvent", OnEvent)

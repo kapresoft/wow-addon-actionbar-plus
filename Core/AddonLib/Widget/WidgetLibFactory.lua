@@ -52,6 +52,8 @@ function _L:GetConfig() return LibStub(M.Config) end
 function _L:GetButtonUI() return LibStub(M.ButtonUI) end
 ---@return MacroTextureDialog
 function _L:GetMacroTextureDialog() return LibStub(M.MacroTextureDialog) end
+---@return WidgetMixin
+function _L:GetWidgetMixin() return LibStub(M.WidgetMixin) end
 
 --- Usage: local Config, Profile, ButtonFactory = WidgetLibFactory:LibPack_AddonLibs()
 ---@return Config, Profile, ButtonFactory

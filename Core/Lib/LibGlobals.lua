@@ -60,6 +60,7 @@ local Module = {
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
     MacroEventsHandler = 'MacroEventsHandler',
     WidgetUtil = 'WidgetUtil',
+    WidgetMixin = 'WidgetMixin',
 }
 
 ---@class LibGlobals
@@ -77,15 +78,22 @@ local _L = {
 ---@type LibGlobals
 ABP_LibGlobals = _L
 
----@return AceLibFactory
-local function GetAceLibFactory() return _L:Get(Module.AceLibFactory)  end
-
 ---```
 ---Example:
----local LocalLibPack, Module = Core:LibPack()
+---local LibStub, Module, LibGlobals = LibGlobals:LibPack()
 ---```
 ---@return LocalLibStub, Module, LibGlobals
 function _L:LibPack() return LibStub, Module, _L end
+
+---```
+---Example:
+---local LibStub, Module, Core, LibGlobals = LibGlobals:LibPack_NewMixin()
+---```
+---@return LocalLibStub, Module, Core, LibGlobals
+function _L:LibPack_NewMixin() return LibStub, Module, Core, _L end
+
+---@return AceLibFactory
+function _L:LibPack_AceLibFactory() return _L:Get(Module.AceLibFactory)  end
 
 ---### Usage:
 ---```
@@ -93,7 +101,7 @@ function _L:LibPack() return LibStub, Module, _L end
 ---```
 ---@return AceDB, AceDBOptions, AceConfig, AceConfigDialog
 function _L:LibPack_AceAddonLibs()
-    local alf = GetAceLibFactory()
+    local alf = self:LibPack_AceLibFactory()
     return alf:GetAceDB(), alf:GetAceDBOptions(), alf:GetAceConfig(), alf:GetAceConfigDialog()
 end
 
