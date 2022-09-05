@@ -6,7 +6,9 @@ ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
 local format = string.format
 
----@class CommonConstants
+local _, NewLibrary = __K_Core:LibPack()
+
+---@class CommonConstantsBase
 local _L = {
     GetLogLevel = function()
         return ABP_LOG_LEVEL
@@ -16,6 +18,10 @@ local _L = {
         ABP_LOG_LEVEL = level or 1
     end
 }
+---@class CommonConstants : CommonConstantsBase
+_L = NewLibrary('CommonConstants')
+
+---@deprecated
 ---@type CommonConstants
 ABP_CommonConstants = _L
 

@@ -243,8 +243,25 @@ function _L:InitPrettyPrint()
 end
 
 function _L:Init() self:InitPrettyPrint() end
-
 _L:Init()
+
+local _LIB = {}
+function _LIB:GetLibraries(...)
+    local libNames = {...}
+    --print("libNames:", pformat(libNames))
+    local libs = {}
+    for _, lib in ipairs(libNames) do
+        local o = _S:GetLibrary(lib)
+        table.insert(libs, o)
+    end
+    return unpack(libs)
+end
+_LIB.mt = {
+    __tostring = function() return "Core::Lib"  end,
+    __call = function (_, ...) return _LIB.GetLibraries(...) end
+}
+setmetatable(_LIB, _LIB.mt)
+_L.Lib = _LIB
 
 ---@type Core
 __K_Core = _L

@@ -35,6 +35,8 @@ local Module = {
     String = 'String',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
+    -- Constants
+    CommonConstants = 'CommonConstants',
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
@@ -43,6 +45,7 @@ local Module = {
     Config = 'Config',
     Profile = 'Profile',
     ButtonUI = 'ButtonUI',
+    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     ButtonDataBuilder = 'ButtonDataBuilder',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
@@ -74,7 +77,17 @@ local _L = {
     versionFormat = versionFormat,
     logPrefix = logPrefix,
     Module = Module,
+    mt = {
+        __tostring = function() return addonName .. "::LibGlobals" end,
+        __call = function (_, ...)
+            --local libNames = {...}
+            --print("G|libNames:", pformat(libNames))
+            return __K_Core:Lib(...)
+        end
+    }
 }
+setmetatable(_L, _L.mt)
+
 ---@type LibGlobals
 ABP_LibGlobals = _L
 
@@ -84,6 +97,14 @@ ABP_LibGlobals = _L
 ---```
 ---@return LocalLibStub, Module, LibGlobals
 function _L:LibPack() return LibStub, Module, _L end
+
+---@return Module, LibGlobals
+function _L:LibPack_Module() return Module, _L end
+
+---### Example:
+---local LibStub, Module, LogFactory, LibGlobals = LibGlobals:LibPack()
+---@return LocalLibStub, Module, LogFactory, LibGlobals
+function _L:LibPack_UI() return LibStub, Module, self:Get(Module.LogFactory), _L end
 
 ---```
 ---Example:
@@ -186,6 +207,16 @@ function _L:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
 function _L:GetWidgetLibFactory() return self:Get(Module.WidgetLibFactory) end
 ---@return MacroEventsHandler
 function _L:GetMacroEventsHandler() return self:Get(Module.MacroEventsHandler) end
+
+---@type CommonConstants
+function _L:LibPack_CommonConstants() return self:Get(Module.CommonConstants) end
+
+---@return string, string, string The spell, item, macro attribute values
+function _L:SpellItemMacroAttributes()
+    local Attr = self:LibPack_CommonConstants().WidgetAttributes
+    return Attr.SPELL, Attr.ITEM, Attr.MACRO
+end
+
 
 function _L:Get(...)
     local libNames = {...}

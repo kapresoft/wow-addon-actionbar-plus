@@ -1,14 +1,18 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local SPELL,ITEM,MACRO = 'spell','item','macro'
-local _, _, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
+---@type String
+local String = G(M.String)
+
+local SPELL,ITEM,MACRO = G:SpellItemMacroAttributes()
+
+
 local p = LogFactory:NewLogger('ButtonProfileMixin')
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local LibStub, M = ABP_LibGlobals:LibPack()
 
 ---@class ButtonProfileMixin
 local _L = LibStub:NewLibrary(M.ButtonProfileMixin)

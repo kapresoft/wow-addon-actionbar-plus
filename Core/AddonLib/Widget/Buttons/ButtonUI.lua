@@ -14,25 +14,52 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local _, AceGUI, AceHook = G:LibPack_AceLibrary()
-local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
-local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
+--local M , G = ABP_LibGlobals:LibPack_Module()
 
-local _, Table, String, LogFactory = G:LibPackUtils()
-local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
+local CC = ABP_CommonConstants
+local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
+
+---@type Assert
+local A
+---@type Profile
+local P
+---@type ButtonDataBuilder
+local ButtonDataBuilder
+---@type WidgetMixin
+local WMX
+---@type WidgetLibFactory
+local WU
+---@type String
+local String
+
+A, P, ButtonDataBuilder, WMX, WU,
+String = G(
+        M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.WidgetUtil,
+        M.String)
+
+---@type LoggerTemplate
+local p = LogFactory:NewLogger('ButtonUI')
 
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local E = ABP_WidgetConstants.E
-
----@type LogFactory
-local p = LogFactory:NewLogger('ButtonUI')
-
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
 local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+---@class ButtonUIWidgetBuilder : WidgetMixin
+local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
+WMX:Mixin(_B)
+
+---@class ButtonUILib
+local _L = LibStub:NewLibrary(M.ButtonUI, 1)
+
+---@return ButtonUIWidgetBuilder
+function _L:WidgetBuilder() return _B end
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -49,6 +76,18 @@ local function IsValidDragSource(cursorInfo)
     end
 
     return true
+end
+
+---@param widget ButtonUIWidget
+---@param down boolean true if the press is KeyDown
+local function RegisterForClicks(widget, event, down)
+    if E.ON_LEAVE == event then
+        widget.button:RegisterForClicks('AnyDown')
+    elseif E.ON_ENTER == event then
+        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
+        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    end
 end
 
 ---@param btn ButtonUI
@@ -92,7 +131,7 @@ local function OnReceiveDrag(btnUI)
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
+    local dragEventHandler = G(M.ReceiveDragEventHandler)
     dragEventHandler:Handle(btnUI, actionType, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
@@ -101,18 +140,6 @@ end
 ---Triggered by SetCallback('event', fn)
 ---@param _widget ButtonUIWidget
 local function OnReceiveDragCallback(_widget) _widget:UpdateStateDelayed(0.01) end
-
----@param widget ButtonUIWidget
----@param down boolean true if the press is KeyDown
-local function RegisterForClicks(widget, event, down)
-    if E.ON_LEAVE == event then
-        widget.button:RegisterForClicks('AnyDown')
-    elseif E.ON_ENTER == event then
-        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-    end
-end
 
 ---@param widget ButtonUIWidget
 ---@param down boolean true if the press is KeyDown
@@ -339,9 +366,6 @@ local function ApplyMixins(widget) G:Mixin(widget, G:LibPack_ButtonMixin()) end
 --[[-----------------------------------------------------------------------------
 Builder Methods
 -------------------------------------------------------------------------------]]
----@class ButtonUIWidgetBuilder
-local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
-    W:Mixin(_B)
 
 ---Creates a new ButtonUI
 ---@param dragFrameWidget FrameWidget The drag frame this button is attached to
@@ -425,19 +449,3 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     return widget
 end
-
---[[-----------------------------------------------------------------------------
-New Instance
--------------------------------------------------------------------------------]]
----@return ButtonUILib
-local function NewLibrary()
-
-    ---@class ButtonUILib
-    local _L = LibStub:NewLibrary(M.ButtonUI, 1)
-
-    ---@return ButtonUIWidgetBuilder
-    function _L:WidgetBuilder() return _B end
-    return _L
-end
-
-NewLibrary()

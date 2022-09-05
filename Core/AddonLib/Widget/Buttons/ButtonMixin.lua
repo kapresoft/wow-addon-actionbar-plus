@@ -20,7 +20,7 @@ local LibStub, M, G = ABP_LibGlobals:LibPack()
 local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local _, Table, String, LogFactory = G:LibPackUtils()
 local p = LogFactory:NewLogger('ButtonMixin')
-local SPELL,ITEM,MACRO = 'spell','item','macro'
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
 --[[-----------------------------------------------------------------------------
 Support Functions

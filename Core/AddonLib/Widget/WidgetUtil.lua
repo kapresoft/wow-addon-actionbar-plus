@@ -28,7 +28,7 @@ local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBla
 ---@type LogFactory
 local p = LogFactory:NewLogger('WidgetUtil')
 
-local SPELL,ITEM,MACRO = 'spell','item','macro'
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
 ---Creates a global var ABP_WidgetUtil
 ---@class WidgetUtil

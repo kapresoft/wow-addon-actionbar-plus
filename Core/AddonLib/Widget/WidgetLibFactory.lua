@@ -89,9 +89,6 @@ function _L:LibPack_ButtonFactory()
             M.ItemAttributeSetter, M.MacroAttributeSetter, M.MacrotextAttributeSetter)
 end
 
----@return ReceiveDragEventHandler
-function _L:LibPack_ReceiveDragEventHandler() return G:Get(M.ReceiveDragEventHandler) end
-
 ---@return ItemAttributeSetter
 function _L:ItemAttributeSetter() return LibStub(M.ItemAttributeSetter) end
 ---@return SpellAttributeSetter

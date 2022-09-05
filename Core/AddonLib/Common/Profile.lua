@@ -1,8 +1,9 @@
 local type, pairs, tostring = type, pairs, tostring
-local LibStub, M = ABP_LibGlobals:LibPack()
+local LibStub, M, G = ABP_LibGlobals:LibPack()
 local _, Table = ABP_LibGlobals:LibPackUtils()
 local Assert = LibStub(M.Assert)
-local CC = ABP_CommonConstants
+
+local CC = G:LibPack_CommonConstants()
 local BAttr = CC.ButtonAttributes
 local WAttr = CC.WidgetAttributes
 
