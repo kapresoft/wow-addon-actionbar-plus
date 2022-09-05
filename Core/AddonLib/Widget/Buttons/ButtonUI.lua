@@ -15,8 +15,6 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local WidgetMixin = W:GetWidgetMixin()
-
 local _, AceGUI, AceHook = G:LibPack_AceLibrary()
 local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
 local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
@@ -343,7 +341,7 @@ Builder Methods
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder
 local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
-    WidgetMixin:Mixin(_B)
+    W:Mixin(_B)
 
 ---Creates a new ButtonUI
 ---@param dragFrameWidget FrameWidget The drag frame this button is attached to

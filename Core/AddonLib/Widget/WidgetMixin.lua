@@ -2,7 +2,7 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, Core, G = ABP_LibGlobals:LibPack_NewMixin()
-local Mixin = Core:LibPack_Mixin()
+local MX = Core:LibPack_Mixin()
 
 ---@return LoggerTemplate
 local p = Core:NewLogger(M.WidgetMixin)
@@ -16,9 +16,11 @@ local _L = LibStub:NewLibrary(M.WidgetMixin)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+---@param target any
+---@param mixins table A list of methods/properties to mix in
 function _L:Mixin(target, mixins)
     if type(mixins) ~= 'table' then
-        Mixin:Mixin(target, self)
+        MX:Mixin(target, self)
         return
     end
     for _, v in pairs(mixins) do target[v] = self[v] end

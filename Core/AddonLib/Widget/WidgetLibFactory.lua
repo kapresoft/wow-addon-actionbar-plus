@@ -55,6 +55,10 @@ function _L:GetMacroTextureDialog() return LibStub(M.MacroTextureDialog) end
 ---@return WidgetMixin
 function _L:GetWidgetMixin() return LibStub(M.WidgetMixin) end
 
+---@param target any
+---@param mixins table A list of methods/properties to mix in
+function _L:Mixin(target, mixins) return self:GetWidgetMixin():Mixin(target, mixins) end
+
 --- Usage: local Config, Profile, ButtonFactory = WidgetLibFactory:LibPack_AddonLibs()
 ---@return Config, Profile, ButtonFactory
 function _L:LibPack_AddonLibs() return self:GetConfig(), self:GetProfile(), self:GetButtonFactory() end
