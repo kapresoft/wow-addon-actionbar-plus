@@ -141,16 +141,24 @@ local _L = {}
 ---### New Addon
 ---```
 ---local MyAddon = LibPack:NewAddon('Assert')
+---### Others
+---local LibStub, NewLibrary = __K_Core:LibPack()
+---local LibStub, NewLibrary, NewAddon = __K_Core:LibPack()
 ---```
----@return LocalLibStub, (fun(libName:string):table), (fun(addonName:string):table)
+---@return LocalLibStub, NewLibrary, NewAddon
 function _L:LibPack()
+    ---@class NewLibrary
     local function NewLibrary(libName, global) return _S.NewLibrary(_S, libName, global or false) end
+    ---@class NewAddon
     local function NewAddon(addonName) return _S.NewAddon(_S, addonName) end
     return _S, NewLibrary, NewAddon
 end
 
 ---@return Mixin
 function _L:LibPack_Mixin() return _S:GetLibrary('Mixin') end
+
+---@return LibGlobals
+function _L:LibPack_Globals() return _G['ABP_LibGlobals'] end
 
 ---@return LocalLibStub
 function _L:LibStub() return _S end
@@ -243,8 +251,25 @@ function _L:InitPrettyPrint()
 end
 
 function _L:Init() self:InitPrettyPrint() end
-
 _L:Init()
+
+local _LIB = {}
+function _LIB:GetLibraries(...)
+    local libNames = {...}
+    --print("libNames:", pformat(libNames))
+    local libs = {}
+    for _, lib in ipairs(libNames) do
+        local o = _S:GetLibrary(lib)
+        table.insert(libs, o)
+    end
+    return unpack(libs)
+end
+_LIB.mt = {
+    __tostring = function() return "Core::Lib"  end,
+    __call = function (_, ...) return _LIB.GetLibraries(...) end
+}
+setmetatable(_LIB, _LIB.mt)
+_L.Lib = _LIB
 
 ---@type Core
 __K_Core = _L

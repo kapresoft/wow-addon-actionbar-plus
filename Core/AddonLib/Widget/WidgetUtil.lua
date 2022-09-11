@@ -28,16 +28,33 @@ local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBla
 ---@type LogFactory
 local p = LogFactory:NewLogger('WidgetUtil')
 
-local SPELL,ITEM,MACRO = 'spell','item','macro'
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
 ---Creates a global var ABP_WidgetUtil
 ---@class WidgetUtil
 local _L = NewLibrary(M.WidgetUtil)
+
 ---@type WidgetUtil
 ABP_WidgetUtil = _L
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+function _L:Embed(target)
+    for k, v in pairs(mixins) do
+        target[v] = self[v]
+    end
+    self.embeds[target] = true
+    return target
+end
+
+---@param button ButtonUI
+function _L:CreateFontString(button)
+    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
+    fs:SetPoint("BOTTOMRIGHT",-3, 2)
+    button.text = fs
+end
+
 ---@param buttonWidget ButtonUIWidget
 function _L:UpdateUsable(buttonWidget)
     local cd = buttonWidget:GetCooldownInfo()

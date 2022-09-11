@@ -20,7 +20,8 @@ local LibStub, M, G = ABP_LibGlobals:LibPack()
 local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local _, Table, String, LogFactory = G:LibPackUtils()
 local p = LogFactory:NewLogger('ButtonMixin')
-local SPELL,ITEM,MACRO = 'spell','item','macro'
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
+local UNIT = G:UnitIdAttributes()
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -46,6 +47,8 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button:SetFrameStrata(frameStrata)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
+
+    button.keybindText.widget:ScaleWithButtonSize(buttonSize)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -63,7 +66,9 @@ function _L:Init()
     WU:InitTextures(self, noIconTexture)
 end
 
+---@return ButtonUI
 function _L:_Button() return self.button end
+---@return ButtonUIWidget
 function _L:_Widget() return self end
 
 function _L:GetName() return self:_Button():GetName() end
@@ -83,7 +88,7 @@ end
 
 function _L:Reset()
     self:ResetCooldown()
-    self:ClearText()
+    self:ClearAllText()
 end
 
 function _L:ResetCooldown() self:SetCooldown(0, 0) end
@@ -130,7 +135,10 @@ function _L:HasKeybindings()
     if not b then return false end
     return b and String.IsNotBlank(b.key1)
 end
-function _L:ClearText() self:SetText('') end
+function _L:ClearAllText()
+    self:SetText('')
+    self.button.keybindText:SetText('')
+end
 
 ---@return CooldownInfo
 function _L:GetCooldownInfo()
@@ -238,14 +246,7 @@ function _L:GetMacroItemCooldown()
     return _API:GetItemCooldown(itemID)
 end
 
-function _L:HasActionAssigned()
-    local d = self:GetConfig()
-    local type = d.type
-    if String:IsBlank(type) then return false end
-    local spellDetails = d[type]
-    if Table.size(spellDetails) <= 0 then return false end
-    return true
-end
+function _L:ContainsValidAction() return self:_Widget().buttonData:ContainsValidAction() end
 
 function _L:ResetWidgetAttributes()
     local button = self:_Button()
@@ -255,7 +256,7 @@ function _L:ResetWidgetAttributes()
 end
 
 function _L:UpdateItemState()
-    self:ClearText()
+    self:ClearAllText()
     local btnData = self:GetConfig()
     if self:invalidButtonData(btnData, ITEM) then return end
     local itemID = btnData.item.id
@@ -273,6 +274,7 @@ function _L:UpdateState()
     self:UpdateCooldown()
     self:UpdateItemState()
     self:UpdateUsable()
+    self:UpdateRangeIndicator()
 end
 function _L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function _L:UpdateCooldown()
@@ -348,4 +350,64 @@ end
 ---@param rowNum number
 ---@param colNum number
 function _L:Resize(rowNum, colNum) SetButtonLayout(self, rowNum, colNum) end
+
+---@param hasTarget boolean Player has a target
+function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
+    -- if no target, do nothing and return
+    local widget = self:_Widget()
+    local fs = widget.button.keybindText
+    if not hasTarget then fs.widget:SetVertexColorNormal(); return end
+    if widget:IsMacro() then return end
+    if not widget:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
+
+    -- else if in range, color is "white"
+    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.target)
+    --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
+    fs.widget:SetVertexColorNormal()
+    if inRange == false then
+        fs.widget:SetVertexColorOutOfRange()
+    elseif inRange == nil then
+        -- spells, items, macros where range is not applicable
+        if not widget:HasKeybindings() then fs.widget:ClearText() end
+    end
+end
+
+---@param hasTarget boolean Player has a target
+function _L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
+    -- if no target, clear text and return
+    local fs = self:_Button().keybindText
+    if not hasTarget then
+        fs.widget:ClearText()
+        fs.widget:SetVertexColorNormal()
+        return
+    end
+
+    local widget = self:_Widget()
+    if widget:IsMacro() then return end
+
+    -- has target, set text as range indicator
+    fs.widget:SetTextWithRangeIndicator()
+
+    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.target)
+    --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
+    fs.widget:SetVertexColorNormal()
+    if inRange == false then
+        fs.widget:SetVertexColorOutOfRange()
+    elseif inRange == nil then
+        fs.widget:ClearText()
+    end
+end
+
+function _L:UpdateRangeIndicator()
+    if not self:ContainsValidAction() then return end
+    local widget = self:_Widget()
+    local configIsShowKeybindText = widget.dragFrame:IsShowKeybindText()
+    local hasTarget = GetUnitName(UNIT.target) ~= null
+    widget:ShowKeybindText(configIsShowKeybindText)
+
+    if configIsShowKeybindText == true then
+        return self:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
+    end
+    self:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
+end
 

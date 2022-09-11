@@ -15,7 +15,7 @@ local AssertNotNil, _ = Assert.AssertNotNil, String.IsNotBlank
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class ItemAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
+---@class ItemAttributeSetter : BaseAttributeSetter
 local _L = LibStub:NewLibrary(M.ItemAttributeSetter, 1)
 ---@type BaseAttributeSetter
 local Base = LibStub(M.BaseAttributeSetter)

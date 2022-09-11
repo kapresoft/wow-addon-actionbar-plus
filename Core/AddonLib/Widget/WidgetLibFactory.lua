@@ -52,6 +52,12 @@ function _L:GetConfig() return LibStub(M.Config) end
 function _L:GetButtonUI() return LibStub(M.ButtonUI) end
 ---@return MacroTextureDialog
 function _L:GetMacroTextureDialog() return LibStub(M.MacroTextureDialog) end
+---@return WidgetMixin
+function _L:GetWidgetMixin() return LibStub(M.WidgetMixin) end
+
+---@param target any
+---@param mixins table A list of methods/properties to mix in
+function _L:Mixin(target, mixins) return self:GetWidgetMixin():Mixin(target, mixins) end
 
 --- Usage: local Config, Profile, ButtonFactory = WidgetLibFactory:LibPack_AddonLibs()
 ---@return Config, Profile, ButtonFactory
@@ -82,9 +88,6 @@ function _L:LibPack_ButtonFactory()
     return G:Get(M.ButtonFrameFactory, M.ReceiveDragEventHandler, M.SpellAttributeSetter,
             M.ItemAttributeSetter, M.MacroAttributeSetter, M.MacrotextAttributeSetter)
 end
-
----@return ReceiveDragEventHandler
-function _L:LibPack_ReceiveDragEventHandler() return G:Get(M.ReceiveDragEventHandler) end
 
 ---@return ItemAttributeSetter
 function _L:ItemAttributeSetter() return LibStub(M.ItemAttributeSetter) end

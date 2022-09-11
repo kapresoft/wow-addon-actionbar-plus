@@ -1,19 +1,59 @@
--- Wow APIs
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetSpellCooldown = GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
 
--- Lua APIs
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local format = string.format
 
--- Local APIs
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 local _, _, String = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank = String.IsNotBlank
 
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class API
 local S = {}
 ---@type API
 _API = S
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+
+---Note: should call ButtonData:ContainsValidAction() before calling this
+---@return boolean true, false or nil if not applicable
+---@param btnConfig ProfileButton
+---@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
+function S:IsActionInRange(btnConfig, targetUnit)
+    local SPELL, ITEM, MACRO = ABP_LibGlobals:SpellItemMacroAttributes()
+
+    if btnConfig.type == SPELL then
+        local val = IsSpellInRange(btnConfig.spell.name, targetUnit)
+        if val == nil then return nil end
+        return val == true or val == 1
+    end
+    if btnConfig.type == ITEM then
+        local val = IsSpellInRange(btnConfig.item.name, targetUnit)
+        if val == nil then return nil end
+        return  val == true or val == 1
+    end
+    if btnConfig.type == MACRO then
+        return false
+    end
+end
 
 --- See:
 ---  * https://wowpedia.fandom.com/wiki/API_GetSpellInfo

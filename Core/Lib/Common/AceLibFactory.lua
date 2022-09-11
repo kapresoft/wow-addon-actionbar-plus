@@ -16,6 +16,7 @@ local AceModule = {
 
 ---@class AceLibFactory
 local _L = NewLibrary('AceLibFactory', 1)
+_L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
 ---@class AceConsole
 local libAceConsole = LibStub(AceModule.AceConsole)
@@ -37,6 +38,22 @@ local libAceConfig = LibStub(AceModule.AceConfig)
 local libAceGUI = LibStub(AceModule.AceGUI)
 
 -- ############################################################
+
+function _L:Constructor(...)
+    return self:Get(...)
+end
+
+function _L:Get(...)
+    local libNames = {...}
+    --print("AceLibFactory libNames:", pformat(libNames))
+    local libs = {}
+    for _, lib in ipairs(libNames) do
+        local o = LibStub(lib)
+        table.insert(libs, o)
+    end
+    return unpack(libs)
+end
+
 ---@return
 ---@return AceConsole
 function _L:GetAceConsole() return libAceConsole end
@@ -56,4 +73,3 @@ function _L:GetAceConfig() return libAceConfig end
 function _L:GetAceConfigDialog() return libAceConfigDialog end
 ---@return AceGUI
 function _L:GetAceGUI() return libAceGUI end
-

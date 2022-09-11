@@ -1,12 +1,9 @@
 --[[-----------------------------------------------------------------------------
 WoW Vars
 -------------------------------------------------------------------------------]]
-local PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent =
-    PickupSpell, ClearCursor, GetCursorInfo, CreateFrame, UIParent
-local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
-    GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local ClearCursor, GetCursorInfo, CreateFrame, UIParent = ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
+local  C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -17,27 +14,52 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local Mixin = __K_Core:LibPack_Mixin()
+--local M , G = ABP_LibGlobals:LibPack_Module()
 
-local _, AceGUI, AceHook = G:LibPack_AceLibrary()
-local ButtonDataBuilder = G:LibPack_ButtonDataBuilder()
-local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
+local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
+local CC = ABP_CommonConstants
+local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
 
-local _, Table, String, LogFactory = G:LibPackUtils()
-local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+---@type Assert
+local A
+---@type Profile
+local P
+---@type ButtonDataBuilder
+local ButtonDataBuilder
+---@type WidgetMixin
+local WMX
+---@type WidgetLibFactory
+local WU
+---@type String
+local String
+
+A, P, ButtonDataBuilder, WMX, WU,
+String = G(
+        M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.WidgetUtil,
+        M.String)
+
+---@type LoggerTemplate
+local p = LogFactory:NewLogger('ButtonUI')
 
 local IsBlank = String.IsBlank
 local PH = ABP_PickupHandler
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local E = ABP_WidgetConstants.E
-
----@type LogFactory
-local p = LogFactory:NewLogger('ButtonUI')
-
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
 local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+---@class ButtonUIWidgetBuilder : WidgetMixin
+local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
+WMX:Mixin(_B)
+
+---@class ButtonUILib
+local _L = LibStub:NewLibrary(M.ButtonUI, 1)
+
+---@return ButtonUIWidgetBuilder
+function _L:WidgetBuilder() return _B end
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -55,6 +77,29 @@ local function IsValidDragSource(cursorInfo)
 
     return true
 end
+
+---@param widget ButtonUIWidget
+---@param down boolean true if the press is KeyDown
+local function RegisterForClicks(widget, event, down)
+    if E.ON_LEAVE == event then
+        widget.button:RegisterForClicks('AnyDown')
+    elseif E.ON_ENTER == event then
+        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
+        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    end
+end
+
+---@param btn ButtonUI
+---@param key string The key clicked
+---@param down boolean true if the press is KeyDown
+local function OnPreClick(btn, key, down)
+    -- This prevents the button from being clicked
+    -- on sequential drag-and-drops (one after another)
+    if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+    RegisterForClicks(btn.widget, 'PreClick', down)
+end
+
 ---@param btnUI ButtonUI
 local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
@@ -86,45 +131,74 @@ local function OnReceiveDrag(btnUI)
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    local dragEventHandler = W:LibPack_ReceiveDragEventHandler()
+    local dragEventHandler = G(M.ReceiveDragEventHandler)
     dragEventHandler:Handle(btnUI, actionType, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
 
 ---Triggered by SetCallback('event', fn)
----@param _widget ButtonUIWidget
-local function OnReceiveDragCallback(_widget) _widget:UpdateStateDelayed(0.01) end
+---@param widget ButtonUIWidget
+local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
 ---@param widget ButtonUIWidget
 ---@param down boolean true if the press is KeyDown
-local function RegisterForClicks(widget, event, down)
-    if E.ON_LEAVE == event then
-        widget.button:RegisterForClicks('AnyDown')
-    elseif E.ON_ENTER == event then
-        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+local function OnModifierStateChanged(widget, down)
+    RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down)
+    if widget:IsMacro() then
+        C_Timer.After(0.05, function() widget:Fire('OnModifierStateChanged') end)
     end
 end
 
 ---@param widget ButtonUIWidget
-local function OnEnter(widget)
-    RegisterForClicks(widget, E.ON_ENTER)
-    -- handle stuff before event
-    ---@param down boolean true if the press is KeyDown
-    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, mouseButton, down)
-        RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
-    end, widget)
+local function OnModifierStateChangedCallback(widget, event)
+    local scd = widget:GetMacroSpellCooldown()
+    if not (scd and scd.spell) then return end
+    --p:log('OnModifierStateChangedCallback: update cooldown: %s', scd.spell.name)
+    widget:SetIcon(scd.spell.icon)
+    widget:UpdateCooldown()
 end
 
 ---@param widget ButtonUIWidget
-local function OnLeave(widget)
-    widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+local function OnBeforeEnter(widget)
+    RegisterForClicks(widget, E.ON_ENTER)
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+
+    -- handle stuff before event
+    ---@param down boolean true if the press is KeyDown
+    --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
+    --    RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
+    --end, widget)
+end
+---@param widget ButtonUIWidget
+local function OnBeforeLeave(widget)
+    --RegisterMacroEvent(widget)
+    if not widget:IsMacro() then
+        --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+        widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
+    end
     RegisterForClicks(widget, E.ON_LEAVE)
 end
+---@param btn ButtonUI
+function OnEnter(btn)
+    OnBeforeEnter(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_ENTER)
+end
+---@param btn ButtonUI
+function OnEnter(btn)
+    OnBeforeEnter(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_ENTER)
+end
+---@param btn ButtonUI
+function OnLeave(btn)
+    OnBeforeLeave(btn.widget)
+    ---Receiver will get a func(widget, event) {}
+    btn.widget:Fire(E.ON_LEAVE)
+end
 
-local function OnClick(btn, mouseButton, down)
+local function OnClick_SecureHookScript(btn, mouseButton, down)
     --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
@@ -166,7 +240,6 @@ end
 ---@param event string Event string
 local function OnSpellCastStart(widget, event, ...)
     if not widget.button:IsShown() then return end
-
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
     local profileButton = widget:GetConfig()
@@ -208,54 +281,46 @@ end
 
 ---@param widget ButtonUIWidget
 ---@param event string
-local function OnSpellCastSent(_widget, event, ...)
+local function OnSpellCastSent(widget, event, ...)
     local castingUnit, _, _, spellID = ...
     if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
+    widget.button:SetButtonState('NORMAL')
 
-    _widget.button:SetButtonState('NORMAL')
+    C_Timer.After(0.5, function()
+        widget:Fire('OnAfterSpellCastSent')
+    end)
 end
 
----@param _widget ButtonUIWidget
+---@param widget ButtonUIWidget
 ---@param event string
-local function OnSpellCastFailedQuiet(_widget, event, ...)
+local function OnSpellCastFailedQuiet(widget, event, ...)
     local castingUnit, _, spellID = ...
     if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
 
-    _widget.button:SetButtonState('NORMAL')
+    widget.button:SetButtonState('NORMAL')
 end
 
+---@see "UnitDocumentation.lua"
+---@param widget ButtonUIWidget
+---@param event string
+local function OnPlayerTargetChanged(widget, event)
+    widget:UpdateRangeIndicator()
+end
+
+---@see "UnitDocumentation.lua"
+---@param widget ButtonUIWidget
+---@param event string
+local function OnPlayerTargetChangedDelayed(widget, event)
+    C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
+end
+local function OnPlayerStartedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
+local function OnPlayerStoppedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
+local function OnCombatLogEventUnfiltered(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
-local function CreateIndexTextFontString(b)
-    local font = LSM:Fetch(LSM.MediaType.FONT, LSM.DefaultMedia.font)
-    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
-    local fontName, fontHeight = fs:GetFont()
-    fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
-    --fs:SetFont(font, 9, "THICKOUTLINE")
-    fs:SetTextColor(100/255, 100/255, 100/255)
-    --fs:SetTextColor(200/255, 200/255, 200/255)
-    fs:SetPoint("BOTTOMLEFT", 4, 4)
-    return fs
-end
-
----Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
-local function CreateKeybindTextFontString(b)
-    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
-    --local fontName, fontHeight, fontFlags = fs:GetFont()
-    --fs:SetFont(fontName, fontHeight, "OUTLINE")
-    fs:SetTextColor(200/255, 200/255, 200/255)
-    fs:SetPoint("TOP", 2, -2)
-    return fs
-end
-
 ---@param widget ButtonUIWidget
 ---@param name string The widget name.
 local function RegisterWidget(widget, name)
@@ -276,34 +341,17 @@ end
 
 ---@param button ButtonUI
 local function RegisterScripts(button)
-    AceHook:SecureHookScript(button, 'OnClick', OnClick)
+    AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
-    ---@param btn ButtonUI
-    button:SetScript("PreClick", function(btn, mouseButton, down)
-        -- This prevents the button from being clicked
-        -- on sequential drag-and-drops (one after another)
-        if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
-        RegisterForClicks(btn.widget, 'PreClick', down)
-    end)
-
+    button:SetScript("PreClick", OnPreClick)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
-
-    ---@param b ButtonUI
-    button:SetScript(E.ON_ENTER, function(b)
-        OnEnter(b.widget)
-        ---Receiver will get a func(widget, event) {}
-        b.widget:Fire(E.ON_ENTER)
-    end)
-    ---@param b ButtonUI
-    button:SetScript(E.ON_LEAVE, function(b)
-        OnLeave(b.widget)
-        ---Receiver will get a func(widget, event) {}
-        b.widget:Fire(E.ON_LEAVE)
-    end)
+    button:SetScript(E.ON_ENTER, OnEnter)
+    button:SetScript(E.ON_LEAVE, OnLeave)
 
 end
 
+---@param w ButtonUIWidget
 local function RegisterCallbacks(widget)
 
     --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
@@ -318,17 +366,16 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
+    widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+    widget:RegisterEvent(E.PLAYER_TARGET_CHANGED, OnPlayerTargetChanged, widget)
+    widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
+    widget:RegisterEvent(E.UNIT_HEALTH, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.COMBAT_LOG_EVENT_UNFILTERED, OnCombatLogEventUnfiltered, widget)
 
+    -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
-
-
-
-end
-
-local function CreateFontString(button)
-    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint("BOTTOMRIGHT",-3, 2)
-    button.text = fs
+    widget:SetCallback(E.ON_MODIFIER_STATE_CHANGED, OnModifierStateChangedCallback)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -340,8 +387,6 @@ local function ApplyMixins(widget) G:Mixin(widget, G:LibPack_ButtonMixin()) end
 --[[-----------------------------------------------------------------------------
 Builder Methods
 -------------------------------------------------------------------------------]]
----@class ButtonUIWidgetBuilder
-local _B = LogFactory:NewLogger('ButtonUIWidgetBuilder', {})
 
 ---Creates a new ButtonUI
 ---@param dragFrameWidget FrameWidget The drag frame this button is attached to
@@ -356,14 +401,14 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
-    button.indexText = CreateIndexTextFontString(button)
-    button.keybindText = CreateKeybindTextFontString(button)
+    button.indexText = self:CreateIndexTextFontString(button)
+    button.keybindText = self:CreateKeybindTextFontString(button)
 
     RegisterScripts(button)
-    CreateFontString(button)
+    self:CreateFontString(button)
 
-    button:RegisterForDrag('LeftButton')
-    button:RegisterForClicks("AnyDown")
+    button:RegisterForDrag("LeftButton", "RightButton");
+    button:RegisterForClicks("AnyDown");
 
     ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
@@ -425,20 +470,3 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     return widget
 end
-
---[[-----------------------------------------------------------------------------
-New Instance
--------------------------------------------------------------------------------]]
----@return ButtonUILib
-local function NewLibrary()
-
-    ---@class ButtonUILib
-    local _L = LibStub:NewLibrary(M.ButtonUI, 1)
-
-    ---@return ButtonUIWidgetBuilder
-    function _L:WidgetBuilder() return _B end
-    return _L
-end
-
-NewLibrary()
-

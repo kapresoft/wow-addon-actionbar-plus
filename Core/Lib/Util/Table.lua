@@ -27,6 +27,7 @@ function _L.parseCSV(text)
 end
 
 function _L.size(t)
+    if type(t) ~= 'table' then error(string.format("Expected arg to be of type table, but got: %s", type(t))) end
     local count = 0
     for _ in pairs(t) do count = count + 1 end
     return count

@@ -34,6 +34,8 @@ local p = LogFactory:NewLogger('Config')
 local P
 ---@type ProfileConfigNames
 local PC
+---@type TooltipKey
+local TTK
 ---@type ButtonFactory
 local BF
 ---@type ButtonFrameFactory
@@ -125,6 +127,7 @@ local function fetchLibs()
     local W = G:GetWidgetLibFactory()
     P, BF, FF = W:LibPack_Config()
     PC = P:GetConfigNames()
+    TTK = P:GetTooltipKey()
 end
 
 --[[-----------------------------------------------------------------------------
@@ -181,6 +184,27 @@ local methods = {
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
                     get = PropertyGetter(self, PC.hide_when_taxi, false),
                     set = PropertySetter(self, PC.hide_when_taxi, false)
+                },
+                tooltip_header = { type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS, order = order + 3 },
+                tooltip_visibility_key = {
+                    type = 'select', style = 'dropdown',
+                    order = order + 4,
+                    width = 'normal',
+                    values = TTK.kvPairs, sorting = TTK.sorting,
+                    name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
+                    desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC,
+                    get = PropertyGetter(self, PC.tooltip_visibility_key, TTK.names.SHOW),
+                    set = PropertySetter(self, PC.tooltip_visibility_key, TTK.names.SHOW)
+                },
+                tooltip_visibility_combat_override_key = {
+                    type = 'select', style = 'dropdown',
+                    order = order + 5,
+                    width = 'normal',
+                    values = TTK.kvPairs, sorting = TTK.sorting,
+                    name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
+                    desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
+                    get = PropertyGetter(self, PC.tooltip_visibility_combat_override_key),
+                    set = PropertySetter(self, PC.tooltip_visibility_combat_override_key)
                 }
             }
         }

@@ -29,7 +29,7 @@ function _L:Handle(btnUI, cursorInfo)
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues
     local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
-    self:log(10, 'macroInfo: %s', macroInfoText)
+    --self:log(10, 'macroInfo: %s', macroInfoText)
     --DEVT:EvalObject(macroInfo, 'macroInfo')
 
     if self:IsMacrotext(macroInfo) then

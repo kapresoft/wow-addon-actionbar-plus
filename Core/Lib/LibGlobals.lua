@@ -35,6 +35,8 @@ local Module = {
     String = 'String',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
+    -- Constants
+    CommonConstants = 'CommonConstants',
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
@@ -43,6 +45,7 @@ local Module = {
     Config = 'Config',
     Profile = 'Profile',
     ButtonUI = 'ButtonUI',
+    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     ButtonDataBuilder = 'ButtonDataBuilder',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
@@ -60,6 +63,7 @@ local Module = {
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
     MacroEventsHandler = 'MacroEventsHandler',
     WidgetUtil = 'WidgetUtil',
+    WidgetMixin = 'WidgetMixin',
 }
 
 ---@class LibGlobals
@@ -73,19 +77,44 @@ local _L = {
     versionFormat = versionFormat,
     logPrefix = logPrefix,
     Module = Module,
+    mt = {
+        __tostring = function() return addonName .. "::LibGlobals" end,
+        __call = function (_, ...)
+            --local libNames = {...}
+            --print("G|libNames:", pformat(libNames))
+            return __K_Core:Lib(...)
+        end
+    }
 }
+setmetatable(_L, _L.mt)
+
 ---@type LibGlobals
 ABP_LibGlobals = _L
 
----@return AceLibFactory
-local function GetAceLibFactory() return _L:Get(Module.AceLibFactory)  end
-
 ---```
 ---Example:
----local LocalLibPack, Module = Core:LibPack()
+---local LibStub, Module, LibGlobals = LibGlobals:LibPack()
 ---```
 ---@return LocalLibStub, Module, LibGlobals
 function _L:LibPack() return LibStub, Module, _L end
+
+---@return Module, LibGlobals
+function _L:LibPack_Module() return Module, _L end
+
+---### Example:
+---local LibStub, Module, LogFactory, LibGlobals = LibGlobals:LibPack()
+---@return LocalLibStub, Module, LogFactory, LibGlobals
+function _L:LibPack_UI() return LibStub, Module, self:Get(Module.LogFactory), _L end
+
+---```
+---Example:
+---local LibStub, Module, Core, LibGlobals = LibGlobals:LibPack_NewMixin()
+---```
+---@return LocalLibStub, Module, Core, LibGlobals
+function _L:LibPack_NewMixin() return LibStub, Module, Core, _L end
+
+---@return AceLibFactory
+function _L:LibPack_AceLibFactory() return _L:Get(Module.AceLibFactory)  end
 
 ---### Usage:
 ---```
@@ -93,7 +122,7 @@ function _L:LibPack() return LibStub, Module, _L end
 ---```
 ---@return AceDB, AceDBOptions, AceConfig, AceConfigDialog
 function _L:LibPack_AceAddonLibs()
-    local alf = GetAceLibFactory()
+    local alf = self:LibPack_AceLibFactory()
     return alf:GetAceDB(), alf:GetAceDBOptions(), alf:GetAceConfig(), alf:GetAceConfigDialog()
 end
 
@@ -178,6 +207,30 @@ function _L:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
 function _L:GetWidgetLibFactory() return self:Get(Module.WidgetLibFactory) end
 ---@return MacroEventsHandler
 function _L:GetMacroEventsHandler() return self:Get(Module.MacroEventsHandler) end
+
+---@type CommonConstants
+function _L:LibPack_CommonConstants() return self:Get(Module.CommonConstants) end
+
+---@return string, string, string The spell, item, macro attribute values
+function _L:SpellItemMacroAttributes()
+    local Attr = self:LibPack_CommonConstants().WidgetAttributes
+    return Attr.SPELL, Attr.ITEM, Attr.MACRO
+end
+
+---@return UnitIDAttributes
+function _L:UnitIdAttributes()
+    ---@class UnitIDAttributes
+    local unitIDAttributes = {
+        focus = 'focus',
+        target = 'target',
+        mouseover = 'mouseover',
+        none = 'none',
+        pet = 'pet',
+        player = 'player',
+        vehicle = 'vehicle',
+    }
+    return unitIDAttributes
+end
 
 function _L:Get(...)
     local libNames = {...}
