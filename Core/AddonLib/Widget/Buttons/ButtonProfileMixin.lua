@@ -40,6 +40,7 @@ end
 ---@return ProfileButton
 function _L:GetConfig() return self.buttonData:GetData() end
 
+---@param type string One of: spell, item, or macro
 function _L:GetConfigActionbarData(type)
     local btnData = self:GetConfig()
     if self:invalidButtonData(btnData, type) then return nil end

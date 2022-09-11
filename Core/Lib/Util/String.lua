@@ -10,10 +10,21 @@ local _L = LibStub:NewLibrary('String')
 -- ## Functions ------------------------------------------------
 
 function _L.IsEmpty(str) return (str or '') == '' end
-function _L.IsNotEmpty(str) return not _L.IsEmpty(str) end
-function _L.IsBlank(str) return len(_L.TrimAll(str)) <= 0 end
-function _L.IsNotBlank(str) return not _L.IsEmpty(str) end
-function _L.TrimAll(str) return gsub(str or '', "%s", "") end
+function _L.IsNotEmpty(str)
+    if str == nil then return true end
+    return not _L.IsEmpty(str)
+end
+function _L.IsBlank(str)
+    if str == nil then return true end
+    if type(str) ~= 'string' then return false end
+    return len(_L.TrimAll(str)) <= 0
+end
+function _L.IsNotBlank(str) return not _L.IsBlank(str) end
+function _L.TrimAll(str)
+    if str == nil then return str end
+    if type(str) ~= 'string' then error(string.format('expected a string type but got: %s', type(str))) end
+    return gsub(str or '', "%s", "")
+end
 
 function _L.ToTable(args)
     -- print(string.format("args: %s, type=%s", args, type(args)))

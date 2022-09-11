@@ -217,6 +217,20 @@ function _L:SpellItemMacroAttributes()
     return Attr.SPELL, Attr.ITEM, Attr.MACRO
 end
 
+---@return UnitIDAttributes
+function _L:UnitIdAttributes()
+    ---@class UnitIDAttributes
+    local unitIDAttributes = {
+        focus = 'focus',
+        target = 'target',
+        mouseover = 'mouseover',
+        none = 'none',
+        pet = 'pet',
+        player = 'player',
+        vehicle = 'vehicle',
+    }
+    return unitIDAttributes
+end
 
 function _L:Get(...)
     local libNames = {...}

@@ -138,8 +138,8 @@ local function OnReceiveDrag(btnUI)
 end
 
 ---Triggered by SetCallback('event', fn)
----@param _widget ButtonUIWidget
-local function OnReceiveDragCallback(_widget) _widget:UpdateStateDelayed(0.01) end
+---@param widget ButtonUIWidget
+local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
 ---@param widget ButtonUIWidget
 ---@param down boolean true if the press is KeyDown
@@ -292,16 +292,32 @@ local function OnSpellCastSent(widget, event, ...)
     end)
 end
 
----@param _widget ButtonUIWidget
+---@param widget ButtonUIWidget
 ---@param event string
-local function OnSpellCastFailedQuiet(_widget, event, ...)
+local function OnSpellCastFailedQuiet(widget, event, ...)
     local castingUnit, _, spellID = ...
     if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and _widget:IsMatchingMacroOrSpell(spellID)) then return end
+    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
 
-    _widget.button:SetButtonState('NORMAL')
+    widget.button:SetButtonState('NORMAL')
 end
 
+---@see "UnitDocumentation.lua"
+---@param widget ButtonUIWidget
+---@param event string
+local function OnPlayerTargetChanged(widget, event)
+    widget:UpdateRangeIndicator()
+end
+
+---@see "UnitDocumentation.lua"
+---@param widget ButtonUIWidget
+---@param event string
+local function OnPlayerTargetChangedDelayed(widget, event)
+    C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
+end
+local function OnPlayerStartedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
+local function OnPlayerStoppedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
+local function OnCombatLogEventUnfiltered(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -351,6 +367,11 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
+    widget:RegisterEvent(E.PLAYER_TARGET_CHANGED, OnPlayerTargetChanged, widget)
+    widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
+    widget:RegisterEvent(E.UNIT_HEALTH, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.COMBAT_LOG_EVENT_UNFILTERED, OnCombatLogEventUnfiltered, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)

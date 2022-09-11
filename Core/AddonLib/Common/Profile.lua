@@ -89,7 +89,7 @@ local MacroDataTemplate = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
----@class ProfileButton
+---@class ProfileButton : ProfileButtonDataMixin
 local ProfileButtonTemplate = {
     ['type'] = 'spell',
     ["spell"] = SpellDataTemplate,
