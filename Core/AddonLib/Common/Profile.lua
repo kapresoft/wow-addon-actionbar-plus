@@ -31,8 +31,33 @@ local ConfigNames = {
     ---@deprecated lock_actionbars is to be removed
     ['lock_actionbars'] = 'lock_actionbars',
     ['hide_when_taxi'] = 'hide_when_taxi',
+    ['tooltip_visibility_key'] = 'tooltip_visibility_key',
+    ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
     ['show_button_index'] = 'show_button_index',
     ['show_keybind_text'] = 'show_keybind_text',
+}
+
+---@class TooltipKeyName
+local TooltipKeyName = {
+    ['SHOW'] = '',
+    ['ALT'] = 'alt',
+    ['CTRL'] = 'ctrl',
+    ['SHIFT'] = 'shift',
+    ['HIDE'] = 'hide',
+}
+---@class TooltipKey
+local TooltipKey = {
+    names = TooltipKeyName,
+    sorting = {
+        TooltipKeyName.SHOW, TooltipKeyName.ALT, TooltipKeyName.CTRL,
+        TooltipKeyName.SHIFT, TooltipKeyName.HIDE },
+    kvPairs = {
+        [TooltipKeyName.SHOW]  = ABP_SHOW,
+        [TooltipKeyName.ALT]   = ABP_ALT,
+        [TooltipKeyName.CTRL]  = ABP_CTRL,
+        [TooltipKeyName.SHIFT] = ABP_SHIFT,
+        [TooltipKeyName.HIDE]  = ABP_HIDE,
+    }
 }
 
 local SingleBarTemplate = {
@@ -211,6 +236,8 @@ function P:CreateBarsTemplate()
 
     return bars
 end
+
+function P:GetProfileData() return self.profile end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 ---@return BarData
@@ -425,3 +452,6 @@ end
 
 ---@return ProfileConfigNames
 function P:GetConfigNames() return ConfigNames end
+
+---@return TooltipKey
+function P:GetTooltipKey() return TooltipKey end

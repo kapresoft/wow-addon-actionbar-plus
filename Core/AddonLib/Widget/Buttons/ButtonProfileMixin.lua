@@ -6,6 +6,7 @@ local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
 local String = G(M.String)
 
 local SPELL,ITEM,MACRO = G:SpellItemMacroAttributes()
+local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 
 
 local p = LogFactory:NewLogger('ButtonProfileMixin')
@@ -25,6 +26,13 @@ Support Functions
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+
+---@return Profile
+function _L:_Profile() return self.profile end
+---@return ButtonUI
+function _L:_Button() return self.button end
+---@return ButtonUIWidget
+function _L:_Widget() return self end
 
 function _L:invalidButtonData(o, key)
     if type(o) ~= 'table' then return true end
@@ -69,3 +77,45 @@ function _L:IsSpellConfig(config) return config and config.type and SPELL == con
 ---@param config ProfileButton
 ---@return boolean
 function _L:IsItemConfig(config) return config and config.type and ITEM == config.type end
+
+---@return boolean true if the key override is pressed
+function _L:IsTooltipModifierKeyDown()
+    local tooltipKey = self:GetTooltipVisibilityKey();
+    return self:IsOverrideKeyDown(tooltipKey)
+end
+
+---@return boolean true if the key override is pressed
+function _L:IsTooltipCombatModifierKeyDown()
+    local combatOverride = self:GetTooltipVisibilityCombatOverrideKeyOption();
+    return self:IsOverrideKeyDown(combatOverride)
+end
+
+---@see TooltipKeyName
+---@param value string One of TooltipKeyName value
+---@return boolean true if the key override is pressed
+function _L:IsOverrideKeyDown(value)
+    local tooltipKey = self:_Profile():GetTooltipKey().names
+    if tooltipKey.SHOW == value then return true end
+    if tooltipKey.HIDE == value then return false end
+
+    if tooltipKey.ALT == value then
+        return IsAltKeyDown()
+    elseif tooltipKey.CTRL == value then
+        return IsControlKeyDown()
+    elseif tooltipKey.SHIFT == value then
+        return IsShiftKeyDown()
+    end
+    return false
+end
+
+function _L:GetTooltipVisibilityKey()
+    local profile = self:_Profile()
+    local profileData = profile:GetProfileData()
+    return profileData[profile:GetConfigNames().tooltip_visibility_key]
+end
+
+function _L:GetTooltipVisibilityCombatOverrideKeyOption()
+    local profile = self:_Profile()
+    local profileData = profile:GetProfileData()
+    return profileData[profile:GetConfigNames().tooltip_visibility_combat_override_key]
+end
