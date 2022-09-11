@@ -1,4 +1,4 @@
-### 1.0.0.29.FUTURE
+### 1.0.0.29
 
 - Range indicators for spells ~ Fix for [Issue #11](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/11)
 - New option for showing tooltips ~ Fix for [Enh #30 - Hide tooltip](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/30)
