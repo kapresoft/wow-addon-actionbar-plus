@@ -1,3 +1,8 @@
+### 1.0.0.29.FUTURE
+
+- Range indicators for spells ~ Fix for [Issue #11](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/11)
+- New option for showing tooltips ~ Fix for [Enh #30 - Hide tooltip](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/30)
+
 ### 1.0.0.28
 
 - Fix for 3-state spells like Hunter/Flare, Mage/Blizzard [Issue #34 - Cooking Fire Spell Icon disappears after click](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/34)
