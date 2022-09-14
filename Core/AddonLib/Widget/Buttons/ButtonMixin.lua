@@ -181,7 +181,7 @@ end
 ---@return ItemCooldown
 function _L:GetItemCooldown(cd)
     local item = self:GetItemData()
-    if not item then return nil end
+    if not (item and item.id) then return nil end
     local itemCD = _API:GetItemCooldown(item.id, item)
     if itemCD ~= nil then
         cd.details = itemCD
