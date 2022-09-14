@@ -1,3 +1,6 @@
+### 1.0.0.30
+- fix bug introduced in previous build
+
 ### 1.0.0.29
 
 - Range indicators for spells ~ Fix for [Issue #11](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/11)
