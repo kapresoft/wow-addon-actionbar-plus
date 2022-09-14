@@ -150,6 +150,7 @@ end
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
 ---@return ItemCooldown
 function S:GetItemCooldown(itemId, optionalItem)
+    if not itemId then return nil end;
     local start, duration, enabled = GetItemCooldown(itemId)
     ---@class ItemCooldown
     local cd = {
