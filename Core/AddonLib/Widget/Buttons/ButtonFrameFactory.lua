@@ -15,16 +15,19 @@ local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, Assert, P, LSM, _, _, G = ABP_WidgetConstants:LibPack()
-local _, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
-local AceEvent, AceGUI = G:LibPack_AceLibrary()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local Assert, Table, P = O.Assert, O.Table, O.Profile
+local ALF = O.AceLibFactory
+local LSM = ALF:GetAceSharedMedia()
+local AceEvent, AceGUI = ALF:GetAceEvent(), ALF:GetAceGUI()
 
-local toStringSorted = Table.toStringSorted
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class ButtonFrameFactory
-local _L = LibStub:NewLibrary(M.ButtonFrameFactory)
+local _L = LibStub:NewLibrary(Core.M.ButtonFrameFactory)
 
----@type LogFactory
-local p = LogFactory:NewLogger('ButtonFrameFactory')
+local p = O.LogFactory:NewLogger(Core.M.ButtonFrameFactory)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -73,13 +76,13 @@ end
 
 ---@param widget FrameWidget
 local function RegisterEvents(widget)
-    local C = ABP_WidgetConstants.C
+    local E = O.WidgetConstants.E
     ---@param w FrameWidget
     local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
     ---@param w FrameWidget
     local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
-    widget:RegisterEvent(C.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
-    widget:RegisterEvent(C.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+    widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
+    widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
 end
 
 --[[-----------------------------------------------------------------------------

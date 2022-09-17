@@ -1,35 +1,31 @@
 --[[-----------------------------------------------------------------------------
-Wow Vars
+Blizzard Vars
 -------------------------------------------------------------------------------]]
 local PickupSpell, PickupMacro, PickupItem = PickupSpell, PickupMacro, PickupItem
 local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local Core = __K_Core
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local _, _, String = G:LibPackUtils()
-local IsNotBlank = String.IsNotBlank
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local G, LogFactory, Table = O.LibGlobals, O.LogFactory, O.Table
+local IsNotBlank = O.String.IsNotBlank
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
----@type LogFactory
-local LogFactory = LibStub(M.LogFactory)
+local p = LogFactory(Core.M.PickupHandler)
 
-local p = LogFactory('PickupHandler')
----@type Table
-local Table = LibStub(M.Table)
----@type WidgetAttributes
-local WAttr = ABP_CommonConstants.WidgetAttributes
-local SPELL = WAttr.SPELL
-local MACRO = WAttr.MACRO
-local ITEM = WAttr.ITEM
-
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class PickupHandler
-local _L = {}
-Core:Register(M.PickupHandler, _L)
+local _L = LibStub:NewLibrary(Core.M.PickupHandler)
 
+--TODO: NEXT: Deprecate
 ---@type PickupHandler
 ABP_PickupHandler = _L
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 function _L:IsPickingUpSomething()
     local type = GetCursorInfo()
     return IsNotBlank(type)

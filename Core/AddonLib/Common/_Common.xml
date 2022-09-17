@@ -3,8 +3,6 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
     <Script file="CommonConstants.lua"/>
-
-<!--    <Script file="Wait.lua"/>-->
     <Script file="Config.lua"/>
     <Script file="ProfileInitializer.lua"/>
     <Script file="Profile.lua"/>

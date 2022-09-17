@@ -17,146 +17,30 @@ Local Vars
 -------------------------------------------------------------------------------]]
 
 -- ## Start Here ---
-local Core = __K_Core
-local LibStub = Core:LibPack()
-
+local LibStub, Core = __K_Core:LibPack()
+local M = Core.M
 -- ABP_LOG_LEVEL is also in use here
 local ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 local addonName, versionFormat, logPrefix = Core:GetAddonInfo()
 
----@class Module
-local M = {
-    -- Libraries
-    Logger = 'Logger',
-    LogFactory = 'LogFactory',
-    PrettyPrint = 'PrettyPrint',
-    Table = 'Table',
-    String = 'String',
-    Assert = 'Assert',
-    AceLibFactory = 'AceLibFactory',
-    -- Constants
-    CommonConstants = 'CommonConstants',
-    -- Mixins
-    Mixin = 'Mixin',
-    ButtonMixin = 'ButtonMixin',
-    ButtonProfileMixin = 'ButtonProfileMixin',
-    -- Addons
-    BaseAttributeSetter = 'BaseAttributeSetter',
-    ButtonDataBuilder = 'ButtonDataBuilder',
-    ButtonFactory = 'ButtonFactory',
-    ButtonFrameFactory = 'ButtonFrameFactory',
-    ButtonUI = 'ButtonUI',
-    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
-    Config = 'Config',
-    ItemAttributeSetter = 'ItemAttributeSetter',
-    ItemDragEventHandler = 'ItemDragEventHandler',
-    MacroAttributeSetter = 'MacroAttributeSetter',
-    MacroDragEventHandler = 'MacroDragEventHandler',
-    MacroEventsHandler = 'MacroEventsHandler',
-    MacrotextAttributeSetter = 'MacrotextAttributeSetter',
-    MacroTextureDialog = 'MacroTextureDialog',
-    PickupHandler = 'PickupHandler',
-    Profile = 'Profile',
-    ProfileInitializer = 'ProfileInitializer',
-    ReceiveDragEventHandler = 'ReceiveDragEventHandler',
-    SpellAttributeSetter = 'SpellAttributeSetter',
-    SpellDragEventHandler = 'SpellDragEventHandler',
-    WidgetConstants = 'WidgetConstants',
-    WidgetLibFactory = 'WidgetLibFactory',
-    WidgetMixin = 'WidgetMixin',
-}
-
----@class GlobalObjects
-local GlobalObjectsTemplate = {
-    ---@type AceLibFactory
-    AceLibFactory = {},
-    ---@type Assert
-    Assert = {},
-    ---@type BaseAttributeSetter
-    BaseAttributeSetter = {},
-    ---@type ButtonDataBuilder
-    ButtonDataBuilder = {},
-    ---@type ButtonFactory
-    ButtonFactory = {},
-    ---@type ButtonFrameFactory
-    ButtonFrameFactory = {},
-    ---@type ButtonMixin
-    ButtonMixin = {},
-    ---@type ButtonProfileMixin
-    ButtonProfileMixin = {},
-    ---@type ButtonUI
-    ButtonUI = {},
-    ---@type ButtonUIWidgetBuilder
-    ButtonUIWidgetBuilder = {},
-    ---@type CommonConstants
-    CommonConstants = {},
-    ---@type Config
-    Config = {},
-    ---@type ItemAttributeSetter
-    ItemAttributeSetter = {},
-    ---@type ItemDragEventHandler
-    ItemDragEventHandler = {},
-    ---@type LogFactory
-    LogFactory = {},
-    ---@type Logger
-    Logger = {},
-    ---@type MacroAttributeSetter
-    MacroAttributeSetter = {},
-    ---@type MacroDragEventHandler
-    MacroDragEventHandler = {},
-    ---@type MacroEventsHandler
-    MacroEventsHandler = {},
-    ---@type MacroTextureDialog
-    MacroTextureDialog = {},
-    ---@type MacrotextAttributeSetter
-    MacrotextAttributeSetter = {},
-    ---@type Mixin
-    Mixin = {},
-    ---@type PickupHandler
-    PickupHandler = {},
-    ---@type Profile
-    Profile = {},
-    ---@type ProfileInitializer
-    ProfileInitializer = {},
-    ---@type ReceiveDragEventHandler
-    ReceiveDragEventHandler = {},
-    ---@type SpellAttributeSetter
-    SpellAttributeSetter = {},
-    ---@type SpellDragEventHandler
-    SpellDragEventHandler = {},
-    ---@type String
-    String = {},
-    ---@type Table
-    Table = {},
-    ---@type WidgetConstants
-    WidgetConstants = {},
-    ---@type WidgetLibFactory
-    WidgetLibFactory = {},
-    ---@type WidgetMixin
-    WidgetMixin = {},
-}
-
----TODO: Add all constants here
+---Only put string constants here (non-UI contants)
 ---@class GlobalConstants
 local C = {
 
+    ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
     ALT = 'ALT',
-    CTRL = 'CTRL',
-    SHIFT = 'SHIFT',
-    PICKUPACTION = 'PICKUPACTION',
-
+    ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
+    ARTWORK_DRAW_LAYER = 'ARTWORK',
     BOTTOMLEFT = 'BOTTOMLEFT',
     BOTTOMRIGHT = 'BOTTOMRIGHT',
-    TOPLEFT = 'TOPLEFT',
-    ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
-
     CLAMPTOBLACKADDITIVE = 'CLAMPTOBLACKADDITIVE',
     CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI',
-    SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate',
-
+    CTRL = 'CTRL',
     HIGHLIGHT_DRAW_LAYER = 'HIGHLIGHT',
-    ARTWORK_DRAW_LAYER = 'ARTWORK',
-    ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
+    PICKUPACTION = 'PICKUPACTION',
+    SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate',
+    SHIFT = 'SHIFT',
+    TOPLEFT = 'TOPLEFT',
 
 }
 
@@ -184,33 +68,11 @@ local _L = {
     }
 }
 setmetatable(_L, _L.mt)
+Core:Register(M.LibGlobals, _L)
 
+--TODO: NEXT: deprecated
 ---@type LibGlobals
 ABP_LibGlobals = _L
-
---[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-local function _pack(...) return { len = select("#", ...), ... } end
------@xreturn GlobalObjects
---local function XCreateGlobalObjects()
---    local o = {}
---    for k,v in pairs(M) do o[k] = Core:Get(v) end
---    return o
---end
-
----@return GlobalObjects
-local function CreateGlobalObjects(...)
-    local a = {...}
-    local o = {}
-    if #a <= 0 then
-        for k,v in pairs(M) do o[k] = Core:Get(v) end
-    else
-        for k,v in pairs(a) do o[v] = Core:Get(v) end
-    end
-    return o
-end
-_L.O = CreateGlobalObjects
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -331,6 +193,7 @@ function _L:LibPack_CommonConstants() return self:Get(M.CommonConstants) end
 ---@return WidgetMixin
 function _L:Lib_WidgetMixin() return self:Get(M.WidgetMixin) end
 
+---local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 ---@return string, string, string The spell, item, macro attribute values
 function _L:SpellItemMacroAttributes()
     local Attr = self:LibPack_CommonConstants().WidgetAttributes

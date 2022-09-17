@@ -3,49 +3,46 @@ WoW Vars
 -------------------------------------------------------------------------------]]
 local ClearCursor, GetCursorInfo, CreateFrame, UIParent = ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local  C_Timer = C_Timer
+local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
 -------------------------------------------------------------------------------]]
-local pack, fmod = table.pack, math.fmod
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---local M , G = ABP_LibGlobals:LibPack_Module()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M = Core.M
+local AceLibFactory, LogFactory = O.AceLibFactory, O.LogFactory
+local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 
-local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
-local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
-local O = G.O()
-local CC = O.CommonConstants()
-local A = O.Assert()
-local P = O.Profile()
-local ButtonDataBuilder = O.ButtonDataBuilder()
-local PH = O.PickupHandler()
-local String = O.String()
-local WC = O.WidgetConstants()
-local WMX = O.WidgetMixin()
-
----@type LoggerTemplate
-local p = LogFactory:NewLogger('ButtonUI')
+local CC = O.CommonConstants
+local A = O.Assert
+local P = O.Profile
+local ButtonDataBuilder = O.ButtonDataBuilder
+local PH = O.PickupHandler
+local String = O.String
+local WC = O.WidgetConstants
+local WMX = O.WidgetMixin
+local G = O.LibGlobals
 
 local IsBlank = String.IsBlank
-local E = WC.E
+local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
-local SPELL, ITEM, MACRO = WC:LibPack_SpellItemMacro()
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder : WidgetMixin
-local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
+local _B = LibStub:NewLibrary(Core.M.ButtonUIWidgetBuilder)
 WMX:Mixin(_B)
 
 ---@class ButtonUILib
-local _L = LibStub:NewLibrary(M.ButtonUI, 1)
+local _L = LibStub:NewLibrary(Core.M.ButtonUI, 1)
+local p = LogFactory:NewLogger(Core.M.ButtonUI)
 
 ---@return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end
@@ -389,7 +386,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
     ---@class ButtonUI
-    local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+    local button = CreateFrame("Button", btnName, UIParent, C.SECURE_ACTION_BUTTON_TEMPLATE)
     button.indexText = self:CreateIndexTextFontString(button)
     button.keybindText = self:CreateKeybindTextFontString(button)
 

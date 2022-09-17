@@ -1,10 +1,8 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetMacroSpell, GetMacroItem, GetItemInfoInstant =
-    GetMacroSpell, GetMacroItem, GetItemInfoInstant
-local C_Timer = C_Timer
-local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
+local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
+local IsUsableSpell, C_Timer = IsUsableSpell, C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -14,22 +12,25 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local LSM = ABP_WidgetConstants:LibPack_AceLibFactory():GetAceSharedMedia()
-local _, Table, String, LogFactory = G:LibPackUtils()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M = Core.M
+local G = O.LibGlobals
+local LSM = O.AceLibFactory:GetAceSharedMedia()
+local String, LogFactory = O.String, O.LogFactory
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 local UNIT = G:UnitIdAttributes()
+local WC = O.WidgetConstants
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
-local highlightTexture = TEXTURE_HIGHLIGHT2
-local pushedTextureMask = TEXTURE_HIGHLIGHT2
+local highlightTexture = WC.C.TEXTURE_HIGHLIGHT2
+local pushedTextureMask = WC.C.TEXTURE_HIGHLIGHT2
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
 
-local p = LogFactory:NewLogger('ButtonMixin')
+local p = LogFactory:NewLogger(Core.M.ButtonMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -64,7 +65,7 @@ local function SetButtonLayout(widget, rowNum, colNum)
 
     button:SetFrameStrata(frameStrata)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(TOPLEFT, dragFrameWidget.frame, TOPLEFT, widthAdj, -heightAdj)
+    button:SetPoint(WC.C.TOPLEFT, dragFrameWidget.frame, WC.C.TOPLEFT, widthAdj, -heightAdj)
 
     button.keybindText.widget:ScaleWithButtonSize(buttonSize)
 end
@@ -98,9 +99,9 @@ function _L:InitTextures(icon)
     local tex = btnUI:GetPushedTexture()
     tex:SetAlpha(pushedTextureInUseAlpha)
     local mask = btnUI:CreateMaskTexture()
-    mask:SetPoint(TOPLEFT, tex, TOPLEFT, 3, -3)
-    mask:SetPoint(BOTTOMRIGHT, tex, BOTTOMRIGHT, -3, 3)
-    mask:SetTexture(pushedTextureMask, CLAMPTOBLACKADDITIVE, CLAMPTOBLACKADDITIVE)
+    mask:SetPoint(WC.C.TOPLEFT, tex, WC.C.TOPLEFT, 3, -3)
+    mask:SetPoint(WC.C.BOTTOMRIGHT, tex, WC.C.BOTTOMRIGHT, -3, 3)
+    mask:SetTexture(pushedTextureMask, WC.C.CLAMPTOBLACKADDITIVE, WC.C.CLAMPTOBLACKADDITIVE)
     tex:AddMaskTexture(mask)
 end
 
@@ -371,13 +372,13 @@ function _L:SetCooldownTextures(icon)
 end
 function _L:SetHighlightInUse()
     local hlt = self:_Button():GetHighlightTexture()
-    hlt:SetDrawLayer(ARTWORK_DRAW_LAYER)
+    hlt:SetDrawLayer(WC.C.ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
 function _L:SetHighlightDefault()
     local btnUI = self:_Button()
     btnUI:SetHighlightTexture(highlightTexture)
-    btnUI:GetHighlightTexture():SetDrawLayer(HIGHLIGHT_DRAW_LAYER)
+    btnUI:GetHighlightTexture():SetDrawLayer(WC.C.HIGHLIGHT_DRAW_LAYER)
     btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
 end
 

@@ -1,22 +1,24 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GameTooltip = GameTooltip
 
--- ## Local ----------------------------------------------------
-local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
-local PrettyPrint = ABP_LibGlobals:LibPackUtils()
-local pformat = PrettyPrint.pformat
-local BATTR, WAttr, RWAttr = W:LibPack_WidgetAttributes()
-local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local W, WAttr = O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local WC = O.WidgetConstants
 
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class MacrotextAttributeSetter
-local S = LibStub:NewLibrary(M.MacrotextAttributeSetter)
+local S = LibStub:NewLibrary(Core.M.MacrotextAttributeSetter)
 
--- ## Functions ------------------------------------------------
-
---- Macrotext Info:
---- `{
----
---- }`
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 function S:SetAttributes(btnUI, btnData)
     W:ResetWidgetAttributes(btnUI)
 
@@ -28,10 +30,10 @@ function S:SetAttributes(btnUI, btnData)
 
     AssertNotNil(macroTextInfo.id, 'btnData[item].macroInfo.id')
 
-    local icon = TEXTURE_EMPTY
+    local icon = WC.C.TEXTURE_EMPTY
     if macroTextInfo.icon then icon = macroTextInfo.icon end
     btnUI:SetNormalTexture(icon)
-    btnUI:SetHighlightTexture(TEXTURE_HIGHLIGHT)
+    btnUI:SetHighlightTexture(WC.C.TEXTURE_HIGHLIGHT)
 
 end
 
@@ -42,7 +44,7 @@ function S:ShowTooltip(btnUI, btnData)
     if not type then return end
 
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(macroTextInfo.id)
 end
 

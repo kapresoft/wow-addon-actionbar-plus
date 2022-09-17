@@ -8,24 +8,13 @@ Blizzard vars
 -------------------------------------------------------------------------------]]
 local UIParent, CreateFrame, C_Timer = UIParent, CreateFrame, C_Timer
 local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
-local GameTooltip, ConfigureFrameToCloseOnEscapeKey = GameTooltip, ConfigureFrameToCloseOnEscapeKey
 
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local _, Table, String = ABP_LibGlobals:LibPackUtils()
-local LibStub, M = ABP_LibGlobals:LibPack()
-local _, AceGUI = ABP_LibGlobals:LibPack_AceLibrary()
---local MC = ABP_MacroIconCategories
-local ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT = ART_TEXTURES, TEXTURE_EMPTY, ANCHOR_TOPLEFT
-local replace = String.replace
-local ADDON_NAME = ADDON_NAME
-
----@class MacroTextureDialog
-local _L = LibStub:NewLibrary(M.MacroTextureDialog)
----@type MacroTextureDialog
-ABP_MacroTextureDialog = _L
-
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:GetAceGUI(), O.WidgetMixin
+local WC = O.WidgetConstants
 local ICON_PREFIX = 'Interface/Icons/'
 local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
@@ -59,6 +48,13 @@ local iconOptions = {
     size = 38,
     relativeWidth = 0.065
 }
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+---@class MacroTextureDialog
+local _L = LibStub:NewLibrary(Core.M.MacroTextureDialog)
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -149,7 +145,7 @@ end
 
 ---@return MacroTextureDialogFrame
 function _L:CreateTexturePopupDialog()
-    local defaultIcon = TEXTURE_EMPTY
+    local defaultIcon = WC.C.TEXTURE_EMPTY
 
     ---@class MacroTextureDialogFrame
     local frame = AceGUI:Create("Frame")
@@ -158,7 +154,7 @@ function _L:CreateTexturePopupDialog()
     --self:FetchMacroIcons()
     --self:FetchCategoriesCache()
 
-    ConfigureFrameToCloseOnEscapeKey(TEXTURE_DIALOG_GLOBAL_FRAME_NAME, frame)
+    WMX:ConfigureFrameToCloseOnEscapeKey(TEXTURE_DIALOG_GLOBAL_FRAME_NAME, frame)
 
     frame:SetTitle("Choose an Icon")
     frame:SetStatusText('')
@@ -248,14 +244,6 @@ function _L:CreateTexturePopupDialog()
     return frame
 end
 
---function _L:FetchCategoriesCache()
---    if categoryCache or type(categoryCache) == 'table' then
---        return
---    end
---    categoryCache = MC:GetCategoriesCache()
---    self:log(10, 'Macro icon categories cache fetched')
---end
-
 function _L:FetchMacroIcons()
     if macroIcons or type(macroIcons) == 'table' then
         return
@@ -268,7 +256,7 @@ end
 --[[-----------------------------------------------------------------------------
 Frame
 -------------------------------------------------------------------------------]]
-local f = CreateFrame("Frame", ADDON_NAME .. "MacroTextureDialogFrame", UIParent)
+local f = CreateFrame("Frame", Core.addonName .. "MacroTextureDialogFrame", UIParent)
 f:SetScript("OnEvent", function(self, event, ...)
     if event ~= 'PLAYER_ENTERING_WORLD' then return end
     --local isLogin, isReload = ...

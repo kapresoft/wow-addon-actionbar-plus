@@ -11,25 +11,14 @@ local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_S
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
-local LOCK_FRAME_DESC = [[
-
-
-Options:
-  Always: lock the frame at all times.
-  In-Combat: lock the frame during combat.
-
-Note: this option only prevents the frame from being moved and does not lock individual
-action items.
-]]
-
--- ActionbarPlus APIs
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local _, _, _, LogFactory = ABP_LibGlobals:LibPackUtils()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M = Core.M
+local G, LogFactory = O.LibGlobals, O.LogFactory
 
 ---@type LogFactory
-local p = LogFactory:NewLogger('Config')
+local p = LogFactory(Core.M.Config)
 
+---These are loaded in #fetchLibs()
 ---@type Profile
 local P
 ---@type ProfileConfigNames
@@ -40,6 +29,18 @@ local TTK
 local BF
 ---@type ButtonFrameFactory
 local FF
+
+local CONFIRM_RELOAD_UI = G.CONFIRM_RELOAD_UI
+local LOCK_FRAME_DESC = [[
+
+
+Options:
+  Always: lock the frame at all times.
+  In-Combat: lock the frame during combat.
+
+Note: this option only prevents the frame from being moved and does not lock individual
+action items.
+]]
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -124,8 +125,7 @@ local function PropertyGetter(config, key, fallbackVal)
 end
 
 local function fetchLibs()
-    local W = G:GetWidgetLibFactory()
-    P, BF, FF = W:LibPack_Config()
+    P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
     PC = P:GetConfigNames()
     TTK = P:GetTooltipKey()
 end

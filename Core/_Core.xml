@@ -5,6 +5,7 @@
     <Include file='ExtLib\_ExtLib.xml'/>
 
     <!-- Addon Resources   -->
+    <Script file="Modules.lua"/>
     <Script file="_Core.lua"/>
     <Include file='Lib\_Lib.xml'/>
     <Include file='AddonLib\_AddonLib.xml'/>

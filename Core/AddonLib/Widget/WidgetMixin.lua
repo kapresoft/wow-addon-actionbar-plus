@@ -4,13 +4,19 @@ Blizzard Vars
 local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
 local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
+local UISpecialFrames, StaticPopup_Show = UISpecialFrames, StaticPopup_Show
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local setglobal = setglobal
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, Core, G = ABP_LibGlobals:LibPack_NewMixin()
-local O = G.O()
-local MX, String, P = O.Mixin(), O.String(), O.Profile()
+local O = Core:O()
+local MX, String, P = O.Mixin, O.String, O.Profile
+local WC = O.WidgetConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
@@ -241,7 +247,7 @@ end
 function _L:AddItemKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
     local bindings = btnWidget:GetBindings()
-    GameTooltip:AppendText(String.format(G.C.ABP_KEYBIND_FORMAT, bindings.key1))
+    GameTooltip:AppendText(String.format(WC.C.ABP_KEYBIND_FORMAT, bindings.key1))
 end
 
 function _L:IsDragKeyDown()
@@ -260,3 +266,12 @@ function _L:CreateFontString(button)
     fs:SetPoint(G.C.BOTTOMRIGHT,-3, 2)
     button.text = fs
 end
+
+function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
+    local frame = frameInstance
+    if frameInstance.frame then frame = frameInstance.frame end
+    setglobal(frameName, frame)
+    table.insert(UISpecialFrames, frameName)
+end
+
+function _L:ShowReloadUIConfirmation() StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI) end

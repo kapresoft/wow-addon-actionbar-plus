@@ -1,5 +1,4 @@
-local _, NewLibrary = __K_Core:LibPack()
-local LibStub = LibStub
+local LibStub, Core = __K_Core:LibPack()
 
 local AceModule = {
     AceAddon = "AceAddon-3.0",
@@ -13,29 +12,29 @@ local AceModule = {
     AceGUI = 'AceGUI-3.0',
     AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
-
+--TODO: Test
 ---@class AceLibFactory
-local _L = NewLibrary('AceLibFactory', 1)
+local _L = LibStub:NewLibrary(Core.M.AceLibFactory)
 _L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
 ---@class AceConsole
-local libAceConsole = LibStub(AceModule.AceConsole)
+local libAceConsole = LibStub:LibStubAce(AceModule.AceConsole)
 ---@class LibSharedMedia
-local libSharedMedia = LibStub(AceModule.AceLibSharedMedia)
+local libSharedMedia = LibStub:LibStubAce(AceModule.AceLibSharedMedia)
 ---@class AceEvent
-local libAceEvent = LibStub(AceModule.AceEvent)
+local libAceEvent = LibStub:LibStubAce(AceModule.AceEvent)
 ---@class AceHook
-local libAceHook = LibStub(AceModule.AceHook)
+local libAceHook = LibStub:LibStubAce(AceModule.AceHook)
 ---@class AceDB
-local libAceDB = LibStub(AceModule.AceDB)
+local libAceDB = LibStub:LibStubAce(AceModule.AceDB)
 ---@class AceDBOptions
-local libAceDBOptions = LibStub(AceModule.AceDBOptions)
+local libAceDBOptions = LibStub:LibStubAce(AceModule.AceDBOptions)
 ---@class AceConfigDialog
-local libAceConfigDialog = LibStub(AceModule.AceConfigDialog)
+local libAceConfigDialog = LibStub:LibStubAce(AceModule.AceConfigDialog)
 ---@class AceConfig
-local libAceConfig = LibStub(AceModule.AceConfig)
+local libAceConfig = LibStub:LibStubAce(AceModule.AceConfig)
 ---@class AceGUI
-local libAceGUI = LibStub(AceModule.AceGUI)
+local libAceGUI = LibStub:LibStubAce(AceModule.AceGUI)
 
 -- ############################################################
 
@@ -48,7 +47,7 @@ function _L:Get(...)
     --print("AceLibFactory libNames:", pformat(libNames))
     local libs = {}
     for _, lib in ipairs(libNames) do
-        local o = LibStub(lib)
+        local o = LibStub:LibStubAce(lib)
         table.insert(libs, o)
     end
     return unpack(libs)

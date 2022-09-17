@@ -19,12 +19,9 @@ local _L = LibStub:NewLibrary(M.WidgetLibFactory)
 local assertLib = LibStub(M.Assert)
 
 local CC = ABP_CommonConstants
-local WC = ABP_WidgetConstants
 local unitAttributes = CC.UnitAttributes
 local buttonAttributes = CC.ButtonAttributes
 local widgetAttributes = CC.WidgetAttributes
----@type function
-local resetWidgetAttributes = WC.ResetWidgetAttributes
 
 ---@type AceLibFactory
 local aceLibFactory = LibStub(M.AceLibFactory)

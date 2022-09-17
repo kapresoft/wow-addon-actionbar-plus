@@ -3,14 +3,17 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, GetMacroSpell, GetMacroItem = GameTooltip, GetMacroSpell, GetMacroItem
 
-local LibStub, M, A, P, LSM, W = ABP_WidgetConstants:LibPack()
-
-local PrettyPrint, Table, String, L = ABP_LibGlobals:LibPackUtils()
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local sformat = string.format
 
-local BATTR, WAttr = W:LibPack_WidgetAttributes()
-
-local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local String, WA, WAttr = O.String, O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local WC = O.WidgetConstants
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
 local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
 
@@ -18,9 +21,9 @@ local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
-local _L = LibStub:NewLibrary(M.MacroAttributeSetter)
+local _L = LibStub:NewLibrary(Core.M.MacroAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(M.BaseAttributeSetter)
+local Base = LibStub(Core.M.BaseAttributeSetter)
 _L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
@@ -30,10 +33,10 @@ Methods
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
 function _L:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+    WA:ResetWidgetAttributes(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
-    local icon = TEXTURE_EMPTY
+    local icon = WC.C.TEXTURE_EMPTY
     if macroInfo.icon then icon = macroInfo.icon end
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
@@ -56,7 +59,7 @@ function _L:ShowTooltip(btnUI)
 
     if not (macroInfo.index or macroInfo.name) then return end
 
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then
         local _, itemLink = GetMacroItem(macroInfo.index)

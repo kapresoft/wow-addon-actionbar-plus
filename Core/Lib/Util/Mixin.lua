@@ -1,14 +1,14 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub = __K_Core:LibPack()
+local LibStub, Core = __K_Core:LibPack()
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 
 ---@class Mixin
-local _L = LibStub:NewLibrary(ABP_LibGlobals.M.Mixin)
+local _L = LibStub:NewLibrary(Core.M.Mixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -50,6 +50,3 @@ function _L:MixinExcept(object, skipList, ...)
 
     return object
 end
-
----@type Mixin
-ABP_Mixin = _L

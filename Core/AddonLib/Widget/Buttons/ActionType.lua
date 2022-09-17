@@ -1,6 +1,7 @@
-local LibStub = __K_Core:LibPack()
+local O, Core = __K_Core:LibPack_GlobalObjects()
+
 ---@type String
-local String = LibStub('String')
+local String = O.String
 local tinsert, ipairs = table.insert, ipairs
 
 ---@class ActionType
@@ -10,8 +11,7 @@ local AT = {
     MACRO = 'macro',
     MACRO_TEXT = 'macrotext',
 }
----@type ActionType
-ABP_ActionType = AT
+Core:Register(Core.M.ActionType, AT)
 
 -- ## Start Here ##
 

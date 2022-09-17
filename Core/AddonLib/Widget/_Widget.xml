@@ -10,7 +10,7 @@
     <Script file="WidgetLibFactory.lua"/>
 
     <!--@debug@-->
-    <Script file="MacroTextureDialog.lua"/>
+    <!--  <Script file="MacroTextureDialog.lua"/>  -->
     <!--@end-debug@-->
     <Script file="MacroEventsHandler.lua"/>
 

@@ -1,23 +1,23 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GameTooltip = GameTooltip
 
--- ## Local ----------------------------------------------------
-
--- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, LibGlobals
-local LibStub, M, Assert, _, _, W = ABP_WidgetConstants:LibPack()
-local _, _, String, _ = ABP_LibGlobals:LibPackUtils()
-local _, WAttr = W:LibPack_WidgetAttributes()
-
-local _, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
-local AssertNotNil, _ = Assert.AssertNotNil, String.IsNotBlank
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local Assert, String, W, WAttr = O.Assert, O.String, O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local AssertNotNil = Assert.AssertNotNil
+local WC = O.WidgetConstants
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ItemAttributeSetter : BaseAttributeSetter
-local _L = LibStub:NewLibrary(M.ItemAttributeSetter, 1)
+local _L = LibStub:NewLibrary(Core.M.ItemAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(M.BaseAttributeSetter)
+local Base = LibStub(Core.M.BaseAttributeSetter)
 _L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ function _L:SetAttributes(btnUI, btnData)
 
     AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
-    local icon = TEXTURE_EMPTY
+    local icon = WC.C.TEXTURE_EMPTY
     if itemData.icon then icon = itemData.icon end
 
     btnUI.widget:SetIcon(icon)
@@ -53,7 +53,7 @@ function _L:ShowTooltip(btnUI)
     if String.IsBlank(btnData.type) then return end
 
     ---@type ItemData
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
     local itemInfo = btnData[WAttr.ITEM]
     if itemInfo and itemInfo.id then
         GameTooltip:SetItemByID(itemInfo.id)

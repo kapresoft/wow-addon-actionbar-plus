@@ -11,29 +11,17 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
-local ADDON_NAME = ADDON_NAME
-local LibStub, M, P, LogFactory = ABP_LibGlobals:LibPack_NewLibrary()
-local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local P, LogFactory, Table = O.Profile, O.LogFactory, O.Table
 local toStringSorted = Table.toStringSorted
 
 ---@class MacroEventsHandler
-local _L = LibStub:NewLibrary(M.MacroEventsHandler)
+local _L = LibStub:NewLibrary(Core.M.MacroEventsHandler)
+local p = LogFactory(Core.M.MacroEventsHandler)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-
---[[
-    {
-        ["type"] = "macro",
-        ["index"] = 67,
-        ["name"] = "z#Moon",
-        ["icon"] = 132093,
-        ["body"] = "/moon\n",
-    }
-]]
-
-
 ---### Find first-matching macro by body
 ---@return MacroDetails
 ---@param matchingBody string The macro body to match
@@ -179,7 +167,7 @@ end
 --[[-----------------------------------------------------------------------------
 Event Hook
 -------------------------------------------------------------------------------]]
-local frame = CreateFrame("Frame", ADDON_NAME .. "Frame", UIParent)
+local frame = CreateFrame("Frame", Core.addonName .. "Frame", UIParent)
 frame:SetScript("OnEvent", OnAddonLoaded)
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 

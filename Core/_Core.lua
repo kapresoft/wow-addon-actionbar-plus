@@ -7,18 +7,16 @@ local LibStub = LibStub
 
 local _G = _G
 local pkg = 'ActionbarPlus'
-local namespace = pkg .. '_Objects'
 local shortName = 'ABP'
 local globalVarPrefix = shortName .. '_'
 local versionFormat = pkg .. '-%s-1.0'
+local Modules = ABP_Modules
 
 -- ## ----------------------------------------------------------
 -- ## LocalLibStub ---------------------------------------------
 -- ## ----------------------------------------------------------
 
----@class CoreInternalObject
 local __Internal = {}
-_G[namespace] = __Internal
 
 ---Version Format: ActionbarPlus-[LibName]-1.0, Example: LibStub('ActionbarPlus-Logger-1.0')
 ---@class LocalLibStub
@@ -27,7 +25,8 @@ local _S = {
     shortName = shortName,
     globalVarPrefix = globalVarPrefix,
     logPrefix = '|cfdffffff{{|r|cfd2db9fb' .. pkg .. '|r|cfdfbeb2d%s|r|cfdffffff}}|r',
-    versionFormat = versionFormat
+    versionFormat = versionFormat,
+    M = Modules.M,
 }
 
 --- Get a local or acelibrary
@@ -65,6 +64,10 @@ end
 function _S:NewAddon(addonName)
     return LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 end
+
+---@param major string The major version ~ AceGUI-3.0
+---@param silent boolean set to true for verbose
+function _S:LibStubAce(major, silent) return LibStub(major, silent) end
 
 function _S:GetMajorVersion(libName)
     return format(self.versionFormat, libName)
@@ -132,7 +135,8 @@ setmetatable(_S, _S.mt)
 
 ---@class Core
 local _L = {
-    namespace = namespace,
+    addonName = _S.package,
+    M = Modules.M
 }
 
 -- ## Functions ------------------------------------------------
@@ -152,16 +156,15 @@ local _L = {
 ---local MyAddon = LibPack:NewAddon('Assert')
 ---### Others
 ---local LibStub, NewLibrary = __K_Core:LibPack()
----local LibStub, NewLibrary, NewAddon = __K_Core:LibPack()
+---local LibStub, Core = __K_Core:LibPack()
+---local AceGUI = LibStub:LibStubAce('AceGUI-3.0')
 ---```
----@return LocalLibStub, NewLibrary, NewAddon
-function _L:LibPack()
-    ---@class NewLibrary
-    local function NewLibrary(libName, global) return _S.NewLibrary(_S, libName, global or false) end
-    ---@class NewAddon
-    local function NewAddon(addonName) return _S.NewAddon(_S, addonName) end
-    return _S, NewLibrary, NewAddon
-end
+---@return LocalLibStub, Core, GlobalObjects
+function _L:LibPack() return _S, self, self:O() end
+
+---local O, Core, LocalLibStub = __K_Core:LibPack_GlobalObjects()
+---@return GlobalObjects, Core, LocalLibStub
+function _L:LibPack_GlobalObjects() return self:O(), self, _S  end
 
 ---@return Mixin
 function _L:LibPack_Mixin() return _S:GetLibrary('Mixin') end
@@ -267,17 +270,17 @@ end
 ---@param o table The object
 function _L:Register(name, o)
     if not (name or o) then return end
-    local n = {
-        mt = {
-            __tostring = function() return name  end,
-            __call = function() return o  end
-        }
-    }
-    setmetatable(n, n.mt)
-    __Internal[name] = n
+    --local n = {
+    --    mt = {
+    --        __tostring = function() return name  end,
+    --        __call = function() return o  end
+    --    }
+    --}
+    --setmetatable(n, n.mt)
+    __Internal[name] = o
 end
----@see LibGlobals#O
-function _L:Get(name) return __Internal[name] end
+---@return GlobalObjects
+function _L:O() return __Internal end
 
 function _L:Init() self:InitPrettyPrint() end
 _L:Init()

@@ -1,26 +1,26 @@
--- ## External -------------------------------------------------
--- TODO: Move to API
-local GetMacroInfo, GetActionTexture = GetMacroInfo, GetActionTexture
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GetMacroInfo = GetMacroInfo
 
--- ## Local ----------------------------------------------------
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local WC = ABP_WidgetConstants
-local LibStub, M, A, P, _, W, CC = WC:LibPack()
-local MacroAttributeSetter = W:MacroAttributeSetter()
-local WAttr = CC.WidgetAttributes
-local PH = ABP_PickupHandler
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local Assert, String = O.Assert, O.String
+local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.WidgetAttributes, O.PickupHandler
+local s_replace, IsNil = String.replace, Assert.IsNil
 
--- LocalLibStub, Module, Assert, Profile, LibSharedMedia, WidgetLibFactory, CommonConstants, LibGlobals
-
-local s_replace, IsNil = String.replace, A.IsNil
-
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler
-local _L = LibStub:NewLibrary(M.MacroDragEventHandler)
+local _L = LibStub:NewLibrary(Core.M.MacroDragEventHandler)
 
--- ## Functions ------------------------------------------------
-function _L:IsMacrotext(macroInfo)
-    return macroInfo.type == 'macrotext'
-end
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+function _L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
 
 ---@param cursorInfo table Structure `{ -- }`
 function _L:Handle(btnUI, cursorInfo)
@@ -69,5 +69,5 @@ function _L:GetMacroInfo(cursorInfo)
 end
 
 function _L:HandleMacrotext(btnUI, cursorInfo)
-
+    -- TODO: Not yet needed
 end
