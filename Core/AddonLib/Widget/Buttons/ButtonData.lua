@@ -1,27 +1,12 @@
--- #ButtonData.lua
-
---[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local CreateFrame = CreateFrame
-
---[[-----------------------------------------------------------------------------
-Lua Vars
--------------------------------------------------------------------------------]]
-local format = string.format
-
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local G = __K_Core:LibPack_Globals()
-local LibStub, M, P, LogFactory = G:LibPack_NewLibrary()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local G = O.LibGlobals
+local String, P, LogFactory = O.String, O.Profile, O.LogFactory
+local MX = O.Mixin
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
-
----@type String
-local String = G(M.String)
-
 local IsBlank = String.IsBlank
-local MX = G(M.Mixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -46,8 +31,11 @@ end
 New Instance: ButtonDataMixin
 -------------------------------------------------------------------------------]]
 
----@class ButtonDataOperations
-local _L = {}
+---@class ButtonData
+local _L = {
+    profile = P
+}
+
 function _L:invalidButtonData(o, key)
     if type(o) ~= 'table' then return true end
     if type(o[key]) ~= 'nil' then
@@ -65,9 +53,13 @@ function _L:GetData()
     return profileButton
 end
 
+---@return ProfileTemplate
+function _L:GetProfileData() return self.profile:GetProfileData() end
+---@return boolean
 function _L:IsHideWhenTaxi() return self.profile:IsHideWhenTaxi() end
+---@return boolean
 function _L:ContainsValidAction() return self:GetActionName() ~= nil end
-
+---@return string
 function _L:GetActionName()
     local conf = self:GetData()
     if not self:invalidButtonData(conf, SPELL) then return conf.spell.name end
@@ -86,15 +78,12 @@ local _B = LogFactory:NewLogger('ButtonDataBuilder', {})
 local function ApplyBuilderMethods(builder)
 
     ---@param widget ButtonUIWidget
+    ---@return ButtonData
     function builder:Create(widget)
-        ---@class ButtonData : ButtonDataOperations
-        local bd = {
-            ---@type Profile
-            profile = P,
-            widget = widget
-        }
+        ---@class ButtonData_Constructor
+        local bd = {}
         MX:Mixin(bd, _L)
-
+        bd.widget = widget
         return bd
     end
 
@@ -108,9 +97,9 @@ New Instance
 -------------------------------------------------------------------------------]]
 local function NewLibrary()
     ---@class ButtonDataBuilder
-    local _L = LibStub:NewLibrary(M.ButtonDataBuilder, 1)
-    ApplyBuilderMethods(_L)
-    return _L
+    local _N = LibStub:NewLibrary(Core.M.ButtonDataBuilder)
+    ApplyBuilderMethods(_N)
+    return _N
 end
 
 NewLibrary()

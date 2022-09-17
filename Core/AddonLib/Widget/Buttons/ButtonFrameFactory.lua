@@ -24,7 +24,7 @@ local AceEvent, AceGUI = ALF:GetAceEvent(), ALF:GetAceGUI()
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class ButtonFrameFactory
+---@class ButtonFrameFactory : ButtonFrameFactory_Methods
 local _L = LibStub:NewLibrary(Core.M.ButtonFrameFactory)
 
 local p = O.LogFactory:NewLogger(Core.M.ButtonFrameFactory)
@@ -210,6 +210,14 @@ local function WidgetMethods(widget)
         self:ApplyForEachButtons(function(btnWidget)
             btnWidget:ShowKeybindText(isShowKeybindText)
             btnWidget.button:Show()
+        end)
+    end
+
+    ---@param state boolean
+    function widget:UpdateActionButtonMouseoverState(state)
+        ---@param btnWidget ButtonUIWidget
+        self:ApplyForEachButtons(function(btnWidget)
+            btnWidget:SetHighlightEnabled(state)
         end)
     end
 

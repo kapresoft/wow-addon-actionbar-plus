@@ -127,6 +127,14 @@ function L:OnAfterInitialize()
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
 end
 
+---@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+function L:ApplyForEachFrames(applyFunction)
+    local frames = P:GetAllFrameNames()
+    if #frames <= 0 then return end
+    -- `_` is the index
+    for _,f in ipairs(frames) do applyFunction(_G[f].widget) end
+end
+
 function L:UpdateKeybindText()
     local frames = P:GetAllFrameNames()
     for i,name in ipairs(frames) do

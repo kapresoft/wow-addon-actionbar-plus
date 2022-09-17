@@ -57,10 +57,13 @@ local ITEM_TEMPLATE = {
     }
 }
 
+---@class DefaultProfile
 local DEFAULT_PROFILE_DATA = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
     ["tooltip_visibility_key"] = '',
+    -- toggle action button mouseover glow
+    ["action_button_mouseover_glow"] = true,
     ["tooltip_visibility_combat_override_key"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = {

@@ -13,13 +13,11 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local M = Core.M
 local G = O.LibGlobals
-local LSM = O.AceLibFactory:GetAceSharedMedia()
+local LSM, WC, P = O.AceLibFactory:GetAceSharedMedia(), O.WidgetConstants, O.Profile
 local String, LogFactory = O.String, O.LogFactory
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 local UNIT = G:UnitIdAttributes()
-local WC = O.WidgetConstants
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
@@ -39,7 +37,7 @@ button: widget.button
 -------------------------------------------------------------------------------]]
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
-local _L = LibStub:NewLibrary(M.ButtonMixin)
+local _L = LibStub:NewLibrary(Core.M.ButtonMixin)
 G:Mixin(_L, G:LibPack_ButtonProfileMixin())
 
 --[[-----------------------------------------------------------------------------
@@ -104,6 +102,11 @@ function _L:InitTextures(icon)
     mask:SetTexture(pushedTextureMask, WC.C.CLAMPTOBLACKADDITIVE, WC.C.CLAMPTOBLACKADDITIVE)
     tex:AddMaskTexture(mask)
 end
+
+---@return ButtonUIWidget
+function _L:W() return self end
+---@return ButtonUI
+function _L:B() return self.button end
 
 ---@return ButtonUI
 function _L:_Button() return self.button end
@@ -375,11 +378,18 @@ function _L:SetHighlightInUse()
     hlt:SetDrawLayer(WC.C.ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
-function _L:SetHighlightDefault()
-    local btnUI = self:_Button()
-    btnUI:SetHighlightTexture(highlightTexture)
-    btnUI:GetHighlightTexture():SetDrawLayer(WC.C.HIGHLIGHT_DRAW_LAYER)
-    btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
+
+---@param state boolean true, to enable highlight
+function _L:SetHighlightEnabled(state)
+    local btnUI = self:B()
+    if state == true then
+        btnUI:SetHighlightTexture(highlightTexture)
+        btnUI:GetHighlightTexture():SetDrawLayer(WC.C.HIGHLIGHT_DRAW_LAYER)
+        btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+        return
+    end
+    btnUI:SetHighlightTexture(nil)
 end
 
 
