@@ -17,34 +17,25 @@ Local Vars
 --local M , G = ABP_LibGlobals:LibPack_Module()
 
 local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
-local CC = ABP_CommonConstants
 local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
-
----@type Assert
-local A
----@type Profile
-local P
----@type ButtonDataBuilder
-local ButtonDataBuilder
----@type WidgetMixin
-local WMX
----@type WidgetLibFactory
-local WU
----@type String
-local String
-
-A, P, ButtonDataBuilder, WMX, String =
-    G(M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.String)
+local O = G.O()
+local CC = O.CommonConstants()
+local A = O.Assert()
+local P = O.Profile()
+local ButtonDataBuilder = O.ButtonDataBuilder()
+local PH = O.PickupHandler()
+local String = O.String()
+local WC = O.WidgetConstants()
+local WMX = O.WidgetMixin()
 
 ---@type LoggerTemplate
 local p = LogFactory:NewLogger('ButtonUI')
 
 local IsBlank = String.IsBlank
-local PH = ABP_PickupHandler
-local E = ABP_WidgetConstants.E
+local E = WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
-local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
+local SPELL, ITEM, MACRO = WC:LibPack_SpellItemMacro()
 
 --[[-----------------------------------------------------------------------------
 New Instance

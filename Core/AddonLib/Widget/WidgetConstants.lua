@@ -1,5 +1,5 @@
 local ReloadUI = ReloadUI
-
+local Core = __K_Core
 local LibStub, M, G = ABP_LibGlobals:LibPack()
 
 ---@type AceLibFactory
@@ -85,7 +85,7 @@ _L.E = E
 
 ---@type WidgetConstants
 ABP_WidgetConstants = _L
-
+Core:Register(M.WidgetConstants, _L)
 
 StaticPopupDialogs[CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",

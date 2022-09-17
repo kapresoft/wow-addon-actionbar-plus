@@ -6,6 +6,7 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
+local Core = __K_Core
 local LibStub, M, G = ABP_LibGlobals:LibPack()
 local _, _, String = G:LibPackUtils()
 local IsNotBlank = String.IsNotBlank
@@ -24,6 +25,8 @@ local ITEM = WAttr.ITEM
 
 ---@class PickupHandler
 local _L = {}
+Core:Register(M.PickupHandler, _L)
+
 ---@type PickupHandler
 ABP_PickupHandler = _L
 

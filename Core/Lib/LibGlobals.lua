@@ -5,7 +5,7 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local format = string.format
+local format, unpack = string.format, unpack
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -23,7 +23,6 @@ local LibStub = Core:LibPack()
 -- ABP_LOG_LEVEL is also in use here
 local ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 local addonName, versionFormat, logPrefix = Core:GetAddonInfo()
-local __globalObjects
 
 ---@class Module
 local M = {
@@ -42,103 +41,100 @@ local M = {
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
     -- Addons
-    Config = 'Config',
-    Profile = 'Profile',
-    ButtonUI = 'ButtonUI',
-    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
+    BaseAttributeSetter = 'BaseAttributeSetter',
     ButtonDataBuilder = 'ButtonDataBuilder',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
+    ButtonUI = 'ButtonUI',
+    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
+    Config = 'Config',
+    ItemAttributeSetter = 'ItemAttributeSetter',
+    ItemDragEventHandler = 'ItemDragEventHandler',
+    MacroAttributeSetter = 'MacroAttributeSetter',
+    MacroDragEventHandler = 'MacroDragEventHandler',
+    MacroEventsHandler = 'MacroEventsHandler',
+    MacrotextAttributeSetter = 'MacrotextAttributeSetter',
     MacroTextureDialog = 'MacroTextureDialog',
+    PickupHandler = 'PickupHandler',
+    Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
-    BaseAttributeSetter = 'BaseAttributeSetter',
-    SpellDragEventHandler = 'SpellDragEventHandler',
     SpellAttributeSetter = 'SpellAttributeSetter',
-    ItemDragEventHandler = 'ItemDragEventHandler',
-    MacroDragEventHandler = 'MacroDragEventHandler',
-    ItemAttributeSetter = 'ItemAttributeSetter',
+    SpellDragEventHandler = 'SpellDragEventHandler',
+    WidgetConstants = 'WidgetConstants',
     WidgetLibFactory = 'WidgetLibFactory',
-    MacroAttributeSetter = 'MacroAttributeSetter',
-    MacrotextAttributeSetter = 'MacrotextAttributeSetter',
-    MacroEventsHandler = 'MacroEventsHandler',
     WidgetMixin = 'WidgetMixin',
 }
 
 ---@class GlobalObjects
 local GlobalObjectsTemplate = {
-    ---@type Profile
-    Profile = {},
-    ---@type WidgetMixin
-    WidgetMixin = {},
-    ---@type Logger
-    Logger = {},
-    ---@type Table
-    Table = {},
-    ---@type String
-    String = {},
-    ---@type Assert
-    Assert = {},
-    ---@type LogFactory
-    LogFactory = {},
     ---@type AceLibFactory
     AceLibFactory = {},
-    ---@type CommonConstants
-    CommonConstants = {},
-    ---@type Mixin
-    Mixin = {},
-    ---@type Config
-    Config = {},
-    ---@type Profile
-    Profile = {},
-    ---@type ButtonMixin
-    ButtonMixin = {},
-    ---@type ButtonProfileMixin
-    ButtonProfileMixin = {},
-    ---@type ButtonUIWidgetBuilder
-    ButtonUIWidgetBuilder = {},
+    ---@type Assert
+    Assert = {},
+    ---@type BaseAttributeSetter
+    BaseAttributeSetter = {},
     ---@type ButtonDataBuilder
     ButtonDataBuilder = {},
     ---@type ButtonFactory
     ButtonFactory = {},
     ---@type ButtonFrameFactory
     ButtonFrameFactory = {},
+    ---@type ButtonMixin
+    ButtonMixin = {},
+    ---@type ButtonProfileMixin
+    ButtonProfileMixin = {},
+    ---@type ButtonUI
+    ButtonUI = {},
+    ---@type ButtonUIWidgetBuilder
+    ButtonUIWidgetBuilder = {},
+    ---@type CommonConstants
+    CommonConstants = {},
+    ---@type Config
+    Config = {},
+    ---@type ItemAttributeSetter
+    ItemAttributeSetter = {},
+    ---@type ItemDragEventHandler
+    ItemDragEventHandler = {},
+    ---@type LogFactory
+    LogFactory = {},
+    ---@type Logger
+    Logger = {},
+    ---@type MacroAttributeSetter
+    MacroAttributeSetter = {},
+    ---@type MacroDragEventHandler
+    MacroDragEventHandler = {},
+    ---@type MacroEventsHandler
+    MacroEventsHandler = {},
     ---@type MacroTextureDialog
     MacroTextureDialog = {},
+    ---@type MacrotextAttributeSetter
+    MacrotextAttributeSetter = {},
+    ---@type Mixin
+    Mixin = {},
+    ---@type PickupHandler
+    PickupHandler = {},
+    ---@type Profile
+    Profile = {},
     ---@type ProfileInitializer
     ProfileInitializer = {},
     ---@type ReceiveDragEventHandler
     ReceiveDragEventHandler = {},
-    ---@type BaseAttributeSetter
-    BaseAttributeSetter = {},
-    ---@type SpellDragEventHandler
-    SpellDragEventHandler = {},
     ---@type SpellAttributeSetter
     SpellAttributeSetter = {},
-    ---@type ItemDragEventHandler
-    ItemDragEventHandler = {},
-    ---@type MacroDragEventHandler
-    MacroDragEventHandler = {},
-    ---@type ItemAttributeSetter
-    ItemAttributeSetter = {},
+    ---@type SpellDragEventHandler
+    SpellDragEventHandler = {},
+    ---@type String
+    String = {},
+    ---@type Table
+    Table = {},
+    ---@type WidgetConstants
+    WidgetConstants = {},
     ---@type WidgetLibFactory
     WidgetLibFactory = {},
-    ---@type MacroAttributeSetter
-    MacroAttributeSetter = {},
-    ---@type MacrotextAttributeSetter
-    MacrotextAttributeSetter = {},
-    ---@type MacroEventsHandler
-    MacroEventsHandler = {},
     ---@type WidgetMixin
     WidgetMixin = {},
 }
-local function _pack(...) return { len = select("#", ...), ... } end
----@return GlobalObjects
-local function CreateGlobalObjects()
-    local o = {}
-    for k,v in pairs(M) do o[k] = Core:Get(v) end
-    return o
-end
 
 ---TODO: Add all constants here
 ---@class GlobalConstants
@@ -175,7 +171,6 @@ local _L = {
     versionFormat = versionFormat,
     logPrefix = logPrefix,
     C = C,
-    O = CreateGlobalObjects,
     M = M,
     ---@deprecated Use 'M'
     Module = M,
@@ -192,6 +187,34 @@ setmetatable(_L, _L.mt)
 
 ---@type LibGlobals
 ABP_LibGlobals = _L
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+local function _pack(...) return { len = select("#", ...), ... } end
+-----@xreturn GlobalObjects
+--local function XCreateGlobalObjects()
+--    local o = {}
+--    for k,v in pairs(M) do o[k] = Core:Get(v) end
+--    return o
+--end
+
+---@return GlobalObjects
+local function CreateGlobalObjects(...)
+    local a = {...}
+    local o = {}
+    if #a <= 0 then
+        for k,v in pairs(M) do o[k] = Core:Get(v) end
+    else
+        for k,v in pairs(a) do o[v] = Core:Get(v) end
+    end
+    return o
+end
+_L.O = CreateGlobalObjects
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 
 ---local LibStub, M, G = ABP_LibGlobals:LibPack()
 ---@return LocalLibStub, Module, LibGlobals
@@ -362,5 +385,3 @@ function _L:GetAddonInfo()
     return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
                 GetAddOnMetadata(addonName, 'X-Github-Repo')
 end
-
---print('Init: LibGlobals:', ABP_LibGlobals.O.Mixin)
