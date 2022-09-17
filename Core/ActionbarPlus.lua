@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local ConfigureFrameToCloseOnEscapeKey = ConfigureFrameToCloseOnEscapeKey
+local ConfigureFrameToCloseOnEscapeKey, CreateFromMixins = ConfigureFrameToCloseOnEscapeKey, CreateFromMixins
 local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
 local UIParent, CreateFrame = UIParent, CreateFrame
 --[[-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
 local isEmpty = Table.isEmpty
 local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
 local TextureDialog = W:GetMacroTextureDialog()
-local WU = ABP_WidgetUtil
+local WU = G:Lib_WidgetMixin()
 
 -- ## Addon ----------------------------------------------------
 -----class ActionbarPlus
@@ -92,7 +92,7 @@ local function OnAddonLoaded(frame, event, ...)
 
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
     if UnitOnTaxi('player') == true then
-        local hideWhenTaxi = P:IsHideWhenTaxi()
+        local hideWhenTaxi = WU:IsHideWhenTaxi()
         addon:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
         WU:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
     end

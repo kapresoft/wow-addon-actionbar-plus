@@ -33,10 +33,8 @@ local WU
 ---@type String
 local String
 
-A, P, ButtonDataBuilder, WMX, WU,
-String = G(
-        M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.WidgetUtil,
-        M.String)
+A, P, ButtonDataBuilder, WMX, String =
+    G(M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.String)
 
 ---@type LoggerTemplate
 local p = LogFactory:NewLogger('ButtonUI')
@@ -84,9 +82,9 @@ local function RegisterForClicks(widget, event, down)
     if E.ON_LEAVE == event then
         widget.button:RegisterForClicks('AnyDown')
     elseif E.ON_ENTER == event then
-        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     end
 end
 
@@ -105,7 +103,7 @@ local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
 
-    if InCombatLockdown() or not WU:IsDragKeyDown() then return end
+    if InCombatLockdown() or not WMX:IsDragKeyDown() then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
@@ -200,7 +198,7 @@ end
 
 local function OnClick_SecureHookScript(btn, mouseButton, down)
     --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
-    btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
 end
@@ -225,7 +223,7 @@ end
 ---@param event string Event string
 local function OnUpdateButtonUsable(widget, event)
     if not widget.button:IsShown() then return end
-    WU:UpdateUsable(widget)
+    widget:UpdateUsable()
 end
 
 ---@param widget ButtonUIWidget
@@ -268,7 +266,7 @@ end
 ---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WU:SetEnabledActionBarStatesDelayed(false, 1)
+    WMX:SetEnabledActionBarStatesDelayed(false, 1)
 end
 
 ---@param widget ButtonUIWidget
@@ -276,7 +274,7 @@ end
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WU:SetEnabledActionBarStatesDelayed(true, 2)
+    WMX:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
 ---@param widget ButtonUIWidget
@@ -456,6 +454,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         placement = { rowNum = rowNum, colNum = colNum },
     }
     AceEvent:Embed(widget)
+    function widget:GetName() return self.button:GetName() end
 
     ---@type ButtonData
     local buttonData = ButtonDataBuilder:Create(widget)

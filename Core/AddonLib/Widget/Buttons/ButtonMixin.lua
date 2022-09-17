@@ -4,24 +4,42 @@ Blizzard Vars
 local GetMacroSpell, GetMacroItem, GetItemInfoInstant =
     GetMacroSpell, GetMacroItem, GetItemInfoInstant
 local C_Timer = C_Timer
+local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
-local LSM = ABP_WidgetConstants:LibPack_AceLibFactory():GetAceSharedMedia()
-local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
-local TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT = TOPLEFT, BOTTOMLEFT, ANCHOR_TOPLEFT
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, M, G = ABP_LibGlobals:LibPack()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local LSM = ABP_WidgetConstants:LibPack_AceLibFactory():GetAceSharedMedia()
 local _, Table, String, LogFactory = G:LibPackUtils()
-local p = LogFactory:NewLogger('ButtonMixin')
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 local UNIT = G:UnitIdAttributes()
+
+local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
+local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
+
+local highlightTexture = TEXTURE_HIGHLIGHT2
+local pushedTextureMask = TEXTURE_HIGHLIGHT2
+local highlightTextureAlpha = 0.2
+local highlightTextureInUseAlpha = 0.5
+local pushedTextureInUseAlpha = 0.5
+
+local p = LogFactory:NewLogger('ButtonMixin')
+
+--[[-----------------------------------------------------------------------------
+New Instance
+self: widget
+button: widget.button
+-------------------------------------------------------------------------------]]
+---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
+---@see ButtonUIWidget
+local _L = LibStub:NewLibrary(M.ButtonMixin)
+G:Mixin(_L, G:LibPack_ButtonProfileMixin())
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -51,19 +69,39 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button.keybindText.widget:ScaleWithButtonSize(buttonSize)
 end
 
---[[-----------------------------------------------------------------------------
-New Instance
-self: widget
-button: widget.button
--------------------------------------------------------------------------------]]
----@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
----@see ButtonUIWidget
-local _L = LibStub:NewLibrary(M.ButtonMixin)
-G:Mixin(_L, G:LibPack_ButtonProfileMixin())
-
 function _L:Init()
     SetButtonLayout(self, self.placement.rowNum, self.placement.colNum)
-    WU:InitTextures(self, noIconTexture)
+    self:InitTextures(noIconTexture)
+end
+
+--[[-----------------------------------------------------------------------------
+Instance Methods
+-------------------------------------------------------------------------------]]
+
+--- - Call this function once only; otherwise *CRASH* if called N times
+--- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
+--- - [Texture:SetTexture()](https://wowpedia.fandom.com/wiki/API_Texture_SetTexture)
+--- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
+---@param btnWidget ButtonUIWidget
+function _L:InitTextures(icon)
+    local btnWidget = self
+    local btnUI = self:_Button()
+
+    -- DrawLayer is 'ARTWORK' by default for icons
+    btnUI:SetNormalTexture(icon)
+    btnUI:GetNormalTexture():SetAlpha(1.0)
+    btnUI:GetNormalTexture():SetBlendMode('DISABLE')
+
+    self:SetHighlightDefault(btnUI)
+
+    btnUI:SetPushedTexture(icon)
+    local tex = btnUI:GetPushedTexture()
+    tex:SetAlpha(pushedTextureInUseAlpha)
+    local mask = btnUI:CreateMaskTexture()
+    mask:SetPoint(TOPLEFT, tex, TOPLEFT, 3, -3)
+    mask:SetPoint(BOTTOMRIGHT, tex, BOTTOMRIGHT, -3, 3)
+    mask:SetTexture(pushedTextureMask, CLAMPTOBLACKADDITIVE, CLAMPTOBLACKADDITIVE)
+    tex:AddMaskTexture(mask)
 end
 
 ---@return ButtonUI
@@ -71,7 +109,6 @@ function _L:_Button() return self.button end
 ---@return ButtonUIWidget
 function _L:_Widget() return self end
 
-function _L:GetName() return self:_Button():GetName() end
 function _L:GetIndex() return self.index end
 function _L:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
 function _L:IsParentFrameShown() return self.dragFrame:IsShown() end
@@ -263,12 +300,31 @@ function _L:UpdateItemState()
     local itemInfo = _API:GetItemInfo(itemID)
     if itemInfo == nil then return end
     local stackCount = itemInfo.stackCount or 1
-    btnData.item.count = itemInfo.count
+    local count = itemInfo.count
+    btnData.item.count = count
     btnData.item.stackCount = stackCount
     if stackCount > 1 then self:SetText(btnData.item.count) end
+    if count <= 0 then self:SetSpellUsable(false)
+    else self:SetSpellUsable(true) end
 end
 
-function _L:UpdateUsable() WU:UpdateUsable(self) end
+function _L:UpdateUsable()
+    local cd = self:GetCooldownInfo()
+    if (cd == nil or cd.details == nil or cd.details.spell == nil) then
+        return true
+    end
+
+    local c = self:GetConfig()
+    local isUsableSpell = true
+    if c.type == SPELL then
+        isUsableSpell = self:IsUsableSpell(cd)
+    elseif c.type == MACRO then
+        -- TODO:
+        isUsableSpell = self:IsUsableMacro(cd)
+    end
+    -- TODO:
+    self:SetSpellUsable(isUsableSpell)
+end
 
 function _L:UpdateState()
     self:UpdateCooldown()
@@ -305,32 +361,71 @@ function _L:GetActionbarInfo()
     return info
 end
 
-function _L:ClearHighlight() self.button:SetHighlightTexture(nil) end
-function _L:ResetHighlight() WU:ResetHighlight(self) end
-function _L:SetTextureAsEmpty() self:SetIcon(noIconTexture) end
-function _L:SetIcon(icon) WU:SetIcon(self, icon) end
-function _L:SetCooldownTextures(icon) WU:SetCooldownTextures(self, icon) end
-function _L:SetHighlightInUse() WU:SetHighlightInUse(self.button) end
-function _L:SetHighlightDefault() WU:SetHighlightDefault(self.button) end
+function _L:ClearHighlight() self:_Button():SetHighlightTexture(nil) end
+function _L:ResetHighlight() self:SetHighlightDefault() end
+function _L:SetTextureAsEmpty() self:_Widget():SetIcon(noIconTexture) end
+function _L:SetCooldownTextures(icon)
+    local btnUI = self:_Button()
+    btnUI:SetNormalTexture(icon)
+    btnUI:SetPushedTexture(icon)
+end
+function _L:SetHighlightInUse()
+    local hlt = self:_Button():GetHighlightTexture()
+    hlt:SetDrawLayer(ARTWORK_DRAW_LAYER)
+    hlt:SetAlpha(highlightTextureInUseAlpha)
+end
+function _L:SetHighlightDefault()
+    local btnUI = self:_Button()
+    btnUI:SetHighlightTexture(highlightTexture)
+    btnUI:GetHighlightTexture():SetDrawLayer(HIGHLIGHT_DRAW_LAYER)
+    btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+end
+
 
 ---@param spellID string The spellID to match
 ---@param optionalProfileButton ProfileButton
 ---@return boolean
 function _L:IsMatchingItemSpellID(spellID, optionalProfileButton)
-    return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
+    --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
+    --local profileButton = btnWidget:GetConfig()
+    if not self:IsValidItemProfile(optionalProfileButton) then return end
+    local _, btnItemSpellId = _API:GetItemSpellInfo(optionalProfileButton.item.id)
+    if spellID == btnItemSpellId then return true end
+    return false
 end
+
 ---@param spellID string The spellID to match
 ---@param optionalProfileButton ProfileButton
 ---@return boolean
 function _L:IsMatchingSpellID(spellID, optionalProfileButton)
-    return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
+    --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
+    local buttonData = optionalProfileButton or self:GetConfig()
+    if not self:IsValidSpellProfile(buttonData) then return end
+    if spellID == buttonData.spell.id then return true end
+    return false
 end
----@param spellID string The spellID to match
+
+---@param widget ButtonUIWidget
+---@param spellName string The spell name
+---@param buttonData ProfileButton
+function _L:IsMatchingSpellName(spellName, buttonData)
+    local s = buttonData or self:GetConfig()
+    if not (s.spell and s.spell.name) then return false end
+    if not (s and spellName == s.spell.name) then return false end
+    return true
+end
+
+---@param spellID string
 ---@param optionalProfileButton ProfileButton
----@return boolean
 function _L:IsMatchingMacroSpellID(spellID, optionalProfileButton)
-    return WU:IsMatchingMacroSpellID(spellID, optionalProfileButton or self:GetConfig())
+    optionalProfileButton = optionalProfileButton or self:GetConfig()
+    if not self:IsValidMacroProfile(optionalProfileButton) then return end
+    local macroSpellId =  GetMacroSpell(optionalProfileButton.macro.index)
+    if not macroSpellId then return false end
+    if spellID == macroSpellId then return true end
+    return false
 end
+
 ---@param spellID string The spellID to match
 ---@return boolean
 function _L:IsMatchingMacroOrSpell(spellID)
@@ -411,3 +506,53 @@ function _L:UpdateRangeIndicator()
     self:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
 end
 
+function _L:SetSpellUsable(isUsable)
+    local normalTexture = self:_Button():GetNormalTexture()
+    if not normalTexture then return end
+    -- energy based spells do not use 'notEnoughMana'
+    if not isUsable then
+        normalTexture:SetVertexColor(0.3, 0.3, 0.3)
+    else
+        normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+    end
+end
+
+---@param cd CooldownInfo
+function _L:IsUsableSpell(cd)
+    local spellID = cd.details.spell.id
+    -- why true by default?
+    if IsBlank(spellID) then return true end
+    return IsUsableSpell(spellID)
+end
+
+---@param cd CooldownInfo
+function _L:IsUsableMacro(cd)
+    local spellID = cd.details.spell.id
+    if IsBlank(spellID) then return true end
+    return IsUsableSpell(spellID)
+end
+
+---@param icon string Blizzard Icon
+function _L:SetIcon(icon)
+    self:_Button():SetNormalTexture(icon)
+    self:_Button():SetPushedTexture(icon)
+end
+
+---@param buttonData ProfileButton
+function _L:IsValidItemProfile(buttonData)
+    return not (buttonData == nil or buttonData.item == nil
+            or IsBlank(buttonData.item.id))
+end
+
+---@param buttonData ProfileButton
+function _L:IsValidSpellProfile(buttonData)
+    return not (buttonData == nil or buttonData.spell == nil
+            or IsBlank(buttonData.spell.id))
+end
+
+---@param buttonData ProfileButton
+function _L:IsValidMacroProfile(buttonData)
+    return not (buttonData == nil or buttonData.macro == nil
+            or IsBlank(buttonData.macro.index)
+            or IsBlank(buttonData.macro.name))
+end

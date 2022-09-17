@@ -1,5 +1,5 @@
-local LibStub, M = ABP_WidgetConstants:LibPack()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local LibStub, M, G = ABP_LibGlobals:LibPack()
+local WMX = G:Lib_WidgetMixin()
 local InCombatLockdown = InCombatLockdown
 
 ---@class BaseAttributeSetter @parent class
@@ -18,6 +18,9 @@ function _L:HandleGameTooltipCallbacks(btnUI)
         self:ShowTooltip(w.button)
     end)
 
-    btnUI.widget:SetCallback("OnLeave", function(w, event) WU:HideTooltipDelayed() end)
+    ---@param w ButtonUIWidget
+    btnUI.widget:SetCallback("OnLeave", function(w, event)
+        WMX:HideTooltipDelayed()
+    end)
 
 end

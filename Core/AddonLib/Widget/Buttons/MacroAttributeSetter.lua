@@ -9,7 +9,6 @@ local PrettyPrint, Table, String, L = ABP_LibGlobals:LibPackUtils()
 local sformat = string.format
 
 local BATTR, WAttr = W:LibPack_WidgetAttributes()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 
 local TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'

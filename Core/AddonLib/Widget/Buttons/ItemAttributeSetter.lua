@@ -7,7 +7,6 @@ local GameTooltip = GameTooltip
 local LibStub, M, Assert, _, _, W = ABP_WidgetConstants:LibPack()
 local _, _, String, _ = ABP_LibGlobals:LibPackUtils()
 local _, WAttr = W:LibPack_WidgetAttributes()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 
 local _, TEXTURE_EMPTY, ANCHOR_TOPLEFT = TEXTURE_HIGHLIGHT, TEXTURE_EMPTY, ANCHOR_TOPLEFT
 local AssertNotNil, _ = Assert.AssertNotNil, String.IsNotBlank

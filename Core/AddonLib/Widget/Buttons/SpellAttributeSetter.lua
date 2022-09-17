@@ -12,7 +12,6 @@ local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
 local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
 local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
 local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
 local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
 
 local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()

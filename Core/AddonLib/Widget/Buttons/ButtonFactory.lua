@@ -2,15 +2,14 @@
 --- Button Factory
 ---
 -- ## External -------------------------------------------------
-local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local format, strlower = string.format, string.lower
 
 -- ## Local ----------------------------------------------------
 local LibStub, M, A, P, _, W = ABP_WidgetConstants:LibPack()
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
+local G = ABP_LibGlobals
+local _, _, String = G:LibPackUtils()
 
 local ButtonFrameFactory, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
 local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
@@ -18,13 +17,11 @@ local ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
 
 ---@type ButtonUILib
 local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
-local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local WMX = G:Lib_WidgetMixin()
 
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(M.ButtonFactory)
 if not L then return end
-
 
 local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['macrotext'] = MTAS, }
 
@@ -39,16 +36,16 @@ Support Functions
 local function InitButtonGameTooltipHooks()
     ---For macros not using spells
     GameTooltip:HookScript("OnShow", function(tooltip, ...)
-        if not WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip, ...)
-        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
-        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
 end
 

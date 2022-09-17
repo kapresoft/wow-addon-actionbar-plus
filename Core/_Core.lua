@@ -7,6 +7,7 @@ local LibStub = LibStub
 
 local _G = _G
 local pkg = 'ActionbarPlus'
+local namespace = pkg .. '_Objects'
 local shortName = 'ABP'
 local globalVarPrefix = shortName .. '_'
 local versionFormat = pkg .. '-%s-1.0'
@@ -14,6 +15,10 @@ local versionFormat = pkg .. '-%s-1.0'
 -- ## ----------------------------------------------------------
 -- ## LocalLibStub ---------------------------------------------
 -- ## ----------------------------------------------------------
+
+---@class CoreInternalObject
+local __Internal = {}
+_G[namespace] = __Internal
 
 ---Version Format: ActionbarPlus-[LibName]-1.0, Example: LibStub('ActionbarPlus-Logger-1.0')
 ---@class LocalLibStub
@@ -40,7 +45,7 @@ function _S:GetLibrary(libName, isAceLib)
     return LibStub(_S:GetLibVersionUnpacked(libName))
 end
 
-function _S:NewLibrary(libName, global)
+function _S:NewLibrary(libName)
     local major, minor = _S:GetLibVersionUnpacked(libName)
     local obj = LibStub:NewLibrary(major, minor)
     if type(obj.mt) ~= 'table' then obj.mt = {} end
@@ -48,10 +53,12 @@ function _S:NewLibrary(libName, global)
     setmetatable(obj, obj.mt)
 
     _S:Embed(obj, libName, major, minor)
-    if true == global then
-        obj:log('Setting global var: %s', __K_Core:GetGlobalVarName(libName))
-        __K_Core:SetGlobal(libName, obj)
-    end
+    --if true == global then
+    --    obj:log('Setting global var: %s', __K_Core:GetGlobalVarName(libName))
+    --    __K_Core:SetGlobal(libName, obj)
+    --end
+    __K_Core:Register(libName, obj)
+    --print('Registered:', libName)
     return obj
 end
 
@@ -124,7 +131,9 @@ setmetatable(_S, _S.mt)
 -- ## ----------------------------------------------------------
 
 ---@class Core
-local _L = {}
+local _L = {
+    namespace = namespace,
+}
 
 -- ## Functions ------------------------------------------------
 
@@ -249,6 +258,26 @@ function _L:InitPrettyPrint()
 
     self:SetGlobal('PrettyPrint', pformat)
 end
+
+--function _L:GetNamespaceObject()
+--    return self
+--end
+
+---@param name string The module name
+---@param o table The object
+function _L:Register(name, o)
+    if not (name or o) then return end
+    local n = {
+        mt = {
+            __tostring = function() return name  end,
+            __call = function() return o  end
+        }
+    }
+    setmetatable(n, n.mt)
+    __Internal[name] = n
+end
+---@see LibGlobals#O
+function _L:Get(name) return __Internal[name] end
 
 function _L:Init() self:InitPrettyPrint() end
 _L:Init()

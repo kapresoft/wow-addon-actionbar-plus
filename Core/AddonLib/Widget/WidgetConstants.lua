@@ -15,6 +15,8 @@ ADDON_NAME = 'ActionbarPlus'
 SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate'
 TOPLEFT = 'TOPLEFT'
 BOTTOMLEFT = 'BOTTOMLEFT'
+BOTTOMRIGHT = 'BOTTOMRIGHT'
+CLAMPTOBLACKADDITIVE = 'CLAMPTOBLACKADDITIVE'
 ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT'
 CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
 TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background")
@@ -23,6 +25,11 @@ TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\WHITE8X8]]
 TEXTURE_HIGHLIGHT3 = [[Interface\Buttons\ButtonHilight-Square]]
 TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]]
 TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock")
+
+--ALT = 'ALT'
+--CTRL = 'CTRL'
+--SHIFT = 'SHIFT'
+--PICKUPACTION = 'PICKUPACTION'
 
 ---@class WidgetConstantsConstants
 local C = {
