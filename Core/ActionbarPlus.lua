@@ -1,36 +1,38 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local ConfigureFrameToCloseOnEscapeKey = ConfigureFrameToCloseOnEscapeKey
 local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
 local UIParent, CreateFrame = UIParent, CreateFrame
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local unpack, format = unpack, string.format
+local unpack, sformat = unpack, string.format
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 -- Bump this version for every release tag
 --
-local LibStub, M, AceLibFactory, W, ProfileInitializer, G = ABP_LibGlobals:LibPack_NewAddon()
-local ADDON_NAME = G.addonName
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local AceLibFactory, W = O.AceLibFactory, O.WidgetLibFactory
+local G = O.LibGlobals
+
+local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
 
-local PrettyPrint, Table, String, LogFactory = G:LibPackUtils()
-local isEmpty = Table.isEmpty
+local Table, LogFactory, TextureDialog = O.Table, O.LogFactory, O.MacroTextureDialog
+local isEmpty, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
 local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
-local TextureDialog = W:GetMacroTextureDialog()
-local WU = ABP_WidgetUtil
+local WMX = O.WidgetMixin
 
 -- ## Addon ----------------------------------------------------
 -----class ActionbarPlus
 --local A = LibStub:NewAddon(G.addonName)
 --if not A then return end
 --LogFactory:EmbedLogger(A)
-local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = ABP_LibGlobals:LibPack_AceAddonLibs()
-local C, P, BF = W:LibPack_AddonLibs()
+local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = AceLibFactory:GetAceDB(), AceLibFactory:GetAceDBOptions(),
+        AceLibFactory:GetAceConfig(), AceLibFactory:GetAceConfigDialog()
+local C, P, BF = O.Config, O.Profile, O.ButtonFactory
 local libModules = { C, P, BF }
 local debugDialog
 
@@ -76,7 +78,7 @@ Support functions
 
 
 local function OnUpdateBindings(addon)
-    addon.barBindings = WU:GetBarBindingsMap()
+    addon.barBindings = WMX:GetBarBindingsMap()
     if addon.barBindings then BF:UpdateKeybindText() end
 end
 
@@ -92,9 +94,9 @@ local function OnAddonLoaded(frame, event, ...)
 
     addon:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
     if UnitOnTaxi('player') == true then
-        local hideWhenTaxi = P:IsHideWhenTaxi()
+        local hideWhenTaxi = WMX:IsHideWhenTaxi()
         addon:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
-        WU:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
+        WMX:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
     end
     if not isLogin then return end
 
@@ -121,7 +123,7 @@ local methods = {
         local AceGUI = AceLibFactory:GetAceGUI()
         local frame = AceGUI:Create("Frame")
         -- The following makes the "Escape" close the window
-        ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, frame)
+        WMX:ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, frame)
         frame:SetTitle("Debug Frame")
         frame:SetStatusText('')
         frame:SetCallback("OnClose", function(widget)
@@ -154,8 +156,8 @@ local methods = {
     end,
     ['ShowTextureDialog'] = function(self) TextureDialog:Show() end,
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
-        --self:log('vars: ', spaceSeparatedArgs)
-        local vars = table.parseSpaceSeparatedVar(spaceSeparatedArgs)
+        --TODO: NEXT: Move to DevTools addon
+        local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
         if isEmpty(vars) then return end
         local firstVar = vars[1]
 
@@ -165,19 +167,17 @@ local methods = {
         end
 
         local firstObj = _G[firstVar]
-        PrettyPrint._ShowAll()
-        local strVal = pformat(firstObj)
+        local strVal = pformat:A():pformat(firstObj)
         debugDialog:SetTextContent(strVal)
-        debugDialog:SetStatusText(format('Var: %s type: %s', firstVar, type(firstObj)))
+        debugDialog:SetStatusText(sformat('Var: %s type: %s', firstVar, type(firstObj)))
         debugDialog:Show()
     end,
     ['HandleSlashCommand_ShowProfile'] = function(self)
-        PrettyPrint._ShowAll()
         local profileData = self:GetCurrentProfileData()
-        local strVal = pformat(profileData)
+        local strVal = pformat:A():pformat(profileData)
         local profileName = self.db:GetCurrentProfile()
         debugDialog:SetTextContent(strVal)
-        debugDialog:SetStatusText(format('Current Profile Data for [%s]', profileName))
+        debugDialog:SetStatusText(sformat('Current Profile Data for [%s]', profileName))
         debugDialog:Show()
     end,
     ['ShowDebugDialog'] = function(self, obj, optionalLabel)
@@ -198,7 +198,7 @@ local methods = {
             ReloadUI()
             return
         end
-        ShowReloadUIConfirmation()
+        WMX:ShowReloadUIConfirmation()
     end,
     ['OpenConfig'] = function(self, sourceFrameWidget)
         --select the frame config tab if possible
@@ -245,9 +245,9 @@ local methods = {
         self:InitDbDefaults()
 
         debugDialog = self:CreateDebugPopupDialog()
-        ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, debugDialog.frame)
+        WMX:ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, debugDialog.frame)
 
-        self.barBindings = WU:GetBarBindingsMap()
+        self.barBindings = WMX:GetBarBindingsMap()
         self:OnInitializeModules()
 
         local options = C:GetOptions()
@@ -270,7 +270,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 local function NewInstance()
     ---@type WidgetConstants
-    local WC = ABP_WidgetConstants
+    local WC = O.WidgetConstants
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetScript("OnEvent", OnAddonLoaded)
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")

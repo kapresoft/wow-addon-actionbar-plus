@@ -1,13 +1,27 @@
 if type(ABP_PLUS_DB) ~= "table" then ABP_PLUS_DB = {} end
 if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
+
+--[[-----------------------------------------------------------------------------
+Global Vars
+-------------------------------------------------------------------------------]]
 ABP_PREFIX = '|cfdffffff{{|r|cfd2db9fbActionBarPlus|r|cfdfbeb2d%s|r|cfdffffff}}|r'
 ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 VERSION_FORMAT = 'ActionbarPlus-%s-1.0'
+
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local format = string.format
 
-local _, NewLibrary = __K_Core:LibPack()
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local LibStub, Core, O = __K_Core:LibPack()
 
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class CommonConstantsBase
 local _L = {
     GetLogLevel = function()
@@ -19,17 +33,20 @@ local _L = {
     end
 }
 ---@class CommonConstants : CommonConstantsBase
-_L = NewLibrary('CommonConstants')
+_L = LibStub:NewLibrary(Core.M.CommonConstants)
 
 ---@deprecated
 ---@type CommonConstants
+--TODO: NEXT: Deprecate ABP_CommonConstants
 ABP_CommonConstants = _L
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 ---@class UnitAttributes
 _L.UnitAttributes = {
     FOCUS = 'focus'
 }
-
 
 ---@class WidgetAttributes
 local WidgetAttributes = {

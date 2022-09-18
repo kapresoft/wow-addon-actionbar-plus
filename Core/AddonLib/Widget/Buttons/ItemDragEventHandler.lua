@@ -5,16 +5,19 @@ local _, Table = ABP_LibGlobals:LibPackUtils()
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, Assert, P, LSM, W, CC = ABP_WidgetConstants:LibPack()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local P, Assert, PH = O.Profile, O.Assert, O.PickupHandler
+local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.CommonConstants.WidgetAttributes
+local IsNil = Assert.IsNil
 
-local AssertNotNil, IsNil = Assert.AssertNotNil, Assert.IsNil
-local ItemAttributeSetter = W:ItemAttributeSetter()
-local WAttr = CC.WidgetAttributes
-local PH = ABP_PickupHandler
+--TODO: NEXT: Add _API to GlobalObjects
 local _API = _API
 
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class ItemDragEventHandler
-local _L = LibStub:NewLibrary(M.ItemDragEventHandler, 1)
+local _L = LibStub:NewLibrary(Core.M.ItemDragEventHandler)
 
 -- ## Functions ------------------------------------------------
 --- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`

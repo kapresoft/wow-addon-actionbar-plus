@@ -28,6 +28,12 @@ Methods
 -------------------------------------------------------------------------------]]
 
 ---@return Profile
+function _L:P() return self.profile end
+---@return ButtonUI
+function _L:B() return self.button end
+---@return ButtonUIWidget
+function _L:W() return self end
+---@return Profile
 function _L:_Profile() return self.profile end
 ---@return ButtonUI
 function _L:_Button() return self.button end
@@ -43,10 +49,11 @@ function _L:invalidButtonData(o, key)
     return true
 end
 
-
 ---#### Get Profile Button Config Data
 ---@return ProfileButton
-function _L:GetConfig() return self.buttonData:GetData() end
+function _L:GetConfig() return self:W().buttonData:GetData() end
+---@return ProfileTemplate
+function _L:GetProfileData() return self:W().buttonData:GetProfileData() end
 
 ---@param type string One of: spell, item, or macro
 function _L:GetConfigActionbarData(type)

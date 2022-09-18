@@ -1,30 +1,30 @@
----
---- Button Factory
----
--- ## External -------------------------------------------------
-local ClearCursor, GetCursorInfo = ClearCursor, GetCursorInfo
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local format, strlower = string.format, string.lower
 
--- ## Local ----------------------------------------------------
-local LibStub, M, A, P, _, W = ABP_WidgetConstants:LibPack()
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
-
-local ButtonFrameFactory, H, SAS, IAS, MAS, MTAS = W:LibPack_ButtonFactory()
-local AssertThatMethodArgIsNotNil, AssertNotNil = A.AssertThatMethodArgIsNotNil, A.AssertNotNil
-local ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI = ANCHOR_TOPLEFT, CONFIRM_RELOAD_UI
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local String, A, P = O.String, O.Assert, O.Profile
+local ButtonFrameFactory, SAS, IAS, MAS, MTAS = O.ButtonFrameFactory, O.SpellAttributeSetter, O.ItemAttributeSetter,
+        O.MacroAttributeSetter, O.MacrotextAttributeSetter
+local WC = O.WidgetConstants
+local AssertNotNil = A.AssertNotNil
 
 ---@type ButtonUILib
-local ButtonUI = ABP_WidgetConstants:LibPack_ButtonUI()
-local AceEvent = ABP_LibGlobals:LibPack_AceLibrary()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
+local ButtonUI = O.ButtonUI
+local WMX = O.WidgetMixin
 
 ---@class ButtonFactory
-local L = LibStub:NewLibrary(M.ButtonFactory)
-if not L then return end
-
+local L = LibStub:NewLibrary(Core.M.ButtonFactory)
 
 local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['macrotext'] = MTAS, }
 
@@ -39,22 +39,22 @@ Support Functions
 local function InitButtonGameTooltipHooks()
     ---For macros not using spells
     GameTooltip:HookScript("OnShow", function(tooltip, ...)
-        if not WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip, ...)
-        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
     GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
-        if WU:IsTypeMacro(tooltip:GetOwner()) then return end
-        WU:SetupTooltipKeybindingInfo(tooltip)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
 end
 
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
-    GameTooltip:SetOwner(frame, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(frame, WC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget:GetFrameIndex(), 1, 1, 1))
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -84,7 +84,7 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     elseif strlower(mouseButton) == 'rightbutton' then
         L.addon:OpenConfig(frameHandle.widget)
     elseif strlower(mouseButton) == 'button5' then
-        StaticPopup_Show(CONFIRM_RELOAD_UI)
+        StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI)
     end
 end
 
@@ -125,6 +125,14 @@ function L:OnAfterInitialize()
     end
 
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
+end
+
+---@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+function L:ApplyForEachFrames(applyFunction)
+    local frames = P:GetAllFrameNames()
+    if #frames <= 0 then return end
+    -- `_` is the index
+    for _,f in ipairs(frames) do applyFunction(_G[f].widget) end
 end
 
 function L:UpdateKeybindText()

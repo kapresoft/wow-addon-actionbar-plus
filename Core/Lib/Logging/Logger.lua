@@ -9,11 +9,12 @@ local type, select, tostring, error, setmetatable = type, select, tostring, erro
 
 local C = LibStub('AceConsole-3.0', true)
 -- ## Local ----------------------------------------------------
-
-local major, minor, logPrefix = __K_Core:GetLibVersion('Logger', 1)
+local G = ABP_LibGlobals
+local Core = __K_Core
+local major, minor, logPrefix = Core:GetLibVersion(G.M.Logger)
 ---@class Logger
 local L = LibStub:NewLibrary(major, minor)
-if not L then return end
+Core:Register(G.M.Logger, L)
 
 -- ## Functions ------------------------------------------------
 ---@class LogUtil

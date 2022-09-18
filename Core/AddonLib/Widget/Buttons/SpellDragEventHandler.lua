@@ -1,23 +1,19 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.CommonConstants.WidgetAttributes, O.PickupHandler
+local Assert = O.Assert
 
--- ## Local ----------------------------------------------------
-local WC = ABP_WidgetConstants
-local LibStub, M, Assert, _, _, W, CC = WC:LibPack()
-local _, Table = ABP_LibGlobals:LibPackUtils()
-local toStringSorted = Table.toStringSorted
-
-local SpellAttributeSetter = W:SpellAttributeSetter()
-local WAttr = CC.WidgetAttributes
-local _API = _API
-local PH = ABP_PickupHandler
-
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class SpellDragEventHandler
-local _L = LibStub:NewLibrary(M.SpellDragEventHandler)
+local _L = LibStub:NewLibrary(Core.M.SpellDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
 ---spellCursorInfo `{ type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }`
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
 function _L:Handle(btnUI, cursorInfo)

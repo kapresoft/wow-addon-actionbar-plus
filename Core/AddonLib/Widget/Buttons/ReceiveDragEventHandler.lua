@@ -1,14 +1,17 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local A, AT = O.Assert, O.ActionType
+local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = O.SpellDragEventHandler,
+    O.ItemDragEventHandler, O.MacroDragEventHandler
+local IsNotNil, AssertThatMethodArgIsNotNil = A.IsNotNil, A.AssertThatMethodArgIsNotNil
 
--- ## Local ----------------------------------------------------
-local LibStub, M, A, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = W:LibPack_DragEventHandlers()
-
-local IsNotNil, AssertThatMethodArgIsNotNil, Throw = A.IsNotNil, A.AssertThatMethodArgIsNotNil, A.Throw
-local AT = ABP_ActionType
-
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler
-local _L = LibStub:NewLibrary(M.ReceiveDragEventHandler)
+local _L = LibStub:NewLibrary(Core.M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {

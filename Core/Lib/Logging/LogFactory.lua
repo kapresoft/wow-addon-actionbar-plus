@@ -1,13 +1,13 @@
 -- ## External -------------------------------------------------
 local LibStub = LibStub
 local logger = __K_Core:GetLogger()
-
+local G = ABP_LibGlobals
 -- ## Local ----------------------------------------------------
-
-local major, minor = __K_Core:GetLibVersion('LogFactory', 1)
+local Core = __K_Core
+local major, minor = Core:GetLibVersion(G.M.LogFactory)
 ---@class LogFactory
 local _L = LibStub:NewLibrary(major, minor)
-
+Core:Register(G.M.LogFactory, _L)
 
 -- ## Functions ------------------------------------------------
 

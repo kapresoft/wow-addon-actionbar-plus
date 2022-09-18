@@ -1,35 +1,34 @@
--- Wow APIs
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GameTooltip = GameTooltip
 
--- Lua APIs
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local format = string.format
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-
-local LibStub, M, Assert, P, LSM, W, CC, G = ABP_WidgetConstants:LibPack()
-local PrettyPrint, Table, String, LOG = ABP_LibGlobals:LibPackUtils()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local Assert, String = O.Assert, O.String
 local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
-local BAttr, WAttr, UAttr = W:LibPack_WidgetAttributes()
-local WU = ABP_LibGlobals:LibPack_WidgetUtil()
-local ANCHOR_TOPLEFT = ANCHOR_TOPLEFT
-
-local TEXTURE_EMPTY, TEXTURE_HIGHLIGHT, TEXTURE_CASTING = ABP_WidgetConstants:GetButtonTextures()
+local CC, WC = O.CommonConstants, O.WidgetConstants
+local BAttr, WAttr, UAttr = CC.ButtonAttributes,  CC.WidgetAttributes, CC.UnitAttributes
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class SpellAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
-local _L = LibStub:NewLibrary(M.SpellAttributeSetter)
+---@class SpellAttributeSetter : BaseAttributeSetter
+local _L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(M.BaseAttributeSetter)
+local Base = LibStub(Core.M.BaseAttributeSetter)
 _L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
 ---@param link table The blizzard `GameTooltip` link
 function _L:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
@@ -37,7 +36,7 @@ function _L:ShowTooltip(btnUI, btnData)
     if not type then return end
 
     local spellInfo = btnData[WAttr.SPELL]
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
 
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
@@ -60,7 +59,7 @@ function _L:SetAttributes(btnUI, btnData)
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
-    local spellIcon = TEXTURE_EMPTY
+    local spellIcon = WC.C.TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
     btnUI.widget:SetIcon(spellIcon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
@@ -80,7 +79,7 @@ function _L:ShowTooltip(btnUI)
 
     local spellInfo = btnData[WAttr.SPELL]
     if not spellInfo.id then return end
-    GameTooltip:SetOwner(btnUI, ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(spellInfo.id)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then

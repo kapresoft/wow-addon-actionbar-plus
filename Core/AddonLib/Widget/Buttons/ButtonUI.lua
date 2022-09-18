@@ -3,60 +3,46 @@ WoW Vars
 -------------------------------------------------------------------------------]]
 local ClearCursor, GetCursorInfo, CreateFrame, UIParent = ClearCursor, GetCursorInfo, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local  C_Timer = C_Timer
+local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
 -------------------------------------------------------------------------------]]
-local pack, fmod = table.pack, math.fmod
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---local M , G = ABP_LibGlobals:LibPack_Module()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M = Core.M
+local AceLibFactory, LogFactory = O.AceLibFactory, O.LogFactory
+local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 
-local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
-local CC = ABP_CommonConstants
-local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
-
----@type Assert
-local A
----@type Profile
-local P
----@type ButtonDataBuilder
-local ButtonDataBuilder
----@type WidgetMixin
-local WMX
----@type WidgetLibFactory
-local WU
----@type String
-local String
-
-A, P, ButtonDataBuilder, WMX, WU,
-String = G(
-        M.Assert, M.Profile,  M.ButtonDataBuilder, M.WidgetMixin, M.WidgetUtil,
-        M.String)
-
----@type LoggerTemplate
-local p = LogFactory:NewLogger('ButtonUI')
+local CC = O.CommonConstants
+local A = O.Assert
+local P = O.Profile
+local ButtonDataBuilder = O.ButtonDataBuilder
+local PH = O.PickupHandler
+local String = O.String
+local WC = O.WidgetConstants
+local WMX = O.WidgetMixin
+local G = O.LibGlobals
 
 local IsBlank = String.IsBlank
-local PH = ABP_PickupHandler
-local E = ABP_WidgetConstants.E
+local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local SECURE_ACTION_BUTTON_TEMPLATE = SECURE_ACTION_BUTTON_TEMPLATE
-local SPELL, ITEM, MACRO = ABP_WidgetConstants:LibPack_SpellItemMacro()
+local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder : WidgetMixin
-local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
+local _B = LibStub:NewLibrary(Core.M.ButtonUIWidgetBuilder)
 WMX:Mixin(_B)
 
 ---@class ButtonUILib
-local _L = LibStub:NewLibrary(M.ButtonUI, 1)
+local _L = LibStub:NewLibrary(Core.M.ButtonUI, 1)
+local p = LogFactory:NewLogger(Core.M.ButtonUI)
 
 ---@return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end
@@ -84,9 +70,9 @@ local function RegisterForClicks(widget, event, down)
     if E.ON_LEAVE == event then
         widget.button:RegisterForClicks('AnyDown')
     elseif E.ON_ENTER == event then
-        widget.button:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        widget.button:RegisterForClicks(down and WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     end
 end
 
@@ -105,7 +91,7 @@ local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
 
-    if InCombatLockdown() or not WU:IsDragKeyDown() then return end
+    if InCombatLockdown() or not WMX:IsDragKeyDown() then return end
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
@@ -200,7 +186,7 @@ end
 
 local function OnClick_SecureHookScript(btn, mouseButton, down)
     --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
-    btn:RegisterForClicks(WU:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
 end
@@ -225,7 +211,7 @@ end
 ---@param event string Event string
 local function OnUpdateButtonUsable(widget, event)
     if not widget.button:IsShown() then return end
-    WU:UpdateUsable(widget)
+    widget:UpdateUsable()
 end
 
 ---@param widget ButtonUIWidget
@@ -268,7 +254,7 @@ end
 ---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WU:SetEnabledActionBarStatesDelayed(false, 1)
+    WMX:SetEnabledActionBarStatesDelayed(false, 1)
 end
 
 ---@param widget ButtonUIWidget
@@ -276,7 +262,7 @@ end
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WU:SetEnabledActionBarStatesDelayed(true, 2)
+    WMX:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
 ---@param widget ButtonUIWidget
@@ -400,7 +386,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
     ---@class ButtonUI
-    local button = CreateFrame("Button", btnName, UIParent, SECURE_ACTION_BUTTON_TEMPLATE)
+    local button = CreateFrame("Button", btnName, UIParent, C.SECURE_ACTION_BUTTON_TEMPLATE)
     button.indexText = self:CreateIndexTextFontString(button)
     button.keybindText = self:CreateKeybindTextFontString(button)
 
@@ -456,6 +442,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         placement = { rowNum = rowNum, colNum = colNum },
     }
     AceEvent:Embed(widget)
+    function widget:GetName() return self.button:GetName() end
 
     ---@type ButtonData
     local buttonData = ButtonDataBuilder:Create(widget)

@@ -46,8 +46,11 @@ L['ABP_BUTTON_NAME_TEXT_FORMAT']                         = ABP_BUTTON_NAME_TEXT_
 L['ABP_BAR_HEADER_FORMAT']                               = ABP_BAR_HEADER_FORMAT_DEFAULT
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']            = 'Lock Actionbars with SHIFT key'
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']            = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
-L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide Actionbars while in taxi'
+L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide during taxi'
 L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC']  = 'Hides the action bars while the player is in taxi; flying from one point to another.'
+L['ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME']   = 'Mouseover Glow'
+L['ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC']   = 'Enables action button mouseover glow'
+
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME']      = 'Tooltip Visibility'
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC']      = 'Choose when you want the tooltip to show when not in combat. If a modifier is chosen, then you need to hold that modifier down to show the tooltip.'
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME'] = 'Combat Override Key'

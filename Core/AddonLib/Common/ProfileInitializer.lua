@@ -1,18 +1,19 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local format = string.format
 
--- ## Local ----------------------------------------------------
-local LibGlobals = ABP_LibGlobals
-local ATTR = ABP_CommonConstants.WidgetAttributes
-
-local PrettyPrint, Table, String = LibGlobals:LibPackUtils()
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ATTR, Table = O.CommonConstants.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
-local LibStub, M, _ = LibGlobals:LibPack()
 
 -- ## Functions ------------------------------------------------
 
 ---@class ProfileInitializer
-local P = LibStub:NewLibrary(M.ProfileInitializer, 1)
+local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
 
 local FrameDetails = {
     [1] = { rowSize = 2, colSize = 6 },
@@ -56,10 +57,13 @@ local ITEM_TEMPLATE = {
     }
 }
 
+---@class DefaultProfile
 local DEFAULT_PROFILE_DATA = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
     ["tooltip_visibility_key"] = '',
+    -- toggle action button mouseover glow
+    ["action_button_mouseover_glow"] = true,
     ["tooltip_visibility_combat_override_key"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = {

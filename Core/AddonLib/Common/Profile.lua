@@ -31,6 +31,7 @@ local ConfigNames = {
     ---@deprecated lock_actionbars is to be removed
     ['lock_actionbars'] = 'lock_actionbars',
     ['hide_when_taxi'] = 'hide_when_taxi',
+    ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
     ['tooltip_visibility_key'] = 'tooltip_visibility_key',
     ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
     ['show_button_index'] = 'show_button_index',
@@ -122,8 +123,14 @@ local ProfileButtonTemplate = {
     ["macro"] = MacroDataTemplate,
 }
 
----@class ProfileTemplate
+---@class ProfileTemplate : DefaultProfile
 local ProfileTemplate = {
+    ["lock_actionbars"] = false,
+    ["hide_when_taxi"] = true,
+    ["tooltip_visibility_key"] = '',
+    ---toggle action button mouseover glow
+    ["action_button_mouseover_glow"] = true,
+    ["tooltip_visibility_combat_override_key"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = bar,
         ["ActionbarPlusF2"] = {["enabled"] = false, ["buttons"] = {}},
@@ -237,6 +244,7 @@ function P:CreateBarsTemplate()
     return bars
 end
 
+---@return ProfileTemplate
 function P:GetProfileData() return self.profile end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
@@ -309,21 +317,11 @@ function P:SetBarLockValue(frameIndex, value)
     return bar.locked
 end
 
-function P:IsBarUnlocked(frameIndex)
-    return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil
-end
-
-function P:IsBarLockedInCombat(frameIndex)
-    return self:GetBarLockValue(frameIndex) == 'in-combat'
-end
-
-function P:IsBarLockedAlways(frameIndex)
-    return self:GetBarLockValue(frameIndex) == 'always'
-end
-
-function P:IsBarIndexEnabled(frameIndex)
-    return self:IsBarNameEnabled(self:GetFrameNameByIndex(frameIndex))
-end
+function P:IsActionButtonMouseoverGlowEnabled() return self:GetProfileData().action_button_mouseover_glow == true end
+function P:IsBarUnlocked(frameIndex) return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil end
+function P:IsBarLockedInCombat(frameIndex) return self:GetBarLockValue(frameIndex) == 'in-combat' end
+function P:IsBarLockedAlways(frameIndex) return self:GetBarLockValue(frameIndex) == 'always' end
+function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(self:GetFrameNameByIndex(frameIndex)) end
 
 function P:IsBarNameEnabled(frameName)
     if not self.profile.bars then return false end

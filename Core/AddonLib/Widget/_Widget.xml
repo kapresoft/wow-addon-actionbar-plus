@@ -8,9 +8,9 @@
     <Script file="WidgetConstants.lua"/>
     <Script file="WidgetMixin.lua"/>
     <Script file="WidgetLibFactory.lua"/>
-    <Script file="WidgetUtil.lua"/>
+
     <!--@debug@-->
-    <Script file="MacroTextureDialog.lua"/>
+    <!--  <Script file="MacroTextureDialog.lua"/>  -->
     <!--@end-debug@-->
     <Script file="MacroEventsHandler.lua"/>
 

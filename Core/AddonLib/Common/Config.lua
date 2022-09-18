@@ -11,25 +11,13 @@ local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_S
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI'
-local LOCK_FRAME_DESC = [[
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M = Core.M
+local G, LogFactory = O.LibGlobals, O.LogFactory
 
+local p = O.LogFactory(Core.M.Config)
 
-Options:
-  Always: lock the frame at all times.
-  In-Combat: lock the frame during combat.
-
-Note: this option only prevents the frame from being moved and does not lock individual
-action items.
-]]
-
--- ActionbarPlus APIs
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local _, _, _, LogFactory = ABP_LibGlobals:LibPackUtils()
-
----@type LogFactory
-local p = LogFactory:NewLogger('Config')
-
+---These are loaded in #fetchLibs()
 ---@type Profile
 local P
 ---@type ProfileConfigNames
@@ -40,6 +28,18 @@ local TTK
 local BF
 ---@type ButtonFrameFactory
 local FF
+
+local CONFIRM_RELOAD_UI = G.CONFIRM_RELOAD_UI
+local LOCK_FRAME_DESC = [[
+
+
+Options:
+  Always: lock the frame at all times.
+  In-Combat: lock the frame during combat.
+
+Note: this option only prevents the frame from being moved and does not lock individual
+action items.
+]]
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -123,9 +123,22 @@ local function PropertyGetter(config, key, fallbackVal)
     end
 end
 
+local function GetActionButtonMouseoverGlowSetter(config, key, fallbackVal)
+    return function(_, v)
+        PropertySetter(config, key, fallbackVal)(_, v)
+        local state = config.profile[key]
+        ---@param frameWidget FrameWidget
+        BF:ApplyForEachFrames(function(frameWidget)
+            ---@param widget ButtonUIWidget
+            frameWidget:ApplyForEachButtons(function(widget)
+                widget:SetHighlightEnabled(state)
+            end)
+        end)
+    end
+end
+
 local function fetchLibs()
-    local W = G:GetWidgetLibFactory()
-    P, BF, FF = W:LibPack_Config()
+    P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
     PC = P:GetConfigNames()
     TTK = P:GetTooltipKey()
 end
@@ -179,11 +192,18 @@ local methods = {
                 hide_while_taxi = {
                     type = 'toggle',
                     order = order + 2,
-                    width = 'full',
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
                     get = PropertyGetter(self, PC.hide_when_taxi, false),
                     set = PropertySetter(self, PC.hide_when_taxi, false)
+                },
+                action_button_mouseover_glow = {
+                    type = 'toggle',
+                    order = order + 3,
+                    name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
+                    desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
+                    get = PropertyGetter(self, PC.action_button_mouseover_glow, false),
+                    set = GetActionButtonMouseoverGlowSetter(self, PC.action_button_mouseover_glow, false)
                 },
                 tooltip_header = { type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS, order = order + 3 },
                 tooltip_visibility_key = {
