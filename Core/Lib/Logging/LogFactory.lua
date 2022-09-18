@@ -5,7 +5,7 @@ local G = ABP_LibGlobals
 -- ## Local ----------------------------------------------------
 local Core = __K_Core
 local major, minor = Core:GetLibVersion(G.M.LogFactory)
----@class LogFactory
+---@type LogFactory
 local _L = LibStub:NewLibrary(major, minor)
 Core:Register(G.M.LogFactory, _L)
 
@@ -20,12 +20,12 @@ local LoggerTemplate = {}
 ---@param format string The string format. Example: logger:log('hello: %s', 'world')
 function LoggerTemplate:log(format, ...)  end
 
-
 ---```
 ---local newLib = LogFactory:GetLogger('Assert', LibStub:NewLibrary(MINOR, MAJOR))
 ---```
----@return LoggerTemplate A generic object with embedded AceConsole and Logger
+---@return LogFactory A generic object with embedded AceConsole and Logger
 function _L:NewLogger(logName, optionalObj)
+    ---@class LogFactory : LoggerTemplate
     local o = {}
     if type(optionalObj) == 'table' then
         o = optionalObj

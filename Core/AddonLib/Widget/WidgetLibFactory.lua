@@ -4,17 +4,6 @@ local LibStub, M, G = ABP_LibGlobals:LibPack()
 ---@class WidgetLibFactory
 local _L = LibStub:NewLibrary(M.WidgetLibFactory)
 
--- Lazy Loaded libs
------@type ButtonFactory
---local buttonFactory = LibStub(M.ButtonFactory)
------@type ButtonFrameFactory
---local buttonFrameFactory = LibStub(M.ButtonFrameFactory)
------@type Profile
---local profile = LibStub(M.Profile)
------@type Config
---local config = LibStub(M.Config)
------@type ButtonUI
---local buttonUI = LibStub(M.ButtonUI)
 ---@type Assert
 local assertLib = LibStub(M.Assert)
 
@@ -51,10 +40,6 @@ function _L:GetButtonUI() return LibStub(M.ButtonUI) end
 function _L:GetMacroTextureDialog() return LibStub(M.MacroTextureDialog) end
 ---@return WidgetMixin
 function _L:GetWidgetMixin() return LibStub(M.WidgetMixin) end
-
----@param target any
----@param mixins table A list of methods/properties to mix in
-function _L:Mixin(target, mixins) return self:GetWidgetMixin():Mixin(target, mixins) end
 
 --- Usage: local Config, Profile, ButtonFactory = WidgetLibFactory:LibPack_AddonLibs()
 ---@return Config, Profile, ButtonFactory

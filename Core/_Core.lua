@@ -97,7 +97,7 @@ function _S:Embed(o, name, major, minor)
 
     ---@return void
     function o:OnAddonLoaded()
-        self:log(20, '%s.%s loaded', major, minor)
+        --self:log(20, '%s.%s loaded', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end

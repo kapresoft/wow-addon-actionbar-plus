@@ -76,16 +76,7 @@ local FontStringTemplate = {
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param target any
----@param mixins table A list of methods/properties to mix in
-function _L:Mixin(target, mixins)
-    if type(mixins) ~= 'table' then
-        MX:Mixin(target, self)
-        return
-    end
-    for _, v in pairs(mixins) do target[v] = self[v] end
-    return target
-end
+function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
 ---@param button ButtonUI
 function _L:CreateFontString(button)

@@ -28,10 +28,24 @@ setmetatable(C, C.mt)
 ---@class WidgetConstantsEventNames
 local E = {
 
-    ON_LEAVE = 'OnLeave',
+    OnEnter = 'OnEnter',
+    OnEvent = 'OnEvent',
+    OnLeave = 'OnLeave',
+    OnModifierStateChanged = 'OnModifierStateChanged',
+    OnReceiveDrag = 'OnReceiveDrag',
+
+    -- ################################
+    ---@deprecated DEPRECATED: Use the camel cased version
     ON_ENTER = 'OnEnter',
-    ON_RECEIVE_DRAG = 'OnReceiveDrag',
+    ---@deprecated DEPRECATED: Use the camel cased version
+    ON_EVENT = 'OnEvent',
+    ---@deprecated DEPRECATED: Use the camel cased version
+    ON_LEAVE = 'OnLeave',
+    ---@deprecated DEPRECATED: Use the camel cased version
     ON_MODIFIER_STATE_CHANGED = 'OnModifierStateChanged',
+    ---@deprecated DEPRECATED: Use the camel cased version
+    ON_RECEIVE_DRAG = 'OnReceiveDrag',
+    -- ################################
 
     ACTIONBAR_UPDATE_COOLDOWN = 'ACTIONBAR_UPDATE_COOLDOWN',
     ACTIONBAR_UPDATE_STATE = 'ACTIONBAR_UPDATE_STATE',
@@ -43,6 +57,7 @@ local E = {
 
     PLAYER_CONTROL_GAINED = 'PLAYER_CONTROL_GAINED',
     PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST',
+    PLAYER_ENTERING_WORLD = 'PLAYER_ENTERING_WORLD',
     PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED',
     PLAYER_REGEN_ENABLED = 'PLAYER_REGEN_ENABLED',
     PLAYER_STARTED_MOVING = 'PLAYER_STARTED_MOVING',

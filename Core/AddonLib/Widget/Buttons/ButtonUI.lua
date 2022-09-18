@@ -38,7 +38,6 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder : WidgetMixin
 local _B = LibStub:NewLibrary(Core.M.ButtonUIWidgetBuilder)
-WMX:Mixin(_B)
 
 ---@class ButtonUILib
 local _L = LibStub:NewLibrary(Core.M.ButtonUI, 1)
@@ -337,7 +336,7 @@ local function RegisterScripts(button)
 
 end
 
----@param w ButtonUIWidget
+---@param widget ButtonUIWidget
 local function RegisterCallbacks(widget)
 
     --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
@@ -368,7 +367,7 @@ end
 Widget Methods
 -------------------------------------------------------------------------------]]
 ---@param widget ButtonUIWidget
-local function ApplyMixins(widget) G:Mixin(widget, G:LibPack_ButtonMixin()) end
+local function ApplyMixins(widget) O.ButtonMixin:Mixin(widget) end
 
 --[[-----------------------------------------------------------------------------
 Builder Methods
@@ -387,11 +386,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, C.SECURE_ACTION_BUTTON_TEMPLATE)
-    button.indexText = self:CreateIndexTextFontString(button)
-    button.keybindText = self:CreateKeybindTextFontString(button)
+    button.indexText = WMX:CreateIndexTextFontString(button)
+    button.keybindText = WMX:CreateKeybindTextFontString(button)
 
     RegisterScripts(button)
-    self:CreateFontString(button)
+    WMX:CreateFontString(button)
 
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown");
@@ -408,7 +407,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    ---@class ButtonUIWidget : ButtonMixin @ButtonUIWidget extends ButtonMixin
+    ---@class ButtonUIWidget : ButtonMixin
     local widget = {
         ---@type ActionbarPlus
         addon = ABP,
