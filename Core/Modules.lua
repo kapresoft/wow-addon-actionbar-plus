@@ -84,7 +84,7 @@ local GlobalObjectsTemplate = {
     ItemDragEventHandler = {},
     ---@type LibGlobals
     LibGlobals = {},
-    ---@type LoggerTemplate
+    ---@type LogFactory
     LogFactory = {},
     ---@type Logger
     Logger = {},
