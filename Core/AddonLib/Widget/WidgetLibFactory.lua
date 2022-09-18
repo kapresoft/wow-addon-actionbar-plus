@@ -4,17 +4,6 @@ local LibStub, M, G = ABP_LibGlobals:LibPack()
 ---@class WidgetLibFactory
 local _L = LibStub:NewLibrary(M.WidgetLibFactory)
 
--- Lazy Loaded libs
------@type ButtonFactory
---local buttonFactory = LibStub(M.ButtonFactory)
------@type ButtonFrameFactory
---local buttonFrameFactory = LibStub(M.ButtonFrameFactory)
------@type Profile
---local profile = LibStub(M.Profile)
------@type Config
---local config = LibStub(M.Config)
------@type ButtonUI
---local buttonUI = LibStub(M.ButtonUI)
 ---@type Assert
 local assertLib = LibStub(M.Assert)
 

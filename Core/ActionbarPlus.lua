@@ -14,8 +14,7 @@ Local Vars
 -- Bump this version for every release tag
 --
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local AceLibFactory, W = O.AceLibFactory, O.WidgetLibFactory
-local G = O.LibGlobals
+local AceLibFactory, G = O.AceLibFactory, O.LibGlobals
 
 local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
@@ -26,10 +25,6 @@ local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
 local WMX = O.WidgetMixin
 
 -- ## Addon ----------------------------------------------------
------class ActionbarPlus
---local A = LibStub:NewAddon(G.addonName)
---if not A then return end
---LogFactory:EmbedLogger(A)
 local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = AceLibFactory:GetAceDB(), AceLibFactory:GetAceDBOptions(),
         AceLibFactory:GetAceConfig(), AceLibFactory:GetAceConfigDialog()
 local C, P, BF = O.Config, O.Profile, O.ButtonFactory
@@ -39,44 +34,6 @@ local debugDialog
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
----- TODO: Move to ABP_WidgetUtil
---function getBindingByName(bindingName)
---    local bindCount = GetNumBindings()
---    if bindCount <=0 then return nil end
---
---    for i = 1, bindCount do
---        local command,cat,key1,key2 = GetBinding(i)
---        if bindingName == command then
---            return { name = command, category = cat, key1 = key1, key2 = key2 }
---        end
---    end
---    return nil
---end
---
----- TODO: Move to ABP_WidgetUtil
---function GetBarBindings(beginsWith)
---    local bindCount = GetNumBindings()
---    if bindCount <=0 then return nil end
---
---    --print('beginsWith:', beginsWith)
---    -- key: name, value: binding obj
---    local bindings = {}
---    for i = 1, bindCount do
---        local command,cat,key1,key2 = GetBinding(i)
---        --print('bindingName: ', command)
---        if string.find(command, beginsWith) then
---            local value = { name = command, category = cat, key1 = key1, key2 = key2 }
---            local keyName = 'BINDING_NAME_' .. command
---            local key = _G[keyName]
---            if key then
---                bindings[key] = value
---            end
---        end
---    end
---    return bindings
---end
-
-
 local function OnUpdateBindings(addon)
     addon.barBindings = WMX:GetBarBindingsMap()
     if addon.barBindings then BF:UpdateKeybindText() end

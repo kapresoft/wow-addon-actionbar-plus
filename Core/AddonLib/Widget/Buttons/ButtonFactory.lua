@@ -192,39 +192,9 @@ function L:SetButtonAttributes(btnWidget)
     local btnData = btnWidget:GetConfig()
     if btnData == nil or String.IsBlank(btnData.type) then return end
     local setter = self:GetAttributesSetter(btnData.type)
-    if not setter then
-        --self:log(1, 'No Attribute Setter found for type: %s', btnData.type)
-        return
-    end
+    if not setter then return end
     setter:SetAttributes(btnWidget.button, btnData)
-
-    ----TODO:Move SetCallback to macro attribute setter
-    -----@param w ButtonUIWidget
-    --btnWidget:SetCallback("OnEnter", function(w)
-    --    L:log('SetCallback|OnEnter')
-    --    setter:ShowTooltip(w.button)
-    --end)
-    --btnWidget:SetCallback("OnLeave", function(w)
-    --    GameTooltip:Hide()
-    --end)
 end
-
----- See: https://wowpedia.fandom.com/wiki/API_GetCursorInfo
-----      This one is incorrect:  https://wowwiki-archive.fandom.com/wiki/API_GetCursorInfo
----- spell: spellId=info1 bookType=info2 ?=info3
----- item: itemId = info1, itemName/Link = info2
----- macro: macro-index=info1
---function L:OnReceiveDrag(btnUI)
---    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
---    -- TODO: Move to TBC/API
---    local actionType, info1, info2, info3 = GetCursorInfo()
---    ClearCursor()
---
---    local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
---    self:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
---    if not self:IsValidDragSource(cursorInfo) then return end
---    H:Handle(btnUI, actionType, cursorInfo)
---end
 
 function L:IsValidDragSource(cursorInfo)
     if String.IsBlank(cursorInfo.type) then
