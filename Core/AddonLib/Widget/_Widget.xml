@@ -9,11 +9,7 @@
     <Script file="WidgetMixin.lua"/>
     <Script file="WidgetLibFactory.lua"/>
 
-    <!--@debug@-->
-    <!--  <Script file="MacroTextureDialog.lua"/>  -->
-    <!--@end-debug@-->
     <Script file="MacroEventsHandler.lua"/>
-
     <Include file="Buttons\_Buttons.xml"/>
 
 </Ui>

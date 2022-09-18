@@ -1,3 +1,6 @@
+### 1.0.0.31.1
+- Emergency fix for an addon loading bug that stemmed from a debug line comment in _Widget.xml
+
 ### 1.0.0.31
 - Enhancement - Option to hide the mouseover glow [Issue #41](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/41)
 - Bug Fix - Blur out items that do not [Issue #47](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/47)
