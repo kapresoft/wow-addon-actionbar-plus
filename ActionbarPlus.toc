@@ -20,7 +20,7 @@
 ## X-Github-Project-Author: @project-author@
 ## X-Github-Project-Hash: @project-hash@
 ## X-Github-Project-Last-Changed-Date: @project-date-iso@
-## X-Github-Project-Version: 1.0.0.x
+## X-Github-Project-Version: @project-version@
 
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
