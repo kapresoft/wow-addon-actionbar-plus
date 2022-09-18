@@ -138,17 +138,6 @@ function _L:LibPack_AceLibrary()
     return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 end
 
----@param object any The target object
----@return any The mixed-in object
-function _L:Mixin(object, ...) return self:LibPack_Mixin():Mixin(object, ...) end
-
----@return Mixin
-function _L:LibPack_Mixin() return self:Get(M.Mixin) end
----@return ButtonProfileMixin
-function _L:LibPack_ButtonProfileMixin() return self:Get(M.ButtonProfileMixin) end
----@return ButtonMixin
-function _L:LibPack_ButtonMixin() return self:Get(M.ButtonMixin) end
-
 ---### Usage:
 ---```
 ---local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()

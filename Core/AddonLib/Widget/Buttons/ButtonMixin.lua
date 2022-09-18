@@ -13,7 +13,7 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local G = O.LibGlobals
+local G, MX = O.LibGlobals, O.Mixin
 local LSM, WC, P = O.AceLibFactory:GetAceSharedMedia(), O.WidgetConstants, O.Profile
 local String, LogFactory = O.String, O.LogFactory
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
@@ -38,7 +38,7 @@ button: widget.button
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
 local _L = LibStub:NewLibrary(Core.M.ButtonMixin)
-G:Mixin(_L, G:LibPack_ButtonProfileMixin())
+MX:Mixin(_L, O.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -68,14 +68,17 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button.keybindText.widget:ScaleWithButtonSize(buttonSize)
 end
 
+--[[-----------------------------------------------------------------------------
+Instance Methods
+-------------------------------------------------------------------------------]]
+
 function _L:Init()
     SetButtonLayout(self, self.placement.rowNum, self.placement.colNum)
     self:InitTextures(noIconTexture)
 end
 
---[[-----------------------------------------------------------------------------
-Instance Methods
--------------------------------------------------------------------------------]]
+---@param target any
+function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
 --- - Call this function once only; otherwise *CRASH* if called N times
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
@@ -83,7 +86,6 @@ Instance Methods
 --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
 ---@param btnWidget ButtonUIWidget
 function _L:InitTextures(icon)
-    local btnWidget = self
     local btnUI = self:_Button()
 
     -- DrawLayer is 'ARTWORK' by default for icons
