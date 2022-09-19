@@ -29,7 +29,6 @@ local BF
 ---@type ButtonFrameFactory
 local FF
 
-local CONFIRM_RELOAD_UI = G.CONFIRM_RELOAD_UI
 local LOCK_FRAME_DESC = [[
 
 
@@ -44,10 +43,7 @@ action items.
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
-local function ConfirmAndReload()
-    if StaticPopup_Visible(CONFIRM_RELOAD_UI) == nil then return StaticPopup_Show(CONFIRM_RELOAD_UI) end
-    return false
-end
+local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
 
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
 ---@return BarData

@@ -4,7 +4,7 @@ Blizzard Vars
 local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
 local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
-local UISpecialFrames, StaticPopup_Show = UISpecialFrames, StaticPopup_Show
+local UISpecialFrames, StaticPopup_Visible, StaticPopup_Show = UISpecialFrames, StaticPopup_Visible, StaticPopup_Show
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -22,6 +22,13 @@ local sreplace = String.replace
 
 ---@return LoggerTemplate
 local p = Core:NewLogger(M.WidgetMixin)
+
+StaticPopupDialogs[WC.C.CONFIRM_RELOAD_UI] = {
+    text = "Reload UI?", button1 = "Yes", button2 = "No",
+    timeout = 0, whileDead = true, hideOnEscape = true,
+    OnAccept = function() ReloadUI() end,
+    preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+}
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -183,7 +190,7 @@ function _L:GetBarBindingsMap()
     return barBindingsMap
 end
 
----@return BindingInfo
+---@return BindingDetails
 ---@param btnName string The button name
 function _L:GetBarBindings(btnName)
     if IsBlank(btnName) then return nil end
@@ -266,3 +273,8 @@ function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
 end
 
 function _L:ShowReloadUIConfirmation() StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI) end
+
+function _L:ConfirmAndReload()
+    if StaticPopup_Visible(WC.C.CONFIRM_RELOAD_UI) == nil then return StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI) end
+    return false
+end
