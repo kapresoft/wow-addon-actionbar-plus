@@ -26,7 +26,7 @@ local M = {
     ButtonProfileMixin = 'ButtonProfileMixin',
     -- Addons
     BaseAttributeSetter = 'BaseAttributeSetter',
-    ButtonDataBuilder = 'ButtonDataBuilder',
+    ButtonData = 'ButtonData',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
@@ -39,6 +39,8 @@ local M = {
     MacroEventsHandler = 'MacroEventsHandler',
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
     MacroTextureDialog = 'MacroTextureDialog',
+    MountDragEventHandler = 'MountDragEventHandler',
+    MountAttributeSetter = 'MountAttributeSetter',
     PickupHandler = 'PickupHandler',
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
@@ -60,8 +62,8 @@ local GlobalObjectsTemplate = {
     Assert = {},
     ---@type BaseAttributeSetter
     BaseAttributeSetter = {},
-    ---@type ButtonDataBuilder
-    ButtonDataBuilder = {},
+    ---@type ButtonData
+    ButtonData = {},
     ---@type ButtonFactory
     ButtonFactory = {},
     ---@type ButtonFrameFactory
@@ -98,6 +100,10 @@ local GlobalObjectsTemplate = {
     MacroTextureDialog = {},
     ---@type MacrotextAttributeSetter
     MacrotextAttributeSetter = {},
+    ---@type MountDragEventHandler
+    MountDragEventHandler = {},
+    ---@type MountAttributeSetter
+    MountAttributeSetter = {},
     ---@type Mixin
     Mixin = {},
     ---@type PickupHandler

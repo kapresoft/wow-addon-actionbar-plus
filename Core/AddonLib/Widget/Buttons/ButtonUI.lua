@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 WoW Vars
 -------------------------------------------------------------------------------]]
-local ClearCursor, GetCursorInfo, CreateFrame, UIParent = ClearCursor, GetCursorInfo, CreateFrame, UIParent
+local ClearCursor, CreateFrame, UIParent = ClearCursor, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
 local C_Timer = C_Timer
 
@@ -21,7 +21,6 @@ local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:Get
 local CC = O.CommonConstants
 local A = O.Assert
 local P = O.Profile
-local ButtonDataBuilder = O.ButtonDataBuilder
 local PH = O.PickupHandler
 local String = O.String
 local WC = O.WidgetConstants
@@ -31,7 +30,7 @@ local G = O.LibGlobals
 local IsBlank = String.IsBlank
 local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
+local ACTION_TYPES = O.CommonConstants.WidgetAttributes
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -49,18 +48,19 @@ function _L:WidgetBuilder() return _B end
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
+---@param cursorInfo CursorInfo
 local function IsValidDragSource(cursorInfo)
+    --p:log("IsValidDragSource| CursorInfo=%s", cursorInfo)
     if IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
         --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
-    if not (cursorInfo.type == SPELL or cursorInfo.type == ITEM or cursorInfo.type == MACRO) then
-        return false
-    end
-
-    return true
+    return (cursorInfo.type == ACTION_TYPES.SPELL
+            or cursorInfo.type == ACTION_TYPES.ITEM
+            or cursorInfo.type == ACTION_TYPES.MACRO
+            or cursorInfo.type == ACTION_TYPES.MOUNT)
 end
 
 ---@param widget ButtonUIWidget
@@ -105,19 +105,13 @@ end
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-    --p:log('OnReceiveDrag|_state_type: %s', pformat(btnUI._state_type))
-
-    -- TODO: Move to TBC/API
-    local actionType, info1, info2, info3 = GetCursorInfo()
-
-    local cursorInfo = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
-    --p:log(20, 'OnReceiveDrag Cursor-Info: %s', ToStringSorted(cursorInfo))
+    local cursorInfo = _API:GetCursorInfo()
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
     local dragEventHandler = G(M.ReceiveDragEventHandler)
-    dragEventHandler:Handle(btnUI, actionType, cursorInfo)
+    dragEventHandler:Handle(btnUI, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
@@ -443,8 +437,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     AceEvent:Embed(widget)
     function widget:GetName() return self.button:GetName() end
 
-    ---@type ButtonData
-    local buttonData = ButtonDataBuilder:Create(widget)
+    local buttonData = O.ButtonData(widget)
     widget.buttonData =  buttonData
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 

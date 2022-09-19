@@ -1,10 +1,35 @@
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local WMX = G:Lib_WidgetMixin()
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local InCombatLockdown = InCombatLockdown
 
----@class BaseAttributeSetter @parent class
-local _L = LibStub:NewLibrary(M.BaseAttributeSetter)
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local WMX = O.WidgetMixin
 
+--[[-----------------------------------------------------------------------------
+Interface
+-------------------------------------------------------------------------------]]
+---@class AttributeSetter
+local AttributeSetter = {
+    ---@param btnUI ButtonUI
+    ---@param btnData ProfileButton
+    ['SetAttributes'] = function(btnUI, btnData) end,
+    ---@param btnUI ButtonUI
+    ['ShowTooltip'] = function(btnUI) end
+}
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+---@class BaseAttributeSetter : AttributeSetter
+local _L = LibStub:NewLibrary(Core.M.BaseAttributeSetter)
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 ---@param btnUI ButtonUI
 function _L:HandleGameTooltipCallbacks(btnUI)
     ---@param w ButtonUIWidget
@@ -22,5 +47,4 @@ function _L:HandleGameTooltipCallbacks(btnUI)
     btnUI.widget:SetCallback("OnLeave", function(w, event)
         WMX:HideTooltipDelayed()
     end)
-
 end

@@ -13,8 +13,10 @@ local WC = O.WidgetConstants
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class MacrotextAttributeSetter
+---@class MacrotextAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(Core.M.MacrotextAttributeSetter)
+---@type BaseAttributeSetter
+local BaseAttributeSetter = O.BaseAttributeSetter
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -48,4 +50,5 @@ function S:ShowTooltip(btnUI, btnData)
     GameTooltip:AddSpellByID(macroTextInfo.id)
 end
 
+S.mt.__index = BaseAttributeSetter
 S.mt.__call = S.SetAttributes

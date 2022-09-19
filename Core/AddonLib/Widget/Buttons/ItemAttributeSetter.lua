@@ -15,10 +15,9 @@ local WC = O.WidgetConstants
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ItemAttributeSetter : BaseAttributeSetter
-local _L = LibStub:NewLibrary(Core.M.ItemAttributeSetter)
+local S = LibStub:NewLibrary(Core.M.ItemAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(Core.M.BaseAttributeSetter)
-_L.mt.__index = Base
+local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -26,7 +25,7 @@ Methods
 
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
-function _L:SetAttributes(btnUI, btnData)
+function S:SetAttributes(btnUI, btnData)
     W:ResetWidgetAttributes(btnUI)
     local itemData = btnData[WAttr.ITEM]
     if type(itemData) ~= 'table' then return end
@@ -45,7 +44,7 @@ function _L:SetAttributes(btnUI, btnData)
 end
 
 ---@param btnUI ButtonUI
-function _L:ShowTooltip(btnUI)
+function S:ShowTooltip(btnUI)
     if not btnUI then return end
     local w = btnUI.widget
     local btnData = w:GetConfig()
@@ -60,8 +59,6 @@ function _L:ShowTooltip(btnUI)
     end
 end
 
---[[-----------------------------------------------------------------------------
-Constructor Setup
--------------------------------------------------------------------------------]]
-_L.mt.__call = _L.SetAttributes
 
+S.mt.__index = BaseAttributeSetter
+S.mt.__call = S.SetAttributes

@@ -14,8 +14,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local String, A, P = O.String, O.Assert, O.Profile
-local ButtonFrameFactory, SAS, IAS, MAS, MTAS = O.ButtonFrameFactory, O.SpellAttributeSetter, O.ItemAttributeSetter,
-        O.MacroAttributeSetter, O.MacrotextAttributeSetter
+local ButtonFrameFactory = O.ButtonFrameFactory
 local WC = O.WidgetConstants
 local AssertNotNil = A.AssertNotNil
 
@@ -26,7 +25,13 @@ local WMX = O.WidgetMixin
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(Core.M.ButtonFactory)
 
-local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['macrotext'] = MTAS, }
+local AttributeSetters = {
+    ['spell']       = O.SpellAttributeSetter,
+    ['item']        = O.ItemAttributeSetter,
+    ['macro']       = O.MacroAttributeSetter,
+    ['mount']       = O.MountAttributeSetter,
+    ['macrotext']   = O.MacrotextAttributeSetter,
+}
 
 -- Initialized on Logger#OnAddonLoaded()
 L.addon = nil
@@ -62,7 +67,7 @@ end
 
 ---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    MAS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
+    Macro_AS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
 --[[-----------------------------------------------------------------------------

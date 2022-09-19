@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
-local GetSpellCooldown = GetSpellCooldown
+local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
 
 --[[-----------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local _, _, String = ABP_LibGlobals:LibPackUtils()
-local IsNotBlank = String.IsNotBlank
+local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -25,13 +25,54 @@ local S = {}
 _API = S
 
 --[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-
-
---[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+
+---@return CursorInfo
+function S:GetCursorInfo()
+    -- actionType string spell, item, macro, mount, etc..
+    local actionType, info1, info2, info3 = GetCursorInfo()
+    if IsBlank(actionType) then error('Invalid CursorInfo') end
+    ---@class CursorInfo
+    return { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+end
+
+---##  C_MountJournal.GetMountInfoByID(mountId)
+---## C_MountJournal.GetDisplayedMountInfo(mountIndex)
+--- actionType, info1, info2
+--- "mount", mountId, C_MountJournal index
+---@return MountInfo
+---@param cursorInfo CursorInfo
+function S:GetMountInfo(cursorInfo)
+    local mountID = cursorInfo.info1
+    local name, spellID, icon,
+    isActive, isUsable, sourceType, isFavorite,
+    isFactionSpecific, faction, shouldHideOnChar,
+    isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
+
+    ---@class MountInfoSpell
+    local spell = {
+        ---@type number
+        id = spellID,
+        ---@type number
+        icon = icon }
+
+    ---@class MountInfo
+    local info = {
+        ---@type string
+        type = cursorInfo.type,
+        ---@type string
+        name = name,
+        ---@type number
+        mountID = mountID,
+        ---@type number
+        mountIndex = cursorInfo.info2,
+        ---@type MountInfoSpell
+        spell = spell
+    }
+
+    return info
+end
 
 ---Note: should call ButtonData:ContainsValidAction() before calling this
 ---@return boolean true, false or nil if not applicable

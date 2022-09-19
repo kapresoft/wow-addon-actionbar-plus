@@ -164,8 +164,6 @@ function _L:LibPack_CommonUtils()
     local Table, String = self:Get(M.Table, M.String)
     return Table, String
 end
----@return ButtonDataBuilder
-function _L:LibPack_ButtonDataBuilder() return self:Get(M.ButtonDataBuilder) end
 
 function _L:GetLogLevel() return ABP_LOG_LEVEL end
 ---@param level number The log level between 1 and 100
@@ -185,6 +183,7 @@ function _L:Lib_WidgetMixin() return self:Get(M.WidgetMixin) end
 ---local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
 ---@return string, string, string The spell, item, macro attribute values
 function _L:SpellItemMacroAttributes()
+    ---@type WidgetAttributes
     local Attr = self:LibPack_CommonConstants().WidgetAttributes
     return Attr.SPELL, Attr.ITEM, Attr.MACRO
 end

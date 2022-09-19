@@ -54,6 +54,9 @@ local WidgetAttributes = {
     UNIT = 'unit',
     SPELL = 'spell',
     ITEM = 'item',
+    MOUNT = 'mount',
+    FLY_OUT = 'flyout',
+    PET_ACTION = 'petaction',
     MACRO_TEXT = "macrotext",
     MACRO = "macro",
 }

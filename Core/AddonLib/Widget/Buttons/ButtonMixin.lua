@@ -569,3 +569,6 @@ function _L:IsValidMacroProfile(buttonData)
             or IsBlank(buttonData.macro.index)
             or IsBlank(buttonData.macro.name))
 end
+
+---@return ButtonData
+function _L:GetButtonData() return self:W().buttonData end

@@ -115,12 +115,20 @@ local MacroDataTemplate = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
+---@class MountData
+local MountDataTemplate = {
+    ["type"] = "mount",
+    ["index"] = 41,
+    ["name"] = "Dragon",
+    ["icon"] = 1,
+}
 ---@class ProfileButton : ProfileButtonDataMixin
 local ProfileButtonTemplate = {
     ['type'] = 'spell',
     ["spell"] = SpellDataTemplate,
     ["item"] = ItemDataTemplate,
     ["macro"] = MacroDataTemplate,
+    ["mount"] = MountDataTemplate,
 }
 
 ---@class ProfileTemplate : DefaultProfile
@@ -147,14 +155,6 @@ local ProfileTemplate = {
 local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
 ---- ## Start Here ----
-
-local SPELL = { id = nil, name = nil, icon = nil, label = nil }
-local ITEM = { id = nil, name = nil, icon = nil, label = nil }
-local MACRO = { index = nil, name = nil, icon = nil }
-local MACROTEXT = { name = nil, icon = nil, body = nil }
-local DETAILS = { spell = SPELL, item = ITEM, macro = MACRO, macrotext = MACROTEXT }
-local TOOLTIP = { text = nil, link = nil }
-local BUTTON = { type = nil, name = nil, icon = nil, macrotext = nil, tooltip = TOOLTIP, details = DETAILS }
 
 
 local function assertProfile(p)

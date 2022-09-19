@@ -13,7 +13,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
+local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
 local CC, WC = O.CommonConstants, O.WidgetConstants
 local BAttr, WAttr, UAttr = CC.ButtonAttributes,  CC.WidgetAttributes, CC.UnitAttributes
 
@@ -24,7 +24,6 @@ New Instance
 local _L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
 ---@type BaseAttributeSetter
 local Base = LibStub(Core.M.BaseAttributeSetter)
-_L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -75,7 +74,7 @@ function _L:ShowTooltip(btnUI)
     local w = btnUI.widget
     local btnData = w:GetConfig()
     if not btnData then return end
-    if String.IsBlank(btnData.type) then return end
+    if IsBlank(btnData.type) then return end
 
     local spellInfo = btnData[WAttr.SPELL]
     if not spellInfo.id then return end
@@ -88,5 +87,5 @@ function _L:ShowTooltip(btnUI)
     end
 end
 
---- So that we can call with SetAttributes(btnUI)
+_L.mt.__index = Base
 _L.mt.__call = _L.SetAttributes

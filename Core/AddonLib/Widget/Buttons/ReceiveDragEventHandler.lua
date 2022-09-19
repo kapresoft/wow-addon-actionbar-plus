@@ -8,21 +8,32 @@ local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = O.Spe
 local IsNotNil, AssertThatMethodArgIsNotNil = A.IsNotNil, A.AssertThatMethodArgIsNotNil
 
 --[[-----------------------------------------------------------------------------
+Interface
+-------------------------------------------------------------------------------]]
+---@class DragEventHandler
+---@param btnUI ButtonUI
+---@param cursorInfo CursorInfo
+local DragEventHandler = {
+    ['Handle'] = function(btnUI, cursorInfo)  end
+}
+
+--[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler
-local _L = LibStub:NewLibrary(Core.M.ReceiveDragEventHandler)
+local L = LibStub:NewLibrary(Core.M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {
     ['spell'] = SpellDragEventHandler,
     ['item'] = ItemDragEventHandler,
     ['macro'] = MacroDragEventHandler,
+    ['mount'] = O.MountDragEventHandler,
     ['macrotext'] = MacroDragEventHandler
 }
 
 -- ## Functions ------------------------------------------------
-function _L:CleanupProfile(btnUI, actionType)
+function L:CleanupProfile(btnUI, actionType)
     local btnData = btnUI.widget:GetConfig()
     if not btnData then return end
 
@@ -32,22 +43,18 @@ function _L:CleanupProfile(btnUI, actionType)
     end
 end
 
-function _L:CanHandle(actionType)
+function L:CanHandle(actionType)
     local handler = handlers[actionType]
-    local hasHandler = IsNotNil(handler) and IsNotNil(handler.Handle)
-    self:log(10, 'Can handle drag event from [%s]? %s', actionType, hasHandler)
-    return hasHandler
+    return IsNotNil(handler) and IsNotNil(handler.Handle)
 end
 
-function _L:Handle(btnUI, actionType, cursorInfo)
+---@param cursorInfo CursorInfo
+---@param btnUI ButtonUI
+function L:Handle(btnUI, cursorInfo)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
-    AssertThatMethodArgIsNotNil(actionType, 'actionType', 'Handle(btnUI, actionType)')
-
-    if not self:CanHandle(actionType) then
-        --Throw('Handler not found for action-type: %s', actionType)
-        self:log(10, 'Handler not found for action-type: %s', actionType)
-        return
-    end
+    AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
+    local actionType = cursorInfo.type
+    if not self:CanHandle(actionType) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
 

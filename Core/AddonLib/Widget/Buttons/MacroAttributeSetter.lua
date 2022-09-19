@@ -20,11 +20,10 @@ local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class MacroAttributeSetter : BaseAttributeSetter @SpellAttributeSetter extends BaseAttributeSetter
-local _L = LibStub:NewLibrary(Core.M.MacroAttributeSetter)
+---@class MacroAttributeSetter : BaseAttributeSetter
+local S = LibStub:NewLibrary(Core.M.MacroAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(Core.M.BaseAttributeSetter)
-_L.mt.__index = Base
+local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -32,7 +31,7 @@ Methods
 
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
-function _L:SetAttributes(btnUI, btnData)
+function S:SetAttributes(btnUI, btnData)
     WA:ResetWidgetAttributes(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
@@ -47,7 +46,7 @@ function _L:SetAttributes(btnUI, btnData)
 end
 
 ---@param btnUI ButtonUI
-function _L:ShowTooltip(btnUI)
+function S:ShowTooltip(btnUI)
     if not btnUI then return end
     local w = btnUI.widget
     local btnData = w:GetConfig()
@@ -74,4 +73,5 @@ function _L:ShowTooltip(btnUI)
     GameTooltip:AppendText(' ' .. sformat(MACRO_WITH_SPELL_FORMAT, macroInfo.name))
 end
 
-_L.mt.__call = _L.SetAttributes
+S.mt.__index = BaseAttributeSetter
+S.mt.__call = S.SetAttributes

@@ -3,10 +3,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local G = O.LibGlobals
-local String, P, LogFactory = O.String, O.Profile, O.LogFactory
-local MX = O.Mixin
+local String, Assert = O.String, O.Assert
+local WAttr = O.CommonConstants.WidgetAttributes
 local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
-local IsBlank = String.IsBlank
+local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -28,63 +28,57 @@ local function CleanupTypeData(profileButton)
 end
 
 --[[-----------------------------------------------------------------------------
-New Instance: ButtonDataMixin
+Methods
 -------------------------------------------------------------------------------]]
-
----@class ButtonData
-local _L = {
-    profile = P
-}
-
-function _L:invalidButtonData(o, key)
-    if type(o) ~= 'table' then return true end
-    if type(o[key]) ~= 'nil' then
-        local d = o[key]
-        if type(d) == 'table' then return (IsBlank(d['id']) and IsBlank(d['index'])) end
+---@param bd ButtonData
+local function methods(bd)
+    function bd:invalidButtonData(o, key)
+        if type(o) ~= 'table' then return true end
+        if type(o[key]) ~= 'nil' then
+            local d = o[key]
+            if type(d) == 'table' then return (IsBlank(d['id']) and IsBlank(d['index'])) end
+        end
+        return true
     end
-    return true
-end
 
----@return ProfileButton
-function _L:GetData()
-    local profileButton = self.profile:GetButtonData(self.widget.frameIndex, self.widget.buttonName)
-    -- self cleanup
-    CleanupTypeData(profileButton)
-    return profileButton
-end
+    ---@return ProfileButton
+    function bd:GetData()
+        local w = self.widget
+        local profile = w.profile
+        local profileButton = profile:GetButtonData(w.frameIndex, w.buttonName)
+        -- self cleanup
+        CleanupTypeData(profileButton)
+        return profileButton
+    end
 
----@return ProfileTemplate
-function _L:GetProfileData() return self.profile:GetProfileData() end
----@return boolean
-function _L:IsHideWhenTaxi() return self.profile:IsHideWhenTaxi() end
----@return boolean
-function _L:ContainsValidAction() return self:GetActionName() ~= nil end
----@return string
-function _L:GetActionName()
-    local conf = self:GetData()
-    if not self:invalidButtonData(conf, SPELL) then return conf.spell.name end
-    if not self:invalidButtonData(conf, ITEM) then return conf.item.name end
-    if not self:invalidButtonData(conf, MACRO) then return conf.macro.name end
-    return nil
-end
+    ---@return ProfileTemplate
+    function bd:GetProfileData() return self.profile:GetProfileData() end
+    ---@return boolean
+    function bd:IsHideWhenTaxi() return self.profile:IsHideWhenTaxi() end
+    ---@return boolean
+    function bd:ContainsValidAction() return self:GetActionName() ~= nil end
+    ---@return string
+    function bd:GetActionName()
+        local conf = self:GetData()
+        if not self:invalidButtonData(conf, SPELL) then return conf.spell.name end
+        if not self:invalidButtonData(conf, ITEM) then return conf.item.name end
+        if not self:invalidButtonData(conf, MACRO) then return conf.macro.name end
+        return nil
+    end
 
---[[-----------------------------------------------------------------------------
-Builder Methods
--------------------------------------------------------------------------------]]
----@type ButtonDataBuilder
-local _B = LogFactory:NewLogger('ButtonDataBuilder', {})
+    ---@return SpellInfo
+    function bd:GetSpellInfo() return self:GetData()[WAttr.SPELL] end
+    function bd:GetItemInfo() return self:GetData()[WAttr.ITEM] end
+    function bd:GetMacroInfo() return self:GetData()[WAttr.MACRO] end
+    ---@return MountInfo
+    function bd:GetMountInfo() return self:GetData()[WAttr.MOUNT] end
 
----@param builder ButtonDataBuilder
-local function ApplyBuilderMethods(builder)
-
-    ---@param widget ButtonUIWidget
-    ---@return ButtonData
-    function builder:Create(widget)
-        ---@class ButtonData_Constructor
-        local bd = {}
-        MX:Mixin(bd, _L)
-        bd.widget = widget
-        return bd
+    ---@param mountInfo MountInfo
+    function bd:IsInvalidMountInfo(mountInfo)
+        return IsNil(mountInfo)
+                and IsNil(mountInfo.name)
+                and IsNil(mountInfo.spell)
+                and IsNil(mountInfo.spell.id)
     end
 
 end
@@ -92,14 +86,15 @@ end
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---[[-----------------------------------------------------------------------------
-New Instance
--------------------------------------------------------------------------------]]
-local function NewLibrary()
-    ---@class ButtonDataBuilder
-    local _N = LibStub:NewLibrary(Core.M.ButtonDataBuilder)
-    ApplyBuilderMethods(_N)
-    return _N
+local _B = LibStub:NewLibrary(Core.M.ButtonData)
+
+---@param widget ButtonUIWidget
+---@return ButtonData
+function _B:Constructor(widget)
+    ---@class ButtonData
+    local o = { widget = widget }
+    methods(o)
+    return o
 end
 
-NewLibrary()
+_B.mt.__call = _B.Constructor
