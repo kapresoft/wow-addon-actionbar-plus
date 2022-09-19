@@ -1,3 +1,7 @@
+### 1.0.0.32
+- fix for confirmation dialog not showing on rows and col changes in settings
+- fix for macro type drag and drop to ActionbarPlus action bar.
+
 ### 1.0.0.31.1
 - Emergency fix for an addon loading bug that stemmed from a debug line comment in _Widget.xml
 

@@ -8,7 +8,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.WidgetAttributes, O.PickupHandler
+local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.CommonConstants.WidgetAttributes, O.PickupHandler
 local s_replace, IsNil = String.replace, Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
