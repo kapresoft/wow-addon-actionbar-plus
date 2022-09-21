@@ -94,8 +94,7 @@ local function OnDragStart(btnUI)
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
-    local btnData = btnUI.widget:GetConfig()
-    PH:Pickup(btnData)
+    PH:Pickup(btnUI.widget)
 
     w:SetButtonAsEmpty()
     btnUI.widget:Fire('OnDragStart')
@@ -430,7 +429,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameStrata = 'MEDIUM',
         ---@type number
         buttonPadding = 2,
-        ---@type table
         buttonAttributes = CC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }

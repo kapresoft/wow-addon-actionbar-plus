@@ -28,7 +28,7 @@ function L:Handle(btnUI, cursorInfo)
     if IsNil(spellInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()
-    PH:PickupExisting(btnData)
+    PH:PickupExisting(btnUI.widget)
     btnData[WAttr.TYPE] = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo
 

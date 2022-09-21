@@ -36,18 +36,21 @@ Methods: MountDragEventHandler
 -------------------------------------------------------------------------------]]
 ---@param e MountDragEventHandler
 local function eventHandlerMethods(e)
+
     ---@param btnUI ButtonUI
     ---@param cursorInfo CursorInfo
     function e:Handle(btnUI, cursorInfo)
         local mountInfo = _API:GetMountInfo(cursorInfo)
         if IsInvalidMountInfo(mountInfo) then return end
         local btnData = btnUI.widget:GetConfig()
-        PH:PickupExisting(btnData)
+
+        PH:PickupExisting(btnUI.widget)
         btnData[WAttr.TYPE] = WAttr.MOUNT
         btnData[WAttr.MOUNT] = mountInfo
 
         S(btnUI, btnData)
     end
+
 end
 
 --[[-----------------------------------------------------------------------------

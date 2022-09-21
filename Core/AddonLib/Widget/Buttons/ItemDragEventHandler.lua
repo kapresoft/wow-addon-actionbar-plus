@@ -36,8 +36,8 @@ function L:Handle(btnUI, cursorInfo)
     local btnName = btnUI:GetName()
     local barData = P:GetBar(actionbarInfo.index)
 
-    local btnData = barData.buttons[btnName] or P:GetTemplate().Button
-    PH:PickupExisting(btnData)
+    local btnData = barData.buttons[btnName]
+    PH:PickupExisting(btnUI.widget)
     btnData.type = WAttr.ITEM
     btnData[WAttr.ITEM] = itemData
 

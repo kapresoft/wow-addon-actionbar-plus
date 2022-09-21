@@ -39,7 +39,7 @@ function L:Handle(btnUI, cursorInfo)
     if IsNil(macroInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()
-    PH:PickupExisting(btnData)
+    PH:PickupExisting(btnUI.widget)
     btnData[WAttr.TYPE] = WAttr.MACRO
     btnData[WAttr.MACRO] = macroInfo
 

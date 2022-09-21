@@ -117,10 +117,11 @@ local MacroDataTemplate = {
 }
 ---@class MountData
 local MountDataTemplate = {
-    ["type"] = "mount",
-    ["index"] = 41,
-    ["name"] = "Dragon",
-    ["icon"] = 1,
+    type = 'mount',
+    id = -1,
+    index = -1,
+    name = 'Reawakened Phase Hunter',
+    spell = {  id = 1, icon = 123 },
 }
 ---@class ProfileButton : ProfileButtonDataMixin
 local ProfileButtonTemplate = {
@@ -174,21 +175,6 @@ local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
 P.maxFrames = 8
 P.baseFrameName = 'ActionbarPlusF'
 
---function P:GetFrameConfig()
---    return FrameDetails
---end
-
---function P:GetFrameConfigByIndex(frameIndex)
---    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetFrameConfigByIndex(frameIndex)')
---    return FrameDetails[frameIndex]
---end
-
-function P:GetTemplate()
-    return {
-        Button = ButtonTemplate
-    }
-end
-
 ---@return ProfileButton
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
@@ -197,7 +183,7 @@ function P:GetButtonData(frameIndex, buttonName)
     --if not buttons then return nil end
     local btnData = buttons[buttonName]
     if type(buttons[buttonName]) ~= 'table' then
-        buttons[buttonName] = self:GetTemplate()
+        buttons[buttonName] = {}
     end
     return buttons[buttonName]
 end

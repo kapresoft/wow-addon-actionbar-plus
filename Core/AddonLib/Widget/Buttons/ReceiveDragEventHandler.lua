@@ -6,7 +6,6 @@ local A, AT = O.Assert, O.ActionType
 local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = O.SpellDragEventHandler,
     O.ItemDragEventHandler, O.MacroDragEventHandler
 local IsNotNil, AssertThatMethodArgIsNotNil = A.IsNotNil, A.AssertThatMethodArgIsNotNil
-
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]

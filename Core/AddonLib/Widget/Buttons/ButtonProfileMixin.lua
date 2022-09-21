@@ -1,22 +1,24 @@
 --[[-----------------------------------------------------------------------------
-Local Vars
+Blizzard Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, LogFactory, G = ABP_LibGlobals:LibPack_UI()
----@type String
-local String = G(M.String)
-
-local SPELL,ITEM,MACRO = G:SpellItemMacroAttributes()
 local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local String, Table, WAttr = O.String, O.Table, O.CommonConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local IsTableEmpty = Table.isEmpty
 
-local p = LogFactory:NewLogger('ButtonProfileMixin')
+local p = O.LogFactory(Core.M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 
 ---@class ButtonProfileMixin
-local _L = LibStub:NewLibrary(M.ButtonProfileMixin)
+local _L = LibStub:NewLibrary(Core.M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -69,21 +71,20 @@ function _L:GetItemData() return self:GetConfigActionbarData(ITEM) end
 ---@return MacroData
 function _L:GetMacroData() return self:GetConfigActionbarData(MACRO) end
 ---@return boolean
-function _L:IsMacro() return self:IsMacroConfig(self:GetConfig()) end
+function _L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
 ---@return boolean
-function _L:IsSpell() return self:IsSpellConfig(self:GetConfig()) end
+function _L:IsSpell() return self:IsConfigOfType(self:GetConfig(), SPELL) end
 ---@return boolean
-function _L:IsItem() return self:IsItemConfig(self:GetConfig()) end
+function _L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
+---@return boolean
+function _L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
 
 ---@param config ProfileButton
----@return boolean
-function _L:IsMacroConfig(config) return config and config.type and MACRO == config.type end
----@param config ProfileButton
----@return boolean
-function _L:IsSpellConfig(config) return config and config.type and SPELL == config.type end
----@param config ProfileButton
----@return boolean
-function _L:IsItemConfig(config) return config and config.type and ITEM == config.type end
+---@param type string spell, item, macro, mount, etc
+function _L:IsConfigOfType(config, type)
+    if IsTableEmpty(config) then return false end
+    return config.type and type == config.type
+end
 
 ---@return boolean true if the key override is pressed
 function _L:IsTooltipModifierKeyDown()

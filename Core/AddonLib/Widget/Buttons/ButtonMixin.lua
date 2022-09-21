@@ -114,7 +114,8 @@ function _L:B() return self.button end
 function _L:_Button() return self.button end
 ---@return ButtonUIWidget
 function _L:_Widget() return self end
-
+---@return ButtonAttributes
+function _L:GetButtonAttributes() return self.buttonAttributes end
 function _L:GetIndex() return self.index end
 function _L:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
 function _L:IsParentFrameShown() return self.dragFrame:IsShown() end
@@ -293,7 +294,7 @@ function _L:ContainsValidAction() return self:_Widget().buttonData:ContainsValid
 
 function _L:ResetWidgetAttributes()
     local button = self:_Button()
-    for _, v in pairs(self.buttonAttributes) do
+    for _, v in pairs(self:GetButtonAttributes()) do
         button:SetAttribute(v, nil)
     end
 end
@@ -445,9 +446,9 @@ function _L:IsMatchingMacroOrSpell(spellID)
     ---@type ProfileButton
     local conf = self:GetConfig()
     if not conf and (conf.spell or conf.macro) then return false end
-    if self:IsSpellConfig(conf) then
+    if self:IsConfigOfType(conf, SPELL) then
         return spellID == conf.spell.id
-    elseif self:IsMacroConfig(conf) and conf.macro.index then
+    elseif self:IsConfigOfType(conf, MACRO) and conf.macro.index then
         local macroSpellId =  GetMacroSpell(conf.macro.index)
         return spellID == macroSpellId
     end

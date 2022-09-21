@@ -60,15 +60,18 @@ local WidgetAttributes = {
     MACRO_TEXT = "macrotext",
     MACRO = "macro",
 }
----@type WidgetAttributes
-_L.WidgetAttributes = WidgetAttributes
 
 ---@class ButtonAttributes
-_L.ButtonAttributes = {
+local ButtonAttributes = {
     SPELL = WidgetAttributes.SPELL,
     UNIT = WidgetAttributes.UNIT,
     UNIT2 = format("*%s2", WidgetAttributes.UNIT),
     TYPE = WidgetAttributes.TYPE,
     MACRO = WidgetAttributes.MACRO,
+    MOUNT = WidgetAttributes.MOUNT,
     MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
 }
+---@type WidgetAttributes
+_L.WidgetAttributes = WidgetAttributes
+---@type ButtonAttributes
+_L.ButtonAttributes = ButtonAttributes

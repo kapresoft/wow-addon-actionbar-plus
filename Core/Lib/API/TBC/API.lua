@@ -13,8 +13,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
+local O = __K_Core:LibPack_GlobalObjects()
+local String = O.String
+local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -23,6 +24,8 @@ New Instance
 local S = {}
 ---@type API
 _API = S
+
+local p = O.LogFactory('API')
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -34,21 +37,59 @@ function S:GetCursorInfo()
     local actionType, info1, info2, info3 = GetCursorInfo()
     if IsBlank(actionType) then error('Invalid CursorInfo') end
     ---@class CursorInfo
-    return { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+    local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+
+    local info2Lc = strlower(c.info2 or '')
+    if c.type == 'companion' and 'mount' == info2Lc then
+        c.info2 = info2Lc
+        c.originalCursor = { type = c.type, info1 = c.info1, info2 = info2 }
+        c.type = c.info2
+    end
+
+    return c
 end
 
----##  C_MountJournal.GetMountInfoByID(mountId)
----## C_MountJournal.GetDisplayedMountInfo(mountIndex)
+---@param mountIDorIndex number
+function S:_GetMountInfo(mountIDorIndex)
+
+    if C_MountJournal then
+        local mountID = mountIDorIndex
+        local name, spellID, icon,
+        isActive, isUsable, sourceType, isFavorite,
+        isFactionSpecific, faction, shouldHideOnChar,
+        isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
+
+        return name, spellID, icon
+    end
+
+    local mountCompanionIndex = mountIDorIndex
+    local creatureID, creatureName, creatureSpellID, icon, issummoned =
+        GetCompanionInfo("mount", mountCompanionIndex)
+    return creatureName, creatureSpellID, icon;
+end
+
+---## For WOTLK
+--- CursorInfo for WOTLK
+---```
+---   info1 = <mountIndex> <-- info you need for GetCompanionInfo("mount", <info1>)
+---   info2 = "MOUNT"
+---   info3 = "companion"
+---
+--- GetCompanionInfo("mount", mountIndex), ex: GetCompanionInfo("mount", 1)
+---    returns {   4271, 'Dire Wolf', 6653, 132266, false }
+---```
+---## For Retail, use C_MountJournal
+---```
+---  C_MountJournal.GetMountInfoByID(mountId)
+---  C_MountJournal.GetDisplayedMountInfo(mountIndex)
 --- actionType, info1, info2
 --- "mount", mountId, C_MountJournal index
+---```
 ---@return MountInfo
 ---@param cursorInfo CursorInfo
 function S:GetMountInfo(cursorInfo)
-    local mountID = cursorInfo.info1
-    local name, spellID, icon,
-    isActive, isUsable, sourceType, isFavorite,
-    isFactionSpecific, faction, shouldHideOnChar,
-    isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
+    local mountIDorIndex = cursorInfo.info1
+    local name, spellID, icon = self:_GetMountInfo(mountIDorIndex)
 
     ---@class MountInfoSpell
     local spell = {
@@ -60,16 +101,15 @@ function S:GetMountInfo(cursorInfo)
     ---@class MountInfo
     local info = {
         ---@type string
-        type = cursorInfo.type,
-        ---@type string
         name = name,
         ---@type number
-        mountID = mountID,
+        id = mountIDorIndex,
         ---@type number
-        mountIndex = cursorInfo.info2,
+        index = -1,
         ---@type MountInfoSpell
         spell = spell
     }
+    if C_MountJournal then info.index = cursorInfo.info2 end
 
     return info
 end
