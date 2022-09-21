@@ -163,6 +163,13 @@ function _L:HideTooltipDelayed(delayInSec)
     C_Timer.After(actualDelayInSec, function() GameTooltip:Hide() end)
 end
 
+---@class BindingInfo
+local BindingInfo = {
+    btnName = '', category = '',
+    key1 = '', key1Short = '', key2 = key2,
+    details = { action = '', buttonPressed = '' }
+}
+
 ---@return table The binding map with button names as the key
 function _L:GetBarBindingsMap()
     local barBindingsMap = {}
