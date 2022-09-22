@@ -94,7 +94,7 @@ end
 function S:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
     local mountInfoAPI = BaseAPI:GetMountInfo(mountIDorIndex)
-    p:log(10, "mountInfoAPI: %s", mountInfoAPI)
+    p:log(10, "GetMountInfo| MountInfo: %s", pformat:B()(mountInfoAPI))
 
     ---@class MountInfoSpell
     local spell = {
