@@ -99,6 +99,7 @@ end
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorInfo = API:GetCursorInfo()
+    p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 

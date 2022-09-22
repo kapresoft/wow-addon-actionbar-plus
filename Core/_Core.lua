@@ -233,7 +233,7 @@ function _L:InitPrettyPrint()
 
     ---@return pformat
     function o:Default()
-        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
+        pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
                    show_all=false, show_function = false })
         return self;
     end
@@ -241,8 +241,16 @@ function _L:InitPrettyPrint()
     ---Configured to show all
     ---@return pformat
     function o:A()
-        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
-                   show_all=true, show_function = true, depth_limit = true })
+        pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
+                       show_all=true, show_function = true, depth_limit = true })
+        return self;
+    end
+
+    ---Configured to print in single line
+    ---@return pformat
+    function o:B()
+        pprint.setup({ use_newline = false, wrap_string = true, indent_size=2, sort_keys=true,
+                       level_width=120, show_all=true, show_function = true, depth_limit = true })
         return self;
     end
 
