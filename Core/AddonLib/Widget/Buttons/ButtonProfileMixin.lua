@@ -50,6 +50,10 @@ function _L:invalidButtonData(o, key)
     end
     return true
 end
+function _L:IsEmpty()
+    local conf = self:GetConfig()
+    return conf and String.IsEmpty(conf.type)
+end
 
 ---#### Get Profile Button Config Data
 ---@return ProfileButton

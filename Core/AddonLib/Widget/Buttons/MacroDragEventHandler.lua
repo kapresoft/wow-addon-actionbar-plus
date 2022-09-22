@@ -24,7 +24,6 @@ function L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
 
 ---@param cursorInfo table Structure `{ -- }`
 function L:Handle(btnUI, cursorInfo)
-    self:log(10, 'cursorInfo: %s', cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues

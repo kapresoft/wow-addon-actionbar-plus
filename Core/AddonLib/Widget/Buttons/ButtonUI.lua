@@ -27,6 +27,7 @@ local IsBlank = String.IsBlank
 local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local ACTION_TYPES = GC.WidgetAttributes
+local API = O.API
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -47,7 +48,7 @@ Scripts
 ---@param cursorInfo CursorInfo
 local function IsValidDragSource(cursorInfo)
     --p:log("IsValidDragSource| CursorInfo=%s", cursorInfo)
-    if IsBlank(cursorInfo.type) then
+    if not cursorInfo or IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
         --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
@@ -100,7 +101,7 @@ end
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-    local cursorInfo = _API:GetCursorInfo()
+    local cursorInfo = API:GetCursorInfo()
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 

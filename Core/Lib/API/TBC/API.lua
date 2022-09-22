@@ -22,7 +22,6 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---TODO: Rename to TBC_API
 ---@class API : BaseAPI
 local S = {}
 ---@type API
@@ -40,7 +39,7 @@ Methods
 function S:GetCursorInfo()
     -- actionType string spell, item, macro, mount, etc..
     local actionType, info1, info2, info3 = GetCursorInfo()
-    if IsBlank(actionType) then error('Invalid CursorInfo') end
+    if IsBlank(actionType) then return nil end
     ---@class CursorInfo
     local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
 
@@ -95,7 +94,7 @@ end
 function S:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
     local mountInfoAPI = BaseAPI:GetMountInfo(mountIDorIndex)
-    p:log("mountInfoAPI: %s", mountInfoAPI)
+    p:log(10, "mountInfoAPI: %s", mountInfoAPI)
 
     ---@class MountInfoSpell
     local spell = {
@@ -116,7 +115,6 @@ function S:GetMountInfo(cursorInfo)
         spell = spell
     }
     if C_MountJournal then info.index = cursorInfo.info2 end
-    p:log('GetMountInfo| mount info: %s', info)
     return info
 end
 

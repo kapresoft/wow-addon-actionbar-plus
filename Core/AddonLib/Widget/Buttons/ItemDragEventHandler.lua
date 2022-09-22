@@ -10,9 +10,7 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
 local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
 local IsNil = Assert.IsNil
-
---TODO: NEXT: Add _API to GlobalObjects
-local _API = O.TBC_API
+local API = O.API
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -29,7 +27,7 @@ function L:Handle(btnUI, cursorInfo)
 
     local itemID = cursorInfo.info1
     ---@type ItemInfo
-    local itemInfo = _API:GetItemInfo(itemID)
+    local itemInfo = API:GetItemInfo(itemID)
     local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
                        link = itemInfo.link, count = itemInfo.count, stackCount=itemInfo.stackCount }
     local actionbarInfo = btnUI.widget:GetActionbarInfo()
