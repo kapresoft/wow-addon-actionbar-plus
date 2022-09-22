@@ -119,14 +119,17 @@ function _S:Embed(o, name, major, minor)
 end
 
 function _S:EmbedLoggerIfAvailable(o)
-    local logger = self:GetLogger()
+    local logger = self:_LoggerImpl()
     if not logger then return end
     logger:EmbedModule(o)
 end
 
 ---@return Logger
----@see Core#GetLogger
-function _S:GetLogger() return LibStub(self:GetMajorVersion('Logger'), true) end
+---@see Core#_LoggerImpl
+function _S:_LoggerImpl() return LibStub(self:GetMajorVersion('Logger'), true) end
+---@return LoggerTemplate
+---@param libObj table Any library created by "NewLibrary"
+function _S:GetLogger(libObj) return libObj:GetLogger() end
 
 _S.mt = { __call = function (_, ...) return _S:GetLibrary(...) end }
 setmetatable(_S, _S.mt)
@@ -195,7 +198,7 @@ function _L:GetLibVersion(libName, revisionNumber)
 end
 
 ---@return Logger
-function _L:GetLogger() return _S:GetLogger() end
+function _L:_LoggerImpl() return _S:_LoggerImpl() end
 
 ---Sets the global var name with the Addon short-name prefix
 ---```

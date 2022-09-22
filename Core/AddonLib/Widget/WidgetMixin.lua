@@ -15,14 +15,10 @@ local setglobal = setglobal
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local M = Core.M
 local MX, String, P = O.Mixin, O.String, O.Profile
 local GC = O.GlobalConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
-
----@return LoggerTemplate
-local p = Core:NewLogger(M.WidgetMixin)
 
 StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
@@ -35,7 +31,9 @@ StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class WidgetMixin
-local _L = LibStub:NewLibrary(M.WidgetMixin)
+local _L = LibStub:NewLibrary(Core.M.WidgetMixin)
+---@type LoggerTemplate
+local p = _L:GetLogger()
 
 ---@class FontStringWidget
 local FontStringWidget = {
