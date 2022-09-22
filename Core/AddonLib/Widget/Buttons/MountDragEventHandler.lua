@@ -3,11 +3,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local PH, GC, WC = O.PickupHandler, O.GlobalConstants, O.WidgetConstants
+local PH, GC = O.PickupHandler, O.GlobalConstants
 local IsBlank, IsNotBlank, AssertNotNil, IsNil =
     String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
-local WAttr = GC.WidgetAttributes
-local EMPTY_ICON = WC.C.TEXTURE_EMPTY
+local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -87,7 +86,7 @@ local function attributeSetterMethods(a)
         local mountInfo = w:GetButtonData():GetMountInfo()
         if w:GetButtonData():IsInvalidMountInfo(mountInfo) then return end
 
-        GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+        GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
         GameTooltip:AddSpellByID(mountInfo.spell.id)
     end
 end

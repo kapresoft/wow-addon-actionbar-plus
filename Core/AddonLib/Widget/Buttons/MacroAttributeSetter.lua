@@ -12,8 +12,8 @@ local sformat = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local String, WAttr = O.String, O.GlobalConstants.WidgetAttributes
-local WC = O.WidgetConstants
+local GC = O.GlobalConstants
+local String, WAttr = O.String, GC.WidgetAttributes
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
 local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
 
@@ -35,7 +35,7 @@ function S:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
-    local icon = WC.C.TEXTURE_EMPTY
+    local icon = GC.Textures.TEXTURE_EMPTY
     if macroInfo.icon then icon = macroInfo.icon end
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
@@ -58,7 +58,7 @@ function S:ShowTooltip(btnUI)
 
     if not (macroInfo.index or macroInfo.name) then return end
 
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then
         local _, itemLink = GetMacroItem(macroInfo.index)

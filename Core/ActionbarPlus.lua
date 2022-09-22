@@ -14,8 +14,7 @@ Local Vars
 -- Bump this version for every release tag
 --
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local AceLibFactory, G = O.AceLibFactory, O.LibGlobals
-local WC = O.WidgetConstants
+local AceLibFactory, GC = O.AceLibFactory, O.GlobalConstants
 
 local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
@@ -46,7 +45,7 @@ local function OnAddonLoaded(frame, event, ...)
 
     ---@type ActionbarPlus
     local addon = frame.obj
-    if event == WC.E.UPDATE_BINDINGS then return OnUpdateBindings(addon) end
+    if event == GC.E.UPDATE_BINDINGS then return OnUpdateBindings(addon) end
 
     addon:OnAddonLoadedModules()
 
@@ -61,7 +60,7 @@ local function OnAddonLoaded(frame, event, ...)
     --@end-debug@
 
     if not isLogin then return end
-    local versionText, curseForge, githubIssues = G:GetAddonInfo()
+    local versionText, curseForge, githubIssues = GC:GetAddonInfo()
     p:log("%s initialized", versionText)
     p:log('Available commands: /abp to open config dialog.')
     p:log('Right-click on the button drag frame to open config dialog.')
@@ -243,7 +242,7 @@ local methods = {
 ---@return ActionbarPlus_Frame
 ---@param addon ActionbarPlus
 local function CreateAddonFrame(addon)
-    local E = WC.E
+    local E = GC.E
     ---@class ActionbarPlus_Frame
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetScript(E.OnEvent, OnAddonLoaded)
@@ -260,7 +259,7 @@ New Addon Instance
 ---@return ActionbarPlus
 local function NewInstance()
     ---@class ActionbarPlus : ActionbarPlus_Methods
-    local A = LibStub:NewAddon(G.addonName)
+    local A = LibStub:NewAddon(GC.C.ADDON_NAME)
     CreateAddonFrame(A)
     MX:Mixin(A, methods)
 

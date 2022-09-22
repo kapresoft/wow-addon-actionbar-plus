@@ -16,8 +16,9 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local C = O.GlobalConstants.C
 local String, A, P = O.String, O.Assert, O.Profile
 local ButtonFrameFactory = O.ButtonFrameFactory
-local WC = O.WidgetConstants
 local AssertNotNil = A.AssertNotNil
+local WAttr = O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 ---@type ButtonUILib
 local ButtonUI = O.ButtonUI
@@ -25,13 +26,13 @@ local WMX = O.WidgetMixin
 
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(Core.M.ButtonFactory)
+local p = L:GetLogger()
 
 local AttributeSetters = {
-    ['spell']       = O.SpellAttributeSetter,
-    ['item']        = O.ItemAttributeSetter,
-    ['macro']       = O.MacroAttributeSetter,
-    ['mount']       = O.MountAttributeSetter,
-    ['macrotext']   = O.MacrotextAttributeSetter,
+    [SPELL]       = O.SpellAttributeSetter,
+    [ITEM]        = O.ItemAttributeSetter,
+    [MACRO]       = O.MacroAttributeSetter,
+    [MOUNT]       = O.MountAttributeSetter,
 }
 
 -- Initialized on Logger#OnAddonLoaded()
@@ -68,7 +69,7 @@ end
 
 ---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    Macro_AS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
+    AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
 --[[-----------------------------------------------------------------------------

@@ -168,15 +168,6 @@ function _L:LibPack() return _S, self, self:O() end
 ---@return GlobalObjects, Core, LocalLibStub
 function _L:LibPack_GlobalObjects() return self:O(), self, _S  end
 
----@return Mixin
-function _L:LibPack_Mixin() return _S:GetLibrary('Mixin') end
-
----@return LibGlobals
-function _L:LibPack_Globals() return _G['ABP_LibGlobals'] end
-
----@return LocalLibStub
-function _L:LibStub() return _S end
-
 ---@see LogFactory
 ---@return LoggerTemplate
 function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logName) end

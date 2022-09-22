@@ -11,7 +11,6 @@ local M = {
     -- Libraries
     BaseAPI = 'BaseAPI',
     API = 'API',
-    LibGlobals = 'LibGlobals',
     Logger = 'Logger',
     LogFactory = 'LogFactory',
     PrettyPrint = 'PrettyPrint',
@@ -50,7 +49,6 @@ local M = {
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
-    WidgetConstants = 'WidgetConstants',
     WidgetMixin = 'WidgetMixin',
 }
 
@@ -93,8 +91,6 @@ local GlobalObjectsTemplate = {
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler
     ItemDragEventHandler = {},
-    ---@type LibGlobals
-    LibGlobals = {},
     ---@type LogFactory
     LogFactory = {},
     ---@type Logger
@@ -133,8 +129,6 @@ local GlobalObjectsTemplate = {
     String = {},
     ---@type Table
     Table = {},
-    ---@type WidgetConstants
-    WidgetConstants = {},
     ---@type WidgetMixin
     WidgetMixin = {},
 }

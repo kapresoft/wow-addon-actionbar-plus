@@ -14,7 +14,7 @@ Local vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:GetAceGUI(), O.WidgetMixin
-local WC = O.WidgetConstants
+local GC = O.GlobalConstants
 local ICON_PREFIX = 'Interface/Icons/'
 local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
@@ -145,7 +145,7 @@ end
 
 ---@return MacroTextureDialogFrame
 function _L:CreateTexturePopupDialog()
-    local defaultIcon = WC.C.TEXTURE_EMPTY
+    local defaultIcon = GC.Textures.TEXTURE_EMPTY
 
     ---@class MacroTextureDialogFrame
     local frame = AceGUI:Create("Frame")

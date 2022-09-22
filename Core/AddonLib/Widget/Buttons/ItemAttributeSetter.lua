@@ -7,9 +7,9 @@ local GameTooltip = GameTooltip
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local Assert, String, WAttr = O.Assert, O.String, O.GlobalConstants.WidgetAttributes
+local GC = O.GlobalConstants
+local Assert, String, WAttr = O.Assert, O.String, GC.WidgetAttributes
 local AssertNotNil = Assert.AssertNotNil
-local WC = O.WidgetConstants
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -33,7 +33,7 @@ function S:SetAttributes(btnUI, btnData)
 
     AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
-    local icon = WC.C.TEXTURE_EMPTY
+    local icon = GC.Textures.TEXTURE_EMPTY
     if itemData.icon then icon = itemData.icon end
 
     btnUI.widget:SetIcon(icon)
@@ -52,7 +52,7 @@ function S:ShowTooltip(btnUI)
     if String.IsBlank(btnData.type) then return end
 
     ---@type ItemData
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     local itemInfo = btnData[WAttr.ITEM]
     if itemInfo and itemInfo.id then
         GameTooltip:SetItemByID(itemInfo.id)

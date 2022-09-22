@@ -13,9 +13,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local G, GC, MX = O.LibGlobals, O.GlobalConstants, O.Mixin
-local LSM, WC, P = O.AceLibFactory:GetAceSharedMedia(), O.WidgetConstants, O.Profile
-local String, LogFactory = O.String, O.LogFactory
+local GC, MX = O.GlobalConstants, O.Mixin
+local LSM, String = O.AceLibFactory:GetAceSharedMedia(), O.String
 
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
@@ -392,7 +391,7 @@ function _L:SetHighlightEnabled(state)
     local btnUI = self:B()
     if state == true then
         btnUI:SetHighlightTexture(highlightTexture)
-        btnUI:GetHighlightTexture():SetDrawLayer(WC.C.HIGHLIGHT_DRAW_LAYER)
+        btnUI:GetHighlightTexture():SetDrawLayer(GC.C.HIGHLIGHT_DRAW_LAYER)
         btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
         return
     end

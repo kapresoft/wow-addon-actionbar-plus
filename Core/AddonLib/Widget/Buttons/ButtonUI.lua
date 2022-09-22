@@ -20,15 +20,12 @@ local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:Get
 
 local String = O.String
 local A, P, PH = O.Assert, O.Profile, O.PickupHandler
-local WC, WMX = O.WidgetConstants, O.WidgetMixin
-local G, GC = O.LibGlobals, O.GlobalConstants
+local GC, WMX = O.GlobalConstants, O.WidgetMixin
+local E, API = GC.E, O.API
 
 local IsBlank = String.IsBlank
-local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local ACTION_TYPES = GC.WidgetAttributes
-local API = O.API
-
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -106,7 +103,7 @@ local function OnReceiveDrag(btnUI)
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    local dragEventHandler = G(M.ReceiveDragEventHandler)
+    local dragEventHandler = O.ReceiveDragEventHandler
     dragEventHandler:Handle(btnUI, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
@@ -375,7 +372,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
     ---@class ButtonUI
-    local button = CreateFrame("Button", btnName, UIParent, C.SECURE_ACTION_BUTTON_TEMPLATE)
+    local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
 
