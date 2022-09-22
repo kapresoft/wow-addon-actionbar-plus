@@ -9,6 +9,8 @@ setmetatable(L, L.mt)
 ---@class Module
 local M = {
     -- Libraries
+    BaseAPI = 'BaseAPI',
+    API = 'API',
     LibGlobals = 'LibGlobals',
     Logger = 'Logger',
     LogFactory = 'LogFactory',
@@ -32,6 +34,7 @@ local M = {
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     Config = 'Config',
+    GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     MacroAttributeSetter = 'MacroAttributeSetter',
@@ -48,12 +51,16 @@ local M = {
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     WidgetConstants = 'WidgetConstants',
-    WidgetLibFactory = 'WidgetLibFactory',
     WidgetMixin = 'WidgetMixin',
 }
 
 ---@class GlobalObjects
 local GlobalObjectsTemplate = {
+
+    ---@type BaseAPI
+    BaseAPI = {},
+    ---@type API
+    API = {},
     ---@type AceLibFactory
     AceLibFactory = {},
     ---@type ActionType
@@ -80,6 +87,8 @@ local GlobalObjectsTemplate = {
     CommonConstants = {},
     ---@type Config
     Config = {},
+    ---@type GlobalConstants
+    GlobalConstants = {},
     ---@type ItemAttributeSetter
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler
@@ -100,6 +109,8 @@ local GlobalObjectsTemplate = {
     MacroTextureDialog = {},
     ---@type MacrotextAttributeSetter
     MacrotextAttributeSetter = {},
+    ---@type Modules
+    Modules = {},
     ---@type MountDragEventHandler
     MountDragEventHandler = {},
     ---@type MountAttributeSetter
@@ -124,8 +135,6 @@ local GlobalObjectsTemplate = {
     Table = {},
     ---@type WidgetConstants
     WidgetConstants = {},
-    ---@type WidgetLibFactory
-    WidgetLibFactory = {},
     ---@type WidgetMixin
     WidgetMixin = {},
 }

@@ -102,6 +102,8 @@ function _S:Embed(o, name, major, minor)
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end
 
+    function o:GetLogger() return __K_Core:O().LogFactory(self:GetModuleName()) end
+
     ---
     ---AceAddon lifecycle template method
     ---### Example Call:
@@ -305,3 +307,7 @@ _L.Lib = _LIB
 
 ---@type Core
 __K_Core = _L
+
+--Define Globals here
+if ABP_GlobalConstants then _L:Register('GlobalConstants', ABP_GlobalConstants) end
+if ABP_Modules then _L:Register('Modules', ABP_Modules) end

@@ -52,6 +52,7 @@ end
 function L:Handle(btnUI, cursorInfo)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
     AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
+    self:log('cursorInfo: %s', cursorInfo)
     local actionType = cursorInfo.type
     if not self:CanHandle(actionType) then return end
 

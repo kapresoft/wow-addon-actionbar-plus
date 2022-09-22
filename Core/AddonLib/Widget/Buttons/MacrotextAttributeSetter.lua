@@ -7,7 +7,7 @@ local GameTooltip = GameTooltip
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local W, WAttr = O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local WAttr = O.GlobalConstants.WidgetAttributes
 local WC = O.WidgetConstants
 
 --[[-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ local BaseAttributeSetter = O.BaseAttributeSetter
 Methods
 -------------------------------------------------------------------------------]]
 function S:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+    btnUI.widget:ResetWidgetAttributes(btnUI)
 
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
     if type(macroTextInfo) ~= 'table' then return end

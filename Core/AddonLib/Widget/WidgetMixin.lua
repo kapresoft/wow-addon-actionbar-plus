@@ -13,8 +13,8 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, Core, G = ABP_LibGlobals:LibPack_NewMixin()
-local O = Core:O()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M, G = Core.M, O.LibGlobals
 local MX, String, P = O.Mixin, O.String, O.Profile
 local WC = O.WidgetConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails

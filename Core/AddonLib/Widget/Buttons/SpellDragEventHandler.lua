@@ -2,7 +2,7 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.CommonConstants.WidgetAttributes, O.PickupHandler
+local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
 local Assert = O.Assert
 local IsNil = Assert.IsNil
 

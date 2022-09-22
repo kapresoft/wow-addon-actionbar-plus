@@ -18,6 +18,7 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local LibStub, Core, O = __K_Core:LibPack()
+local GC = O.GlobalConstants
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -40,38 +41,3 @@ _L = LibStub:NewLibrary(Core.M.CommonConstants)
 --TODO: NEXT: Deprecate ABP_CommonConstants
 ABP_CommonConstants = _L
 
---[[-----------------------------------------------------------------------------
-Methods
--------------------------------------------------------------------------------]]
----@class UnitAttributes
-_L.UnitAttributes = {
-    FOCUS = 'focus'
-}
-
----@class WidgetAttributes
-local WidgetAttributes = {
-    TYPE = 'type',
-    UNIT = 'unit',
-    SPELL = 'spell',
-    ITEM = 'item',
-    MOUNT = 'mount',
-    FLY_OUT = 'flyout',
-    PET_ACTION = 'petaction',
-    MACRO_TEXT = "macrotext",
-    MACRO = "macro",
-}
-
----@class ButtonAttributes
-local ButtonAttributes = {
-    SPELL = WidgetAttributes.SPELL,
-    UNIT = WidgetAttributes.UNIT,
-    UNIT2 = format("*%s2", WidgetAttributes.UNIT),
-    TYPE = WidgetAttributes.TYPE,
-    MACRO = WidgetAttributes.MACRO,
-    MOUNT = WidgetAttributes.MOUNT,
-    MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
-}
----@type WidgetAttributes
-_L.WidgetAttributes = WidgetAttributes
----@type ButtonAttributes
-_L.ButtonAttributes = ButtonAttributes

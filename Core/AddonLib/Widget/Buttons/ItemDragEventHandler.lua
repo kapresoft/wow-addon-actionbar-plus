@@ -1,17 +1,18 @@
--- ## External -------------------------------------------------
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
 local GetItemInfo = GetItemInfo
-local _, Table = ABP_LibGlobals:LibPackUtils()
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local P, Assert, PH = O.Profile, O.Assert, O.PickupHandler
-local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.CommonConstants.WidgetAttributes
+local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
+local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
 local IsNil = Assert.IsNil
 
 --TODO: NEXT: Add _API to GlobalObjects
-local _API = _API
+local _API = O.TBC_API
 
 --[[-----------------------------------------------------------------------------
 New Instance

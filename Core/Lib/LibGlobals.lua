@@ -24,7 +24,7 @@ local ABP_PLUS_DB_NAME = 'ABP_PLUS_DB'
 local addonName, versionFormat, logPrefix = Core:GetAddonInfo()
 
 ---Only put string constants here (non-UI contants)
----@class GlobalConstants
+---@class LibGlobalConstants
 local C = {
 
     ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
@@ -77,131 +77,10 @@ ABP_LibGlobals = _L
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
----local LibStub, M, G = ABP_LibGlobals:LibPack()
----@return LocalLibStub, Module, LibGlobals
-function _L:LibPack() return LibStub, M, _L end
-
----### Get New Addon LibPack
----```
----local LibStub, Module, AceLibFactory, WidgetLibFactory, ProfileInitializer, LibGlobals = LibGlobals:LibPack_NewAddon()
----```
----@return LocalLibStub, Module, AceLibFactory, WidgetLibFactory, ProfileInitializer, LibGlobals
-function _L:LibPack_NewAddon()
-    local AceLibFactory, WidgetLibFactory, ProfileInitializer = self:Get(
-            M.AceLibFactory, M.WidgetLibFactory, M.ProfileInitializer)
-    return LibStub, M, AceLibFactory, WidgetLibFactory, ProfileInitializer, _L
-end
----### Usage
----```
----local LibStub, M, P, LogFactory = ABP_LibGlobals:LibPack_NewLibrary()
----```
----@return LocalLibStub, Module, Profile, LogFactory
-function _L:LibPack_NewLibrary()
-    local Profile, LogFactory = self:Get(M.Profile, M.LogFactory)
-    return LibStub, M, Profile, LogFactory
-end
-
----### Example:
----local LibStub, Module, LogFactory, LibGlobals = LibGlobals:LibPack()
----@return LocalLibStub, Module, LogFactory, LibGlobals
-function _L:LibPack_UI() return LibStub, M, self:Get(M.LogFactory), _L end
-
----```
----Example:
----local LibStub, Module, Core, LibGlobals = LibGlobals:LibPack_NewMixin()
----```
----@return LocalLibStub, Module, Core, LibGlobals
-function _L:LibPack_NewMixin() return LibStub, M, Core, _L end
-
----@return AceLibFactory
-function _L:LibPack_AceLibFactory() return _L:Get(M.AceLibFactory)  end
-
----### Usage:
----```
----local AceDB, AceDBOptions, AceConfig, AceConfigDialog = AceLibFactory:GetAddonAceLibs()
----```
----@return AceDB, AceDBOptions, AceConfig, AceConfigDialog
-function _L:LibPack_AceAddonLibs()
-    local alf = self:LibPack_AceLibFactory()
-    return alf:GetAceDB(), alf:GetAceDBOptions(), alf:GetAceConfig(), alf:GetAceConfigDialog()
-end
-
----### Example
----```
----local AceEvent, AceGUI, AceHook = G:LibPack_AceLibrary()
----```
----@return AceEvent, AceGUI, AceHook
-function _L:LibPack_AceLibrary()
-    ---@type AceLibFactory
-    local AceLibFactory = self:Get(M.AceLibFactory)
-    return AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
-end
-
----### Usage:
----```
----local pformat, ToStringSorted = ABP_LibGlobals:LibPackPrettyPrint()
----```
----@return pformat, function
-function _L:LibPackPrettyPrint()
-    local PrettyPrint, Table = self:Get(M.PrettyPrint, M.Table)
-    return PrettyPrint.pformat, Table.ToStringSorted
-end
-
---- ### Usage
----```
----local PrettyPrint, Table, String, LogFactory = ABP_LibGlobals:LibPackUtils()
----```
----@return PrettyPrint, Table, String, LogFactory
-function _L:LibPackUtils()
-    local PrettyPrint, Table, String, LogFactory = self:Get(
-            M.PrettyPrint, M.Table, M.String, M.LogFactory)
-    return PrettyPrint, Table, String, LogFactory
-end
-
----@return Table, String
-function _L:LibPack_CommonUtils()
-    local Table, String = self:Get(M.Table, M.String)
-    return Table, String
-end
-
 function _L:GetLogLevel() return ABP_LOG_LEVEL end
 ---@param level number The log level between 1 and 100
 function _L:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
 
----@return WidgetLibFactory
-function _L:GetWidgetLibFactory() return self:Get(M.WidgetLibFactory) end
----@return MacroEventsHandler
-function _L:GetMacroEventsHandler() return self:Get(M.MacroEventsHandler) end
-
----@type CommonConstants
-function _L:LibPack_CommonConstants() return self:Get(M.CommonConstants) end
-
----@return WidgetMixin
-function _L:Lib_WidgetMixin() return self:Get(M.WidgetMixin) end
-
----local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
----@return string, string, string The spell, item, macro attribute values
-function _L:SpellItemMacroAttributes()
-    ---@type WidgetAttributes
-    local Attr = self:LibPack_CommonConstants().WidgetAttributes
-    return Attr.SPELL, Attr.ITEM, Attr.MACRO
-end
-
----@return UnitIDAttributes
-function _L:UnitIdAttributes()
-    ---@class UnitIDAttributes
-    local unitIDAttributes = {
-        focus = 'focus',
-        target = 'target',
-        mouseover = 'mouseover',
-        none = 'none',
-        pet = 'pet',
-        player = 'player',
-        vehicle = 'vehicle',
-    }
-    return unitIDAttributes
-end
 
 function _L:Get(...)
     local libNames = {...}
@@ -231,7 +110,7 @@ function _L:GetVersionInfo() return self.versionText, self.version end
 function _L:GetAddonInfo()
     local versionText = self.versionText
     --@debug@
-    if versionText == '1.0.0.10-beta' then versionText = addonName .. '-' .. self.version .. '.dev' end
+    versionText = '1.0.dev'
     --@end-debug@
     return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
                 GetAddOnMetadata(addonName, 'X-Github-Repo')

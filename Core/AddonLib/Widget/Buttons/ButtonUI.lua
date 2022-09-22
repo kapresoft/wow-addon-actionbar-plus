@@ -18,19 +18,15 @@ local M = Core.M
 local AceLibFactory, LogFactory = O.AceLibFactory, O.LogFactory
 local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
 
-local CC = O.CommonConstants
-local A = O.Assert
-local P = O.Profile
-local PH = O.PickupHandler
 local String = O.String
-local WC = O.WidgetConstants
-local WMX = O.WidgetMixin
-local G = O.LibGlobals
+local A, P, PH = O.Assert, O.Profile, O.PickupHandler
+local WC, WMX = O.WidgetConstants, O.WidgetMixin
+local G, GC = O.LibGlobals, O.GlobalConstants
 
 local IsBlank = String.IsBlank
 local C, E = WC.C, WC.E
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local ACTION_TYPES = O.CommonConstants.WidgetAttributes
+local ACTION_TYPES = GC.WidgetAttributes
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -429,7 +425,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameStrata = 'MEDIUM',
         ---@type number
         buttonPadding = 2,
-        buttonAttributes = CC.ButtonAttributes,
+        buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
     AceEvent:Embed(widget)

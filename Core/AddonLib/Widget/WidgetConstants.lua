@@ -13,7 +13,7 @@ local p = LogFactory(Core.M.WidgetConstants)
 -- #########################################################
 
 ---Only put Widget Constants here
----@class WidgetConstantsConstants : GlobalConstants
+---@class WidgetConstantsConstants : LibGlobalConstants
 local C = {
     mt = { __index = G.C },
     TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),

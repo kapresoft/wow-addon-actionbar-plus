@@ -2,9 +2,8 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local G = O.LibGlobals
 local String, Assert = O.String, O.Assert
-local WAttr = O.CommonConstants.WidgetAttributes
+local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil

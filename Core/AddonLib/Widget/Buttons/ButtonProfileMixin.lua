@@ -7,7 +7,7 @@ local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyD
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local String, Table, WAttr = O.String, O.Table, O.CommonConstants.WidgetAttributes
+local String, Table, WAttr = O.String, O.Table, O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 local IsTableEmpty = Table.isEmpty
 

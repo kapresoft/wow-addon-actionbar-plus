@@ -13,22 +13,25 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local G, MX = O.LibGlobals, O.Mixin
+local G, GC, MX = O.LibGlobals, O.GlobalConstants, O.Mixin
 local LSM, WC, P = O.AceLibFactory:GetAceSharedMedia(), O.WidgetConstants, O.Profile
 local String, LogFactory = O.String, O.LogFactory
-local SPELL, ITEM, MACRO = G:SpellItemMacroAttributes()
-local UNIT = G:UnitIdAttributes()
+
+local WAttr = O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+
+local C, T = GC.C, GC.Textures
+local UNIT = GC.UnitIDAttributes
 
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
-local highlightTexture = WC.C.TEXTURE_HIGHLIGHT2
-local pushedTextureMask = WC.C.TEXTURE_HIGHLIGHT2
+local highlightTexture = T.TEXTURE_HIGHLIGHT2
+local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
 
-local p = LogFactory:NewLogger(Core.M.ButtonMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -38,6 +41,7 @@ button: widget.button
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
 local _L = LibStub:NewLibrary(Core.M.ButtonMixin)
+local p = _L:GetLogger()
 MX:Mixin(_L, O.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -63,7 +67,7 @@ local function SetButtonLayout(widget, rowNum, colNum)
 
     button:SetFrameStrata(frameStrata)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(WC.C.TOPLEFT, dragFrameWidget.frame, WC.C.TOPLEFT, widthAdj, -heightAdj)
+    button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
     button.keybindText.widget:ScaleWithButtonSize(buttonSize)
 end
@@ -99,9 +103,9 @@ function _L:InitTextures(icon)
     local tex = btnUI:GetPushedTexture()
     tex:SetAlpha(pushedTextureInUseAlpha)
     local mask = btnUI:CreateMaskTexture()
-    mask:SetPoint(WC.C.TOPLEFT, tex, WC.C.TOPLEFT, 3, -3)
-    mask:SetPoint(WC.C.BOTTOMRIGHT, tex, WC.C.BOTTOMRIGHT, -3, 3)
-    mask:SetTexture(pushedTextureMask, WC.C.CLAMPTOBLACKADDITIVE, WC.C.CLAMPTOBLACKADDITIVE)
+    mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 3, -3)
+    mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -3, 3)
+    mask:SetTexture(pushedTextureMask, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
     tex:AddMaskTexture(mask)
 end
 
@@ -378,7 +382,7 @@ function _L:SetCooldownTextures(icon)
 end
 function _L:SetHighlightInUse()
     local hlt = self:_Button():GetHighlightTexture()
-    hlt:SetDrawLayer(WC.C.ARTWORK_DRAW_LAYER)
+    hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
 function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
@@ -470,7 +474,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
     if not widget:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
     -- else if in range, color is "white"
-    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.target)
+    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -497,7 +501,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
     -- has target, set text as range indicator
     fs.widget:SetTextWithRangeIndicator()
 
-    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.target)
+    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -511,7 +515,7 @@ function _L:UpdateRangeIndicator()
     if not self:ContainsValidAction() then return end
     local widget = self:_Widget()
     local configIsShowKeybindText = widget.dragFrame:IsShowKeybindText()
-    local hasTarget = GetUnitName(UNIT.target) ~= null
+    local hasTarget = GetUnitName(UNIT.TARGET) ~= null
     widget:ShowKeybindText(configIsShowKeybindText)
 
     if configIsShowKeybindText == true then

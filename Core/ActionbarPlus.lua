@@ -56,14 +56,17 @@ local function OnAddonLoaded(frame, event, ...)
         --p:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
         WMX:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
     end
-    if not isLogin then return end
+    --@debug@
+    isLogin = true
+    --@end-debug@
 
+    if not isLogin then return end
     local versionText, curseForge, githubIssues = G:GetAddonInfo()
     p:log("%s initialized", versionText)
     p:log('Available commands: /abp to open config dialog.')
     p:log('Right-click on the button drag frame to open config dialog.')
-    p:log('Curse Forge:', curseForge)
-    p:log('Issues:', githubIssues)
+    p:log('Curse Forge: %s', curseForge)
+    p:log('Issues: %s', githubIssues)
 
 end
 

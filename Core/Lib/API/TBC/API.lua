@@ -13,17 +13,22 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O = __K_Core:LibPack_GlobalObjects()
-local String = O.String
+local O, Core = __K_Core:LibPack_GlobalObjects()
+local String, Mixin = O.String, O.Mixin
 local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
+local BaseAPI, WAttr = O.BaseAPI, O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class API
+--TODO: Rename to TBC_API
+---@class API : BaseAPI
 local S = {}
 ---@type API
 _API = S
+--TODO: Next Deprecate Global Var _API
+Core:Register(Core.M.API, S)
 
 local p = O.LogFactory('API')
 
@@ -89,19 +94,20 @@ end
 ---@param cursorInfo CursorInfo
 function S:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
-    local name, spellID, icon = self:_GetMountInfo(mountIDorIndex)
+    local mountInfoAPI = BaseAPI:GetMountInfo(mountIDorIndex)
+    p:log("mountInfoAPI: %s", mountInfoAPI)
 
     ---@class MountInfoSpell
     local spell = {
         ---@type number
-        id = spellID,
+        id = mountInfoAPI.spellID,
         ---@type number
-        icon = icon }
+        icon = mountInfoAPI.icon }
 
     ---@class MountInfo
     local info = {
         ---@type string
-        name = name,
+        name = mountInfoAPI.name,
         ---@type number
         id = mountIDorIndex,
         ---@type number
@@ -110,7 +116,7 @@ function S:GetMountInfo(cursorInfo)
         spell = spell
     }
     if C_MountJournal then info.index = cursorInfo.info2 end
-
+    p:log('GetMountInfo| mount info: %s', info)
     return info
 end
 
@@ -119,8 +125,6 @@ end
 ---@param btnConfig ProfileButton
 ---@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
 function S:IsActionInRange(btnConfig, targetUnit)
-    local SPELL, ITEM, MACRO = ABP_LibGlobals:SpellItemMacroAttributes()
-
     if btnConfig.type == SPELL then
         local val = IsSpellInRange(btnConfig.spell.name, targetUnit)
         if val == nil then return nil end

@@ -2,12 +2,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <!-- Disable the following for now -->
-    <!-- <Script file="ArtTextureID.lua"/>-->
-    <!-- <Script file="MacroIconCategories.lua"/>-->
     <Script file="WidgetConstants.lua"/>
     <Script file="WidgetMixin.lua"/>
-    <Script file="WidgetLibFactory.lua"/>
 
     <Script file="MacroEventsHandler.lua"/>
     <Include file="Buttons\_Buttons.xml"/>

@@ -7,7 +7,7 @@ local GameTooltip = GameTooltip
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local Assert, String, W, WAttr = O.Assert, O.String, O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local Assert, String, WAttr = O.Assert, O.String, O.GlobalConstants.WidgetAttributes
 local AssertNotNil = Assert.AssertNotNil
 local WC = O.WidgetConstants
 
@@ -26,7 +26,7 @@ Methods
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
 function S:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+    btnUI.widget:ResetWidgetAttributes(btnUI)
     local itemData = btnData[WAttr.ITEM]
     if type(itemData) ~= 'table' then return end
     if not itemData.id then return end

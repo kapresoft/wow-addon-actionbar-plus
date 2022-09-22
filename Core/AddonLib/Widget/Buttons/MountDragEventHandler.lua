@@ -3,10 +3,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local PH, CC, WC = O.PickupHandler, O.CommonConstants, O.WidgetConstants
+local PH, GC, WC = O.PickupHandler, O.GlobalConstants, O.WidgetConstants
 local IsBlank, IsNotBlank, AssertNotNil, IsNil =
     String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
-local BAttr, WAttr, UAttr = CC.ButtonAttributes,  CC.WidgetAttributes, CC.UnitAttributes
+local WAttr = GC.WidgetAttributes
 local EMPTY_ICON = WC.C.TEXTURE_EMPTY
 
 --[[-----------------------------------------------------------------------------

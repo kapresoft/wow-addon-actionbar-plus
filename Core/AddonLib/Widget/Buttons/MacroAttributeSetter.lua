@@ -12,7 +12,7 @@ local sformat = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local String, WA, WAttr = O.String, O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local String, WAttr = O.String, O.GlobalConstants.WidgetAttributes
 local WC = O.WidgetConstants
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
 local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
@@ -32,7 +32,7 @@ Methods
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
 function S:SetAttributes(btnUI, btnData)
-    WA:ResetWidgetAttributes(btnUI)
+    btnUI.widget:ResetWidgetAttributes(btnUI)
 
     local macroInfo = btnData[WAttr.MACRO]
     local icon = WC.C.TEXTURE_EMPTY

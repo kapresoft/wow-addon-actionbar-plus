@@ -1,17 +1,23 @@
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local type, pairs, tostring = type, pairs, tostring
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local _, Table = ABP_LibGlobals:LibPackUtils()
-local Assert = LibStub(M.Assert)
 
-local CC = G:LibPack_CommonConstants()
-local BAttr = CC.ButtonAttributes
-local WAttr = CC.WidgetAttributes
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M, GC = Core.M, O.GlobalConstants
 
+local Table, Assert = O.Table, O.Assert
+
+local BAttr, WAttr = GC.ButtonAttributes, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+
 ---@type ProfileInitializer
-local ProfileInitializer = LibStub(M.ProfileInitializer)
+local ProfileInitializer = O.ProfileInitializer
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 

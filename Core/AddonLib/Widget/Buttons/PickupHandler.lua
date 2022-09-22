@@ -1,15 +1,15 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local PickupSpell, PickupMacro, PickupItem = PickupSpell, PickupMacro, PickupItem
+local PickupSpell, PickupMacro, PickupItem, PickupCompanion = PickupSpell, PickupMacro, PickupItem, PickupCompanion
 local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local G, LogFactory, Table = O.LibGlobals, O.LogFactory, O.Table
+local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table
 local IsNotBlank, IsTableEmpty = O.String.IsNotBlank, Table.isEmpty
-local WAttr = O.CommonConstants.WidgetAttributes
+local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 local p = LogFactory(Core.M.PickupHandler)
@@ -39,7 +39,8 @@ local function PickupStuff(widget)
     elseif widget:IsItem() then
         PickupItem(btnConf[ITEM].id)
     elseif widget:IsMount() then
-        PickupCompanion(MOUNT, btnConf[MOUNT].id)
+        local mountData = widget:GetButtonData():GetMountInfo()
+        BaseAPI:PickupMount(mountData.name, mountData.id)
     else
         p:log(20, "PickupExisting | no item picked up")
     end

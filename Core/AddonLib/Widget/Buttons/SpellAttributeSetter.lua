@@ -14,8 +14,9 @@ Local Vars
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
 local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
-local CC, WC = O.CommonConstants, O.WidgetConstants
-local BAttr, WAttr, UAttr = CC.ButtonAttributes,  CC.WidgetAttributes, CC.UnitAttributes
+local WC = O.WidgetConstants
+local GC = O.GlobalConstants
+local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 
 --[[-----------------------------------------------------------------------------
 New Instance

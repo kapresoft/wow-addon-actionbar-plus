@@ -299,11 +299,6 @@ local function WidgetMethods(widget)
     end
 end
 
---local function getProfileUtil()
---    if not P then P = WidgetLibFactory:GetProfile() end
---    return P
---end
-
 ---@return Frame
 function _L:GetFrameByIndex(frameIndex)
     local frameName = P:GetFrameNameByIndex(frameIndex)
