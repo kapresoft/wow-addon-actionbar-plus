@@ -4,6 +4,8 @@ Blizzard Vars
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
+local C_MountJournal, GetCompanionInfo = C_MountJournal, GetCompanionInfo
+local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
