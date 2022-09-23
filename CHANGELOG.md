@@ -1,3 +1,6 @@
+### 1.0.0.33.Future
+- Support for Mounts [WOTLK and Retail] [Issue #54](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/54)
+
 ### 1.0.0.32
 - fix for confirmation dialog not showing on rows and col changes in settings
 - fix for macro type drag and drop to ActionbarPlus action bar.
