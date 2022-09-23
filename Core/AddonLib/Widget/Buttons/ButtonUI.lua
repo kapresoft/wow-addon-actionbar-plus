@@ -215,9 +215,9 @@ local function OnSpellCastStart(widget, event, ...)
     if not widget.button:IsShown() then return end
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    local profileButton = widget:GetConfig()
-    if widget:IsMatchingItemSpellID(spellID, profileButton)
-            or widget:IsMatchingSpellID(spellID, profileButton) then
+    local btnConf = widget:GetConfig()
+    if widget:IsMatchingSpellID(spellID, btnConf) then
+        p:log(10, 'OnSpellCastStart| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
         widget:SetHighlightInUse()
     end
 end
@@ -230,9 +230,9 @@ local function OnSpellCastStop(widget, event, ...)
 
     local unitTarget, castGUID, spellID = ...
     if 'player' ~= unitTarget then return end
-    local profileButton = widget:GetConfig()
-    if widget:IsMatchingItemSpellID(spellID, profileButton)
-            or widget:IsMatchingSpellID(spellID, profileButton) then
+    local btnConf = widget:GetConfig()
+    if widget:IsMatchingSpellID(spellID, btnConf) then
+        p:log(10, 'OnSpellCastStop| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
         widget:ResetHighlight()
     end
 end

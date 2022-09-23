@@ -379,6 +379,7 @@ function _L:SetCooldownTextures(icon)
     btnUI:SetNormalTexture(icon)
     btnUI:SetPushedTexture(icon)
 end
+---Typically used when casting spells that take longer than GCD
 function _L:SetHighlightInUse()
     local hlt = self:_Button():GetHighlightTexture()
     hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
@@ -400,25 +401,31 @@ end
 
 
 ---@param spellID string The spellID to match
----@param optionalProfileButton ProfileButton
+---@param optionalBtnConf ProfileButton
 ---@return boolean
-function _L:IsMatchingItemSpellID(spellID, optionalProfileButton)
+function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
     --local profileButton = btnWidget:GetConfig()
-    if not self:IsValidItemProfile(optionalProfileButton) then return end
-    local _, btnItemSpellId = _API:GetItemSpellInfo(optionalProfileButton.item.id)
+    if not self:IsValidItemProfile(optionalBtnConf) then return end
+    local _, btnItemSpellId = _API:GetItemSpellInfo(optionalBtnConf.item.id)
     if spellID == btnItemSpellId then return true end
     return false
 end
 
 ---@param spellID string The spellID to match
----@param optionalProfileButton ProfileButton
+---@param optionalBtnConf ProfileButton
 ---@return boolean
-function _L:IsMatchingSpellID(spellID, optionalProfileButton)
+function _L:IsMatchingSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
-    local buttonData = optionalProfileButton or self:GetConfig()
-    if not self:IsValidSpellProfile(buttonData) then return end
-    if spellID == buttonData.spell.id then return true end
+    local buttonData = optionalBtnConf or self:GetConfig()
+    local w = self:W()
+    if w:IsSpell() then
+        return spellID == buttonData.spell.id
+    elseif w:IsItem() then
+        return w:IsMatchingItemSpellID(spellID, buttonData)
+    elseif w:IsMount() then
+        return spellID == buttonData.mount.spell.id
+    end
     return false
 end
 
