@@ -16,6 +16,7 @@ local M = {
     PrettyPrint = 'PrettyPrint',
     Table = 'Table',
     String = 'String',
+    LuaEvaluator = 'LuaEvaluator',
     ActionType = 'ActionType',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
@@ -31,7 +32,7 @@ local M = {
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     Config = 'Config',
-    DebugDialog = 'DebugDialog',
+    PopupDebugDialog = 'PopupDebugDialog',
     GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
@@ -82,8 +83,8 @@ local GlobalObjectsTemplate = {
     ButtonUIWidgetBuilder = {},
     ---@type Config
     Config = {},
-    ---@type DebugDialog
-    DebugDialog = {},
+    ---@type PopupDebugDialog
+    PopupDebugDialog = {},
     ---@type GlobalConstants
     GlobalConstants = {},
     ---@type ItemAttributeSetter
@@ -94,6 +95,8 @@ local GlobalObjectsTemplate = {
     LogFactory = {},
     ---@type Logger
     Logger = {},
+    ---@type LuaEvaluator,
+    LuaEvaluator = {},
     ---@type MacroAttributeSetter
     MacroAttributeSetter = {},
     ---@type MacroDragEventHandler

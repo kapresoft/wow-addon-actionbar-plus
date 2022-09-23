@@ -22,7 +22,7 @@ local FRAME_NAME = ADDON_NAME .. "Frame"
 local Table, LogFactory = O.Table, O.LogFactory
 local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
 local IsBlank = O.String.IsBlank
-local MX, WMX, DebugDialog = O.Mixin, O.WidgetMixin, O.DebugDialog
+local MX, WMX, PopupDebugDialog = O.Mixin, O.WidgetMixin, O.PopupDebugDialog
 
 local AceDB, AceDBOptions = ALF:GetAceDB(), ALF:GetAceDBOptions()
 local AceConfig, AceConfigDialog = ALF:GetAceConfig(), ALF:GetAceConfigDialog()
@@ -30,8 +30,8 @@ local AceConfig, AceConfigDialog = ALF:GetAceConfig(), ALF:GetAceConfigDialog()
 local C, P, BF = O.Config, O.Profile, O.ButtonFactory
 local libModules = { C, P, BF }
 
----@type DebugDialog
-local debugDialog
+---@type PopupDebugDialog
+local popupDebugDialog
 
 ---@type LoggerTemplate
 local p = LogFactory()
@@ -73,21 +73,6 @@ local function OnAddonLoaded(frame, event, ...)
 
 end
 
----@param literalVarName string
-local function evalValue(literalVarName)
-    if IsBlank(literalVarName) then return end
-    local scriptToEval = format([[ return %s]], literalVarName)
-    local func, errorMessage = loadstring(scriptToEval, "Eval-Variable")
-    local val = func()
-    if type(val) == 'function' then
-        local status, error = pcall(function() val = val() end)
-        if not status then
-            val = nil
-        end
-    end
-    return val
-end
-
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -96,35 +81,26 @@ local methods = {
     ---@param self ActionbarPlus
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand("abp", "OpenConfig")
-        --@debug@--
         self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
-        --@end-debug@--
     end,
     ---@param self ActionbarPlus
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
-        --TODO: NEXT: Move to DevTools addon
         local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if IsEmptyTable(vars) then return end
-        local firstVar = vars[1]
-
-        if firstVar == '<profile>' then
-            self:HandleSlashCommand_ShowProfile()
+        if IsEmptyTable(vars) then 
+            p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Variable Checker Syntax", "/cv <var-name>")
+            p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Example", "/cv <profile> or /cv ABP.profile")
             return
         end
 
-        local strVal = evalValue(firstVar)
-        debugDialog:SetTextContent(pformat:A()(strVal))
-        debugDialog:SetStatusText(sformat('Var: %s type: %s', firstVar, type(strVal)))
-        debugDialog:Show()
-    end,
-    ---@param self ActionbarPlus
-    ['HandleSlashCommand_ShowProfile'] = function(self)
-        local profileData = self:GetCurrentProfileData()
-        local strVal = pformat:A():pformat(profileData)
-        local profileName = self.db:GetCurrentProfile()
-        debugDialog:SetTextContent(strVal)
-        debugDialog:SetStatusText(sformat('Current Profile Data for [%s]', profileName))
-        debugDialog:Show()
+        local firstArg = vars[1]
+        if firstArg == '<profile>' then
+            local profileData = self:GetCurrentProfileData()
+            local profileName = self.db:GetCurrentProfile()
+            popupDebugDialog:EvalObjectThenShow(profileData, profileName)
+            return
+        end
+
+        popupDebugDialog:EvalThenShow(firstArg)
     end,
     ---@param self ActionbarPlus
     ['ShowDebugDialog'] = function(self, obj, optionalLabel)
@@ -135,12 +111,10 @@ local methods = {
         else
             text = obj
         end
-        debugDialog:SetTextContent(text)
-        debugDialog:SetStatusText(label)
-        debugDialog:Show()
+        popupDebugDialog:SetTextContent(text)
+        popupDebugDialog:SetStatusText(label)
+        popupDebugDialog:Show()
     end,
-    ---@param self ActionbarPlus
-    ['DBG'] = function(self, obj, optionalLabel) self:ShowDebugDialog(obj, optionalLabel)  end,
     ---@param self ActionbarPlus
     ['ConfirmReloadUI'] = function(self)
         if IsShiftKeyDown() then
@@ -201,7 +175,7 @@ local methods = {
         self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
         self:InitDbDefaults()
 
-        debugDialog = DebugDialog()
+        popupDebugDialog = PopupDebugDialog()
 
         self.barBindings = WMX:GetBarBindingsMap()
         self:OnInitializeModules()

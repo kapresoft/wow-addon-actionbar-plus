@@ -27,6 +27,7 @@ local C = {
     ADDON_NAME = 'ActionbarPlus',
     DB_NAME = 'ABP_PLUS_DB',
     ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
+    ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
     ALT = 'ALT',
     ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
     ARTWORK_DRAW_LAYER = 'ARTWORK',
