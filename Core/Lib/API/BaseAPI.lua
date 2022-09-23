@@ -4,13 +4,24 @@
 --- with different API versions.
 --- #############################################################
 ---
+
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local C_MountJournal, C_Timer, PickupCompanion, GetCompanionInfo = C_MountJournal, C_Timer, PickupCompanion, GetCompanionInfo
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local String, Assert = O.String, O.Assert
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
 local MOUNT = O.GlobalConstants.WidgetAttributes.MOUNT
+local sformat = String.format
 
 ---@class BaseAPI
 local L = LibStub:NewLibrary(Core.M.BaseAPI)
+---@type LoggerTemplate
 local p = L:GetLogger()
 
 ---@class MountInfo_API
@@ -34,7 +45,7 @@ end
 ---@param mountID number
 function L:PickupMount(mountName, mountID)
     if C_MountJournal and IsNotBlank(mountName) then
-        C_MountJournal.SetSearch(mountName)
+        C_MountJournal.SetSearch(sformat('"%s"', mountName))
         C_MountJournal.Pickup(1)
         C_Timer.After(0.5, function() C_MountJournal.SetSearch('')  end)
         return
@@ -53,7 +64,7 @@ end
 --- @return MountInfo_API
 ---@param companionIndex number
 function L:GetMountInfoLegacy(companionIndex)
-    local creatureID, creatureName, creatureSpellID, icon, issummoned =
+    local creatureID, creatureName, creatureSpellID, icon, isSummoned =
             GetCompanionInfo(MOUNT, companionIndex)
 
     local o = {
