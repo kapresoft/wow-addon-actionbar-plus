@@ -19,8 +19,6 @@ local M = {
     ActionType = 'ActionType',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
-    -- Constants
-    CommonConstants = 'CommonConstants',
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
@@ -33,6 +31,7 @@ local M = {
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     Config = 'Config',
+    DebugDialog = 'DebugDialog',
     GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
@@ -81,10 +80,10 @@ local GlobalObjectsTemplate = {
     ButtonUI = {},
     ---@type ButtonUIWidgetBuilder
     ButtonUIWidgetBuilder = {},
-    ---@type CommonConstants
-    CommonConstants = {},
     ---@type Config
     Config = {},
+    ---@type DebugDialog
+    DebugDialog = {},
     ---@type GlobalConstants
     GlobalConstants = {},
     ---@type ItemAttributeSetter

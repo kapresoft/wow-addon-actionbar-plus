@@ -25,6 +25,7 @@ local L = {}
 ---@class GlobalAttributes
 local C = {
     ADDON_NAME = 'ActionbarPlus',
+    DB_NAME = 'ABP_PLUS_DB',
     ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
     ALT = 'ALT',
     ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',

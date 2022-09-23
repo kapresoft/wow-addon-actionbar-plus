@@ -6,5 +6,6 @@
 
     <Script file="MacroEventsHandler.lua"/>
     <Include file="Buttons\_Buttons.xml"/>
+    <Include file="Dialogs\_Dialogs.xml"/>
 
 </Ui>

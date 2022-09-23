@@ -6,7 +6,7 @@ local UIParent, CreateFrame = UIParent, CreateFrame
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local unpack, sformat = unpack, string.format
+local sformat, loadstring, format = string.format, loadstring, format
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -14,22 +14,26 @@ Local Vars
 -- Bump this version for every release tag
 --
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local AceLibFactory, GC = O.AceLibFactory, O.GlobalConstants
+local ALF, GC = O.AceLibFactory, O.GlobalConstants
 
 local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
 
-local Table, LogFactory, TextureDialog = O.Table, O.LogFactory, O.MacroTextureDialog
-local isEmpty, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
-local DEBUG_DIALOG_GLOBAL_FRAME_NAME = 'ABP_DebugPopupDialogFrame'
-local MX, WMX = O.Mixin, O.WidgetMixin
+local Table, LogFactory = O.Table, O.LogFactory
+local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
+local IsBlank = O.String.IsBlank
+local MX, WMX, DebugDialog = O.Mixin, O.WidgetMixin, O.DebugDialog
 
--- ## Addon ----------------------------------------------------
-local ACE_DB, ACE_DBO, ACE_CFG, ACE_CFGD = AceLibFactory:GetAceDB(), AceLibFactory:GetAceDBOptions(),
-        AceLibFactory:GetAceConfig(), AceLibFactory:GetAceConfigDialog()
+local AceDB, AceDBOptions = ALF:GetAceDB(), ALF:GetAceDBOptions()
+local AceConfig, AceConfigDialog = ALF:GetAceConfig(), ALF:GetAceConfigDialog()
+
 local C, P, BF = O.Config, O.Profile, O.ButtonFactory
 local libModules = { C, P, BF }
+
+---@type DebugDialog
 local debugDialog
+
+---@type LoggerTemplate
 local p = LogFactory()
 
 --[[-----------------------------------------------------------------------------
@@ -69,6 +73,21 @@ local function OnAddonLoaded(frame, event, ...)
 
 end
 
+---@param literalVarName string
+local function evalValue(literalVarName)
+    if IsBlank(literalVarName) then return end
+    local scriptToEval = format([[ return %s]], literalVarName)
+    local func, errorMessage = loadstring(scriptToEval, "Eval-Variable")
+    local val = func()
+    if type(val) == 'function' then
+        local status, error = pcall(function() val = val() end)
+        if not status then
+            val = nil
+        end
+    end
+    return val
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -82,48 +101,10 @@ local methods = {
         --@end-debug@--
     end,
     ---@param self ActionbarPlus
-    ['CreateDebugPopupDialog'] = function(self)
-        local AceGUI = AceLibFactory:GetAceGUI()
-        local frame = AceGUI:Create("Frame")
-        -- The following makes the "Escape" close the window
-        WMX:ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, frame)
-        frame:SetTitle("Debug Frame")
-        frame:SetStatusText('')
-        frame:SetCallback("OnClose", function(widget)
-            widget:SetTextContent('')
-            widget:SetStatusText('')
-        end)
-        frame:SetLayout("Flow")
-        --frame:SetWidth(800)
-
-        -- ABP_PrettyPrint.format(obj)
-        local editbox = AceGUI:Create("MultiLineEditBox")
-        editbox:SetLabel('')
-        editbox:SetText('')
-        editbox:SetFullWidth(true)
-        editbox:SetFullHeight(true)
-        editbox.button:Hide()
-        frame:AddChild(editbox)
-        frame.editBox = editbox
-
-        function frame:SetTextContent(text)
-            self.editBox:SetText(text)
-        end
-        function frame:SetIcon(iconPathOrId)
-            if not iconPathOrId then return end
-            self.iconFrame:SetImage(iconPathOrId)
-        end
-
-        frame:Hide()
-        return frame
-    end,
-    ---@param self ActionbarPlus
-    ['ShowTextureDialog'] = function(self) TextureDialog:Show() end,
-    ---@param self ActionbarPlus
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
         --TODO: NEXT: Move to DevTools addon
         local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if isEmpty(vars) then return end
+        if IsEmptyTable(vars) then return end
         local firstVar = vars[1]
 
         if firstVar == '<profile>' then
@@ -131,10 +112,9 @@ local methods = {
             return
         end
 
-        local firstObj = _G[firstVar]
-        local strVal = pformat:A():pformat(firstObj)
-        debugDialog:SetTextContent(strVal)
-        debugDialog:SetStatusText(sformat('Var: %s type: %s', firstVar, type(firstObj)))
+        local strVal = evalValue(firstVar)
+        debugDialog:SetTextContent(pformat:A()(strVal))
+        debugDialog:SetStatusText(sformat('Var: %s type: %s', firstVar, type(strVal)))
         debugDialog:Show()
     end,
     ---@param self ActionbarPlus
@@ -177,9 +157,9 @@ local methods = {
             optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
         end
         if optionsConfigPath ~= nil then
-            ACE_CFGD:SelectGroup(ADDON_NAME, optionsConfigPath)
+            AceConfigDialog:SelectGroup(ADDON_NAME, optionsConfigPath)
         end
-        ACE_CFGD:Open(ADDON_NAME)
+        AceConfigDialog:Open(ADDON_NAME)
     end,
     ---@param self ActionbarPlus
     ['OnUpdate'] = function(self) p:log('OnUpdate called...') end,
@@ -192,7 +172,7 @@ local methods = {
         local defaults = { profile =  defaultProfile }
         self.db:RegisterDefaults(defaults)
         self.profile = self.db.profile
-        if isEmpty(ABP_PLUS_DB.profiles[profileName]) then
+        if IsEmptyTable(ABP_PLUS_DB.profiles[profileName]) then
             ABP_PLUS_DB.profiles[profileName] = defaultProfile
             --error(profileName .. ': ' .. ABP_Table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
         end
@@ -215,26 +195,25 @@ local methods = {
     ---@param self ActionbarPlus
     ['OnInitialize'] = function(self)
         -- Set up our database
-        self.db = ACE_DB:New(ABP_PLUS_DB_NAME)
+        self.db = AceDB:New(GC.C.DB_NAME)
         self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
         self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
         self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
         self:InitDbDefaults()
 
-        debugDialog = self:CreateDebugPopupDialog()
-        WMX:ConfigureFrameToCloseOnEscapeKey(DEBUG_DIALOG_GLOBAL_FRAME_NAME, debugDialog.frame)
+        debugDialog = DebugDialog()
 
         self.barBindings = WMX:GetBarBindingsMap()
         self:OnInitializeModules()
 
         local options = C:GetOptions()
         -- Register options table and slash command
-        ACE_CFG:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
+        AceConfig:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
         --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
-        ACE_CFGD:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
+        AceConfigDialog:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
 
         -- Get the option table for profiles
-        options.args.profiles = ACE_DBO:GetOptionsTable(self.db)
+        options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         self:RegisterSlashCommands()
     end
 }
