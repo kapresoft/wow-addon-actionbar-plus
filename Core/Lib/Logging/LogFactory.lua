@@ -1,19 +1,17 @@
 -- ## External -------------------------------------------------
 local LibStub = LibStub
-local logger = __K_Core:GetLogger()
-local G = ABP_LibGlobals
+local logger = __K_Core:_LoggerImpl()
+
 -- ## Local ----------------------------------------------------
 local Core = __K_Core
-local major, minor = Core:GetLibVersion(G.M.LogFactory)
+local major, minor = Core:GetLibVersion(Core.M.LogFactory)
 ---@type LogFactory
 local _L = LibStub:NewLibrary(major, minor)
-Core:Register(G.M.LogFactory, _L)
+Core:Register(Core.M.LogFactory, _L)
 
 -- ## Functions ------------------------------------------------
 
----@return LogFactory
-function _L:GetLogger() return logger end
-function _L:EmbedLogger(obj, optionalLogName) self:GetLogger():Embed(obj, optionalLogName) end
+function _L:EmbedLogger(obj, optionalLogName) logger:Embed(obj, optionalLogName) end
 
 ---@class LoggerTemplate
 local LoggerTemplate = {}

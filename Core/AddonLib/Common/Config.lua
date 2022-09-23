@@ -12,8 +12,7 @@ local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_S
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local M = Core.M
-local G, LogFactory = O.LibGlobals, O.LogFactory
+local GC, Mixin = O.GlobalConstants, O.Mixin
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -147,7 +146,7 @@ local methods = {
     ['OnAfterAddonLoaded'] = function(self) end,
     ['GetOptions'] = function(self)
         return {
-            name = G.addonName, handler = self.addon, type = "group",
+            name = GC.C.ADDON_NAME, handler = self.addon, type = "group",
             args = self:CreateConfig(),
         }
     end,
@@ -242,8 +241,8 @@ local methods = {
                     width = 1.2,
                     name = 'Log Level',
                     desc = 'Higher log levels generate for console logs.',
-                    get = function(_) return G:GetLogLevel() end,
-                    set = function(_, v) G:SetLogLevel(v) end,
+                    get = function(_) return GC:GetLogLevel() end,
+                    set = function(_, v) GC:SetLogLevel(v) end,
                 },
             },
         }
@@ -365,15 +364,12 @@ local function NewInstance()
     }
 
     ---@class Config
-    local _L = LibStub:NewLibrary(M.Config)
+    local _L = LibStub:NewLibrary(Core.M.Config)
     _L.mt.__index = properties
 
-    for method, func in pairs(methods) do
-        _L[method] = func
-    end
-
+    Mixin:Mixin(_L, methods)
+    ---for method, func in pairs(methods) do _L[method] = func end
     return _L
-
 end
 
 NewInstance()

@@ -9,12 +9,11 @@ local type, select, tostring, error, setmetatable = type, select, tostring, erro
 
 local C = LibStub('AceConsole-3.0', true)
 -- ## Local ----------------------------------------------------
-local G = ABP_LibGlobals
 local Core = __K_Core
-local major, minor, logPrefix = Core:GetLibVersion(G.M.Logger)
+local major, minor, logPrefix = Core:GetLibVersion(Core.M.Logger)
 ---@class Logger
 local L = LibStub:NewLibrary(major, minor)
-Core:Register(G.M.Logger, L)
+Core:Register(Core.M.Logger, L)
 
 -- ## Functions ------------------------------------------------
 ---@class LogUtil
@@ -245,7 +244,6 @@ function L:Embed(obj, optionalLogName)
 end
 
 ---Embed in a registered object module
----@see LibGlobals#EmbedNewLib for the available fields
 function L:EmbedModule(obj)
     assert(obj ~= nil and type(obj.GetModuleName) == 'function',
             'The passed object is not a valid module object.')

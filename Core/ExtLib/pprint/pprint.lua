@@ -79,6 +79,9 @@ pprint.defaults = {
     wrap_string = true,         -- wrap string when it's longer than level_width
     wrap_array = false,         -- wrap every array elements
     sort_keys = true,           -- sort table keys
+
+    -- custom
+    use_newline = true,
 }
 
 local TYPES = {
@@ -264,8 +267,14 @@ function pprint.pformat(obj, option, printer)
     end
 
     local function _n(d)
-        wrapped_printer('\n')
+        if false == option.use_newline then
+            wrapped_printer('')
+            status.indent = ' '
+        else
+            wrapped_printer('\n')
+        end
         wrapped_printer(status.indent)
+
         if d then
             _indent(d)
         end

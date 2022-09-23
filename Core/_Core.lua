@@ -102,6 +102,8 @@ function _S:Embed(o, name, major, minor)
         if type(self.OnAfterAddonLoaded) == 'function' then self:OnAfterAddonLoaded() end
     end
 
+    function o:GetLogger() return __K_Core:O().LogFactory(self:GetModuleName()) end
+
     ---
     ---AceAddon lifecycle template method
     ---### Example Call:
@@ -117,14 +119,17 @@ function _S:Embed(o, name, major, minor)
 end
 
 function _S:EmbedLoggerIfAvailable(o)
-    local logger = self:GetLogger()
+    local logger = self:_LoggerImpl()
     if not logger then return end
     logger:EmbedModule(o)
 end
 
 ---@return Logger
----@see Core#GetLogger
-function _S:GetLogger() return LibStub(self:GetMajorVersion('Logger'), true) end
+---@see Core#_LoggerImpl
+function _S:_LoggerImpl() return LibStub(self:GetMajorVersion('Logger'), true) end
+---@return LoggerTemplate
+---@param libObj table Any library created by "NewLibrary"
+function _S:GetLogger(libObj) return libObj:GetLogger() end
 
 _S.mt = { __call = function (_, ...) return _S:GetLibrary(...) end }
 setmetatable(_S, _S.mt)
@@ -166,15 +171,6 @@ function _L:LibPack() return _S, self, self:O() end
 ---@return GlobalObjects, Core, LocalLibStub
 function _L:LibPack_GlobalObjects() return self:O(), self, _S  end
 
----@return Mixin
-function _L:LibPack_Mixin() return _S:GetLibrary('Mixin') end
-
----@return LibGlobals
-function _L:LibPack_Globals() return _G['ABP_LibGlobals'] end
-
----@return LocalLibStub
-function _L:LibStub() return _S end
-
 ---@see LogFactory
 ---@return LoggerTemplate
 function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logName) end
@@ -202,7 +198,7 @@ function _L:GetLibVersion(libName, revisionNumber)
 end
 
 ---@return Logger
-function _L:GetLogger() return _S:GetLogger() end
+function _L:_LoggerImpl() return _S:_LoggerImpl() end
 
 ---Sets the global var name with the Addon short-name prefix
 ---```
@@ -237,7 +233,7 @@ function _L:InitPrettyPrint()
 
     ---@return pformat
     function o:Default()
-        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
+        pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
                    show_all=false, show_function = false })
         return self;
     end
@@ -245,8 +241,16 @@ function _L:InitPrettyPrint()
     ---Configured to show all
     ---@return pformat
     function o:A()
-        pprint.setup({ wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
-                   show_all=true, show_function = true, depth_limit = true })
+        pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
+                       show_all=true, show_function = true, depth_limit = true })
+        return self;
+    end
+
+    ---Configured to print in single line
+    ---@return pformat
+    function o:B()
+        pprint.setup({ use_newline = false, wrap_string = true, indent_size=2, sort_keys=true,
+                       level_width=120, show_all=true, show_function = true, depth_limit = true })
         return self;
     end
 
@@ -305,3 +309,7 @@ _L.Lib = _LIB
 
 ---@type Core
 __K_Core = _L
+
+--Define Globals here
+if ABP_GlobalConstants then _L:Register('GlobalConstants', ABP_GlobalConstants) end
+if ABP_Modules then _L:Register('Modules', ABP_Modules) end

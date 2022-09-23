@@ -7,18 +7,17 @@ local GameTooltip = GameTooltip
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local Assert, String, W, WAttr = O.Assert, O.String, O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
+local GC = O.GlobalConstants
+local Assert, String, WAttr = O.Assert, O.String, GC.WidgetAttributes
 local AssertNotNil = Assert.AssertNotNil
-local WC = O.WidgetConstants
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ItemAttributeSetter : BaseAttributeSetter
-local _L = LibStub:NewLibrary(Core.M.ItemAttributeSetter)
+local S = LibStub:NewLibrary(Core.M.ItemAttributeSetter)
 ---@type BaseAttributeSetter
-local Base = LibStub(Core.M.BaseAttributeSetter)
-_L.mt.__index = Base
+local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -26,15 +25,15 @@ Methods
 
 ---@param btnUI ButtonUI
 ---@param btnData ProfileButton
-function _L:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+function S:SetAttributes(btnUI, btnData)
+    btnUI.widget:ResetWidgetAttributes(btnUI)
     local itemData = btnData[WAttr.ITEM]
     if type(itemData) ~= 'table' then return end
     if not itemData.id then return end
 
     AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
-    local icon = WC.C.TEXTURE_EMPTY
+    local icon = GC.Textures.TEXTURE_EMPTY
     if itemData.icon then icon = itemData.icon end
 
     btnUI.widget:SetIcon(icon)
@@ -45,7 +44,7 @@ function _L:SetAttributes(btnUI, btnData)
 end
 
 ---@param btnUI ButtonUI
-function _L:ShowTooltip(btnUI)
+function S:ShowTooltip(btnUI)
     if not btnUI then return end
     local w = btnUI.widget
     local btnData = w:GetConfig()
@@ -53,15 +52,13 @@ function _L:ShowTooltip(btnUI)
     if String.IsBlank(btnData.type) then return end
 
     ---@type ItemData
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     local itemInfo = btnData[WAttr.ITEM]
     if itemInfo and itemInfo.id then
         GameTooltip:SetItemByID(itemInfo.id)
     end
 end
 
---[[-----------------------------------------------------------------------------
-Constructor Setup
--------------------------------------------------------------------------------]]
-_L.mt.__call = _L.SetAttributes
 
+S.mt.__index = BaseAttributeSetter
+S.mt.__call = S.SetAttributes

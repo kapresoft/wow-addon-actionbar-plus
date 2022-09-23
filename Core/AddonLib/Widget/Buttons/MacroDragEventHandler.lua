@@ -8,23 +8,22 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.CommonConstants.WidgetAttributes, O.PickupHandler
+local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
 local s_replace, IsNil = String.replace, Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class MacroDragEventHandler
-local _L = LibStub:NewLibrary(Core.M.MacroDragEventHandler)
+---@class MacroDragEventHandler : DragEventHandler
+local L = LibStub:NewLibrary(Core.M.MacroDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-function _L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
+function L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
 
 ---@param cursorInfo table Structure `{ -- }`
-function _L:Handle(btnUI, cursorInfo)
-    self:log(10, 'cursorInfo: %s', cursorInfo)
+function L:Handle(btnUI, cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues
@@ -39,7 +38,7 @@ function _L:Handle(btnUI, cursorInfo)
     if IsNil(macroInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()
-    PH:PickupExisting(btnData)
+    PH:PickupExisting(btnUI.widget)
     btnData[WAttr.TYPE] = WAttr.MACRO
     btnData[WAttr.MACRO] = macroInfo
 
@@ -54,7 +53,7 @@ end
 ---     type = 'macro'
 --- }
 ---@param cursorInfo table Cursor Info `{ type='type', info1='macroIndex' }`
-function _L:GetMacroInfo(cursorInfo)
+function L:GetMacroInfo(cursorInfo)
     local macroIndex = cursorInfo.info1
     local macroName, macroIconId, macroBody, isLocal = GetMacroInfo(macroIndex)
     local macroInfo = {
@@ -68,6 +67,6 @@ function _L:GetMacroInfo(cursorInfo)
     return macroInfo
 end
 
-function _L:HandleMacrotext(btnUI, cursorInfo)
+function L:HandleMacrotext(btnUI, cursorInfo)
     -- TODO: Not yet needed
 end

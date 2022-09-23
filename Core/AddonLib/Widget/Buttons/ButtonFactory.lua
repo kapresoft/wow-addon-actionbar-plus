@@ -13,11 +13,12 @@ local format, strlower = string.format, string.lower
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local C = O.GlobalConstants.C
 local String, A, P = O.String, O.Assert, O.Profile
-local ButtonFrameFactory, SAS, IAS, MAS, MTAS = O.ButtonFrameFactory, O.SpellAttributeSetter, O.ItemAttributeSetter,
-        O.MacroAttributeSetter, O.MacrotextAttributeSetter
-local WC = O.WidgetConstants
+local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
+local WAttr = O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 ---@type ButtonUILib
 local ButtonUI = O.ButtonUI
@@ -25,8 +26,14 @@ local WMX = O.WidgetMixin
 
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(Core.M.ButtonFactory)
+local p = L:GetLogger()
 
-local AttributeSetters = { ['spell'] = SAS, ['item'] = IAS, ['macro'] = MAS, ['macrotext'] = MTAS, }
+local AttributeSetters = {
+    [SPELL]       = O.SpellAttributeSetter,
+    [ITEM]        = O.ItemAttributeSetter,
+    [MACRO]       = O.MacroAttributeSetter,
+    [MOUNT]       = O.MountAttributeSetter,
+}
 
 -- Initialized on Logger#OnAddonLoaded()
 L.addon = nil
@@ -54,7 +61,7 @@ end
 
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
-    GameTooltip:SetOwner(frame, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
     GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget:GetFrameIndex(), 1, 1, 1))
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -62,7 +69,7 @@ end
 
 ---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    MAS:SetAttributes(btnWidget.button, btnWidget:GetConfig())
+    AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
 --[[-----------------------------------------------------------------------------
@@ -84,7 +91,7 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     elseif strlower(mouseButton) == 'rightbutton' then
         L.addon:OpenConfig(frameHandle.widget)
     elseif strlower(mouseButton) == 'button5' then
-        StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI)
+        StaticPopup_Show(C.CONFIRM_RELOAD_UI)
     end
 end
 

@@ -2,8 +2,10 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
-local GetSpellCooldown = GetSpellCooldown
+local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
+local C_MountJournal, GetCompanionInfo = C_MountJournal, GetCompanionInfo
+local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -13,33 +15,116 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local _, _, String = ABP_LibGlobals:LibPackUtils()
-local IsNotBlank = String.IsNotBlank
+local O, Core = __K_Core:LibPack_GlobalObjects()
+local String, Mixin = O.String, O.Mixin
+local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
+local BaseAPI, WAttr = O.BaseAPI, O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class API
+---@class API : BaseAPI
 local S = {}
 ---@type API
 _API = S
+--TODO: Next Deprecate Global Var _API
+Core:Register(Core.M.API, S)
 
---[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-
+local p = O.LogFactory('API')
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+
+---@return CursorInfo
+function S:GetCursorInfo()
+    -- actionType string spell, item, macro, mount, etc..
+    local actionType, info1, info2, info3 = GetCursorInfo()
+    if IsBlank(actionType) then return nil end
+    ---@class CursorInfo
+    local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
+
+    local info2Lc = strlower(c.info2 or '')
+    if c.type == 'companion' and 'mount' == info2Lc then
+        c.info2 = info2Lc
+        c.originalCursor = { type = c.type, info1 = c.info1, info2 = info2 }
+        c.type = c.info2
+    end
+
+    return c
+end
+
+---@param mountIDorIndex number
+function S:_GetMountInfo(mountIDorIndex)
+
+    if C_MountJournal then
+        local mountID = mountIDorIndex
+        local name, spellID, icon,
+        isActive, isUsable, sourceType, isFavorite,
+        isFactionSpecific, faction, shouldHideOnChar,
+        isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
+
+        return name, spellID, icon
+    end
+
+    local mountCompanionIndex = mountIDorIndex
+    local creatureID, creatureName, creatureSpellID, icon, issummoned =
+        GetCompanionInfo("mount", mountCompanionIndex)
+    return creatureName, creatureSpellID, icon;
+end
+
+---## For WOTLK
+--- CursorInfo for WOTLK
+---```
+---   info1 = <mountIndex> <-- info you need for GetCompanionInfo("mount", <info1>)
+---   info2 = "MOUNT"
+---   info3 = "companion"
+---
+--- GetCompanionInfo("mount", mountIndex), ex: GetCompanionInfo("mount", 1)
+---    returns {   4271, 'Dire Wolf', 6653, 132266, false }
+---```
+---## For Retail, use C_MountJournal
+---```
+---  C_MountJournal.GetMountInfoByID(mountId)
+---  C_MountJournal.GetDisplayedMountInfo(mountIndex)
+--- actionType, info1, info2
+--- "mount", mountId, C_MountJournal index
+---```
+---@return MountInfo
+---@param cursorInfo CursorInfo
+function S:GetMountInfo(cursorInfo)
+    local mountIDorIndex = cursorInfo.info1
+    local mountInfoAPI = BaseAPI:GetMountInfo(mountIDorIndex)
+    p:log(10, "GetMountInfo| MountInfo: %s", pformat:B()(mountInfoAPI))
+
+    ---@class MountInfoSpell
+    local spell = {
+        ---@type number
+        id = mountInfoAPI.spellID,
+        ---@type number
+        icon = mountInfoAPI.icon }
+
+    ---@class MountInfo
+    local info = {
+        ---@type string
+        name = mountInfoAPI.name,
+        ---@type number
+        id = mountIDorIndex,
+        ---@type number
+        index = -1,
+        ---@type MountInfoSpell
+        spell = spell
+    }
+    if C_MountJournal then info.index = cursorInfo.info2 end
+    return info
+end
 
 ---Note: should call ButtonData:ContainsValidAction() before calling this
 ---@return boolean true, false or nil if not applicable
 ---@param btnConfig ProfileButton
 ---@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
 function S:IsActionInRange(btnConfig, targetUnit)
-    local SPELL, ITEM, MACRO = ABP_LibGlobals:SpellItemMacroAttributes()
-
     if btnConfig.type == SPELL then
         local val = IsSpellInRange(btnConfig.spell.name, targetUnit)
         if val == nil then return nil end

@@ -7,20 +7,23 @@ local GameTooltip = GameTooltip
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local W, WAttr = O.WidgetLibFactory, O.CommonConstants.WidgetAttributes
-local WC = O.WidgetConstants
+local GC = O.GlobalConstants
+local WAttr, Assert = GC.WidgetAttributes, O.Assert
+local AssertNotNil = Assert.AssertNotNil
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class MacrotextAttributeSetter
+---@class MacrotextAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(Core.M.MacrotextAttributeSetter)
+---@type BaseAttributeSetter
+local BaseAttributeSetter = O.BaseAttributeSetter
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 function S:SetAttributes(btnUI, btnData)
-    W:ResetWidgetAttributes(btnUI)
+    btnUI.widget:ResetWidgetAttributes(btnUI)
 
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
     if type(macroTextInfo) ~= 'table' then return end
@@ -30,10 +33,10 @@ function S:SetAttributes(btnUI, btnData)
 
     AssertNotNil(macroTextInfo.id, 'btnData[item].macroInfo.id')
 
-    local icon = WC.C.TEXTURE_EMPTY
+    local icon = GC.Textures.TEXTURE_EMPTY
     if macroTextInfo.icon then icon = macroTextInfo.icon end
     btnUI:SetNormalTexture(icon)
-    btnUI:SetHighlightTexture(WC.C.TEXTURE_HIGHLIGHT)
+    btnUI:SetHighlightTexture(GC.Textures.TEXTURE_HIGHLIGHT)
 
 end
 
@@ -44,8 +47,9 @@ function S:ShowTooltip(btnUI, btnData)
     if not type then return end
 
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(macroTextInfo.id)
 end
 
+S.mt.__index = BaseAttributeSetter
 S.mt.__call = S.SetAttributes

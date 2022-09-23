@@ -76,7 +76,7 @@ end
 
 ---@param widget FrameWidget
 local function RegisterEvents(widget)
-    local E = O.WidgetConstants.E
+    local E = O.GlobalConstants.E
     ---@param w FrameWidget
     local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
     ---@param w FrameWidget
@@ -298,11 +298,6 @@ local function WidgetMethods(widget)
         f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
     end
 end
-
---local function getProfileUtil()
---    if not P then P = WidgetLibFactory:GetProfile() end
---    return P
---end
 
 ---@return Frame
 function _L:GetFrameByIndex(frameIndex)

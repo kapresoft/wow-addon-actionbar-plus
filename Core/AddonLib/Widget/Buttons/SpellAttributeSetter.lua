@@ -13,9 +13,9 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, String = O.Assert, O.String
-local IsNotBlank, AssertNotNil = String.IsNotBlank, Assert.AssertNotNil
-local CC, WC = O.CommonConstants, O.WidgetConstants
-local BAttr, WAttr, UAttr = CC.ButtonAttributes,  CC.WidgetAttributes, CC.UnitAttributes
+local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
+local GC = O.GlobalConstants
+local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -24,7 +24,6 @@ New Instance
 local _L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
 ---@type BaseAttributeSetter
 local Base = LibStub(Core.M.BaseAttributeSetter)
-_L.mt.__index = Base
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -36,7 +35,7 @@ function _L:ShowTooltip(btnUI, btnData)
     if not type then return end
 
     local spellInfo = btnData[WAttr.SPELL]
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
 
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
@@ -59,7 +58,7 @@ function _L:SetAttributes(btnUI, btnData)
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
-    local spellIcon = WC.C.TEXTURE_EMPTY
+    local spellIcon = GC.Textures.TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
     btnUI.widget:SetIcon(spellIcon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
@@ -75,11 +74,11 @@ function _L:ShowTooltip(btnUI)
     local w = btnUI.widget
     local btnData = w:GetConfig()
     if not btnData then return end
-    if String.IsBlank(btnData.type) then return end
+    if IsBlank(btnData.type) then return end
 
     local spellInfo = btnData[WAttr.SPELL]
     if not spellInfo.id then return end
-    GameTooltip:SetOwner(btnUI, WC.C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(spellInfo.id)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
@@ -88,5 +87,5 @@ function _L:ShowTooltip(btnUI)
     end
 end
 
---- So that we can call with SetAttributes(btnUI)
+_L.mt.__index = Base
 _L.mt.__call = _L.SetAttributes

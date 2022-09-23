@@ -13,6 +13,7 @@ Local Variables
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local P, LogFactory, Table = O.Profile, O.LogFactory, O.Table
+local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
 ---@class MacroEventsHandler
@@ -152,13 +153,14 @@ end
 ---1. Macro UI Updates
 ---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
-    if event == 'PLAYER_ENTERING_WORLD' then
-        _L:log(5, event)
+
+    if event == E.PLAYER_ENTERING_WORLD then
+        _L:log(10, event)
         frame:RegisterEvent('UPDATE_MACROS')
     end
 
     if event == 'UPDATE_MACROS' then
-        _L:log(15, 'Event Received: %s', event)
+        _L:log(20, 'Event Received: %s', event)
         OnMacroUpdate()
     end
 end
@@ -168,6 +170,6 @@ end
 Event Hook
 -------------------------------------------------------------------------------]]
 local frame = CreateFrame("Frame", Core.addonName .. "Frame", UIParent)
-frame:SetScript("OnEvent", OnAddonLoaded)
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:SetScript(E.OnEvent, OnAddonLoaded)
+frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
 

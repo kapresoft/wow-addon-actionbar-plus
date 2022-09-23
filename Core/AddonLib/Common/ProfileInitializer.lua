@@ -7,7 +7,7 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local ATTR, Table = O.CommonConstants.WidgetAttributes, O.Table
+local ATTR, Table = O.GlobalConstants.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
 -- ## Functions ------------------------------------------------

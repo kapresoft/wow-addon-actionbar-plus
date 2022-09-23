@@ -1,17 +1,23 @@
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local type, pairs, tostring = type, pairs, tostring
-local LibStub, M, G = ABP_LibGlobals:LibPack()
-local _, Table = ABP_LibGlobals:LibPackUtils()
-local Assert = LibStub(M.Assert)
 
-local CC = G:LibPack_CommonConstants()
-local BAttr = CC.ButtonAttributes
-local WAttr = CC.WidgetAttributes
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local M, GC = Core.M, O.GlobalConstants
 
+local Table, Assert = O.Table, O.Assert
+
+local BAttr, WAttr = GC.ButtonAttributes, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+
 ---@type ProfileInitializer
-local ProfileInitializer = LibStub(M.ProfileInitializer)
+local ProfileInitializer = O.ProfileInitializer
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
@@ -115,12 +121,21 @@ local MacroDataTemplate = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
+---@class MountData
+local MountDataTemplate = {
+    type = 'mount',
+    id = -1,
+    index = -1,
+    name = 'Reawakened Phase Hunter',
+    spell = {  id = 1, icon = 123 },
+}
 ---@class ProfileButton : ProfileButtonDataMixin
 local ProfileButtonTemplate = {
     ['type'] = 'spell',
     ["spell"] = SpellDataTemplate,
     ["item"] = ItemDataTemplate,
     ["macro"] = MacroDataTemplate,
+    ["mount"] = MountDataTemplate,
 }
 
 ---@class ProfileTemplate : DefaultProfile
@@ -148,14 +163,6 @@ local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
 ---- ## Start Here ----
 
-local SPELL = { id = nil, name = nil, icon = nil, label = nil }
-local ITEM = { id = nil, name = nil, icon = nil, label = nil }
-local MACRO = { index = nil, name = nil, icon = nil }
-local MACROTEXT = { name = nil, icon = nil, body = nil }
-local DETAILS = { spell = SPELL, item = ITEM, macro = MACRO, macrotext = MACROTEXT }
-local TOOLTIP = { text = nil, link = nil }
-local BUTTON = { type = nil, name = nil, icon = nil, macrotext = nil, tooltip = TOOLTIP, details = DETAILS }
-
 
 local function assertProfile(p)
     assert(isTable(p), "profile is not a table")
@@ -174,21 +181,6 @@ local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
 P.maxFrames = 8
 P.baseFrameName = 'ActionbarPlusF'
 
---function P:GetFrameConfig()
---    return FrameDetails
---end
-
---function P:GetFrameConfigByIndex(frameIndex)
---    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetFrameConfigByIndex(frameIndex)')
---    return FrameDetails[frameIndex]
---end
-
-function P:GetTemplate()
-    return {
-        Button = ButtonTemplate
-    }
-end
-
 ---@return ProfileButton
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
@@ -197,7 +189,7 @@ function P:GetButtonData(frameIndex, buttonName)
     --if not buttons then return nil end
     local btnData = buttons[buttonName]
     if type(buttons[buttonName]) ~= 'table' then
-        buttons[buttonName] = self:GetTemplate()
+        buttons[buttonName] = {}
     end
     return buttons[buttonName]
 end

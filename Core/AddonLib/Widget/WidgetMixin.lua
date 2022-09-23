@@ -5,6 +5,7 @@ local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
 local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 local UISpecialFrames, StaticPopup_Visible, StaticPopup_Show = UISpecialFrames, StaticPopup_Visible, StaticPopup_Show
+local StaticPopupDialogs, ReloadUI = StaticPopupDialogs, ReloadUI
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -13,17 +14,13 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local LibStub, M, Core, G = ABP_LibGlobals:LibPack_NewMixin()
-local O = Core:O()
+local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local MX, String, P = O.Mixin, O.String, O.Profile
-local WC = O.WidgetConstants
+local GC = O.GlobalConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
----@return LoggerTemplate
-local p = Core:NewLogger(M.WidgetMixin)
-
-StaticPopupDialogs[WC.C.CONFIRM_RELOAD_UI] = {
+StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
     timeout = 0, whileDead = true, hideOnEscape = true,
     OnAccept = function() ReloadUI() end,
@@ -34,7 +31,9 @@ StaticPopupDialogs[WC.C.CONFIRM_RELOAD_UI] = {
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class WidgetMixin
-local _L = LibStub:NewLibrary(M.WidgetMixin)
+local _L = LibStub:NewLibrary(Core.M.WidgetMixin)
+---@type LoggerTemplate
+local p = _L:GetLogger()
 
 ---@class FontStringWidget
 local FontStringWidget = {
@@ -163,6 +162,13 @@ function _L:HideTooltipDelayed(delayInSec)
     C_Timer.After(actualDelayInSec, function() GameTooltip:Hide() end)
 end
 
+---@class BindingInfo
+local BindingInfo = {
+    btnName = '', category = '',
+    key1 = '', key1Short = '', key2 = key2,
+    details = { action = '', buttonPressed = '' }
+}
+
 ---@return table The binding map with button names as the key
 function _L:GetBarBindingsMap()
     local barBindingsMap = {}
@@ -245,23 +251,23 @@ end
 function _L:AddItemKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
     local bindings = btnWidget:GetBindings()
-    GameTooltip:AppendText(String.format(WC.C.ABP_KEYBIND_FORMAT, bindings.key1))
+    GameTooltip:AppendText(String.format(GC.C.ABP_KEYBIND_FORMAT, bindings.key1))
 end
 
 function _L:IsDragKeyDown()
     -- 'NONE' if not specified
-    local pickupAction = GetModifiedClick(G.C.PICKUPACTION)
-    pickupAction = pickupAction == G.C.CTRL and G.C.SHIFT or pickupAction
-    local isDragKeyDown = pickupAction == G.C.SHIFT and IsShiftKeyDown()
-            or pickupAction == G.C.ALT and IsAltKeyDown()
-            or pickupAction == G.C.CTRL and IsControlKeyDown()
+    local pickupAction = GetModifiedClick(GC.C.PICKUPACTION)
+    pickupAction = pickupAction == GC.C.CTRL and GC.C.SHIFT or pickupAction
+    local isDragKeyDown = pickupAction == GC.C.SHIFT and IsShiftKeyDown()
+            or pickupAction == GC.C.ALT and IsAltKeyDown()
+            or pickupAction == GC.C.CTRL and IsControlKeyDown()
     return isDragKeyDown
 end
 
 ---@param button ButtonUI
 function _L:CreateFontString(button)
     local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint(G.C.BOTTOMRIGHT,-3, 2)
+    fs:SetPoint(GC.C.BOTTOMRIGHT,-3, 2)
     button.text = fs
 end
 
@@ -272,9 +278,10 @@ function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
     table.insert(UISpecialFrames, frameName)
 end
 
-function _L:ShowReloadUIConfirmation() StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI) end
+function _L:ShowReloadUIConfirmation() StaticPopup_Show(GC.C.CONFIRM_RELOAD_UI) end
 
 function _L:ConfirmAndReload()
-    if StaticPopup_Visible(WC.C.CONFIRM_RELOAD_UI) == nil then return StaticPopup_Show(WC.C.CONFIRM_RELOAD_UI) end
+    local reloadUI = GC.C.CONFIRM_RELOAD_UI
+    if StaticPopup_Visible(reloadUI) == nil then return StaticPopup_Show(reloadUI) end
     return false
 end

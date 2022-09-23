@@ -1,3 +1,6 @@
+### 1.0.0.33
+- Support for Mounts [WOTLK and Retail] [Issue #54](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/54)
+
 ### 1.0.0.32
 - fix for confirmation dialog not showing on rows and col changes in settings
 - fix for macro type drag and drop to ActionbarPlus action bar.
@@ -62,7 +65,7 @@
   - See doc: https://github.com/kapresoft/wow-addon-actionbar-plus/wiki/Release-1.0.0.21-Notes
 
 ### 1.0.0.20
-- Enhancement work for resizing actionbar buttons [I![](../../../../../../Users/tony/Desktop/Screen Shot 2022-08-19 at 3.56.59 PM.png)![](../../../../../../Users/tony/Desktop/Screen Shot 2022-08-19 at 3.59.32 PM.png)ssue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
+- Enhancement work for resizing actionbar buttons [Issue #6](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/6)
 - Per Character Macro rename fix for [Issue #14](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/14)
 
 ### 1.0.0.19-beta

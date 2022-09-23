@@ -9,29 +9,31 @@ setmetatable(L, L.mt)
 ---@class Module
 local M = {
     -- Libraries
-    LibGlobals = 'LibGlobals',
+    BaseAPI = 'BaseAPI',
+    API = 'API',
     Logger = 'Logger',
     LogFactory = 'LogFactory',
     PrettyPrint = 'PrettyPrint',
     Table = 'Table',
     String = 'String',
+    LuaEvaluator = 'LuaEvaluator',
     ActionType = 'ActionType',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
-    -- Constants
-    CommonConstants = 'CommonConstants',
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
     -- Addons
     BaseAttributeSetter = 'BaseAttributeSetter',
-    ButtonDataBuilder = 'ButtonDataBuilder',
+    ButtonData = 'ButtonData',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     Config = 'Config',
+    PopupDebugDialog = 'PopupDebugDialog',
+    GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     MacroAttributeSetter = 'MacroAttributeSetter',
@@ -39,19 +41,24 @@ local M = {
     MacroEventsHandler = 'MacroEventsHandler',
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
     MacroTextureDialog = 'MacroTextureDialog',
+    MountDragEventHandler = 'MountDragEventHandler',
+    MountAttributeSetter = 'MountAttributeSetter',
     PickupHandler = 'PickupHandler',
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
-    WidgetConstants = 'WidgetConstants',
-    WidgetLibFactory = 'WidgetLibFactory',
     WidgetMixin = 'WidgetMixin',
 }
 
 ---@class GlobalObjects
 local GlobalObjectsTemplate = {
+
+    ---@type BaseAPI
+    BaseAPI = {},
+    ---@type API
+    API = {},
     ---@type AceLibFactory
     AceLibFactory = {},
     ---@type ActionType
@@ -60,8 +67,8 @@ local GlobalObjectsTemplate = {
     Assert = {},
     ---@type BaseAttributeSetter
     BaseAttributeSetter = {},
-    ---@type ButtonDataBuilder
-    ButtonDataBuilder = {},
+    ---@type ButtonData
+    ButtonData = {},
     ---@type ButtonFactory
     ButtonFactory = {},
     ---@type ButtonFrameFactory
@@ -74,20 +81,22 @@ local GlobalObjectsTemplate = {
     ButtonUI = {},
     ---@type ButtonUIWidgetBuilder
     ButtonUIWidgetBuilder = {},
-    ---@type CommonConstants
-    CommonConstants = {},
     ---@type Config
     Config = {},
+    ---@type PopupDebugDialog
+    PopupDebugDialog = {},
+    ---@type GlobalConstants
+    GlobalConstants = {},
     ---@type ItemAttributeSetter
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler
     ItemDragEventHandler = {},
-    ---@type LibGlobals
-    LibGlobals = {},
     ---@type LogFactory
     LogFactory = {},
     ---@type Logger
     Logger = {},
+    ---@type LuaEvaluator,
+    LuaEvaluator = {},
     ---@type MacroAttributeSetter
     MacroAttributeSetter = {},
     ---@type MacroDragEventHandler
@@ -98,6 +107,12 @@ local GlobalObjectsTemplate = {
     MacroTextureDialog = {},
     ---@type MacrotextAttributeSetter
     MacrotextAttributeSetter = {},
+    ---@type Modules
+    Modules = {},
+    ---@type MountDragEventHandler
+    MountDragEventHandler = {},
+    ---@type MountAttributeSetter
+    MountAttributeSetter = {},
     ---@type Mixin
     Mixin = {},
     ---@type PickupHandler
@@ -116,10 +131,6 @@ local GlobalObjectsTemplate = {
     String = {},
     ---@type Table
     Table = {},
-    ---@type WidgetConstants
-    WidgetConstants = {},
-    ---@type WidgetLibFactory
-    WidgetLibFactory = {},
     ---@type WidgetMixin
     WidgetMixin = {},
 }
