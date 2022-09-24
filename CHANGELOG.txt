@@ -1,3 +1,7 @@
+### 1.0.1.Future
+- Start incrementing minor version
+- Fix for toy items being grayed out [Issue #55](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/55)
+
 ### 1.0.0.33
 - Support for Mounts [WOTLK and Retail] [Issue #54](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/54)
 
