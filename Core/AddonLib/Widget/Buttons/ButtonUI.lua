@@ -14,9 +14,9 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local M = Core.M
-local AceLibFactory, LogFactory = O.AceLibFactory, O.LogFactory
-local AceEvent, AceGUI, AceHook = AceLibFactory:GetAceEvent(), AceLibFactory:GetAceGUI(), AceLibFactory:GetAceHook()
+local LogFactory = O.LogFactory
+local AO = O.AceLibFactory:A()
+local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 
 local String = O.String
 local A, P, PH = O.Assert, O.Profile, O.PickupHandler

@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
-local IsUsableSpell, C_Timer = IsUsableSpell, C_Timer
+local IsUsableSpell, GetUnitName, C_Timer = IsUsableSpell, GetUnitName, C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -14,7 +14,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, MX = O.GlobalConstants, O.Mixin
-local LSM, String = O.AceLibFactory:GetAceSharedMedia(), O.String
+local AO, API = O.AceLibFactory:A(), O.API
+local LSM, String = AO.AceLibSharedMedia, O.String
 
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
@@ -213,7 +214,7 @@ end
 function _L:GetSpellCooldown(cd)
     local spell = self:GetSpellData()
     if not spell then return nil end
-    local spellCD = _API:GetSpellCooldown(spell.id, spell)
+    local spellCD = API:GetSpellCooldown(spell.id, spell)
     if spellCD ~= nil then
         cd.details = spellCD
         cd.start = spellCD.start
@@ -229,7 +230,7 @@ end
 function _L:GetItemCooldown(cd)
     local item = self:GetItemData()
     if not (item and item.id) then return nil end
-    local itemCD = _API:GetItemCooldown(item.id, item)
+    local itemCD = API:GetItemCooldown(item.id, item)
     if itemCD ~= nil then
         cd.details = itemCD
         cd.start = itemCD.start
@@ -271,7 +272,7 @@ function _L:GetMacroSpellCooldown()
     if not macro then return nil end
     local spellId = GetMacroSpell(macro.index)
     if not spellId then return nil end
-    return _API:GetSpellCooldown(spellId)
+    return API:GetSpellCooldown(spellId)
 end
 
 ---@return number The spellID for macro
@@ -290,7 +291,7 @@ function _L:GetMacroItemCooldown()
     if not itemName then return nil end
 
     local itemID = GetItemInfoInstant(itemName)
-    return _API:GetItemCooldown(itemID)
+    return API:GetItemCooldown(itemID)
 end
 
 function _L:ContainsValidAction() return self:_Widget().buttonData:ContainsValidAction() end
@@ -307,8 +308,10 @@ function _L:UpdateItemState()
     local btnData = self:GetConfig()
     if self:invalidButtonData(btnData, ITEM) then return end
     local itemID = btnData.item.id
-    local itemInfo = _API:GetItemInfo(itemID)
+    local itemInfo = API:GetItemInfo(itemID)
     if itemInfo == nil then return end
+    if API:IsToyItem(itemID) then self:SetSpellUsable(true); return end
+
     local stackCount = itemInfo.stackCount or 1
     local count = itemInfo.count
     btnData.item.count = count
@@ -407,7 +410,7 @@ function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
     --local profileButton = btnWidget:GetConfig()
     if not self:IsValidItemProfile(optionalBtnConf) then return end
-    local _, btnItemSpellId = _API:GetItemSpellInfo(optionalBtnConf.item.id)
+    local _, btnItemSpellId = API:GetItemSpellInfo(optionalBtnConf.item.id)
     if spellID == btnItemSpellId then return true end
     return false
 end
@@ -480,7 +483,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
     if not widget:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
     -- else if in range, color is "white"
-    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+    local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -507,7 +510,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
     -- has target, set text as range indicator
     fs.widget:SetTextWithRangeIndicator()
 
-    local inRange = _API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+    local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then

@@ -1,3 +1,9 @@
+--- Examle Usage:
+---```
+---A = O.AceLibFactory:A()
+---AceConsole = A.AceConsole
+---AceConfig = A.AceConfig
+--- ```
 local LibStub, Core = __K_Core:LibPack()
 
 local AceModule = {
@@ -12,31 +18,79 @@ local AceModule = {
     AceGUI = 'AceGUI-3.0',
     AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
---TODO: Test
+---@class AceObjects
+local AceObjectsTemplate = {
+
+    ---@type AceAddon
+    AceAddon = {},
+    ---@type AceConsole
+    AceConsole = {},
+    ---@type AceConfig
+    AceConfig = {},
+    ---@type AceConfigDialog
+    AceConfigDialog = {},
+    ---@type AceDB
+    AceDB = {},
+    ---@type AceDBOptions
+    AceDBOptions = {},
+    ---@type AceEvent
+    AceEvent = {},
+    ---@type AceHook
+    AceHook = {},
+    ---@type AceGUI
+    AceGUI = {},
+    ---@type AceLibSharedMedia
+    AceLibSharedMedia = {},
+
+}
+
+local __Internal = {}
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 ---@class AceLibFactory
 local _L = LibStub:NewLibrary(Core.M.AceLibFactory)
 _L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
----@class AceConsole
-local libAceConsole = LibStub:LibStubAce(AceModule.AceConsole)
----@class LibSharedMedia
-local libSharedMedia = LibStub:LibStubAce(AceModule.AceLibSharedMedia)
----@class AceEvent
-local libAceEvent = LibStub:LibStubAce(AceModule.AceEvent)
----@class AceHook
-local libAceHook = LibStub:LibStubAce(AceModule.AceHook)
----@class AceDB
-local libAceDB = LibStub:LibStubAce(AceModule.AceDB)
----@class AceDBOptions
-local libAceDBOptions = LibStub:LibStubAce(AceModule.AceDBOptions)
----@class AceConfigDialog
-local libAceConfigDialog = LibStub:LibStubAce(AceModule.AceConfigDialog)
----@class AceConfig
-local libAceConfig = LibStub:LibStubAce(AceModule.AceConfig)
----@class AceGUI
-local libAceGUI = LibStub:LibStubAce(AceModule.AceGUI)
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+---@param aceLib string
+local function LocalLibAce(name, aceLib)
+    local o = LibStub:LibStubAce(aceLib)
+    __Internal[name] = o
+    return o
+end
 
--- ############################################################
+local function Init()
+    ---@class AceAddon
+    LocalLibAce('AceAddon', AceModule.AceAddon)
+    ---@class AceConsole
+    LocalLibAce('AceConsole', AceModule.AceConsole)
+    ---@class AceConfig
+    LocalLibAce('AceConfig', AceModule.AceConfig)
+    ---@class AceConfigDialog
+    LocalLibAce('AceConfigDialog', AceModule.AceConfigDialog)
+    ---@class AceDB
+    LocalLibAce('AceDB', AceModule.AceDB)
+    ---@class AceDBOptions
+    LocalLibAce('AceDBOptions', AceModule.AceDBOptions)
+    ---@class AceEvent
+    LocalLibAce('AceEvent', AceModule.AceEvent)
+    ---@class AceHook
+    LocalLibAce('AceHook', AceModule.AceHook)
+    ---@class AceGUI
+    LocalLibAce('AceGUI', AceModule.AceGUI)
+    ---@class AceLibSharedMedia
+    LocalLibAce('AceLibSharedMedia', AceModule.AceLibSharedMedia)
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+---@return AceObjects
+function _L:A() return __Internal end
 
 function _L:Constructor(...)
     return self:Get(...)
@@ -53,22 +107,7 @@ function _L:Get(...)
     return unpack(libs)
 end
 
----@return
----@return AceConsole
-function _L:GetAceConsole() return libAceConsole end
----@return AceEvent
-function _L:GetAceEvent() return libAceEvent end
----@return LibSharedMedia
-function _L:GetAceSharedMedia() return libSharedMedia end
----@return AceHook
-function _L:GetAceHook() return libAceHook end
----@return AceDB
-function _L:GetAceDB() return libAceDB end
----@return AceDBOptions
-function _L:GetAceDBOptions() return libAceDBOptions end
----@return AceConfigDialog
-function _L:GetAceConfig() return libAceConfig end
----@return AceConfigDialog
-function _L:GetAceConfigDialog() return libAceConfigDialog end
----@return AceGUI
-function _L:GetAceGUI() return libAceGUI end
+--[[-----------------------------------------------------------------------------
+Initialize
+-------------------------------------------------------------------------------]]
+Init()
