@@ -20,4 +20,9 @@ manual-changelog:
 #  - .idea
 
 # Additional Info
-# Template is at: https://support.curseforge.com/en/support/solutions/articles/9000197281-automatic-packaging
+# Template is at:
+#  • https://support.curseforge.com/en/support/solutions/articles/9000197281-automatic-packaging
+# Preparing pkgmeta file:
+#  • https://support.curseforge.com/en/support/solutions/articles/9000197952-preparing-the-packagemeta-file
+#  • https://github.com/TimothyLuke/GSE-Advanced-Macro-Compiler/blob/master/.pkgmeta
+#  • https://github.com/TimothyLuke/GSE-Advanced-Macro-Compiler/blob/master/GSE/GSE.toc
