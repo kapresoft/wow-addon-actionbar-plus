@@ -266,22 +266,9 @@ local function WidgetMethods(widget)
     end
 
     function widget:RefreshActionbarFrame()
-        local barData = self:GetBarData()
-        local rowSize = barData.widget.rowSize or 1
-        local colSize = barData.widget.colSize or 6
         self:SetFrameDimensions()
-
-        local index = 0
-        local frameName = self:GetName()
-        for row=1, rowSize do
-            for col=1, colSize do
-                index = index + 1
-                local btnName = format('%sButton%s', frameName, tostring(index))
-                ---@type ButtonUIWidget
-                local btnWidget = _G[btnName].widget
-                btnWidget:Resize(row, col)
-            end
-        end
+        ---@param btnWidget ButtonUIWidget
+        self:ApplyForEachButtons(function(btnWidget) btnWidget:SetButtonLayout() end)
     end
 
     function widget:SetFrameDimensions()

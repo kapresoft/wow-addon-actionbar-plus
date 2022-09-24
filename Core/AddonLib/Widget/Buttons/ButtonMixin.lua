@@ -45,12 +45,18 @@ local p = _L:GetLogger()
 MX:Mixin(_L, O.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
-Support Functions
+Instance Methods
 -------------------------------------------------------------------------------]]
----@param widget ButtonUIWidget
----@param rowNum number The row number
----@param colNum number The column number
-local function SetButtonLayout(widget, rowNum, colNum)
+function _L:Init()
+    self:SetButtonLayout()
+    self:InitTextures(noIconTexture)
+end
+
+function _L:SetButtonLayout()
+    --self.placement.rowNum, self.placement.colNum
+    local widget = self:W()
+    local rowNum, colNum = widget.placement.rowNum, widget.placement.colNum
+
     ---@type FrameWidget
     local dragFrame = widget.dragFrame
     local barConfig = dragFrame:GetConfig()
@@ -69,16 +75,61 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
-    button.keybindText.widget:ScaleWithButtonSize(buttonSize)
+    self:Scale(buttonSize)
+
 end
 
---[[-----------------------------------------------------------------------------
-Instance Methods
--------------------------------------------------------------------------------]]
+---@param buttonSize number
+function _L:Scale(buttonSize)
+    local button = self:B()
+    button.keybindText.widget:ScaleWithButtonSize(buttonSize)
+    self:ScaleCooldownWithButtonSize(buttonSize)
+end
 
-function _L:Init()
-    SetButtonLayout(self, self.placement.rowNum, self.placement.colNum)
-    self:InitTextures(noIconTexture)
+---@see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
+function _L:ScaleCooldownWithButtonSize(buttonSize)
+    local widget = self:W()
+    local frameIndex = widget:GetFrameIndex()
+
+    local hideCountdownNumbers = false
+    local hideIndexText = false
+    local hideKeybindText = false
+    local countdownFont
+
+    if buttonSize > 80 then
+        print('[>80]')
+        countdownFont = "GameFontNormalHuge4Outline"
+    elseif buttonSize >= 50 and buttonSize <= 80 then
+        countdownFont = "GameFontNormalHuge3Outline"
+    elseif buttonSize >= 40 and buttonSize < 50 then
+        countdownFont = "GameFontNormalLargeOutline"
+    elseif buttonSize >= 35 and buttonSize < 40 then
+        countdownFont = "GameFontNormalMed3Outline"
+    else
+        countdownFont = "GameFontNormalOutline"
+        hideCountdownNumbers = true
+        hideIndexText = true
+        hideKeybindText = true
+    end
+
+    if frameIndex == 6 or frameIndex == 7 then
+        p:log('[%s]: buttonSize=%s cf=%s hcn=%s', widget:GetName(),
+                buttonSize, countdownFont, hideCountdownNumbers)
+    end
+
+    widget.cooldown:SetCountdownFont(countdownFont)
+    widget.cooldown:SetHideCountdownNumbers(hideCountdownNumbers)
+
+    if hideIndexText then
+        widget.button.indexText:Hide()
+    else
+        widget.button.indexText:Show()
+    end
+    if hideKeybindText then
+        widget.button.keybindText:Hide()
+    else
+        widget.button.keybindText:Show()
+    end
 end
 
 ---@param target any
@@ -119,9 +170,9 @@ function _L:_Button() return self.button end
 ---@return ButtonUIWidget
 function _L:_Widget() return self end
 ---@return ButtonAttributes
-function _L:GetButtonAttributes() return self.buttonAttributes end
-function _L:GetIndex() return self.index end
-function _L:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
+function _L:GetButtonAttributes() return self:W().buttonAttributes end
+function _L:GetIndex() return self:W().index end
+function _L:GetFrameIndex() return self:W().frameIndex end
 function _L:IsParentFrameShown() return self.dragFrame:IsShown() end
 
 function _L:ResetConfig()
@@ -468,10 +519,6 @@ function _L:IsMatchingMacroOrSpell(spellID)
 
     return false;
 end
-
----@param rowNum number
----@param colNum number
-function _L:Resize(rowNum, colNum) SetButtonLayout(self, rowNum, colNum) end
 
 ---@param hasTarget boolean Player has a target
 function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
