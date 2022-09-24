@@ -4,7 +4,7 @@ Blizzard Vars
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
-local C_MountJournal, GetCompanionInfo = C_MountJournal, GetCompanionInfo
+local C_MountJournal, GetCompanionInfo, C_ToyBox = C_MountJournal, GetCompanionInfo, C_ToyBox
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 
 --[[-----------------------------------------------------------------------------
@@ -203,6 +203,13 @@ function S:GetSpellCooldown(spellID, optionalSpell)
         cd.spell.details = optionalSpell
     end
     return cd
+end
+
+---@param itemID number
+function S:IsToyItem(itemID)
+    if not C_ToyBox then return false end
+    local _itemID, toyName, icon, isFavorite, hasFanfare, quality = C_ToyBox.GetToyInfo(itemID)
+    return not (_itemID == nil or toyName == nil)
 end
 
 --- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
