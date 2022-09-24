@@ -2,6 +2,8 @@
 - Start incrementing minor version
 - Fix for toy items being grayed out [Issue #55](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/55)
 - Dynamic resizing of button keybind, index, and cooldown texts
+- New options to hide keybind, index, cooldown text for smaller buttons
+- New option to hide countdown numbers in cooldowns
 
 ### 1.0.0.33
 - Support for Mounts [WOTLK and Retail] [Issue #54](https://github.com/kapresoft/wow-addon-actionbar-plus/issues/54)

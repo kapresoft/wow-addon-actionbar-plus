@@ -31,7 +31,7 @@ local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
-
+local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -89,47 +89,77 @@ end
 ---@see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
 function _L:ScaleCooldownWithButtonSize(buttonSize)
     local widget = self:W()
-    local frameIndex = widget:GetFrameIndex()
-
     local hideCountdownNumbers = false
     local hideIndexText = false
     local hideKeybindText = false
     local countdownFont
+    local profile = widget:GetButtonData():GetProfileData()
+
+    if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
 
     if buttonSize > 80 then
-        print('[>80]')
         countdownFont = "GameFontNormalHuge4Outline"
-    elseif buttonSize >= 50 and buttonSize <= 80 then
+    elseif buttonSize >= 70 and buttonSize <= 80 then
         countdownFont = "GameFontNormalHuge3Outline"
-    elseif buttonSize >= 40 and buttonSize < 50 then
+    elseif buttonSize >= 40 and buttonSize < 70 then
         countdownFont = "GameFontNormalLargeOutline"
-    elseif buttonSize >= 35 and buttonSize < 40 then
+    elseif buttonSize >= MIN_BUTTON_SIZE and buttonSize < 40 then
         countdownFont = "GameFontNormalMed3Outline"
     else
         countdownFont = "GameFontNormalOutline"
-        hideCountdownNumbers = true
-        hideIndexText = true
-        hideKeybindText = true
-    end
-
-    if frameIndex == 6 or frameIndex == 7 then
-        p:log('[%s]: buttonSize=%s cf=%s hcn=%s', widget:GetName(),
-                buttonSize, countdownFont, hideCountdownNumbers)
+        if true == profile.hide_text_on_small_buttons then
+            hideIndexText = true
+            hideCountdownNumbers = true
+            hideKeybindText = true
+        end
     end
 
     widget.cooldown:SetCountdownFont(countdownFont)
-    widget.cooldown:SetHideCountdownNumbers(hideCountdownNumbers)
+    self:HideCountdownNumbers(hideCountdownNumbers)
+    self:SetHideIndexText(hideIndexText)
+    self:SetHideKeybindText(hideKeybindText)
+end
 
-    if hideIndexText then
-        widget.button.indexText:Hide()
-    else
-        widget.button.indexText:Show()
-    end
-    if hideKeybindText then
+function _L:RefreshTexts()
+    local widget = self:W()
+    local profile = widget:GetButtonData():GetProfileData()
+    self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
+    local hideTexts = true == profile.hide_text_on_small_buttons
+    if not hideTexts then return end
+
+    local barConfig = widget.dragFrame:GetConfig()
+    local buttonSize = barConfig.widget.buttonSize
+    if buttonSize > MIN_BUTTON_SIZE then return end
+
+    self:SetHideKeybindText(hideTexts)
+    self:SetHideIndexText(hideTexts)
+    if not profile.hide_countdown_numbers then self:HideCountdownNumbers(hideTexts) end
+end
+
+---@param state boolean
+function _L:HideCountdownNumbers(state)
+    self:W().cooldown:SetHideCountdownNumbers(state)
+end
+
+---@param state boolean
+function _L:SetHideKeybindText(state)
+    local widget = self:W()
+    if true == state then
         widget.button.keybindText:Hide()
-    else
-        widget.button.keybindText:Show()
+        return
     end
+
+    widget.button.keybindText:Show()
+end
+---@param state boolean
+function _L:SetHideIndexText(state)
+    local widget = self:W()
+    if true == state then
+        widget.button.indexText:Hide()
+        return
+    end
+
+    widget.button.indexText:Show()
 end
 
 ---@param target any
@@ -440,6 +470,11 @@ function _L:SetHighlightInUse()
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
 function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
+
+function _L:RefreshHighlightEnabled()
+    local profile = self:W():GetButtonData():GetProfileData()
+    self:SetHighlightEnabled(true == profile.action_button_mouseover_glow)
+end
 
 ---@param state boolean true, to enable highlight
 function _L:SetHighlightEnabled(state)
