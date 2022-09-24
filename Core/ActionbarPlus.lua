@@ -14,8 +14,7 @@ Local Vars
 -- Bump this version for every release tag
 --
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local ALF, GC = O.AceLibFactory, O.GlobalConstants
-
+local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
 local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
 
@@ -24,8 +23,7 @@ local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSepa
 local IsBlank = O.String.IsBlank
 local MX, WMX, PopupDebugDialog = O.Mixin, O.WidgetMixin, O.PopupDebugDialog
 
-local AceDB, AceDBOptions = ALF:GetAceDB(), ALF:GetAceDBOptions()
-local AceConfig, AceConfigDialog = ALF:GetAceConfig(), ALF:GetAceConfigDialog()
+local AceDB, AceDBOptions, AceConfig, AceConfigDialog = AO.AceDB, AO.AceDBOptions, AO.AceConfig, AO.AceConfigDialog
 
 local C, P, BF = O.Config, O.Profile, O.ButtonFactory
 local libModules = { C, P, BF }

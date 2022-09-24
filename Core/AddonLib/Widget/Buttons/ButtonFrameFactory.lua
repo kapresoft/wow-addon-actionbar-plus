@@ -17,9 +17,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, Table, P = O.Assert, O.Table, O.Profile
-local ALF = O.AceLibFactory
-local LSM = ALF:GetAceSharedMedia()
-local AceEvent, AceGUI = ALF:GetAceEvent(), ALF:GetAceGUI()
+local AO = O.AceLibFactory:A()
+local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 
 --[[-----------------------------------------------------------------------------
 New Instance

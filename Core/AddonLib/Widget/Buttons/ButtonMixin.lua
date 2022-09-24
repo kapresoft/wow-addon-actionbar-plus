@@ -14,7 +14,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, MX = O.GlobalConstants, O.Mixin
-local LSM, String = O.AceLibFactory:GetAceSharedMedia(), O.String
+local AO = O.AceLibFactory:A()
+local LSM, String = AO.AceLibSharedMedia, O.String
 
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT

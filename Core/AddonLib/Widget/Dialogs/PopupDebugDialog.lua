@@ -8,7 +8,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Mixin, WMX = O.Mixin, O.WidgetMixin
-local AceLibFactory = O.AceLibFactory
+local AO = O.AceLibFactory:A()
+local AceGUI = AO.AceGUI
 local LuaEvaluator = O.LuaEvaluator
 
 local L = LibStub:NewLibrary(Core.M.PopupDebugDialog)
@@ -19,7 +20,6 @@ local FRAME_TITLE = 'Popup Debug Dialog'
 
 ---@return PopupDebugDialogFrame
 local function CreateDialog()
-    local AceGUI = AceLibFactory:GetAceGUI()
     ---@class PopupDebugDialogFrame
     local frame = AceGUI:Create("Frame")
     -- The following makes the "Escape" close the window
