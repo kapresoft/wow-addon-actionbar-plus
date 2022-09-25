@@ -46,6 +46,13 @@ local ConfigNames = {
     ['show_keybind_text'] = 'show_keybind_text',
 }
 
+---@class ProfileWidgetConfigNames
+local WidgetConfigNames = {
+    ['rowSize'] = 'rowSize',
+    ['colSize'] = 'colSize',
+    ['buttonSize'] = 'buttonSize',
+}
+
 ---@class TooltipKeyName
 local TooltipKeyName = {
     ['SHOW'] = '',

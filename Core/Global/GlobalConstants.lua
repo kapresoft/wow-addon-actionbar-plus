@@ -111,6 +111,7 @@ local E = {
     OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
     OnTextSettingsChanged = 'OnTextSettingsChanged',
     OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
+    OnButtonSizeChanged = 'OnButtonSizeChanged',
 
     -- ################################
     ---@deprecated DEPRECATED: Use the camel cased version
