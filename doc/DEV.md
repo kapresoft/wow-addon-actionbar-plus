@@ -64,3 +64,10 @@ Turns into <!--@non-debug@--> (insert code here) <!--@end-non-debug@-->.
 Turns into #@debug@ and #@end-debug@, as well as adding a # to the beginning of each line in-between.
 
 More at https://support.curseforge.com/en/support/solutions/articles/9000197281-automatic-packaging#Replacement-Tokens
+
+### Testing Release with BigWigMods/packager
+```shell
+ # pwd should be the top-level project
+ $ ~/sandbox/github/wow/packager/release.sh
+ # creates a .release directory
+```
