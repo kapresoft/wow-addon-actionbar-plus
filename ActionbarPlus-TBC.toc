@@ -17,6 +17,7 @@
 ## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus
 ## X-Github-Issues: https://github.com/kapresoft/wowaddon-actionbar-plus/issues
 ## X-CurseForge: https://www.curseforge.com/wow/addons/actionbarplus
+## X-Curse-Project-ID: 566626
 ## X-Github-Project-Author: @project-author@
 ## X-Github-Project-Hash: @project-hash@
 ## X-Github-Project-Last-Changed-Date: @project-date-iso@
