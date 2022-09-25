@@ -36,6 +36,7 @@ See [Getting Started](../../wiki/Getting-Started) for more details.
 
 ## Miscellaneous
 
+- [For Developers](doc/DEV.md)
 - [Contributing](doc/CONTRIBUTING.md)
 - [Release Checklist](doc/RELEASE-CHECKLIST.md)
 

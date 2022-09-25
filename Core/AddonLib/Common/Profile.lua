@@ -38,6 +38,8 @@ local ConfigNames = {
     ['lock_actionbars'] = 'lock_actionbars',
     ['hide_when_taxi'] = 'hide_when_taxi',
     ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
+    ['hide_text_on_small_buttons'] = 'hide_text_on_small_buttons',
+    ['hide_countdown_numbers'] = 'hide_countdown_numbers',
     ['tooltip_visibility_key'] = 'tooltip_visibility_key',
     ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
     ['show_button_index'] = 'show_button_index',
@@ -142,9 +144,13 @@ local ProfileButtonTemplate = {
 local ProfileTemplate = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
-    ["tooltip_visibility_key"] = '',
     ---toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
+    ---hide keybindText and indexText for smaller buttons
+    ["hide_text_on_small_buttons"] = true,
+    ---hide cooldown countdown numbers
+    ["hide_countdown_numbers"] = true,
+    ["tooltip_visibility_key"] = '',
     ["tooltip_visibility_combat_override_key"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = bar,

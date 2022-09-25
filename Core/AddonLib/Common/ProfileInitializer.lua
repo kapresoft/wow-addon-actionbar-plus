@@ -57,13 +57,16 @@ local ITEM_TEMPLATE = {
     }
 }
 
+---The defaults provided here will used for the default state of the settings
 ---@class DefaultProfile
 local DEFAULT_PROFILE_DATA = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
-    ["tooltip_visibility_key"] = '',
     -- toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
+    ["hide_text_on_small_buttons"] = false,
+    ["hide_countdown_numbers"] = false,
+    ["tooltip_visibility_key"] = '',
     ["tooltip_visibility_combat_override_key"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = {

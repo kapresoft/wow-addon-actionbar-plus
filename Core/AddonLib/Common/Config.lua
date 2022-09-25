@@ -4,15 +4,11 @@ Lua Vars
 local format = string.format
 
 --[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_Show
-
---[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, Mixin = O.GlobalConstants, O.Mixin
+local E = GC.E
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -44,6 +40,43 @@ Support functions
 -------------------------------------------------------------------------------]]
 local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
 
+---@param applyFunction function Format: applyFuntion(ButtonUIWidget)
+local function ApplyForEachButton(applyFunction, configVal)
+    BF:ApplyForEachFrames(function(frameWidget)
+        ---@param widget ButtonUIWidget
+        frameWidget:ApplyForEachButtons(function(widget) applyFunction(widget, configVal) end)
+    end)
+end
+
+local function PSetWithEvent(config, key, fallbackVal, eventName)
+    return function(_, v)
+        assert(type(key) == 'string', 'Profile key should be a string')
+        config.profile[key] = v or fallbackVal
+        if eventName then BF:Fire(eventName) end
+    end
+end
+
+local function SetAndApplyGeneric(config, key, fallbackVal, postFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Profile key should be a string')
+        config.profile[key] = v or fallbackVal
+        if 'function' == type(postFunction) then postFunction(config.profile[key]) end
+    end
+end
+
+---@param fallback any The fallback value
+---@param key string The key value
+---@param config Config The config instance
+local function SetAndApply(config, key, fallback, foreachButtonFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Profile key should be a string')
+        config.profile[key] = v or fallback
+        if 'function' == type(foreachButtonFunction) then
+            ApplyForEachButton(foreachButtonFunction, config.profile[key])
+        end
+    end
+end
+
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
 ---@return BarData
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
@@ -57,12 +90,14 @@ local function GetShowButtonIndexStateGetterHandler(frameIndex)
     return function(_) return GetFrameWidget(frameIndex):IsShowIndex() end
 end
 local function GetShowButtonIndexStateSetterHandler(frameIndex)
+    --TODO: NEXT: Use events instead
     return function(_, v) GetFrameWidget(frameIndex):ShowButtonIndices(v) end
 end
 local function GetShowKeybindTextStateGetterHandler(frameIndex)
     return function(_) return GetFrameWidget(frameIndex):IsShowKeybindText() end
 end
 local function GetShowKeybindTextStateSetterHandler(frameIndex)
+    --TODO: NEXT: Use events instead
     return function(_, v) GetFrameWidget(frameIndex):ShowKeybindText(v) end
 end
 local function GetLockStateSetterHandler(frameIndex)
@@ -104,31 +139,23 @@ local function GetColSizeSetterHandler(frameIndex)
     return function(_, v) GetBarConfig(frameIndex).widget.colSize = v end
 end
 
-local function PropertySetter(config, key, fallbackVal)
+---@param fallback any The fallback value
+---@param key string The key value
+---@param config Config The config instance
+local function PSet(config, key, fallback)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallbackVal
+        config.profile[key] = v or fallback
     end
 end
 
-local function PropertyGetter(config, key, fallbackVal)
+---@param fallback any The fallback value
+---@param key string The key value
+---@param config Config The config instance
+local function PGet(config, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Profile key should be a string')
-        return config.profile[key] or fallbackVal
-    end
-end
-
-local function GetActionButtonMouseoverGlowSetter(config, key, fallbackVal)
-    return function(_, v)
-        PropertySetter(config, key, fallbackVal)(_, v)
-        local state = config.profile[key]
-        ---@param frameWidget FrameWidget
-        BF:ApplyForEachFrames(function(frameWidget)
-            ---@param widget ButtonUIWidget
-            frameWidget:ApplyForEachButtons(function(widget)
-                widget:SetHighlightEnabled(state)
-            end)
-        end)
+        return config.profile[key] or fallback
     end
 end
 
@@ -181,45 +208,63 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME,
                     --desc = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.',
                     desc = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC,
-                    get = PropertyGetter(self, PC.lock_actionbars, false),
-                    set = PropertySetter(self, PC.lock_actionbars, false)
+                    get = PGet(self, PC.lock_actionbars, false),
+                    set = PSet(self, PC.lock_actionbars, false)
                 },
                 hide_while_taxi = {
                     type = 'toggle',
                     order = order + 2,
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
-                    get = PropertyGetter(self, PC.hide_when_taxi, false),
-                    set = PropertySetter(self, PC.hide_when_taxi, false)
+                    get = PGet(self, PC.hide_when_taxi, false),
+                    set = PSet(self, PC.hide_when_taxi, false)
                 },
                 action_button_mouseover_glow = {
                     type = 'toggle',
                     order = order + 3,
                     name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
                     desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
-                    get = PropertyGetter(self, PC.action_button_mouseover_glow, false),
-                    set = GetActionButtonMouseoverGlowSetter(self, PC.action_button_mouseover_glow, false)
+                    get = PGet(self, PC.action_button_mouseover_glow, false),
+                    set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
                 },
-                tooltip_header = { type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS, order = order + 3 },
+                hide_text_on_small_buttons = {
+                    type = 'toggle',
+                    order = order + 4,
+                    width = 'full',
+                    name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
+                    desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
+                    get = PGet(self, PC.hide_text_on_small_buttons, false),
+                    set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
+                },
+                hide_countdown_numbers = {
+                    type = 'toggle',
+                    order = order + 5,
+                    width = 'full',
+                    name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
+                    desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
+                    get = PGet(self, PC.hide_countdown_numbers, false),
+                    set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
+                },
+                tooltip_header = { order = order + 6, type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS },
                 tooltip_visibility_key = {
                     type = 'select', style = 'dropdown',
-                    order = order + 4,
+                    order = order + 7,
                     width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC,
-                    get = PropertyGetter(self, PC.tooltip_visibility_key, TTK.names.SHOW),
-                    set = PropertySetter(self, PC.tooltip_visibility_key, TTK.names.SHOW)
+                    get = PGet(self, PC.tooltip_visibility_key, TTK.names.SHOW),
+                    set = PSet(self, PC.tooltip_visibility_key, TTK.names.SHOW)
                 },
                 tooltip_visibility_combat_override_key = {
                     type = 'select', style = 'dropdown',
-                    order = order + 5,
+                    order = order + 8,
                     width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
-                    get = PropertyGetter(self, PC.tooltip_visibility_combat_override_key),
-                    set = PropertySetter(self, PC.tooltip_visibility_combat_override_key)
+                    get = PGet(self, PC.tooltip_visibility_combat_override_key),
+                    set = PSet(self, PC.tooltip_visibility_combat_override_key)
                 }
             }
         }
@@ -368,7 +413,6 @@ local function NewInstance()
     _L.mt.__index = properties
 
     Mixin:Mixin(_L, methods)
-    ---for method, func in pairs(methods) do _L[method] = func end
     return _L
 end
 

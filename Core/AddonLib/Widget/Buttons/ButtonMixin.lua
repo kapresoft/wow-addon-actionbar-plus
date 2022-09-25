@@ -31,7 +31,7 @@ local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
-
+local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -45,12 +45,18 @@ local p = _L:GetLogger()
 MX:Mixin(_L, O.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
-Support Functions
+Instance Methods
 -------------------------------------------------------------------------------]]
----@param widget ButtonUIWidget
----@param rowNum number The row number
----@param colNum number The column number
-local function SetButtonLayout(widget, rowNum, colNum)
+function _L:Init()
+    self:SetButtonLayout()
+    self:InitTextures(noIconTexture)
+end
+
+function _L:SetButtonLayout()
+    --self.placement.rowNum, self.placement.colNum
+    local widget = self:W()
+    local rowNum, colNum = widget.placement.rowNum, widget.placement.colNum
+
     ---@type FrameWidget
     local dragFrame = widget.dragFrame
     local barConfig = dragFrame:GetConfig()
@@ -69,16 +75,98 @@ local function SetButtonLayout(widget, rowNum, colNum)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
-    button.keybindText.widget:ScaleWithButtonSize(buttonSize)
+    self:Scale(buttonSize)
+
 end
 
---[[-----------------------------------------------------------------------------
-Instance Methods
--------------------------------------------------------------------------------]]
+---@param buttonSize number
+function _L:Scale(buttonSize)
+    local button = self:B()
+    button.keybindText.widget:ScaleWithButtonSize(buttonSize)
+    self:ScaleCooldownWithButtonSize(buttonSize)
+end
 
-function _L:Init()
-    SetButtonLayout(self, self.placement.rowNum, self.placement.colNum)
-    self:InitTextures(noIconTexture)
+---@see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
+function _L:ScaleCooldownWithButtonSize(buttonSize)
+    local widget = self:W()
+    local hideCountdownNumbers = false
+    local hideIndexText = false
+    local hideKeybindText = false
+    local countdownFont
+    local profile = widget:GetButtonData():GetProfileData()
+
+    if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
+
+    if buttonSize > 80 then
+        countdownFont = "GameFontNormalHuge4Outline"
+    elseif buttonSize >= 70 and buttonSize <= 80 then
+        countdownFont = "GameFontNormalHuge3Outline"
+    elseif buttonSize >= 40 and buttonSize < 70 then
+        countdownFont = "GameFontNormalLargeOutline"
+    elseif buttonSize >= MIN_BUTTON_SIZE and buttonSize < 40 then
+        countdownFont = "GameFontNormalMed3Outline"
+    else
+        countdownFont = "GameFontNormalOutline"
+        if true == profile.hide_text_on_small_buttons then
+            hideIndexText = true
+            hideCountdownNumbers = true
+            hideKeybindText = true
+        end
+    end
+
+    widget.cooldown:SetCountdownFont(countdownFont)
+    self:HideCountdownNumbers(hideCountdownNumbers)
+    self:SetHideIndexText(hideIndexText)
+    self:SetHideKeybindText(hideKeybindText)
+end
+
+function _L:RefreshTexts()
+    local widget = self:W()
+    local profile = widget:GetButtonData():GetProfileData()
+    self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
+    local hideTexts = true == profile.hide_text_on_small_buttons
+    if not hideTexts then
+        local fw = widget.dragFrame
+        local barConf = fw:GetConfig()
+        if true == barConf.show_button_index then
+            self:SetHideIndexText(false)
+        end
+        return
+    end
+
+    local barConfig = widget.dragFrame:GetConfig()
+    local buttonSize = barConfig.widget.buttonSize
+    if buttonSize > MIN_BUTTON_SIZE then return end
+
+    self:SetHideKeybindText(hideTexts)
+    self:SetHideIndexText(hideTexts)
+    if not profile.hide_countdown_numbers then self:HideCountdownNumbers(hideTexts) end
+end
+
+---@param state boolean
+function _L:HideCountdownNumbers(state)
+    self:W().cooldown:SetHideCountdownNumbers(state)
+end
+
+---@param state boolean
+function _L:SetHideKeybindText(state)
+    local widget = self:W()
+    if true == state then
+        widget.button.keybindText:Hide()
+        return
+    end
+
+    widget.button.keybindText:Show()
+end
+---@param state boolean
+function _L:SetHideIndexText(state)
+    local widget = self:W()
+    if true == state then
+        widget.button.indexText:Hide()
+        return
+    end
+
+    widget.button.indexText:Show()
 end
 
 ---@param target any
@@ -119,9 +207,9 @@ function _L:_Button() return self.button end
 ---@return ButtonUIWidget
 function _L:_Widget() return self end
 ---@return ButtonAttributes
-function _L:GetButtonAttributes() return self.buttonAttributes end
-function _L:GetIndex() return self.index end
-function _L:GetFrameIndex() return self.dragFrameWidget:GetIndex() end
+function _L:GetButtonAttributes() return self:W().buttonAttributes end
+function _L:GetIndex() return self:W().index end
+function _L:GetFrameIndex() return self:W().frameIndex end
 function _L:IsParentFrameShown() return self.dragFrame:IsShown() end
 
 function _L:ResetConfig()
@@ -158,6 +246,7 @@ function _L:ShowIndex(state)
     local text = ''
     if true == state then text = self:_Widget().index end
     self:_Button().indexText:SetText(text)
+    self:RefreshTexts()
 end
 
 ---@param state boolean true will show the button index number
@@ -176,6 +265,7 @@ function _L:ShowKeybindText(state)
         end
     end
     button.keybindText:SetText(text)
+    self:RefreshTexts()
 end
 
 function _L:HasKeybindings()
@@ -390,6 +480,11 @@ function _L:SetHighlightInUse()
 end
 function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
 
+function _L:RefreshHighlightEnabled()
+    local profile = self:W():GetButtonData():GetProfileData()
+    self:SetHighlightEnabled(true == profile.action_button_mouseover_glow)
+end
+
 ---@param state boolean true, to enable highlight
 function _L:SetHighlightEnabled(state)
     local btnUI = self:B()
@@ -468,10 +563,6 @@ function _L:IsMatchingMacroOrSpell(spellID)
 
     return false;
 end
-
----@param rowNum number
----@param colNum number
-function _L:Resize(rowNum, colNum) SetButtonLayout(self, rowNum, colNum) end
 
 ---@param hasTarget boolean Player has a target
 function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
