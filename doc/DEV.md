@@ -88,6 +88,14 @@ More at https://support.curseforge.com/en/support/solutions/articles/9000197281-
 > release-wow-addon is a link to BigWigMods/release.sh
 see [PACKAGER.md](PACKAGER.md) for more details
 
+Run the sync bash script
+```shell
+# Make executable (Optional)
+$ cmod +x ./sync-extlibs.sh
+# Runs package.sh and rsync to work directory
+./sync-extlibs.sh
+```
+
 ```shell
 # generate
 $ release-wow-addon -cdzulo

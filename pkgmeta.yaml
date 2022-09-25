@@ -40,7 +40,7 @@ externals:
     tag: latest
   Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0:
     # https://www.wowace.com/projects/libqtip-1-0
-    url: git://git.wowace.com/wow/libqtip-1-0
+    url: https://repos.wowace.com/wow/libqtip-1-0
     tag: latest
 
 ignore:
