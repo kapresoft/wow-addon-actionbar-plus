@@ -39,6 +39,9 @@ action items.
 Support functions
 -------------------------------------------------------------------------------]]
 local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
+local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
+---@return BarData
+local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
 
 ---@param applyFunction function Format: applyFuntion(ButtonUIWidget)
 local function ApplyForEachButton(applyFunction, configVal)
@@ -77,9 +80,31 @@ local function SetAndApply(config, key, fallback, foreachButtonFunction)
     end
 end
 
-local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
----@return BarData
-local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
+---@param frameIndex number
+---@param key string The key value
+---@param fallback any The fallback value
+---@param eventNameOrFunction string | function | nil
+---@see ProfileWidgetConfigNames
+local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
+        GetBarConfig(frameIndex).widget[key] = v or fallback
+        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction)
+        elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
+    end
+end
+
+---@param frameIndex number
+---@param key string The key value
+---@param fallback any The fallback value
+---@see ProfileWidgetConfigNames
+local function PGetWidget(frameIndex, key, fallback)
+    return function(_)
+        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
+        return GetBarConfig(frameIndex).widget[key] or fallback
+    end
+end
+
 local function GetFrameStateSetterHandler(frameIndex)
     return function(_, v) GetFrameWidget(frameIndex):SetFrameState(v) end
 end
@@ -110,22 +135,6 @@ local function GetLockStateGetterHandler(frameIndex)
     return function(_) return P:GetBarLockValue(frameIndex) end
 end
 
-local function GetButtonSizeGetterHandler(frameIndex)
-    return function(_) return GetBarConfig(frameIndex).widget.buttonSize or 36 end
-end
-
-local function GetButtonSizeSetterHandler(frameIndex)
-    return function(_, v) GetBarConfig(frameIndex).widget.buttonSize = v end
-end
-
-local function GetResizeButtonHandler(frameIndex)
-    return function(_, v)
-        GetButtonSizeSetterHandler(frameIndex)(nil, v)
-        ---@type FrameWidget
-        BF:RefreshActionbar(frameIndex)
-    end
-end
-
 local function GetRowSizeGetterHandler(frameIndex)
     return function(_) return GetBarConfig(frameIndex).widget.rowSize or 2 end
 end
@@ -139,9 +148,9 @@ local function GetColSizeSetterHandler(frameIndex)
     return function(_, v) GetBarConfig(frameIndex).widget.colSize = v end
 end
 
----@param fallback any The fallback value
----@param key string The key value
 ---@param config Config The config instance
+---@param key string The key value
+---@param fallback any The fallback value
 local function PSet(config, key, fallback)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -149,9 +158,9 @@ local function PSet(config, key, fallback)
     end
 end
 
+---@param config Config The config instance
 ---@param fallback any The fallback value
 ---@param key string The key value
----@param config Config The config instance
 local function PGet(config, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -349,10 +358,8 @@ local methods = {
                     width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    --confirm = ConfirmAndReload,
-                    get = GetButtonSizeGetterHandler(frameIndex),
-                    --set = GetButtonSizeSetterHandler(frameIndex)
-                    set = GetResizeButtonHandler(frameIndex)
+                    get = PGetWidget(frameIndex, "buttonSize", 36),
+                    set = PSetWidget(frameIndex, "buttonSize", 36, E.OnButtonSizeChanged),
                 },
                 rows = {
                     type = 'range',

@@ -80,6 +80,18 @@ local function OnMouseOverGlowSettingsChanged(frameWidget, event)
     frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:RefreshHighlightEnabled() end)
 end
 
+---@param frameWidget FrameWidget
+local function OnButtonSizeChanged(frameWidget, event)
+    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+
+    frameWidget:SetFrameDimensions()
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget)
+        btnWidget:SetButtonLayout()
+        btnWidget:RefreshTexts()
+    end)
+end
+
 local function RegisterCallbacks(widget)
 
     ---@param fw FrameWidget
@@ -105,6 +117,7 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
+    widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
 
 end
 
