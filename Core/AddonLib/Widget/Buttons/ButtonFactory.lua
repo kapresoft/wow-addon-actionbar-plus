@@ -95,12 +95,6 @@ local function OnMouseDownFrame(frameHandle, mouseButton)
     end
 end
 
-local function FireFrameEvent(event, sourceEvent, ...)
-    for _, f in ipairs(P:GetAllFrameWidgets()) do
-        f:Fire(event, sourceEvent, ...)
-    end
-end
-
 ---Fired when the cooldown for an actionbar or inventory slot starts or
 ---stops. Also fires when you log into a new area.
 ---### See Also:
@@ -110,9 +104,9 @@ end
 --    L:log(50, 'Triggered: %s', event)
 --end
 
-local function OnBagUpdate(_, ...)
-    FireFrameEvent('OnRefreshItemCooldowns', 'OnBagUpdate', ...)
-end
+--local function OnBagUpdate(_, ...)
+--    FireFrameEvent('OnRefreshItemCooldowns', 'OnBagUpdate', ...)
+--end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -132,6 +126,14 @@ function L:OnAfterInitialize()
     end
 
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
+end
+
+function L:Fire(event, sourceEvent, ...)
+    local args = ...
+    ---@param frameWidget FrameWidget
+    self:ApplyForEachFrames(function(frameWidget)
+        frameWidget:Fire(event, sourceEvent, args)
+    end)
 end
 
 ---@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}

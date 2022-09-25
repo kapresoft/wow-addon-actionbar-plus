@@ -107,6 +107,12 @@ local E = {
     OnReceiveDrag = 'OnReceiveDrag',
 
     -- ################################
+    ---Custom Events
+    OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
+    OnTextSettingsChanged = 'OnTextSettingsChanged',
+    OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
+
+    -- ################################
     ---@deprecated DEPRECATED: Use the camel cased version
     ON_ENTER = 'OnEnter',
     ---@deprecated DEPRECATED: Use the camel cased version

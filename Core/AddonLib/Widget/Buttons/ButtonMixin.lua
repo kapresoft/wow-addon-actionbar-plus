@@ -125,7 +125,14 @@ function _L:RefreshTexts()
     local profile = widget:GetButtonData():GetProfileData()
     self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
     local hideTexts = true == profile.hide_text_on_small_buttons
-    if not hideTexts then return end
+    if not hideTexts then
+        local fw = widget.dragFrame
+        local barConf = fw:GetConfig()
+        if true == barConf.show_button_index then
+            self:SetHideIndexText(false)
+        end
+        return
+    end
 
     local barConfig = widget.dragFrame:GetConfig()
     local buttonSize = barConfig.widget.buttonSize
@@ -239,6 +246,7 @@ function _L:ShowIndex(state)
     local text = ''
     if true == state then text = self:_Widget().index end
     self:_Button().indexText:SetText(text)
+    self:RefreshTexts()
 end
 
 ---@param state boolean true will show the button index number
@@ -257,6 +265,7 @@ function _L:ShowKeybindText(state)
         end
     end
     button.keybindText:SetText(text)
+    self:RefreshTexts()
 end
 
 function _L:HasKeybindings()

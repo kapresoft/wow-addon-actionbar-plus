@@ -4,15 +4,11 @@ Lua Vars
 local format = string.format
 
 --[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local StaticPopup_Visible, StaticPopup_Show = StaticPopup_Visible, StaticPopup_Show
-
---[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, Mixin = O.GlobalConstants, O.Mixin
+local E = GC.E
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -51,6 +47,15 @@ local function ApplyForEachButton(applyFunction, configVal)
         frameWidget:ApplyForEachButtons(function(widget) applyFunction(widget, configVal) end)
     end)
 end
+
+local function PSetWithEvent(config, key, fallbackVal, eventName)
+    return function(_, v)
+        assert(type(key) == 'string', 'Profile key should be a string')
+        config.profile[key] = v or fallbackVal
+        if eventName then BF:Fire(eventName) end
+    end
+end
+
 local function SetAndApplyGeneric(config, key, fallbackVal, postFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -58,6 +63,7 @@ local function SetAndApplyGeneric(config, key, fallbackVal, postFunction)
         if 'function' == type(postFunction) then postFunction(config.profile[key]) end
     end
 end
+
 ---@param fallback any The fallback value
 ---@param key string The key value
 ---@param config Config The config instance
@@ -70,13 +76,6 @@ local function SetAndApply(config, key, fallback, foreachButtonFunction)
         end
     end
 end
-
----@param widget ButtonUIWidget
----@param configVal any
-local function RefreshButtonTexts(widget, configVal) widget:RefreshTexts() end
----@param widget ButtonUIWidget
----@param configVal any
-local function RefreshHighlight(widget, configVal) widget:RefreshHighlightEnabled() end
 
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
 ---@return BarData
@@ -91,12 +90,14 @@ local function GetShowButtonIndexStateGetterHandler(frameIndex)
     return function(_) return GetFrameWidget(frameIndex):IsShowIndex() end
 end
 local function GetShowButtonIndexStateSetterHandler(frameIndex)
+    --TODO: NEXT: Use events instead
     return function(_, v) GetFrameWidget(frameIndex):ShowButtonIndices(v) end
 end
 local function GetShowKeybindTextStateGetterHandler(frameIndex)
     return function(_) return GetFrameWidget(frameIndex):IsShowKeybindText() end
 end
 local function GetShowKeybindTextStateSetterHandler(frameIndex)
+    --TODO: NEXT: Use events instead
     return function(_, v) GetFrameWidget(frameIndex):ShowKeybindText(v) end
 end
 local function GetLockStateSetterHandler(frameIndex)
@@ -224,7 +225,7 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
                     desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
                     get = PGet(self, PC.action_button_mouseover_glow, false),
-                    set = SetAndApply(self, PC.action_button_mouseover_glow, false, RefreshHighlight)
+                    set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
                 },
                 hide_text_on_small_buttons = {
                     type = 'toggle',
@@ -233,7 +234,7 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
-                    set = SetAndApply(self, PC.hide_text_on_small_buttons, false, RefreshButtonTexts),
+                    set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
                 },
                 hide_countdown_numbers = {
                     type = 'toggle',
@@ -242,7 +243,7 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
                     get = PGet(self, PC.hide_countdown_numbers, false),
-                    set = SetAndApply(self, PC.hide_countdown_numbers, false, RefreshButtonTexts),
+                    set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
                 tooltip_header = { order = order + 6, type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS },
                 tooltip_visibility_key = {
@@ -412,7 +413,6 @@ local function NewInstance()
     _L.mt.__index = properties
 
     Mixin:Mixin(_L, methods)
-    ---for method, func in pairs(methods) do _L[method] = func end
     return _L
 end
 

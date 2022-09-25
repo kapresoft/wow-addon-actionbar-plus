@@ -19,14 +19,26 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
+local E = O.GlobalConstants.E
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ButtonFrameFactory : ButtonFrameFactory_Methods
 local _L = LibStub:NewLibrary(Core.M.ButtonFrameFactory)
+---@type LoggerTemplate
+local p = _L:GetLogger()
 
-local p = O.LogFactory:NewLogger(Core.M.ButtonFrameFactory)
+---@class WidgetBase
+local WidgetBaseTemplate = {
+    ---@param self WidgetBase
+    ---@param name string
+    ['Fire'] = function(self, name, ...) end,
+    ---@param self WidgetBase
+    ---@param name string
+    ---@param func function The callback function
+    ['SetCallback'] = function(self, name, func) end,
+}
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -47,6 +59,25 @@ local function RegisterWidget(widget, name)
         __index = WidgetBase
     }
     setmetatable(widget, mt)
+end
+
+---@param frameWidget FrameWidget
+local function OnCooldownTextSettingsChanged(frameWidget, event)
+    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:RefreshTexts()  end)
+end
+---@param frameWidget FrameWidget
+local function OnTextSettingsChanged(frameWidget, event)
+    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:RefreshTexts()  end)
+end
+---@param frameWidget FrameWidget
+local function OnMouseOverGlowSettingsChanged(frameWidget, event)
+    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:RefreshHighlightEnabled() end)
 end
 
 local function RegisterCallbacks(widget)
@@ -70,6 +101,10 @@ local function RegisterCallbacks(widget)
             _G[btnName].widget:UpdateState()
         end
     end)
+
+    widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
+    widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
+    widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
 
 end
 
@@ -316,7 +351,7 @@ function _L:Constructor(frameIndex)
     local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
     --fh:SetToplevel(true)
 
-    ---@class FrameWidget
+    ---@class FrameWidget : WidgetBase
     local widget = {
         p = p,
         profile = P,
