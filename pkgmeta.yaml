@@ -44,16 +44,19 @@ externals:
     tag: latest
 
 ignore:
+  - README.md
+  - sync-extlibs.sh
+  - doc
   - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibStub
   - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibQTip-1.0.toc
   - Core/ExtLib/WoWAce/LibCompress/LibCompress/LibCompress.toc
+  - Core/ExtLib/WoWAce/Ace3/tests
   - Core/ExtLib/WoWAce/Ace3/Ace3.lua
   - Core/ExtLib/WoWAce/Ace3/Ace3.toc
   - Core/ExtLib/WoWAce/Ace3/Ace3_TBC.toc
   - Core/ExtLib/WoWAce/Ace3/Ace3_Vanilla.toc
   - Core/ExtLib/WoWAce/Ace3/Ace3_Wrath.toc
   - Core/ExtLib/WoWAce/Ace3/Bindings.xml
-
 
 ## Potentially helpful libraries
 ## - https://www.wowace.com/projects/libactionbutton-1-0
