@@ -44,3 +44,6 @@ luac.out
 /.history/
 /.vscode/
 /Core/ExtLib/.Ace3.*
+
+# BigWigMods/packager
+/.release/
