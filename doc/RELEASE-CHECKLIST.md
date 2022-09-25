@@ -3,8 +3,8 @@
 ## PRE-Release
 
 ### README.md
-- Create a new version section in [CHANGELOG.txt](../CHANGELOG.txt) file
-- Outline changes
+- Create a new version section in [CHANGELOG.txt](../CHANGELOG.txt) file.  Move previous release notes to doc/CHANGELOG-previous.md
+- Create a new github DRAFT release in /release page - copy contents of CHANGELOG.txt
 
 ### Commit Changes and check CurseForge Build Page
 
@@ -41,4 +41,5 @@ $ git push --tags
 - Verify that the new version is showing in CurseForge app
 - Use an account that has the addon installed and upgrade to the new version. Note that WoW retail takes a little longer to publish
 
-
+### Release in Github
+- go to /release in github and publish the DRAFT release created in previous steps
