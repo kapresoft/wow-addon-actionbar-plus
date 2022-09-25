@@ -5,7 +5,7 @@
 
 - Start incrementing minor version (untracked)
 - #55 Fix for toy items being grayed out
-- #59 Scale cooldown font with button size
+- #57 Scale cooldown font with button size
 - #60 New option to auto hide keybind text and index for smaller buttons (less than size 35)
 - #61 New option to hide countdown numbers in cooldowns
 
