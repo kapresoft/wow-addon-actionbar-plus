@@ -65,9 +65,40 @@ Turns into #@debug@ and #@end-debug@, as well as adding a # to the beginning of 
 
 More at https://support.curseforge.com/en/support/solutions/articles/9000197281-automatic-packaging#Replacement-Tokens
 
+## The pkgmeta.yaml or yml file
+
+### Template is at:
+- https://support.curseforge.com/en/support/solutions/articles/9000197281-automatic-packaging
+
+### Preparing pkgmeta file:
+- https://support.curseforge.com/en/support/solutions/articles/9000197952-preparing-the-packagemeta-file
+- https://github.com/TimothyLuke/GSE-Advanced-Macro-Compiler/blob/master/.pkgmeta
+- https://github.com/TimothyLuke/GSE-Advanced-Macro-Compiler/blob/master/GSE/GSE.toc
+
+
 ### Testing Release with BigWigMods/packager
 ```shell
  # pwd should be the top-level project
  $ ~/sandbox/github/wow/packager/release.sh
  # creates a .release directory
+```
+
+## Steps to get the latest external lib dependencies
+
+> release-wow-addon is a link to BigWigMods/release.sh
+see [PACKAGER.md](PACKAGER.md) for more details
+
+Run the sync bash script
+```shell
+# Make executable (Optional)
+$ cmod +x ./sync-extlibs.sh
+# Runs package.sh and rsync to work directory
+./sync-extlibs.sh
+```
+
+```shell
+# generate
+$ release-wow-addon -cdzulo
+# sync with local
+$ rsyncw -s .release/ActionbarPlus/Core/ExtLib/WoWAce Core/ExtLib/WoWAce/
 ```
