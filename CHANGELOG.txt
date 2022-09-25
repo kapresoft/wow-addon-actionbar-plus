@@ -1,14 +1,10 @@
 # ActionbarPlus
 
 ## [1.0.1](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.1) (2022-MM-DD)
-**[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.0.33...1.0.1)**
+[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.0.33...1.0.1) | [Previous Releases](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 - Start incrementing minor version (untracked)
 - #55 Fix for toy items being grayed out
-- #57 Scale cooldown font with button size
+- #59 Scale cooldown font with button size
 - #60 New option to auto hide keybind text and index for smaller buttons (less than size 35)
 - #61 New option to hide countdown numbers in cooldowns
-
-
-### Misc
-- **[Previous Releases](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)**
