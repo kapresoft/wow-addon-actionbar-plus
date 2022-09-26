@@ -1,6 +1,7 @@
 # ActionbarPlus
 
 ## [1.0.1](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.1) (2022-Sep-25)
+
 [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.0.33...1.0.1) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 - #55 Fix for toy items being grayed out
