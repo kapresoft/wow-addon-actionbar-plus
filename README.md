@@ -6,17 +6,15 @@
 [//]: # (https://cf.way2muchnoise.eu/)
 [//]: # (See more on badges at: https://support.curseforge.com/en/support/solutions/articles/9000206928-curseforge-badges)
 
+[Releases](../../releases) | [Milestones](../../milestones) | [Known Issues](../../issues)
+
 ## Actionbars Everywhere, Make you click happy
 
-#### Available for World of Warcraft Versions
-
-
+>Available for all of World of Warcraft Versions
 
 ## Description
 
 >ActionbarPlus provides an Up to 8 additional configurable actionbars that can be freely positioned around the game. They are convenient and allow players to have additional floating actionbars to enhance your gaming experience.
-
-See [Getting Started](../../wiki/Getting-Started) for more details.
 
 ### Features
 - action buttons triggers on KeyDown (not KeyUp)
@@ -25,20 +23,31 @@ See [Getting Started](../../wiki/Getting-Started) for more details.
 - support for keybinding action buttons in World of Warcraft Keybinding options
 - [WowAce](https://www.wowace.com/projects/ace3) profile support (import, export, copy)
 
-## Author Notes
+## Docs
+- [Wiki](../../wiki)
+- [Getting Started](../../wiki/Getting-Started)
 
-- Please submit bugs and feature requests at [Github/ActionbarPlus/issues](/../../issues)
-- [RoadMap](../../wiki/Roadmap)
+### Author Notes
+
+- Please submit bugs and feature requests at [Github/ActionbarPlus/issues](../../issues)
+- [Milestones](../../milestones)
+- [Releases](../../releases)
+- [About the Author (Tony Lagnada)](https://tony.resume.lagnada.com/)
 
 ## Curseforge / Twitch
 
 - https://www.curseforge.com/wow/addons/actionbarplus
+
+## Donations
+
+As a software engineer I love working on this project and devote quite a bit of quality time producing this product.  If you like this World of Warcraft add-on please donate via [Paypal&trade;](https://www.curseforge.com/wow/addons/actionbarplus) or the Bitcoin Address below.  You are appreciated!  Thanks in advance.
+
+**Bitcoin Address**
+
+[https://www.blockchain.com/btc/address/3QQVAwJGkKHMM2oq6CLVWYgfx83TFVwp39](https://www.blockchain.com/btc/address/3QQVAwJGkKHMM2oq6CLVWYgfx83TFVwp39)
 
 ## Miscellaneous
 
 - [For Developers](doc/DEV.md)
 - [Contributing](doc/CONTRIBUTING.md)
 - [Release Checklist](doc/RELEASE-CHECKLIST.md)
-
-## Docs
-- [Getting Started](../../wiki/Getting-Started)
