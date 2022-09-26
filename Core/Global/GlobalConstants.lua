@@ -164,11 +164,13 @@ Methods: GlobalConstants
 local function methods(o)
     function o:GetAddonInfo()
         local addonName = C.ADDON_NAME
-        local versionText = self.versionText
+        local versionText
+        --@non-debug@
+        versionText = GetAddOnMetadata(addonName, 'X-Github-Project-Version')
+        --@end-non-debug@
         --@debug@
         versionText = '1.0.dev'
         --@end-debug@
-
         return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'),
                             GetAddOnMetadata(addonName, 'X-Github-Issues'),
                             GetAddOnMetadata(addonName, 'X-Github-Repo')
