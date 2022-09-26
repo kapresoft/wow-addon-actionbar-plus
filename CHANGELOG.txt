@@ -1,13 +1,7 @@
 # ActionbarPlus
 
-## [1.0.1](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.1) (2022-Sep-25)
+## [1.0.2.FUTURE](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.2) (2022-MM-DD)
 
-[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.0.33...1.0.1) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.1...1.0.2) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-- #55 Fix for toy items being grayed out
-- #59 Scale cooldown font with button size
-- #60 New option to auto hide keybind text and index for smaller buttons (less than size 35)
-- #61 New option to hide countdown numbers in cooldowns
-- #64 Use externals for Ace3 and other libs in pkgmeta.yaml
-- #65 Use events when updating barSize in settings
-- Start incrementing minor version, i.e. 1.0.X instead of 1.0.0.XX (untracked)
+- #NN Issue Description
