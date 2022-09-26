@@ -14,7 +14,9 @@
 
 - /dump: Just dumps a variable's value to chat. This works better than print for tables.
 
--  /script: Anything following this will executed immediately as Lua code.
+- /script: Anything following this will executed immediately as Lua code.
+  
+- /dump GetMouseFocus(): Dump on anything your mouse is over
 
 ### Replacement Tokens
 
