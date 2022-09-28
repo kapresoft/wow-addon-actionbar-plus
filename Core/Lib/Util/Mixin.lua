@@ -47,6 +47,17 @@ function _L:Mixin(object, ...)
     return self:MixinExcept(object, { 'GetName', 'mt', 'log' }, ...)
 end
 
+---```
+---local MyObj = MixinAndInit(MyMixin, arg1, arg2, argN)
+---```
+---@param object any
+function _L:MixinAndInit(object, ...)
+    if not object then error(MIXIN_OBJ_REQUIRED_MSG) end
+    local o = self:MixinExcept(object, { 'GetName', 'mt', 'log' }, ...)
+    if o.Init then o:Init(...) end
+    return o
+end
+
 ---Mixin the ... with target object
 ---otherwise mixin selfObj if no args {...} are provided
 function _L:MixinOrElseSelf(target, selfObj, ...)

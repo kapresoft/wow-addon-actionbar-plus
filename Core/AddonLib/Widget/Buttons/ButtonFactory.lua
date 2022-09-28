@@ -59,54 +59,10 @@ local function InitButtonGameTooltipHooks()
     end)
 end
 
-local function ShowConfigTooltip(frame)
-    local widget = frame.widget
-    GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
-    GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget:GetFrameIndex(), 1, 1, 1))
-    GameTooltip:Show()
-    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
-end
-
 ---@param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
     AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
-
---[[-----------------------------------------------------------------------------
-Scripts
--------------------------------------------------------------------------------]]
-
-local function OnLeaveFrame(_) GameTooltip:Hide() end
-local function OnShowFrameTooltip(frame)
-    ShowConfigTooltip(frame)
-    C_Timer.After(3, function() GameTooltip:Hide() end)
-end
-
-local function OnMouseDownFrame(frameHandle, mouseButton)
-    --F:log(1, 'Mouse Button Clicked: %s', mouseButton or '')
-    frameHandle.widget.frame:StartMoving()
-    GameTooltip:Hide()
-    if IsShiftKeyDown() and strlower(mouseButton) == 'leftbutton' then
-        ReloadUI()
-    elseif strlower(mouseButton) == 'rightbutton' then
-        L.addon:OpenConfig(frameHandle.widget)
-    elseif strlower(mouseButton) == 'button5' then
-        StaticPopup_Show(C.CONFIRM_RELOAD_UI)
-    end
-end
-
----Fired when the cooldown for an actionbar or inventory slot starts or
----stops. Also fires when you log into a new area.
----### See Also:
----https://wowpedia.fandom.com/wiki/ACTIONBAR_UPDATE_COOLDOWN
---local function OnActionbarUpdateCooldown(event)
---    -- also fired on: refresh, new zone
---    L:log(50, 'Triggered: %s', event)
---end
-
---local function OnBagUpdate(_, ...)
---    FireFrameEvent('OnRefreshItemCooldowns', 'OnBagUpdate', ...)
---end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -161,15 +117,12 @@ function L:RefreshActionbar(frameIndex)
 end
 
 function L:CreateActionbarGroup(frameIndex)
-    -- TODO: config should be in profiles
-    local config = P:GetActionBarSizeDetailsByIndex(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
     ---@type FrameWidget
     local f = ButtonFrameFactory(frameIndex)
     self:CreateButtons(f, widget.rowSize, widget.colSize)
     f:SetInitialState()
-    self:AttachFrameEvents(f)
     return f
 end
 
@@ -186,6 +139,8 @@ function L:CreateButtons(frameWidget, rowSize, colSize)
 end
 
 ---@param frameWidget FrameWidget
+---@param row number
+---@param col number
 ---@param btnIndex number The button index number
 function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
@@ -214,13 +169,6 @@ function L:IsValidDragSource(cursorInfo)
     end
 
     return true
-end
-
-function L:AttachFrameEvents(frameWidget)
-    local frame = frameWidget.frameHandle
-    frame:SetScript("OnMouseDown", OnMouseDownFrame)
-    frame:SetScript("OnEnter", OnShowFrameTooltip)
-    frame:SetScript("OnLEave", OnLeaveFrame)
 end
 
 function L:GetAttributesSetter(actionType)

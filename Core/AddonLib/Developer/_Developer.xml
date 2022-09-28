@@ -1,3 +1,5 @@
 <Ui xmlns='http://www.blizzard.com/wow/ui/'>
-	<Script file='Test.lua'/>
+	<!--@debug@
+	<Script file='Developer.lua'/>
+	@end-debug@-->
 </Ui>

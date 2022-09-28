@@ -56,6 +56,7 @@ local ITEM_TEMPLATE = {
         link = '[Honey Bread]',
     }
 }
+local startingX = -300.0
 
 ---The defaults provided here will used for the default state of the settings
 ---@class DefaultProfile
@@ -72,6 +73,10 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = true,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=400.0
+            },
             ["buttons"] = {
                 ["ActionbarPlusF1Button1"] = {
                     ["type"] = "spell",
@@ -91,43 +96,71 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF2"] = {
             ["enabled"] = true,
-            ["widget"] = { ["rowSize"] = 6, ["colSize"] = 2, ["buttonSize"] = 35 },
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=300.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF3"] = {
             ["enabled"] = false,
-            ["widget"] = { ["rowSize"] = 3, ["colSize"] = 5, ["buttonSize"] = 35 },
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=200.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF4"] = {
             ["enabled"] = false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=100.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF5"] = {
             ["enabled"] = false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=0.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF6"] = {
             ["enabled"] = false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-100.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF7"] = {
             ["enabled"] = false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-200.0
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF8"] = {
             ["enabled"] = false,
-            ["widget"] = { ["rowSize"] = 4, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-300.0
+            },
             ["buttons"] = {
             },
         },

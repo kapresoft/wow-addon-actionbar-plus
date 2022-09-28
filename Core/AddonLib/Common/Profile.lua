@@ -91,6 +91,8 @@ local ProfileBarTemplate = {
     -- shows the keybind text TOP
     ["show_keybind_text"] = true,
     ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
+    ---@type Blizzard_RegionAnchor
+    ["anchor"] = {},
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = {
             ['type'] = 'spell',

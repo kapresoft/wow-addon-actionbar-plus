@@ -33,15 +33,20 @@ local C = {
     ALT = 'ALT',
     ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
     ARTWORK_DRAW_LAYER = 'ARTWORK',
+    BOTTOM = 'BOTTOM',
     BOTTOMLEFT = 'BOTTOMLEFT',
     BOTTOMRIGHT = 'BOTTOMRIGHT',
+    Button5 = 'Button5',
     CLAMPTOBLACKADDITIVE = 'CLAMPTOBLACKADDITIVE',
     CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI',
     CTRL = 'CTRL',
     HIGHLIGHT_DRAW_LAYER = 'HIGHLIGHT',
+    LeftButton = 'LeftButton',
+    RightButton = 'RightButton',
     PICKUPACTION = 'PICKUPACTION',
     SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate',
     SHIFT = 'SHIFT',
+    TOP = 'TOP',
     TOPLEFT = 'TOPLEFT',
 
 }
@@ -104,6 +109,10 @@ local E = {
     OnEvent = 'OnEvent',
     OnLeave = 'OnLeave',
     OnModifierStateChanged = 'OnModifierStateChanged',
+    OnDragStart = 'OnDragStart',
+    OnDragStop = 'OnDragStop',
+    OnMouseUp = 'OnMouseUp',
+    OnMouseDown = 'OnMouseDown',
     OnReceiveDrag = 'OnReceiveDrag',
 
     -- ################################
@@ -112,6 +121,7 @@ local E = {
     OnTextSettingsChanged = 'OnTextSettingsChanged',
     OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
     OnButtonSizeChanged = 'OnButtonSizeChanged',
+    OnAddonLoaded = 'OnAddonLoaded',
 
     -- ################################
     ---@deprecated DEPRECATED: Use the camel cased version
@@ -178,6 +188,15 @@ local function methods(o)
     function o:GetLogLevel() return ABP_LOG_LEVEL end
     ---@param level number The log level between 1 and 100
     function o:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
+
+
+    ---@param level number
+    function o:ShouldLog(level)
+        return self:GetLogLevel() >= level
+    end
+
+    function o:IsVerboseLogging() return self:ShouldLog(20) end
+
 end
 
 

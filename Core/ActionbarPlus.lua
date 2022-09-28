@@ -57,9 +57,13 @@ local function OnAddonLoaded(frame, event, ...)
         --p:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
         WMX:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
     end
+
+    BF:Fire(GC.E.OnAddonLoaded)
+
     --@debug@
     isLogin = true
     --@end-debug@
+
 
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
