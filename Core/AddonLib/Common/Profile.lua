@@ -120,20 +120,6 @@ function P:ResetButtonData(widget)
     btnData[WAttr.TYPE] = ''
 end
 
-function P:InitDELETEME(newProfile)
-    assertProfile(newProfile)
-
-    if type(newProfile.bars) ~= 'table' then
-        newProfile.bars = self:CreateBarsTemplate()
-    end
-
-    for _,bar in pairs(newProfile.bars) do
-        if type(bar['buttons']) ~= 'table' then
-            newProfile.bars['buttons'] = {}
-        end
-    end
-end
-
 function P:CreateDefaultProfile(profileName)
     return ProfileInitializer:InitNewProfile(profileName)
 end
