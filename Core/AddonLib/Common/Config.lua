@@ -9,6 +9,8 @@ Local Vars
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, Mixin = O.GlobalConstants, O.Mixin
 local E = GC.E
+local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
+local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -232,7 +234,7 @@ local methods = {
             desc = "General Settings",
             order = order:nextOrder(),
             args = {
-                desc = { name = " General Configuration ", type = "header", order = 0 },
+                desc = { name = GeneralConfigHeader, type = "header", order = 0 },
                 -- TODO: Remove lock_actionbars; Addon now uses WOW's ActionBars / Pick Up Action Key Settings
                 lock_actionbars = {
                     hidden = true,
@@ -248,8 +250,8 @@ local methods = {
                     type = 'toggle',
                     width = 'full',
                     order = order:nextOrder(),
-                    name = 'Character Specific Frame Anchors',
-                    desc = 'By default, all frame positions (or anchors) are global across characters. If checked, the frame positions are saved at the character level.',
+                    name = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME,
+                    desc = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC,
                     get = PGet(self, PC.character_specific_anchors, false),
                     set = PSet(self, PC.character_specific_anchors, false)
                 },
@@ -287,7 +289,7 @@ local methods = {
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
-                tooltip_header = { order = order:nextOrder(), type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS },
+                tooltip_header = { order = order:nextOrder(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {
                     type = 'select', style = 'dropdown',
                     order = order:nextOrder(),
