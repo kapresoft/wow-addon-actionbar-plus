@@ -7,7 +7,7 @@ local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local format, strlower = string.format, string.lower
+local format, strlower, tinsert = string.format, string.lower, table.insert
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -26,6 +26,7 @@ local WMX = O.WidgetMixin
 
 ---@class ButtonFactory
 local L = LibStub:NewLibrary(Core.M.ButtonFactory)
+---@type LoggerTemplate
 local p = L:GetLogger()
 
 local AttributeSetters = {
@@ -38,6 +39,8 @@ local AttributeSetters = {
 -- Initialized on Logger#OnAddonLoaded()
 L.addon = nil
 L.profile = nil
+L.FRAMES = {}
+
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -69,19 +72,23 @@ Methods
 -------------------------------------------------------------------------------]]
 
 function L:OnAfterInitialize()
-    local frames = P:GetAllFrameNames()
+    local frameNames = P:GetAllFrameNames()
     --error(format('frames: %s', ABP_Table.toString(frames)))
-    for i,_ in ipairs(frames) do
+    local inactiveFrameCount = 0
+    for i,_ in ipairs(frameNames) do
         local frameEnabled = P:IsBarIndexEnabled(i)
         local f = self:CreateActionbarGroup(i)
         if frameEnabled then
             f:ShowGroup()
         else
             f:HideGroup()
+            inactiveFrameCount = inactiveFrameCount + 1
         end
+        tinsert(self.FRAMES, f)
     end
 
     --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
+    p:log('Total frames loaded: %s, %s are hidden', #self.FRAMES, inactiveFrameCount)
 end
 
 function L:Fire(event, sourceEvent, ...)

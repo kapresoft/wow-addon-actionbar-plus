@@ -7,6 +7,7 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local BF = O.ButtonFactory
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -52,11 +53,11 @@ function L:AnchorReset(frameIndex)
 end
 
 ---@param frameIndex number
----@return Frame
-function L:F(frameIndex)
-    return _G['ActionbarPlusF' .. tostring(frameIndex)]
-end
+---@return FrameWidget
+function L:F(frameIndex) return BF.FRAMES[frameIndex] end
 
+---@return Profile_Bar
+function L:C(frameIndex) return self:F(frameIndex):GetConfig() end
 
 D = L
 

@@ -15,6 +15,7 @@ local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 ---@class ProfileInitializer
 local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
 
+---FrameDetails is used for initializing defaults for AceDB profile
 local FrameDetails = {
     [1] = { rowSize = 2, colSize = 6 },
     [2] = { rowSize = 6, colSize = 2 },
