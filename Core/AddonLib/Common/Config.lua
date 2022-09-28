@@ -15,7 +15,7 @@ local p = O.LogFactory(Core.M.Config)
 ---These are loaded in #fetchLibs()
 ---@type Profile
 local P
----@type Profile_ConfigNames
+---@type Profile_Config_Names
 local PC
 ---@type TooltipKey
 local TTK
@@ -172,25 +172,50 @@ local function fetchLibs()
     TTK = P:GetTooltipKey()
 end
 
+---@param order number
+---@param optionalIncrement number
+local function nextOrder(order, optionalIncrement)
+    order = order + (optionalIncrement or 1)
+    print('new order:', order)
+    return order
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+---@class OrderInfo
+local orderInfo = {
+    order = 1,
+
+    ---@param self OrderInfo
+    ---@param incr number An optional increment amount
+    ["nextOrder"] = function(self, incr)
+        self.order = self.order + (incr or 1)
+        return self.order
+    end
+}
+
+---@class Config_Methods
 local methods = {
+    ---@param self Config
     ['OnAfterInitialize'] = function(self) fetchLibs() end,
+    ---@param self Config
     ['OnAfterAddonLoaded'] = function(self) end,
+    ---@param self Config
     ['GetOptions'] = function(self)
         return {
             name = GC.C.ADDON_NAME, handler = self.addon, type = "group",
             args = self:CreateConfig(),
         }
     end,
+    ---@param self Config
     ['CreateConfig'] = function(self)
         local configArgs = {}
 
-        configArgs['general'] = self:CreateGeneralGroup(1)
-        configArgs['debugging'] = self:CreateDebuggingGroup(100)
+        configArgs['general'] = self:CreateGeneralGroup(orderInfo)
+        configArgs['debugging'] = self:CreateDebuggingGroup(orderInfo)
 
-        local barConfigs = self:CreateActionBarConfigs(9)
+        local barConfigs = self:CreateActionBarConfigs(orderInfo)
         for bName, bConf in pairs(barConfigs) do
             configArgs[bName] = bConf
         end
@@ -198,29 +223,39 @@ local methods = {
 
         return configArgs
     end,
+    ---@param self Config
+    ---@param order OrderInfo
     ['CreateGeneralGroup'] = function(self, order)
         return {
             type = "group",
             name = "General",
             desc = "General Settings",
-            order = order or 999,
+            order = order:nextOrder(),
             args = {
                 desc = { name = " General Configuration ", type = "header", order = 0 },
                 -- TODO: Remove lock_actionbars; Addon now uses WOW's ActionBars / Pick Up Action Key Settings
                 lock_actionbars = {
                     hidden = true,
                     type = 'toggle',
-                    order = order + 1,
-                    width = 'full',
+                    order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME,
                     --desc = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.',
                     desc = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC,
                     get = PGet(self, PC.lock_actionbars, false),
                     set = PSet(self, PC.lock_actionbars, false)
                 },
+                character_specific_anchors = {
+                    type = 'toggle',
+                    width = 'full',
+                    order = order:nextOrder(),
+                    name = 'Character Specific Frame Anchors',
+                    desc = 'By default, all frame positions (or anchors) are global across characters. If checked, the frame positions are saved at the character level.',
+                    get = PGet(self, PC.character_specific_anchors, false),
+                    set = PSet(self, PC.character_specific_anchors, false)
+                },
                 hide_while_taxi = {
                     type = 'toggle',
-                    order = order + 2,
+                    order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
                     get = PGet(self, PC.hide_when_taxi, false),
@@ -228,7 +263,7 @@ local methods = {
                 },
                 action_button_mouseover_glow = {
                     type = 'toggle',
-                    order = order + 3,
+                    order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
                     desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
                     get = PGet(self, PC.action_button_mouseover_glow, false),
@@ -236,7 +271,7 @@ local methods = {
                 },
                 hide_text_on_small_buttons = {
                     type = 'toggle',
-                    order = order + 4,
+                    order = order:nextOrder(),
                     width = 'full',
                     name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
@@ -245,17 +280,17 @@ local methods = {
                 },
                 hide_countdown_numbers = {
                     type = 'toggle',
-                    order = order + 5,
+                    order = order:nextOrder(),
                     width = 'full',
                     name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
-                tooltip_header = { order = order + 6, type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS },
+                tooltip_header = { order = order:nextOrder(), type = "header", name = ABP_GENERAL_TOOLTIP_OPTIONS },
                 tooltip_visibility_key = {
                     type = 'select', style = 'dropdown',
-                    order = order + 7,
+                    order = order:nextOrder(),
                     width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
@@ -265,7 +300,7 @@ local methods = {
                 },
                 tooltip_visibility_combat_override_key = {
                     type = 'select', style = 'dropdown',
-                    order = order + 8,
+                    order = order:nextOrder(),
                     width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
@@ -276,12 +311,15 @@ local methods = {
             }
         }
     end,
+    ---@param self Config
+    ---@param order OrderInfo
     ['CreateDebuggingGroup'] = function(self, order)
         return {
             type = "group",
             name = "Debugging",
             desc = "Debug Settings",
-            order = order or 999,
+            -- Place right before Profiles
+            order = 90,
             args = {
                 desc = { name = " Debugging Configuration ", type = "header", order = 0 },
                 log_level = {
@@ -299,6 +337,8 @@ local methods = {
             },
         }
     end,
+    ---@param self Config
+    ---@param order OrderInfo
     ['CreateActionBarConfigs'] = function(self, order)
         local count = P:GetBarSize()
         local bars = {}
@@ -306,24 +346,28 @@ local methods = {
             -- barN is the config path name used for OptionDialog#OpenConfig()
             local key = 'bar' .. i
             local barOrder = tonumber(tostring(order) .. tostring(i))
-            bars[key] = self:CreateBarConfigDef(i, barOrder)
+            bars[key] = self:CreateBarConfigDef(i, order)
         end
         return bars
     end,
+    ---@param self Config
+    ---@param frameIndex number
+    ---@param order OrderInfo
     ['CreateBarConfigDef'] = function(self, frameIndex, order)
         local configName = format('Action Bar #%s', tostring(frameIndex))
         return {
             type = 'group',
             name = configName,
             desc = format("%s Settings", configName),
-            order = order or 999,
+            order = order:nextOrder(),
             args = {
-                desc = { name = format("%s Settings", configName), type = "header", order = 0 },
+                desc = { name = format("%s Settings", configName),
+                         type = "header", order = order:nextOrder(), },
                 enabled = {
                     type = "toggle",
                     name = "Enable",
                     desc = format("Enable %s", configName),
-                    order = 1,
+                    order = order:nextOrder(),
                     width = "full",
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
@@ -332,7 +376,7 @@ local methods = {
                     type = "toggle",
                     name = "Show Button Numbers",
                     desc = format("Show each button index on %s", configName),
-                    order = 1,
+                    order = order:nextOrder(),
                     width = "full",
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
@@ -341,15 +385,15 @@ local methods = {
                     type = "toggle",
                     name = "Show Keybind Text",
                     desc = format("Show each button keybind text on %s", configName),
-                    order = 1,
+                    order = order:nextOrder(),
                     width = "full",
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
                 },
-                spacer1 = { type="description", name=" ", order=2 },
+                spacer1 = { type="description", name=" ", order = order:nextOrder() },
                 button_width = {
                     type = 'range',
-                    order = 3,
+                    order = order:nextOrder(),
                     step = 1,
                     min = 20,
                     max = 100,
@@ -361,7 +405,7 @@ local methods = {
                 },
                 rows = {
                     type = 'range',
-                    order = 4,
+                    order = order:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 10,
@@ -374,7 +418,7 @@ local methods = {
                 },
                 cols = {
                     type = 'range',
-                    order = 5,
+                    order = order:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 10,
@@ -388,10 +432,10 @@ local methods = {
                 spacer2 = { type="description", name=" ", order=6 },
                 lock = {
                     type = "select", style = "radio",
+                    order = order:nextOrder(),
                     values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
                     name = "Lock Actionbar Frame?",
                     desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),
-                    order = 7,
                     width = .8,
                     get = GetLockStateGetterHandler(frameIndex),
                     set = GetLockStateSetterHandler(frameIndex)
@@ -413,7 +457,7 @@ local function NewInstance()
         profile = nil
     }
 
-    ---@class Config
+    ---@class Config : Config_Methods
     local _L = LibStub:NewLibrary(Core.M.Config)
     _L.mt.__index = properties
 

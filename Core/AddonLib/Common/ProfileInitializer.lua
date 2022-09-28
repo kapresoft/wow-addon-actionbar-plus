@@ -7,7 +7,8 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local ATTR, Table = O.GlobalConstants.WidgetAttributes, O.Table
+local GC = O.GlobalConstants
+local ATTR, Table = GC.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
 -- ## Functions ------------------------------------------------
@@ -38,17 +39,21 @@ local ButtonDataTemplate = {
 
 local startingX = -300.0
 
+local ConfigNames = GC.Profile_Config_Names
+
 ---The defaults provided here will used for the default state of the settings
 ---@type Profile_Config
 local DEFAULT_PROFILE_DATA = {
-    ["lock_actionbars"] = false,
-    ["hide_when_taxi"] = true,
-    ["action_button_mouseover_glow"] = true,
-    ["hide_text_on_small_buttons"] = false,
-    ["hide_countdown_numbers"] = false,
-    ["tooltip_visibility_key"] = '',
-    ["tooltip_visibility_combat_override_key"] = '',
-    ["bars"] = {
+    ---@deprecated lock_actionbars is no longer used
+    [ConfigNames.lock_actionbars] = false,
+    [ConfigNames.character_specific_anchors] = false,
+    [ConfigNames.hide_when_taxi] = true,
+    [ConfigNames.action_button_mouseover_glow] = true,
+    [ConfigNames.hide_text_on_small_buttons] = false,
+    [ConfigNames.hide_countdown_numbers] = false,
+    [ConfigNames.tooltip_visibility_key] = '',
+    [ConfigNames.tooltip_visibility_combat_override_key] = '',
+    [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = true,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },

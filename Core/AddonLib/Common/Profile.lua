@@ -30,21 +30,24 @@ if not P then return end
 
 ---- ## Start Here ----
 
----These are the config names used by the UI
----@see Config.lua
----@class Profile_ConfigNames
-local ConfigNames = {
-    ---@deprecated lock_actionbars is to be removed
-    ['lock_actionbars'] = 'lock_actionbars',
-    ['hide_when_taxi'] = 'hide_when_taxi',
-    ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
-    ['hide_text_on_small_buttons'] = 'hide_text_on_small_buttons',
-    ['hide_countdown_numbers'] = 'hide_countdown_numbers',
-    ['tooltip_visibility_key'] = 'tooltip_visibility_key',
-    ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
-    ['show_button_index'] = 'show_button_index',
-    ['show_keybind_text'] = 'show_keybind_text',
-}
+-----These are the config names used by the UI
+-----@seexx Config.lua
+-----@classxx Profile_ConfigNames
+--local ConfigNames = {
+--    ---@deprecated lock_actionbars is to be removed
+--    ['lock_actionbars'] = 'lock_actionbars',
+--    ['character_specific_anchors'] = 'character_specific_anchors',
+--    ['hide_when_taxi'] = 'hide_when_taxi',
+--    ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
+--    ['hide_text_on_small_buttons'] = 'hide_text_on_small_buttons',
+--    ['hide_countdown_numbers'] = 'hide_countdown_numbers',
+--    ['tooltip_visibility_key'] = 'tooltip_visibility_key',
+--    ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
+--    ['show_button_index'] = 'show_button_index',
+--    ['show_keybind_text'] = 'show_keybind_text',
+--}
+
+local ConfigNames = GC.Profile_Config_Names
 
 ---@class TooltipKeyName
 local TooltipKeyName = {
@@ -356,7 +359,7 @@ function P:IsHideWhenTaxi()
     return self.profile[ConfigNames.hide_when_taxi] == true
 end
 
----@return Profile_ConfigNames
+---@return Profile_Config_Names
 function P:GetConfigNames() return ConfigNames end
 
 ---@return TooltipKey
