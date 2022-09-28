@@ -503,7 +503,7 @@ end
 
 
 ---@param spellID string The spellID to match
----@param optionalBtnConf ProfileButton
+---@param optionalBtnConf Profile_Button
 ---@return boolean
 function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
@@ -515,7 +515,7 @@ function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
 end
 
 ---@param spellID string The spellID to match
----@param optionalBtnConf ProfileButton
+---@param optionalBtnConf Profile_Button
 ---@return boolean
 function _L:IsMatchingSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
@@ -533,7 +533,7 @@ end
 
 ---@param widget ButtonUIWidget
 ---@param spellName string The spell name
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsMatchingSpellName(spellName, buttonData)
     local s = buttonData or self:GetConfig()
     if not (s.spell and s.spell.name) then return false end
@@ -542,7 +542,7 @@ function _L:IsMatchingSpellName(spellName, buttonData)
 end
 
 ---@param spellID string
----@param optionalProfileButton ProfileButton
+---@param optionalProfileButton Profile_Button
 function _L:IsMatchingMacroSpellID(spellID, optionalProfileButton)
     optionalProfileButton = optionalProfileButton or self:GetConfig()
     if not self:IsValidMacroProfile(optionalProfileButton) then return end
@@ -555,7 +555,7 @@ end
 ---@param spellID string The spellID to match
 ---@return boolean
 function _L:IsMatchingMacroOrSpell(spellID)
-    ---@type ProfileButton
+    ---@type Profile_Button
     local conf = self:GetConfig()
     if not conf and (conf.spell or conf.macro) then return false end
     if self:IsConfigOfType(conf, SPELL) then
@@ -659,19 +659,19 @@ function _L:SetIcon(icon)
     self:_Button():SetPushedTexture(icon)
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidItemProfile(buttonData)
     return not (buttonData == nil or buttonData.item == nil
             or IsBlank(buttonData.item.id))
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidSpellProfile(buttonData)
     return not (buttonData == nil or buttonData.spell == nil
             or IsBlank(buttonData.spell.id))
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidMacroProfile(buttonData)
     return not (buttonData == nil or buttonData.macro == nil
             or IsBlank(buttonData.macro.index)

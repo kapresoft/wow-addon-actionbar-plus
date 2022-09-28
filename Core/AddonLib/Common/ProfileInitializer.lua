@@ -59,11 +59,10 @@ local ITEM_TEMPLATE = {
 local startingX = -300.0
 
 ---The defaults provided here will used for the default state of the settings
----@class DefaultProfile
+---@type Profile_Config
 local DEFAULT_PROFILE_DATA = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
-    -- toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
     ["hide_text_on_small_buttons"] = false,
     ["hide_countdown_numbers"] = false,

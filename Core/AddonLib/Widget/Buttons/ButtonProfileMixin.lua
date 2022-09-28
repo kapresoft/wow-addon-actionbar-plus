@@ -56,9 +56,9 @@ function _L:IsEmpty()
 end
 
 ---#### Get Profile Button Config Data
----@return ProfileButton
+---@return Profile_Button
 function _L:GetConfig() return self:W().buttonData:GetData() end
----@return ProfileTemplate
+---@return Profile_Config
 function _L:GetProfileData() return self:W().buttonData:GetProfileData() end
 
 ---@param type string One of: spell, item, or macro
@@ -68,11 +68,11 @@ function _L:GetConfigActionbarData(type)
     return btnData[type]
 end
 
----@return SpellData
+---@return Profile_Spell
 function _L:GetSpellData() return self:GetConfigActionbarData(SPELL) end
----@return ItemData
+---@return Profile_Item
 function _L:GetItemData() return self:GetConfigActionbarData(ITEM) end
----@return MacroData
+---@return Profile_Macro
 function _L:GetMacroData() return self:GetConfigActionbarData(MACRO) end
 ---@return boolean
 function _L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
@@ -83,7 +83,7 @@ function _L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
 ---@return boolean
 function _L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
 
----@param config ProfileButton
+---@param config Profile_Button
 ---@param type string spell, item, macro, mount, etc
 function _L:IsConfigOfType(config, type)
     if IsTableEmpty(config) then return false end

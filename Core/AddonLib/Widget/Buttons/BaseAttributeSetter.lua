@@ -15,7 +15,7 @@ Interface
 ---@class AttributeSetter
 local AttributeSetter = {
     ---@param btnUI ButtonUI
-    ---@param btnData ProfileButton
+    ---@param btnData Profile_Button
     ['SetAttributes'] = function(btnUI, btnData) end,
     ---@param btnUI ButtonUI
     ['ShowTooltip'] = function(btnUI) end

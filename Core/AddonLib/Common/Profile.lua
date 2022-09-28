@@ -81,98 +81,6 @@ local SingleBarTemplate = {
     buttons = {}
 }
 
----@class BarData
-local ProfileBarTemplate = {
-    ["enabled"] = false,
-    -- allowed values: {"", "always", "in-combat"}
-    ["locked"] = "",
-    -- shows the button index BOTTOMLEFT
-    ["show_button_index"] = true,
-    -- shows the keybind text TOP
-    ["show_keybind_text"] = true,
-    ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
-    ---@type Blizzard_RegionAnchor
-    ["anchor"] = {},
-    ["buttons"] = {
-        ['ActionbarPlusF1Button1'] = {
-            ['type'] = 'spell',
-            ['spell'] = {
-                -- spellInfo
-            }
-        }
-    }
-}
-
----@class SpellData
-local SpellDataTemplate = {
-    ["minRange"] = 0,
-    ["id"] = 8232,
-    ["label"] = "Windfury Weapon |c00747474(Rank 1)|r",
-    ["name"] = "Windfury Weapon",
-    ["castTime"] = 0,
-    ["link"] = "|cff71d5ff|Hspell:8232:0|h[Windfury Weapon]|h|r",
-    ["maxRange"] = 0,
-    ["icon"] = 136018,
-    ["rank"] = "Rank 1"
-}
----@class ItemData
-local ItemDataTemplate = {
-    ["name"] = "Arcane Powder",
-    ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
-    ["id"] = 17020,
-    ["stackCount"] = 20,
-    ["icon"] = 133848,
-    ["count"] = 40,
-}
----@class MacroData
-local MacroDataTemplate = {
-    ["type"] = "macro",
-    ["index"] = 41,
-    ["name"] = "z#LOL",
-    ["icon"] = 132093,
-    ["body"] = "/lol\n",
-}
----@class MountData
-local MountDataTemplate = {
-    type = 'mount',
-    id = -1,
-    index = -1,
-    name = 'Reawakened Phase Hunter',
-    spell = {  id = 1, icon = 123 },
-}
----@class ProfileButton : ProfileButtonDataMixin
-local ProfileButtonTemplate = {
-    ['type'] = 'spell',
-    ["spell"] = SpellDataTemplate,
-    ["item"] = ItemDataTemplate,
-    ["macro"] = MacroDataTemplate,
-    ["mount"] = MountDataTemplate,
-}
-
----@class ProfileTemplate : DefaultProfile
-local ProfileTemplate = {
-    ["lock_actionbars"] = false,
-    ["hide_when_taxi"] = true,
-    ---toggle action button mouseover glow
-    ["action_button_mouseover_glow"] = true,
-    ---hide keybindText and indexText for smaller buttons
-    ["hide_text_on_small_buttons"] = true,
-    ---hide cooldown countdown numbers
-    ["hide_countdown_numbers"] = true,
-    ["tooltip_visibility_key"] = '',
-    ["tooltip_visibility_combat_override_key"] = '',
-    ["bars"] = {
-        ["ActionbarPlusF1"] = bar,
-        ["ActionbarPlusF2"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF3"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF4"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF5"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF6"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF7"] = {["enabled"] = false, ["buttons"] = {}},
-        ["ActionbarPlusF8"] = {["enabled"] = false, ["buttons"] = {}},
-    }
-}
-
 ---@see API#GetSpellinfo
 local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
 
@@ -196,7 +104,7 @@ local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
 P.maxFrames = 8
 P.baseFrameName = 'ActionbarPlusF'
 
----@return ProfileButton
+---@return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
     if not barData then return end
@@ -251,11 +159,11 @@ function P:CreateBarsTemplate()
     return bars
 end
 
----@return ProfileTemplate
+---@return Profile_Config
 function P:GetProfileData() return self.profile end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
----@return BarData
+---@return Profile_Bar
 function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 

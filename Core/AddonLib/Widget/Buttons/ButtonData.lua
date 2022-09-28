@@ -17,7 +17,7 @@ local function removeElement(tbl, value)
     end
 end
 
----@param profileButton ProfileButton
+---@param profileButton Profile_Button
 local function CleanupTypeData(profileButton)
     if profileButton == nil or profileButton.type == nil then return end
     local btnTypes = { SPELL, MACRO, ITEM, MOUNT}
@@ -41,7 +41,7 @@ local function methods(bd)
         return true
     end
 
-    ---@return ProfileButton
+    ---@return Profile_Button
     function bd:GetData()
         local w = self.widget
         local profile = w.profile
@@ -51,7 +51,7 @@ local function methods(bd)
         return profileButton
     end
 
-    ---@return ProfileTemplate
+    ---@return Profile_Config
     function bd:GetProfileData() return self.widget.profile:GetProfileData() end
     ---@return boolean
     function bd:IsHideWhenTaxi() return self.widget.profile:IsHideWhenTaxi() end

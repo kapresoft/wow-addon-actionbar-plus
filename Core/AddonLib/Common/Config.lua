@@ -40,7 +40,7 @@ Support functions
 -------------------------------------------------------------------------------]]
 local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
----@return BarData
+---@return Profile_Bar
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
 
 ---@param applyFunction function Format: applyFuntion(ButtonUIWidget)

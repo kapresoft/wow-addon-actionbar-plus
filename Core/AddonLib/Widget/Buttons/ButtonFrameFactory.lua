@@ -142,13 +142,16 @@ local function WidgetMethods(widget)
     function widget:GetFrameIndex() return self:GetIndex() end
     function widget:GetIndex() return self.index end
 
-    ---@return BarData
+    ---@return Profile_Bar
     function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
 
     function widget:InitAnchor()
         local barConf = self:GetConfig()
         ---@type Blizzard_RegionAnchor
         local anchor = barConf.anchor or {}
+
+        --TODO: NEXT: Global Anchor Settings
+        --error("General / Character Specific Actionbar Locations [not checked by default]")
 
         --if not anchor or Table.isEmpty(anchor) or not (anchor.point and anchor.relativePoint) then
         --    --failsafe, probably never gonna happen due to profile defaults

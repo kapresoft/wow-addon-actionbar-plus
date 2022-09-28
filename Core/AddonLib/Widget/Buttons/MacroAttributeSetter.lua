@@ -30,7 +30,7 @@ Methods
 -------------------------------------------------------------------------------]]
 
 ---@param btnUI ButtonUI
----@param btnData ProfileButton
+---@param btnData Profile_Button
 function S:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes(btnUI)
 
