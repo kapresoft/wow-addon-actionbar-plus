@@ -39,6 +39,17 @@ function L:AnchorX(frameIndex, x)
     local a = fw:GetConfig().anchor
     a.x = x
 end
+function L:AnchorReset(frameIndex)
+    local fw = self:F(frameIndex).widget
+    local barData = fw:GetConfig()
+    --barData.anchor = {}
+    local a = barData.anchor
+    a.point = nil
+    a.relativePoint = nil
+    a.x = nil
+    a.y = nil
+    print('Anchor Reset Done')
+end
 
 ---@param frameIndex number
 ---@return Frame

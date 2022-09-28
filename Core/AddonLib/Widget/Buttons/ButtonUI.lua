@@ -421,6 +421,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
         ---@type string
         frameStrata = dragFrameWidget.frameStrata or 'MEDIUM',
+        frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
         ---@type number
         buttonPadding = 2,
         buttonAttributes = GC.ButtonAttributes,

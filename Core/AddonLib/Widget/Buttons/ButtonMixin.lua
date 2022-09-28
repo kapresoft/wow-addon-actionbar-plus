@@ -63,6 +63,7 @@ function _L:SetButtonLayout()
     local buttonSize = barConfig.widget.buttonSize
     local buttonPadding = widget.buttonPadding
     local frameStrata = widget.frameStrata
+    local frameLevel = widget.frameLevel
     local button = widget.button
     local dragFrameWidget = widget.dragFrame
 
@@ -72,6 +73,7 @@ function _L:SetButtonLayout()
     local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
 
     button:SetFrameStrata(frameStrata)
+    button:SetFrameLevel(frameLevel)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
@@ -577,7 +579,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
 
     -- else if in range, color is "white"
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
-    --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
+    --p:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
         fs.widget:SetVertexColorOutOfRange()
@@ -596,7 +598,6 @@ function _L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
         fs.widget:SetVertexColorNormal()
         return
     end
-
     local widget = self:_Widget()
     if widget:IsMacro() then return end
 

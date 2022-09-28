@@ -167,6 +167,12 @@ local E = {
 
 }
 
+local Default = {
+    FrameAnchor = {
+        point = "CENTER", relativeTo = nil, relativePoint = 'CENTER', x = 0.0, y = 0.0
+    }
+}
+
 --[[-----------------------------------------------------------------------------
 Methods: GlobalConstants
 -------------------------------------------------------------------------------]]
@@ -205,6 +211,7 @@ end
 Initializer
 -------------------------------------------------------------------------------]]
 local function Init()
+    L.Default = Default
     L.WidgetAttributes = WidgetAttributes
     L.ButtonAttributes = ButtonAttributes
     L.UnitIDAttributes = UnitIDAttributes

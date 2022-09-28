@@ -146,8 +146,16 @@ local function WidgetMethods(widget)
     function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
 
     function widget:InitAnchor()
+        local barConf = self:GetConfig()
         ---@type Blizzard_RegionAnchor
-        local anchor = self:GetConfig().anchor or {}
+        local anchor = barConf.anchor or {}
+
+        --if not anchor or Table.isEmpty(anchor) or not (anchor.point and anchor.relativePoint) then
+        --    --failsafe, probably never gonna happen due to profile defaults
+        --    anchor = GC.Default.FrameAnchor
+        --    p:log('Invalid anchor. Using default: %s', pformat:B()(anchor))
+        --end
+
         local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
         if GC:IsVerboseLogging() and frame:IsShown() then
             p:log('InitAnchor| anchor-from-profile[f.%s]: %s', self.index, anchor)
@@ -171,11 +179,6 @@ local function WidgetMethods(widget)
         anchor.y = frameAnchor.y
 
         p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, anchor)
-    end
-
-    function widget:Toggle()
-        if self:IsShown() then self:Hide(); return end
-        self:Show()
     end
 
     function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
@@ -241,12 +244,16 @@ local function WidgetMethods(widget)
         if self.HideGroup then self:HideGroup() end
     end
 
-    function widget:ToggleGroup()
-        if #self.buttons > 0 then
-            local firstBtn = _G[self.buttons[1]]
-            if firstBtn:IsShown() then self:HideGroup()
-            else self:ShowButtons() end
+    function widget:ToggleVisibility()
+        local barData = self:GetConfig()
+        local enabled = barData.enabled
+        barData.enabled = not enabled
+        if enabled then
+            self:HideGroup()
+            return
         end
+
+        self:ShowGroup()
     end
 
     function widget:LockGroup() self.frameHandle:Hide() end
@@ -356,6 +363,7 @@ function _L:Constructor(frameIndex)
         dragHandleHeight = 0,
         padding = 2,
         frameStrata = frameStrata,
+        frameLevel = 1,
         frame = f,
         ---@see FrameHandleMixin#Constructor()
         frameHandle = nil,
