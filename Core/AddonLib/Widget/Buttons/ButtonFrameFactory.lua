@@ -105,33 +105,7 @@ end
 ---@param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
----@param fw FrameWidget
-local function OnRefreshSpellCooldowns(fw, event, ...)
-    local sourceEvent, spellID = ...
-    --local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
-    --p:log('%s: %s params=%s', fw:GetName(), event, toStringSorted(params))
-    print('hello')
-    for _, btnName in ipairs(fw:GetButtons()) do
-        ---@type ButtonUIWidget
-        _G[btnName].widget:Fire(sourceEvent)
-    end
-
-end
-
----@param fw FrameWidget
-local function OnRefreshItemCooldowns(fw, event, ...)
-    for _, btnName in ipairs(fw:GetButtons()) do
-        ---@type ButtonUIWidget
-        _G[btnName].widget:UpdateState()
-    end
-end
-
 local function RegisterCallbacks(widget)
-
-    --TODO: I don't believe these are being used. Delete next time
-    --widget:SetCallback('OnRefreshSpellCooldowns', OnRefreshSpellCooldowns)
-    --widget:SetCallback('OnRefreshItemCooldowns', OnRefreshItemCooldowns)
-
     widget:SetCallback(E.OnAddonLoaded, OnAddonLoaded)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)

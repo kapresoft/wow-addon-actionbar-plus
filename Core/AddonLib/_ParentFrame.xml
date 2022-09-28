@@ -45,6 +45,7 @@
         </Layers>
     </Frame>
 
+    <!--
     <Frame name="ABP_UIParent" inherits="ABP_ParentFrameTemplate" parent="UIParent" frameStrata="LOW"
            hidden="true" enableMouse="false" movable="false" alpha="0.5">
         <Size x="10" y="10" />
@@ -55,37 +56,7 @@
                 </Texture>
             </Layer>
         </Layers>
-        <!--
-        <KeyValues>
-            <KeyValue key="backdropInfo" value="BACKDROP_GOLD_DIALOG_32_32" type="global" />
-        </KeyValues>
-       <Scripts>
-           <OnLoad>
-               (function()
-                   self:RegisterForDrag("LeftButton")
-                   self:ApplyBackdrop()
-                   self:Show()
-               end)()
-           </OnLoad>
-           <OnDragStart>
-               (function()
-                   self:StartMoving();
-                   &#45;&#45;local p = { top = self:GetTop(), right = self:GetRight(),
-                   &#45;&#45;            bottom = self:GetBottom(), left = self:GetLeft() }
-                   &#45;&#45;print('Start|', pformat(p))
-               end)()
-           </OnDragStart>
-           <OnDragStop>
-               (function()
-                   self:StopMovingOrSizing();
-                   local p = { top = self:GetTop(), right = self:GetRight(),
-                               bottom = self:GetBottom(), left = self:GetLeft() }
-                   print('Stop|', pformat(p))
-               end)()
-           </OnDragStop>
-        </Scripts>
-           -->
-
     </Frame>
+    -->
 
 </Ui>
