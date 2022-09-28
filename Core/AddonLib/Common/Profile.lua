@@ -32,7 +32,7 @@ if not P then return end
 
 ---These are the config names used by the UI
 ---@see Config.lua
----@class ProfileConfigNames
+---@class Profile_ConfigNames
 local ConfigNames = {
     ---@deprecated lock_actionbars is to be removed
     ['lock_actionbars'] = 'lock_actionbars',
@@ -44,13 +44,6 @@ local ConfigNames = {
     ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
     ['show_button_index'] = 'show_button_index',
     ['show_keybind_text'] = 'show_keybind_text',
-}
-
----@class ProfileWidgetConfigNames
-local WidgetConfigNames = {
-    ['rowSize'] = 'rowSize',
-    ['colSize'] = 'colSize',
-    ['buttonSize'] = 'buttonSize',
 }
 
 ---@class TooltipKeyName
@@ -363,7 +356,7 @@ function P:IsHideWhenTaxi()
     return self.profile[ConfigNames.hide_when_taxi] == true
 end
 
----@return ProfileConfigNames
+---@return Profile_ConfigNames
 function P:GetConfigNames() return ConfigNames end
 
 ---@return TooltipKey

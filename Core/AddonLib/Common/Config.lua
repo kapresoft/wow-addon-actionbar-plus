@@ -15,7 +15,7 @@ local p = O.LogFactory(Core.M.Config)
 ---These are loaded in #fetchLibs()
 ---@type Profile
 local P
----@type ProfileConfigNames
+---@type Profile_ConfigNames
 local PC
 ---@type TooltipKey
 local TTK
@@ -84,7 +84,6 @@ end
 ---@param key string The key value
 ---@param fallback any The fallback value
 ---@param eventNameOrFunction string | function | nil
----@see ProfileWidgetConfigNames
 local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
@@ -97,7 +96,6 @@ end
 ---@param frameIndex number
 ---@param key string The key value
 ---@param fallback any The fallback value
----@see ProfileWidgetConfigNames
 local function PGetWidget(frameIndex, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))

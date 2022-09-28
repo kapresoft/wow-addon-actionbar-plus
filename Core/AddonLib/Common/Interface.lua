@@ -120,4 +120,3 @@ local Profile_Data = {
         ["ActionbarPlusF8"] = Profile_Bar,
     }
 }
-
