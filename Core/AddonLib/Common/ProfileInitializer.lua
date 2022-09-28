@@ -32,30 +32,9 @@ local ButtonDataTemplate = {
     [ATTR.ITEM] = {},
     [ATTR.MACRO] = {},
     [ATTR.MACRO_TEXT] = {},
+    [ATTR.MOUNT] = {},
 }
 
-local SPELL_TEMPLATE = {
-    spell = {
-        castTime = 3000,
-        icon = 132803,
-        id = 27090,
-        label = 'Conjure Water (Rank 9)',
-        link = '[Conjure Water]',
-        maxRange = 0,
-        minRange = 0,
-        name = 'Conjure Water',
-        rank = 'Rank 9'
-    }
-}
-
-local ITEM_TEMPLATE = {
-    item = {
-        id = 20857,
-        name = 'Honey Bread',
-        icon = 133964,
-        link = '[Honey Bread]',
-    }
-}
 local startingX = -300.0
 
 ---The defaults provided here will used for the default state of the settings
