@@ -116,7 +116,6 @@ end
 
 ---@param widget FrameWidget
 local function RegisterEvents(widget)
-    local E = O.GlobalConstants.E
     ---@param w FrameWidget
     local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
     ---@param w FrameWidget
