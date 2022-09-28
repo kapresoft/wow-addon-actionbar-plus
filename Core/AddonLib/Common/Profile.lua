@@ -183,18 +183,6 @@ function P:IsBarEnabled(frameIndex)
     return bar.enabled
 end
 
-function P:SetBarLockedState(frameIndex, isLocked)
-    local bar = self:GetBar(frameIndex)
-    --bar.locked = isLocked
-end
-
----@param frameIndex number The frame index number
-function P:IsBarLocked(frameIndex)
-    local bar = self:GetBar(frameIndex)
-    --return bar.locked
-    return false
-end
-
 ---@param frameIndex number The frame index number
 function P:GetBarLockValue(frameIndex)
     local bar = self:GetBar(frameIndex)
