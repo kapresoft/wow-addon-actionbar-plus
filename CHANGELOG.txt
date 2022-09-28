@@ -4,6 +4,7 @@
 
 [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.1...1.0.2) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-- Actionbar positions are lost after re-enabling addon #4
-- Support for Pet Actions #53
-- Support for "flyout" spells #52
+### Stories / Issues
+- #4 Actionbar positions are lost after re-enabling addon
+- #53 Support for Pet Actions
+- #52 Support for "flyout" spells
