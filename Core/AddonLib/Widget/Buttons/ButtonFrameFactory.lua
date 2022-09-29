@@ -95,12 +95,13 @@ local function OnButtonSizeChanged(frameWidget, event)
     end)
 end
 
+---Event is fired from ActionbarPlus#OnAddonLoaded
 ---@param w FrameWidget
 local function OnAddonLoaded(w)
     p:log(30, 'OnAddonLoaded: %s', w:GetName())
     -- show delayed due to anchor not setting until UI is fully loaded
-    C_Timer.After(2, function() w:InitAnchor() end)
-    C_Timer.After(3, function() w:ShowGroupIfEnabled() end)
+    C_Timer.After(1, function() w:InitAnchor() end)
+    C_Timer.After(2, function() w:ShowGroupIfEnabled() end)
 end
 
 ---Fired by FrameHandle when dragging stopped

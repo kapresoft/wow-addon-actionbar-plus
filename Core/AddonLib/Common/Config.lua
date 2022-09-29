@@ -249,6 +249,7 @@ local methods = {
                 character_specific_anchors = {
                     type = 'toggle',
                     width = 'full',
+                    confirm = ConfirmAndReload,
                     order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME,
                     desc = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC,
