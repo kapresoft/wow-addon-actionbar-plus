@@ -169,7 +169,7 @@ local function WidgetMethods(widget)
         if not self.index then error('hello') end
         P:SaveAnchor(frameAnchor, self.index)
 
-        p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, anchor)
+        p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, pformat:D2()(frameAnchor))
     end
 
     function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
