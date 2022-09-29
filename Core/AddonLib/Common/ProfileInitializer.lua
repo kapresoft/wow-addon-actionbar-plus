@@ -7,14 +7,20 @@ local format = string.format
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local ATTR, Table = O.GlobalConstants.WidgetAttributes, O.Table
+local GC = O.GlobalConstants
+local ATTR, Table = GC.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
 -- ## Functions ------------------------------------------------
 
 ---@class ProfileInitializer
 local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
+---@type LoggerTemplate
+local p = P:GetLogger()
 
+P.baseFrameName = 'ActionbarPlusF'
+
+---FrameDetails is used for initializing defaults for AceDB profile
 local FrameDetails = {
     [1] = { rowSize = 2, colSize = 6 },
     [2] = { rowSize = 6, colSize = 2 },
@@ -32,46 +38,38 @@ local ButtonDataTemplate = {
     [ATTR.ITEM] = {},
     [ATTR.MACRO] = {},
     [ATTR.MACRO_TEXT] = {},
+    [ATTR.MOUNT] = {},
+}
+local EnabledBars = {
+    ["ActionbarPlusF1"] = true,
+    ["ActionbarPlusF2"] = true,
 }
 
-local SPELL_TEMPLATE = {
-    spell = {
-        castTime = 3000,
-        icon = 132803,
-        id = 27090,
-        label = 'Conjure Water (Rank 9)',
-        link = '[Conjure Water]',
-        maxRange = 0,
-        minRange = 0,
-        name = 'Conjure Water',
-        rank = 'Rank 9'
-    }
-}
+local ConfigNames = GC.Profile_Config_Names
 
-local ITEM_TEMPLATE = {
-    item = {
-        id = 20857,
-        name = 'Honey Bread',
-        icon = 133964,
-        link = '[Honey Bread]',
-    }
-}
+local xIncr = ABP_CreateIncrementer(30, 220)
+local yIncr = ABP_CreateIncrementer(-130, -90)
 
 ---The defaults provided here will used for the default state of the settings
----@class DefaultProfile
+---@type Profile_Config
 local DEFAULT_PROFILE_DATA = {
-    ["lock_actionbars"] = false,
-    ["hide_when_taxi"] = true,
-    -- toggle action button mouseover glow
-    ["action_button_mouseover_glow"] = true,
-    ["hide_text_on_small_buttons"] = false,
-    ["hide_countdown_numbers"] = false,
-    ["tooltip_visibility_key"] = '',
-    ["tooltip_visibility_combat_override_key"] = '',
-    ["bars"] = {
+    ---@deprecated lock_actionbars is no longer used
+    [ConfigNames.lock_actionbars] = false,
+    [ConfigNames.character_specific_anchors] = false,
+    [ConfigNames.hide_when_taxi] = true,
+    [ConfigNames.action_button_mouseover_glow] = true,
+    [ConfigNames.hide_text_on_small_buttons] = false,
+    [ConfigNames.hide_countdown_numbers] = false,
+    [ConfigNames.tooltip_visibility_key] = '',
+    [ConfigNames.tooltip_visibility_combat_override_key] = '',
+    [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
-            ["enabled"] = true,
+            ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
+            },
             ["buttons"] = {
                 ["ActionbarPlusF1Button1"] = {
                     ["type"] = "spell",
@@ -90,57 +88,117 @@ local DEFAULT_PROFILE_DATA = {
             },
         },
         ["ActionbarPlusF2"] = {
-            ["enabled"] = true,
-            ["widget"] = { ["rowSize"] = 6, ["colSize"] = 2, ["buttonSize"] = 35 },
+            ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF3"] = {
-            ["enabled"] = false,
-            ["widget"] = { ["rowSize"] = 3, ["colSize"] = 5, ["buttonSize"] = 35 },
+            ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF4"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF5"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF6"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF7"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF8"] = {
-            ["enabled"] = false,
-            ["widget"] = { ["rowSize"] = 4, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
+            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
+            ---@type Blizzard_RegionAnchor
+            ["anchor"] = {
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
+            },
             ["buttons"] = {
             },
         },
     },
 }
 
-function P:GetAllActionBarSizeDetails()
-    return FrameDetails
+---@param frameIndex number
+function P:GetFrameNameByIndex(frameIndex)
+    assert(type(frameIndex) == 'number',
+            'GetFrameNameByIndex(..)| frameIndex should be a number')
+    return P.baseFrameName .. tostring(frameIndex)
 end
 
-local function CreateNewProfile()
-    return shallow_copy(DEFAULT_PROFILE_DATA)
+---@param g Profile_Global_Config
+function P:InitGlobalSettings(g)
+    g.bars = {}
+
+    for frameIndex=1, #FrameDetails do
+        local fn = P:GetFrameNameByIndex(frameIndex)
+        self:InitGlobalButtonConfig(g, fn)
+    end
+
 end
+
+---@param g Profile_Global_Config
+---@param frameName string
+function P:InitGlobalButtonConfig(g, frameName)
+    g.bars[frameName] = { }
+    self:InitGlobalButtonConfigAnchor(g, frameName)
+    return g.bars[frameName]
+end
+
+---@param g Profile_Global_Config
+---@param frameName string
+function P:InitGlobalButtonConfigAnchor(g, frameName)
+    local defaultBars = DEFAULT_PROFILE_DATA.bars
+    ---@type Global_Profile_Bar
+    local btnConf = g.bars[frameName]
+    btnConf.anchor = Table.shallow_copy(defaultBars[frameName].anchor)
+    return btnConf.anchor
+end
+
+function P:GetAllActionBarSizeDetails() return FrameDetails end
+
+local function CreateNewProfile() return shallow_copy(DEFAULT_PROFILE_DATA) end
 
 function P:InitNewProfile()
     local profile = CreateNewProfile()

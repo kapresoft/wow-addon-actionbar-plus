@@ -4,6 +4,7 @@
     <Script file="Assert.lua"/>
     <Script file="Table.lua"/>
     <Script file="String.lua"/>
+    <Script file="Incrementer.lua"/>
     <Script file="Mixin.lua"/>
     <Script file="LuaEvaluator.lua"/>
 

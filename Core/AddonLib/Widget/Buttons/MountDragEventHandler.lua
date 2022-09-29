@@ -58,7 +58,7 @@ Methods: MountAttributeSetter
 ---@param a MountAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
-    ---@param btnData ProfileButton
+    ---@param btnData Profile_Button
     function a:SetAttributes(btnUI, btnData)
         --TODO: NEXT: Remove btnData
         local w = btnUI.widget

@@ -44,6 +44,9 @@ L['ABP_SHIFT']                                           = 'SHIFT'
 
 L['ABP_BUTTON_NAME_TEXT_FORMAT']                         = ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT
 L['ABP_BAR_HEADER_FORMAT']                               = ABP_BAR_HEADER_FORMAT_DEFAULT
+L['ABP_GENERAL_CONFIG_HEADER']                           = 'General Configuration'
+L['ABP_GENERAL_TOOLTIP_OPTIONS_HEADER']                  = 'Tooltip Options'
+
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']            = 'Lock Actionbars with SHIFT key'
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']            = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
 L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide during taxi'
@@ -59,4 +62,5 @@ L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME']                 = 'Tooltip V
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC']                 = 'Choose when you want the tooltip to show when not in combat. If a modifier is chosen, then you need to hold that modifier down to show the tooltip.'
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME'] = 'Combat Override Key'
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC'] = 'Choose when you want the tooltip to show during combat. If a modifier is chosen, then you need to hold that modifier down to show the tooltip.'
-L['ABP_GENERAL_TOOLTIP_OPTIONS']                         = 'Tooltip Options'
+L['ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME']     = 'Character Specific Frame Positions'
+L['ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC']     = 'By default, all frame positions (or anchors) are global across characters. If checked, the frame positions are saved at the character level.'

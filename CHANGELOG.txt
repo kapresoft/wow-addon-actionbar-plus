@@ -1,7 +1,8 @@
 # ActionbarPlus
 
-## [1.0.1.1](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.1.1) (2022-Sep-28)
+## [1.0.2](https://github.com/kapresoft/wow-addon-actionbar-plus/tree/1.0.2) (2022-09-28)
 
-[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.1...1.0.1.1) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.1.1...1.0.2) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-- #69 Lua Error when Mouse over glow option is disabled
+- #4 Actionbar positions are lost after re-enabling addon Bug Something isn't working
+- #71 Add more row and columns

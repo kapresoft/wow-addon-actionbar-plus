@@ -122,7 +122,7 @@ end
 
 ---Note: should call ButtonData:ContainsValidAction() before calling this
 ---@return boolean true, false or nil if not applicable
----@param btnConfig ProfileButton
+---@param btnConfig Profile_Button
 ---@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
 function S:IsActionInRange(btnConfig, targetUnit)
     if btnConfig.type == SPELL then

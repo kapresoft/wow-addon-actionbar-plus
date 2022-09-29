@@ -7,10 +7,12 @@ local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyD
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local String, Table, WAttr = O.String, O.Table, O.GlobalConstants.WidgetAttributes
+local GC = O.GlobalConstants
+local CN = GC.Profile_Config_Names
+local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 local IsTableEmpty = Table.isEmpty
-
+local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
 local p = O.LogFactory(Core.M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -31,35 +33,29 @@ Methods
 
 ---@return Profile
 function _L:P() return self.profile end
----@return ButtonUI
-function _L:B() return self.button end
 ---@return ButtonUIWidget
 function _L:W() return self end
----@return Profile
-function _L:_Profile() return self.profile end
 ---@return ButtonUI
-function _L:_Button() return self.button end
----@return ButtonUIWidget
-function _L:_Widget() return self end
+function _L:B() return self.button end
 
 function _L:invalidButtonData(o, key)
     if type(o) ~= 'table' then return true end
     if type(o[key]) ~= 'nil' then
         local d = o[key]
-        if type(d) == 'table' then return (String.IsBlank(d['id']) and String.IsBlank(d['index'])) end
+        if type(d) == 'table' then return (IsBlankStr(d['id']) and IsBlankStr(d['index'])) end
     end
     return true
 end
 function _L:IsEmpty()
     local conf = self:GetConfig()
-    return conf and String.IsEmpty(conf.type)
+    return conf and IsEmptyStr(conf.type)
 end
 
 ---#### Get Profile Button Config Data
----@return ProfileButton
-function _L:GetConfig() return self:W().buttonData:GetData() end
----@return ProfileTemplate
-function _L:GetProfileData() return self:W().buttonData:GetProfileData() end
+---@return Profile_Button
+function _L:GetConfig() return self:W():GetButtonData():GetConfig() end
+---@return Profile_Config
+function _L:GetProfileConfig() return self:W():GetButtonData():GetProfileConfig() end
 
 ---@param type string One of: spell, item, or macro
 function _L:GetConfigActionbarData(type)
@@ -68,11 +64,11 @@ function _L:GetConfigActionbarData(type)
     return btnData[type]
 end
 
----@return SpellData
+---@return Profile_Spell
 function _L:GetSpellData() return self:GetConfigActionbarData(SPELL) end
----@return ItemData
+---@return Profile_Item
 function _L:GetItemData() return self:GetConfigActionbarData(ITEM) end
----@return MacroData
+---@return Profile_Macro
 function _L:GetMacroData() return self:GetConfigActionbarData(MACRO) end
 ---@return boolean
 function _L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
@@ -83,7 +79,7 @@ function _L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
 ---@return boolean
 function _L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
 
----@param config ProfileButton
+---@param config Profile_Button
 ---@param type string spell, item, macro, mount, etc
 function _L:IsConfigOfType(config, type)
     if IsTableEmpty(config) then return false end
@@ -106,7 +102,7 @@ end
 ---@param value string One of TooltipKeyName value
 ---@return boolean true if the key override is pressed
 function _L:IsOverrideKeyDown(value)
-    local tooltipKey = self:_Profile():GetTooltipKey().names
+    local tooltipKey = self:P():GetTooltipKey().names
     if tooltipKey.SHOW == value then return true end
     if tooltipKey.HIDE == value then return false end
 
@@ -121,13 +117,9 @@ function _L:IsOverrideKeyDown(value)
 end
 
 function _L:GetTooltipVisibilityKey()
-    local profile = self:_Profile()
-    local profileData = profile:GetProfileData()
-    return profileData[profile:GetConfigNames().tooltip_visibility_key]
+    return self:GetProfileConfig()[CN.tooltip_visibility_key]
 end
 
 function _L:GetTooltipVisibilityCombatOverrideKeyOption()
-    local profile = self:_Profile()
-    local profileData = profile:GetProfileData()
-    return profileData[profile:GetConfigNames().tooltip_visibility_combat_override_key]
+    return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
 end

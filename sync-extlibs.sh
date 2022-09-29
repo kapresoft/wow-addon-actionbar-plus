@@ -7,6 +7,11 @@ ADDON_NAME="ActionbarPlus"
 Package() {
   local arg1=$1
   local rel_dir=$RELEASE_DIR
+  # -c Skip copying files into the package directory.
+  # -d Skip uploading.
+  # -e Skip checkout of external repositories.
+  # default: -cdzul
+  # for checking debug tags: -edzul
   local rel_cmd="release-wow-addon -r ${RELEASE_DIR} -cdzul $*"
 
   if [[ "$arg1" == "-h" ]]; then

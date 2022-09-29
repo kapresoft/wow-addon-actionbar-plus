@@ -24,7 +24,7 @@ Methods
 -------------------------------------------------------------------------------]]
 
 ---@param btnUI ButtonUI
----@param btnData ProfileButton
+---@param btnData Profile_Button
 function S:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes(btnUI)
     local itemData = btnData[WAttr.ITEM]
@@ -51,7 +51,7 @@ function S:ShowTooltip(btnUI)
     if not btnData then return end
     if String.IsBlank(btnData.type) then return end
 
-    ---@type ItemData
+    ---@type Profile_Item
     GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     local itemInfo = btnData[WAttr.ITEM]
     if itemInfo and itemInfo.id then

@@ -63,6 +63,7 @@ function _L:SetButtonLayout()
     local buttonSize = barConfig.widget.buttonSize
     local buttonPadding = widget.buttonPadding
     local frameStrata = widget.frameStrata
+    local frameLevel = widget.frameLevel
     local button = widget.button
     local dragFrameWidget = widget.dragFrame
 
@@ -72,6 +73,7 @@ function _L:SetButtonLayout()
     local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
 
     button:SetFrameStrata(frameStrata)
+    button:SetFrameLevel(frameLevel)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
@@ -93,7 +95,7 @@ function _L:ScaleCooldownWithButtonSize(buttonSize)
     local hideIndexText = false
     local hideKeybindText = false
     local countdownFont
-    local profile = widget:GetButtonData():GetProfileData()
+    local profile = widget:GetButtonData():GetProfileConfig()
 
     if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
 
@@ -122,7 +124,7 @@ end
 
 function _L:RefreshTexts()
     local widget = self:W()
-    local profile = widget:GetButtonData():GetProfileData()
+    local profile = widget:GetButtonData():GetProfileConfig()
     self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
     local hideTexts = true == profile.hide_text_on_small_buttons
     if not hideTexts then
@@ -178,7 +180,7 @@ function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
 ---@param btnWidget ButtonUIWidget
 function _L:InitTextures(icon)
-    local btnUI = self:_Button()
+    local btnUI = self:B()
 
     -- DrawLayer is 'ARTWORK' by default for icons
     btnUI:SetNormalTexture(icon)
@@ -203,9 +205,9 @@ function _L:W() return self end
 function _L:B() return self.button end
 
 ---@return ButtonUI
-function _L:_Button() return self.button end
+function _L:B() return self.button end
 ---@return ButtonUIWidget
-function _L:_Widget() return self end
+function _L:W() return self end
 ---@return ButtonAttributes
 function _L:GetButtonAttributes() return self:W().buttonAttributes end
 function _L:GetIndex() return self:W().index end
@@ -213,7 +215,7 @@ function _L:GetFrameIndex() return self:W().frameIndex end
 function _L:IsParentFrameShown() return self.dragFrame:IsShown() end
 
 function _L:ResetConfig()
-    self:_Widget().profile:ResetButtonData(self)
+    self:W().profile:ResetButtonData(self)
     self:ResetWidgetAttributes()
 end
 
@@ -239,20 +241,20 @@ end
 ---@param text string
 function _L:SetText(text)
     if String.IsBlank(text) then text = '' end
-    self:_Button().text:SetText(text)
+    self:B().text:SetText(text)
 end
 ---@param state boolean true will show the button index number
 function _L:ShowIndex(state)
     local text = ''
-    if true == state then text = self:_Widget().index end
-    self:_Button().indexText:SetText(text)
+    if true == state then text = self:W().index end
+    self:B().indexText:SetText(text)
     self:RefreshTexts()
 end
 
 ---@param state boolean true will show the button index number
 function _L:ShowKeybindText(state)
     local text = ''
-    local button = self:_Button()
+    local button = self:B()
     if not self:HasKeybindings() then
         button.keybindText:SetText(text)
         return
@@ -384,10 +386,10 @@ function _L:GetMacroItemCooldown()
     return API:GetItemCooldown(itemID)
 end
 
-function _L:ContainsValidAction() return self:_Widget().buttonData:ContainsValidAction() end
+function _L:ContainsValidAction() return self:W().buttonData:ContainsValidAction() end
 
 function _L:ResetWidgetAttributes()
-    local button = self:_Button()
+    local button = self:B()
     for _, v in pairs(self:GetButtonAttributes()) do
         button:SetAttribute(v, nil)
     end
@@ -464,11 +466,11 @@ function _L:GetActionbarInfo()
     return info
 end
 
-function _L:ClearHighlight() self:_Button():SetHighlightTexture(nil) end
+function _L:ClearHighlight() self:B():SetHighlightTexture(nil) end
 function _L:ResetHighlight() self:SetHighlightDefault() end
-function _L:SetTextureAsEmpty() self:_Widget():SetIcon(noIconTexture) end
+function _L:SetTextureAsEmpty() self:W():SetIcon(noIconTexture) end
 function _L:SetCooldownTextures(icon)
-    local btnUI = self:_Button()
+    local btnUI = self:B()
     btnUI:SetNormalTexture(icon)
     btnUI:SetPushedTexture(icon)
 end
@@ -483,7 +485,7 @@ end
 function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
 
 function _L:RefreshHighlightEnabled()
-    local profile = self:W():GetButtonData():GetProfileData()
+    local profile = self:W():GetButtonData():GetProfileConfig()
     self:SetHighlightEnabled(true == profile.action_button_mouseover_glow)
 end
 
@@ -501,7 +503,7 @@ end
 
 
 ---@param spellID string The spellID to match
----@param optionalBtnConf ProfileButton
+---@param optionalBtnConf Profile_Button
 ---@return boolean
 function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
@@ -513,7 +515,7 @@ function _L:IsMatchingItemSpellID(spellID, optionalBtnConf)
 end
 
 ---@param spellID string The spellID to match
----@param optionalBtnConf ProfileButton
+---@param optionalBtnConf Profile_Button
 ---@return boolean
 function _L:IsMatchingSpellID(spellID, optionalBtnConf)
     --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
@@ -531,7 +533,7 @@ end
 
 ---@param widget ButtonUIWidget
 ---@param spellName string The spell name
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsMatchingSpellName(spellName, buttonData)
     local s = buttonData or self:GetConfig()
     if not (s.spell and s.spell.name) then return false end
@@ -540,7 +542,7 @@ function _L:IsMatchingSpellName(spellName, buttonData)
 end
 
 ---@param spellID string
----@param optionalProfileButton ProfileButton
+---@param optionalProfileButton Profile_Button
 function _L:IsMatchingMacroSpellID(spellID, optionalProfileButton)
     optionalProfileButton = optionalProfileButton or self:GetConfig()
     if not self:IsValidMacroProfile(optionalProfileButton) then return end
@@ -553,7 +555,7 @@ end
 ---@param spellID string The spellID to match
 ---@return boolean
 function _L:IsMatchingMacroOrSpell(spellID)
-    ---@type ProfileButton
+    ---@type Profile_Button
     local conf = self:GetConfig()
     if not conf and (conf.spell or conf.macro) then return false end
     if self:IsConfigOfType(conf, SPELL) then
@@ -569,7 +571,7 @@ end
 ---@param hasTarget boolean Player has a target
 function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
     -- if no target, do nothing and return
-    local widget = self:_Widget()
+    local widget = self:W()
     local fs = widget.button.keybindText
     if not hasTarget then fs.widget:SetVertexColorNormal(); return end
     if widget:IsMacro() then return end
@@ -577,7 +579,7 @@ function _L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
 
     -- else if in range, color is "white"
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
-    --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
+    --p:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
         fs.widget:SetVertexColorOutOfRange()
@@ -590,14 +592,13 @@ end
 ---@param hasTarget boolean Player has a target
 function _L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
     -- if no target, clear text and return
-    local fs = self:_Button().keybindText
+    local fs = self:B().keybindText
     if not hasTarget then
         fs.widget:ClearText()
         fs.widget:SetVertexColorNormal()
         return
     end
-
-    local widget = self:_Widget()
+    local widget = self:W()
     if widget:IsMacro() then return end
 
     -- has target, set text as range indicator
@@ -615,7 +616,7 @@ end
 
 function _L:UpdateRangeIndicator()
     if not self:ContainsValidAction() then return end
-    local widget = self:_Widget()
+    local widget = self:W()
     local configIsShowKeybindText = widget.dragFrame:IsShowKeybindText()
     local hasTarget = GetUnitName(UNIT.TARGET) ~= null
     widget:ShowKeybindText(configIsShowKeybindText)
@@ -627,7 +628,7 @@ function _L:UpdateRangeIndicator()
 end
 
 function _L:SetSpellUsable(isUsable)
-    local normalTexture = self:_Button():GetNormalTexture()
+    local normalTexture = self:B():GetNormalTexture()
     if not normalTexture then return end
     -- energy based spells do not use 'notEnoughMana'
     if not isUsable then
@@ -654,23 +655,23 @@ end
 
 ---@param icon string Blizzard Icon
 function _L:SetIcon(icon)
-    self:_Button():SetNormalTexture(icon)
-    self:_Button():SetPushedTexture(icon)
+    self:B():SetNormalTexture(icon)
+    self:B():SetPushedTexture(icon)
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidItemProfile(buttonData)
     return not (buttonData == nil or buttonData.item == nil
             or IsBlank(buttonData.item.id))
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidSpellProfile(buttonData)
     return not (buttonData == nil or buttonData.spell == nil
             or IsBlank(buttonData.spell.id))
 end
 
----@param buttonData ProfileButton
+---@param buttonData Profile_Button
 function _L:IsValidMacroProfile(buttonData)
     return not (buttonData == nil or buttonData.macro == nil
             or IsBlank(buttonData.macro.index)

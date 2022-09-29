@@ -17,7 +17,7 @@ local function removeElement(tbl, value)
     end
 end
 
----@param profileButton ProfileButton
+---@param profileButton Profile_Button
 local function CleanupTypeData(profileButton)
     if profileButton == nil or profileButton.type == nil then return end
     local btnTypes = { SPELL, MACRO, ITEM, MOUNT}
@@ -41,8 +41,8 @@ local function methods(bd)
         return true
     end
 
-    ---@return ProfileButton
-    function bd:GetData()
+    ---@return Profile_Button
+    function bd:GetConfig()
         local w = self.widget
         local profile = w.profile
         local profileButton = profile:GetButtonData(w.frameIndex, w.buttonName)
@@ -51,15 +51,15 @@ local function methods(bd)
         return profileButton
     end
 
-    ---@return ProfileTemplate
-    function bd:GetProfileData() return self.widget.profile:GetProfileData() end
+    ---@return Profile_Config
+    function bd:GetProfileConfig() return self.widget.profile:P() end
     ---@return boolean
     function bd:IsHideWhenTaxi() return self.widget.profile:IsHideWhenTaxi() end
     ---@return boolean
     function bd:ContainsValidAction() return self:GetActionName() ~= nil end
     ---@return string
     function bd:GetActionName()
-        local conf = self:GetData()
+        local conf = self:GetConfig()
         if not self:invalidButtonData(conf, SPELL) then return conf.spell.name end
         if not self:invalidButtonData(conf, ITEM) then return conf.item.name end
         if not self:invalidButtonData(conf, MACRO) then return conf.macro.name end
@@ -67,11 +67,11 @@ local function methods(bd)
     end
 
     ---@return SpellInfo
-    function bd:GetSpellInfo() return self:GetData()[SPELL] end
-    function bd:GetItemInfo() return self:GetData()[ITEM] end
-    function bd:GetMacroInfo() return self:GetData()[MACRO] end
+    function bd:GetSpellInfo() return self:GetConfig()[SPELL] end
+    function bd:GetItemInfo() return self:GetConfig()[ITEM] end
+    function bd:GetMacroInfo() return self:GetConfig()[MACRO] end
     ---@return MountInfo
-    function bd:GetMountInfo() return self:GetData()[MOUNT] end
+    function bd:GetMountInfo() return self:GetConfig()[MOUNT] end
 
     ---@param mountInfo MountInfo
     function bd:IsInvalidMountInfo(mountInfo)

@@ -1,0 +1,62 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="LOW"
+           hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true"
+           inherits="BackdropTemplate" mixin="BackdropTemplateMixin">
+        <Size x="200" y="15" />
+        <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeto="UIParent">
+                <Offset>
+                    <AbsDimension x="5" y="-100" />
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture setAllPoints="true">
+                    <Color r="0.1" g="0.1" b="0.1" a="0.2" />
+                </Texture>
+            </Layer>
+            <Layer level="BACKGROUND">
+                <Texture setAllPoints="true" file="Interface\DialogFrame\UI-DialogBox-Background" />
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="ABP_ParentFrameTemplate" parent="UIParent" frameStrata="LOW"
+           hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true"
+           inherits="BackdropTemplate" mixin="BackdropTemplateMixin">
+        <Size x="10" y="10" />
+        <Anchors>
+            <Anchor point="CENTER" relativePoint="CENTER" relativeto="UIParent">
+                <Offset>
+                    <AbsDimension x="0" y="0" />
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture setAllPoints="true">
+                    <Color r="0.1" g="0.1" b="0.1" a="0.4" />
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!--
+    <Frame name="ABP_UIParent" inherits="ABP_ParentFrameTemplate" parent="UIParent" frameStrata="LOW"
+           hidden="true" enableMouse="false" movable="false" alpha="0.5">
+        <Size x="10" y="10" />
+        <Layers>
+            <Layer level="BORDER">
+                <Texture setAllPoints="true">
+                    <Color r="0.1" g="0.1" b="0.1" a="0.9" />
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+    -->
+
+</Ui>

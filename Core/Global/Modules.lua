@@ -32,8 +32,9 @@ local M = {
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     Config = 'Config',
-    PopupDebugDialog = 'PopupDebugDialog',
+    FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
+    Incrementer = 'Incrementer',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     MacroAttributeSetter = 'MacroAttributeSetter',
@@ -44,6 +45,7 @@ local M = {
     MountDragEventHandler = 'MountDragEventHandler',
     MountAttributeSetter = 'MountAttributeSetter',
     PickupHandler = 'PickupHandler',
+    PopupDebugDialog = 'PopupDebugDialog',
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
@@ -83,10 +85,12 @@ local GlobalObjectsTemplate = {
     ButtonUIWidgetBuilder = {},
     ---@type Config
     Config = {},
-    ---@type PopupDebugDialog
-    PopupDebugDialog = {},
+    ---@type FrameHandleMixin
+    FrameHandleMixin = {},
     ---@type GlobalConstants
     GlobalConstants = {},
+    ---@type Incrementer
+    Incrementer = {},
     ---@type ItemAttributeSetter
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler
@@ -117,6 +121,8 @@ local GlobalObjectsTemplate = {
     Mixin = {},
     ---@type PickupHandler
     PickupHandler = {},
+    ---@type PopupDebugDialog
+    PopupDebugDialog = {},
     ---@type Profile
     Profile = {},
     ---@type ProfileInitializer

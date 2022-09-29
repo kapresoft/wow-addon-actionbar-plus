@@ -1,16 +1,18 @@
 --
 -- ButtonFrameFactory
+-- Creates the actionbar frame (anchor) for the buttons
 --
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
 local _G = _G
 local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
-
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
+---@type Blizzard_AnchorUtil
+local AnchorUtil = AnchorUtil
+local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -19,7 +21,8 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
-local E = O.GlobalConstants.E
+local GC = O.GlobalConstants
+local E = GC.E
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -92,38 +95,31 @@ local function OnButtonSizeChanged(frameWidget, event)
     end)
 end
 
+---Event is fired from ActionbarPlus#OnAddonLoaded
+---@param w FrameWidget
+local function OnAddonLoaded(w)
+    p:log(30, 'OnAddonLoaded: %s', w:GetName())
+    -- show delayed due to anchor not setting until UI is fully loaded
+    C_Timer.After(1, function() w:InitAnchor() end)
+    C_Timer.After(2, function() w:ShowGroupIfEnabled() end)
+end
+
+---Fired by FrameHandle when dragging stopped
+---@param frameWidget FrameWidget
+---@param event string
+local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
+
 local function RegisterCallbacks(widget)
-
-    ---@param fw FrameWidget
-    widget:SetCallback('OnRefreshSpellCooldowns', function(fw, event, ...)
-        local sourceEvent, spellID = ...
-        --local params = { sourceEvent=sourceEvent, spellID=spellID, delay=delay }
-        --p:log('%s: %s params=%s', fw:GetName(), event, toStringSorted(params))
-        for _, btnName in ipairs(fw:GetButtons()) do
-            ---@type ButtonUIWidget
-            _G[btnName].widget:Fire(sourceEvent)
-        end
-
-    end)
-
-    ---@param fw FrameWidget
-    widget:SetCallback('OnRefreshItemCooldowns', function(fw, event, ...)
-        for _, btnName in ipairs(fw:GetButtons()) do
-            ---@type ButtonUIWidget
-            _G[btnName].widget:UpdateState()
-        end
-    end)
-
+    widget:SetCallback(E.OnAddonLoaded, OnAddonLoaded)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
-
+    widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
 end
 
 ---@param widget FrameWidget
 local function RegisterEvents(widget)
-    local E = O.GlobalConstants.E
     ---@param w FrameWidget
     local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
     ---@param w FrameWidget
@@ -141,29 +137,46 @@ local function WidgetMethods(widget)
 
     widget.rendered = false
     widget.buttons = {}
+    local profile = widget.profile
     local frame = widget.frame
 
-    function widget:GetName()
-        return widget.frame:GetName()
-    end
+    function widget:GetName() return widget.frame:GetName() end
 
     ---@deprecated Use self#GetIndex()
     function widget:GetFrameIndex() return self:GetIndex() end
     function widget:GetIndex() return self.index end
 
-    ---@return BarData
-    function widget:GetConfig()
-        return P:GetBar(self:GetIndex())
+    ---@return Profile_Bar
+    function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
+
+    function widget:InitAnchor()
+        local anchor = P:GetAnchor(self.index)
+        local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
+        if GC:IsVerboseLogging() and frame:IsShown() then
+            p:log('InitAnchor| anchor-from-profile[f.%s]: %s', self.index, anchor)
+        end
+        frame:ClearAllPoints()
+        frame:SetPoint(anchor.point, relativeTo , anchor.relativePoint, anchor.x, anchor.y)
     end
 
-    function widget:Toggle()
-        if self:IsShown() then self:Hide(); return end
-        self:Show()
+    function widget:UpdateAnchor()
+        local n = frame:GetNumPoints()
+        if n <= 0 then return end
+
+        ---@type Blizzard_RegionAnchor
+        local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
+        _F = self
+        if not self.index then error('hello') end
+        P:SaveAnchor(frameAnchor, self.index)
+
+        p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, pformat:D2()(frameAnchor))
     end
 
-    function widget:IsLockedInCombat() return P:IsBarLockedInCombat(self:GetFrameIndex()) end
+    function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
+
+    function widget:IsFrameEnabledInConfig() return P:IsBarNameEnabled(self:GetName()) end
 
     function widget:SetFrameState(isEnabled)
         local frameIndex = self:GetIndex()
@@ -193,20 +206,14 @@ local function WidgetMethods(widget)
         local theState = (state == true)
         self:GetConfig().show_button_index = theState
         ---@param btn ButtonUIWidget
-        self:ApplyForEachButtons(function(btn)
-            --p:log('apply[%s]: %s', btn:GetName(), theState)
-            btn:ShowIndex(theState)
-        end)
+        self:ApplyForEachButtons(function(btn) btn:ShowIndex(theState) end)
     end
     ---@param state boolean true will show button indices
     function widget:ShowKeybindText(state)
         local theState = (state == true)
         self:GetConfig().show_keybind_text = theState
         ---@param btn ButtonUIWidget
-        self:ApplyForEachButtons(function(btn)
-            --p:log('ShowKeyBindText[%s]: %s', btn:GetName(), theState)
-            btn:ShowKeybindText(theState)
-        end)
+        self:ApplyForEachButtons(function(btn) btn:ShowKeybindText(theState) end)
     end
 
     function widget:UpdateKeybindText()
@@ -230,12 +237,16 @@ local function WidgetMethods(widget)
         if self.HideGroup then self:HideGroup() end
     end
 
-    function widget:ToggleGroup()
-        if #self.buttons > 0 then
-            local firstBtn = _G[self.buttons[1]]
-            if firstBtn:IsShown() then self:HideGroup()
-            else self:ShowButtons() end
+    function widget:ToggleVisibility()
+        local barData = self:GetConfig()
+        local enabled = barData.enabled
+        barData.enabled = not enabled
+        if enabled then
+            self:HideGroup()
+            return
         end
+
+        self:ShowGroup()
     end
 
     function widget:LockGroup() self.frameHandle:Hide() end
@@ -245,10 +256,12 @@ local function WidgetMethods(widget)
         frame:Hide()
         self:HideButtons()
     end
-
     function widget:ShowGroup()
         frame:Show()
         self:ShowButtons()
+    end
+    function widget:ShowGroupIfEnabled()
+        if self:IsFrameEnabledInConfig() then self:ShowGroup() end
     end
 
     function widget:ShowButtons()
@@ -269,9 +282,7 @@ local function WidgetMethods(widget)
     end
 
     function widget:HideButtons()
-        for _, btnName in ipairs(self.buttons) do
-            _G[btnName]:Hide()
-        end
+        for _, btnName in ipairs(self.buttons) do _G[btnName]:Hide() end
     end
 
     function widget:AddButton(buttonName)
@@ -280,18 +291,10 @@ local function WidgetMethods(widget)
     end
 
     function widget:GetButtonCount() return #self.buttons end
-
-    function widget:GetButtons()
-        return self.buttons
-    end
-
-    function widget:IsRendered()
-        return self.rendered
-    end
-
-    function widget:IsNotRendered()
-        return not self:IsRendered()
-    end
+    function widget:GetButtons() return self.buttons end
+    function widget:IsRendered() return self.rendered end
+    function widget:IsNotRendered() return not self:IsRendered() end
+    function widget:MarkRendered() self.rendered = true end
 
     function widget:SetInitialState()
         self:MarkRendered()
@@ -309,10 +312,6 @@ local function WidgetMethods(widget)
         end
     end
 
-    function widget:MarkRendered()
-        self.rendered = true
-    end
-
     function widget:RefreshActionbarFrame()
         self:SetFrameDimensions()
         ---@param btnWidget ButtonUIWidget
@@ -320,7 +319,7 @@ local function WidgetMethods(widget)
     end
 
     function widget:SetFrameDimensions()
-        local barData = self:GetBarData()
+        local barData = self:GetConfig()
         local widgetData = barData.widget
         local f = self.frame
         local frameHandle = self.frameHandle
@@ -344,66 +343,33 @@ function _L:IsFrameShownByIndex(frameIndex)
 end
 
 function _L:Constructor(frameIndex)
-    local FrameBackdrop = {
-        ---@see LibSharedMedia
-        --bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Marble"),
-        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
-        --edgeFile = LSM:Fetch(LSM.MediaType.BORDER, "Blizzard Dialog"),
-        tile = false, tileSize = 26, edgeSize = 0,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 }
-    }
-    local FrameHandleBackdrop = {
-        ---@see LibSharedMedia
-        bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
-        tile = false, tileSize = 26, edgeSize = 0,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 }
-    }
 
     ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
-    local fh = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate" or nil)
-    --fh:SetToplevel(true)
+    --TODO: NEXT: Move frame strata to Settings
+    local frameStrata = 'MEDIUM'
+    f:SetFrameStrata(frameStrata)
 
     ---@class FrameWidget : WidgetBase
     local widget = {
-        p = p,
         profile = P,
         index = frameIndex,
-        ---deprecated: Use index instead
-        frameIndex = frameIndex,
-        GetBarData = function() return P:GetBar(frameIndex) end,
-        --options = barData.widget,
         frameHandleHeight = 4,
         dragHandleHeight = 0,
         padding = 2,
-        frameStrata = 'LOW',
+        frameStrata = frameStrata,
+        frameLevel = 1,
         frame = f,
-        frameHandle = fh
+        ---@see FrameHandleMixin#Constructor()
+        frameHandle = nil,
     }
-    -- Allows call to RegisterEvent
+    -- Allows call to Use callbacks / RegisterEvent
     AceEvent:Embed(widget)
 
     widget.frame = f
-    f.widget, fh.widget = widget, widget
+    f.widget = widget
 
-    f:SetFrameStrata(widget.frameStrata)
-    f:SetBackdrop(FrameBackdrop)
-    f:SetBackdropColor(1/255, 1/255, 1/255, 1)
-
-    fh:SetBackdrop(FrameHandleBackdrop)
-    fh:SetBackdropColor(235/255, 152/255, 45/255, 1)
-    fh:EnableMouse(true)
-    fh:SetMovable(true)
-    fh:SetResizable(true)
-    fh:SetHeight(widget.frameHandleHeight)
-    fh:SetFrameStrata(widget.frameStrata)
-    fh:SetPoint("BOTTOM", f, "TOP", 0, 1)
-    fh:SetScript("OnLoad", function() self:RegisterForDrag("LeftButton"); end)
-    -- TODO: Overridden in ButtonFactory, will migrate it here
-    -- fh:SetScript("OnMouseDown", function() f:StartMoving(); end)
-    fh:SetScript("OnMouseUp", function() f:StopMovingOrSizing(); end)
-    fh:SetScript("OnDragStart", function() f:StartMoving();  end)
-    fh:SetScript("OnDragStop", function() f:StopMovingOrSizing(); end)
+    local fh = ABP_CreateFrameHandle(widget)
     fh:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')

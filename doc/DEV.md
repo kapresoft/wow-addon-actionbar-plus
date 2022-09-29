@@ -14,7 +14,9 @@
 
 - /dump: Just dumps a variable's value to chat. This works better than print for tables.
 
--  /script: Anything following this will executed immediately as Lua code.
+- /script: Anything following this will executed immediately as Lua code.
+  
+- /dump GetMouseFocus(): Dump on anything your mouse is over
 
 ### Replacement Tokens
 
@@ -28,11 +30,12 @@ The insides aren't removed so that line numbers stay the same, they just cause t
 #Lua
 
 ```text
---@debug@ and --@end-debug@
+--@debug@ 
+print('hello')
+--@end-debug@
 ```
 
 Turns into --[===[@debug and --@end-debug]===].
-
 
 ```text
 --[===[@non-debug@ and --@end-non-debug@]===]
@@ -50,7 +53,7 @@ Turns into <!--@debug (insert code here) @end-debug@-->.
 
 
 ```text
-<!--@non-debug@ (insert code here) @end-non-debug@-->
+<!--@non-debug@--> (insert code here) <!--@end-non-debug@-->
 ```
 Turns into <!--@non-debug@--> (insert code here) <!--@end-non-debug@-->.
 
@@ -59,7 +62,9 @@ Turns into <!--@non-debug@--> (insert code here) <!--@end-non-debug@-->.
 ### TOC
 
 ```text
-#@debug@ and #@end-debug@>
+#@debug@
+## X-Version: 1.0.0
+#@end-debug@
 ```
 Turns into #@debug@ and #@end-debug@, as well as adding a # to the beginning of each line in-between.
 

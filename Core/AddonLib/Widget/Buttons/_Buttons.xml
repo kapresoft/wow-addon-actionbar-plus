@@ -7,6 +7,7 @@
     <Script file="ButtonProfileMixin.lua"/>
     <Script file="ButtonMixin.lua"/>
     <Script file="ButtonUI.lua"/>
+    <Script file="FrameHandleMixin.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="BaseAttributeSetter.lua"/>
     <Script file="SpellAttributeSetter.lua"/>
@@ -19,35 +20,6 @@
     <Script file="MountDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
-
-    <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="LOW"
-           hidden="true" enableMouse="true" movable="true" alpha="0.5" virtual="true"
-           inherits="BackdropTemplate" mixin="BackdropTemplateMixin"
-            >
-        <Scripts>
-<!--            <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>-->
-<!--            <OnDragStart>self:StartMoving();</OnDragStart>-->
-<!--            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>-->
-        </Scripts>
-        <Size x="200" y="15" />
-        <Anchors>
-            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeto="UIParent">
-                <Offset>
-                    <AbsDimension x="5" y="-100" />
-                </Offset>
-            </Anchor>
-        </Anchors>
-        <Layers>
-            <Layer level="ARTWORK">
-                <Texture setAllPoints="true">
-                    <Color r="0.1" g="0.1" b="0.1" a="0.2" />
-                </Texture>
-            </Layer>
-            <Layer level="BACKGROUND">
-                <Texture setAllPoints="true" file="Interface\DialogFrame\UI-DialogBox-Background" />
-            </Layer>
-        </Layers>
-    </Frame>
 
     <Frame name="ActionbarPlusF1" inherits="ActionbarPlusFrameTemplate" />
     <Frame name="ActionbarPlusF2" inherits="ActionbarPlusFrameTemplate" />

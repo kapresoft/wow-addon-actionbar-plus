@@ -45,7 +45,7 @@ function _L:ShowTooltip(btnUI, btnData)
 end
 
 ---@param btnUI ButtonUI The UIFrame
----@param btnData ProfileButton The button data
+---@param btnData Profile_Button The button data
 function _L:SetAttributes(btnUI, btnData)
     btnUI.widget:ResetWidgetAttributes()
 

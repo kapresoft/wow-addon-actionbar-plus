@@ -237,6 +237,13 @@ function _L:InitPrettyPrint()
                    show_all=false, show_function = false })
         return self;
     end
+    ---no new lines
+    ---@return pformat
+    function o:D2()
+        pprint.setup({ use_newline = false, wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
+                   show_all=false, show_function = false })
+        return self;
+    end
 
     ---Configured to show all
     ---@return pformat
