@@ -12,6 +12,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 ---@type Blizzard_AnchorUtil
 local AnchorUtil = AnchorUtil
+local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -97,7 +98,9 @@ end
 ---@param w FrameWidget
 local function OnAddonLoaded(w)
     p:log(30, 'OnAddonLoaded: %s', w:GetName())
-    w:InitAnchor()
+    -- show delayed due to anchor not setting until UI is fully loaded
+    C_Timer.After(2, function() w:InitAnchor() end)
+    C_Timer.After(3, function() w:ShowGroupIfEnabled() end)
 end
 
 ---Fired by FrameHandle when dragging stopped
@@ -146,19 +149,7 @@ local function WidgetMethods(widget)
     function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
 
     function widget:InitAnchor()
-        local barConf = self:GetConfig()
-        ---@type Blizzard_RegionAnchor
-        local anchor = barConf.anchor or {}
-
-        --TODO: NEXT: Global Anchor Settings
-        --error("General / Character Specific Actionbar Locations [not checked by default]")
-
-        --if not anchor or Table.isEmpty(anchor) or not (anchor.point and anchor.relativePoint) then
-        --    --failsafe, probably never gonna happen due to profile defaults
-        --    anchor = GC.Default.FrameAnchor
-        --    p:log('Invalid anchor. Using default: %s', pformat:B()(anchor))
-        --end
-
+        local anchor = P:GetAnchor(self.index)
         local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
         if GC:IsVerboseLogging() and frame:IsShown() then
             p:log('InitAnchor| anchor-from-profile[f.%s]: %s', self.index, anchor)
@@ -173,13 +164,9 @@ local function WidgetMethods(widget)
 
         ---@type Blizzard_RegionAnchor
         local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
-
-        local anchor = self:GetConfig().anchor
-        anchor.point = frameAnchor.point
-        anchor.relativeTo = frameAnchor.relativeTo
-        anchor.relativePoint = frameAnchor.relativePoint
-        anchor.x = frameAnchor.x
-        anchor.y = frameAnchor.y
+        _F = self
+        if not self.index then error('hello') end
+        P:SaveAnchor(frameAnchor, self.index)
 
         p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, anchor)
     end
@@ -187,6 +174,8 @@ local function WidgetMethods(widget)
     function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
+
+    function widget:IsFrameEnabledInConfig() return P:IsBarNameEnabled(self:GetName()) end
 
     function widget:SetFrameState(isEnabled)
         local frameIndex = self:GetIndex()
@@ -266,10 +255,12 @@ local function WidgetMethods(widget)
         frame:Hide()
         self:HideButtons()
     end
-
     function widget:ShowGroup()
         frame:Show()
         self:ShowButtons()
+    end
+    function widget:ShowGroupIfEnabled()
+        if self:IsFrameEnabledInConfig() then self:ShowGroup() end
     end
 
     function widget:ShowButtons()

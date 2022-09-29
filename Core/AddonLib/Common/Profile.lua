@@ -17,12 +17,15 @@ local isTable, isNotTable, tsize, tinsert, tsort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
 ---@type ProfileInitializer
-local ProfileInitializer = O.ProfileInitializer
+local PI = O.ProfileInitializer
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
 ---@class Profile
 local P = LibStub:NewLibrary(M.Profile)
+---@type LoggerTemplate
+local p = P:GetLogger()
+
 ---@type Profile
 ABP_Profile = P
 
@@ -87,17 +90,28 @@ local function assertProfile(p)
     assert(isTable(p), "profile is not a table")
 end
 
+---@param source Blizzard_RegionAnchor
+---@param dest Blizzard_RegionAnchor
+local function CopyAnchor(source, dest)
+    dest.point = source.point
+    dest.relativeTo = source.relativeTo
+    dest.relativePoint = source.relativePoint
+    dest.x = source.x
+    dest.y = source.y
+end
+
 -- Implicit
 -- self.adddon = ActionBarPlus
 -- self.profile = profile
 
 -- ##########################################################################
 
-local FrameDetails = ProfileInitializer:GetAllActionBarSizeDetails()
+local FrameDetails = PI:GetAllActionBarSizeDetails()
 
 -- ##########################################################################
 
-P.maxFrames = 8
+--P.maxFrames = 8
+---@deprecated Use ProfileInitializer
 P.baseFrameName = 'ActionbarPlusF'
 
 ---@return Profile_Button
@@ -121,7 +135,7 @@ function P:ResetButtonData(widget)
 end
 
 function P:CreateDefaultProfile(profileName)
-    return ProfileInitializer:InitNewProfile(profileName)
+    return PI:InitNewProfile(profileName)
 end
 
 function P:OnAfterInitialize()
@@ -142,7 +156,17 @@ function P:CreateBarsTemplate()
 end
 
 ---@return Profile_Config
-function P:GetProfileData() return self.profile end
+function P:P() return self.profile  end
+---@return Profile_Global_Config
+function P:G()
+    local g = self.addon.db.global
+    --g.bars = nil
+    if Table.isNotTable(g.bars) then
+        --p:log('G()| here')
+        PI:InitGlobalSettings(g)
+    end
+    return g
+end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 ---@return Profile_Bar
@@ -202,7 +226,71 @@ function P:SetBarLockValue(frameIndex, value)
     return bar.locked
 end
 
-function P:IsActionButtonMouseoverGlowEnabled() return self:GetProfileData().action_button_mouseover_glow == true end
+function P:IsCharacterSpecificAnchor()
+    return true == self.profile[ConfigNames.character_specific_anchors]
+end
+
+---@param frameIndex number
+---@return Blizzard_RegionAnchor
+function P:GetAnchor(frameIndex)
+    if self:IsCharacterSpecificAnchor() then return self:GetCharacterSpecificAnchor(frameIndex) end
+    --p:log('GetAnchor| Is global anchor')
+    return self:GetGlobalAnchor(frameIndex)
+end
+
+---@param frameIndex number
+---@return Blizzard_RegionAnchor
+function P:GetGlobalAnchor(frameIndex)
+    ---@type Global_Profile_Bar
+    local g = self:G()
+    local fn = P:GetFrameNameByIndex(frameIndex)
+    ---@type Profile_Global_Config
+    local buttonConf = g.bars[fn]
+    if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, fn) end
+    if Table.isEmpty(buttonConf.anchor) then
+        buttonConf.anchor = PI:InitGlobalButtonConfigAnchor(g, fn)
+    end
+    return buttonConf.anchor
+end
+
+---@param frameIndex number
+---@return Blizzard_RegionAnchor
+function P:GetCharacterSpecificAnchor(frameIndex) return self:GetBar(frameIndex).anchor end
+
+---@param frameAnchor Blizzard_RegionAnchor
+---@param frameIndex number
+function P:SaveAnchor(frameAnchor, frameIndex)
+    -- always sync the character specific settings
+    self:SaveCharacterSpecificAnchor(frameAnchor, frameIndex)
+
+    if not self:IsCharacterSpecificAnchor() then
+        self:SaveGlobalAnchor(frameAnchor, frameIndex)
+    end
+end
+
+---@param frameIndex number
+---@return Global_Profile_Bar
+function P:GetGlobalBar(frameIndex)
+    local frameName = self:GetFrameNameByIndex(frameIndex)
+    return frameIndex and self:G().bars[frameName]
+end
+
+--- Global
+---@param frameAnchor Blizzard_RegionAnchor
+---@param frameIndex number
+function P:SaveGlobalAnchor(frameAnchor, frameIndex)
+    local globalBarConf = self:GetGlobalBar(frameIndex)
+    CopyAnchor(frameAnchor, globalBarConf.anchor)
+end
+
+---@param frameAnchor Blizzard_RegionAnchor
+---@param frameIndex number
+function P:SaveCharacterSpecificAnchor(frameAnchor, frameIndex)
+    local barProfile = self:GetBar(frameIndex)
+    CopyAnchor(frameAnchor, barProfile.anchor)
+end
+
+function P:IsActionButtonMouseoverGlowEnabled() return self:P().action_button_mouseover_glow == true end
 function P:IsBarUnlocked(frameIndex) return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil end
 function P:IsBarLockedInCombat(frameIndex) return self:GetBarLockValue(frameIndex) == 'in-combat' end
 function P:IsBarLockedAlways(frameIndex) return self:GetBarLockValue(frameIndex) == 'always' end
@@ -238,20 +326,14 @@ function P:IsShowKeybindText(frameIndex)
     return self:GetBar(frameIndex).show_keybind_text == true
 end
 
-function P:GetBaseFrameName() return self.baseFrameName end
-
-function P:GetFrameNameByIndex(frameIndex)
-    return self:GetBaseFrameName() .. tostring(frameIndex)
-end
+function P:GetFrameNameByIndex(frameIndex) return PI:GetFrameNameByIndex(frameIndex) end
 
 ---@return FrameWidget
 function P:GetFrameWidgetByIndex(frameIndex)
     return _G[self:GetFrameNameByIndex(frameIndex)].widget
 end
 
-function P:GetMaxFrames()
-    return #FrameDetails
-end
+function P:GetMaxFrames() return #FrameDetails end
 
 function P:GetAllFrameNames()
     local fnames = {}

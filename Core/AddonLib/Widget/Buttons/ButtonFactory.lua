@@ -73,22 +73,14 @@ Methods
 
 function L:OnAfterInitialize()
     local frameNames = P:GetAllFrameNames()
-    --error(format('frames: %s', ABP_Table.toString(frames)))
-    local inactiveFrameCount = 0
     for i,_ in ipairs(frameNames) do
-        local frameEnabled = P:IsBarIndexEnabled(i)
         local f = self:CreateActionbarGroup(i)
-        if frameEnabled then
-            f:ShowGroup()
-        else
-            f:HideGroup()
-            inactiveFrameCount = inactiveFrameCount + 1
-        end
         tinsert(self.FRAMES, f)
+        --- initially hide
+        ---@see ButtonFrameFactory#OnAddonLoaded
+        f:HideGroup()
     end
-
-    --AceEvent:RegisterEvent('BAG_UPDATE_DELAYED', OnBagUpdate)
-    p:log('Total frames loaded: %s, %s are hidden', #self.FRAMES, inactiveFrameCount)
+    p:log(10, 'Total ActionbarPlus frames loaded: %s', #self.FRAMES)
 end
 
 function L:Fire(event, sourceEvent, ...)

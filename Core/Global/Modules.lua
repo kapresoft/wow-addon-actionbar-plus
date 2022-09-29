@@ -34,6 +34,7 @@ local M = {
     Config = 'Config',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
+    Incrementer = 'Incrementer',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     MacroAttributeSetter = 'MacroAttributeSetter',
@@ -88,6 +89,8 @@ local GlobalObjectsTemplate = {
     FrameHandleMixin = {},
     ---@type GlobalConstants
     GlobalConstants = {},
+    ---@type Incrementer
+    Incrementer = {},
     ---@type ItemAttributeSetter
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler

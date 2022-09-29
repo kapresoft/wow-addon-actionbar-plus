@@ -15,6 +15,10 @@ local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
 ---@class ProfileInitializer
 local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
+---@type LoggerTemplate
+local p = P:GetLogger()
+
+P.baseFrameName = 'ActionbarPlusF'
 
 ---FrameDetails is used for initializing defaults for AceDB profile
 local FrameDetails = {
@@ -36,10 +40,15 @@ local ButtonDataTemplate = {
     [ATTR.MACRO_TEXT] = {},
     [ATTR.MOUNT] = {},
 }
-
-local startingX = -300.0
+local EnabledBars = {
+    ["ActionbarPlusF1"] = true,
+    ["ActionbarPlusF2"] = true,
+}
 
 local ConfigNames = GC.Profile_Config_Names
+
+local xIncr = ABP_CreateIncrementer(30, 220)
+local yIncr = ABP_CreateIncrementer(-130, -90)
 
 ---The defaults provided here will used for the default state of the settings
 ---@type Profile_Config
@@ -55,11 +64,11 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.tooltip_visibility_combat_override_key] = '',
     [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
-            ["enabled"] = true,
+            ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=400.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
             },
             ["buttons"] = {
                 ["ActionbarPlusF1Button1"] = {
@@ -79,71 +88,71 @@ local DEFAULT_PROFILE_DATA = {
             },
         },
         ["ActionbarPlusF2"] = {
-            ["enabled"] = true,
+            ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=300.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF3"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=200.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF4"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=100.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF5"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=0.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF6"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-100.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF7"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-200.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
         },
         ["ActionbarPlusF8"] = {
-            ["enabled"] = false,
+            ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
             ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
             ---@type Blizzard_RegionAnchor
             ["anchor"] = {
-                point="CENTER", relativeTo=nil, relativePoint='CENTER', x=startingX, y=-300.0
+                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
             ["buttons"] = {
             },
@@ -151,13 +160,45 @@ local DEFAULT_PROFILE_DATA = {
     },
 }
 
-function P:GetAllActionBarSizeDetails()
-    return FrameDetails
+---@param frameIndex number
+function P:GetFrameNameByIndex(frameIndex)
+    assert(type(frameIndex) == 'number',
+            'GetFrameNameByIndex(..)| frameIndex should be a number')
+    return P.baseFrameName .. tostring(frameIndex)
 end
 
-local function CreateNewProfile()
-    return shallow_copy(DEFAULT_PROFILE_DATA)
+---@param g Profile_Global_Config
+function P:InitGlobalSettings(g)
+    g.bars = {}
+
+    for frameIndex=1, #FrameDetails do
+        local fn = P:GetFrameNameByIndex(frameIndex)
+        self:InitGlobalButtonConfig(g, fn)
+    end
+
 end
+
+---@param g Profile_Global_Config
+---@param frameName string
+function P:InitGlobalButtonConfig(g, frameName)
+    g.bars[frameName] = { }
+    self:InitGlobalButtonConfigAnchor(g, frameName)
+    return g.bars[frameName]
+end
+
+---@param g Profile_Global_Config
+---@param frameName string
+function P:InitGlobalButtonConfigAnchor(g, frameName)
+    local defaultBars = DEFAULT_PROFILE_DATA.bars
+    ---@type Global_Profile_Bar
+    local btnConf = g.bars[frameName]
+    btnConf.anchor = Table.shallow_copy(defaultBars[frameName].anchor)
+    return btnConf.anchor
+end
+
+function P:GetAllActionBarSizeDetails() return FrameDetails end
+
+local function CreateNewProfile() return shallow_copy(DEFAULT_PROFILE_DATA) end
 
 function P:InitNewProfile()
     local profile = CreateNewProfile()

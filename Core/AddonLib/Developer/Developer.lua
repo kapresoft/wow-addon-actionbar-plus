@@ -8,6 +8,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local BF = O.ButtonFactory
+local P = O.Profile
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -34,6 +35,9 @@ function L:ResetBarConfig()
     end
 
 end
+
+function L:GetGlobalProfile() return P:G() end
+
 
 function L:AnchorX(frameIndex, x)
     local fw = self:F(frameIndex).widget
