@@ -381,13 +381,18 @@ function P:FindButtonsBySpellById(spellId)
     return buttons
 end
 
+--- Only return the bars that do exist. Some old profile button info
+--- may exist even though the size of bar may not include these buttons.
+--- The number of buttons do not reflect how many buttons actually exist because
+--- the addon doesn't cleanup old data.
+-- TODO: Should we cleanup old config?
 ---@param btnType string spell, macro, item
 function P:FindButtonsByType(btnType)
     local buttons = {}
     for _, bar in pairs(self:GetBars()) do
         if bar.buttons then
             for buttonName, button in pairs(bar.buttons) do
-                if btnType == button.type then
+                if btnType == button.type and _G[buttonName] then
                     buttons[buttonName] = button
                 end
             end
