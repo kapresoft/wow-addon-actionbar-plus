@@ -474,7 +474,9 @@ function _L:SetCooldownTextures(icon)
 end
 ---Typically used when casting spells that take longer than GCD
 function _L:SetHighlightInUse()
-    local hlt = self:_Button():GetHighlightTexture()
+    local hlt = self:B():GetHighlightTexture()
+    --highlight texture could be nil if action_button_mouseover_glow is disabled
+    if not hlt then return end
     hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
