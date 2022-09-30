@@ -1,7 +1,24 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
+
+IncludeBase() {
+  local fnn="script-functions.sh"
+  local fn="dev/${fnn}"
+  if [ -f "${fn}" ]; then
+    source "${fn}"
+  elif [ -f "${fnn}" ]; then
+    source "${fnn}"
+  else
+    echo "${fn} not found" && exit 1
+  fi
+}
+IncludeBase && Validate
+
+# --------------------------------------------
+# Vars / Support Functions
+# --------------------------------------------
 
 # Use Common Release Dir
-RELEASE_DIR="$HOME/.release"
+RELEASE_DIR="${dev_release_dir}"
 ADDON_NAME="ActionbarPlus"
 EXTLIB="Core/ExtLib"
 
@@ -32,24 +49,15 @@ Package() {
 
 SyncExtLib() {
   local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/WoWAce/"
-  local dest="${EXTLIB}/WoWAce/"
-  local cmd="rsync -aucv --progress --inplace --out-format=\"[Modified: %M] %o %n%L\" ${src} ${dest}"
-  echo "Executing: $cmd"
-  echo "Source: ${src}"
-  echo "  Dest: ${dest}"
-  echo "---------------"
-  eval "$cmd"
+  local dest="${EXTLIB}/WoWAce/."
+  SyncDir "${src}" "${dest}"
 }
 
 SyncKapresoftLib() {
-  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/Kapresoft-LibUtil/"
-  local dest="${EXTLIB}/Kapresoft-LibUtil/"
-  local cmd="rsync -aucv --progress --inplace --out-format=\"[Modified: %M] %o %n%L\" ${src} ${dest}"
-  echo "Executing: $cmd"
-  echo "Source: ${src}"
-  echo "  Dest: ${dest}"
-  echo "---------------"
-  eval "$cmd"
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/Kapresoft-LibUtil"
+  local dest="${EXTLIB}/."
+  SyncDir "${src}" "${dest}"
 }
 
-Package $* && SyncExtLib $* && SyncKapresoftLib
+#SyncExtLib && SyncKapresoftLib
+Package $* && SyncExtLib && SyncKapresoftLib

@@ -90,16 +90,20 @@ More at https://support.curseforge.com/en/support/solutions/articles/9000197281-
 
 ## Steps to get the latest external lib dependencies
 
-> release-wow-addon is a link to BigWigMods/release.sh
-see [PACKAGER.md](PACKAGER.md) for more details
+### Prerequisite
+- Install BigWigMods Packager  (See [README-BigWigsMods-Packager.md](README-BigWigsMods-Packager.md))
 
-Run the sync bash script
+#### Linking BigWigMods/release.sh
+
+Pull all external libraries
 ```shell
 # Make executable (Optional)
-$ cmod +x ./sync-extlibs.sh
+$ cmod +x ./dev/pull-extlib.sh
 # Runs package.sh and rsync to work directory
-./sync-extlibs.sh
+./dev/pull-extlib.sh
 ```
+
+Or Equivalent
 
 ```shell
 # generate
