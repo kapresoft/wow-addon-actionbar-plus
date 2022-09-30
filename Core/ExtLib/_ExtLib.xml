@@ -9,4 +9,6 @@
     <!-- TODO: Start sourcing at github in pkgmeta -->
     <Include file='pprint\pprint.xml'/>
 
+    <Include file='Kapresoft-LibUtil\_Lib.xml'/>
+
 </Ui>
