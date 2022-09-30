@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 # Use Common Release Dir
-RELEASE_DIR=~/.release
+RELEASE_DIR="$HOME/.release"
 ADDON_NAME="ActionbarPlus"
+EXTLIB="Core/ExtLib"
 
 Package() {
   local arg1=$1
@@ -30,9 +31,25 @@ Package() {
 }
 
 SyncExtLib() {
-  local cmd='rsync -aucv --progress --inplace --out-format="[Modified: %M] %o %n%L" "${RELEASE_DIR}/${ADDON_NAME}/Core/ExtLib/WoWAce/" "Core/ExtLib/WoWAce/"'
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/WoWAce/"
+  local dest="${EXTLIB}/WoWAce/"
+  local cmd="rsync -aucv --progress --inplace --out-format=\"[Modified: %M] %o %n%L\" ${src} ${dest}"
   echo "Executing: $cmd"
+  echo "Source: ${src}"
+  echo "  Dest: ${dest}"
+  echo "---------------"
   eval "$cmd"
 }
 
-Package $* && SyncExtLib $*
+SyncKapresoftLib() {
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/Kapresoft-LibUtil/"
+  local dest="${EXTLIB}/Kapresoft-LibUtil/"
+  local cmd="rsync -aucv --progress --inplace --out-format=\"[Modified: %M] %o %n%L\" ${src} ${dest}"
+  echo "Executing: $cmd"
+  echo "Source: ${src}"
+  echo "  Dest: ${dest}"
+  echo "---------------"
+  eval "$cmd"
+}
+
+Package $* && SyncExtLib $* && SyncKapresoftLib

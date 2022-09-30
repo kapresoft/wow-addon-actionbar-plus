@@ -1,0 +1,35 @@
+package-as: ActionbarPlus
+# --------------------------
+license-output: LICENSE.txt
+enable-nolib-creation: no
+#enable-toc-creation: yes
+manual-changelog:
+  filename: CHANGELOG.txt
+  markup-type: markdown
+
+# Resources:
+#  - https://github.com/wowace-mirror
+#  - https://www.wowace.com/projects/ace3
+#  - SVN URLs are still the primary source recommendation
+externals:
+  Core-Dev/Extlib/Kapresoft-LibUtil:
+    url: https://github.com/kapresoft/wow-lib-util
+    tag: latest
+
+ignore:
+  - README.md
+  - sync-extlibs.sh
+  - doc
+  - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibStub
+  - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibQTip-1.0.toc
+  - Core/ExtLib/WoWAce/LibCompress/LibCompress/LibCompress.toc
+  - Core/ExtLib/WoWAce/Ace3/tests
+  - Core/ExtLib/WoWAce/Ace3/Ace3.lua
+  - Core/ExtLib/WoWAce/Ace3/Ace3.toc
+  - Core/ExtLib/WoWAce/Ace3/Ace3_TBC.toc
+  - Core/ExtLib/WoWAce/Ace3/Ace3_Vanilla.toc
+  - Core/ExtLib/WoWAce/Ace3/Ace3_Wrath.toc
+  - Core/ExtLib/WoWAce/Ace3/Bindings.xml
+
+## Potentially helpful libraries
+## - https://www.wowace.com/projects/libactionbutton-1-0
