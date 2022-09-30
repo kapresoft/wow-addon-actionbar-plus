@@ -59,5 +59,5 @@ SyncKapresoftLib() {
   SyncDir "${src}" "${dest}"
 }
 
-SyncExtLib && SyncKapresoftLib
-#Package $* && SyncExtLib && SyncKapresoftLib
+#SyncExtLib && SyncKapresoftLib
+Package $* && SyncExtLib && SyncKapresoftLib
