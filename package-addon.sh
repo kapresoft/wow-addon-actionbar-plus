@@ -1,11 +1,26 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
+
+IncludeBase() {
+  local fnn="script-functions.sh"
+  local fn="dev/${fnn}"
+  if [ -f "${fn}" ]; then
+    source "${fn}"
+  elif [ -f "${fnn}" ]; then
+    source "${fnn}"
+  else
+    echo "${fn} not found" && exit 1
+  fi
+}
+IncludeBase && Validate
+
+# --------------------------------------------
+# Vars / Support Functions
+# --------------------------------------------
 
 # Use Common Release Dir
-RELEASE_DIR=~/.release
+RELEASE_DIR="${pre_release_dir}"
 ADDON_NAME="ActionbarPlus"
-SRC="${RELEASE_DIR}/${ADDON_NAME}/Core-Dev/ExtLib/Kapresoft-LibUtil/"
-DEST="Core/ExtLib/Kapresoft-LibUtil/"
-PKGMETA="-m pkgmeta-kapresoftlibs.yaml"
+EXTLIB="Core/ExtLib"
 
 Package() {
   local arg1=$1
@@ -15,7 +30,7 @@ Package() {
   # -e Skip checkout of external repositories.
   # default: -cdzul
   # for checking debug tags: -edzul
-  local rel_cmd="release-wow-addon ${PKGMETA} -r ${RELEASE_DIR} -cdzul $*"
+  local rel_cmd="release-wow-addon -r ${RELEASE_DIR} -du $*"
 
   if [[ "$arg1" == "-h" ]]; then
     echo "Usage: $0 [-o]"
@@ -32,13 +47,4 @@ Package() {
   eval "$rel_cmd"
 }
 
-SyncKapresoftLib() {
-  local cmd="rsync -aucv --exclude ${excludes} --progress --inplace --out-format=\"[Modified: %M] %o %n%L\" ${SRC} ${DEST}"
-
-  echo "Executing: $cmd"
-  echo "Source: ${SRC}"
-  echo "  Dest: ${DEST}"
-  eval "$cmd"
-}
-
-Package $* && SyncKapresoftLib
+Package $*

@@ -26,7 +26,7 @@ manual-changelog:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  Core/Extlib/Kapresoft-LibUtil:
+  Core/ExtLib/Kapresoft-LibUtil:
     url: https://github.com/kapresoft/wow-lib-util
     tag: latest
   # Sourcing Ace3 addon directly from github
@@ -48,7 +48,8 @@ externals:
 
 ignore:
   - README.md
-  - sync-extlibs.sh
+  - dev
+  - package-addon.sh
   - dev-local-sync-kapresoftlibs.sh
   - dev-sync-kapresoftlibs.sh
   - pkgmeta-kapresoftlibs.yaml
