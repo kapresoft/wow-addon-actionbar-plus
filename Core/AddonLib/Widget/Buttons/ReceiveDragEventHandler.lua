@@ -57,6 +57,12 @@ function L:Handle(btnUI, cursorInfo)
     if not self:CanHandle(actionType) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
+    btnUI:GetNormalTexture():SetAlpha(1)
+
+    ---@param btnWidget ButtonUIWidget
+    btnUI.widget.dragFrame:ApplyForEachButtons(function(btnWidget)
+        btnWidget:HideGrid()
+    end)
 
     self:CleanupProfile(btnUI, actionType)
 end

@@ -120,3 +120,8 @@ local Profile_Data = {
         ["ActionbarPlusF8"] = Profile_Bar,
     }
 }
+
+---@class Spellcast_Event_Data
+local SpellcastSent_Data = {
+    unit='unit', target='target', castGUID='castGUID', spellID=12345
+}

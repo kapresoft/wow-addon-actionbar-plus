@@ -41,10 +41,16 @@ function _L:HandleGameTooltipCallbacks(btnUI)
         end
 
         self:ShowTooltip(w.button)
+
+        if not GetCursorInfo() then return end
+        w.border:SetAlpha(1)
     end)
 
     ---@param w ButtonUIWidget
     btnUI.widget:SetCallback("OnLeave", function(w, event)
         WMX:HideTooltipDelayed()
+
+        if not GetCursorInfo() then return end
+        w.border:SetAlpha(0.5)
     end)
 end

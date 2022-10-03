@@ -197,6 +197,25 @@ local function GlobalConstantProperties(o)
         ['show_keybind_text'] = 'show_keybind_text',
     }
 
+    ---@class Blizzard_DrawLayer
+    local DrawLayer = {
+        BACKGROUND = 'BACKGROUND',
+        BORDER = 'BORDER',
+        ARTWORK = 'ARTWORK',
+        OVERLAY = 'OVERLAY',
+        HIGHLIGHT = 'HIGHLIGHT',
+    }
+
+    ---Also known as AlphaMode
+    ---@class Blizzard_BlendMode
+    local BlendMode = {
+        DISABLE = 'DISABLE',
+        BLEND = 'BLEND',
+        ALPHAKEY = 'ALPHAKEY',
+        ADD = 'ADD',
+        MOD = 'MOD',
+    }
+
     o.Textures = Textures
     o.C = C
     o.E = E
@@ -205,7 +224,9 @@ local function GlobalConstantProperties(o)
     o.ButtonAttributes = ButtonAttributes
     o.UnitIDAttributes = UnitIDAttributes
     o.WidgetAttributes = WidgetAttributes
-
+    o.DrawLayer = DrawLayer
+    o.BlendMode = BlendMode
+    o.AlphaMode = BlendMode
 end
 
 ---@param o GlobalConstants

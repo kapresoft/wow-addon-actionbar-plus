@@ -58,10 +58,20 @@ end
 
 ---@param frameIndex number
 ---@return FrameWidget
-function L:F(frameIndex) return BF.FRAMES[frameIndex] end
+function L:F(frameIndex, buttonIndex)
+    if not buttonIndex then return _G['ActionbarPlusF' .. tostring(frameIndex)].widget end
+    return self:B(frameIndex, buttonIndex)
+end
 
 ---@return Profile_Bar
 function L:C(frameIndex) return self:F(frameIndex):GetConfig() end
+
+function L:M() return GetMouseFocus() end
+
+function L:B(frameIndex, buttonIndex)
+    local bn = string.format('ActionbarPlusF%sButton%s', frameIndex, buttonIndex)
+    return _G[bn].widget
+end
 
 D = L
 

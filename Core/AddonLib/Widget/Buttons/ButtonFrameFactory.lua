@@ -109,6 +109,69 @@ end
 ---@param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
+local function OnActionbarShowGrid(frameWidget, e, ...)
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget)
+        btnWidget:ShowGrid()
+    end)
+end
+local function OnActionbarHideGrid(frameWidget, e, ...)
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget)
+        btnWidget:HideGrid()
+    end)
+end
+
+-----@param frameWidget FrameWidget
+--local function OnUnitSpellcastSent(frameWidget, e, ...)
+--    ---@type Spellcast_Event_Data
+--    local args = ...
+--    --p:log('F%s %s: %s', frameWidget.index, e, args)
+--    -----@param w ButtonUIWidget
+--    --frameWidget:ApplyForEachButtons(function(w)
+--    --    if w:IsEmpty() or not w:IsShown() then return end
+--    --    if w:IsMatchingSpellID(args.spellID) then
+--    --        --p:log('matches: %s', w:GetName())
+--    --        w:SetHighlightInUse()
+--    --    end
+--    --end)
+--end
+--
+-----@param frameWidget FrameWidget
+--local function OnCurrentSpellcastChanged(frameWidget, e, ...)
+--    local isCancelled = ...
+--    local visible = frameWidget.frame:IsVisible()
+--    if not (visible or isCancelled) then return end
+--
+--    --p:log('F%s %s: canclled=%s visible=%s',
+--    --        frameWidget.index, e, isCancelled, visible)
+--    ---@param w ButtonUIWidget
+--
+--    frameWidget:ApplyForEachButtons(function(w)
+--        if w:IsEmpty() or not w:IsShown() then return end
+--        w:SetHighlightDefault()
+--    end)
+--end
+--
+-----#### Non-Instant Start-Cast Handler
+-----@param widget ButtonUIWidget
+-----@param event string Event string
+--local function OnSpellCastStart(frameWidget, event, ...)
+--    if not frameWidget.frame:IsVisible() then return end
+--    local unitTarget, castGUID, spellID = ...
+--    if 'player' ~= unitTarget then return end
+--
+--    frameWidget:ApplyForEachButtons(function(w)
+--        if w:IsEmpty() or not w:IsShown() then return end
+--        --p:log('%s: %s', event, { unitTarget })
+--        local btnConf = w:GetConfig()
+--        if w:IsMatchingSpellID(spellID, btnConf) then
+--            p:log(10, 'OnSpellCastStart| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
+--            w:SetHighlightInUse()
+--        end
+--    end)
+--end
+
 local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnAddonLoaded, OnAddonLoaded)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
@@ -116,6 +179,10 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
+    widget:SetCallback("OnActionbarShowGrid", OnActionbarShowGrid)
+    widget:SetCallback("OnActionbarHideGrid", OnActionbarHideGrid)
+    --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
+    --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
 end
 
 ---@param widget FrameWidget
@@ -126,6 +193,7 @@ local function RegisterEvents(widget)
     local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
     widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
     widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+    --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -329,6 +397,13 @@ local function WidgetMethods(widget)
         frameHandle:SetWidth(frameWidth)
         f:SetWidth(frameWidth)
         f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
+
+        --TODO: Clears the backdrop
+        -- frame backdrop when button is empty state
+        --f:ClearBackdrop()
+        --f:SetBackdrop(BACKDROP_GOLD_DIALOG_32_32)
+        --f:ApplyBackdrop()
+        --f:SetAlpha(0)
     end
 end
 
@@ -349,6 +424,12 @@ function _L:Constructor(frameIndex)
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
+    --todo next if background is transparent (in settings/future), then
+    --      set alpha to zero
+    local frameAlpha = 0.5
+    local transparentBackgroundInSettings = true
+    if transparentBackgroundInSettings then frameAlpha = 0 end
+    f:SetAlpha(frameAlpha)
 
     ---@class FrameWidget : WidgetBase
     local widget = {
@@ -370,6 +451,9 @@ function _L:Constructor(frameIndex)
     f.widget = widget
 
     local fh = ABP_CreateFrameHandle(widget)
+    --fh:SetFrameStrata('TOOLTIP')
+    --fh:SetFrameLevel(100)
+    --fh:SetAlpha(1.0)
     fh:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')

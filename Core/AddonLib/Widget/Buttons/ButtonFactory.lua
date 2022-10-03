@@ -133,6 +133,7 @@ function L:CreateButtons(frameWidget, rowSize, colSize)
             index = index + 1
             local btnWidget = self:CreateSingleButton(frameWidget, row, col, index)
             frameWidget:AddButton(btnWidget:GetName())
+            if btnWidget:IsEmpty() then btnWidget:SetTextureAsEmpty() end
         end
     end
 end

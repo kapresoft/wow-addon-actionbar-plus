@@ -59,6 +59,8 @@ local MBU = MouseButtonUtil
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
     GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
+    --todo next add: Left click to move;
+    --  Shift + Left-Click to ReloadUI (on debug only)
     GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget.index, 1, 1, 1))
     GameTooltip:Show()
     frame:SetScript("OnLeave", function() GameTooltip:Hide() end)

@@ -46,9 +46,11 @@ function _L:invalidButtonData(o, key)
     end
     return true
 end
+
 function _L:IsEmpty()
     local conf = self:GetConfig()
-    return conf and IsEmptyStr(conf.type)
+    if not (conf and conf.type) then return true end
+    return Table.isEmpty(conf[conf.type])
 end
 
 ---#### Get Profile Button Config Data

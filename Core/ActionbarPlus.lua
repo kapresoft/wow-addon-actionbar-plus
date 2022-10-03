@@ -42,8 +42,33 @@ local function OnUpdateBindings(addon)
     if addon.barBindings then BF:UpdateKeybindText() end
 end
 
+local function OnSpellcast(frame, event, ...)
+    if 'UNIT_SPELLCAST_SENT' == event then
+        local unit, target, castGUID, spellID = ...
+        ---@type Spellcast_Event_Data
+        local eventArgs = {
+            unit = unit, target = target,
+            castGUID = castGUID, spellID = spellID }
+        if 'player' == unit then BF:Fire("OnUnitSpellcastSent", eventArgs) end
+    elseif 'CURRENT_SPELL_CAST_CHANGED' == event then
+        local isCancelled = ...
+        BF:Fire("OnCurrentSpellcastChanged", isCancelled)
+    else
+        p:log('%s: %s', event, { ... })
+    end
+end
+
+local function OnActionbarGrid(frame, event, ...)
+    if 'ACTIONBAR_SHOWGRID' == event then
+        BF:Fire('OnActionbarShowGrid')
+        return
+    end
+    BF:Fire('OnActionbarHideGrid')
+end
+
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
+    if not ('PLAYER_ENTERING_WORLD' or 'UPDATE_BINDINGS') then return end
 
     ---@type ActionbarPlus
     local addon = frame.obj
@@ -88,7 +113,7 @@ local methods = {
     ---@param self ActionbarPlus
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
         local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if IsEmptyTable(vars) then 
+        if IsEmptyTable(vars) then
             p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Variable Checker Syntax", "/cv <var-name>")
             p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Example", "/cv <profile> or /cv ABP.profile")
             return
@@ -200,10 +225,25 @@ local function CreateAddonFrame(addon)
     local E = GC.E
     ---@class ActionbarPlus_Frame
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
+
     frame:SetScript(E.OnEvent, OnAddonLoaded)
     frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
     frame:RegisterEvent(E.UPDATE_BINDINGS)
+
+    local actionbarGridFrame = CreateFrame("Frame", nil, frame)
+    actionbarGridFrame:SetScript(E.OnEvent, OnActionbarGrid)
+    actionbarGridFrame:RegisterEvent("ACTIONBAR_SHOWGRID")
+    actionbarGridFrame:RegisterEvent("ACTIONBAR_HIDEGRID")
+
+    --local spellCastFrame = CreateFrame("Frame", nil, frame)
+    --spellCastFrame:SetScript(E.OnEvent, OnSpellcast)
+    --spellCastFrame:RegisterEvent("CURRENT_SPELL_CAST_CHANGED")
+    --spellCastFrame:RegisterEvent("UNIT_SPELLCAST_SENT")
+
     addon.frame = frame
+    addon.actionbarGridFrame = actionbarGridFrame
+    addon.spellCastFrame = spellCastFrame
+
     frame.obj = addon
     return frame
 end

@@ -23,7 +23,9 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
 
+--todo next button background?
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
+--local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid")
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
 local highlightTexture = T.TEXTURE_HIGHLIGHT2
@@ -50,6 +52,7 @@ Instance Methods
 function _L:Init()
     self:SetButtonLayout()
     self:InitTextures(noIconTexture)
+    if self:IsEmpty() then self:SetTextureAsEmpty() end
 end
 
 function _L:SetButtonLayout()
@@ -185,10 +188,10 @@ function _L:InitTextures(icon)
     -- DrawLayer is 'ARTWORK' by default for icons
     btnUI:SetNormalTexture(icon)
     btnUI:GetNormalTexture():SetAlpha(1.0)
-    btnUI:GetNormalTexture():SetBlendMode('DISABLE')
+    --Blend mode "Blend" gets rid of the dark edges in buttonsd
+    btnUI:GetNormalTexture():SetBlendMode('BLEND')
 
     self:SetHighlightDefault(btnUI)
-
     btnUI:SetPushedTexture(icon)
     local tex = btnUI:GetPushedTexture()
     tex:SetAlpha(pushedTextureInUseAlpha)
@@ -219,6 +222,12 @@ function _L:ResetConfig()
     self:ResetWidgetAttributes()
 end
 
+function _L:OnStartDrag_UpdateProperties()
+    self:ResetConfig()
+    self:SetTextureAsEmpty()
+end
+
+---@deprecated Use #OnStartDrag_UpdateProperties()
 function _L:SetButtonAsEmpty()
     self:ResetConfig()
     self:SetTextureAsEmpty()
@@ -436,6 +445,10 @@ function _L:UpdateState()
     self:UpdateItemState()
     self:UpdateUsable()
     self:UpdateRangeIndicator()
+
+    --if self:IsEmpty() then
+    --    self:B():GetNormalTexture():SetAlpha(0.1)
+    --end
 end
 function _L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function _L:UpdateCooldown()
@@ -468,21 +481,56 @@ end
 
 function _L:ClearHighlight() self:B():SetHighlightTexture(nil) end
 function _L:ResetHighlight() self:SetHighlightDefault() end
-function _L:SetTextureAsEmpty() self:W():SetIcon(noIconTexture) end
+
+--todo next how to reset button to empty state?
+function _L:SetTextureAsEmpty()
+    local w = self:W()
+    w:SetIcon(noIconTexture)
+    --self:W():SetIcon(nil)
+    local b = self:B()
+    b:GetNormalTexture():SetAlpha(0)
+    self:SetHighlightEnabled(false)
+    self:HideGrid()
+end
+
+function _L:ShowGrid()
+    local w = self:W()
+    if not w:IsEmpty() then return end
+    local border = w.border
+    local level = w.dragFrame.frameLevel
+    border:SetFrameStrata("DIALOG")
+    border:SetFrameLevel(level + 10)
+    border:Show()
+end
+
+function _L:HideGrid()
+    local border = self:W().border
+    local flevel = self:W().dragFrame.frameLevel
+    border:SetFrameStrata("LOW")
+    border:SetFrameLevel(flevel)
+    border:Hide()
+end
+
+function _L:HighlightEmptyButtons()
+
+end
+
 function _L:SetCooldownTextures(icon)
     local btnUI = self:B()
     btnUI:SetNormalTexture(icon)
     btnUI:SetPushedTexture(icon)
 end
 ---Typically used when casting spells that take longer than GCD
-function _L:SetHighlightInUse()
+function _L: SetHighlightInUse()
     local hlt = self:B():GetHighlightTexture()
     --highlight texture could be nil if action_button_mouseover_glow is disabled
     if not hlt then return end
     hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
-function _L:SetHighlightDefault() self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled()) end
+function _L:SetHighlightDefault()
+    self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled())
+end
 
 function _L:RefreshHighlightEnabled()
     local profile = self:W():GetButtonData():GetProfileConfig()
@@ -494,7 +542,8 @@ function _L:SetHighlightEnabled(state)
     local btnUI = self:B()
     if state == true then
         btnUI:SetHighlightTexture(highlightTexture)
-        btnUI:GetHighlightTexture():SetDrawLayer(GC.C.HIGHLIGHT_DRAW_LAYER)
+        btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
+        btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
         btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
         return
     end
