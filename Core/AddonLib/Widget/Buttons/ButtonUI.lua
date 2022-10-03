@@ -364,15 +364,15 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
     widget:SetCallback(E.ON_MODIFIER_STATE_CHANGED, OnModifierStateChangedCallback)
 
-    -----@param w ButtonUIWidget
-    --widget:SetCallback("OnEnter", function(w)
-    --    if not GetCursorInfo() then return end
-    --    w.border:SetAlpha(1)
-    --end)
-    --widget:SetCallback("OnLeave", function(_w)
-    --    if not GetCursorInfo() then return end
-    --    _w.border:SetAlpha(0.5)
-    --end)
+    ---@param w ButtonUIWidget
+    widget:SetCallback("OnEnter", function(w)
+        if not GetCursorInfo() then return end
+        w.border:SetAlpha(1)
+    end)
+    widget:SetCallback("OnLeave", function(_w)
+        if not GetCursorInfo() then return end
+        _w.border:SetAlpha(0.5)
+    end)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -419,8 +419,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         edgeFile = "Interface\\FriendsFrame\\UI-Toast-Border",
         tile = true,
         tileEdge = true,
-        tileSize = 10,
-        edgeSize = 10,
+        tileSize = 12,
+        edgeSize = 12,
         insets = { left = 5, right = 5, top = 5, bottom = 5 },
     }
     border:SetBackdrop(backdrop)

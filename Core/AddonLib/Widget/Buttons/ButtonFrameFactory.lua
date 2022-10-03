@@ -95,6 +95,14 @@ local function OnButtonSizeChanged(frameWidget, event)
     end)
 end
 
+---@param frameWidget FrameWidget
+local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
+    p:log(20,'%s: frame #%s ', event, frameWidget:GetFrameIndex())
+    local barConf = frameWidget:GetConfig()
+    if barConf.widget.alpha < 0 then return end
+    frameWidget.frame.background:SetAlpha(barConf.widget.alpha)
+end
+
 ---Event is fired from ActionbarPlus#OnAddonLoaded
 ---@param w FrameWidget
 local function OnAddonLoaded(w)
@@ -178,6 +186,7 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
+    widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
     widget:SetCallback("OnActionbarShowGrid", OnActionbarShowGrid)
     widget:SetCallback("OnActionbarHideGrid", OnActionbarHideGrid)
@@ -426,16 +435,11 @@ function _L:Constructor(frameIndex)
     f:SetFrameStrata(frameStrata)
     --todo next if background is transparent (in settings/future), then
     --      set alpha to zero
-    local frameAlpha = 0.5
-    local transparentBackgroundInSettings = true
-    if transparentBackgroundInSettings then frameAlpha = 0 end
-    f:SetAlpha(frameAlpha)
-
     ---@class FrameWidget : WidgetBase
     local widget = {
         profile = P,
         index = frameIndex,
-        frameHandleHeight = 4,
+        frameHandleHeight = 5,
         dragHandleHeight = 0,
         padding = 2,
         frameStrata = frameStrata,
@@ -451,9 +455,6 @@ function _L:Constructor(frameIndex)
     f.widget = widget
 
     local fh = ABP_CreateFrameHandle(widget)
-    --fh:SetFrameStrata('TOOLTIP')
-    --fh:SetFrameLevel(100)
-    --fh:SetAlpha(1.0)
     fh:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')
@@ -462,6 +463,10 @@ function _L:Constructor(frameIndex)
     RegisterEvents(widget)
 
     widget:SetFrameDimensions()
+
+    local frameAlpha = widget:GetConfig().widget.alpha or 0.5
+    f.background:SetAlpha(frameAlpha)
+
 
     return widget
 end

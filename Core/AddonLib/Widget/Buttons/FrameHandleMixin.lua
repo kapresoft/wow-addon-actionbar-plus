@@ -63,12 +63,18 @@ local function ShowConfigTooltip(frame)
     --  Shift + Left-Click to ReloadUI (on debug only)
     GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget.index, 1, 1, 1))
     GameTooltip:Show()
-    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-local function OnLeave(_) GameTooltip:Hide() end
+---@param frame FrameHandleMixin
+local function OnLeave(frame)
+    --todo next: get from settings
+    frame:HideBackdrop()
+    GameTooltip:Hide()
+end
 
+---@param frame FrameHandleMixin
 local function OnEnter(frame)
+    frame:ShowBackdrop()
     ShowConfigTooltip(frame)
     C_Timer.After(3, function() GameTooltip:Hide() end)
 end
@@ -105,6 +111,19 @@ function L:Init(widget)
     self.frame = widget.frame
 end
 
+---@param f FrameHandleMixin
+local function Methods(f)
+
+    function f:ShowBackdrop()
+        self:SetBackdrop(FrameHandleBackdrop)
+        self:ApplyBackdrop()
+        self:SetBackdropColor(235/255, 152/255, 45/255, 1)
+    end
+    function f:HideBackdrop() self:ClearBackdrop() end
+
+end
+
+
 ---@return FrameHandle
 function L:Constructor()
     ---@class FrameHandle
@@ -112,17 +131,15 @@ function L:Constructor()
     self.widget.frameHandle = fh
     fh.widget = self.widget
 
-    --TODO: NEXT: Customizable backdrop in settings
     fh:RegisterForDrag(C.LeftButton, C.RightButton);
-    fh:SetBackdrop(FrameHandleBackdrop)
-    fh:ApplyBackdrop()
-    fh:SetBackdropColor(235/255, 152/255, 45/255, 1)
     fh:EnableMouse(true)
     fh:SetMovable(true)
     fh:SetResizable(true)
     fh:SetHeight(self.widget.frameHandleHeight)
     fh:SetFrameStrata(self.widget.frameStrata)
     fh:SetPoint(C.BOTTOM, self.frame, C.TOP, 0, 1)
+
+    Methods(fh)
 
     self:RegisterScripts(fh)
 

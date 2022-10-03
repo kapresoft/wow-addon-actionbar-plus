@@ -11,6 +11,7 @@ local GC, Mixin = O.GlobalConstants, O.Mixin
 local E = GC.E
 local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
 local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
+local MOUSEOVER_FRAME_MOVER_DESC = "Hide the frame mover at the top of the actionbar by default.  Mouseover to make it visible for moving the frame."
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -90,7 +91,21 @@ local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
         GetBarConfig(frameIndex).widget[key] = v or fallback
-        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction)
+        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction, frameIndex)
+        elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
+    end
+end
+
+---@param frameIndex number
+---@param key string The key value
+---@param fallback any The fallback value
+---@param eventNameOrFunction string | function | nil
+local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
+        GetBarConfig(frameIndex).widget[key] = v or fallback
+        --print('key:', key, 'val:', GetBarConfig(frameIndex).widget[key])
+        if 'string' == type(eventNameOrFunction) then BF:FireOnFrame(frameIndex, eventNameOrFunction)
         elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
     end
 end
@@ -194,6 +209,22 @@ local orderInfo = {
     ["nextOrder"] = function(self, incr)
         self.order = self.order + (incr or 1)
         return self.order
+    end
+}
+---@class ActionbarOrderInfo
+local barOrderInfo = {
+    order = 1,
+
+    ---@param self OrderInfo
+    ---@param incr number An optional increment amount
+    ["nextOrder"] = function(self, incr)
+        self.order = self.order + (incr or 1)
+        return self.order
+    end,
+    ["reset"] = function(self)
+        local lastCount = self.order + 1
+        self.order = 1
+        return lastCount
     end
 }
 
@@ -330,7 +361,7 @@ local methods = {
                     order = 1,
                     step = 5,
                     min = 0,
-                    max = 100,
+                    max = 50,
                     width = 1.2,
                     name = 'Log Level',
                     desc = 'Higher log levels generate for console logs.',
@@ -365,22 +396,40 @@ local methods = {
             order = order:nextOrder(),
             args = {
                 desc = { name = format("%s Settings", configName),
-                         type = "header", order = order:nextOrder(), },
+                         type = "header", order = barOrderInfo:nextOrder(), },
                 enabled = {
                     type = "toggle",
                     name = "Enable",
                     desc = format("Enable %s", configName),
-                    order = order:nextOrder(),
+                    order = barOrderInfo:nextOrder(),
                     width = "full",
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
+                },
+                mouseover_frame_handle = {
+                    type = "toggle",
+                    name = "Mouseover Frame Mover",
+                    desc = MOUSEOVER_FRAME_MOVER_DESC,
+                    order = barOrderInfo:nextOrder(),
+                    width = "double",
+                    get = PGetWidget(frameIndex, "mouseover_frame_handle", false),
+                    set = PSetWidget(frameIndex, "mouseover_frame_handle", false),
+                },
+                show_empty_buttons = {
+                    type = "toggle",
+                    name = "Show empty buttons",
+                    desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
+                    order = barOrderInfo:nextOrder(),
+                    width = "double",
+                    get = PGetWidget(frameIndex, "show_empty_buttons", false),
+                    set = PSetWidget(frameIndex, "show_empty_buttons", false),
                 },
                 showIndex = {
                     type = "toggle",
                     name = "Show Button Numbers",
                     desc = format("Show each button index on %s", configName),
-                    order = order:nextOrder(),
-                    width = "full",
+                    order = barOrderInfo:nextOrder(),
+                    width = "double",
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
                 },
@@ -388,15 +437,28 @@ local methods = {
                     type = "toggle",
                     name = "Show Keybind Text",
                     desc = format("Show each button keybind text on %s", configName),
-                    order = order:nextOrder(),
-                    width = "full",
+                    order = barOrderInfo:nextOrder(),
+                    width = "double",
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
                 },
                 spacer1 = { type="description", name=" ", order = order:nextOrder() },
+                alpha = {
+                    type = 'range',
+                    order = barOrderInfo:nextOrder(),
+                    isPercent = true,
+                    step = 0.01,
+                    min = 0,
+                    max = 1,
+                    width = "full",
+                    name = 'Alpha',
+                    desc = '',
+                    get = PGetWidget(frameIndex, "alpha", 1.0),
+                    set = PSetSpecificWidget(frameIndex, "alpha", 1.0, E.OnActionbarFrameAlphaUpdated),
+                },
                 button_width = {
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 20,
                     max = 100,
@@ -408,7 +470,7 @@ local methods = {
                 },
                 rows = {
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 10,
@@ -421,7 +483,7 @@ local methods = {
                 },
                 cols = {
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 40,
@@ -432,10 +494,10 @@ local methods = {
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
                 },
-                spacer2 = { type="description", name=" ", order=6 },
+                spacer2 = { type="description", name=" ", order = barOrderInfo:nextOrder() },
                 lock = {
                     type = "select", style = "radio",
-                    order = order:nextOrder(),
+                    order = barOrderInfo:reset(),
                     values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
                     name = "Lock Actionbar Frame?",
                     desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),

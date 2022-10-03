@@ -101,6 +101,7 @@ local function GlobalConstantProperties(o)
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
         OnButtonSizeChanged = 'OnButtonSizeChanged',
         OnAddonLoaded = 'OnAddonLoaded',
+        OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
