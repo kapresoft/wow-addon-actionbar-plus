@@ -74,7 +74,9 @@ local function GlobalConstantProperties(o)
         ---@type string
         TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\WHITE8X8]],
         ---@type string
-        TEXTURE_HIGHLIGHT3 = [[Interface\Buttons\ButtonHilight-Square]],
+        TEXTURE_HIGHLIGHT3A = [[Interface\Buttons\ButtonHilight-Square]],
+        ---@type string
+        TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
         ---@type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],
         ---@type string
@@ -102,6 +104,8 @@ local function GlobalConstantProperties(o)
         OnButtonSizeChanged = 'OnButtonSizeChanged',
         OnAddonLoaded = 'OnAddonLoaded',
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
+        OnActionbarShowGrid = 'OnActionbarShowGrid',
+        OnActionbarHideGrid = 'OnActionbarHideGrid',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version

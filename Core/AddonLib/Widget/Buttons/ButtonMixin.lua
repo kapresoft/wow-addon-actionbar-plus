@@ -181,14 +181,16 @@ function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
 --- - [Texture:SetTexture()](https://wowpedia.fandom.com/wiki/API_Texture_SetTexture)
 --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
----@param btnWidget ButtonUIWidget
+---@param icon string The icon texture path
 function _L:InitTextures(icon)
     local btnUI = self:B()
 
     -- DrawLayer is 'ARTWORK' by default for icons
     btnUI:SetNormalTexture(icon)
-    btnUI:GetNormalTexture():SetAlpha(1.0)
-    --Blend mode "Blend" gets rid of the dark edges in buttonsd
+    --btnUI:GetNormalTexture():SetAlpha(1.0)
+    self:SetHighlightEmptyButtonEnabled(false)
+
+    --Blend mode "Blend" gets rid of the dark edges in buttons
     btnUI:GetNormalTexture():SetBlendMode('BLEND')
 
     self:SetHighlightDefault(btnUI)
@@ -482,37 +484,23 @@ end
 function _L:ClearHighlight() self:B():SetHighlightTexture(nil) end
 function _L:ResetHighlight() self:SetHighlightDefault() end
 
---todo next how to reset button to empty state?
 function _L:SetTextureAsEmpty()
-    local w = self:W()
-    w:SetIcon(noIconTexture)
-    --self:W():SetIcon(nil)
-    local b = self:B()
-    b:GetNormalTexture():SetAlpha(0)
+    self:SetIcon(noIconTexture)
+    self:SetIconAlpha(1.0)
     self:SetHighlightEnabled(false)
-    self:HideGrid()
+    self:HideEmptyGrid()
 end
 
-function _L:ShowGrid()
-    local w = self:W()
-    if not w:IsEmpty() then return end
-    local border = w.border
-    local level = w.dragFrame.frameLevel
-    border:SetFrameStrata("DIALOG")
-    border:SetFrameLevel(level + 10)
-    border:Show()
+function _L:ShowEmptyGrid()
+    if not self:IsEmpty() then return end
+    self:SetIcon(GC.Textures.TEXTURE_HIGHLIGHT3B)
+    self:SetHighlightEmptyButtonEnabled(false)
 end
 
-function _L:HideGrid()
-    local border = self:W().border
-    local flevel = self:W().dragFrame.frameLevel
-    border:SetFrameStrata("LOW")
-    border:SetFrameLevel(flevel)
-    border:Hide()
-end
-
-function _L:HighlightEmptyButtons()
-
+function _L:HideEmptyGrid()
+    if not self:IsEmpty() then return end
+    self:SetIcon(noIconTexture)
+    self:SetHighlightEmptyButtonEnabled(true)
 end
 
 function _L:SetCooldownTextures(icon)
@@ -550,6 +538,16 @@ function _L:SetHighlightEnabled(state)
     btnUI:SetHighlightTexture(nil)
 end
 
+---This is used for mouseover when dragging a cursor
+---to highlight an empty slot
+function _L:SetHighlightEmptyButtonEnabled(state)
+    if not self:IsEmpty() then return end
+    if true == state then
+        self:SetIconAlpha(1.0)
+        return
+    end
+    self:SetIconAlpha(0.5)
+end
 
 ---@param spellID string The spellID to match
 ---@param optionalBtnConf Profile_Button
@@ -707,6 +705,8 @@ function _L:SetIcon(icon)
     self:B():SetNormalTexture(icon)
     self:B():SetPushedTexture(icon)
 end
+---@param alpha number 0.0 to 1.0
+function _L:SetIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
 
 ---@param buttonData Profile_Button
 function _L:IsValidItemProfile(buttonData)

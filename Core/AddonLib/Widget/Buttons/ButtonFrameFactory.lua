@@ -120,13 +120,13 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 local function OnActionbarShowGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
     frameWidget:ApplyForEachButtons(function(btnWidget)
-        btnWidget:ShowGrid()
+        btnWidget:ShowEmptyGrid()
     end)
 end
 local function OnActionbarHideGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
     frameWidget:ApplyForEachButtons(function(btnWidget)
-        btnWidget:HideGrid()
+        btnWidget:HideEmptyGrid()
     end)
 end
 
@@ -188,8 +188,9 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
     widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
-    widget:SetCallback("OnActionbarShowGrid", OnActionbarShowGrid)
-    widget:SetCallback("OnActionbarHideGrid", OnActionbarHideGrid)
+    widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
+    widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
+    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
     --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
 end
@@ -202,6 +203,7 @@ local function RegisterEvents(widget)
     local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
     widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
     widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
 

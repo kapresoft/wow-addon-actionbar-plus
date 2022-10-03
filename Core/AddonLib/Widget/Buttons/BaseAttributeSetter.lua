@@ -43,7 +43,7 @@ function _L:HandleGameTooltipCallbacks(btnUI)
         self:ShowTooltip(w.button)
 
         if not GetCursorInfo() then return end
-        w.border:SetAlpha(1)
+        w:SetHighlightEmptyButtonEnabled(true)
     end)
 
     ---@param w ButtonUIWidget
@@ -51,6 +51,6 @@ function _L:HandleGameTooltipCallbacks(btnUI)
         WMX:HideTooltipDelayed()
 
         if not GetCursorInfo() then return end
-        w.border:SetAlpha(0.5)
+        w:SetHighlightEmptyButtonEnabled(false)
     end)
 end
