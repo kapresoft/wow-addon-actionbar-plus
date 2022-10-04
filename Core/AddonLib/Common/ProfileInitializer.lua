@@ -70,6 +70,8 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -94,6 +96,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF2"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -104,6 +108,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF3"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -114,6 +120,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF4"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -124,6 +132,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF5"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -134,6 +144,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF6"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -144,6 +156,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF7"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
@@ -154,6 +168,8 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF8"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
             ---@type _RegionAnchor
             ["anchor"] = {
