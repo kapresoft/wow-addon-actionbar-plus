@@ -56,7 +56,7 @@ local Profile_Bar_Widget = {
     ["rowSize"] = 1,
     ["colSize"] = 1,
     ["buttonSize"] = 11,
-    ["alpha"] = 0.1,
+    ["buttonAlpha"] = 0.1,
     ["mouseover_frame_handle"] = false,
     ["show_empty_buttons"] = true
 }
@@ -73,7 +73,7 @@ local Profile_Bar = {
     -- shows the keybind text TOP
     ["show_keybind_text"] = true,
     ["widget"] = Profile_Bar_Widget,
-    ---@type Blizzard_RegionAnchor
+    ---@type _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = Profile_Button
@@ -82,7 +82,7 @@ local Profile_Bar = {
 
 ---@class Global_Profile_Bar
 local Global_Profile_Bar = {
-    ---@type Blizzard_RegionAnchor
+    ---@type _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
 }
 

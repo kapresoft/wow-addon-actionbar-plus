@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
----@type Blizzard_AnchorUtil
+---@type _AnchorUtil
 local AnchorUtil = AnchorUtil
 local GameTooltip, StaticPopup_Show, ReloadUI = GameTooltip, StaticPopup_Show, ReloadUI
 local C_Timer, IsShiftKeyDown = C_Timer, IsShiftKeyDown
@@ -55,7 +55,7 @@ function MouseButtonUtil:IsRightButton(mouseButton) return C.RightButton == mous
 function MouseButtonUtil:IsButton5(mouseButton) return C.Button5 == mouseButton end
 local MBU = MouseButtonUtil
 
----@param frame Frame
+---@param frame FrameHandleMixin
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
     GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
@@ -126,11 +126,14 @@ end
 
 ---@return FrameHandle
 function L:Constructor()
-    ---@class FrameHandle
+    ---@class FrameHandle : _Frame
     local fh = CreateFrame("Frame", nil, self.widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
     self.widget.frameHandle = fh
     fh.widget = self.widget
 
+    ---Ignore parent alpha so the handle frame doesn't get affected when we hide the
+    --- main actionbar frame
+    fh:SetIgnoreParentAlpha(true)
     fh:RegisterForDrag(C.LeftButton, C.RightButton);
     fh:EnableMouse(true)
     fh:SetMovable(true)

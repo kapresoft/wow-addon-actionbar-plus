@@ -69,7 +69,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
             },
@@ -93,7 +93,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF2"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -103,7 +103,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF3"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -113,7 +113,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF4"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -123,7 +123,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF5"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
             },
@@ -133,7 +133,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF6"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -143,7 +143,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF7"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -153,7 +153,7 @@ local DEFAULT_PROFILE_DATA = {
         ["ActionbarPlusF8"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type Blizzard_RegionAnchor
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },

@@ -11,18 +11,27 @@ local M, GC = Core.M, O.GlobalConstants
 
 local Table, Assert = O.Table, O.Assert
 
-local BAttr, WAttr = GC.ButtonAttributes, GC.WidgetAttributes
+local WAttr = GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
----@type ProfileInitializer
 local PI = O.ProfileInitializer
+local FrameDetails = PI:GetAllActionBarSizeDetails()
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
 ---@class Profile
 local P = LibStub:NewLibrary(M.Profile)
+
+-- Implicit
+-- self.adddon = ActionBarPlus
+-- self.profile = profile
+
+---@deprecated Use ProfileInitializer
+P.baseFrameName = 'ActionbarPlusF'
+
+
 ---@type LoggerTemplate
 local p = P:GetLogger()
 
@@ -60,6 +69,7 @@ local TooltipKeyName = {
     ['SHIFT'] = 'shift',
     ['HIDE'] = 'hide',
 }
+
 ---@class TooltipKey
 local TooltipKey = {
     names = TooltipKeyName,
@@ -75,23 +85,12 @@ local TooltipKey = {
     }
 }
 
-local SingleBarTemplate = {
-    enabled = false,
-    buttons = {}
-}
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 
----@see API#GetSpellinfo
-local ButtonTemplate = { ['type'] = nil, [BAttr.SPELL] = {} }
-
----- ## Start Here ----
-
-
-local function assertProfile(p)
-    assert(isTable(p), "profile is not a table")
-end
-
----@param source Blizzard_RegionAnchor
----@param dest Blizzard_RegionAnchor
+---@param source _RegionAnchor
+---@param dest _RegionAnchor
 local function CopyAnchor(source, dest)
     dest.point = source.point
     dest.relativeTo = source.relativeTo
@@ -99,20 +98,6 @@ local function CopyAnchor(source, dest)
     dest.x = source.x
     dest.y = source.y
 end
-
--- Implicit
--- self.adddon = ActionBarPlus
--- self.profile = profile
-
--- ##########################################################################
-
-local FrameDetails = PI:GetAllActionBarSizeDetails()
-
--- ##########################################################################
-
---P.maxFrames = 8
----@deprecated Use ProfileInitializer
-P.baseFrameName = 'ActionbarPlusF'
 
 ---@return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
@@ -231,7 +216,7 @@ function P:IsCharacterSpecificAnchor()
 end
 
 ---@param frameIndex number
----@return Blizzard_RegionAnchor
+---@return _RegionAnchor
 function P:GetAnchor(frameIndex)
     if self:IsCharacterSpecificAnchor() then return self:GetCharacterSpecificAnchor(frameIndex) end
     --p:log('GetAnchor| Is global anchor')
@@ -239,7 +224,7 @@ function P:GetAnchor(frameIndex)
 end
 
 ---@param frameIndex number
----@return Blizzard_RegionAnchor
+---@return _RegionAnchor
 function P:GetGlobalAnchor(frameIndex)
     ---@type Global_Profile_Bar
     local g = self:G()
@@ -254,10 +239,10 @@ function P:GetGlobalAnchor(frameIndex)
 end
 
 ---@param frameIndex number
----@return Blizzard_RegionAnchor
+---@return _RegionAnchor
 function P:GetCharacterSpecificAnchor(frameIndex) return self:GetBar(frameIndex).anchor end
 
----@param frameAnchor Blizzard_RegionAnchor
+---@param frameAnchor _RegionAnchor
 ---@param frameIndex number
 function P:SaveAnchor(frameAnchor, frameIndex)
     -- always sync the character specific settings
@@ -276,14 +261,14 @@ function P:GetGlobalBar(frameIndex)
 end
 
 --- Global
----@param frameAnchor Blizzard_RegionAnchor
+---@param frameAnchor _RegionAnchor
 ---@param frameIndex number
 function P:SaveGlobalAnchor(frameAnchor, frameIndex)
     local globalBarConf = self:GetGlobalBar(frameIndex)
     CopyAnchor(frameAnchor, globalBarConf.anchor)
 end
 
----@param frameAnchor Blizzard_RegionAnchor
+---@param frameAnchor _RegionAnchor
 ---@param frameIndex number
 function P:SaveCharacterSpecificAnchor(frameAnchor, frameIndex)
     local barProfile = self:GetBar(frameIndex)

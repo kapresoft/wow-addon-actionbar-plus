@@ -20,6 +20,8 @@ local p = O.LogFactory(Core.M.Config)
 local P
 ---@type Profile_Config_Names
 local PC
+---@type Profile_Config_Widget_Names
+local WC
 ---@type TooltipKey
 local TTK
 ---@type ButtonFactory
@@ -185,7 +187,8 @@ end
 
 local function fetchLibs()
     P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
-    PC = P:GetConfigNames()
+    PC = GC.Profile_Config_Names
+    WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
 end
 
@@ -379,7 +382,6 @@ local methods = {
         for i=1,count do
             -- barN is the config path name used for OptionDialog#OpenConfig()
             local key = 'bar' .. i
-            local barOrder = tonumber(tostring(order) .. tostring(i))
             bars[key] = self:CreateBarConfigDef(i, order)
         end
         return bars
@@ -412,8 +414,8 @@ local methods = {
                     desc = MOUSEOVER_FRAME_MOVER_DESC,
                     order = barOrderInfo:nextOrder(),
                     width = "double",
-                    get = PGetWidget(frameIndex, "mouseover_frame_handle", false),
-                    set = PSetWidget(frameIndex, "mouseover_frame_handle", false),
+                    get = PGetWidget(frameIndex, WC.mouseover_frame_handle, false),
+                    set = PSetWidget(frameIndex, WC.mouseover_frame_handle, false),
                 },
                 show_empty_buttons = {
                     type = "toggle",
@@ -421,8 +423,8 @@ local methods = {
                     desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
                     order = barOrderInfo:nextOrder(),
                     width = "double",
-                    get = PGetWidget(frameIndex, "show_empty_buttons", false),
-                    set = PSetWidget(frameIndex, "show_empty_buttons", false),
+                    get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
+                    set = PSetWidget(frameIndex, WC.show_empty_buttons, false),
                 },
                 showIndex = {
                     type = "toggle",
@@ -452,9 +454,9 @@ local methods = {
                     max = 1,
                     width = "full",
                     name = 'Alpha',
-                    desc = '',
-                    get = PGetWidget(frameIndex, "alpha", 1.0),
-                    set = PSetSpecificWidget(frameIndex, "alpha", 1.0, E.OnActionbarFrameAlphaUpdated),
+                    desc = 'Actionbar alpha',
+                    get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
+                    set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
                 },
                 button_width = {
                     type = 'range',
@@ -465,8 +467,8 @@ local methods = {
                     width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    get = PGetWidget(frameIndex, "buttonSize", 36),
-                    set = PSetWidget(frameIndex, "buttonSize", 36, E.OnButtonSizeChanged),
+                    get = PGetWidget(frameIndex, WC.buttonSize, 36),
+                    set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
                 },
                 rows = {
                     type = 'range',
@@ -517,14 +519,13 @@ New Instance
 local function NewInstance()
 
     -- profile is injected OnAfterInitialize()
-    local properties = {
-        addon = nil,
-        profile = nil
-    }
+    --local properties = {
+    --    addon = nil,
+    --    profile = nil
+    --}
 
     ---@class Config : Config_Methods
     local _L = LibStub:NewLibrary(Core.M.Config)
-    _L.mt.__index = properties
 
     Mixin:Mixin(_L, methods)
     return _L

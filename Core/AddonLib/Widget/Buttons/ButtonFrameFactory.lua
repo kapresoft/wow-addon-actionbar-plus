@@ -10,7 +10,7 @@ local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
----@type Blizzard_AnchorUtil
+---@type _AnchorUtil
 local AnchorUtil = AnchorUtil
 local C_Timer = C_Timer
 
@@ -97,10 +97,7 @@ end
 
 ---@param frameWidget FrameWidget
 local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
-    p:log(20,'%s: frame #%s ', event, frameWidget:GetFrameIndex())
-    local barConf = frameWidget:GetConfig()
-    if barConf.widget.alpha < 0 then return end
-    frameWidget.frame.background:SetAlpha(barConf.widget.alpha)
+    frameWidget:UpdateButtonAlpha()
 end
 
 ---Event is fired from ActionbarPlus#OnAddonLoaded
@@ -242,7 +239,7 @@ local function WidgetMethods(widget)
         local n = frame:GetNumPoints()
         if n <= 0 then return end
 
-        ---@type Blizzard_RegionAnchor
+        ---@type _RegionAnchor
         local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
         _F = self
         if not self.index then error('hello') end
@@ -380,6 +377,17 @@ local function WidgetMethods(widget)
         self:SetLockedState()
         self:ShowButtonIndices(self:IsShowIndex())
         self:ShowKeybindText(self:IsShowKeybindText())
+        self:UpdateButtonAlpha()
+    end
+
+    function widget:UpdateButtonAlpha()
+        local barConf = self:GetConfig()
+        local buttonAlpha = barConf.widget.buttonAlpha
+        if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
+        ---@param w ButtonUIWidget
+        self:ApplyForEachButtons(function(w)
+            w.button:SetAlpha(buttonAlpha)
+        end)
     end
 
     function widget:SetLockedState()
@@ -418,7 +426,7 @@ local function WidgetMethods(widget)
     end
 end
 
----@return Frame
+---@return _Frame
 function _L:GetFrameByIndex(frameIndex)
     local frameName = P:GetFrameNameByIndex(frameIndex)
     return _G[frameName]
@@ -430,13 +438,13 @@ end
 
 function _L:Constructor(frameIndex)
 
-    ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
-    --todo next if background is transparent (in settings/future), then
-    --      set alpha to zero
+    ---Alpha needs to be zero so that we can hide the buttons
+    f:SetAlpha(0)
+
     ---@class FrameWidget : WidgetBase
     local widget = {
         profile = P,
@@ -465,9 +473,6 @@ function _L:Constructor(frameIndex)
     RegisterEvents(widget)
 
     widget:SetFrameDimensions()
-
-    local frameAlpha = widget:GetConfig().widget.alpha or 0.5
-    f.background:SetAlpha(frameAlpha)
 
 
     return widget

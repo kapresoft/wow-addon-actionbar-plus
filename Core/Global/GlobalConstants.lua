@@ -202,7 +202,17 @@ local function GlobalConstantProperties(o)
         ['show_keybind_text'] = 'show_keybind_text',
     }
 
-    ---@class Blizzard_DrawLayer
+    ---@class Profile_Config_Widget_Names
+    local Profile_Config_Widget_Names = {
+        ['rowSize'] = 'rowSize',
+        ['colSize'] = 'colSize',
+        ['buttonSize'] = 'buttonSize',
+        ['buttonAlpha'] = 'buttonAlpha',
+        ['mouseover_frame_handle'] = 'mouseover_frame_handle',
+        ['show_empty_buttons'] = 'show_empty_buttons',
+    }
+
+    ---@class Blizzard_DrawLayer : _DrawLayer
     local DrawLayer = {
         BACKGROUND = 'BACKGROUND',
         BORDER = 'BORDER',
@@ -212,7 +222,7 @@ local function GlobalConstantProperties(o)
     }
 
     ---Also known as AlphaMode
-    ---@class Blizzard_BlendMode
+    ---@class Blizzard_BlendMode : _BlendMode
     local BlendMode = {
         DISABLE = 'DISABLE',
         BLEND = 'BLEND',
@@ -226,6 +236,7 @@ local function GlobalConstantProperties(o)
     o.E = E
     o.Default = Default
     o.Profile_Config_Names = Profile_Config_Names
+    o.Profile_Config_Widget_Names = Profile_Config_Widget_Names
     o.ButtonAttributes = ButtonAttributes
     o.UnitIDAttributes = UnitIDAttributes
     o.WidgetAttributes = WidgetAttributes

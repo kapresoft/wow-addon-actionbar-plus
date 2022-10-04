@@ -396,7 +396,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local frameName = dragFrameWidget:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
-    ---@class ButtonUI
+    ---@class ButtonUI : _Button
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
