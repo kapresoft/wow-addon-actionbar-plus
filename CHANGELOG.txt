@@ -4,6 +4,6 @@
 
 [Milestone #10.2](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/2?closed=1)
 
-- #52 Support for "flyout" spells Enhancement New feature or requestREL-NEXT Version: Retail
-- #53 Support for Pet Actions Enhancement New feature or requestREL-NEXT
-- #72 Provide options to hide buttons that are empty Enhancement New feature or requestPriority: High
+- #52 Support for "flyout" spells
+- #53 Support for Pet Actions
+- #72 Provide options to hide buttons that are empty
