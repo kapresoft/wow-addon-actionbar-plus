@@ -49,7 +49,12 @@ local ConfigNames = GC.Profile_Config_Names
 
 local xIncr = ABP_CreateIncrementer(30, 220)
 local yIncr = ABP_CreateIncrementer(-130, -90)
-
+local defaultWidget = {
+    ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35,
+    ["alpha"] = 0.5, ["show_empty_buttons"] = true,
+    ["frame_handle_mouseover"] = false,
+    ["frame_handle_alpha"] = 1.0,
+}
 ---The defaults provided here will used for the default state of the settings
 ---@type Profile_Config
 local DEFAULT_PROFILE_DATA = {
@@ -65,8 +70,10 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35, },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
             },
@@ -89,8 +96,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF2"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -99,8 +108,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF3"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -109,8 +120,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF4"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -119,8 +132,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF5"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
             },
@@ -129,8 +144,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF6"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -139,8 +156,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF7"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -149,8 +168,10 @@ local DEFAULT_PROFILE_DATA = {
         },
         ["ActionbarPlusF8"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
-            ["widget"] = { ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35 },
-            ---@type Blizzard_RegionAnchor
+            ["show_keybind_text"] = false,
+            ["show_button_index"] = false,
+            ["widget"] = Table.shallow_copy(defaultWidget),
+            ---@type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },

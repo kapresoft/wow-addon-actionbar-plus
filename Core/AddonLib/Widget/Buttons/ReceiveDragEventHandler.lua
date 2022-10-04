@@ -57,6 +57,5 @@ function L:Handle(btnUI, cursorInfo)
     if not self:CanHandle(actionType) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
-
     self:CleanupProfile(btnUI, actionType)
 end

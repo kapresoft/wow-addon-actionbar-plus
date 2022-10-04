@@ -54,6 +54,7 @@ ignore:
   - dev-sync-kapresoftlibs.sh
   - pkgmeta-kapresoftlibs.yaml
   - doc
+  - Core/Interface
   - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibStub
   - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibQTip-1.0.toc
   - Core/ExtLib/WoWAce/LibCompress/LibCompress/LibCompress.toc

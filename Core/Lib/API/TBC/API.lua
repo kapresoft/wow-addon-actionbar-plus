@@ -36,7 +36,11 @@ local p = O.LogFactory('API')
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
+--todo next: start using CursorHasSpell(),
+--CursorHasItem() - True if the cursor currently holds an item.
+--CursorHasMacro() - Returns 1 if the cursor is currently dragging a macro.
+--CursorHasMoney() -
+-- p:log('cursor-has-spell: %s', CursorHasSpell())
 ---@return CursorInfo
 function S:GetCursorInfo()
     -- actionType string spell, item, macro, mount, etc..

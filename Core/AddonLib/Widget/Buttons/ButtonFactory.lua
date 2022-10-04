@@ -91,6 +91,11 @@ function L:Fire(event, sourceEvent, ...)
     end)
 end
 
+function L:FireOnFrame(frameIndex, event, sourceEvent, ...)
+    local args = ...
+    self.FRAMES[frameIndex]:Fire(event, sourceEvent, args)
+end
+
 ---@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
 function L:ApplyForEachFrames(applyFunction)
     local frames = P:GetAllFrameNames()
@@ -133,6 +138,7 @@ function L:CreateButtons(frameWidget, rowSize, colSize)
             index = index + 1
             local btnWidget = self:CreateSingleButton(frameWidget, row, col, index)
             frameWidget:AddButton(btnWidget:GetName())
+            if btnWidget:IsEmpty() then btnWidget:SetTextureAsEmpty() end
         end
     end
 end

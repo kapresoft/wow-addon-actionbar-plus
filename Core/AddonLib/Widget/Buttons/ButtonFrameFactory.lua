@@ -10,7 +10,7 @@ local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
----@type Blizzard_AnchorUtil
+---@type _AnchorUtil
 local AnchorUtil = AnchorUtil
 local C_Timer = C_Timer
 
@@ -95,6 +95,11 @@ local function OnButtonSizeChanged(frameWidget, event)
     end)
 end
 
+---@param frameWidget FrameWidget
+local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
+    frameWidget:UpdateButtonAlpha()
+end
+
 ---Event is fired from ActionbarPlus#OnAddonLoaded
 ---@param w FrameWidget
 local function OnAddonLoaded(w)
@@ -109,13 +114,95 @@ end
 ---@param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
+---@param frameWidget FrameWidget
+local function OnActionbarShowGrid(frameWidget, e, ...)
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget)
+        btnWidget:ShowEmptyGrid()
+    end)
+end
+---@param frameWidget FrameWidget
+local function OnActionbarHideGrid(frameWidget, e, ...)
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachButtons(function(btnWidget)
+        btnWidget:HideEmptyGrid()
+    end)
+end
+---@param frameWidget FrameWidget
+local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
+
+---@param frameWidget FrameWidget
+local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
+    --p:log('f %s: called...', frameWidget.index)
+    local barConf = frameWidget:GetConfig()
+    frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
+end
+
+-----@param frameWidget FrameWidget
+--local function OnUnitSpellcastSent(frameWidget, e, ...)
+--    ---@type Spellcast_Event_Data
+--    local args = ...
+--    --p:log('F%s %s: %s', frameWidget.index, e, args)
+--    -----@param w ButtonUIWidget
+--    --frameWidget:ApplyForEachButtons(function(w)
+--    --    if w:IsEmpty() or not w:IsShown() then return end
+--    --    if w:IsMatchingSpellID(args.spellID) then
+--    --        --p:log('matches: %s', w:GetName())
+--    --        w:SetHighlightInUse()
+--    --    end
+--    --end)
+--end
+--
+-----@param frameWidget FrameWidget
+--local function OnCurrentSpellcastChanged(frameWidget, e, ...)
+--    local isCancelled = ...
+--    local visible = frameWidget.frame:IsVisible()
+--    if not (visible or isCancelled) then return end
+--
+--    --p:log('F%s %s: canclled=%s visible=%s',
+--    --        frameWidget.index, e, isCancelled, visible)
+--    ---@param w ButtonUIWidget
+--
+--    frameWidget:ApplyForEachButtons(function(w)
+--        if w:IsEmpty() or not w:IsShown() then return end
+--        w:SetHighlightDefault()
+--    end)
+--end
+--
+-----#### Non-Instant Start-Cast Handler
+-----@param widget ButtonUIWidget
+-----@param event string Event string
+--local function OnSpellCastStart(frameWidget, event, ...)
+--    if not frameWidget.frame:IsVisible() then return end
+--    local unitTarget, castGUID, spellID = ...
+--    if 'player' ~= unitTarget then return end
+--
+--    frameWidget:ApplyForEachButtons(function(w)
+--        if w:IsEmpty() or not w:IsShown() then return end
+--        --p:log('%s: %s', event, { unitTarget })
+--        local btnConf = w:GetConfig()
+--        if w:IsMatchingSpellID(spellID, btnConf) then
+--            p:log(10, 'OnSpellCastStart| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
+--            w:SetHighlightInUse()
+--        end
+--    end)
+--end
+
 local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnAddonLoaded, OnAddonLoaded)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
+    widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
+    widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
+    widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
+    widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
+    widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
+    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
+    --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
+    --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
 end
 
 ---@param widget FrameWidget
@@ -126,6 +213,8 @@ local function RegisterEvents(widget)
     local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
     widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
     widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
+    --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -163,7 +252,7 @@ local function WidgetMethods(widget)
         local n = frame:GetNumPoints()
         if n <= 0 then return end
 
-        ---@type Blizzard_RegionAnchor
+        ---@type _RegionAnchor
         local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
         _F = self
         if not self.index then error('hello') end
@@ -301,6 +390,20 @@ local function WidgetMethods(widget)
         self:SetLockedState()
         self:ShowButtonIndices(self:IsShowIndex())
         self:ShowKeybindText(self:IsShowKeybindText())
+        self:SetInitialStateOnFrameHandle()
+        self:UpdateButtonAlpha()
+    end
+
+    function widget:SetInitialStateOnFrameHandle() self.frameHandle:UpdateBackdropState() end
+
+    function widget:UpdateButtonAlpha()
+        local barConf = self:GetConfig()
+        local buttonAlpha = barConf.widget.buttonAlpha
+        if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
+        ---@param w ButtonUIWidget
+        self:ApplyForEachButtons(function(w)
+            w.button:SetAlpha(buttonAlpha)
+        end)
     end
 
     function widget:SetLockedState()
@@ -327,12 +430,21 @@ local function WidgetMethods(widget)
         local heightAdj = self.padding + self.dragHandleHeight
         local frameWidth = (widgetData.colSize * widgetData.buttonSize) + widthAdj
         frameHandle:SetWidth(frameWidth)
+        frameHandle:SetHeight(self.frameHandleHeight)
+
         f:SetWidth(frameWidth)
         f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
+
+        --TODO: Clears the backdrop
+        -- frame backdrop when button is empty state
+        --f:ClearBackdrop()
+        --f:SetBackdrop(BACKDROP_GOLD_DIALOG_32_32)
+        --f:ApplyBackdrop()
+        --f:SetAlpha(0)
     end
 end
 
----@return Frame
+---@return _Frame
 function _L:GetFrameByIndex(frameIndex)
     local frameName = P:GetFrameNameByIndex(frameIndex)
     return _G[frameName]
@@ -344,11 +456,12 @@ end
 
 function _L:Constructor(frameIndex)
 
-    ---@class Frame
     local f = self:GetFrameByIndex(frameIndex)
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
+    ---Alpha needs to be zero so that we can hide the buttons
+    f:SetAlpha(0)
 
     ---@class FrameWidget : WidgetBase
     local widget = {
@@ -360,7 +473,7 @@ function _L:Constructor(frameIndex)
         frameStrata = frameStrata,
         frameLevel = 1,
         frame = f,
-        ---@see FrameHandleMixin#Constructor()
+        ---@type FrameHandle
         frameHandle = nil,
     }
     -- Allows call to Use callbacks / RegisterEvent
@@ -369,8 +482,8 @@ function _L:Constructor(frameIndex)
     widget.frame = f
     f.widget = widget
 
-    local fh = ABP_CreateFrameHandle(widget)
-    fh:Show()
+    widget.frameHandle = ABP_CreateFrameHandle(widget)
+    widget.frameHandle:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
@@ -378,6 +491,7 @@ function _L:Constructor(frameIndex)
     RegisterEvents(widget)
 
     widget:SetFrameDimensions()
+
 
     return widget
 end

@@ -11,6 +11,7 @@ local GC, Mixin = O.GlobalConstants, O.Mixin
 local E = GC.E
 local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
 local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
+local MOUSEOVER_FRAME_MOVER_DESC = "Hide the frame mover at the top of the actionbar by default.  Mouseover to make it visible for moving the frame."
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -19,6 +20,8 @@ local p = O.LogFactory(Core.M.Config)
 local P
 ---@type Profile_Config_Names
 local PC
+---@type Profile_Config_Widget_Names
+local WC
 ---@type TooltipKey
 local TTK
 ---@type ButtonFactory
@@ -90,7 +93,21 @@ local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
         GetBarConfig(frameIndex).widget[key] = v or fallback
-        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction)
+        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction, frameIndex)
+        elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
+    end
+end
+
+---@param frameIndex number
+---@param key string The key value
+---@param fallback any The fallback value
+---@param eventNameOrFunction string | function | nil
+local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
+        GetBarConfig(frameIndex).widget[key] = v or fallback
+        --print('key:', key, 'val:', GetBarConfig(frameIndex).widget[key])
+        if 'string' == type(eventNameOrFunction) then BF:FireOnFrame(frameIndex, eventNameOrFunction)
         elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
     end
 end
@@ -170,33 +187,52 @@ end
 
 local function fetchLibs()
     P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
-    PC = P:GetConfigNames()
+    PC = GC.Profile_Config_Names
+    WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
 end
+--[[-----------------------------------------------------------------------------
+Sequence
+-------------------------------------------------------------------------------]]
+local sp = '                                                                   '
 
----@param order number
----@param optionalIncrement number
-local function nextOrder(order, optionalIncrement)
-    order = order + (optionalIncrement or 1)
-    print('new order:', order)
-    return order
+---@class SequenceMixin
+local SequenceMixin = {
+
+    ---@param self SequenceMixin
+    ---@param startingIndex number
+    ["Init"] = function(self, startingIndex)
+        self.order = startingIndex or 1
+    end,
+    ---@param self SequenceMixin
+    ["get"] = function(self) return self.order  end,
+    ---@param self SequenceMixin
+    ---@param incr number An optional increment amount
+    ["next"] = function(self, incr)
+        self.order = self.order + (incr or 1)
+        return self.order
+    end,
+    ---@param self SequenceMixin
+    ["reset"] = function(self)
+        local lastCount = self.order + 1
+        self.order = 1
+        return lastCount
+    end
+}
+
+---@param startingSequence number Optional
+---@return SequenceMixin
+local function CreateSequence(startingSequence)
+    ---@type SequenceMixin
+    return CreateAndInitFromMixin(SequenceMixin, startingSequence)
 end
+
+local mainSeq = CreateSequence()
+local barSeq = CreateSequence()
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@class OrderInfo
-local orderInfo = {
-    order = 1,
-
-    ---@param self OrderInfo
-    ---@param incr number An optional increment amount
-    ["nextOrder"] = function(self, incr)
-        self.order = self.order + (incr or 1)
-        return self.order
-    end
-}
-
 ---@class Config_Methods
 local methods = {
     ---@param self Config
@@ -214,10 +250,10 @@ local methods = {
     ['CreateConfig'] = function(self)
         local configArgs = {}
 
-        configArgs['general'] = self:CreateGeneralGroup(orderInfo)
-        configArgs['debugging'] = self:CreateDebuggingGroup(orderInfo)
+        configArgs['general'] = self:CreateGeneralGroup()
+        configArgs['debugging'] = self:CreateDebuggingGroup()
 
-        local barConfigs = self:CreateActionBarConfigs(orderInfo)
+        local barConfigs = self:CreateActionBarConfigs()
         for bName, bConf in pairs(barConfigs) do
             configArgs[bName] = bConf
         end
@@ -226,20 +262,19 @@ local methods = {
         return configArgs
     end,
     ---@param self Config
-    ---@param order OrderInfo
-    ['CreateGeneralGroup'] = function(self, order)
+    ['CreateGeneralGroup'] = function(self)
         return {
             type = "group",
             name = "General",
             desc = "General Settings",
-            order = order:nextOrder(),
+            order = mainSeq:next(),
             args = {
                 desc = { name = GeneralConfigHeader, type = "header", order = 0 },
                 -- TODO: Remove lock_actionbars; Addon now uses WOW's ActionBars / Pick Up Action Key Settings
                 lock_actionbars = {
                     hidden = true,
                     type = 'toggle',
-                    order = order:nextOrder(),
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME,
                     --desc = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.',
                     desc = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC,
@@ -250,51 +285,53 @@ local methods = {
                     type = 'toggle',
                     width = 'full',
                     confirm = ConfirmAndReload,
-                    order = order:nextOrder(),
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME,
                     desc = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC,
                     get = PGet(self, PC.character_specific_anchors, false),
                     set = PSet(self, PC.character_specific_anchors, false)
                 },
                 hide_while_taxi = {
+                    width = 'normal',
                     type = 'toggle',
-                    order = order:nextOrder(),
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
                     get = PGet(self, PC.hide_when_taxi, false),
                     set = PSet(self, PC.hide_when_taxi, false)
                 },
                 action_button_mouseover_glow = {
+                    width = 'normal',
                     type = 'toggle',
-                    order = order:nextOrder(),
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
                     desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
                     get = PGet(self, PC.action_button_mouseover_glow, false),
                     set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
                 },
                 hide_text_on_small_buttons = {
-                    type = 'toggle',
-                    order = order:nextOrder(),
                     width = 'full',
+                    type = 'toggle',
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
                     set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
                 },
                 hide_countdown_numbers = {
-                    type = 'toggle',
-                    order = order:nextOrder(),
                     width = 'full',
+                    type = 'toggle',
+                    order = mainSeq:next(),
                     name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
-                tooltip_header = { order = order:nextOrder(), type = "header", name = GeneralTooltipOptionsHeader },
+                tooltip_header = { order = mainSeq:next(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {
-                    type = 'select', style = 'dropdown',
-                    order = order:nextOrder(),
                     width = 'normal',
+                    type = 'select', style = 'dropdown',
+                    order = mainSeq:next(),
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC,
@@ -302,9 +339,9 @@ local methods = {
                     set = PSet(self, PC.tooltip_visibility_key, TTK.names.SHOW)
                 },
                 tooltip_visibility_combat_override_key = {
-                    type = 'select', style = 'dropdown',
-                    order = order:nextOrder(),
                     width = 'normal',
+                    type = 'select', style = 'dropdown',
+                    order = mainSeq:next(),
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
@@ -315,8 +352,7 @@ local methods = {
         }
     end,
     ---@param self Config
-    ---@param order OrderInfo
-    ['CreateDebuggingGroup'] = function(self, order)
+    ['CreateDebuggingGroup'] = function(self)
         return {
             type = "group",
             name = "Debugging",
@@ -330,7 +366,7 @@ local methods = {
                     order = 1,
                     step = 5,
                     min = 0,
-                    max = 100,
+                    max = 50,
                     width = 1.2,
                     name = 'Log Level',
                     desc = 'Higher log levels generate for console logs.',
@@ -341,78 +377,130 @@ local methods = {
         }
     end,
     ---@param self Config
-    ---@param order OrderInfo
-    ['CreateActionBarConfigs'] = function(self, order)
+    ['CreateActionBarConfigs'] = function(self)
         local count = P:GetBarSize()
         local bars = {}
         for i=1,count do
             -- barN is the config path name used for OptionDialog#OpenConfig()
             local key = 'bar' .. i
-            local barOrder = tonumber(tostring(order) .. tostring(i))
-            bars[key] = self:CreateBarConfigDef(i, order)
+            bars[key] = self:CreateBarConfigDef(i)
         end
         return bars
     end,
     ---@param self Config
     ---@param frameIndex number
-    ---@param order OrderInfo
-    ['CreateBarConfigDef'] = function(self, frameIndex, order)
+    ['CreateBarConfigDef'] = function(self, frameIndex)
         local configName = format('Action Bar #%s', tostring(frameIndex))
         return {
             type = 'group',
             name = configName,
             desc = format("%s Settings", configName),
-            order = order:nextOrder(),
+            order = mainSeq:next(),
             args = {
                 desc = { name = format("%s Settings", configName),
-                         type = "header", order = order:nextOrder(), },
+                         type = "header", order = barSeq:next(), },
+                --[[frameHandleOptions = {
+                    type = 'group',
+                    name = "Frame Handle",
+                    desc = "This is a frame strip located at the top used to move the actionbar around.",
+                    order = framehSeq:get(),
+                    args = {
+                        desc = { name = format("%s Frame Handle Settings", configName),
+                                 type = "header", order = framehSeq:next(), },
+                        frame_handle_mouseover = {
+                            width = "full",
+                            type = "toggle",
+                            order = framehSeq:next(),
+                            name = "Mouseover",
+                            desc = MOUSEOVER_FRAME_MOVER_DESC,
+                            get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
+                            set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
+                        },
+                        frame_handle_alpha = {
+                            width = "normal",
+                            type = 'range',
+                            order = framehSeq:next(),
+                            name = 'Alpha',
+                            desc = 'The opacity of the frame handle',
+                            isPercent = true,
+                            step = 0.01,
+                            min = 0,
+                            max = 1,
+                            get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
+                            set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
+                        },
+                    }
+                },]]
+
                 enabled = {
+                    width = "full",
                     type = "toggle",
                     name = "Enable",
                     desc = format("Enable %s", configName),
-                    order = order:nextOrder(),
-                    width = "full",
+                    order = barSeq:next(),
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
                 },
+                show_empty_buttons = {
+                    width = "normal",
+                    type = "toggle",
+                    name = "Show empty buttons",
+                    desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
+                    order = barSeq:next(),
+                    get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
+                    set = PSetWidget(frameIndex, WC.show_empty_buttons, false),
+                },
                 showIndex = {
+                    width = "normal",
                     type = "toggle",
                     name = "Show Button Numbers",
                     desc = format("Show each button index on %s", configName),
-                    order = order:nextOrder(),
-                    width = "full",
+                    order = barSeq:next(),
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
                 },
                 showKeybindText = {
+                    width = "normal",
                     type = "toggle",
                     name = "Show Keybind Text",
                     desc = format("Show each button keybind text on %s", configName),
-                    order = order:nextOrder(),
-                    width = "full",
+                    order = barSeq:next(),
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
                 },
-                spacer1 = { type="description", name=" ", order = order:nextOrder() },
-                button_width = {
+                spacer1 = { type="description", name = sp, width="full", order = barSeq:next() },
+                alpha = {
+                    width = "normal",
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barSeq:next(),
+                    isPercent = true,
+                    step = 0.01,
+                    min = 0,
+                    max = 1,
+                    name = 'Alpha',
+                    desc = 'Set the opacity of the actionbar',
+                    get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
+                    set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
+                },
+                button_width = {
+                    width = "normal",
+                    type = 'range',
+                    order = barSeq:next(),
                     step = 1,
                     min = 20,
                     max = 100,
-                    width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
-                    get = PGetWidget(frameIndex, "buttonSize", 36),
-                    set = PSetWidget(frameIndex, "buttonSize", 36, E.OnButtonSizeChanged),
+                    get = PGetWidget(frameIndex, WC.buttonSize, 36),
+                    set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
                 },
                 rows = {
+                    width = "normal",
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barSeq:next(),
                     step = 1,
                     min = 1,
                     max = 10,
-                    width = 0.8,
                     name = 'Rows',
                     desc = 'The number of rows for the buttons',
                     confirm = ConfirmAndReload,
@@ -420,28 +508,52 @@ local methods = {
                     set = GetRowSizeSetterHandler(frameIndex)
                 },
                 cols = {
+                    width = "normal",
                     type = 'range',
-                    order = order:nextOrder(),
+                    order = barSeq:next(),
                     step = 1,
                     min = 1,
                     max = 40,
-                    width = 0.8,
                     name = 'Columns',
                     desc = 'The number of columns for the buttons',
                     confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
                 },
-                spacer2 = { type="description", name=" ", order=6 },
+                spacer2 = { type="description", name=sp, width="full", order = barSeq:next() },
                 lock = {
-                    type = "select", style = "radio",
-                    order = order:nextOrder(),
+                    width = "normal",
+                    type = "select", style = "dropdown",
+                    order = barSeq:next(),
                     values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
-                    name = "Lock Actionbar Frame?",
+                    name = "Lock Actionbar?",
                     desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),
-                    width = .8,
                     get = GetLockStateGetterHandler(frameIndex),
                     set = GetLockStateSetterHandler(frameIndex)
+                },
+                spacer3 = { type="description", name=sp, width="full", order = barSeq:next() },
+                spacer4 = { type="header", name = "Frame Handle Settings", width="full", order = barSeq:next() },
+                frame_handle_mouseover = {
+                    width = "normal",
+                    type = "toggle",
+                    order = barSeq:next(),
+                    name = "Mouseover",
+                    desc = MOUSEOVER_FRAME_MOVER_DESC,
+                    get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
+                    set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
+                },
+                frame_handle_alpha = {
+                    width = "normal",
+                    type = 'range',
+                    order = barSeq:reset(),
+                    name = 'Alpha',
+                    desc = 'Set the opacity of the frame handle.',
+                    isPercent = true,
+                    step = 0.01,
+                    min = 0,
+                    max = 1,
+                    get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
+                    set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
                 }
             }
         }
@@ -455,14 +567,13 @@ New Instance
 local function NewInstance()
 
     -- profile is injected OnAfterInitialize()
-    local properties = {
-        addon = nil,
-        profile = nil
-    }
+    --local properties = {
+    --    addon = nil,
+    --    profile = nil
+    --}
 
     ---@class Config : Config_Methods
     local _L = LibStub:NewLibrary(Core.M.Config)
-    _L.mt.__index = properties
 
     Mixin:Mixin(_L, methods)
     return _L

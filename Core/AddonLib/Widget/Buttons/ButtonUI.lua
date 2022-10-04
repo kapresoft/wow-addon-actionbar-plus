@@ -83,6 +83,7 @@ end
 local function OnDragStart(btnUI)
     ---@type ButtonUIWidget
     local w = btnUI.widget
+    if w:IsEmpty() then return end
 
     if InCombatLockdown() or not WMX:IsDragKeyDown() then return end
     w:Reset()
@@ -91,7 +92,8 @@ local function OnDragStart(btnUI)
     PH:Pickup(btnUI.widget)
 
     w:SetButtonAsEmpty()
-    btnUI.widget:Fire('OnDragStart')
+    w:ShowEmptyGrid()
+    w:Fire('OnDragStart')
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
@@ -317,6 +319,17 @@ local function RegisterScripts(button)
     AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
     button:SetScript("PreClick", OnPreClick)
+    --button:SetScript("PostClick", function(btn, key, down)
+    --    p:log('buttonState: %s', btn:GetButtonState())
+    --    local spellID = btn:GetAttribute("spell")
+    --    if not spellID then return end
+    --    p:log('spell: %s', spellID)
+    --    p:log('spell-cd: %s', { GetSpellCooldown(spellID) })
+    --    local start = GetSpellCooldown(spellID)
+    --    if start == 0 then
+    --        button.widget:SetHighlightInUse()
+    --    end
+    --end)
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript(E.ON_ENTER, OnEnter)
@@ -330,6 +343,7 @@ local function RegisterCallbacks(widget)
     --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
     --SPELL_UPDATE_ICON
 
+    --TODO next Move at the frame level
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnUpdateButtonUsable, widget)
     widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
@@ -349,6 +363,16 @@ local function RegisterCallbacks(widget)
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
     widget:SetCallback(E.ON_MODIFIER_STATE_CHANGED, OnModifierStateChangedCallback)
+
+    ---@param w ButtonUIWidget
+    widget:SetCallback("OnEnter", function(w)
+        if not GetCursorInfo() then return end
+        w:SetHighlightEmptyButtonEnabled(true)
+    end)
+    widget:SetCallback("OnLeave", function(w)
+        if not GetCursorInfo() then return end
+        w:SetHighlightEmptyButtonEnabled(false)
+    end)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -372,7 +396,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local frameName = dragFrameWidget:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
-    ---@class ButtonUI
+    ---@class ButtonUI : _Button
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
@@ -438,6 +462,24 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     ApplyMixins(widget)
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
+
+    -- This is for mouseover effect
+    -----@param w ButtonUIWidget
+    --widget:SetCallback("OnEnter", function(w)
+    --    w.dragFrame.frame:SetAlpha(1.0)
+    --    w.dragFrame:ApplyForEachButtons(function(bw)
+    --        bw.button:SetAlpha(1)
+    --    end)
+    --end)
+    -----@param w ButtonUIWidget
+    --widget:SetCallback("OnLeave", function(w)
+    --    w.dragFrame.frame:SetAlpha(0)
+    --    w.dragFrame:ApplyForEachButtons(function(bw)
+    --        bw.button:SetAlpha(0.4)
+    --    end)
+    --end)
+
+
     widget:Init()
 
     return widget

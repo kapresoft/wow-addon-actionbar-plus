@@ -74,7 +74,9 @@ local function GlobalConstantProperties(o)
         ---@type string
         TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\WHITE8X8]],
         ---@type string
-        TEXTURE_HIGHLIGHT3 = [[Interface\Buttons\ButtonHilight-Square]],
+        TEXTURE_HIGHLIGHT3A = [[Interface\Buttons\ButtonHilight-Square]],
+        ---@type string
+        TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
         ---@type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],
         ---@type string
@@ -101,6 +103,11 @@ local function GlobalConstantProperties(o)
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
         OnButtonSizeChanged = 'OnButtonSizeChanged',
         OnAddonLoaded = 'OnAddonLoaded',
+        OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
+        OnActionbarShowGrid = 'OnActionbarShowGrid',
+        OnActionbarHideGrid = 'OnActionbarHideGrid',
+        OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
+        OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
@@ -197,15 +204,48 @@ local function GlobalConstantProperties(o)
         ['show_keybind_text'] = 'show_keybind_text',
     }
 
+    ---@class Profile_Config_Widget_Names
+    local Profile_Config_Widget_Names = {
+        ['rowSize'] = 'rowSize',
+        ['colSize'] = 'colSize',
+        ['buttonSize'] = 'buttonSize',
+        ['buttonAlpha'] = 'buttonAlpha',
+        ['show_empty_buttons'] = 'show_empty_buttons',
+        ['frame_handle_mouseover'] = 'frame_handle_mouseover',
+        ['frame_handle_alpha'] = 'frame_handle_alpha',
+    }
+
+    ---@class Blizzard_DrawLayer : _DrawLayer
+    local DrawLayer = {
+        BACKGROUND = 'BACKGROUND',
+        BORDER = 'BORDER',
+        ARTWORK = 'ARTWORK',
+        OVERLAY = 'OVERLAY',
+        HIGHLIGHT = 'HIGHLIGHT',
+    }
+
+    ---Also known as AlphaMode
+    ---@class Blizzard_BlendMode : _BlendMode
+    local BlendMode = {
+        DISABLE = 'DISABLE',
+        BLEND = 'BLEND',
+        ALPHAKEY = 'ALPHAKEY',
+        ADD = 'ADD',
+        MOD = 'MOD',
+    }
+
     o.Textures = Textures
     o.C = C
     o.E = E
     o.Default = Default
     o.Profile_Config_Names = Profile_Config_Names
+    o.Profile_Config_Widget_Names = Profile_Config_Widget_Names
     o.ButtonAttributes = ButtonAttributes
     o.UnitIDAttributes = UnitIDAttributes
     o.WidgetAttributes = WidgetAttributes
-
+    o.DrawLayer = DrawLayer
+    o.BlendMode = BlendMode
+    o.AlphaMode = BlendMode
 end
 
 ---@param o GlobalConstants

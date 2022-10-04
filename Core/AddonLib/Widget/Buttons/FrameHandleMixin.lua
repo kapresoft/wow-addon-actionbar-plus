@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
----@type Blizzard_AnchorUtil
+---@type _AnchorUtil
 local AnchorUtil = AnchorUtil
 local GameTooltip, StaticPopup_Show, ReloadUI = GameTooltip, StaticPopup_Show, ReloadUI
 local C_Timer, IsShiftKeyDown = C_Timer, IsShiftKeyDown
@@ -19,7 +19,6 @@ local Mixin, LSM = O.Mixin, O.AceLibFactory:A().AceLibSharedMedia
 local E = O.GlobalConstants.E
 local C = O.GlobalConstants.C
 
-
 local FrameHandleBackdrop = {
     ---@see LibSharedMedia
     bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
@@ -33,12 +32,15 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class FrameHandleMixin
 local L = LibStub:NewLibrary(Core.M.FrameHandleMixin)
+
+---@type LoggerTemplate
+local p = L:GetLogger()
+
 --Events
 L.E = {
     OnDragStop_FrameHandle = 'OnDragStop_FrameHandle'
 }
----@return LoggerTemplate
-local p = L:GetLogger()
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -55,20 +57,31 @@ function MouseButtonUtil:IsRightButton(mouseButton) return C.RightButton == mous
 function MouseButtonUtil:IsButton5(mouseButton) return C.Button5 == mouseButton end
 local MBU = MouseButtonUtil
 
----@param frame Frame
+---@param frame FrameHandleMixin
 local function ShowConfigTooltip(frame)
     local widget = frame.widget
     GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
+    --todo next add: Left click to move;
+    --  Shift + Left-Click to ReloadUI (on debug only)
     GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget.index, 1, 1, 1))
     GameTooltip:Show()
-    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
-local function OnLeave(_) GameTooltip:Hide() end
+---@param frame FrameHandleMixin
+local function OnLeave(frame)
+    GameTooltip:Hide()
 
+    if not frame:IsMouseOverEnabled() then return end
+    frame:HideBackdrop()
+end
+
+---@param frame FrameHandleMixin
 local function OnEnter(frame)
     ShowConfigTooltip(frame)
     C_Timer.After(3, function() GameTooltip:Hide() end)
+
+    if not frame:IsMouseOverEnabled() then return end
+    frame:ShowBackdrop()
 end
 
 local function OnMouseDown(frameHandle, mouseButton)
@@ -103,25 +116,58 @@ function L:Init(widget)
     self.frame = widget.frame
 end
 
+---@param f FrameHandle
+local function Methods(f)
+
+    function f:UpdateBackdropState()
+        if self:IsMouseOverEnabled() then
+            self:HideBackdrop()
+            return
+        end
+        self:ShowBackdrop()
+    end
+
+    function f:ShowBackdrop()
+        self:SetBackdrop(FrameHandleBackdrop)
+        self:ApplyBackdrop()
+        self:SetBackdropColor(235/255, 152/255, 45/255, 1)
+    end
+
+    function f:HideBackdrop()
+        self:ClearBackdrop()
+    end
+
+    function f:IsMouseOverEnabled()
+        local barConf = self.widget:GetConfig()
+        return true == barConf.widget.frame_handle_mouseover
+    end
+end
+
+
 ---@return FrameHandle
 function L:Constructor()
-    ---@class FrameHandle
+    ---@class FrameHandle : _Frame
     local fh = CreateFrame("Frame", nil, self.widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
     self.widget.frameHandle = fh
     fh.widget = self.widget
 
-    --TODO: NEXT: Customizable backdrop in settings
+    ---Ignore parent alpha so the handle frame doesn't get affected when we hide the
+    --- main actionbar frame
+    fh:SetIgnoreParentAlpha(true)
     fh:RegisterForDrag(C.LeftButton, C.RightButton);
-    fh:SetBackdrop(FrameHandleBackdrop)
-    fh:ApplyBackdrop()
-    fh:SetBackdropColor(235/255, 152/255, 45/255, 1)
     fh:EnableMouse(true)
     fh:SetMovable(true)
     fh:SetResizable(true)
-    fh:SetHeight(self.widget.frameHandleHeight)
+    --todo next: review height settings
+    --fh:SetHeight(self.widget.frameHandleHeight)
     fh:SetFrameStrata(self.widget.frameStrata)
+    --todo next: move alpha to settings
+    fh:SetAlpha(0.5)
     fh:SetPoint(C.BOTTOM, self.frame, C.TOP, 0, 1)
 
+    Methods(fh)
+
+    fh:ShowBackdrop()
     self:RegisterScripts(fh)
 
     return fh
