@@ -2,7 +2,7 @@
 ..\FrameXML\UI.xsd">
 
     <!-- External Libs -->
-    <!--@debug@--><Include file='Interface\_Interface.xml'/><!--@end-debug@-->
+    <Include file='Interface\_Interface.xml'/>
     <Include file='ExtLib\_ExtLib.xml'/>
 
     <!-- Global Lib for the Addon   -->
