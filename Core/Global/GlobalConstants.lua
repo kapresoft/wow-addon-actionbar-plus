@@ -106,6 +106,7 @@ local function GlobalConstantProperties(o)
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
+        OnMouseOverFrameHandleConfigChanged = 'OnMouseOverFrameHandleConfigChanged',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version

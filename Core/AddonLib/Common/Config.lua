@@ -203,6 +203,8 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+local sp = '                                                                   '
+
 ---@class OrderInfo
 local orderInfo = {
     order = 1,
@@ -282,7 +284,7 @@ local methods = {
                 },
                 character_specific_anchors = {
                     type = 'toggle',
-                    width = 'full',
+                    width = 'normal',
                     confirm = ConfirmAndReload,
                     order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME,
@@ -291,6 +293,7 @@ local methods = {
                     set = PSet(self, PC.character_specific_anchors, false)
                 },
                 hide_while_taxi = {
+                    width = 'normal',
                     type = 'toggle',
                     order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
@@ -299,6 +302,7 @@ local methods = {
                     set = PSet(self, PC.hide_when_taxi, false)
                 },
                 action_button_mouseover_glow = {
+                    width = 'normal',
                     type = 'toggle',
                     order = order:nextOrder(),
                     name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
@@ -307,18 +311,18 @@ local methods = {
                     set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
                 },
                 hide_text_on_small_buttons = {
+                    width = 'full',
                     type = 'toggle',
                     order = order:nextOrder(),
-                    width = 'full',
                     name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
                     set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
                 },
                 hide_countdown_numbers = {
+                    width = 'full',
                     type = 'toggle',
                     order = order:nextOrder(),
-                    width = 'full',
                     name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
                     get = PGet(self, PC.hide_countdown_numbers, false),
@@ -326,9 +330,9 @@ local methods = {
                 },
                 tooltip_header = { order = order:nextOrder(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {
+                    width = 'normal',
                     type = 'select', style = 'dropdown',
                     order = order:nextOrder(),
-                    width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC,
@@ -336,9 +340,9 @@ local methods = {
                     set = PSet(self, PC.tooltip_visibility_key, TTK.names.SHOW)
                 },
                 tooltip_visibility_combat_override_key = {
+                    width = 'normal',
                     type = 'select', style = 'dropdown',
                     order = order:nextOrder(),
-                    width = 'normal',
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
@@ -400,83 +404,83 @@ local methods = {
                 desc = { name = format("%s Settings", configName),
                          type = "header", order = barOrderInfo:nextOrder(), },
                 enabled = {
+                    width = "full",
                     type = "toggle",
                     name = "Enable",
                     desc = format("Enable %s", configName),
                     order = barOrderInfo:nextOrder(),
-                    width = "full",
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
                 },
                 mouseover_frame_handle = {
+                    width = "full",
                     type = "toggle",
                     name = "Mouseover Frame Mover",
                     desc = MOUSEOVER_FRAME_MOVER_DESC,
                     order = barOrderInfo:nextOrder(),
-                    width = "double",
                     get = PGetWidget(frameIndex, WC.mouseover_frame_handle, false),
-                    set = PSetWidget(frameIndex, WC.mouseover_frame_handle, false),
+                    set = PSetSpecificWidget(frameIndex, WC.mouseover_frame_handle, false, E.OnMouseOverFrameHandleConfigChanged),
                 },
                 show_empty_buttons = {
+                    width = "normal",
                     type = "toggle",
                     name = "Show empty buttons",
                     desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
                     order = barOrderInfo:nextOrder(),
-                    width = "double",
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
                     set = PSetWidget(frameIndex, WC.show_empty_buttons, false),
                 },
                 showIndex = {
+                    width = "normal",
                     type = "toggle",
                     name = "Show Button Numbers",
                     desc = format("Show each button index on %s", configName),
                     order = barOrderInfo:nextOrder(),
-                    width = "double",
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
                 },
                 showKeybindText = {
+                    width = "normal",
                     type = "toggle",
                     name = "Show Keybind Text",
                     desc = format("Show each button keybind text on %s", configName),
                     order = barOrderInfo:nextOrder(),
-                    width = "double",
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
                 },
-                spacer1 = { type="description", name=" ", order = order:nextOrder() },
+                spacer1 = { type="description", name = sp, width="full", order = barOrderInfo:nextOrder() },
                 alpha = {
+                    width = "normal",
                     type = 'range',
                     order = barOrderInfo:nextOrder(),
                     isPercent = true,
                     step = 0.01,
                     min = 0,
                     max = 1,
-                    width = "full",
                     name = 'Alpha',
                     desc = 'Actionbar alpha',
                     get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
                     set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
                 },
                 button_width = {
+                    width = "normal",
                     type = 'range',
                     order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 20,
                     max = 100,
-                    width = 1,
                     name = 'Size (Width & Height)',
                     desc = 'The width and height of a buttons',
                     get = PGetWidget(frameIndex, WC.buttonSize, 36),
                     set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
                 },
                 rows = {
+                    width = "normal",
                     type = 'range',
                     order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 10,
-                    width = 0.8,
                     name = 'Rows',
                     desc = 'The number of rows for the buttons',
                     confirm = ConfirmAndReload,
@@ -484,26 +488,26 @@ local methods = {
                     set = GetRowSizeSetterHandler(frameIndex)
                 },
                 cols = {
+                    width = "normal",
                     type = 'range',
                     order = barOrderInfo:nextOrder(),
                     step = 1,
                     min = 1,
                     max = 40,
-                    width = 0.8,
                     name = 'Columns',
                     desc = 'The number of columns for the buttons',
                     confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
                 },
-                spacer2 = { type="description", name=" ", order = barOrderInfo:nextOrder() },
+                spacer2 = { type="description", name=sp, width="full", order = barOrderInfo:nextOrder() },
                 lock = {
-                    type = "select", style = "radio",
+                    width = "normal",
+                    type = "select", style = "dropdown",
                     order = barOrderInfo:reset(),
                     values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
-                    name = "Lock Actionbar Frame?",
+                    name = "Lock Actionbar?",
                     desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),
-                    width = .8,
                     get = GetLockStateGetterHandler(frameIndex),
                     set = GetLockStateSetterHandler(frameIndex)
                 }

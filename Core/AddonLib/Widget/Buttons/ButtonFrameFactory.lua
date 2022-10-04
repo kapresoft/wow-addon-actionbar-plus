@@ -114,17 +114,23 @@ end
 ---@param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
+---@param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
     frameWidget:ApplyForEachButtons(function(btnWidget)
         btnWidget:ShowEmptyGrid()
     end)
 end
+---@param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
     frameWidget:ApplyForEachButtons(function(btnWidget)
         btnWidget:HideEmptyGrid()
     end)
+end
+---@param frameWidget FrameWidget
+local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...)
+    frameWidget.frameHandle:UpdateBackdropState()
 end
 
 -----@param frameWidget FrameWidget
@@ -187,6 +193,7 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
     widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
     widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
+    widget:SetCallback(E.OnMouseOverFrameHandleConfigChanged, OnMouseOverFrameHandleConfigChanged)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
     --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
@@ -377,8 +384,11 @@ local function WidgetMethods(widget)
         self:SetLockedState()
         self:ShowButtonIndices(self:IsShowIndex())
         self:ShowKeybindText(self:IsShowKeybindText())
+        self:SetInitialStateOnFrameHandle()
         self:UpdateButtonAlpha()
     end
+
+    function widget:SetInitialStateOnFrameHandle() self.frameHandle:UpdateBackdropState() end
 
     function widget:UpdateButtonAlpha()
         local barConf = self:GetConfig()
@@ -414,6 +424,8 @@ local function WidgetMethods(widget)
         local heightAdj = self.padding + self.dragHandleHeight
         local frameWidth = (widgetData.colSize * widgetData.buttonSize) + widthAdj
         frameHandle:SetWidth(frameWidth)
+        frameHandle:SetHeight(self.frameHandleHeight)
+
         f:SetWidth(frameWidth)
         f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
 
@@ -449,12 +461,13 @@ function _L:Constructor(frameIndex)
     local widget = {
         profile = P,
         index = frameIndex,
-        frameHandleHeight = 5,
+        frameHandleHeight = 4,
         dragHandleHeight = 0,
         padding = 2,
         frameStrata = frameStrata,
         frameLevel = 1,
         frame = f,
+        ---@type FrameHandleMixin
         ---@see FrameHandleMixin#Constructor()
         frameHandle = nil,
     }
