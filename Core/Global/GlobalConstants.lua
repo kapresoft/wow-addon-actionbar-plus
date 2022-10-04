@@ -106,7 +106,8 @@ local function GlobalConstantProperties(o)
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
-        OnMouseOverFrameHandleConfigChanged = 'OnMouseOverFrameHandleConfigChanged',
+        OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
+        OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
@@ -209,8 +210,9 @@ local function GlobalConstantProperties(o)
         ['colSize'] = 'colSize',
         ['buttonSize'] = 'buttonSize',
         ['buttonAlpha'] = 'buttonAlpha',
-        ['mouseover_frame_handle'] = 'mouseover_frame_handle',
         ['show_empty_buttons'] = 'show_empty_buttons',
+        ['frame_handle_mouseover'] = 'frame_handle_mouseover',
+        ['frame_handle_alpha'] = 'frame_handle_alpha',
     }
 
     ---@class Blizzard_DrawLayer : _DrawLayer

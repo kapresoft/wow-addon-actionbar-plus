@@ -139,7 +139,7 @@ local function Methods(f)
 
     function f:IsMouseOverEnabled()
         local barConf = self.widget:GetConfig()
-        return true == barConf.widget.mouseover_frame_handle
+        return true == barConf.widget.frame_handle_mouseover
     end
 end
 

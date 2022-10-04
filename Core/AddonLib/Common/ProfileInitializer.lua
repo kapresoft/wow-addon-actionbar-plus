@@ -51,7 +51,9 @@ local xIncr = ABP_CreateIncrementer(30, 220)
 local yIncr = ABP_CreateIncrementer(-130, -90)
 local defaultWidget = {
     ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35,
-    ["alpha"] = 0.5, ["mouseover_frame_handle"] = false, ["show_empty_buttons"] = true,
+    ["alpha"] = 0.5, ["show_empty_buttons"] = true,
+    ["frame_handle_mouseover"] = false,
+    ["frame_handle_alpha"] = 1.0,
 }
 ---The defaults provided here will used for the default state of the settings
 ---@type Profile_Config

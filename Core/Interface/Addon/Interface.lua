@@ -57,7 +57,8 @@ local Profile_Bar_Widget = {
     ["colSize"] = 1,
     ["buttonSize"] = 11,
     ["buttonAlpha"] = 0.1,
-    ["mouseover_frame_handle"] = false,
+    ["frame_handle_mouseover"] = false,
+    ["frame_handle_alpha"] = 1.0,
     ["show_empty_buttons"] = true
 }
 

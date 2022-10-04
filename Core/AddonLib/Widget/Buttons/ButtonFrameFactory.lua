@@ -129,8 +129,13 @@ local function OnActionbarHideGrid(frameWidget, e, ...)
     end)
 end
 ---@param frameWidget FrameWidget
-local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...)
-    frameWidget.frameHandle:UpdateBackdropState()
+local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
+
+---@param frameWidget FrameWidget
+local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
+    --p:log('f %s: called...', frameWidget.index)
+    local barConf = frameWidget:GetConfig()
+    frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
 end
 
 -----@param frameWidget FrameWidget
@@ -193,7 +198,8 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
     widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
     widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
-    widget:SetCallback(E.OnMouseOverFrameHandleConfigChanged, OnMouseOverFrameHandleConfigChanged)
+    widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
+    widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
     --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
@@ -467,8 +473,7 @@ function _L:Constructor(frameIndex)
         frameStrata = frameStrata,
         frameLevel = 1,
         frame = f,
-        ---@type FrameHandleMixin
-        ---@see FrameHandleMixin#Constructor()
+        ---@type FrameHandle
         frameHandle = nil,
     }
     -- Allows call to Use callbacks / RegisterEvent
@@ -477,8 +482,8 @@ function _L:Constructor(frameIndex)
     widget.frame = f
     f.widget = widget
 
-    local fh = ABP_CreateFrameHandle(widget)
-    fh:Show()
+    widget.frameHandle = ABP_CreateFrameHandle(widget)
+    widget.frameHandle:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
