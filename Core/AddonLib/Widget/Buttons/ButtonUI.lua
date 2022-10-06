@@ -155,19 +155,13 @@ local function OnBeforeLeave(widget)
     RegisterForClicks(widget, E.ON_LEAVE)
 end
 ---@param btn ButtonUI
-function OnEnter(btn)
+local function OnEnter(btn)
     OnBeforeEnter(btn.widget)
     ---Receiver will get a func(widget, event) {}
     btn.widget:Fire(E.ON_ENTER)
 end
 ---@param btn ButtonUI
-function OnEnter(btn)
-    OnBeforeEnter(btn.widget)
-    ---Receiver will get a func(widget, event) {}
-    btn.widget:Fire(E.ON_ENTER)
-end
----@param btn ButtonUI
-function OnLeave(btn)
+local function OnLeave(btn)
     OnBeforeLeave(btn.widget)
     ---Receiver will get a func(widget, event) {}
     btn.widget:Fire(E.ON_LEAVE)
@@ -201,6 +195,14 @@ end
 local function OnUpdateButtonUsable(widget, event)
     if not widget.button:IsShown() then return end
     widget:UpdateUsable()
+end
+
+---@param widget ButtonUIWidget
+---@param event string Event string
+local function OnSpellUpdateUsable(widget, event)
+    widget:UpdateRangeIndicator()
+
+    OnUpdateButtonUsable(widget, event)
 end
 
 ---@param widget ButtonUIWidget
@@ -280,9 +282,7 @@ end
 ---@see "UnitDocumentation.lua"
 ---@param widget ButtonUIWidget
 ---@param event string
-local function OnPlayerTargetChanged(widget, event)
-    widget:UpdateRangeIndicator()
-end
+local function OnPlayerTargetChanged(widget, event) widget:UpdateRangeIndicator() end
 
 ---@see "UnitDocumentation.lua"
 ---@param widget ButtonUIWidget
@@ -345,7 +345,7 @@ local function RegisterCallbacks(widget)
 
     --TODO next Move at the frame level
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnUpdateButtonUsable, widget)
+    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
     widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
@@ -354,11 +354,14 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-    widget:RegisterEvent(E.PLAYER_TARGET_CHANGED, OnPlayerTargetChanged, widget)
+
+    --widget:RegisterEvent(E.PLAYER_TARGET_CHANGED, OnPlayerTargetChanged, widget)
     widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
-    widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
-    widget:RegisterEvent(E.UNIT_HEALTH, OnPlayerStartedMoving, widget)
-    widget:RegisterEvent(E.COMBAT_LOG_EVENT_UNFILTERED, OnCombatLogEventUnfiltered, widget)
+    --widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
+    -- add UPDATE_MOUSEOVER_UNIT
+    --widget:RegisterEvent(E.UNIT_HEALTH, OnPlayerStartedMoving, widget)
+
+    --widget:RegisterEvent(E.COMBAT_LOG_EVENT_UNFILTERED, OnCombatLogEventUnfiltered, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)

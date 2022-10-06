@@ -22,6 +22,7 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
+local UnitId = GC.UnitId
 
 --todo next button background?
 local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
@@ -612,15 +613,18 @@ end
 
 ---@param hasTarget boolean Player has a target
 function L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
+    local show = self:W().frameIndex == 1 and (self:W().index == 1 or self:W().index == 2)
+    --if show then p:log('UpdateRangeIndicatorWithShowKeybindOn: %s', hasTarget) end
     -- if no target, do nothing and return
     local widget = self:W()
     local fs = widget.button.keybindText
     if not hasTarget then fs.widget:SetVertexColorNormal(); return end
-    if widget:IsMacro() then return end
+
     if not widget:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
     -- else if in range, color is "white"
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+    --if show then p:log('Target InRange: %s', tostring(inRange)) end
     --p:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -633,6 +637,8 @@ end
 
 ---@param hasTarget boolean Player has a target
 function L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
+    local show = self:W().frameIndex == 1 and self:W().index == 1
+    --if show then p:log('UpdateRangeIndicatorWithShowKeybindOff: %s', hasTarget) end
     -- if no target, clear text and return
     local fs = self:B().keybindText
     if not hasTarget then
@@ -641,12 +647,12 @@ function L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
         return
     end
     local widget = self:W()
-    if widget:IsMacro() then return end
 
     -- has target, set text as range indicator
     fs.widget:SetTextWithRangeIndicator()
 
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -660,9 +666,9 @@ function L:UpdateRangeIndicator()
     if not self:ContainsValidAction() then return end
     local widget = self:W()
     local configIsShowKeybindText = widget.dragFrame:IsShowKeybindText()
-    local hasTarget = GetUnitName(UNIT.TARGET) ~= null
     widget:ShowKeybindText(configIsShowKeybindText)
 
+    local hasTarget = API:IsValidActionTarget()
     if configIsShowKeybindText == true then
         return self:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
     end

@@ -234,6 +234,24 @@ local function GlobalConstantProperties(o)
         MOD = 'MOD',
     }
 
+    ---@param prefix string
+    ---@param index number
+    local function toSuffix(prefix, index) return prefix .. tostring(index) end
+
+    ---@class Blizzard_UnitId
+    local UnitId = {
+        ["target"] = "target",
+        ["player"] = "player",
+        ["vehicle"] = "vehicle",
+        ["pet"] = "pet",
+        ["none"] = "none",
+        ["focus"] = "focus",
+        ["mouseover"] = "mouseover",
+        ---@param raidIndex number
+        ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
+        ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
+    }
+
     o.Textures = Textures
     o.C = C
     o.E = E
@@ -246,6 +264,8 @@ local function GlobalConstantProperties(o)
     o.DrawLayer = DrawLayer
     o.BlendMode = BlendMode
     o.AlphaMode = BlendMode
+    ---@type Blizzard_UnitId
+    o.UnitId = UnitId
 end
 
 ---@param o GlobalConstants

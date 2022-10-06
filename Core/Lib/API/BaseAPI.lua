@@ -14,6 +14,8 @@ local C_MountJournal, C_Timer, PickupCompanion, GetCompanionInfo = C_MountJourna
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local GC = O.GlobalConstants
+local UnitId = GC.UnitId
 local String, Assert = O.String, O.Assert
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
 local MOUNT = O.GlobalConstants.WidgetAttributes.MOUNT
@@ -40,6 +42,10 @@ Support Functions
 local function IsValidMountInfo(mountInfo)
     return IsNotBlank(mountInfo.name) and IsNotNil(mountInfo.spellID) and IsNotNil(mountInfo.icon)
 end
+
+---@see Blizzard_UnitId
+function L:IsTargetFriendlyToPlayer() return UnitIsFriend(UnitId.player, UnitId.target) end
+function L:IsTargetEnemyToPlayer() return UnitIsEnemy(UnitId.player, UnitId.target) end
 
 ---@param mountName string
 ---@param mountID number
