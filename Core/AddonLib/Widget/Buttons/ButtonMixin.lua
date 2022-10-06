@@ -80,6 +80,16 @@ function L:SetButtonLayout()
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
 
+    --local index = widget.index
+    --if index == 1 then
+    --    button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
+    --end
+    --local previous = widget.dragFrame:GetName() .. 'Button' .. (index - 1)
+    --local pb = _G[previous]
+    --if pb and index > 1 then
+    --    button:SetPoint('TOPLEFT', pb, 'TOPRIGHT', 0, 0)
+    --end
+
     self:Scale(buttonSize)
 
 end
@@ -486,7 +496,7 @@ function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(GC.Textures.TEXTURE_HIGHLIGHT3B)
+    self:SetIcon(GC.Textures.TEXTURE_HIGHLIGHT3A)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
@@ -503,6 +513,9 @@ function L:SetCooldownTextures(icon)
 end
 ---Typically used when casting spells that take longer than GCD
 function L: SetHighlightInUse()
+    --todo next: action_button_mouseover_glow is different from highlight in use
+    --this feature is being masked by action_button_mouseover_glow
+    --need to highlight an action being in-use state regardless
     local hlt = self:B():GetHighlightTexture()
     --highlight texture could be nil if action_button_mouseover_glow is disabled
     if not hlt then return end
@@ -699,10 +712,37 @@ function L:IsUsableMacro(cd)
     return IsUsableSpell(spellID)
 end
 
+local function createMask(b, tex)
+    local mask = b:CreateMaskTexture()
+    local topx, topy = 3, -3
+    local botx, boty = -3, 3
+    --mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, topx, topy)
+    --mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, botx, boty)
+    --mask:SetPoint(C.CENTER, tex, C.CENTER, 1, 1)
+    mask:SetAllPoints(tex)
+
+    mask:SetTexture(GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    --mask:SetTexture([[Interface\BUTTONS\UI-EmptySlot]], C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    tex.mask = mask
+    tex:AddMaskTexture(mask)
+    return mask
+end
+
 ---@param icon string Blizzard Icon
 function L:SetIcon(icon)
     self:B():SetNormalTexture(icon)
     self:B():SetPushedTexture(icon)
+
+    --local tex = self:B():GetNormalTexture()
+    --if not tex.mask then
+    --    local mask = self:B():CreateMaskTexture()
+    --    mask:SetAlpha(1.0)
+    --    mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 1, -1)
+    --    mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -1, 1)
+    --    mask:SetTexture(GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    --    tex:AddMaskTexture(mask)
+    --    tex.mask = mask
+    --end
 end
 ---@param alpha number 0.0 to 1.0
 function L:SetIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
