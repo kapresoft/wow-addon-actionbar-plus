@@ -50,6 +50,7 @@ local function GlobalConstantProperties(o)
         BOTTOM = 'BOTTOM',
         BOTTOMLEFT = 'BOTTOMLEFT',
         BOTTOMRIGHT = 'BOTTOMRIGHT',
+        CENTER = 'CENTER',
         Button5 = 'Button5',
         CLAMPTOBLACKADDITIVE = 'CLAMPTOBLACKADDITIVE',
         CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI',
@@ -79,6 +80,9 @@ local function GlobalConstantProperties(o)
         TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
         ---@type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],
+        ---@type string
+        TEXTURE_HIGHLIGHT_BUTTON_ROUND = [[Interface\Buttons\ButtonHilight-Round]],
+        TEXTURE_HIGHLIGHT_BUTTON_OUTLINE = [[Interface\BUTTONS\UI-Button-Outline]],
         ---@type string
         TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock"),
     }

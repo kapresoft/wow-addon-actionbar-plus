@@ -191,7 +191,7 @@ function L:InitTextures(icon)
     self:SetHighlightEmptyButtonEnabled(false)
 
     --Blend mode "Blend" gets rid of the dark edges in buttons
-    btnUI:GetNormalTexture():SetBlendMode('BLEND')
+    btnUI:GetNormalTexture():SetBlendMode(GC.BlendMode.BLEND)
 
     self:SetHighlightDefault(btnUI)
     btnUI:SetPushedTexture(icon)
@@ -441,10 +441,7 @@ function L:UpdateState()
     self:UpdateItemState()
     self:UpdateUsable()
     self:UpdateRangeIndicator()
-
-    --if self:IsEmpty() then
-    --    self:B():GetNormalTexture():SetAlpha(0.1)
-    --end
+    self:SetHighlightDefault()
 end
 function L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function L:UpdateCooldown()
@@ -513,6 +510,7 @@ function L: SetHighlightInUse()
     hlt:SetAlpha(highlightTextureInUseAlpha)
 end
 function L:SetHighlightDefault()
+    if self:IsEmpty() then return end
     self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled())
 end
 
