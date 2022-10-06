@@ -442,9 +442,6 @@ local methods = {
                     set = GetFrameStateSetterHandler(frameIndex)
                 },
                 show_empty_buttons = {
-                    --todo next: for milestone 10.2
-                    ---hide for now
-                    hidden = true,
                     width = "normal",
                     type = "toggle",
                     name = "Show empty buttons",
