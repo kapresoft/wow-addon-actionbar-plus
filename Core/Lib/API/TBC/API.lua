@@ -288,6 +288,3 @@ function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID
 function S:GSC(spellID, optionalSpellName) return S:GetSpellCooldown(spellID, optionalSpellName) end
 ---@return ItemCooldown
 function S:GIC(itemId, optionalItem) return S:GetItemCooldown(itemId, optionalItem) end
-
----Extends from BaseAPI
-Mixin:Mixin(S, O.BaseAPI)

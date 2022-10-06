@@ -77,6 +77,9 @@ local function GlobalConstantProperties(o)
         ---@type string
         TEXTURE_HIGHLIGHT3A = [[Interface\Buttons\ButtonHilight-Square]],
         ---@type string
+        TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE = [[Interface\Buttons\ButtonHilight-Square]],
+        TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW = [[Interface\Buttons\checkbuttonhilight]],
+        ---@type string
         TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
         ---@type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],

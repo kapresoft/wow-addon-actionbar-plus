@@ -184,6 +184,21 @@ function L:SetHideIndexText(state)
     widget.button.indexText:Show()
 end
 
+---@param btn _Button
+---@param texture _Texture
+---@param texturePath string
+local function CreateMask(btn, texture, texturePath)
+    local mask = btn:CreateMaskTexture()
+    local topx, topy = 1, -1
+    local botx, boty = -1, 1
+    mask:SetPoint(C.TOPLEFT, texture, C.TOPLEFT, topx, topy)
+    mask:SetPoint(C.BOTTOMRIGHT, texture, C.BOTTOMRIGHT, botx, boty)
+    mask:SetTexture(texturePath, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    texture.mask = mask
+    texture:AddMaskTexture(mask)
+    return mask
+end
+
 ---@param target any
 function L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
@@ -212,6 +227,11 @@ function L:InitTextures(icon)
     mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -3, 3)
     mask:SetTexture(pushedTextureMask, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
     tex:AddMaskTexture(mask)
+
+    local hTexture = btnUI:GetHighlightTexture()
+    if hTexture and not hTexture.mask then
+        hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
+    end
 end
 
 ---@return ButtonUIWidget
@@ -496,7 +516,7 @@ function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(GC.Textures.TEXTURE_HIGHLIGHT3A)
+    self:SetIcon(GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
@@ -516,11 +536,17 @@ function L: SetHighlightInUse()
     --todo next: action_button_mouseover_glow is different from highlight in use
     --this feature is being masked by action_button_mouseover_glow
     --need to highlight an action being in-use state regardless
-    local hlt = self:B():GetHighlightTexture()
+    local btn = self:B()
+    local hltTexture = btn:GetHighlightTexture()
     --highlight texture could be nil if action_button_mouseover_glow is disabled
-    if not hlt then return end
-    hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
-    hlt:SetAlpha(highlightTextureInUseAlpha)
+    if not hltTexture then return end
+    hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
+    hltTexture:SetAlpha(highlightTextureInUseAlpha)
+
+    if hltTexture and not hltTexture.mask then
+        -- so that we can show a indicator that a spell is being casted
+        hltTexture.mask = CreateMask(btn, hltTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
+    end
 end
 function L:SetHighlightDefault()
     if self:IsEmpty() then return end
@@ -553,7 +579,7 @@ function L:SetHighlightEmptyButtonEnabled(state)
         self:SetIconAlpha(1.0)
         return
     end
-    self:SetIconAlpha(0.5)
+    self:SetIconAlpha(0.3)
 end
 
 ---@param spellID string The spellID to match
@@ -712,37 +738,17 @@ function L:IsUsableMacro(cd)
     return IsUsableSpell(spellID)
 end
 
-local function createMask(b, tex)
-    local mask = b:CreateMaskTexture()
-    local topx, topy = 3, -3
-    local botx, boty = -3, 3
-    --mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, topx, topy)
-    --mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, botx, boty)
-    --mask:SetPoint(C.CENTER, tex, C.CENTER, 1, 1)
-    mask:SetAllPoints(tex)
-
-    mask:SetTexture(GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
-    --mask:SetTexture([[Interface\BUTTONS\UI-EmptySlot]], C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
-    tex.mask = mask
-    tex:AddMaskTexture(mask)
-    return mask
-end
-
 ---@param icon string Blizzard Icon
 function L:SetIcon(icon)
-    self:B():SetNormalTexture(icon)
-    self:B():SetPushedTexture(icon)
+    local btn = self:B()
+    btn:SetNormalTexture(icon)
+    btn:SetPushedTexture(icon)
 
-    --local tex = self:B():GetNormalTexture()
-    --if not tex.mask then
-    --    local mask = self:B():CreateMaskTexture()
-    --    mask:SetAlpha(1.0)
-    --    mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 1, -1)
-    --    mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -1, 1)
-    --    mask:SetTexture(GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
-    --    tex:AddMaskTexture(mask)
-    --    tex.mask = mask
-    --end
+    local nTexture = btn:GetNormalTexture()
+    if not nTexture.mask then
+        nTexture.mask = CreateMask(btn, nTexture, GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE)
+    end
+
 end
 ---@param alpha number 0.0 to 1.0
 function L:SetIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
