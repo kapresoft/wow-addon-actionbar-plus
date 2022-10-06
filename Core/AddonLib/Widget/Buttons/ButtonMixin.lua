@@ -25,7 +25,9 @@ local UNIT = GC.UnitIDAttributes
 local UnitId = GC.UnitId
 
 --todo next button background?
-local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
+local emptyIcon = GC.Textures.TEXTURE_EMPTY
+local emptyGridIcon = GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW
+
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
 local highlightTexture = T.TEXTURE_HIGHLIGHT2
@@ -51,7 +53,7 @@ Instance Methods
 -------------------------------------------------------------------------------]]
 function L:Init()
     self:SetButtonLayout()
-    self:InitTextures(noIconTexture)
+    self:InitTextures(emptyIcon)
     if self:IsEmpty() then self:SetTextureAsEmpty() end
 end
 
@@ -212,9 +214,6 @@ function L:InitTextures(icon)
 
     -- DrawLayer is 'ARTWORK' by default for icons
     btnUI:SetNormalTexture(icon)
-    --btnUI:GetNormalTexture():SetAlpha(1.0)
-    self:SetHighlightEmptyButtonEnabled(false)
-
     --Blend mode "Blend" gets rid of the dark edges in buttons
     btnUI:GetNormalTexture():SetBlendMode(GC.BlendMode.BLEND)
 
@@ -505,24 +504,32 @@ end
 function L:ClearHighlight() self:B():SetHighlightTexture(nil) end
 function L:ResetHighlight() self:SetHighlightDefault() end
 
+---@param texture string
+function L:SetNormalTexture(texture) self:B():SetNormalTexture(texture) end
+---@param texture string
+function L:SetPushedTexture(texture) self:B():SetPushedTexture(texture) end
+---@param texture string
+function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) end
+
 function L:SetTextureAsEmpty()
-    self:SetIcon(noIconTexture)
-    self:SetHighlightEnabled(false)
-    self:SetPushedTextureDisabled()
-    self:HideEmptyGrid()
+    self:SetNormalTexture(emptyIcon)
+    self:SetPushedTexture(nil)
+    self:SetHighlightTexture(nil)
+    self:SetIconAlpha(1.0)
 end
 
 function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 
+---This is used when an action button starts dragging to highlight other drag targets (empty slots).
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW)
+    self:SetNormalTexture(emptyGridIcon)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
 function L:HideEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(noIconTexture)
+    self:SetTextureAsEmpty()
     self:SetHighlightEmptyButtonEnabled(true)
 end
 
