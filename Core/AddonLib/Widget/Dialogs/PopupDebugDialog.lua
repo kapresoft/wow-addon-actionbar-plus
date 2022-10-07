@@ -15,7 +15,7 @@ local LuaEvaluator = O.LuaEvaluator
 local L = LibStub:NewLibrary(Core.M.PopupDebugDialog)
 ---@type LoggerTemplate
 local p = L:GetLogger()
-local FRAME_NAME = 'DebugDialog'
+local FRAME_NAME = 'ABP_DebugDialog'
 local FRAME_TITLE = 'Popup Debug Dialog'
 
 ---@return PopupDebugDialogFrame

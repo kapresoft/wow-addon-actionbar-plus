@@ -354,14 +354,7 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
     widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-
-    --widget:RegisterEvent(E.PLAYER_TARGET_CHANGED, OnPlayerTargetChanged, widget)
     widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
-    --widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
-    -- add UPDATE_MOUSEOVER_UNIT
-    --widget:RegisterEvent(E.UNIT_HEALTH, OnPlayerStartedMoving, widget)
-
-    --widget:RegisterEvent(E.COMBAT_LOG_EVENT_UNFILTERED, OnCombatLogEventUnfiltered, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
