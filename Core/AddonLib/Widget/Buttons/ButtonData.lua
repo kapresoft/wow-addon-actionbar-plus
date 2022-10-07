@@ -32,6 +32,9 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param bd ButtonData
 local function methods(bd)
+
+    function bd:GetBarConfig() return self.widget.dragFrame:GetConfig() end
+
     function bd:invalidButtonData(o, key)
         if type(o) ~= 'table' then return true end
         if type(o[key]) ~= 'nil' then
@@ -79,6 +82,10 @@ local function methods(bd)
                 and IsNil(mountInfo.name)
                 and IsNil(mountInfo.spell)
                 and IsNil(mountInfo.spell.id)
+    end
+
+    function bd:IsShowEmptyButtons()
+        return true == self:GetBarConfig().widget.show_empty_buttons
     end
 
 end

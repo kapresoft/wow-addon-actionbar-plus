@@ -16,22 +16,26 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, MX = O.GlobalConstants, O.Mixin
 local AO, API = O.AceLibFactory:A(), O.API
 local LSM, String = AO.AceLibSharedMedia, O.String
+local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
+local UnitId = GC.UnitId
 
 --todo next button background?
-local noIconTexture = LSM:Fetch(LSM.MediaType.BACKGROUND, "Blizzard Dialog Background")
-local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
-
+local emptyTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty'
+local emptyGridTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid'
 local highlightTexture = T.TEXTURE_HIGHLIGHT2
 local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
+
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
+local nonEmptySlotAlpha = 1.0
+local showEmptyGridAlpha = 0.6
 local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 
 --[[-----------------------------------------------------------------------------
@@ -50,7 +54,7 @@ Instance Methods
 -------------------------------------------------------------------------------]]
 function L:Init()
     self:SetButtonLayout()
-    self:InitTextures(noIconTexture)
+    self:InitTextures(emptyTexture)
     if self:IsEmpty() then self:SetTextureAsEmpty() end
 end
 
@@ -78,6 +82,16 @@ function L:SetButtonLayout()
     button:SetFrameLevel(frameLevel)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
     button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
+
+    --local index = widget.index
+    --if index == 1 then
+    --    button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
+    --end
+    --local previous = widget.dragFrame:GetName() .. 'Button' .. (index - 1)
+    --local pb = _G[previous]
+    --if pb and index > 1 then
+    --    button:SetPoint('TOPLEFT', pb, 'TOPRIGHT', 0, 0)
+    --end
 
     self:Scale(buttonSize)
 
@@ -173,6 +187,21 @@ function L:SetHideIndexText(state)
     widget.button.indexText:Show()
 end
 
+---@param btn _Button
+---@param texture _Texture
+---@param texturePath string
+local function CreateMask(btn, texture, texturePath)
+    local mask = btn:CreateMaskTexture()
+    local topx, topy = 1, -1
+    local botx, boty = -1, 1
+    mask:SetPoint(C.TOPLEFT, texture, C.TOPLEFT, topx, topy)
+    mask:SetPoint(C.BOTTOMRIGHT, texture, C.BOTTOMRIGHT, botx, boty)
+    mask:SetTexture(texturePath, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    texture.mask = mask
+    texture:AddMaskTexture(mask)
+    return mask
+end
+
 ---@param target any
 function L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
@@ -186,21 +215,25 @@ function L:InitTextures(icon)
 
     -- DrawLayer is 'ARTWORK' by default for icons
     btnUI:SetNormalTexture(icon)
-    --btnUI:GetNormalTexture():SetAlpha(1.0)
-    self:SetHighlightEmptyButtonEnabled(false)
-
     --Blend mode "Blend" gets rid of the dark edges in buttons
-    btnUI:GetNormalTexture():SetBlendMode('BLEND')
+    btnUI:GetNormalTexture():SetBlendMode(GC.BlendMode.BLEND)
 
     self:SetHighlightDefault(btnUI)
     btnUI:SetPushedTexture(icon)
     local tex = btnUI:GetPushedTexture()
+    CreateMask(btnUI, tex, pushedTextureMask)
+
     tex:SetAlpha(pushedTextureInUseAlpha)
     local mask = btnUI:CreateMaskTexture()
     mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 3, -3)
     mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -3, 3)
     mask:SetTexture(pushedTextureMask, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
     tex:AddMaskTexture(mask)
+
+    local hTexture = btnUI:GetHighlightTexture()
+    if hTexture and not hTexture.mask then
+        hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
+    end
 end
 
 ---@return ButtonUIWidget
@@ -440,10 +473,8 @@ function L:UpdateState()
     self:UpdateItemState()
     self:UpdateUsable()
     self:UpdateRangeIndicator()
-
-    --if self:IsEmpty() then
-    --    self:B():GetNormalTexture():SetAlpha(0.1)
-    --end
+    self:SetHighlightDefault()
+    self:SetNormalIconAlphaDefault()
 end
 function L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function L:UpdateCooldown()
@@ -477,25 +508,52 @@ end
 function L:ClearHighlight() self:B():SetHighlightTexture(nil) end
 function L:ResetHighlight() self:SetHighlightDefault() end
 
+---@param texture string
+function L:SetNormalTexture(texture) self:B():SetNormalTexture(texture) end
+---@param texture string
+function L:SetPushedTexture(texture) self:B():SetPushedTexture(texture) end
+---@param texture string
+function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) end
+
 function L:SetTextureAsEmpty()
-    self:SetIcon(noIconTexture)
-    self:SetHighlightEnabled(false)
-    self:SetPushedTextureDisabled()
-    self:HideEmptyGrid()
+    self:SetNormalTexture(emptyTexture)
+    self:SetPushedTexture(nil)
+    self:SetHighlightTexture(nil)
+    self:SetNormalIconAlphaAsEmpty()
+end
+
+function L:SetNormalIconAlphaAsEmpty()
+    local alpha = showEmptyGridAlpha
+    if true ~= self:W():GetButtonData():IsShowEmptyButtons() then alpha = 0 end
+    self:SetNormalIconAlpha(alpha)
+end
+
+---@param alpha number 0.0 to 1.0
+function L:SetNormalIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
+
+function L:SetNormalIconAlphaDefault()
+    if self:IsEmpty() then
+        self:SetNormalIconAlphaAsEmpty()
+        return
+    end
+    self:SetNormalIconAlpha(nonEmptySlotAlpha)
 end
 
 function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 
+---This is used when an action button starts dragging to highlight other drag targets (empty slots).
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(GC.Textures.TEXTURE_HIGHLIGHT3B)
+    self:SetNormalTexture(emptyTexture)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
 function L:HideEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetIcon(noIconTexture)
+    self:SetTextureAsEmpty()
     self:SetHighlightEmptyButtonEnabled(true)
+    self:SetNormalTexture(emptyTexture)
+    self:SetNormalIconAlphaAsEmpty()
 end
 
 function L:SetCooldownTextures(icon)
@@ -505,13 +563,23 @@ function L:SetCooldownTextures(icon)
 end
 ---Typically used when casting spells that take longer than GCD
 function L: SetHighlightInUse()
-    local hlt = self:B():GetHighlightTexture()
+    --todo next: action_button_mouseover_glow is different from highlight in use
+    --this feature is being masked by action_button_mouseover_glow
+    --need to highlight an action being in-use state regardless
+    local btn = self:B()
+    local hltTexture = btn:GetHighlightTexture()
     --highlight texture could be nil if action_button_mouseover_glow is disabled
-    if not hlt then return end
-    hlt:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
-    hlt:SetAlpha(highlightTextureInUseAlpha)
+    if not hltTexture then return end
+    hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
+    hltTexture:SetAlpha(highlightTextureInUseAlpha)
+
+    if hltTexture and not hltTexture.mask then
+        -- so that we can show a indicator that a spell is being casted
+        hltTexture.mask = CreateMask(btn, hltTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
+    end
 end
 function L:SetHighlightDefault()
+    if self:IsEmpty() then return end
     self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled())
 end
 
@@ -538,18 +606,18 @@ end
 function L:SetHighlightEmptyButtonEnabled(state)
     if not self:IsEmpty() then return end
     if true == state then
-        self:SetIconAlpha(1.0)
+        self:SetNormalTexture(emptyGridTexture)
+        self:SetNormalIconAlpha(showEmptyGridAlpha)
         return
     end
-    self:SetIconAlpha(0.5)
+    self:SetNormalTexture(emptyTexture)
+    self:SetNormalIconAlpha(showEmptyGridAlpha)
 end
 
 ---@param spellID string The spellID to match
 ---@param optionalBtnConf Profile_Button
 ---@return boolean
 function L:IsMatchingItemSpellID(spellID, optionalBtnConf)
-    --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
-    --local profileButton = btnWidget:GetConfig()
     if not self:IsValidItemProfile(optionalBtnConf) then return end
     local _, btnItemSpellId = API:GetItemSpellInfo(optionalBtnConf.item.id)
     if spellID == btnItemSpellId then return true end
@@ -560,7 +628,6 @@ end
 ---@param optionalBtnConf Profile_Button
 ---@return boolean
 function L:IsMatchingSpellID(spellID, optionalBtnConf)
-    --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
     local buttonData = optionalBtnConf or self:GetConfig()
     local w = self:W()
     if w:IsSpell() then
@@ -612,15 +679,18 @@ end
 
 ---@param hasTarget boolean Player has a target
 function L:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
+    local show = self:W().frameIndex == 1 and (self:W().index == 1 or self:W().index == 2)
+    --if show then p:log('UpdateRangeIndicatorWithShowKeybindOn: %s', hasTarget) end
     -- if no target, do nothing and return
     local widget = self:W()
     local fs = widget.button.keybindText
     if not hasTarget then fs.widget:SetVertexColorNormal(); return end
-    if widget:IsMacro() then return end
+
     if not widget:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
     -- else if in range, color is "white"
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+    --if show then p:log('Target InRange: %s', tostring(inRange)) end
     --p:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -633,6 +703,8 @@ end
 
 ---@param hasTarget boolean Player has a target
 function L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
+    local show = self:W().frameIndex == 1 and self:W().index == 1
+    --if show then p:log('UpdateRangeIndicatorWithShowKeybindOff: %s', hasTarget) end
     -- if no target, clear text and return
     local fs = self:B().keybindText
     if not hasTarget then
@@ -641,12 +713,12 @@ function L:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
         return
     end
     local widget = self:W()
-    if widget:IsMacro() then return end
 
     -- has target, set text as range indicator
     fs.widget:SetTextWithRangeIndicator()
 
     local inRange = API:IsActionInRange(widget:GetConfig(), UNIT.TARGET)
+
     --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
     fs.widget:SetVertexColorNormal()
     if inRange == false then
@@ -660,9 +732,9 @@ function L:UpdateRangeIndicator()
     if not self:ContainsValidAction() then return end
     local widget = self:W()
     local configIsShowKeybindText = widget.dragFrame:IsShowKeybindText()
-    local hasTarget = GetUnitName(UNIT.TARGET) ~= null
     widget:ShowKeybindText(configIsShowKeybindText)
 
+    local hasTarget = API:IsValidActionTarget()
     if configIsShowKeybindText == true then
         return self:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
     end
@@ -697,11 +769,16 @@ end
 
 ---@param icon string Blizzard Icon
 function L:SetIcon(icon)
-    self:B():SetNormalTexture(icon)
-    self:B():SetPushedTexture(icon)
+    local btn = self:B()
+    btn:SetNormalTexture(icon)
+    btn:SetPushedTexture(icon)
+
+    local nTexture = btn:GetNormalTexture()
+    if not nTexture.mask then
+        nTexture.mask = CreateMask(btn, nTexture, GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE)
+    end
+
 end
----@param alpha number 0.0 to 1.0
-function L:SetIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
 
 ---@param buttonData Profile_Button
 function L:IsValidItemProfile(buttonData)

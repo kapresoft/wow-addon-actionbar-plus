@@ -50,6 +50,7 @@ local function GlobalConstantProperties(o)
         BOTTOM = 'BOTTOM',
         BOTTOMLEFT = 'BOTTOMLEFT',
         BOTTOMRIGHT = 'BOTTOMRIGHT',
+        CENTER = 'CENTER',
         Button5 = 'Button5',
         CLAMPTOBLACKADDITIVE = 'CLAMPTOBLACKADDITIVE',
         CONFIRM_RELOAD_UI = 'CONFIRM_RELOAD_UI',
@@ -76,9 +77,15 @@ local function GlobalConstantProperties(o)
         ---@type string
         TEXTURE_HIGHLIGHT3A = [[Interface\Buttons\ButtonHilight-Square]],
         ---@type string
+        TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE = [[Interface\Buttons\ButtonHilight-Square]],
+        TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW = [[Interface\Buttons\checkbuttonhilight]],
+        ---@type string
         TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
         ---@type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],
+        ---@type string
+        TEXTURE_HIGHLIGHT_BUTTON_ROUND = [[Interface\Buttons\ButtonHilight-Round]],
+        TEXTURE_HIGHLIGHT_BUTTON_OUTLINE = [[Interface\BUTTONS\UI-Button-Outline]],
         ---@type string
         TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock"),
     }
@@ -108,6 +115,7 @@ local function GlobalConstantProperties(o)
         OnActionbarHideGrid = 'OnActionbarHideGrid',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
+        OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
@@ -234,6 +242,24 @@ local function GlobalConstantProperties(o)
         MOD = 'MOD',
     }
 
+    ---@param prefix string
+    ---@param index number
+    local function toSuffix(prefix, index) return prefix .. tostring(index) end
+
+    ---@class Blizzard_UnitId
+    local UnitId = {
+        ["target"] = "target",
+        ["player"] = "player",
+        ["vehicle"] = "vehicle",
+        ["pet"] = "pet",
+        ["none"] = "none",
+        ["focus"] = "focus",
+        ["mouseover"] = "mouseover",
+        ---@param raidIndex number
+        ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
+        ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
+    }
+
     o.Textures = Textures
     o.C = C
     o.E = E
@@ -246,6 +272,8 @@ local function GlobalConstantProperties(o)
     o.DrawLayer = DrawLayer
     o.BlendMode = BlendMode
     o.AlphaMode = BlendMode
+    ---@type Blizzard_UnitId
+    o.UnitId = UnitId
 end
 
 ---@param o GlobalConstants

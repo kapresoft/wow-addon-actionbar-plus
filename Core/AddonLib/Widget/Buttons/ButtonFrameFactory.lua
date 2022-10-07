@@ -99,6 +99,10 @@ end
 local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
     frameWidget:UpdateButtonAlpha()
 end
+---@param frameWidget FrameWidget
+local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFrameIndex)
+    frameWidget:UpdateEmptyButtonsSettings()
+end
 
 ---Event is fired from ActionbarPlus#OnAddonLoaded
 ---@param w FrameWidget
@@ -194,10 +198,13 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
-    widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
+
+    widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
+    widget:SetCallback(E.OnActionbarShowEmptyButtonsUpdated, OnActionbarShowEmptyButtonsUpdated)
     widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
     widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
+
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
@@ -403,6 +410,14 @@ local function WidgetMethods(widget)
         ---@param w ButtonUIWidget
         self:ApplyForEachButtons(function(w)
             w.button:SetAlpha(buttonAlpha)
+        end)
+    end
+
+    function widget:UpdateEmptyButtonsSettings()
+        ---@param w ButtonUIWidget
+        self:ApplyForEachButtons(function(w)
+            if not w:IsEmpty() then return end
+            w:SetNormalIconAlphaAsEmpty()
         end)
     end
 

@@ -399,39 +399,6 @@ local methods = {
             args = {
                 desc = { name = format("%s Settings", configName),
                          type = "header", order = barSeq:next(), },
-                --[[frameHandleOptions = {
-                    type = 'group',
-                    name = "Frame Handle",
-                    desc = "This is a frame strip located at the top used to move the actionbar around.",
-                    order = framehSeq:get(),
-                    args = {
-                        desc = { name = format("%s Frame Handle Settings", configName),
-                                 type = "header", order = framehSeq:next(), },
-                        frame_handle_mouseover = {
-                            width = "full",
-                            type = "toggle",
-                            order = framehSeq:next(),
-                            name = "Mouseover",
-                            desc = MOUSEOVER_FRAME_MOVER_DESC,
-                            get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
-                            set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
-                        },
-                        frame_handle_alpha = {
-                            width = "normal",
-                            type = 'range',
-                            order = framehSeq:next(),
-                            name = 'Alpha',
-                            desc = 'The opacity of the frame handle',
-                            isPercent = true,
-                            step = 0.01,
-                            min = 0,
-                            max = 1,
-                            get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
-                            set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
-                        },
-                    }
-                },]]
-
                 enabled = {
                     width = "full",
                     type = "toggle",
@@ -442,16 +409,13 @@ local methods = {
                     set = GetFrameStateSetterHandler(frameIndex)
                 },
                 show_empty_buttons = {
-                    --todo next: for milestone 10.2
-                    ---hide for now
-                    hidden = true,
                     width = "normal",
                     type = "toggle",
                     name = "Show empty buttons",
                     desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
                     order = barSeq:next(),
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
-                    set = PSetWidget(frameIndex, WC.show_empty_buttons, false),
+                    set = PSetSpecificWidget(frameIndex, WC.show_empty_buttons, false, E.OnActionbarShowEmptyButtonsUpdated),
                 },
                 showIndex = {
                     width = "normal",

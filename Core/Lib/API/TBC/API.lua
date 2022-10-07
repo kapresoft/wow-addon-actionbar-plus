@@ -6,6 +6,7 @@ local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
 local C_MountJournal, GetCompanionInfo, C_ToyBox = C_MountJournal, GetCompanionInfo, C_ToyBox
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
+local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -18,7 +19,8 @@ Local Vars
 local O, Core = __K_Core:LibPack_GlobalObjects()
 local String, Mixin = O.String, O.Mixin
 local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
-local BaseAPI, WAttr = O.BaseAPI, O.GlobalConstants.WidgetAttributes
+local GC = O.GlobalConstants
+local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 --[[-----------------------------------------------------------------------------
@@ -124,25 +126,37 @@ function S:GetMountInfo(cursorInfo)
     return info
 end
 
+---@see Blizzard_UnitId
+function S:IsValidActionTarget() return self:HasTarget() and not UnitIsDead(UnitId.target) end
+function S:HasTarget() return GetUnitName(UnitId.target) ~= nil end
+
 ---Note: should call ButtonData:ContainsValidAction() before calling this
----@return boolean true, false or nil if not applicable
+---@return boolean|nil true, false or nil if not applicable; nil if spell cannot be applied to unit, i.e. targeting a harmful unit on a friendly player
 ---@param btnConfig Profile_Button
 ---@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
 function S:IsActionInRange(btnConfig, targetUnit)
     if btnConfig.type == SPELL then
-        local val = IsSpellInRange(btnConfig.spell.name, targetUnit)
-        if val == nil then return nil end
-        return val == true or val == 1
+        local inRange = IsSpellInRange(btnConfig.spell.name, targetUnit)
+        if inRange == nil then return nil end
+        return inRange == true or inRange == 1
+    elseif btnConfig.type == ITEM then
+        local inRange = IsSpellInRange(btnConfig.item.name, targetUnit)
+        if inRange == nil then return nil end
+        return inRange == true or inRange == 1
+    elseif btnConfig.type == MACRO then
+        local macroIndex = btnConfig.macro.index
+        local spell = self:GetMacroSpellInfo(macroIndex)
+        if not spell then return nil end
+        local inRange = IsSpellInRange(spell.name, targetUnit)
+        if inRange == nil then return nil end
+        return inRange == true or inRange == 1
     end
-    if btnConfig.type == ITEM then
-        local val = IsSpellInRange(btnConfig.item.name, targetUnit)
-        if val == nil then return nil end
-        return  val == true or val == 1
-    end
-    if btnConfig.type == MACRO then
-        return false
-    end
+
+    return false
 end
+
+function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, UnitId.target) ~= nil end
+
 
 --- See:
 ---  * https://wowpedia.fandom.com/wiki/API_GetSpellInfo
@@ -180,6 +194,14 @@ function S:GetSpellInfo(spellNameOrId)
         return spellInfo;
     end
     return nil
+end
+---@param macroIndex number
+---@return SpellInfo
+function S:GetMacroSpellInfo(macroIndex)
+    --local macroIndex = btnConfig.macro.index
+    local spellId = GetMacroSpell(macroIndex)
+    if not spellId then return nil end
+    return self:GetSpellInfo(spellId)
 end
 
 ---@return SpellCooldownDetails
