@@ -115,6 +115,7 @@ local function GlobalConstantProperties(o)
         OnActionbarHideGrid = 'OnActionbarHideGrid',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
+        OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
 
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version

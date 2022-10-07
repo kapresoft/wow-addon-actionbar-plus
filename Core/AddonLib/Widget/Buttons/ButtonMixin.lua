@@ -34,8 +34,8 @@ local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
-local emptyTextureAlpha = 0.6
-local emptyTextureMouseoverAlpha = 0.4
+local nonEmptySlotAlpha = 1.0
+local showEmptyGridAlpha = 0.6
 local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 
 --[[-----------------------------------------------------------------------------
@@ -474,6 +474,7 @@ function L:UpdateState()
     self:UpdateUsable()
     self:UpdateRangeIndicator()
     self:SetHighlightDefault()
+    self:SetNormalIconAlphaDefault()
 end
 function L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function L:UpdateCooldown()
@@ -518,7 +519,24 @@ function L:SetTextureAsEmpty()
     self:SetNormalTexture(emptyTexture)
     self:SetPushedTexture(nil)
     self:SetHighlightTexture(nil)
-    self:SetIconAlpha(emptyTextureAlpha)
+    self:SetNormalIconAlphaAsEmpty()
+end
+
+function L:SetNormalIconAlphaAsEmpty()
+    local alpha = showEmptyGridAlpha
+    if true ~= self:W():GetButtonData():IsShowEmptyButtons() then alpha = 0 end
+    self:SetNormalIconAlpha(alpha)
+end
+
+---@param alpha number 0.0 to 1.0
+function L:SetNormalIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
+
+function L:SetNormalIconAlphaDefault()
+    if self:IsEmpty() then
+        self:SetNormalIconAlphaAsEmpty()
+        return
+    end
+    self:SetNormalIconAlpha(nonEmptySlotAlpha)
 end
 
 function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
@@ -526,7 +544,7 @@ function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 ---This is used when an action button starts dragging to highlight other drag targets (empty slots).
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetNormalTexture(emptyGridTexture)
+    self:SetNormalTexture(emptyTexture)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
@@ -534,6 +552,8 @@ function L:HideEmptyGrid()
     if not self:IsEmpty() then return end
     self:SetTextureAsEmpty()
     self:SetHighlightEmptyButtonEnabled(true)
+    self:SetNormalTexture(emptyTexture)
+    self:SetNormalIconAlphaAsEmpty()
 end
 
 function L:SetCooldownTextures(icon)
@@ -586,10 +606,12 @@ end
 function L:SetHighlightEmptyButtonEnabled(state)
     if not self:IsEmpty() then return end
     if true == state then
-        self:SetIconAlpha(emptyTextureAlpha)
+        self:SetNormalTexture(emptyGridTexture)
+        self:SetNormalIconAlpha(showEmptyGridAlpha)
         return
     end
-    self:SetIconAlpha(emptyTextureMouseoverAlpha)
+    self:SetNormalTexture(emptyTexture)
+    self:SetNormalIconAlpha(showEmptyGridAlpha)
 end
 
 ---@param spellID string The spellID to match
@@ -757,8 +779,6 @@ function L:SetIcon(icon)
     end
 
 end
----@param alpha number 0.0 to 1.0
-function L:SetIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
 
 ---@param buttonData Profile_Button
 function L:IsValidItemProfile(buttonData)
