@@ -16,6 +16,7 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, MX = O.GlobalConstants, O.Mixin
 local AO, API = O.AceLibFactory:A(), O.API
 local LSM, String = AO.AceLibSharedMedia, O.String
+local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
@@ -25,16 +26,16 @@ local UNIT = GC.UnitIDAttributes
 local UnitId = GC.UnitId
 
 --todo next button background?
-local emptyIcon = GC.Textures.TEXTURE_EMPTY
-local emptyGridIcon = GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW
-
-local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
-
+local emptyTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty'
+local emptyGridTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid'
 local highlightTexture = T.TEXTURE_HIGHLIGHT2
 local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
+
 local highlightTextureAlpha = 0.2
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
+local emptyTextureAlpha = 0.6
+local emptyTextureMouseoverAlpha = 0.4
 local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 
 --[[-----------------------------------------------------------------------------
@@ -53,7 +54,7 @@ Instance Methods
 -------------------------------------------------------------------------------]]
 function L:Init()
     self:SetButtonLayout()
-    self:InitTextures(emptyIcon)
+    self:InitTextures(emptyTexture)
     if self:IsEmpty() then self:SetTextureAsEmpty() end
 end
 
@@ -220,6 +221,8 @@ function L:InitTextures(icon)
     self:SetHighlightDefault(btnUI)
     btnUI:SetPushedTexture(icon)
     local tex = btnUI:GetPushedTexture()
+    CreateMask(btnUI, tex, pushedTextureMask)
+
     tex:SetAlpha(pushedTextureInUseAlpha)
     local mask = btnUI:CreateMaskTexture()
     mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 3, -3)
@@ -512,10 +515,10 @@ function L:SetPushedTexture(texture) self:B():SetPushedTexture(texture) end
 function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) end
 
 function L:SetTextureAsEmpty()
-    self:SetNormalTexture(emptyIcon)
+    self:SetNormalTexture(emptyTexture)
     self:SetPushedTexture(nil)
     self:SetHighlightTexture(nil)
-    self:SetIconAlpha(1.0)
+    self:SetIconAlpha(emptyTextureAlpha)
 end
 
 function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
@@ -523,7 +526,7 @@ function L:SetPushedTextureDisabled() self:B():SetPushedTexture(nil) end
 ---This is used when an action button starts dragging to highlight other drag targets (empty slots).
 function L:ShowEmptyGrid()
     if not self:IsEmpty() then return end
-    self:SetNormalTexture(emptyGridIcon)
+    self:SetNormalTexture(emptyGridTexture)
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
@@ -583,18 +586,16 @@ end
 function L:SetHighlightEmptyButtonEnabled(state)
     if not self:IsEmpty() then return end
     if true == state then
-        self:SetIconAlpha(1.0)
+        self:SetIconAlpha(emptyTextureAlpha)
         return
     end
-    self:SetIconAlpha(0.3)
+    self:SetIconAlpha(emptyTextureMouseoverAlpha)
 end
 
 ---@param spellID string The spellID to match
 ---@param optionalBtnConf Profile_Button
 ---@return boolean
 function L:IsMatchingItemSpellID(spellID, optionalBtnConf)
-    --return WU:IsMatchingItemSpellID(spellID, optionalProfileButton or self:GetConfig())
-    --local profileButton = btnWidget:GetConfig()
     if not self:IsValidItemProfile(optionalBtnConf) then return end
     local _, btnItemSpellId = API:GetItemSpellInfo(optionalBtnConf.item.id)
     if spellID == btnItemSpellId then return true end
@@ -605,7 +606,6 @@ end
 ---@param optionalBtnConf Profile_Button
 ---@return boolean
 function L:IsMatchingSpellID(spellID, optionalBtnConf)
-    --return WU:IsMatchingSpellID(spellID, optionalProfileButton or self:GetConfig())
     local buttonData = optionalBtnConf or self:GetConfig()
     local w = self:W()
     if w:IsSpell() then
