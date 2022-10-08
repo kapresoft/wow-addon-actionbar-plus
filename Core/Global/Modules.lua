@@ -17,6 +17,7 @@ local M = {
     Table = 'Table',
     String = 'String',
     LuaEvaluator = 'LuaEvaluator',
+    ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
     ActionType = 'ActionType',
     Assert = 'Assert',
     AceLibFactory = 'AceLibFactory',
@@ -63,6 +64,8 @@ local GlobalObjectsTemplate = {
     API = {},
     ---@type AceLibFactory
     AceLibFactory = {},
+    ---@type ActionbarPlusEventMixin
+    ActionbarPlusEventMixin = {},
     ---@type ActionType
     ActionType = {},
     ---@type Assert

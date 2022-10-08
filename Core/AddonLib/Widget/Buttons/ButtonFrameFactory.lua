@@ -142,55 +142,16 @@ local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
     frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
 end
 
------@param frameWidget FrameWidget
---local function OnUnitSpellcastSent(frameWidget, e, ...)
---    ---@type Spellcast_Event_Data
---    local args = ...
---    --p:log('F%s %s: %s', frameWidget.index, e, args)
---    -----@param w ButtonUIWidget
---    --frameWidget:ApplyForEachButtons(function(w)
---    --    if w:IsEmpty() or not w:IsShown() then return end
---    --    if w:IsMatchingSpellID(args.spellID) then
---    --        --p:log('matches: %s', w:GetName())
---    --        w:SetHighlightInUse()
---    --    end
---    --end)
---end
---
------@param frameWidget FrameWidget
---local function OnCurrentSpellcastChanged(frameWidget, e, ...)
---    local isCancelled = ...
---    local visible = frameWidget.frame:IsVisible()
---    if not (visible or isCancelled) then return end
---
---    --p:log('F%s %s: canclled=%s visible=%s',
---    --        frameWidget.index, e, isCancelled, visible)
---    ---@param w ButtonUIWidget
---
---    frameWidget:ApplyForEachButtons(function(w)
---        if w:IsEmpty() or not w:IsShown() then return end
---        w:SetHighlightDefault()
---    end)
---end
---
------#### Non-Instant Start-Cast Handler
------@param widget ButtonUIWidget
------@param event string Event string
---local function OnSpellCastStart(frameWidget, event, ...)
---    if not frameWidget.frame:IsVisible() then return end
---    local unitTarget, castGUID, spellID = ...
---    if 'player' ~= unitTarget then return end
---
---    frameWidget:ApplyForEachButtons(function(w)
---        if w:IsEmpty() or not w:IsShown() then return end
---        --p:log('%s: %s', event, { unitTarget })
---        local btnConf = w:GetConfig()
---        if w:IsMatchingSpellID(spellID, btnConf) then
---            p:log(10, 'OnSpellCastStart| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
---            w:SetHighlightInUse()
---        end
---    end)
---end
+---@param frameWidget FrameWidget
+local function OnPetBattleStart(frameWidget, e, ...)
+    C_Timer.After(3, function() frameWidget:HideGroup() end)
+
+end
+---@param frameWidget FrameWidget
+local function OnPetBattleEnd(frameWidget, e, ...)
+    if  true ~= P:IsBarEnabled(frameWidget.index) then return end
+    C_Timer.After(2, function() frameWidget:ShowGroup()  end)
+end
 
 local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnAddonLoaded, OnAddonLoaded)
@@ -207,6 +168,8 @@ local function RegisterCallbacks(widget)
 
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
+    widget:SetCallback(E.OnPetBattleStart, OnPetBattleStart)
+    widget:SetCallback(E.OnPetBattleEnd, OnPetBattleEnd)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
     --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
@@ -223,6 +186,23 @@ local function RegisterEvents(widget)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
+
+-----@param frame _Frame
+-----@param event string
+--local function OnEvent(frame, event, ...)
+--    local BF = O.ButtonFactory
+--    p:log('[%s]: %s', event, {...})
+--    ---@param frameWidget FrameWidget
+--    BF:ApplyForEachFrames(function(frameWidget)
+--        p:log('hiding group: %s', frameWidget.index)
+--        frameWidget:HideGroup()
+--        --C_Timer.After(1, function()
+--        --    print('hiding group')
+--        --    frameWidget:HideGroup()
+--        --end)
+--    end)
+--end
+
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -471,6 +451,7 @@ end
 
 function _L:Constructor(frameIndex)
 
+    ---@class ActionbarFrame : _Frame
     local f = self:GetFrameByIndex(frameIndex)
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'

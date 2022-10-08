@@ -5,6 +5,8 @@
     <Script file="WidgetMixin.lua"/>
 
     <Script file="MacroEventsHandler.lua"/>
+    <Script file="ActionbarPlusEventMixin.lua"/>
+
     <Include file="Buttons\_Buttons.xml"/>
     <Include file="Dialogs\_Dialogs.xml"/>
 

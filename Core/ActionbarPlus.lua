@@ -37,49 +37,16 @@ local p = LogFactory()
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
-local function OnUpdateBindings(addon)
-    addon.barBindings = WMX:GetBarBindingsMap()
-    if addon.barBindings then BF:UpdateKeybindText() end
-end
-
-local function OnSpellcast(frame, event, ...)
-    if 'UNIT_SPELLCAST_SENT' == event then
-        local unit, target, castGUID, spellID = ...
-        ---@type Spellcast_Event_Data
-        local eventArgs = {
-            unit = unit, target = target,
-            castGUID = castGUID, spellID = spellID }
-        if 'player' == unit then BF:Fire("OnUnitSpellcastSent", eventArgs) end
-    elseif 'CURRENT_SPELL_CAST_CHANGED' == event then
-        local isCancelled = ...
-        BF:Fire("OnCurrentSpellcastChanged", isCancelled)
-    else
-        p:log('%s: %s', event, { ... })
-    end
-end
-
-local function OnActionbarGrid(frame, event, ...)
-    if 'ACTIONBAR_SHOWGRID' == event then
-        BF:Fire('OnActionbarShowGrid')
-        return
-    end
-    BF:Fire('OnActionbarHideGrid')
-end
-
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
-    if not ('PLAYER_ENTERING_WORLD' or 'UPDATE_BINDINGS') then return end
+    if not ('PLAYER_ENTERING_WORLD') then return end
 
     ---@type ActionbarPlus
     local addon = frame.obj
-    if event == GC.E.UPDATE_BINDINGS then return OnUpdateBindings(addon) end
-
     addon:OnAddonLoadedModules()
 
-    --p:log(10, 'IsLogin: %s IsReload: %s', isLogin, isReload)
     if UnitOnTaxi('player') == true then
         local hideWhenTaxi = WMX:IsHideWhenTaxi()
-        --p:log(10, 'Hide-When-Taxi: %s', hideWhenTaxi)
         WMX:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
     end
 
@@ -88,7 +55,6 @@ local function OnAddonLoaded(frame, event, ...)
     --@debug@
     isLogin = true
     --@end-debug@
-
 
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
@@ -210,8 +176,9 @@ local methods = {
         local options = C:GetOptions()
         -- Register options table and slash command
         AceConfig:RegisterOptionsTable(ADDON_NAME, options, { "abp_options" })
-        --cfgDialog:SetDefaultSize(ADDON_NAME, 800, 500)
         AceConfigDialog:AddToBlizOptions(ADDON_NAME, ADDON_NAME)
+        -- Use this to set the default size
+        --AceConfigDialog:SetDefaultSize(ADDON_NAME, 800, 500)
 
         -- Get the option table for profiles
         options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
@@ -220,29 +187,20 @@ local methods = {
 }
 
 ---@return ActionbarPlus_Frame
----@param addon ActionbarPlus
+---@param addon ActionbarPlus|ActionbarPlusEventMixin
 local function CreateAddonFrame(addon)
+
     local E = GC.E
-    ---@class ActionbarPlus_Frame
+
+    ---@class ActionbarPlus_Frame : _Frame
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent)
+    addon.frame = frame
 
     frame:SetScript(E.OnEvent, OnAddonLoaded)
     frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
-    frame:RegisterEvent(E.UPDATE_BINDINGS)
 
-    local actionbarGridFrame = CreateFrame("Frame", nil, frame)
-    actionbarGridFrame:SetScript(E.OnEvent, OnActionbarGrid)
-    actionbarGridFrame:RegisterEvent("ACTIONBAR_SHOWGRID")
-    actionbarGridFrame:RegisterEvent("ACTIONBAR_HIDEGRID")
-
-    --local spellCastFrame = CreateFrame("Frame", nil, frame)
-    --spellCastFrame:SetScript(E.OnEvent, OnSpellcast)
-    --spellCastFrame:RegisterEvent("CURRENT_SPELL_CAST_CHANGED")
-    --spellCastFrame:RegisterEvent("UNIT_SPELLCAST_SENT")
-
-    addon.frame = frame
-    addon.actionbarGridFrame = actionbarGridFrame
-    addon.spellCastFrame = spellCastFrame
+    local addonEvents = MX:MixinAndInit(O.ActionbarPlusEventMixin, addon)
+    addonEvents:RegisterEvents()
 
     frame.obj = addon
     return frame
