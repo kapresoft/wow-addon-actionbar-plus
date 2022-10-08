@@ -291,7 +291,7 @@ local methods = {
                     get = PGet(self, PC.character_specific_anchors, false),
                     set = PSet(self, PC.character_specific_anchors, false)
                 },
-                hide_while_taxi = {
+                hide_when_taxi = {
                     width = 'normal',
                     type = 'toggle',
                     order = mainSeq:next(),
