@@ -73,6 +73,8 @@ function L:B(frameIndex, buttonIndex)
     return _G[bn].widget
 end
 
+function L:API() return O.BaseAPI, O.API end
+
 D = L
 
 --[[-----------------------------------------------------------------------------

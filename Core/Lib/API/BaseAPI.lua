@@ -8,7 +8,9 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local C_MountJournal, C_Timer, PickupCompanion, GetCompanionInfo = C_MountJournal, C_Timer, PickupCompanion, GetCompanionInfo
+local C_MountJournal, C_Timer = C_MountJournal, C_Timer
+local PickupCompanion, GetCompanionInfo = PickupCompanion, GetCompanionInfo
+local C_PetBattles = C_PetBattles
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -107,3 +109,5 @@ function L:GetMountInfo_CJournal(mountID)
 
     return IsValidMountInfo(o) and o or nil
 end
+
+function L:SupportsPetBattles() return C_PetBattles ~= nil end

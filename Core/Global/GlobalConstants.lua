@@ -116,7 +116,8 @@ local function GlobalConstantProperties(o)
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
-
+        OnPetBattleStart = 'OnPetBattleStart',
+        OnPetBattleEnd = 'OnPetBattleEnd',
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
         ON_ENTER = 'OnEnter',
@@ -134,9 +135,15 @@ local function GlobalConstantProperties(o)
         ACTIONBAR_UPDATE_STATE = 'ACTIONBAR_UPDATE_STATE',
         ACTIONBAR_UPDATE_USABLE = 'ACTIONBAR_UPDATE_USABLE',
 
+        ACTIONBAR_SHOWGRID = 'ACTIONBAR_SHOWGRID',
+        ACTIONBAR_HIDEGRID = 'ACTIONBAR_HIDEGRID',
+
         BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED',
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
+
+        PET_BATTLE_OPENING_START = 'PET_BATTLE_OPENING_START',
+        PET_BATTLE_CLOSE = 'PET_BATTLE_CLOSE',
 
         PLAYER_CONTROL_GAINED = 'PLAYER_CONTROL_GAINED',
         PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST',
