@@ -29,7 +29,6 @@ Support Functions
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
     local addon = f.widget.addon
-    p:log('%s: called, widgetMixin=%s', event, tostring(f.widget.widgetMixin))
     addon.barBindings = f.widget.widgetMixin:GetBarBindingsMap()
     if addon.barBindings then f.widget.buttonFactory:UpdateKeybindText() end
 end
