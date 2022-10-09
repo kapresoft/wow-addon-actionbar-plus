@@ -93,6 +93,7 @@ local function OnDragStart(btnUI)
 
     w:SetButtonAsEmpty()
     w:ShowEmptyGrid()
+    w:ShowKeybindText(true)
     w:Fire('OnDragStart')
 end
 
@@ -181,13 +182,6 @@ local function OnUpdateButtonCooldown(widget, event)
     local cd = widget:GetCooldownInfo();
     if (cd == nil or cd.icon == nil) then return end
     widget:SetCooldownTextures(cd.icon)
-end
-
----@param widget ButtonUIWidget
----@param event string Event string
-local function OnUpdateButtonState(widget, event)
-    if not widget.button:IsShown() then return end
-    widget:UpdateState()
 end
 
 ---@param widget ButtonUIWidget

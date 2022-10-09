@@ -5,6 +5,7 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local String, Assert = O.String, O.Assert
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local P = O.Profile
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 
@@ -84,9 +85,9 @@ local function methods(bd)
                 and IsNil(mountInfo.spell.id)
     end
 
-    function bd:IsShowEmptyButtons()
-        return true == self:GetBarConfig().widget.show_empty_buttons
-    end
+    function bd:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end
+    function bd:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.widget.frameIndex) end
+    function bd:IsShowKeybindText() return P:IsShowKeybindText(self.widget.frameIndex) end
 
 end
 

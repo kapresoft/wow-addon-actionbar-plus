@@ -44,6 +44,7 @@ action items.
 Support functions
 -------------------------------------------------------------------------------]]
 local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
+---@return FrameWidget
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
 ---@return Profile_Bar
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
@@ -106,7 +107,6 @@ local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
         GetBarConfig(frameIndex).widget[key] = v or fallback
-        --print('key:', key, 'val:', GetBarConfig(frameIndex).widget[key])
         if 'string' == type(eventNameOrFunction) then BF:FireOnFrame(frameIndex, eventNameOrFunction)
         elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
     end

@@ -475,7 +475,29 @@ function L:UpdateState()
     self:UpdateRangeIndicator()
     self:SetHighlightDefault()
     self:SetNormalIconAlphaDefault()
+    self:UpdateKeybindTextState()
 end
+
+--Dynamic toggling of keybind text for
+--the actionbar grid event
+function L:UpdateKeybindTextState()
+    if not self:GetButtonData():IsShowKeybindText() then
+        self:B().keybindText:Hide()
+        return
+    end
+
+    if self:IsEmpty() then
+        if self:GetButtonData():IsShowEmptyButtons() then
+            self:B().keybindText:Show()
+        else
+            self:B().keybindText:Hide()
+        end
+        return
+    end
+
+    if not self:IsEmpty() then self:B().keybindText:Show() end
+end
+
 function L:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
 function L:UpdateCooldown()
     local cd = self:GetCooldownInfo()
@@ -548,12 +570,27 @@ function L:ShowEmptyGrid()
     self:SetHighlightEmptyButtonEnabled(false)
 end
 
-function L:HideEmptyGrid()
+function L:ShowEmptyGridEvent()
+    if not self:IsEmpty() then return end
+    self:ShowEmptyGrid()
+    self:ShowKeybindText(true)
+
+    if not self:GetButtonData():IsShowKeybindText() then
+        self:B().keybindText:Hide()
+    elseif self:IsEmpty() then
+        self:B().keybindText:Show()
+    end
+end
+
+function L:HideEmptyGridEvent()
     if not self:IsEmpty() then return end
     self:SetTextureAsEmpty()
     self:SetHighlightEmptyButtonEnabled(true)
     self:SetNormalTexture(emptyTexture)
     self:SetNormalIconAlphaAsEmpty()
+    if self:IsEmpty() and not self:GetButtonData():IsShowEmptyButtons() then
+        self:B().keybindText:Hide()
+    end
 end
 
 function L:SetCooldownTextures(icon)

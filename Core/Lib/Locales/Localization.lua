@@ -32,7 +32,6 @@ do
     for button = 1,50,1
     do
         -- Example: _G["BINDING_NAME_CLICK ActionbarPlusF1Button1:LeftButton"]  = L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]
-        --print(string.format('i: %s', button))
         local left = string.format('BINDING_NAME_CLICK ActionbarPlusF%sButton%s:LeftButton', bar, button)
         local right = string.format('BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s', bar, button)
         _G[left] = L[right]

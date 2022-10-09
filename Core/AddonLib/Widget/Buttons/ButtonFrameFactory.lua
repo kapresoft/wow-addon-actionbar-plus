@@ -92,6 +92,7 @@ local function OnButtonSizeChanged(frameWidget, event)
     frameWidget:ApplyForEachButtons(function(btnWidget)
         btnWidget:SetButtonLayout()
         btnWidget:RefreshTexts()
+        btnWidget:UpdateKeybindTextState()
     end)
 end
 
@@ -121,16 +122,12 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 ---@param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
-    frameWidget:ApplyForEachButtons(function(btnWidget)
-        btnWidget:ShowEmptyGrid()
-    end)
+    frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:ShowEmptyGridEvent() end)
 end
 ---@param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
     ---@param btnWidget ButtonUIWidget
-    frameWidget:ApplyForEachButtons(function(btnWidget)
-        btnWidget:HideEmptyGrid()
-    end)
+    frameWidget:ApplyForEachButtons(function(btnWidget) btnWidget:HideEmptyGridEvent() end)
 end
 ---@param frameWidget FrameWidget
 local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
@@ -289,7 +286,10 @@ local function WidgetMethods(widget)
         local theState = (state == true)
         self:GetConfig().show_keybind_text = theState
         ---@param btn ButtonUIWidget
-        self:ApplyForEachButtons(function(btn) btn:ShowKeybindText(theState) end)
+        self:ApplyForEachButtons(function(btn)
+            btn:ShowKeybindText(theState)
+            btn:UpdateKeybindTextState()
+        end)
     end
 
     function widget:UpdateKeybindText()
@@ -398,6 +398,7 @@ local function WidgetMethods(widget)
         self:ApplyForEachButtons(function(w)
             if not w:IsEmpty() then return end
             w:SetNormalIconAlphaAsEmpty()
+            w:UpdateKeybindTextState()
         end)
     end
 
