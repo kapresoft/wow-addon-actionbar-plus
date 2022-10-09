@@ -1,5 +1,5 @@
 ## Interface: 30400
-## Version: 1.0
+## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r WOTLK
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: kapresoft@gmail.com
