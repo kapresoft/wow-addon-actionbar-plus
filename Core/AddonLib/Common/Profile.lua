@@ -302,21 +302,18 @@ end
 
 ---@param frameIndex number The frame index number
 ---@return boolean
-function P:IsShowIndex(frameIndex)
-    return self:GetBar(frameIndex).show_button_index == true
-end
+function P:IsShowIndex(frameIndex) return self:GetBar(frameIndex).show_button_index == true end
 
 ---@param frameIndex number The frame index number
-function P:IsShowKeybindText(frameIndex)
-    return self:GetBar(frameIndex).show_keybind_text == true
-end
+function P:IsShowKeybindText(frameIndex) return self:GetBar(frameIndex).show_keybind_text == true end
+
+---@param frameIndex number The frame index number
+function P:IsShowEmptyButtons(frameIndex) return self:GetBar(frameIndex).widget.show_empty_buttons == true end
 
 function P:GetFrameNameByIndex(frameIndex) return PI:GetFrameNameByIndex(frameIndex) end
 
 ---@return FrameWidget
-function P:GetFrameWidgetByIndex(frameIndex)
-    return _G[self:GetFrameNameByIndex(frameIndex)].widget
-end
+function P:GetFrameWidgetByIndex(frameIndex) return _G[self:GetFrameNameByIndex(frameIndex)].widget end
 
 function P:GetMaxFrames() return #FrameDetails end
 

@@ -72,6 +72,7 @@ local Profile_Bar = {
     -- shows the button index
     ["show_button_index"] = true,
     -- shows the keybind text TOP
+    --TODO next: show_keybind_text should be in Profile_Bar_Widget properties
     ["show_keybind_text"] = true,
     ["widget"] = Profile_Bar_Widget,
     ---@type _RegionAnchor
