@@ -4,10 +4,10 @@
 
 [Milestone #10.2](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/2?closed=1)
 
+- #89 Fix Version entry in toc files
 - #83 Implement range indicator for macros with spells
+- #87 Option to hide bars in pet battle and vehicle
 - #72 Provide options to hide buttons that are empty
-- #52 Support for "flyout" spells
-- #53 Support for Pet Actions
 
 # ActionbarPlus-1.0.4.zip
 
