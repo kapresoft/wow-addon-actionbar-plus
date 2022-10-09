@@ -48,11 +48,8 @@ externals:
 
 ignore:
   - README.md
-  - dev
   - package-addon.sh
-  - dev-local-sync-kapresoftlibs.sh
-  - dev-sync-kapresoftlibs.sh
-  - pkgmeta-kapresoftlibs.yaml
+  - dev
   - doc
   - Core/Interface
   - Core/ExtLib/WoWAce/LibQTip/LibQTip-1.0/LibStub
