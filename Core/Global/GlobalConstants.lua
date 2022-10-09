@@ -289,15 +289,18 @@ local function GlobalConstantMethods(o)
     function o:AddonName() return o.C.ADDON_NAME end
     function o:Constants() return o.C end
     function o:Events() return o.E end
-
+    ---#### Example
+    ---```
+    ---local version, curseForge, issues, repo = GC:GetAddonInfo()
+    ---```
     function o:GetAddonInfo()
         local addonName = o.C.ADDON_NAME
         local versionText
         --@non-debug@
-        versionText = GetAddOnMetadata(addonName, 'X-Github-Project-Version')
+        versionText = GetAddOnMetadata(addonName, 'Version')
         --@end-non-debug@
         --@debug@
-        versionText = '1.0.dev'
+        versionText = '1.0.x.dev'
         --@end-debug@
         return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'),
         GetAddOnMetadata(addonName, 'X-Github-Issues'),

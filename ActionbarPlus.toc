@@ -1,5 +1,5 @@
 ## Interface: 90207
-## Version: 1.0
+## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r Retail
 ## Notes: Actionbar Addon for World of Warcraft
 ## Author: kapresoft@gmail.com

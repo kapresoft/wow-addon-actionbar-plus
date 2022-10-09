@@ -3,6 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
 local UIParent, CreateFrame = UIParent, CreateFrame
+local GetBuildInfo, GetAddOnMetadata = GetBuildInfo, GetAddOnMetadata
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -63,6 +64,7 @@ local function OnAddonLoaded(frame, event, ...)
     p:log('Right-click on the button drag frame to open config dialog.')
     p:log('Curse Forge: %s', curseForge)
     p:log('Issues: %s', githubIssues)
+    p:log('Type /abp_info on the console to see additional details.')
 
 end
 
@@ -74,7 +76,16 @@ local methods = {
     ---@param self ActionbarPlus
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand("abp", "OpenConfig")
+        self:RegisterChatCommand("abp_info", "SlashCommand_Info")
         self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
+    end,
+    ---@param self ActionbarPlus
+    ['SlashCommand_Info'] = function(self, spaceSeparatedArgs)
+        local wowInterfaceVersion = select(4, GetBuildInfo())
+        local lastChanged = GetAddOnMetadata(ADDON_NAME, 'X-Github-Project-Last-Changed-Date')
+        local version, curseForge, issues, repo = GC:GetAddonInfo()
+        p:log("Addon Info:\n  Version: %s\n  Curse-Forge: %s\n  File-Bugs-At: %s\n  Last-Changed-Date: %s\n  WoW-Interface-Version: %s\n",
+                version, curseForge, issues, lastChanged, wowInterfaceVersion)
     end,
     ---@param self ActionbarPlus
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
