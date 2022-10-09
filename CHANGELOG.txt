@@ -1,16 +1,13 @@
-# ActionbarPlus 1.0.4 (2022-Oct-FUTURE)
+# ActionbarPlus 1.0.5 (2022-Oct-FUTURE)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.4) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.3.8...1.0.4) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.5) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.4...1.0.5) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone #10.2](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/3?closed=1)
+[Milestone #10.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/5?closed=1)
 
-- #89 Fix Version entry in toc files
-- #83 Implement range indicator for macros with spells
-- #87 Option to hide bars in pet battle and vehicle
-- #72 Provide options to hide buttons that are empty
 
-# ActionbarPlus-1.0.4.zip
+# ActionbarPlus-1.0.5.zip
 
 ```text
-MD5 cc20e59e2b8ae00efb097bc1ba7a637c
+MD5 <TBD>
 ```
+π
