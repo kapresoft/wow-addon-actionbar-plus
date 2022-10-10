@@ -7,22 +7,6 @@ if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 
 --[[-----------------------------------------------------------------------------
-Namespace Initialization
--------------------------------------------------------------------------------]]
----### See: [https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace](https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace)
----@return string, table
-function ABP_Namespace(...)
-    ---@type string
-    local addon
-    ---@type table
-    local ns
-    addon, ns = ...
-    ---this is in case we are testing outside of World of Warcraft
-    addon = addon or ABP_GlobalConstants.C.ADDON_NAME
-    return addon, ns
-end
-
---[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetAddOnMetadata = GetAddOnMetadata
@@ -30,7 +14,7 @@ local GetAddOnMetadata = GetAddOnMetadata
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local addon, ns = ABP_Namespace(...)
+local addon, ns = ...
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
 
 --[[-----------------------------------------------------------------------------
@@ -342,6 +326,7 @@ local function Init()
 
     ---@type GlobalConstants
     ABP_GlobalConstants = L
+    ns.GlobalConstants = L
 end
 
 Init()

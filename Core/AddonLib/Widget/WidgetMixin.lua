@@ -15,7 +15,8 @@ local setglobal = setglobal
 Local Vars
 -------------------------------------------------------------------------------]]
 local addon, ns = ABP_Namespace(...)
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, Core, LibStub = ns.O, ns.Core, ns.O.LibStub
+
 local MX, String, P = O.Mixin, O.String, O.Profile
 local GC = O.GlobalConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
