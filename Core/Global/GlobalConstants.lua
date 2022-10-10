@@ -7,6 +7,22 @@ if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 
 --[[-----------------------------------------------------------------------------
+Namespace Initialization
+-------------------------------------------------------------------------------]]
+---### See: [https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace](https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace)
+---@return string, table
+function ABP_Namespace(...)
+    ---@type string
+    local addon
+    ---@type table
+    local ns
+    addon, ns = ...
+    ---this is in case we are testing outside of World of Warcraft
+    addon = addon or ABP_GlobalConstants.C.ADDON_NAME
+    return addon, ns
+end
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetAddOnMetadata = GetAddOnMetadata
@@ -14,6 +30,7 @@ local GetAddOnMetadata = GetAddOnMetadata
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+local addon, ns = ABP_Namespace(...)
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
 
 --[[-----------------------------------------------------------------------------
@@ -38,7 +55,7 @@ local function GlobalConstantProperties(o)
 
     ---@class GlobalAttributes
     local C = {
-        ADDON_NAME = 'ActionbarPlus',
+        ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
@@ -328,4 +345,3 @@ local function Init()
 end
 
 Init()
-

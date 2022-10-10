@@ -4,7 +4,7 @@ local format = string.format
 local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
-
+local addon, ns = ABP_Namespace(...)
 local _G = _G
 local pkg = 'ActionbarPlus'
 local shortName = 'ABP'
@@ -21,7 +21,6 @@ local __Internal = {}
 ---Version Format: ActionbarPlus-[LibName]-1.0, Example: LibStub('ActionbarPlus-Logger-1.0')
 ---@class LocalLibStub
 local _S = {
-    package = pkg,
     shortName = shortName,
     globalVarPrefix = globalVarPrefix,
     logPrefix = '|cfdffffff{{|r|cfd2db9fb' .. pkg .. '|r|cfdfbeb2d%s|r|cfdffffff}}|r',
@@ -140,7 +139,7 @@ setmetatable(_S, _S.mt)
 
 ---@class Core
 local _L = {
-    addonName = _S.package,
+    addonName = addon,
     M = Modules.M
 }
 
@@ -181,7 +180,7 @@ function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logN
 ---```
 ---@return string, string, string
 function _L:GetAddonInfo()
-    return _S.package, _S.versionFormat, _S.logPrefix
+    return addon, _S.versionFormat, _S.logPrefix
 end
 
 ---### Usage:

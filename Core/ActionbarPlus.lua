@@ -14,9 +14,9 @@ Local Vars
 -------------------------------------------------------------------------------]]
 -- Bump this version for every release tag
 --
+local ADDON_NAME, ns = ABP_Namespace(...)
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
-local ADDON_NAME = Core.addonName
 local FRAME_NAME = ADDON_NAME .. "Frame"
 
 local Table, LogFactory = O.Table, O.LogFactory
@@ -108,7 +108,7 @@ local methods = {
     end,
     ---@param self ActionbarPlus
     ['ShowDebugDialog'] = function(self, obj, optionalLabel)
-        local text = nil
+        local text
         local label = optionalLabel or ''
         if type(obj) ~= 'string' then
             text = pformat:A():pformat(obj)
@@ -130,7 +130,7 @@ local methods = {
     ---@param self ActionbarPlus
     ['OpenConfig'] = function(self, sourceFrameWidget)
         --select the frame config tab if possible
-        local optionsConfigPath = nil
+        local optionsConfigPath
         if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
             optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
         end

@@ -14,6 +14,7 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+local addon, ns = ABP_Namespace(...)
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local MX, String, P = O.Mixin, O.String, O.Profile
 local GC = O.GlobalConstants
