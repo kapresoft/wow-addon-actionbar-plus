@@ -1,6 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Namespace Initialization
 -------------------------------------------------------------------------------]]
+
 ---###Usage:
 ---```
 ---local addon, ns = ABP_Namespace(...)
@@ -10,30 +11,21 @@ Namespace Initialization
 function ABP_Namespace(...)
     ---@type string
     local addon
-    ---@type table
+    ---@class Namespace
     local ns
     addon, ns = ...
+
     ---this is in case we are testing outside of World of Warcraft
     addon = addon or ABP_GlobalConstants.C.ADDON_NAME
 
-    ---The following declarations are not functionally need. This is for
-    ---EmmyLua so we can tag the type for better functionality in IntelliJ/IDEs
-    ---@class Namespace
-    ---@type any
-    local obj = {
-        name = addon,
-        ns = ns,
-        ---@type GlobalObjects
-        O = ns.O or {},
-        ---@param self Namespace
-        ---@return GlobalObjects, Core, LocalLibStub
-        LibPack = function(self)
-            return self.O, self.O.Core, self.O.LibStub
-        end,
-        mt = { __index = ns }
-    }
-    setmetatable(obj, obj.mt)
+    ---@type GlobalObjects
+    ns.O = ns.O or {}
+    ---@type string
+    ns.name = addon
 
-    return obj
+    ---@return GlobalObjects, Core, LocalLibStub
+    function ns:LibPack() return self.O, self.O.Core, self.O.LibStub end
+
+    return ns
 end
 

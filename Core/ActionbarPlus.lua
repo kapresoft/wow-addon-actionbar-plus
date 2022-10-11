@@ -17,7 +17,8 @@ Local Vars
 local ns = ABP_Namespace(...)
 local ADDON_NAME = ns.name
 
-local O, LibStub = ns.O, ns.O.LibStub
+local O, Core, LibStub = ns:LibPack()
+
 
 local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
 local FRAME_NAME = ADDON_NAME .. "Frame"
