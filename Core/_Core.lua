@@ -314,7 +314,6 @@ _L.Lib = _LIB
 ---@deprecated Use ns.core instead
 __K_Core = _L
 ns.O[Modules.M.Core] = _L
----@type Core
 ns[Modules.M.Core] = _L
 
 --Define Globals here
