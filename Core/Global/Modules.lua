@@ -11,6 +11,9 @@ setmetatable(L, L.mt)
 
 ---@class Module
 local M = {
+    Core = 'Core',
+    LibStub = 'LibStub',
+
     -- Libraries
     BaseAPI = 'BaseAPI',
     API = 'API',
@@ -60,6 +63,10 @@ local M = {
 
 ---@class GlobalObjects
 local GlobalObjectsTemplate = {
+    ---@type Core,
+    Core = {},
+    ---@type LocalLibStub
+    LibStub = {},
 
     ---@type BaseAPI
     BaseAPI = {},

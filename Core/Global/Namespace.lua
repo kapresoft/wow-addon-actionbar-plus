@@ -6,11 +6,11 @@ Namespace Initialization
 ---local addon, ns = ABP_Namespace(...)
 ---```
 ---#### See: [https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace](https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace)
----@return string, Namespace
+---@return Namespace
 function ABP_Namespace(...)
     ---@type string
     local addon
-    ---@class Namespace
+    ---@type table
     local ns
     addon, ns = ...
     ---this is in case we are testing outside of World of Warcraft
@@ -18,10 +18,22 @@ function ABP_Namespace(...)
 
     ---The following declarations are not functionally need. This is for
     ---EmmyLua so we can tag the type for better functionality in IntelliJ/IDEs
-    ---@type Core
-    ns.Core = ns.Core or nil
-    ---@type GlobalObjects
-    ns.O = ns.O or {}
+    ---@class Namespace
+    ---@type any
+    local obj = {
+        name = addon,
+        ns = ns,
+        ---@type GlobalObjects
+        O = ns.O or {},
+        ---@param self Namespace
+        ---@return GlobalObjects, Core, LocalLibStub
+        LibPack = function(self)
+            return self.O, self.O.Core, self.O.LibStub
+        end,
+        mt = { __index = ns }
+    }
+    setmetatable(obj, obj.mt)
 
-    return addon, ns
+    return obj
 end
+

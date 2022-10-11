@@ -114,11 +114,11 @@ local function GlobalConstantProperties(o)
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
+        OnActionbarShowAll = 'OnActionbarShowAll',
+        OnActionbarHideAll = 'OnActionbarHideAll',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
-        OnPetBattleStart = 'OnPetBattleStart',
-        OnPetBattleEnd = 'OnPetBattleEnd',
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
         ON_ENTER = 'OnEnter',
@@ -167,6 +167,8 @@ local function GlobalConstantProperties(o)
 
         UPDATE_BINDINGS = 'UPDATE_BINDINGS',
 
+        UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
+        UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
     }
 
     ---@class UnitIDAttributes
@@ -326,7 +328,8 @@ local function Init()
 
     ---@type GlobalConstants
     ABP_GlobalConstants = L
-    ns.GlobalConstants = L
+    ns.O = ns.O or {}
+    ns.O.GlobalConstants = L
 end
 
 Init()

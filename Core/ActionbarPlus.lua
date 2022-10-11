@@ -14,8 +14,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 -- Bump this version for every release tag
 --
-local ADDON_NAME, ns = ABP_Namespace(...)
-local LibStub, O = ns.O.LibStub, ns.O
+local ns = ABP_Namespace(...)
+local ADDON_NAME = ns.name
+
+local O, LibStub = ns.O, ns.O.LibStub
 
 local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
 local FRAME_NAME = ADDON_NAME .. "Frame"

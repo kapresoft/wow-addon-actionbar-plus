@@ -4,9 +4,10 @@ local format = string.format
 local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
-local addon, ns = ABP_Namespace(...)
+local ns = ABP_Namespace(...)
+
 local _G = _G
-local pkg = 'ActionbarPlus'
+local pkg = ns.name
 local shortName = 'ABP'
 local globalVarPrefix = shortName .. '_'
 local versionFormat = pkg .. '-%s-1.0'
@@ -25,7 +26,8 @@ local _S = {
     versionFormat = versionFormat,
     M = Modules.M,
 }
-ns.O['LibStub'] = _S
+---@type LocalLibStub
+ns.O[Modules.M.LibStub] = _S
 
 --- Get a local or acelibrary
 ---```
@@ -168,7 +170,7 @@ function _L:LibPack() return _S, self, self:O() end
 ---@deprecated Use global namespace instead
 ---local O, Core, LocalLibStub = __K_Core:LibPack_GlobalObjects()
 ---@return GlobalObjects, Core, LocalLibStub
-function _L:LibPack_GlobalObjects() return ns.O, ns.Core, ns.O.LibStub end
+function _L:LibPack_GlobalObjects() return ns.O, ns.O.Core, ns.O.LibStub end
 
 ---@see LogFactory
 ---@return LoggerTemplate
@@ -311,7 +313,7 @@ _L.Lib = _LIB
 ---@type Core
 ---@deprecated Use ns.core instead
 __K_Core = _L
-ns.Core = _L
+ns.O[Modules.M.Core] = _L
 
 --Define Globals here
 if ABP_GlobalConstants then _L:Register('GlobalConstants', ABP_GlobalConstants) end
