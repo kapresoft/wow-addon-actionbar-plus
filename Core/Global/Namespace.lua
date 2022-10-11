@@ -22,6 +22,9 @@ function ABP_Namespace(...)
     ns.O = ns.O or {}
     ---@type string
     ns.name = addon
+    ---Core exists in both ns.Core and ns.O.Core
+    ---@type Core
+    ns.Core = ns.Core or nil
 
     ---@return GlobalObjects, Core, LocalLibStub
     function ns:LibPack() return self.O, self.O.Core, self.O.LibStub end
