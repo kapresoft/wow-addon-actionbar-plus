@@ -11,6 +11,7 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
+local ns = ABP_Namespace(...)
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local P, LogFactory, Table = O.Profile, O.LogFactory, O.Table
 local E = O.GlobalConstants.E
@@ -169,7 +170,7 @@ end
 --[[-----------------------------------------------------------------------------
 Event Hook
 -------------------------------------------------------------------------------]]
-local frame = CreateFrame("Frame", Core.addonName .. "Frame", UIParent)
+local frame = CreateFrame("Frame", ns.name .. "Frame", UIParent)
 frame:SetScript(E.OnEvent, OnAddonLoaded)
 frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
 

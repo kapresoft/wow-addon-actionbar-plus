@@ -14,6 +14,7 @@ local GetAddOnMetadata = GetAddOnMetadata
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+local addon, ns = ...
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
 
 --[[-----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ local function GlobalConstantProperties(o)
 
     ---@class GlobalAttributes
     local C = {
-        ADDON_NAME = 'ActionbarPlus',
+        ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
@@ -113,11 +114,11 @@ local function GlobalConstantProperties(o)
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
+        OnActionbarShowAll = 'OnActionbarShowAll',
+        OnActionbarHideAll = 'OnActionbarHideAll',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
-        OnPetBattleStart = 'OnPetBattleStart',
-        OnPetBattleEnd = 'OnPetBattleEnd',
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
         ON_ENTER = 'OnEnter',
@@ -166,6 +167,8 @@ local function GlobalConstantProperties(o)
 
         UPDATE_BINDINGS = 'UPDATE_BINDINGS',
 
+        UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
+        UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
     }
 
     ---@class UnitIDAttributes
@@ -325,7 +328,8 @@ local function Init()
 
     ---@type GlobalConstants
     ABP_GlobalConstants = L
+    ns.O = ns.O or {}
+    ns.O.GlobalConstants = L
 end
 
 Init()
-

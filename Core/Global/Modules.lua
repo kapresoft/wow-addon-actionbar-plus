@@ -1,3 +1,6 @@
+--[[-----------------------------------------------------------------------------
+Modules
+-------------------------------------------------------------------------------]]
 ---@class Modules
 local L = {
     mt = {
@@ -8,6 +11,9 @@ setmetatable(L, L.mt)
 
 ---@class Module
 local M = {
+    Core = 'Core',
+    LibStub = 'LibStub',
+
     -- Libraries
     BaseAPI = 'BaseAPI',
     API = 'API',
@@ -57,6 +63,10 @@ local M = {
 
 ---@class GlobalObjects
 local GlobalObjectsTemplate = {
+    ---@type Core,
+    Core = {},
+    ---@type LocalLibStub
+    LibStub = {},
 
     ---@type BaseAPI
     BaseAPI = {},
@@ -68,7 +78,7 @@ local GlobalObjectsTemplate = {
     ActionbarPlusEventMixin = {},
     ---@type ActionType
     ActionType = {},
-    ---@type Assert
+    ---@type Kapresoft_LibUtil_Assert
     Assert = {},
     ---@type BaseAttributeSetter
     BaseAttributeSetter = {},
@@ -92,7 +102,7 @@ local GlobalObjectsTemplate = {
     FrameHandleMixin = {},
     ---@type GlobalConstants
     GlobalConstants = {},
-    ---@type Incrementer
+    ---@type Kapresoft_LibUtil_Incrementer
     Incrementer = {},
     ---@type ItemAttributeSetter
     ItemAttributeSetter = {},
@@ -102,7 +112,7 @@ local GlobalObjectsTemplate = {
     LogFactory = {},
     ---@type Logger
     Logger = {},
-    ---@type LuaEvaluator,
+    ---@type Kapresoft_LibUtil_LuaEvaluator,
     LuaEvaluator = {},
     ---@type MacroAttributeSetter
     MacroAttributeSetter = {},
@@ -120,7 +130,7 @@ local GlobalObjectsTemplate = {
     MountDragEventHandler = {},
     ---@type MountAttributeSetter
     MountAttributeSetter = {},
-    ---@type Mixin
+    ---@type Kapresoft_LibUtil_Mixin
     Mixin = {},
     ---@type PickupHandler
     PickupHandler = {},
@@ -136,9 +146,9 @@ local GlobalObjectsTemplate = {
     SpellAttributeSetter = {},
     ---@type SpellDragEventHandler
     SpellDragEventHandler = {},
-    ---@type String
+    ---@type Kapresoft_LibUtil_String
     String = {},
-    ---@type Table
+    ---@type Kapresoft_LibUtil_Table
     Table = {},
     ---@type WidgetMixin
     WidgetMixin = {},

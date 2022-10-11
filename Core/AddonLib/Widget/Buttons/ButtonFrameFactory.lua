@@ -139,15 +139,18 @@ local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
     frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
 end
 
+---Sometimes there's a delay. Fire immediately, then after a few seconds
 ---@param frameWidget FrameWidget
-local function OnPetBattleStart(frameWidget, e, ...)
-    C_Timer.After(3, function() frameWidget:HideGroup() end)
-
-end
----@param frameWidget FrameWidget
-local function OnPetBattleEnd(frameWidget, e, ...)
+local function OnActionbarShowAll(frameWidget, e, ...)
     if  true ~= P:IsBarEnabled(frameWidget.index) then return end
-    C_Timer.After(2, function() frameWidget:ShowGroup()  end)
+    frameWidget:ShowGroup()
+    C_Timer.After(3, function() frameWidget:ShowGroup() end)
+end
+
+---@param frameWidget FrameWidget
+local function OnActionbarHideAll(frameWidget, e, ...)
+    frameWidget:HideGroup()
+    C_Timer.After(3, function() frameWidget:HideGroup() end)
 end
 
 local function RegisterCallbacks(widget)
@@ -165,8 +168,9 @@ local function RegisterCallbacks(widget)
 
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
-    widget:SetCallback(E.OnPetBattleStart, OnPetBattleStart)
-    widget:SetCallback(E.OnPetBattleEnd, OnPetBattleEnd)
+    widget:SetCallback(E.OnActionbarHideAll, OnActionbarHideAll)
+    widget:SetCallback(E.OnActionbarShowAll, OnActionbarShowAll)
+
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
     --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)

@@ -4,9 +4,10 @@ local format = string.format
 local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
+local ns = ABP_Namespace(...)
 
 local _G = _G
-local pkg = 'ActionbarPlus'
+local pkg = ns.name
 local shortName = 'ABP'
 local globalVarPrefix = shortName .. '_'
 local versionFormat = pkg .. '-%s-1.0'
@@ -16,18 +17,17 @@ local Modules = ABP_Modules
 -- ## LocalLibStub ---------------------------------------------
 -- ## ----------------------------------------------------------
 
-local __Internal = {}
-
 ---Version Format: ActionbarPlus-[LibName]-1.0, Example: LibStub('ActionbarPlus-Logger-1.0')
 ---@class LocalLibStub
 local _S = {
-    package = pkg,
     shortName = shortName,
     globalVarPrefix = globalVarPrefix,
     logPrefix = '|cfdffffff{{|r|cfd2db9fb' .. pkg .. '|r|cfdfbeb2d%s|r|cfdffffff}}|r',
     versionFormat = versionFormat,
     M = Modules.M,
 }
+---@type LocalLibStub
+ns.O[Modules.M.LibStub] = _S
 
 --- Get a local or acelibrary
 ---```
@@ -140,7 +140,7 @@ setmetatable(_S, _S.mt)
 
 ---@class Core
 local _L = {
-    addonName = _S.package,
+    addonName = addon,
     M = Modules.M
 }
 
@@ -167,9 +167,10 @@ local _L = {
 ---@return LocalLibStub, Core, GlobalObjects
 function _L:LibPack() return _S, self, self:O() end
 
+---@deprecated Use global namespace instead
 ---local O, Core, LocalLibStub = __K_Core:LibPack_GlobalObjects()
 ---@return GlobalObjects, Core, LocalLibStub
-function _L:LibPack_GlobalObjects() return self:O(), self, _S  end
+function _L:LibPack_GlobalObjects() return ns.O, ns.O.Core, ns.O.LibStub end
 
 ---@see LogFactory
 ---@return LoggerTemplate
@@ -181,7 +182,7 @@ function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logN
 ---```
 ---@return string, string, string
 function _L:GetAddonInfo()
-    return _S.package, _S.versionFormat, _S.logPrefix
+    return addon, _S.versionFormat, _S.logPrefix
 end
 
 ---### Usage:
@@ -281,17 +282,12 @@ end
 ---@param o table The object
 function _L:Register(name, o)
     if not (name or o) then return end
-    --local n = {
-    --    mt = {
-    --        __tostring = function() return name  end,
-    --        __call = function() return o  end
-    --    }
-    --}
-    --setmetatable(n, n.mt)
-    __Internal[name] = o
+    ns.O[name] = o
 end
+
+---@deprecated Use addon namespace
 ---@return GlobalObjects
-function _L:O() return __Internal end
+function _L:O() return ns.O end
 
 function _L:Init() self:InitPrettyPrint() end
 _L:Init()
@@ -315,7 +311,9 @@ setmetatable(_LIB, _LIB.mt)
 _L.Lib = _LIB
 
 ---@type Core
+---@deprecated Use ns.core instead
 __K_Core = _L
+ns.O[Modules.M.Core] = _L
 
 --Define Globals here
 if ABP_GlobalConstants then _L:Register('GlobalConstants', ABP_GlobalConstants) end

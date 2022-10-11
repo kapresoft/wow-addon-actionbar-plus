@@ -8,7 +8,9 @@ local CreateFrame = CreateFrame
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local O, Core, LibStub = ns:LibPack()
+
 local GC = O.GlobalConstants
 local E = GC.E
 local B = O.BaseAPI
@@ -35,22 +37,32 @@ end
 
 ---@param f PetBattleEventFrame
 ---@param event string
-local function OnPetBattle(f, event, ...)
+local function OnPetBattleEvent(f, event, ...)
     if E.PET_BATTLE_OPENING_START == event then
-        f.widget.buttonFactory:Fire(E.OnPetBattleStart)
-    elseif E.PET_BATTLE_CLOSE == event then
-        f.widget.buttonFactory:Fire(E.OnPetBattleEnd)
+        f.widget.buttonFactory:Fire(E.OnActionbarHideAll)
+        return
     end
+    f.widget.buttonFactory:Fire(E.OnActionbarShowAll)
+end
+
+---@param f VehicleEventFrame
+---@param event string
+local function OnVehicleEvent(f, event, ...)
+    if E.UNIT_ENTERED_VEHICLE == event then
+        f.widget.buttonFactory:Fire(E.OnActionbarHideAll)
+        return
+    end
+    f.widget.buttonFactory:Fire(E.OnActionbarShowAll)
 end
 
 ---@param f ActionbarGridEventFrame
 ---@param event string
 local function OnActionbarGrid(f, event, ...)
     if E.ACTIONBAR_SHOWGRID == event then
-        f.widget.buttonFactory:Fire('OnActionbarShowGrid')
+        f.widget.buttonFactory:Fire(E.OnActionbarShowGrid)
         return
     end
-    f.widget.buttonFactory:Fire('OnActionbarHideGrid')
+    f.widget.buttonFactory:Fire(E.OnActionbarHideGrid)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -87,6 +99,19 @@ function L:RegisterKeybindingsEventFrame()
     f:RegisterEvent(E.UPDATE_BINDINGS)
 end
 
+function L:RegisterVehicleFrame()
+    ---@class VehicleEventFrame : _Frame
+    local f = CreateFrame("Frame", nil, self.addon.frame)
+    ---@class VehicleEventFrameWidget : BaseEventFrameWidget
+    local widget = self:CreateWidget(f)
+    f.widget = widget
+
+    f:SetScript(E.OnEvent, OnVehicleEvent)
+    f:RegisterEvent(E.UNIT_ENTERED_VEHICLE)
+    f:RegisterEvent(E.UNIT_EXITED_VEHICLE)
+
+end
+
 function L:RegisterActionbarGridEventFrame()
     ---@class ActionbarGridEventFrame : _Frame
     local f = CreateFrame("Frame", nil, self.addon.frame)
@@ -106,7 +131,7 @@ function L:RegisterPetBattleFrame()
     local widget = self:CreateWidget(f)
     f.widget = widget
 
-    f:SetScript(E.OnEvent, OnPetBattle)
+    f:SetScript(E.OnEvent, OnPetBattleEvent)
     f:RegisterEvent(E.PET_BATTLE_OPENING_START)
     f:RegisterEvent(E.PET_BATTLE_CLOSE)
 end
@@ -115,4 +140,5 @@ function L:RegisterEvents()
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
+    if B:SupportsVehicles() then self:RegisterVehicleFrame() end
 end
