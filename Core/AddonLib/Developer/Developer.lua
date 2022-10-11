@@ -6,7 +6,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+
+local O = ns:LibPack()
 local BF = O.ButtonFactory
 local P = O.Profile
 
@@ -74,6 +76,7 @@ function L:B(frameIndex, buttonIndex)
 end
 
 function L:API() return O.BaseAPI, O.API end
+function L:NS() return ns end
 
 D = L
 

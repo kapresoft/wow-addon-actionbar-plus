@@ -314,6 +314,7 @@ _L.Lib = _LIB
 ---@deprecated Use ns.core instead
 __K_Core = _L
 ns.O[Modules.M.Core] = _L
+ns[Modules.M.Core] = _L
 
 --Define Globals here
 if ABP_GlobalConstants then _L:Register('GlobalConstants', ABP_GlobalConstants) end
