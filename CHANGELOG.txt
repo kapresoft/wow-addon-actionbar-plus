@@ -1,9 +1,11 @@
-# ActionbarPlus 1.0.5 (2022-Oct-FUTURE)
+# ActionbarPlus 1.0.5 (2022-Oct-11)
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.5) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.4...1.0.5) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 [Milestone #10.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/5?closed=1)
 
+- #96 Hide bars while in a vehicle
+- #99 Migrate some (but not all) global variables to addon namespace [DEV]
 
 # ActionbarPlus-1.0.5.zip
 
