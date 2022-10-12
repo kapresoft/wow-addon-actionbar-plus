@@ -1,9 +1,11 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
-local Assert = O.Assert
+local API, Assert = O.API, O.Assert
 local IsNil = Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
@@ -24,7 +26,7 @@ function L:Handle(btnUI, cursorInfo)
                               bookIndex = cursorInfo.info1,
                               bookType = cursorInfo.info2 }
 
-    local spellInfo = _API:GetSpellInfo(spellCursorInfo.id)
+    local spellInfo = API:GetSpellInfo(spellCursorInfo.id)
     if IsNil(spellInfo) then return end
 
     local btnData = btnUI.widget:GetConfig()

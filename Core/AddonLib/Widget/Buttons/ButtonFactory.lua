@@ -18,7 +18,8 @@ local String, A, P = O.String, O.Assert, O.Profile
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local SPELL, ITEM, MACRO, MOUNT, COMPANION =
+            WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 
 ---@type ButtonUILib
 local ButtonUI = O.ButtonUI
@@ -34,6 +35,7 @@ local AttributeSetters = {
     [ITEM]        = O.ItemAttributeSetter,
     [MACRO]       = O.MacroAttributeSetter,
     [MOUNT]       = O.MountAttributeSetter,
+    [COMPANION]   = O.CompanionAttributeSetter,
 }
 
 -- Initialized on Logger#OnAddonLoaded()

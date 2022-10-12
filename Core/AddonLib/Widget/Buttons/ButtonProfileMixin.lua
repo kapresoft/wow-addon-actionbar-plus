@@ -6,11 +6,13 @@ local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyD
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local GC = O.GlobalConstants
 local CN = GC.Profile_Config_Names
 local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local SPELL, ITEM, MACRO, MOUNT, COMPANION = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 local IsTableEmpty = Table.isEmpty
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
 local p = O.LogFactory(Core.M.ButtonProfileMixin)
@@ -80,6 +82,9 @@ function _L:IsSpell() return self:IsConfigOfType(self:GetConfig(), SPELL) end
 function _L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
 ---@return boolean
 function _L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
+---@see Interface/FrameXML/SecureHandlers.lua
+---@return boolean
+function _L:IsCompanion() return self:IsConfigOfType(self:GetConfig(), COMPANION) end
 
 ---@param config Profile_Button
 ---@param type string spell, item, macro, mount, etc

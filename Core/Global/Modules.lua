@@ -38,6 +38,8 @@ local M = {
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
+    CompanionDragEventHandler = 'CompanionDragEventHandler',
+    CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
@@ -128,6 +130,10 @@ local GlobalObjectsTemplate = {
     Modules = {},
     ---@type MountDragEventHandler
     MountDragEventHandler = {},
+    ---@type CompanionDragEventHandler
+    CompanionDragEventHandler = {},
+    ---@type CompanionAttributeSetter
+    CompanionAttributeSetter = {},
     ---@type MountAttributeSetter
     MountAttributeSetter = {},
     ---@type Kapresoft_LibUtil_Mixin

@@ -1,11 +1,18 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local A, AT = O.Assert, O.ActionType
+local ns = ABP_Namespace(...)
+local LibStub, Core, O, GC = ns.O.LibStub, ns.Core, ns.O, ns.O.GlobalConstants
+
+local A, AT, WAttr = O.Assert, O.ActionType, GC.WidgetAttributes
 local SpellDragEventHandler, ItemDragEventHandler, MacroDragEventHandler = O.SpellDragEventHandler,
     O.ItemDragEventHandler, O.MacroDragEventHandler
 local IsNotNil, AssertThatMethodArgIsNotNil = A.IsNotNil, A.AssertThatMethodArgIsNotNil
+local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION =
+    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT, WAttr.MOUNT, WAttr.COMPANION
+
+
+
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
@@ -24,12 +31,20 @@ local L = LibStub:NewLibrary(Core.M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 local handlers = {
-    ['spell'] = SpellDragEventHandler,
-    ['item'] = ItemDragEventHandler,
-    ['macro'] = MacroDragEventHandler,
-    ['mount'] = O.MountDragEventHandler,
-    ['macrotext'] = MacroDragEventHandler
+    [SPELL] = SpellDragEventHandler,
+    [ITEM] = ItemDragEventHandler,
+    [MACRO] = MacroDragEventHandler,
+    [MOUNT] = O.MountDragEventHandler,
+    [COMPANION] = O.CompanionDragEventHandler,
+    [MACRO_TEXT] = MacroDragEventHandler,
 }
+--print('handlers:', pformat(O.Table.getSortedKeys(handlers)))
+
+---@param type string spell, item, macro, etc...
+function L:IsSupportedCursorType(type)
+    local handler = handlers[type]
+    return IsNotNil(handler) and IsNotNil(handler.Handle)
+end
 
 -- ## Functions ------------------------------------------------
 function L:CleanupProfile(btnUI, actionType)
@@ -42,11 +57,6 @@ function L:CleanupProfile(btnUI, actionType)
     end
 end
 
-function L:CanHandle(actionType)
-    local handler = handlers[actionType]
-    return IsNotNil(handler) and IsNotNil(handler.Handle)
-end
-
 ---@param cursorInfo CursorInfo
 ---@param btnUI ButtonUI
 function L:Handle(btnUI, cursorInfo)
@@ -54,7 +64,7 @@ function L:Handle(btnUI, cursorInfo)
     AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
     self:log(10, 'Handle| CursorInfo: %s', pformat:B()(cursorInfo))
     local actionType = cursorInfo.type
-    if not self:CanHandle(actionType) then return end
+    if not self:IsSupportedCursorType(actionType) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
     self:CleanupProfile(btnUI, actionType)

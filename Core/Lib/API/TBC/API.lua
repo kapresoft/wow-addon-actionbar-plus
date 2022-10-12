@@ -4,7 +4,7 @@ Blizzard Vars
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
-local C_MountJournal, GetCompanionInfo, C_ToyBox = C_MountJournal, GetCompanionInfo, C_ToyBox
+local C_ToyBox = C_ToyBox
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
 
@@ -16,8 +16,10 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core = __K_Core:LibPack_GlobalObjects()
-local String, Mixin = O.String, O.Mixin
+local ns = ABP_Namespace(...)
+local Core, O = ns.Core, ns.O
+
+local String = O.String
 local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
 local GC = O.GlobalConstants
 local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
@@ -48,7 +50,7 @@ function S:GetCursorInfo()
     -- actionType string spell, item, macro, mount, etc..
     local actionType, info1, info2, info3 = GetCursorInfo()
     if IsBlank(actionType) then return nil end
-    ---@class CursorInfo
+    ---@type CursorInfo
     local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
 
     local info2Lc = strlower(c.info2 or '')
@@ -59,71 +61,6 @@ function S:GetCursorInfo()
     end
 
     return c
-end
-
----@param mountIDorIndex number
-function S:_GetMountInfo(mountIDorIndex)
-
-    if C_MountJournal then
-        local mountID = mountIDorIndex
-        local name, spellID, icon,
-        isActive, isUsable, sourceType, isFavorite,
-        isFactionSpecific, faction, shouldHideOnChar,
-        isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
-
-        return name, spellID, icon
-    end
-
-    local mountCompanionIndex = mountIDorIndex
-    local creatureID, creatureName, creatureSpellID, icon, issummoned =
-        GetCompanionInfo("mount", mountCompanionIndex)
-    return creatureName, creatureSpellID, icon;
-end
-
----## For WOTLK
---- CursorInfo for WOTLK
----```
----   info1 = <mountIndex> <-- info you need for GetCompanionInfo("mount", <info1>)
----   info2 = "MOUNT"
----   info3 = "companion"
----
---- GetCompanionInfo("mount", mountIndex), ex: GetCompanionInfo("mount", 1)
----    returns {   4271, 'Dire Wolf', 6653, 132266, false }
----```
----## For Retail, use C_MountJournal
----```
----  C_MountJournal.GetMountInfoByID(mountId)
----  C_MountJournal.GetDisplayedMountInfo(mountIndex)
---- actionType, info1, info2
---- "mount", mountId, C_MountJournal index
----```
----@return MountInfo
----@param cursorInfo CursorInfo
-function S:GetMountInfo(cursorInfo)
-    local mountIDorIndex = cursorInfo.info1
-    local mountInfoAPI = BaseAPI:GetMountInfo(mountIDorIndex)
-    p:log(10, "GetMountInfo| MountInfo: %s", pformat:B()(mountInfoAPI))
-
-    ---@class MountInfoSpell
-    local spell = {
-        ---@type number
-        id = mountInfoAPI.spellID,
-        ---@type number
-        icon = mountInfoAPI.icon }
-
-    ---@class MountInfo
-    local info = {
-        ---@type string
-        name = mountInfoAPI.name,
-        ---@type number
-        id = mountIDorIndex,
-        ---@type number
-        index = -1,
-        ---@type MountInfoSpell
-        spell = spell
-    }
-    if C_MountJournal then info.index = cursorInfo.info2 end
-    return info
 end
 
 ---@see Blizzard_UnitId
@@ -175,13 +112,13 @@ function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, Uni
 --- }
 ---```
 ---@param spellNameOrId string Spell ID or Name
----@return SpellInfo
+---@return Profile_Spell
 function S:GetSpellInfo(spellNameOrId)
     local name, _, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     if name then
         local subTextOrRank = GetSpellSubtext(spellNameOrId)
         local spellLink = GetSpellLink(spellNameOrId)
-        ---@class SpellInfo
+        ---@type Profile_Spell
         local spellInfo = { id = id, name = name, icon = icon,
                             link=spellLink, castTime = castTime,
                             minRange = minRange, maxRange = maxRange, rank = subTextOrRank }
@@ -196,7 +133,7 @@ function S:GetSpellInfo(spellNameOrId)
     return nil
 end
 ---@param macroIndex number
----@return SpellInfo
+---@return Profile_Spell
 function S:GetMacroSpellInfo(macroIndex)
     --local macroIndex = btnConfig.macro.index
     local spellId = GetMacroSpell(macroIndex)

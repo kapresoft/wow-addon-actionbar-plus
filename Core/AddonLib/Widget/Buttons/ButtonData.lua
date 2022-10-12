@@ -1,10 +1,13 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local String, Assert = O.String, O.Assert
 local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local SPELL, ITEM, MACRO, MOUNT, COMPANION =
+    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 local P = O.Profile
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
@@ -70,19 +73,34 @@ local function methods(bd)
         return nil
     end
 
-    ---@return SpellInfo
+    ---@return Profile_Spell
     function bd:GetSpellInfo() return self:GetConfig()[SPELL] end
+    ---@type Profile_Item
     function bd:GetItemInfo() return self:GetConfig()[ITEM] end
+    ---@type Profile_Macro
     function bd:GetMacroInfo() return self:GetConfig()[MACRO] end
-    ---@return MountInfo
+    ---@return Profile_Mount
     function bd:GetMountInfo() return self:GetConfig()[MOUNT] end
+    ---@return Profile_Companion
+    function bd:GetCompanionInfo() return self:GetConfig()[COMPANION] end
 
-    ---@param mountInfo MountInfo
-    function bd:IsInvalidMountInfo(mountInfo)
-        return IsNil(mountInfo)
-                and IsNil(mountInfo.name)
-                and IsNil(mountInfo.spell)
-                and IsNil(mountInfo.spell.id)
+    function bd:ConfigContainsValidActionType()
+        if not type then return false end
+        local btnConf = self:GetConfig()
+        if not btnConf then return false end
+        if IsBlank(btnConf.type) then return false end
+
+        return true
+    end
+
+    ---@param m Profile_Mount
+    function bd:IsInvalidMount(m)
+        return IsNil(m) and IsNil(m.name) and IsNil(m.spell) and IsNil(m.spell.id)
+    end
+
+    ---@param c Profile_Companion
+    function bd:IsInvalidCompanion(c)
+        return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
     end
 
     function bd:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end

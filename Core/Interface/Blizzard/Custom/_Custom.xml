@@ -4,5 +4,8 @@
     <Script file="BlendMode.lua"/>
     <Script file="DrawLayer.lua"/>
     <Script file="RegionAnchor.lua"/>
+    <Script file="Cursor.lua"/>
+    <Script file="Companion.lua"/>
+    <Script file="Mount.lua"/>
 
 </Ui>

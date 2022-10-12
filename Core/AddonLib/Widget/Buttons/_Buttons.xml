@@ -18,6 +18,7 @@
     <Script file="SpellDragEventHandler.lua"/>
     <Script file="MacroDragEventHandler.lua"/>
     <Script file="MountDragEventHandler.lua"/>
+    <Script file="CompanionDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
 

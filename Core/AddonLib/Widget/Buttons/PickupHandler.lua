@@ -6,11 +6,14 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table
 local IsNotBlank, IsTableEmpty = O.String.IsNotBlank, Table.isEmpty
 local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local SPELL, ITEM, MACRO, MOUNT, COMPANION =
+    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 
 local p = LogFactory(Core.M.PickupHandler)
 
@@ -39,8 +42,11 @@ local function PickupStuff(widget)
     elseif widget:IsItem() then
         PickupItem(btnConf[ITEM].id)
     elseif widget:IsMount() then
-        local mountData = widget:GetButtonData():GetMountInfo()
-        BaseAPI:PickupMount(mountData.name, mountData.id)
+        local mount = widget:GetButtonData():GetMountInfo()
+        BaseAPI:PickupMount(mount)
+    elseif widget:IsCompanion() then
+        local companion = widget:GetButtonData():GetCompanionInfo()
+        BaseAPI:PickupCompanion(companion)
     else
         p:log(20, "PickupExisting | no item picked up")
     end

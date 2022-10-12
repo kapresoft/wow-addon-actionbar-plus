@@ -6,7 +6,9 @@ local GameTooltip = GameTooltip
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local GC = O.GlobalConstants
 local Assert, String, WAttr = O.Assert, O.String, GC.WidgetAttributes
 local AssertNotNil = Assert.AssertNotNil
@@ -45,18 +47,15 @@ end
 
 ---@param btnUI ButtonUI
 function S:ShowTooltip(btnUI)
-    if not btnUI then return end
-    local w = btnUI.widget
-    local btnData = w:GetConfig()
-    if not btnData then return end
-    if String.IsBlank(btnData.type) then return end
+    local bd = btnUI.widget:GetButtonData()
+    if not bd:ConfigContainsValidActionType() then return end
 
     ---@type Profile_Item
     GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
+
+    local btnData = btnUI.widget:GetConfig()
     local itemInfo = btnData[WAttr.ITEM]
-    if itemInfo and itemInfo.id then
-        GameTooltip:SetItemByID(itemInfo.id)
-    end
+    if itemInfo and itemInfo.id then GameTooltip:SetItemByID(itemInfo.id) end
 end
 
 

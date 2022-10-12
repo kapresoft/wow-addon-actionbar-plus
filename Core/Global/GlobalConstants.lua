@@ -189,6 +189,7 @@ local function GlobalConstantProperties(o)
         SPELL = 'spell',
         ITEM = 'item',
         MOUNT = 'mount',
+        COMPANION = 'companion',
         FLY_OUT = 'flyout',
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",

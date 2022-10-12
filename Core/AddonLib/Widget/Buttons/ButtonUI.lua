@@ -13,7 +13,9 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local LogFactory = O.LogFactory
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
@@ -25,7 +27,7 @@ local E, API = GC.E, O.API
 
 local IsBlank = String.IsBlank
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local ACTION_TYPES = GC.WidgetAttributes
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -51,10 +53,7 @@ local function IsValidDragSource(cursorInfo)
         --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
-    return (cursorInfo.type == ACTION_TYPES.SPELL
-            or cursorInfo.type == ACTION_TYPES.ITEM
-            or cursorInfo.type == ACTION_TYPES.MACRO
-            or cursorInfo.type == ACTION_TYPES.MOUNT)
+    return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo.type)
 end
 
 ---@param widget ButtonUIWidget
@@ -102,13 +101,12 @@ end
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorInfo = API:GetCursorInfo()
-    p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
+    p:log(10, 'OnReceiveDrag| CursorInfo: %s Valid: %s', pformat:B()(cursorInfo), IsValidDragSource(cursorInfo))
     if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    local dragEventHandler = O.ReceiveDragEventHandler
-    dragEventHandler:Handle(btnUI, cursorInfo)
+    O.ReceiveDragEventHandler:Handle(btnUI, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end

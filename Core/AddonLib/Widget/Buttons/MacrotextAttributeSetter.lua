@@ -6,7 +6,9 @@ local GameTooltip = GameTooltip
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local GC = O.GlobalConstants
 local WAttr, Assert = GC.WidgetAttributes, O.Assert
 local AssertNotNil = Assert.AssertNotNil
@@ -41,11 +43,11 @@ function S:SetAttributes(btnUI, btnData)
 end
 
 ---@param link table The blizzard `GameTooltip` link
-function S:ShowTooltip(btnUI, btnData)
-    if not btnUI or not btnData then return end
-    local type = btnData.type
-    if not type then return end
+function S:ShowTooltip(btnUI)
+    local bd = btnUI.widget:GetButtonData()
+    if not bd:ConfigContainsValidActionType() then return end
 
+    local btnData = btnUI.widget:GetConfig()
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
     GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     GameTooltip:AddSpellByID(macroTextInfo.id)
