@@ -47,6 +47,9 @@ local function PickupStuff(widget)
     elseif widget:IsCompanion() then
         local companion = widget:GetButtonData():GetCompanionInfo()
         BaseAPI:PickupCompanion(companion)
+    elseif widget:IsBattlePet() then
+        local battlePet = widget:GetButtonData():GetBattlePetInfo()
+        BaseAPI:PickupBattlePet(battlePet.guid)
     else
         p:log(20, "PickupExisting | no item picked up")
     end

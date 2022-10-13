@@ -6,8 +6,9 @@ local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local String, Assert = O.String, O.Assert
 local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION =
-    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
+local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
+    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT,
+    WAttr.COMPANION, WAttr.BATTLE_PET
 local P = O.Profile
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
@@ -83,6 +84,8 @@ local function methods(bd)
     function bd:GetMountInfo() return self:GetConfig()[MOUNT] end
     ---@return Profile_Companion
     function bd:GetCompanionInfo() return self:GetConfig()[COMPANION] end
+    ---@return Profile_BattlePet
+    function bd:GetBattlePetInfo() return self:GetConfig()[BATTLE_PET] end
 
     function bd:ConfigContainsValidActionType()
         if not type then return false end
@@ -102,6 +105,9 @@ local function methods(bd)
     function bd:IsInvalidCompanion(c)
         return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
     end
+
+    ---@param p Profile_BattlePet
+    function bd:IsInvalidBattlePet(p) return IsNil(p) and IsNil(p.guid) and IsNil(p.name) end
 
     function bd:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end
     function bd:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.widget.frameIndex) end

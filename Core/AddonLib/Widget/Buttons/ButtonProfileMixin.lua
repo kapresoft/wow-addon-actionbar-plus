@@ -12,7 +12,9 @@ local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 local GC = O.GlobalConstants
 local CN = GC.Profile_Config_Names
 local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
+local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
+            WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
+            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
 local IsTableEmpty = Table.isEmpty
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
 local p = O.LogFactory(Core.M.ButtonProfileMixin)
@@ -85,6 +87,7 @@ function _L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
 ---@see Interface/FrameXML/SecureHandlers.lua
 ---@return boolean
 function _L:IsCompanion() return self:IsConfigOfType(self:GetConfig(), COMPANION) end
+function _L:IsBattlePet() return self:IsConfigOfType(self:GetConfig(), BATTLE_PET) end
 
 ---@param config Profile_Button
 ---@param type string spell, item, macro, mount, etc

@@ -1,7 +1,15 @@
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local sformat = string.format
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
+---@type _GameTooltip
 local GameTooltip = GameTooltip
+---### See: Interface/SharedXML/Constants.lua
+local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -21,56 +29,63 @@ New Instance
 -------------------------------------------------------------------------------]]
 local p = O.LogFactory(Core.M.CompanionDragEventHandler)
 
----@class CompanionDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.CompanionDragEventHandler)
+---@class BattlePetDragEventHandler : DragEventHandler
+local L = LibStub:NewLibrary(Core.M.BattlePetDragEventHandler)
 
----@class CompanionAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.CompanionAttributeSetter)
+---@class BattlePetAttributeSetter : BaseAttributeSetter
+local S = LibStub:NewLibrary(Core.M.BattlePetAttributeSetter)
 ---@type BaseAttributeSetter
 local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
 
----@param companion CompanionInfo
+---@param battlePet BattlePetInfo
 ---@return boolean
-local function IsInvalidCompanion(companion)
-    return IsNil(companion)
-            and IsNil(companion.creatureName)
-            and IsNil(companion.creatureSpellID)
+local function IsInvalidBattlePet(battlePet)
+    return IsNil(battlePet) and IsNil(battlePet.guid) and IsNil(battlePet.name)
 end
----@param companion CompanionInfo
----@return Profile_Companion
-local function ToProfileCompanion(companion)
+
+---@param pet BattlePetInfo
+---@return Profile_BattlePet
+local function ToProfileBattlePet(pet)
     return {
-        type = 'companion',
-        petType = companion.petType,
-        mountType = companion.mountType,
-        id = companion.creatureID,
-        index = companion.index,
-        name = 'Black Kingsnake',
-        spell = {  id = companion.creatureSpellID, icon = companion.icon },
+        type = 'battlepet',
+        petType = pet.petType,
+        guid = pet.guid,
+        creatureID = pet.creatureID,
+        speciesID = pet.speciesID,
+        name = pet.name,
+        icon = pet.icon,
     }
 end
 
+
 --[[-----------------------------------------------------------------------------
-Methods: CompanionDragEventHandler
+Methods: BattlePetDragEventHandler
 -------------------------------------------------------------------------------]]
----@param e CompanionDragEventHandler
+---@param e BattlePetDragEventHandler
 local function eventHandlerMethods(e)
+
+    ---Some battle pets are faction-based
+    ---@param cursorInfo CursorInfo
+    function e:Supports(cursorInfo)
+        local petCursor = BaseAPI:ToBattlePetCursor(cursorInfo)
+        if not petCursor then return false end
+        return BaseAPI:CanSummonBattlePet(petCursor.guid)
+    end
 
     ---@param btnUI ButtonUI
     ---@param cursorInfo CursorInfo
     function e:Handle(btnUI, cursorInfo)
-        local companionCursor = BaseAPI:ToCompanionCursor(cursorInfo)
+        local petCursor = BaseAPI:ToBattlePetCursor(cursorInfo)
+        local battlePet = BaseAPI:GetBattlePetInfo(petCursor.guid)
+        if not battlePet then return end
 
-        local companion = BaseAPI:GetCompanionInfo(companionCursor.petType, companionCursor.index)
-        if not companion then return end
-
-        if IsInvalidCompanion(companion) then return end
+        if IsInvalidBattlePet(battlePet) then return end
         local btnData = btnUI.widget:GetConfig()
-        local profileCompanion = ToProfileCompanion(companion)
+        local profileBattlePet = ToProfileBattlePet(battlePet)
 
         PH:PickupExisting(btnUI.widget)
-        btnData[WAttr.TYPE] = WAttr.COMPANION
-        btnData[WAttr.COMPANION] = profileCompanion
+        btnData[WAttr.TYPE] = WAttr.BATTLE_PET
+        btnData[WAttr.BATTLE_PET] = profileBattlePet
 
         S(btnUI, btnData)
     end
@@ -78,24 +93,26 @@ local function eventHandlerMethods(e)
 end
 
 --[[-----------------------------------------------------------------------------
-Methods: CompanionAttributeSetter
+Methods: BattlePetAttributeSetter
 -------------------------------------------------------------------------------]]
----@param a CompanionAttributeSetter
+---@param a BattlePetAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
     ---@param btnData Profile_Button
     function a:SetAttributes(btnUI, btnData)
-        --TODO: NEXT: Remove btnData
         local w = btnUI.widget
         w:ResetWidgetAttributes()
-        local companion = w:GetButtonData():GetCompanionInfo()
-        if not companion then return end
 
-        local spellIcon, spell = EMPTY_ICON, companion.spell
-        if spell.icon then spellIcon = spell.icon end
+        local battlePet = w:GetButtonData():GetBattlePetInfo()
+
+        local spellIcon  = EMPTY_ICON
+        if battlePet.icon then spellIcon = battlePet.icon end
+
         w:SetIcon(spellIcon)
-        btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
-        btnUI:SetAttribute(WAttr.SPELL, companion.name)
+
+        --- Note: Summoning a battle pet is not a secure call
+        ---     * No Attributes need to be set.
+        ---     * Summon is implemented on ButtonUI#PreClick()
 
         self:HandleGameTooltipCallbacks(btnUI)
     end
@@ -106,11 +123,14 @@ local function attributeSetterMethods(a)
         local bd = btnUI.widget:GetButtonData()
         if not bd:ConfigContainsValidActionType() then return end
 
-        local companion = bd:GetCompanionInfo()
-        if bd:IsInvalidCompanion(companion) then return end
+        local battlePet = bd:GetBattlePetInfo()
+        if bd:IsInvalidBattlePet(battlePet) then return end
 
+        --todo next: localize
         GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
-        GameTooltip:AddSpellByID(companion.spell.id)
+        GameTooltip:SetText(battlePet.name)
+        GameTooltip:AppendText(sformat(DESC_FORMAT, 'Instant'))
+        GameTooltip:AppendText(sformat(DESC_FORMAT, 'Summons and dismisses your ' .. battlePet.name))
     end
 end
 

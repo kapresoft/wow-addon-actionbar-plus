@@ -3,7 +3,7 @@ WoW Vars
 -------------------------------------------------------------------------------]]
 local ClearCursor, CreateFrame, UIParent = ClearCursor, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local C_Timer = C_Timer
+local C_Timer, C_PetJournal = C_Timer, C_PetJournal
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -53,7 +53,7 @@ local function IsValidDragSource(cursorInfo)
         --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
-    return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo.type)
+    return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo)
 end
 
 ---@param widget ButtonUIWidget
@@ -72,6 +72,10 @@ end
 ---@param key string The key clicked
 ---@param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
+    if btn.widget:IsBattlePet() and C_PetJournal then
+        C_PetJournal.SummonPetByGUID(btn.widget:GetButtonData():GetBattlePetInfo().guid)
+        return
+    end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
@@ -101,8 +105,16 @@ end
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorInfo = API:GetCursorInfo()
-    p:log(10, 'OnReceiveDrag| CursorInfo: %s Valid: %s', pformat:B()(cursorInfo), IsValidDragSource(cursorInfo))
-    if not IsValidDragSource(cursorInfo) then return end
+    if not cursorInfo then return end
+    local cursorUtil = ABP_CreateCursorUtil(cursorInfo)
+    if not cursorUtil:IsValid() then
+        p:log(10, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorInfo))
+        return false
+    else
+        p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
+    end
+
+    --if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
     ---@type ReceiveDragEventHandler

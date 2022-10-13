@@ -31,8 +31,11 @@ local M = {
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
+    CursorMixin = 'CursorMixin',
     -- Addons
     BaseAttributeSetter = 'BaseAttributeSetter',
+    BattlePetDragEventHandler = 'BattlePetDragEventHandler',
+    BattlePetAttributeSetter = 'BattlePetAttributeSetter',
     ButtonData = 'ButtonData',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
@@ -130,6 +133,10 @@ local GlobalObjectsTemplate = {
     Modules = {},
     ---@type MountDragEventHandler
     MountDragEventHandler = {},
+    ---@type BattlePetDragEventHandler
+    BattlePetDragEventHandler = {},
+    ---@type BattlePetAttributeSetter
+    BattlePetAttributeSetter = {},
     ---@type CompanionDragEventHandler
     CompanionDragEventHandler = {},
     ---@type CompanionAttributeSetter

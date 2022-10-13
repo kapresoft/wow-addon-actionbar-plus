@@ -8,9 +8,10 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local C_MountJournal, C_Timer = C_MountJournal, C_Timer
+local C_Timer = C_Timer
 local PickupCompanion, GetCompanionInfo = PickupCompanion, GetCompanionInfo
-local C_PetBattles, UnitInVehicle = C_PetBattles, UnitInVehicle
+local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
+local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, UnitInVehicle
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -53,6 +54,15 @@ function L:ToCompanionCursor(cursorInfo)
     }
 end
 
+---@param cursorInfo CursorInfo
+---@return BattlePetCursor
+function L:ToBattlePetCursor(cursorInfo)
+    return {
+        ['type'] = cursorInfo.type or 'battlepet',
+        ['guid'] = cursorInfo.info1 or '',
+    }
+end
+
 ---### See Interface_<wow-version>/FrameXML/Constants.lua#PET_TYPE_SUFFIX
 ---### See Also: GetNumCompanions('type')
 ---@param petType string See PET_TYPE_SUFFIX
@@ -91,13 +101,67 @@ function L:PickupMount(mount)
     PickupCompanion(MOUNT, mount.index)
 end
 
+---@param guid string Pet GUID
+function L:PickupBattlePet(guid)
+    if IsBlank(guid) then return end
+    C_PetJournal.PickupPet(guid)
+end
+
 ---@param companion Profile_Companion
 function L:PickupCompanion(companion)
+    if not companion then return end
     if C_PetJournal then
         return C_PetJournal.PickupPet(companion.id)
     end
     PickupCompanion(companion.petType, companion.index)
 end
+
+---@param petGUID string Example: BattlePet-0-000008C13591
+---@return boolean
+function L:CanSummonBattlePet(petGUID)
+    if not (C_PetJournal and petGUID) then return false end
+    return C_PetJournal.PetIsSummonable(petGUID)
+end
+
+---### Doc: [https://wowpedia.fandom.com/wiki/API_GetCursorInfo](https://wowpedia.fandom.com/wiki/API_GetCursorInfo)
+---### Doc: [https://wowpedia.fandom.com/wiki/API_C_PetJournal.GetPetInfoByPetID](https://wowpedia.fandom.com/wiki/API_C_PetJournal.GetPetInfoByPetID)
+--- ```
+--- local type, info1 = GetCursorInfo()
+---```
+---@param petGUID string Example: BattlePet-0-000008C13591
+---@return BattlePetInfo
+function L:GetBattlePetInfo(petGUID)
+    if IsBlank(petGUID) then return nil end
+
+    local speciesID, customName, level, xp, maxXp, displayID,
+    isFavorite, name, icon, petType, creatureID, sourceText,
+    description, isWild, canBattle, tradable, unique, obtainable =
+            C_PetJournal.GetPetInfoByPetID(petGUID)
+    local isSummonable = C_PetJournal.PetIsSummonable(petGUID)
+    return {
+        ['guid'] = petGUID,
+        ['canSummon'] = isSummonable,
+        ['speciesID'] = speciesID,
+        ['customName'] = customName,
+        ['level'] = level,
+        ['xp'] = xp,
+        ['maxXp'] = maxXp,
+        ['displayID'] = displayID,
+        ['isFavorite'] = isFavorite,
+        ['name'] = name,
+        ['icon'] = icon,
+        ['petType'] = petType,
+        ['creatureID'] = creatureID,
+        ['sourceText'] = sourceText,
+        ['description'] = description,
+        ['isWild'] = isWild,
+        ['canBattle'] = canBattle,
+        ['tradable'] = tradable,
+        ['unique'] = unique,
+        ['obtainable'] = obtainable
+    }
+end
+
 
 ---## For WOTLK
 --- CursorInfo for WOTLK
@@ -116,8 +180,8 @@ end
 --- actionType, info1, info2
 --- "mount", mountId, C_MountJournal index
 ---```
----@return MountInfo
 ---@param cursorInfo CursorInfo
+---@return MountInfo
 function L:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
     local mountInfoAPI = self:GetMountInfoGeneric(mountIDorIndex)

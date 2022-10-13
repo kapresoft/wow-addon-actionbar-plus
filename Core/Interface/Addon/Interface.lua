@@ -43,7 +43,6 @@ local Profile_Mount = {
     name = 'Reawakened Phase Hunter',
     spell = Profile_Mount_Spell,
 }
-
 ---@class Profile_Companion_Spell
 local Profile_Companion_Spell = { id = 1, icon = 123 }
 ---@class Profile_Companion
@@ -55,6 +54,16 @@ local Profile_Companion = {
     index = -1,
     name = 'Black Kingsnake',
     spell = Profile_Companion_Spell,
+}
+---@class Profile_BattlePet
+local Profile_BattlePet = {
+    type='battlepet',
+    petType = -1,
+    ['guid'] = 'BattlePet-0-000008C13591',
+    ['speciesID'] = speciesID,
+    ['creatureID'] = 157969,
+    ['name'] = 'Anima Wyrmling',
+    ['icon'] = 3038273,
 }
 
 ---@class Profile_Button
