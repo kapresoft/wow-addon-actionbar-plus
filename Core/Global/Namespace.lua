@@ -1,6 +1,15 @@
 --[[-----------------------------------------------------------------------------
 Namespace Initialization
 -------------------------------------------------------------------------------]]
+local _addon, _ns = ...
+
+---This absolutely does NOTHING but make EmmyLua work better in IDEs for code
+---completions.
+---@param o Namespace
+local function Define_InterfaceMethods(o)
+    function o:CreateCursorUtil() end
+end
+Define_InterfaceMethods(_ns)
 
 ---###Usage:
 ---```

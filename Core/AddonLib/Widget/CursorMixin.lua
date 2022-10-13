@@ -48,6 +48,3 @@ function ns:CreateCursorUtil()
     local c = K_CreateAndInitFromMixin(L, O.API:GetCursorInfo())
     return c
 end
-
----@return CursorUtil
-ABP_CreateCursorUtil = function() return ns:CreateCursorUtil() end
