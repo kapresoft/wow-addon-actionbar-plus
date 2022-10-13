@@ -45,7 +45,7 @@ local function ToProfileCompanion(companion)
         mountType = companion.mountType,
         id = companion.creatureID,
         index = companion.index,
-        name = 'Black Kingsnake',
+        name = companion.creatureName,
         spell = {  id = companion.creatureSpellID, icon = companion.icon },
     }
 end
