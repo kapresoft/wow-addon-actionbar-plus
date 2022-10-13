@@ -189,6 +189,8 @@ local function GlobalConstantProperties(o)
         SPELL = 'spell',
         ITEM = 'item',
         MOUNT = 'mount',
+        COMPANION = 'companion',
+        BATTLE_PET = 'battlepet',
         FLY_OUT = 'flyout',
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
@@ -203,6 +205,7 @@ local function GlobalConstantProperties(o)
         TYPE = WidgetAttributes.TYPE,
         MACRO = WidgetAttributes.MACRO,
         MOUNT = WidgetAttributes.MOUNT,
+        BATTLE_PET = WidgetAttributes.BATTLE_PET,
         MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
     }
 

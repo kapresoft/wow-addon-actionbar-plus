@@ -31,13 +31,18 @@ local M = {
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
+    CursorMixin = 'CursorMixin',
     -- Addons
     BaseAttributeSetter = 'BaseAttributeSetter',
+    BattlePetDragEventHandler = 'BattlePetDragEventHandler',
+    BattlePetAttributeSetter = 'BattlePetAttributeSetter',
     ButtonData = 'ButtonData',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
+    CompanionDragEventHandler = 'CompanionDragEventHandler',
+    CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
@@ -128,6 +133,14 @@ local GlobalObjectsTemplate = {
     Modules = {},
     ---@type MountDragEventHandler
     MountDragEventHandler = {},
+    ---@type BattlePetDragEventHandler
+    BattlePetDragEventHandler = {},
+    ---@type BattlePetAttributeSetter
+    BattlePetAttributeSetter = {},
+    ---@type CompanionDragEventHandler
+    CompanionDragEventHandler = {},
+    ---@type CompanionAttributeSetter
+    CompanionAttributeSetter = {},
     ---@type MountAttributeSetter
     MountAttributeSetter = {},
     ---@type Kapresoft_LibUtil_Mixin

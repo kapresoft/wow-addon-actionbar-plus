@@ -11,7 +11,9 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local GC = O.GlobalConstants
 local String, WAttr = O.String, GC.WidgetAttributes
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
@@ -47,15 +49,11 @@ end
 
 ---@param btnUI ButtonUI
 function S:ShowTooltip(btnUI)
-    if not btnUI then return end
-    local w = btnUI.widget
-    local btnData = w:GetConfig()
-    if not btnData then return end
-    if String.IsBlank(btnData.type) then return end
+    local bd = btnUI.widget:GetButtonData()
+    if not bd:ConfigContainsValidActionType() then return end
+    local btnData = btnUI.widget:GetConfig()
 
     local macroInfo = btnData[WAttr.MACRO]
-    local macroLabel = ''
-
     if not (macroInfo.index or macroInfo.name) then return end
 
     GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)

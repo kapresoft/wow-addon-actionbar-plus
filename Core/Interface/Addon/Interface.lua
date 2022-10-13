@@ -33,13 +33,37 @@ local Profile_Macro = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
+---@class Profile_Mount_Spell
+local Profile_Mount_Spell = { id = 1, icon = 123 }
 ---@class Profile_Mount
 local Profile_Mount = {
     type = 'mount',
     id = -1,
     index = -1,
     name = 'Reawakened Phase Hunter',
-    spell = {  id = 1, icon = 123 },
+    spell = Profile_Mount_Spell,
+}
+---@class Profile_Companion_Spell
+local Profile_Companion_Spell = { id = 1, icon = 123 }
+---@class Profile_Companion
+local Profile_Companion = {
+    type = 'companion',
+    petType = 'critter',
+    mountType = 0x1,
+    id = -1,
+    index = -1,
+    name = 'Black Kingsnake',
+    spell = Profile_Companion_Spell,
+}
+---@class Profile_BattlePet
+local Profile_BattlePet = {
+    type='battlepet',
+    petType = -1,
+    ['guid'] = 'BattlePet-0-000008C13591',
+    ['speciesID'] = speciesID,
+    ['creatureID'] = 157969,
+    ['name'] = 'Anima Wyrmling',
+    ['icon'] = 3038273,
 }
 
 ---@class Profile_Button
@@ -49,6 +73,7 @@ local Profile_Button = {
     ["item"] = Profile_Item,
     ["macro"] = Profile_Macro,
     ["mount"] = Profile_Mount,
+    ["companion"] = Profile_Companion,
 }
 
 ---@class Profile_Bar_Widget

@@ -77,6 +77,7 @@ end
 
 function L:API() return O.BaseAPI, O.API end
 function L:NS() return ns end
+function L:O() return ns.O end
 
 D = L
 

@@ -3,7 +3,7 @@ WoW Vars
 -------------------------------------------------------------------------------]]
 local ClearCursor, CreateFrame, UIParent = ClearCursor, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
-local C_Timer = C_Timer
+local C_Timer, C_PetJournal = C_Timer, C_PetJournal
 
 --[[-----------------------------------------------------------------------------
 LUA Vars
@@ -13,7 +13,9 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local LogFactory = O.LogFactory
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
@@ -25,7 +27,7 @@ local E, API = GC.E, O.API
 
 local IsBlank = String.IsBlank
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local ACTION_TYPES = GC.WidgetAttributes
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -51,10 +53,7 @@ local function IsValidDragSource(cursorInfo)
         --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
-    return (cursorInfo.type == ACTION_TYPES.SPELL
-            or cursorInfo.type == ACTION_TYPES.ITEM
-            or cursorInfo.type == ACTION_TYPES.MACRO
-            or cursorInfo.type == ACTION_TYPES.MOUNT)
+    return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo)
 end
 
 ---@param widget ButtonUIWidget
@@ -73,6 +72,10 @@ end
 ---@param key string The key clicked
 ---@param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
+    if btn.widget:IsBattlePet() and C_PetJournal then
+        C_PetJournal.SummonPetByGUID(btn.widget:GetButtonData():GetBattlePetInfo().guid)
+        return
+    end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
@@ -102,13 +105,20 @@ end
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorInfo = API:GetCursorInfo()
-    p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
-    if not IsValidDragSource(cursorInfo) then return end
+    if not cursorInfo then return end
+    local cursorUtil = ABP_CreateCursorUtil(cursorInfo)
+    if not cursorUtil:IsValid() then
+        p:log(10, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorInfo))
+        return false
+    else
+        p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
+    end
+
+    --if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    local dragEventHandler = O.ReceiveDragEventHandler
-    dragEventHandler:Handle(btnUI, cursorInfo)
+    O.ReceiveDragEventHandler:Handle(btnUI, cursorInfo)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
