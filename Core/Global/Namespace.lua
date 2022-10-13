@@ -7,8 +7,19 @@ local _addon, _ns = ...
 ---completions.
 ---@param o Namespace
 local function Define_InterfaceMethods(o)
+
+    ---@see CursorMixin.lua
+    ---@return CursorUtil
     function o:CreateCursorUtil() end
+
+    ---@see UtilWrapper.lua
+    ---@param start number
+    ---@param increment number
+    ---@return Kapresoft_LibUtil_Incrementer
+    function o:CreateIncrementer(start, increment) end
+
 end
+
 Define_InterfaceMethods(_ns)
 
 ---###Usage:
