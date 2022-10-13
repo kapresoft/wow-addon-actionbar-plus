@@ -453,7 +453,8 @@ end
 function L:UpdateUsable()
     local cd = self:GetCooldownInfo()
     if (cd == nil or cd.details == nil or cd.details.spell == nil) then
-        return true
+        if self:IsCompanion() then self:SetSpellUsable(true) end
+        return
     end
 
     local c = self:GetConfig()

@@ -40,16 +40,13 @@ local handlers = {
     [MACRO_TEXT] = O.MacroDragEventHandler,
 }
 
----@param cursorInfo CursorInfo
-function L:IsSupportedCursorType(cursorInfo)
-    local cursorUtil = ABP_CreateCursorUtil(cursorInfo)
-    if not cursorUtil:IsValid() then return false end
-
-    local handler = handlers[cursorInfo.type]
+---@param cursor CursorUtil
+function L:IsSupportedCursorType(cursor)
+    local handler = handlers[cursor:GetType()]
     if not (handler and handler.Handle) then return false end
 
     -- Optional method Supports():boolean
-    if handler.Supports then return handler:Supports(cursorInfo) end
+    if handler.Supports then return handler:Supports(cursor:GetCursor()) end
 
     return true
 end
@@ -65,15 +62,16 @@ function L:CleanupProfile(btnUI, actionType)
     end
 end
 
----@param cursorInfo CursorInfo
+---@param cursor CursorUtil
 ---@param btnUI ButtonUI
-function L:Handle(btnUI, cursorInfo)
+function L:Handle(btnUI, cursor)
+    local cursorInfo = cursor:GetCursor()
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
     AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
     self:log(10, 'Handle| CursorInfo: %s', pformat:B()(cursorInfo))
     local actionType = cursorInfo.type
 
-    if not self:IsSupportedCursorType(cursorInfo) then return end
+    if not self:IsSupportedCursorType(cursor) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
     self:CleanupProfile(btnUI, actionType)

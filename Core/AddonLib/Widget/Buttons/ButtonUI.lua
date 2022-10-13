@@ -104,21 +104,17 @@ end
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-    local cursorInfo = API:GetCursorInfo()
-    if not cursorInfo then return end
     local cursorUtil = ABP_CreateCursorUtil(cursorInfo)
     if not cursorUtil:IsValid() then
-        p:log(10, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorInfo))
+        p:log(10, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()))
         return false
     else
-        p:log(10, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorInfo))
+        p:log(1, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()))
     end
-
-    --if not IsValidDragSource(cursorInfo) then return end
     ClearCursor()
 
     ---@type ReceiveDragEventHandler
-    O.ReceiveDragEventHandler:Handle(btnUI, cursorInfo)
+    O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
