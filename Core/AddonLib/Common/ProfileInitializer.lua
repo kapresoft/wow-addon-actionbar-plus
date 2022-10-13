@@ -6,7 +6,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local ns = ABP_Namespace(...)
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+
 local GC = O.GlobalConstants
 local ATTR, Table = GC.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
@@ -47,8 +49,8 @@ local EnabledBars = {
 
 local ConfigNames = GC.Profile_Config_Names
 
-local xIncr = ABP_CreateIncrementer(30, 220)
-local yIncr = ABP_CreateIncrementer(-130, -90)
+local xIncr = ns:CreateIncrementer(30, 220)
+local yIncr = ns:CreateIncrementer(-130, -90)
 local defaultWidget = {
     ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35,
     ["alpha"] = 0.5, ["show_empty_buttons"] = true,
