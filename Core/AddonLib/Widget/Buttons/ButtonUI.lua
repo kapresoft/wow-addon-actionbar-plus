@@ -104,7 +104,7 @@ end
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
-    local cursorUtil = ABP_CreateCursorUtil(cursorInfo)
+    local cursorUtil = ns:CreateCursorUtil()
     if not cursorUtil:IsValid() then
         p:log(10, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()))
         return false
