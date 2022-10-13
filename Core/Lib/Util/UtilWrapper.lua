@@ -2,10 +2,11 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 ---@type Kapresoft_LibUtil_Assert
-local Assert = Kapresoft_LibUtil_Assert()
+--local Assert = Kapresoft_LibUtil_Assert()
+local Assert = LibStub:LibStubAce("Kapresoft-LibUtil-Assert-1.0")
 Core:Register(Core.M.Assert, Assert)
 
 ---@type Kapresoft_LibUtil_Table

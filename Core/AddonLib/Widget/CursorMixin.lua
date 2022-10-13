@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
-local MX, IsBlank = O.Mixin, O.String.IsBlank
+local IsBlank = O.String.IsBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -42,16 +42,12 @@ function L:GetType() return self.cursorInfo.type end
 ---@return CursorInfo
 function L:GetCursor() return self.cursorInfo end
 
----@param cursorInfo CursorInfo
 ---@return CursorUtil
-function ns:CreateCursorUtil(cursorInfo)
-    assert(cursorInfo, "CursorInfo is required.")
-
+function ns:CreateCursorUtil()
     ---@class CursorUtil : CursorMixin
-    local c = MX:MixinAndInit(L, cursorInfo)
+    local c = K_CreateAndInitFromMixin(L, O.API:GetCursorInfo())
     return c
 end
 
----@param cursorInfo CursorInfo
 ---@return CursorUtil
-ABP_CreateCursorUtil = function(cursorInfo) return ns:CreateCursorUtil(cursorInfo) end
+ABP_CreateCursorUtil = function() return ns:CreateCursorUtil() end
