@@ -1,13 +1,15 @@
-# ActionbarPlus 1.0.5 (2022-Oct-11)
+# ActionbarPlus 1.0.6 (2022-Oct-14)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.5) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.4...1.0.5) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.6) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.5...1.0.6) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone #10.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/5?closed=1)
+[Milestone #10.4](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/6?closed=1)
 
-- #96 Hide bars while in a vehicle
-- #99 Migrate some (but not all) global variables to addon namespace [DEV]
+- #53 Support for Pets (Companions and Battle Pets)
+    - A player can now drag and drop companions and Battle Pets (retail)
+- #82 Item count text too big for small sized action bar buttons
+    - Scaling logic has been applied to item count text for items
 
-# ActionbarPlus-1.0.5.zip
+# ActionbarPlus-1.0.6.zip
 
 ```text
 MD5 <TBD>
