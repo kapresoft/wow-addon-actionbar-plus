@@ -46,7 +46,9 @@ button: widget.button
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
 local L = LibStub:NewLibrary(Core.M.ButtonMixin)
+---@type LoggerTemplate
 local p = L:GetLogger()
+
 MX:Mixin(L, O.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -101,41 +103,76 @@ end
 function L:Scale(buttonSize)
     local button = self:B()
     button.keybindText.widget:ScaleWithButtonSize(buttonSize)
-    self:ScaleCooldownWithButtonSize(buttonSize)
+    --todo next: move to a ButtonScaleMixin?
+    self:ScaleButtonTextsWithButtonSize(buttonSize)
+    self:ScaleItemCountOffset(buttonSize)
+end
+
+---@param buttonSize number
+function L:ScaleItemCountOffset(buttonSize)
+    local offsetX = -2
+    local offsetY = 7
+    local scaleFactorX = 50
+    local scaleFactorY = 100
+    if buttonSize <= 40 then offsetX = (buttonSize/20) - offsetX end
+    local scaleXOffset = buttonSize/scaleFactorX * offsetX
+    local scaleYOffset = buttonSize/scaleFactorY * offsetY
+    self:B().text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
 end
 
 ---@see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
-function L:ScaleCooldownWithButtonSize(buttonSize)
+---@param buttonSize number
+function L:ScaleButtonTextsWithButtonSize(buttonSize)
     local widget = self:W()
+    local hideItemCountText = false
     local hideCountdownNumbers = false
     local hideIndexText = false
     local hideKeybindText = false
     local countdownFont
+    local itemCountFont
     local profile = widget:GetButtonData():GetProfileConfig()
+    local textUI = widget.button.text
+    local itemCountFontHeight = textUI.textDefaultFontHeight
 
     if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
 
     if buttonSize > 80 then
+        itemCountFont = "GameFontNormalOutline"
         countdownFont = "GameFontNormalHuge4Outline"
+        itemCountFontHeight = textUI.textDefaultFontHeight
     elseif buttonSize >= 70 and buttonSize <= 80 then
+        itemCountFontHeight = 12
         countdownFont = "GameFontNormalHuge3Outline"
+        itemCountFontHeight = textUI.textDefaultFontHeight
     elseif buttonSize >= 40 and buttonSize < 70 then
+        itemCountFontHeight = 10
         countdownFont = "GameFontNormalLargeOutline"
+        itemCountFontHeight = textUI.textDefaultFontHeight
     elseif buttonSize >= MIN_BUTTON_SIZE and buttonSize < 40 then
+        itemCountFontHeight = 9
         countdownFont = "GameFontNormalMed3Outline"
+        itemCountFontHeight = textUI.textDefaultFontHeight
     else
         countdownFont = "GameFontNormalOutline"
+        itemCountFontHeight = 9
+
         if true == profile.hide_text_on_small_buttons then
+            hideItemCountText = true
             hideIndexText = true
             hideCountdownNumbers = true
             hideKeybindText = true
         end
+
     end
+    local fontName, _, fontAttr = textUI:GetFont()
+    textUI:SetFont(fontName, itemCountFontHeight, fontAttr)
 
     widget.cooldown:SetCountdownFont(countdownFont)
     self:HideCountdownNumbers(hideCountdownNumbers)
+    self:SetHideItemCountText(hideItemCountText)
     self:SetHideIndexText(hideIndexText)
     self:SetHideKeybindText(hideKeybindText)
+
 end
 
 function L:RefreshTexts()
@@ -166,25 +203,37 @@ function L:HideCountdownNumbers(state)
     self:W().cooldown:SetHideCountdownNumbers(state)
 end
 
+---This is the item count text
 ---@param state boolean
-function L:SetHideKeybindText(state)
-    local widget = self:W()
+function L:SetHideItemCountText(state)
+    local btn = self:B()
     if true == state then
-        widget.button.keybindText:Hide()
+        btn.text:Hide()
         return
     end
 
-    widget.button.keybindText:Show()
+    btn.text:Show()
+end
+
+---@param state boolean
+function L:SetHideKeybindText(state)
+    local btn = self:B()
+    if true == state then
+        btn.keybindText:Hide()
+        return
+    end
+
+    btn.keybindText:Show()
 end
 ---@param state boolean
 function L:SetHideIndexText(state)
-    local widget = self:W()
+    local btn = self:B()
     if true == state then
-        widget.button.indexText:Hide()
+        btn.indexText:Hide()
         return
     end
 
-    widget.button.indexText:Show()
+    btn.indexText:Show()
 end
 
 ---@param btn _Button
