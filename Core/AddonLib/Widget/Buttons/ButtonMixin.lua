@@ -114,7 +114,7 @@ function L:ScaleItemCountOffset(buttonSize)
     local offsetY = 7
     local scaleFactorX = 50
     local scaleFactorY = 100
-    if buttonSize <= 40 then offsetX = (buttonSize/20) - offsetX end
+    offsetX = (buttonSize/100) - (offsetX + buttonSize/15)
     local scaleXOffset = buttonSize/scaleFactorX * offsetX
     local scaleYOffset = buttonSize/scaleFactorY * offsetY
     self:B().text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
@@ -143,15 +143,12 @@ function L:ScaleButtonTextsWithButtonSize(buttonSize)
     elseif buttonSize >= 70 and buttonSize <= 80 then
         itemCountFontHeight = 12
         countdownFont = "GameFontNormalHuge3Outline"
-        itemCountFontHeight = textUI.textDefaultFontHeight
     elseif buttonSize >= 40 and buttonSize < 70 then
-        itemCountFontHeight = 10
+        itemCountFontHeight = 11
         countdownFont = "GameFontNormalLargeOutline"
-        itemCountFontHeight = textUI.textDefaultFontHeight
     elseif buttonSize >= MIN_BUTTON_SIZE and buttonSize < 40 then
-        itemCountFontHeight = 9
+        itemCountFontHeight = 10
         countdownFont = "GameFontNormalMed3Outline"
-        itemCountFontHeight = textUI.textDefaultFontHeight
     else
         countdownFont = "GameFontNormalOutline"
         itemCountFontHeight = 9
