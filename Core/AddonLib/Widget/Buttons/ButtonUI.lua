@@ -394,11 +394,11 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI : _Button
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
+    button.text = WMX:CreateFontString(button)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
 
     RegisterScripts(button)
-    WMX:CreateFontString(button)
 
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown");

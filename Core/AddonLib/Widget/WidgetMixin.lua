@@ -89,9 +89,12 @@ function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 ---@param button ButtonUI
 function _L:CreateFontString(button)
     local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint("BOTTOMRIGHT",-3, 2)
-    button.text = fs
+    fs:SetPoint("BOTTOMRIGHT", -3, 2)
+    local _, fontHeight = fs:GetFont()
+    fs.textDefaultFontHeight = fontHeight
+    return fs
 end
+
 
 ---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
 ---@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
@@ -264,13 +267,6 @@ function _L:IsDragKeyDown()
             or pickupAction == GC.C.ALT and IsAltKeyDown()
             or pickupAction == GC.C.CTRL and IsControlKeyDown()
     return isDragKeyDown
-end
-
----@param button ButtonUI
-function _L:CreateFontString(button)
-    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
-    fs:SetPoint(GC.C.BOTTOMRIGHT,-3, 2)
-    button.text = fs
 end
 
 function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
