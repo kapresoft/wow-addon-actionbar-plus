@@ -94,6 +94,10 @@ local function GlobalConstantProperties(o)
     ---@class EventNames
     local E = {
 
+        ---################################
+        --- Addon Messages
+        AddonMessage_OnAfterInitialize = 'AddonMessage_OnAfterInitialize',
+
         OnEnter = 'OnEnter',
         OnEvent = 'OnEvent',
         OnLeave = 'OnLeave',
@@ -104,8 +108,8 @@ local function GlobalConstantProperties(o)
         OnMouseDown = 'OnMouseDown',
         OnReceiveDrag = 'OnReceiveDrag',
 
-        -- ################################
-        ---Custom Events
+        ---################################
+        --- Custom Events
         OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
         OnTextSettingsChanged = 'OnTextSettingsChanged',
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',

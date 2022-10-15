@@ -17,7 +17,7 @@ Local Vars
 local ns = ABP_Namespace(...)
 local ADDON_NAME = ns.name
 
-local O, Core, LibStub = ns:LibPack()
+local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 
 local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
@@ -198,6 +198,8 @@ local methods = {
         -- Get the option table for profiles
         options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         self:RegisterSlashCommands()
+        self:SendMessage(GC.E.AddonMessage_OnAfterInitialize, self)
+
     end
 }
 
@@ -214,8 +216,9 @@ local function CreateAddonFrame(addon)
     frame:SetScript(E.OnEvent, OnAddonLoaded)
     frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
 
+    ---@class ActionbarPlusEvent : ActionbarPlusEventMixin
     local addonEvents = MX:MixinAndInit(O.ActionbarPlusEventMixin, addon)
-    addonEvents:RegisterEvents()
+    addon.addonEvents = addonEvents
 
     frame.obj = addon
     return frame

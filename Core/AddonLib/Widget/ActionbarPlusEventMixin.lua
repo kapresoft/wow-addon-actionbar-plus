@@ -10,10 +10,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
 local O, Core, LibStub = ns:LibPack()
-
 local GC = O.GlobalConstants
 local E = GC.E
 local B = O.BaseAPI
+local AceEvent = O.AceLibFactory:A().AceEvent
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -22,6 +22,13 @@ New Instance
 local L = LibStub:NewLibrary(Core.M.ActionbarPlusEventMixin)
 ---@return LoggerTemplate
 local p = L:GetLogger()
+
+AceEvent:RegisterMessage(E.AddonMessage_OnAfterInitialize, function(evt, ...)
+    ---@type ActionbarPlus
+    local addon = ...
+    p:log(30, 'RegisterMessage: %s called...', evt)
+    addon.addonEvents:RegisterEvents()
+end)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -77,6 +84,7 @@ function L:Init(addon)
 end
 
 ---@param eventFrame _Frame
+---@return BaseEventFrameWidget
 function L:CreateWidget(eventFrame)
     ---@class BaseEventFrameWidget
     local widget = {
@@ -137,6 +145,7 @@ function L:RegisterPetBattleFrame()
 end
 
 function L:RegisterEvents()
+    p:log(30, 'RegisterEvents called..')
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
