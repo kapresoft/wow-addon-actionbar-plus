@@ -35,8 +35,9 @@ local function IsInvalidMount(mount)
 end
 
 ---@param mountInfo MountInfo
+---@param cursorInfo CursorInfo
 ---@return Profile_Mount
-local function ToProfileMount(mountInfo)
+local function ToProfileMount(mountInfo, cursorInfo)
     ---@type Profile_Mount_Spell
     local spell = {
         ---@type number
@@ -72,7 +73,7 @@ local function eventHandlerMethods(e)
         local mountInfoApi = BaseAPI:GetMountInfo(cursorInfo)
         if IsInvalidMount(mountInfoApi) then return end
         local btnData = btnUI.widget:GetConfig()
-        local mount = ToProfileMount(mountInfoApi)
+        local mount = ToProfileMount(mountInfoApi, cursorInfo)
 
         PH:PickupExisting(btnUI.widget)
         btnData[WAttr.TYPE] = WAttr.MOUNT
