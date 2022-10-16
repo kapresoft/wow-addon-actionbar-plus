@@ -248,3 +248,24 @@ end
 
 function L:SupportsPetBattles() return C_PetBattles ~= nil end
 function L:SupportsVehicles() return UnitInVehicle ~= nil end
+
+---@return _SpellCastEventArguments
+function L:ParseSpellCastEventArgs(...)
+    local unitTarget, castGUID, spellID = ...
+    return {
+        ['unitTarget'] = unitTarget,
+        ['castGUID'] = castGUID,
+        ['spellID'] = spellID
+    }
+end
+
+---@return _SpellCastSentEventArguments
+function L:ParseSpellCastSentEventArgs(...)
+    local unit, target, castGUID, spellID = ...
+    return {
+        ['unit'] = unit,
+        ['target'] = target,
+        ['castGUID'] = castGUID,
+        ['spellID'] = spellID
+    }
+end

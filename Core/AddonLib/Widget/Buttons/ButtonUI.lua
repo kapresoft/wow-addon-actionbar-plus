@@ -200,6 +200,9 @@ end
 ---@param widget ButtonUIWidget
 ---@param event string Event string
 local function OnSpellUpdateUsable(widget, event)
+    if not widget.button:IsShown() then return end
+    --p:log('xOnSpellUpdateUsable[f_%s_%s]: %s',
+    --        widget.frameIndex, widget.index, GetTime())
     widget:UpdateRangeIndicator()
 
     OnUpdateButtonUsable(widget, event)
@@ -210,35 +213,6 @@ end
 local function OnBagUpdateDelayed(widget, event)
     if not widget.button:IsShown() then return end
     widget:UpdateItemState()
-end
-
----#### Non-Instant Start-Cast Handler
----@param widget ButtonUIWidget
----@param event string Event string
-local function OnSpellCastStart(widget, event, ...)
-    if not widget.button:IsShown() then return end
-    local unitTarget, castGUID, spellID = ...
-    if 'player' ~= unitTarget then return end
-    local btnConf = widget:GetConfig()
-    if widget:IsMatchingSpellID(spellID, btnConf) then
-        p:log(10, 'OnSpellCastStart| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
-        widget:SetHighlightInUse()
-    end
-end
-
----#### Non-Instant Stop-Cast Handler
----@param widget ButtonUIWidget
----@param event string Event string
-local function OnSpellCastStop(widget, event, ...)
-    if not widget.button:IsShown() then return end
-
-    local unitTarget, castGUID, spellID = ...
-    if 'player' ~= unitTarget then return end
-    local btnConf = widget:GetConfig()
-    if widget:IsMatchingSpellID(spellID, btnConf) then
-        p:log(10, 'OnSpellCastStop| Is matching type[%s] spellID[%s]', btnConf.type, spellID)
-        widget:ResetHighlight()
-    end
 end
 
 ---@param widget ButtonUIWidget
@@ -256,29 +230,6 @@ local function OnPlayerControlGained(widget, event, ...)
     WMX:SetEnabledActionBarStatesDelayed(true, 2)
 end
 
----@param widget ButtonUIWidget
----@param event string
-local function OnSpellCastSent(widget, event, ...)
-    local castingUnit, _, _, spellID = ...
-    if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
-    widget.button:SetButtonState('NORMAL')
-
-    C_Timer.After(0.5, function()
-        widget:Fire('OnAfterSpellCastSent')
-    end)
-end
-
----@param widget ButtonUIWidget
----@param event string
-local function OnSpellCastFailedQuiet(widget, event, ...)
-    local castingUnit, _, spellID = ...
-    if not 'player' == castingUnit then return end
-    if not ('player' == castingUnit and widget:IsMatchingMacroOrSpell(spellID)) then return end
-
-    widget.button:SetButtonState('NORMAL')
-end
-
 ---@see "UnitDocumentation.lua"
 ---@param widget ButtonUIWidget
 ---@param event string
@@ -291,8 +242,6 @@ local function OnPlayerTargetChangedDelayed(widget, event)
     C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
 end
 local function OnPlayerStartedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
-local function OnPlayerStoppedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
-local function OnCombatLogEventUnfiltered(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -347,12 +296,8 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
     widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
-    widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
-    widget:RegisterEvent(E.UNIT_SPELLCAST_STOP, OnSpellCastStop, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
-    widget:RegisterEvent(E.UNIT_SPELLCAST_SENT, OnSpellCastSent, widget)
-    widget:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET, OnSpellCastFailedQuiet, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
     widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
 
