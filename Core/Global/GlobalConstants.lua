@@ -163,9 +163,15 @@ local function GlobalConstantProperties(o)
         SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
 
         UNIT_HEALTH = 'UNIT_HEALTH',
+        --- It fires when:
+        --- 1) A mage is casting a non-instant spell (i.e. teleport) and while still casting,
+        ---     cast another instant spell (i.e., Arcane Intellect)
+        --- 2) Usually a UI error display or an error bell sound
         UNIT_SPELLCAST_FAILED_QUIET = 'UNIT_SPELLCAST_FAILED_QUIET',
         UNIT_SPELLCAST_SENT = 'UNIT_SPELLCAST_SENT',
+        -- Fired for Start of Non-Instant Spell Cast
         UNIT_SPELLCAST_START = 'UNIT_SPELLCAST_START',
+        -- Fired for Stop of Non-Instant Spell Cast
         UNIT_SPELLCAST_STOP = 'UNIT_SPELLCAST_STOP',
         UNIT_SPELLCAST_SUCCEEDED = 'UNIT_SPELLCAST_SUCCEEDED',
 
@@ -175,6 +181,7 @@ local function GlobalConstantProperties(o)
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
     }
 
+    ---@deprecated Use #UnitId
     ---@class UnitIDAttributes
     local UnitIDAttributes = {
         FOCUS = 'focus',
@@ -184,6 +191,19 @@ local function GlobalConstantProperties(o)
         PET = 'pet',
         PLAYER = 'player',
         VEHICLE = 'vehicle',
+    }
+    ---@class Blizzard_UnitId
+    local UnitId = {
+        ["target"] = "target",
+        ["player"] = "player",
+        ["vehicle"] = "vehicle",
+        ["pet"] = "pet",
+        ["none"] = "none",
+        ["focus"] = "focus",
+        ["mouseover"] = "mouseover",
+        ---@param raidIndex number
+        ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
+        ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
     }
 
     ---@class WidgetAttributes
@@ -262,20 +282,6 @@ local function GlobalConstantProperties(o)
     ---@param prefix string
     ---@param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
-
-    ---@class Blizzard_UnitId
-    local UnitId = {
-        ["target"] = "target",
-        ["player"] = "player",
-        ["vehicle"] = "vehicle",
-        ["pet"] = "pet",
-        ["none"] = "none",
-        ["focus"] = "focus",
-        ["mouseover"] = "mouseover",
-        ---@param raidIndex number
-        ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
-        ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
-    }
 
     o.Textures = Textures
     o.C = C

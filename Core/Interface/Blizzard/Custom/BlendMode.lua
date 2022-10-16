@@ -8,3 +8,5 @@ local BlendMode = {
     ADD = 'ADD',
     MOD = 'MOD',
 }
+---@class _AlphaMode : _BlendMode
+local AlphaMode = BlendMode

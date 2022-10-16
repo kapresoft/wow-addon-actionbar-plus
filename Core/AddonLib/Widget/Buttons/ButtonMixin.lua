@@ -295,6 +295,8 @@ function L:W() return self end
 function L:GetButtonAttributes() return self:W().buttonAttributes end
 function L:GetIndex() return self:W().index end
 function L:GetFrameIndex() return self:W().frameIndex end
+---Only used for prefixing logs
+function L:N() return "F" .. self.frameIndex .. "_B" .. self.index end
 function L:IsParentFrameShown() return self.dragFrame:IsShown() end
 
 function L:ResetConfig()
@@ -645,6 +647,10 @@ function L:SetCooldownTextures(icon)
     btnUI:SetNormalTexture(icon)
     btnUI:SetPushedTexture(icon)
 end
+
+function L:SetButtonStateNormal() self:B():SetButtonState('NORMAL') end
+function L:SetButtonStatePushed() self:B():SetButtonState('PUSHED') end
+
 ---Typically used when casting spells that take longer than GCD
 function L: SetHighlightInUse()
     --todo next: action_button_mouseover_glow is different from highlight in use
