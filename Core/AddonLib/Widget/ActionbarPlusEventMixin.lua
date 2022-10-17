@@ -96,6 +96,7 @@ end
 --- Non-Instant Start-Cast Handler
 --- @param f EventFrameInterface
 local function OnSpellCastStart(f, ...)
+    --todo next: include item spells (i.e., quest items)
     local spellCastEvent = B:ParseSpellCastEventArgs(...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
@@ -113,7 +114,7 @@ end
 local function OnSpellCastStop(f, ...)
     local spellCastEvent = B:ParseSpellCastEventArgs(...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
-    --p:log(50, 'OnSpellCastStop: %s', spellCastEvent)
+    p:log(50, 'OnSpellCastStop: %s', spellCastEvent)
     local w = f.widget
     ---@param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
