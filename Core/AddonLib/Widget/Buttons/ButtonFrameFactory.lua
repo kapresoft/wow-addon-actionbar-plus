@@ -266,14 +266,18 @@ local function WidgetMethods(widget)
         if self.HideGroup then self:HideGroup() end
     end
 
+    -- Not sure what the use case is for this
     -- Synchronize UI and Profile data
-    function widget:IsShownInConfig()
+    --[[function widget:IsShownInConfigSynchronize()
         local frameIndex = self:GetIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'IsShownInConfig(frameIndex)')
         local actualFrameIsShown = frame:IsShown()
         P:SetBarEnabledState(frameIndex, actualFrameIsShown)
         return P:IsBarEnabled(frameIndex)
-    end
+    end]]
+
+    -- Synchronize UI and Profile data
+    function widget:IsShownInConfig() return P:IsBarEnabled(self.index) end
 
     function widget:IsShowIndex() return P:IsShowIndex(self:GetFrameIndex()) end
     function widget:IsShowKeybindText() return P:IsShowKeybindText(self:GetFrameIndex()) end

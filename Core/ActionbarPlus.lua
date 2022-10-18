@@ -51,8 +51,8 @@ local function OnAddonLoaded(frame, event, ...)
     addon:OnAddonLoadedModules()
 
     if UnitOnTaxi('player') == true then
-        local hideWhenTaxi = WMX:IsHideWhenTaxi()
-        WMX:SetEnabledActionBarStatesDelayed(not hideWhenTaxi, 3)
+        local isShown = WMX:IsHideWhenTaxi() ~= true
+        WMX:ShowActionbarsDelayed(isShown, 3)
     end
 
     BF:Fire(GC.E.OnAddonLoaded)
@@ -77,6 +77,9 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@class ActionbarPlus_Methods
 local methods = {
+    ['ShowActionbars'] = function(self, isShown)
+        WMX:ShowActionbarsDelayed(isShown, 1)
+    end,
     ---@param self ActionbarPlus
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand("abp", "OpenConfig")

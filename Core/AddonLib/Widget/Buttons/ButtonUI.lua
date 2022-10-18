@@ -219,7 +219,7 @@ end
 ---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WMX:SetEnabledActionBarStatesDelayed(false, 1)
+    WMX:ShowActionbarsDelayed(false, 1)
 end
 
 ---@param widget ButtonUIWidget
@@ -227,7 +227,7 @@ end
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WMX:SetEnabledActionBarStatesDelayed(true, 2)
+    WMX:ShowActionbarsDelayed(true, 2)
 end
 
 ---@see "UnitDocumentation.lua"
