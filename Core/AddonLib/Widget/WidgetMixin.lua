@@ -130,30 +130,24 @@ function _L:CreateKeybindTextFontString(b)
     return fs
 end
 
-function _L:SetEnabledActionBarStatesDelayed(isShown, delayInSec)
+function _L:ShowActionbarsDelayed(isShown, delayInSec)
     local actualDelayInSec = delayInSec
     local showActionBars = isShown == true
     if type(actualDelayInSec) ~= 'number' then actualDelayInSec = delayInSec end
     if actualDelayInSec <= 0 then actualDelayInSec = 1 end
-    --C_Timer.After(actualDelayInSec, function() self:SetEnabledActionBarStates(showActionBars) end)
-    self:SetEnabledActionBarStates(showActionBars)
+    -- Hide immediately and then try again after delayInSec
+    self:ShowActionbars(isShown)
+    C_Timer.After(actualDelayInSec, function() self:ShowActionbars(showActionBars) end)
 end
 
 ---@param isShown boolean Set to true to show action bar
-function _L:SetEnabledActionBarStates(isShown)
-    local bars = P:GetBars()
-    for frameName, profileData in pairs(bars) do
-        if profileData.enabled == true then
-            ---@type ButtonFrameFactory
-            local f = _G[frameName]
-            if f and f.widget then
-                ---@type FrameWidget
-                local widget = f.widget
-                widget:SetGroupState(isShown)
-                --self:log('bar: %s shown=%s', frameName, isShown)
-            end
+function _L:ShowActionbars(isShown)
+    ---@param frameWidget FrameWidget
+    O.ButtonFactory:ApplyForEachVisibleFrames(function(frameWidget)
+        if frameWidget:IsShownInConfig() then
+            frameWidget:SetGroupState(isShown)
         end
-    end
+    end)
 end
 
 function _L:IsHideWhenTaxi() return P:IsHideWhenTaxi() end
