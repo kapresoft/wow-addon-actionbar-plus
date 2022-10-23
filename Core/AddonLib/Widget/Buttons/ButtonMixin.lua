@@ -589,6 +589,7 @@ function L:SetTextureAsEmpty()
     self:SetPushedTexture(nil)
     self:SetHighlightTexture(nil)
     self:SetNormalIconAlphaAsEmpty()
+    self:SetVertexColorNormal()
 end
 
 function L:SetNormalIconAlphaAsEmpty()
@@ -599,6 +600,7 @@ end
 
 ---@param alpha number 0.0 to 1.0
 function L:SetNormalIconAlpha(alpha) self:B():GetNormalTexture():SetAlpha(alpha or 1.0) end
+function L:SetVertexColorNormal() self:B():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
 
 function L:SetNormalIconAlphaDefault()
     if self:IsEmpty() then

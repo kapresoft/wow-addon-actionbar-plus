@@ -35,10 +35,7 @@ function S:SetAttributes(btnUI, btnData)
 
     AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
-    local icon = GC.Textures.TEXTURE_EMPTY
-    if itemData.icon then icon = itemData.icon end
-
-    btnUI.widget:SetIcon(icon)
+    btnUI.widget:SetIcon(itemData.icon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemData.name)
 
