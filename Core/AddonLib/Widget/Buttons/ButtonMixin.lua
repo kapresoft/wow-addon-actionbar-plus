@@ -23,11 +23,9 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
-local UnitId = GC.UnitId
 
---todo next button background?
-local emptyTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty'
-local emptyGridTexture = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid'
+local emptyTexture = GC.Textures.TEXTURE_EMPTY
+local emptyGridTexture = GC.Textures.TEXTURE_EMPTY_GRID
 local highlightTexture = T.TEXTURE_HIGHLIGHT2
 local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
 
