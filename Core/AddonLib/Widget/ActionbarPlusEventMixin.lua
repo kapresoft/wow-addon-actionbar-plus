@@ -93,6 +93,20 @@ local function OnActionbarGrid(f, event, ...)
     f.widget.buttonFactory:Fire(E.OnActionbarHideGrid)
 end
 
+--- See Also: [https://wowpedia.fandom.com/wiki/CURSOR_CHANGED](https://wowpedia.fandom.com/wiki/CURSOR_CHANGED)
+---@param f EventFrameInterface
+---@param event string
+local function OnCursorChangeInBags(f, event, ...)
+    local isDefault, newCursorType, oldCursorType, oldCursorVirtualID = ...
+    --p:log(40, 'OnCursorChangeInBags: isDefault: %s new=%s old=%s', isDefault, newCursorType, oldCursorType)
+    if true == isDefault and oldCursorType == 1 then
+        f.widget.buttonFactory:Fire(E.OnActionbarHideGrid)
+        return
+    end
+    if newCursorType ~= 1 then return end
+    f.widget.buttonFactory:Fire(E.OnActionbarShowGrid)
+end
+
 --- Non-Instant Start-Cast Handler
 --- @param f EventFrameInterface
 local function OnSpellCastStart(f, ...)
@@ -226,6 +240,12 @@ function L:RegisterActionbarGridEventFrame()
     f:RegisterEvent(E.ACTIONBAR_HIDEGRID)
 end
 
+function L:RegisterCursorChangesInBagEvents()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnCursorChangeInBags)
+    f:RegisterEvent(E.CURSOR_CHANGED)
+end
+
 function L:RegisterPetBattleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPetBattleEvent)
@@ -238,6 +258,7 @@ function L:RegisterEvents()
     self:RegisterActionbarsEventFrame()
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
+    self:RegisterCursorChangesInBagEvents()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end
 end
