@@ -236,6 +236,7 @@ local function NewInstance()
     local A = LibStub:NewAddon(GC.C.ADDON_NAME)
     CreateAddonFrame(A)
     MX:Mixin(A, methods)
+    A.ActionbarEmptyGridShowing = false
 
     return A
 end
