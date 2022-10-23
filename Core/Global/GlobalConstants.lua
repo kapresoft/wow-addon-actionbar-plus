@@ -70,7 +70,11 @@ local function GlobalConstantProperties(o)
     ---@class Textures
     local Textures = {
         ---@type string
-        TEXTURE_EMPTY = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),
+        TEXTURE_EMPTY = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty',
+        ---@type string
+        TEXTURE_EMPTY_GRID = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid',
+        ---@type string
+        TEXTURE_EMPTY_BLIZZ_DIALOG_BACKGROUND = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),
         ---@type string
         TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold"),
         ---@type string
