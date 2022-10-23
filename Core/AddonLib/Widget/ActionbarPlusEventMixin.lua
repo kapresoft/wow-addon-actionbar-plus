@@ -14,6 +14,7 @@ local GC = O.GlobalConstants
 local E, UnitId = GC.E, GC.UnitId
 local B = O.BaseAPI
 local AceEvent = O.AceLibFactory:A().AceEvent
+local CURSOR_ITEM_TYPE = 1
 
 --[[-----------------------------------------------------------------------------
 Interface
@@ -99,12 +100,14 @@ end
 local function OnCursorChangeInBags(f, event, ...)
     local isDefault, newCursorType, oldCursorType, oldCursorVirtualID = ...
     --p:log(40, 'OnCursorChangeInBags: isDefault: %s new=%s old=%s', isDefault, newCursorType, oldCursorType)
-    if true == isDefault and oldCursorType == 1 then
+    if true == isDefault and oldCursorType == CURSOR_ITEM_TYPE then
         f.widget.buttonFactory:Fire(E.OnActionbarHideGrid)
+        ABP.ActionbarEmptyGridShowing = false
         return
     end
-    if newCursorType ~= 1 then return end
+    if newCursorType ~= CURSOR_ITEM_TYPE then return end
     f.widget.buttonFactory:Fire(E.OnActionbarShowGrid)
+    ABP.ActionbarEmptyGridShowing = true
 end
 
 --- Non-Instant Start-Cast Handler

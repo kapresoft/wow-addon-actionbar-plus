@@ -26,6 +26,8 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class BaseAttributeSetter : AttributeSetter
 local _L = LibStub:NewLibrary(Core.M.BaseAttributeSetter)
+---@type LoggerTemplate
+local p = _L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -36,6 +38,8 @@ function _L:HandleGameTooltipCallbacks(btnUI)
     btnUI.widget:SetCallback("OnEnter", function(w, event)
         if InCombatLockdown() then
             if not w:IsTooltipCombatModifierKeyDown() then return end
+        elseif ABP.ActionbarEmptyGridShowing == true and btnUI.widget:IsEmpty() then
+            w:SetHighlightEmptyButtonEnabled(true)
         else
             if not w:IsTooltipModifierKeyDown() then return end
         end
