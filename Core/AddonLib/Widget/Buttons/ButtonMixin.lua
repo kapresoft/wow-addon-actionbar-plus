@@ -621,6 +621,7 @@ end
 
 function L:ShowEmptyGridEvent()
     if not self:IsEmpty() then return end
+    self:SetButtonAsEmpty()
     self:ShowEmptyGrid()
     self:ShowKeybindText(true)
 

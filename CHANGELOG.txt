@@ -1,14 +1,13 @@
-# ActionbarPlus 1.0.7 (2022-Oct-18)
+# ActionbarPlus 1.0.8 (2022-Oct-XXX)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.7) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.6.1...1.0.7) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.8) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.7...1.0.8) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 10.5](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/7?closed=1)
+[Milestone 10.6](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/8?closed=1)
 
-- #118 Fix Issue with frame toggle
-- #111 Dev Story: Transition individual button events to ActionbarPlusEventMixin
-- #112 Dev Story: ActionbarPlusEvent refactor
+- #97  Empty buttons are hidden when dragging items from bags to actionbars
+- #121 Incorrect background texture for items
 
-# ActionbarPlus-1.0.7.zip
+# ActionbarPlus-1.0.8.zip
 
 ```text
 MD5 <new>
