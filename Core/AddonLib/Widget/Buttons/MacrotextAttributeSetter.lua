@@ -40,6 +40,7 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetNormalTexture(icon)
     btnUI:SetHighlightTexture(GC.Textures.TEXTURE_HIGHLIGHT)
 
+    self:OnAfterSetAttributes(btnUI)
 end
 
 ---@param link table The blizzard `GameTooltip` link

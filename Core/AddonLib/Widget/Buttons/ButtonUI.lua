@@ -23,7 +23,7 @@ local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 local String = O.String
 local A, P, PH = O.Assert, O.Profile, O.PickupHandler
 local GC, WMX = O.GlobalConstants, O.WidgetMixin
-local E, API = GC.E, O.API
+local E, WAttr = GC.E, GC.WidgetAttributes
 
 local IsBlank = String.IsBlank
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
@@ -201,8 +201,6 @@ end
 ---@param event string Event string
 local function OnSpellUpdateUsable(widget, event)
     if not widget.button:IsShown() then return end
-    --p:log('xOnSpellUpdateUsable[f_%s_%s]: %s',
-    --        widget.frameIndex, widget.index, GetTime())
     widget:UpdateRangeIndicator()
 
     OnUpdateButtonUsable(widget, event)
@@ -268,17 +266,10 @@ local function RegisterScripts(button)
     AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
     button:SetScript("PreClick", OnPreClick)
-    --button:SetScript("PostClick", function(btn, key, down)
-    --    p:log('buttonState: %s', btn:GetButtonState())
-    --    local spellID = btn:GetAttribute("spell")
-    --    if not spellID then return end
-    --    p:log('spell: %s', spellID)
-    --    p:log('spell-cd: %s', { GetSpellCooldown(spellID) })
-    --    local start = GetSpellCooldown(spellID)
-    --    if start == 0 then
-    --        button.widget:SetHighlightInUse()
-    --    end
-    --end)
+
+    ---@param btn ButtonUI
+    --button:SetScript("PostClick", function(btn, key, down) end)
+
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript(E.ON_ENTER, OnEnter)

@@ -57,6 +57,19 @@ Support Functions
 -------------------------------------------------------------------------------]]
 ---@param f EventFrameInterface
 ---@param event string
+local function OnPlayerCombatEvent(f, event, ...)
+    -- p:log(40, 'Event[%s] received...', event)
+    if E.PLAYER_REGEN_ENABLED == event then
+        f.widget.buttonFactory:Fire(E.OnPlayerLeaveCombat)
+    end
+
+    f.widget.buttonFactory:Fire(E.OnUpdateItemStates)
+    -- This second fire is for fail-safety
+    C_Timer.After(2, function() f.widget.buttonFactory:Fire(E.OnUpdateItemStates) end)
+end
+
+---@param f EventFrameInterface
+---@param event string
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
     local addon = f.widget.addon
@@ -68,20 +81,20 @@ end
 ---@param event string
 local function OnPetBattleEvent(f, event, ...)
     if E.PET_BATTLE_OPENING_START == event then
-        f.widget.buttonFactory:Fire(E.OnActionbarHideAll)
+        f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
         return
     end
-    f.widget.buttonFactory:Fire(E.OnActionbarShowAll)
+    f.widget.buttonFactory:Fire(E.OnActionbarShowGroup)
 end
 
 ---@param f EventFrameInterface
 ---@param event string
 local function OnVehicleEvent(f, event, ...)
     if E.UNIT_ENTERED_VEHICLE == event then
-        f.widget.buttonFactory:Fire(E.OnActionbarHideAll)
+        f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
         return
     end
-    f.widget.buttonFactory:Fire(E.OnActionbarShowAll)
+    f.widget.buttonFactory:Fire(E.OnActionbarShowGroup)
 end
 
 ---@param f EventFrameInterface
@@ -256,12 +269,22 @@ function L:RegisterPetBattleFrame()
     f:RegisterEvent(E.PET_BATTLE_CLOSE)
 end
 
+--- Use PLAYER_REGIN[ENABLED|DISABLED] is more reliable than using
+--- PLAYER_[ENTER|LEAVE]_COMBAT event
+function L:RegisterCombatFrame()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnPlayerCombatEvent)
+    f:RegisterEvent(E.PLAYER_REGEN_ENABLED)
+    f:RegisterEvent(E.PLAYER_REGEN_DISABLED)
+end
+
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
     self:RegisterActionbarsEventFrame()
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
+    self:RegisterCombatFrame()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end
 end

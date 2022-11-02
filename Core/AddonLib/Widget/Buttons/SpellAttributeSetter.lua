@@ -65,7 +65,7 @@ function _L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
-    self:HandleGameTooltipCallbacks(btnUI)
+    self:OnAfterSetAttributes(btnUI)
 end
 
 function _L:ShowTooltip(btnUI)

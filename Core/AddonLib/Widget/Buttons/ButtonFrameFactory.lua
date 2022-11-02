@@ -24,6 +24,9 @@ local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 local GC = O.GlobalConstants
 local E = GC.E
 
+-- post combat updates (SetAttribute* is not allowed during combat)
+local PostCombatButtonUpdates = {}
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -62,6 +65,15 @@ local function RegisterWidget(widget, name)
         __index = WidgetBase
     }
     setmetatable(widget, mt)
+end
+
+---@param widget ButtonUIWidget
+local function SetButtonAttributes(widget)
+    if widget:IsEmpty() then return end
+
+    local btnConf = widget:GetConfig()
+    local setter = O.ButtonFactory:GetAttributesSetter(btnConf.type)
+    if setter then setter:SetAttributes(widget.frame, btnConf) end
 end
 
 ---@param frameWidget FrameWidget
@@ -141,16 +153,29 @@ end
 
 ---Sometimes there's a delay. Fire immediately, then after a few seconds
 ---@param frameWidget FrameWidget
-local function OnActionbarShowAll(frameWidget, e, ...)
+local function OnActionbarShowGroup(frameWidget, e, ...)
     if  true ~= P:IsBarEnabled(frameWidget.index) then return end
     frameWidget:ShowGroup()
     C_Timer.After(3, function() frameWidget:ShowGroup() end)
 end
 
+---Sometimes there's a delay. Fire immediately, then after a few seconds
 ---@param frameWidget FrameWidget
-local function OnActionbarHideAll(frameWidget, e, ...)
+local function OnPlayerLeaveCombat(frameWidget, e, ...)
+    OnActionbarShowGroup(frameWidget, e, ...)
+    _L:PostCombatUpdateComplete()
+end
+
+---@param frameWidget FrameWidget
+local function OnActionbarHideGroup(frameWidget, e, ...)
     frameWidget:HideGroup()
     C_Timer.After(3, function() frameWidget:HideGroup() end)
+end
+
+---@param frameWidget FrameWidget
+local function OnUpdateItemStates(frameWidget, e, ...)
+    ---@param btnWidget ButtonUIWidget
+    frameWidget:ApplyForEachItem(function(btnWidget) btnWidget:UpdateItemState() end)
 end
 
 local function RegisterCallbacks(widget)
@@ -168,8 +193,10 @@ local function RegisterCallbacks(widget)
 
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
-    widget:SetCallback(E.OnActionbarHideAll, OnActionbarHideAll)
-    widget:SetCallback(E.OnActionbarShowAll, OnActionbarShowAll)
+    widget:SetCallback(E.OnActionbarHideGroup, OnActionbarHideGroup)
+    widget:SetCallback(E.OnActionbarShowGroup, OnActionbarShowGroup)
+    widget:SetCallback(E.OnUpdateItemStates, OnUpdateItemStates)
+    widget:SetCallback(E.OnPlayerLeaveCombat, OnPlayerLeaveCombat)
 
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
@@ -179,11 +206,12 @@ end
 ---@param widget FrameWidget
 local function RegisterEvents(widget)
     ---@param w FrameWidget
-    local function OnPlayerEnterCombat(w) w:SetCombatLockState() end
+    local function OnPlayerEnterCombatFrameWidget(w) w:SetCombatLockState() end
     ---@param w FrameWidget
-    local function OnPlayerLeaveCombat(w) w:SetCombatUnlockState() end
-    widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombat, widget)
-    widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombat, widget)
+    local function OnPlayerLeaveCombatFrameWidget(w) w:SetCombatUnlockState() end
+
+    widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombatFrameWidget, widget)
+    widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombatFrameWidget, widget)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
@@ -253,6 +281,7 @@ local function WidgetMethods(widget)
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
 
+    ---@return boolean
     function widget:IsFrameEnabledInConfig() return P:IsBarNameEnabled(self:GetName()) end
 
     function widget:SetFrameState(isEnabled)
@@ -314,6 +343,17 @@ local function WidgetMethods(widget)
     end
 
     ---@param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    function widget:ApplyForEachItem(applyFunction)
+        if #self.buttons <= 0 then return end
+        -- `_` is the index
+        for _, btnName in ipairs(self:GetButtons()) do
+            ---@type ButtonUIWidget
+            local w = _G[btnName].widget
+            if w:IsItem() then applyFunction(w) end
+        end
+    end
+
+    ---@param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
     ---@param matchSpellId number
     function widget:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
         return self:ApplyForEachButtonCondition(
@@ -367,7 +407,11 @@ local function WidgetMethods(widget)
         self:ShowButtons()
     end
     function widget:ShowGroupIfEnabled()
-        if self:IsFrameEnabledInConfig() then self:ShowGroup() end
+        if self:IsFrameEnabledInConfig() then
+            self:ShowGroup()
+            return
+        end
+        self:HideGroup()
     end
 
     function widget:ShowButtons()
@@ -478,6 +522,19 @@ end
 
 function _L:IsFrameShownByIndex(frameIndex)
     return self:GetFrameByIndex(frameIndex):IsShown()
+end
+
+---@param btnWidget ButtonUIWidget
+function _L:AddPostCombatUpdate(btnWidget) table.insert(PostCombatButtonUpdates, btnWidget) end
+
+function _L:PostCombatUpdateComplete()
+    local count = #PostCombatButtonUpdates
+    if count <= 0 then return end
+    ---@param widget ButtonUIWidget
+    for i, widget in ipairs(PostCombatButtonUpdates) do
+        SetButtonAttributes(widget)
+        PostCombatButtonUpdates[i] = nil
+    end
 end
 
 function _L:Constructor(frameIndex)

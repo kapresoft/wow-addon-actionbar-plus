@@ -122,11 +122,14 @@ local function GlobalConstantProperties(o)
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
-        OnActionbarShowAll = 'OnActionbarShowAll',
-        OnActionbarHideAll = 'OnActionbarHideAll',
+        OnActionbarShowGroup = 'OnActionbarShowGroup',
+        OnActionbarHideGroup = 'OnActionbarHideGroup',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
+        OnPlayerLeaveCombat = 'OnPlayerLeaveCombat',
+        OnUpdateItemStates = 'OnUpdateItemStates',
+
         -- ################################
         ---@deprecated DEPRECATED: Use the camel cased version
         ON_ENTER = 'OnEnter',

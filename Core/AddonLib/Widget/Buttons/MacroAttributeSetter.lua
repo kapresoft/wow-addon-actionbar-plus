@@ -44,7 +44,7 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
     btnUI.widget:SetIcon(icon)
 
-    self:HandleGameTooltipCallbacks(btnUI)
+    self:OnAfterSetAttributes(btnUI)
 end
 
 ---@param btnUI ButtonUI

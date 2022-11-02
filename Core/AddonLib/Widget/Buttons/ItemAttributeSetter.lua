@@ -39,7 +39,7 @@ function S:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
     btnUI:SetAttribute(WAttr.ITEM, itemData.name)
 
-    self:HandleGameTooltipCallbacks(btnUI)
+    self:OnAfterSetAttributes(btnUI)
 end
 
 ---@param btnUI ButtonUI
