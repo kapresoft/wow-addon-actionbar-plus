@@ -2,7 +2,7 @@
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.9) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.8...1.0.9) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 10.6](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/9?closed=1)
+[Milestone 11.1](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/9?closed=1)
 
 - #130 Item usable states are not being updated
 - #131 Actionbars disappear while reloading in combat
