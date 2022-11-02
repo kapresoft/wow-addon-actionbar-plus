@@ -80,9 +80,7 @@ function L:OnAfterInitialize()
     for i,_ in ipairs(frameNames) do
         local f = self:CreateActionbarGroup(i)
         tinsert(self.FRAMES, f)
-        --- initially hide
-        ---@see ButtonFrameFactory#OnAddonLoaded
-        f:HideGroup()
+        f:ShowGroupIfEnabled()
     end
     p:log(10, 'Total ActionbarPlus frames loaded: %s', #self.FRAMES)
 end
@@ -192,6 +190,7 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
+---@return AttributeSetter
 function L:GetAttributesSetter(actionType)
     AssertNotNil(actionType, 'actionType')
     return AttributeSetters[actionType]

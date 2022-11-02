@@ -14,11 +14,16 @@ Interface
 -------------------------------------------------------------------------------]]
 ---@class AttributeSetter
 local AttributeSetter = {
+    ---@param self AttributeSetter
     ---@param btnUI ButtonUI
     ---@param btnData Profile_Button
-    ['SetAttributes'] = function(btnUI, btnData) end,
+    ['SetAttributes'] = function(self, btnUI, btnData) end,
+    ---@param self AttributeSetter
     ---@param btnUI ButtonUI
-    ['ShowTooltip'] = function(btnUI) end
+    ['OnAfterSetAttributes'] = function(self, btnUI) end,
+    ---@param self AttributeSetter
+    ---@param btnUI ButtonUI
+    ['ShowTooltip'] = function(self, btnUI) end
 }
 
 --[[-----------------------------------------------------------------------------
@@ -30,15 +35,30 @@ local _L = LibStub:NewLibrary(Core.M.BaseAttributeSetter)
 local p = _L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
-Methods
+Support Functions
 -------------------------------------------------------------------------------]]
 ---@param btnUI ButtonUI
-function _L:HandleGameTooltipCallbacks(btnUI)
+local function AddPostCombat(btn)
+    if not InCombatLockdown() then return end
+    O.ButtonFrameFactory:AddPostCombatUpdate(btn.widget)
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+---@param btn ButtonUI
+function _L:OnAfterSetAttributes(btn)
+    AddPostCombat(btn)
+    self:HandleGameTooltipCallbacks(btn)
+end
+
+---@param btn ButtonUI
+function _L:HandleGameTooltipCallbacks(btn)
     ---@param w ButtonUIWidget
-    btnUI.widget:SetCallback("OnEnter", function(w, event)
+    btn.widget:SetCallback("OnEnter", function(w, event)
         if InCombatLockdown() then
             if not w:IsTooltipCombatModifierKeyDown() then return end
-        elseif ABP.ActionbarEmptyGridShowing == true and btnUI.widget:IsEmpty() then
+        elseif ABP.ActionbarEmptyGridShowing == true and btn.widget:IsEmpty() then
             w:SetHighlightEmptyButtonEnabled(true)
         else
             if not w:IsTooltipModifierKeyDown() then return end
@@ -51,7 +71,7 @@ function _L:HandleGameTooltipCallbacks(btnUI)
     end)
 
     ---@param w ButtonUIWidget
-    btnUI.widget:SetCallback("OnLeave", function(w, event)
+    btn.widget:SetCallback("OnLeave", function(w, event)
         WMX:HideTooltipDelayed()
 
         if not GetCursorInfo() then return end

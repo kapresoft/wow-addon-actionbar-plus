@@ -2,7 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
-local IsUsableSpell, GetUnitName, C_Timer = IsUsableSpell, GetUnitName, C_Timer
+local IsUsableSpell, IsUsableItem, GetUnitName, C_Timer = IsUsableSpell, IsUsableItem, GetUnitName, C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -485,21 +485,22 @@ function L:UpdateItemState()
     local itemID = btnData.item.id
     local itemInfo = API:GetItemInfo(itemID)
     if itemInfo == nil then return end
-    if API:IsToyItem(itemID) then self:SetSpellUsable(true); return end
+    if API:IsToyItem(itemID) then self:SetActionUsable(true); return end
 
     local stackCount = itemInfo.stackCount or 1
     local count = itemInfo.count
     btnData.item.count = count
     btnData.item.stackCount = stackCount
     if stackCount > 1 then self:SetText(btnData.item.count) end
-    if count <= 0 then self:SetSpellUsable(false)
-    else self:SetSpellUsable(true) end
+    if count <= 0 then self:SetActionUsable(false)
+    else self:SetActionUsable(self:IsUsableItem(itemID)) end
+    return
 end
 
 function L:UpdateUsable()
     local cd = self:GetCooldownInfo()
     if (cd == nil or cd.details == nil or cd.details.spell == nil) then
-        if self:IsCompanion() then self:SetSpellUsable(true) end
+        if self:IsCompanion() then self:SetActionUsable(true) end
         return
     end
 
@@ -508,11 +509,9 @@ function L:UpdateUsable()
     if c.type == SPELL then
         isUsableSpell = self:IsUsableSpell(cd)
     elseif c.type == MACRO then
-        -- TODO:
         isUsableSpell = self:IsUsableMacro(cd)
     end
-    -- TODO:
-    self:SetSpellUsable(isUsableSpell)
+    self:SetActionUsable(isUsableSpell)
 end
 
 function L:UpdateState()
@@ -832,7 +831,7 @@ function L:UpdateRangeIndicator()
     self:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
 end
 
-function L:SetSpellUsable(isUsable)
+function L:SetActionUsable(isUsable)
     local normalTexture = self:B():GetNormalTexture()
     if not normalTexture then return end
     -- energy based spells do not use 'notEnoughMana'
@@ -849,6 +848,14 @@ function L:IsUsableSpell(cd)
     -- why true by default?
     if IsBlank(spellID) then return true end
     return IsUsableSpell(spellID)
+end
+
+---@param cdOrItemID CooldownInfo|number
+function L:IsUsableItem(cdOrItemID)
+    if 'number' == type(cdOrItemID) then return IsUsableItem(cdOrItemID) end
+    local itemID = cdOrItemID.details.item.id
+    if IsBlank(itemID) then return true end
+    return IsUsableItem(itemID)
 end
 
 ---@param cd CooldownInfo
