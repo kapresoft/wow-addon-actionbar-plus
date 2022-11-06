@@ -91,8 +91,9 @@ local methods = {
         local wowInterfaceVersion = select(4, GetBuildInfo())
         local lastChanged = GetAddOnMetadata(ADDON_NAME, 'X-Github-Project-Last-Changed-Date')
         local version, curseForge, issues, repo = GC:GetAddonInfo()
-        p:log("Addon Info:\n  Version: %s\n  Curse-Forge: %s\n  File-Bugs-At: %s\n  Last-Changed-Date: %s\n  WoW-Interface-Version: %s\n",
-                version, curseForge, issues, lastChanged, wowInterfaceVersion)
+        local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
+        p:log("Addon Info:\n  Version: %s\n  Curse-Forge: %s\n  File-Bugs-At: %s\n  Last-Changed-Date: %s\n  Use-KeyDown(cvar ActionButtonUseKeyDown): %s\n  WoW-Interface-Version: %s\n",
+                version, curseForge, issues, lastChanged, useKeyDown, wowInterfaceVersion)
     end,
     ---@param self ActionbarPlus
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)

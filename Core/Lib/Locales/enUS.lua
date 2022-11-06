@@ -15,7 +15,7 @@ Defaults
 -------------------------------------------------------------------------------]]
 
 ABP_BAR_HEADER_FORMAT_DEFAULT               = '%s Bar #%s'
-ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT         = 'Bar #%s Action Button %s'
+ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT         = 'Action Bar #%s Button %s'
 
 ---@class Localization
 local L = LibStub("AceLocale-3.0"):NewLocale("ActionbarPlus", "enUS", true);
