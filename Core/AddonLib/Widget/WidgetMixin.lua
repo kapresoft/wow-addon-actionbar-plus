@@ -88,7 +88,7 @@ function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
 ---@param button ButtonUI
 function _L:CreateFontString(button)
-    local fs = button:CreateFontString(button:GetName() .. 'Text', nil, "NumberFontNormal")
+    local fs = button:CreateFontString(nil, nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT", -3, 2)
     local _, fontHeight = fs:GetFont()
     fs.textDefaultFontHeight = fontHeight
@@ -101,7 +101,7 @@ end
 ---@param b ButtonUI The button UI
 function _L:CreateIndexTextFontString(b)
     ---@type FontStringTemplate
-    local fs = b:CreateFontString(b, "OVERLAY", "NumberFontNormalSmallGray")
+    local fs = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmallGray")
     local fontName, fontHeight = fs:GetFont()
     fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
     --fs:SetTextColor(100/255, 100/255, 100/255)
@@ -117,7 +117,7 @@ end
 ---@return FontStringTemplate
 function _L:CreateKeybindTextFontString(b)
     ---@type FontStringTemplate
-    local fs = b:CreateFontString(b, "OVERLAY", 'ABP_NumberFontNormalShadow')
+    local fs = b:CreateFontString(nil, "OVERLAY", 'ABP_NumberFontNormalShadow')
     --local fontName, fontHeight = fs:GetFont()
     --fs:SetFont(fontName, fontHeight - 2, "THICKOUTLINE")
     fs:SetJustifyH("RIGHT")

@@ -585,8 +585,6 @@ function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) en
 
 function L:SetTextureAsEmpty()
     self:SetNormalTexture(emptyTexture)
-    self:SetPushedTexture(nil)
-    self:SetHighlightTexture(nil)
     self:SetNormalIconAlphaAsEmpty()
     self:SetVertexColorNormal()
 end

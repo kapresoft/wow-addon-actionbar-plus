@@ -24,6 +24,15 @@ local p = O.LogFactory('Developer')
 Methods
 -------------------------------------------------------------------------------]]
 
+--- down or up
+function L:KDT()
+    local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
+    p:log('ActionButtonUseKeyDown[before]: %s', useKeyDown)
+    useKeyDown = not useKeyDown
+    SetCVar("ActionButtonUseKeyDown", useKeyDown)
+    return useKeyDown
+end
+
 function L:ResetBarConfig()
 
     for i = 1, 8 do

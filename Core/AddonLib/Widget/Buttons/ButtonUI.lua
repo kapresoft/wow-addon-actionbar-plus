@@ -56,15 +56,33 @@ local function IsValidDragSource(cursorInfo)
     return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo)
 end
 
+---TODO: See the following implementation to mimic keydown
+--- - https://wowpedia.fandom.com/wiki/CVar_ActionButtonUseKeyDown
+--- - https://www.wowinterface.com/forums/showthread.php?t=58768
 ---@param widget ButtonUIWidget
 ---@param down boolean true if the press is KeyDown
 local function RegisterForClicks(widget, event, down)
+    local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
     if E.ON_LEAVE == event then
-        widget.button:RegisterForClicks('AnyDown')
+        if useKeyDown then
+            widget.button:RegisterForClicks('AnyDown')
+        else
+            widget.button:RegisterForClicks('AnyUp')
+        end
     elseif E.ON_ENTER == event then
-        widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event then
-        widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        --widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        if useKeyDown then
+            widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        else
+            widget.button:RegisterForClicks('AnyUp')
+        end
+    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event or 'PostClick' == event then
+        --widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        if useKeyDown then
+            widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        else
+            widget.button:RegisterForClicks('AnyUp')
+        end
     end
 end
 
@@ -79,6 +97,15 @@ local function OnPreClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+    RegisterForClicks(btn.widget, 'PreClick', down)
+end
+
+---@param btn ButtonUI
+---@param key string The key clicked
+---@param down boolean true if the press is KeyDown
+local function OnPostClick(btn, key, down)
+    -- This prevents the button from being clicked
+    -- on sequential drag-and-drops (one after another)
     RegisterForClicks(btn.widget, 'PreClick', down)
 end
 
@@ -266,15 +293,12 @@ local function RegisterScripts(button)
     AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
     button:SetScript("PreClick", OnPreClick)
-
-    ---@param btn ButtonUI
-    --button:SetScript("PostClick", function(btn, key, down) end)
+    button:SetScript("PostClick", OnPostClick)
 
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
     button:SetScript(E.ON_ENTER, OnEnter)
     button:SetScript(E.ON_LEAVE, OnLeave)
-
 end
 
 ---@param widget ButtonUIWidget
@@ -330,14 +354,21 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     ---@class ButtonUI : _Button
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
+    --local button = CreateFrame("Button", btnName, UIParent, "SecureActionButtonTemplate,SecureHandlerBaseTemplate")
     button.text = WMX:CreateFontString(button)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
 
     RegisterScripts(button)
 
+    -- todo next: add ActionButtonUseKeyDown to options UI; add to abp_info
+    --            iterate through all buttons and call #RegisterForClicks()
+    -- /run SetCVar("ActionButtonUseKeyDown", 1)
+    -- /run SetCVar("ActionButtonUseKeyDown", 0)
+    -- /dump GetCVarBool("ActionButtonUseKeyDown")
+
     button:RegisterForDrag("LeftButton", "RightButton");
-    button:RegisterForClicks("AnyDown");
+    button:RegisterForClicks("AnyDown", "AnyUp");
 
     ---@class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")

@@ -40,6 +40,8 @@ local function IsValidMountInfo(mountInfo)
     return IsNotBlank(mountInfo.name) and IsNotNil(mountInfo.spellID) and IsNotNil(mountInfo.icon)
 end
 
+function L:IsDragonflight() return select(4, GetBuildInfo()) >= 100000 end
+
 ---@see Blizzard_UnitId
 function L:IsTargetFriendlyToPlayer() return UnitIsFriend(UnitId.player, UnitId.target) end
 function L:IsTargetEnemyToPlayer() return UnitIsEnemy(UnitId.player, UnitId.target) end
