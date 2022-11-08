@@ -17,8 +17,16 @@ externals:
   Core/ExtLib/Kapresoft-LibUtil:
     url: https://github.com/kapresoft/wow-lib-util
     tag: latest
-
+  Core/Interface/Kapresoft-Wow-Api-Interface:
+    url: https://github.com/kapresoft/wow-api-interface
 ignore:
   - README.md
   - dev
   - package-addon.sh
+  - pull-extlib.sh
+  - Core/Interface/Kapresoft-Wow-Api-Interface/dev
+  - Core/Interface/Kapresoft-Wow-Api-Interface/External
+  - Core/Interface/Kapresoft-Wow-Api-Interface/Kapresoft-Wow-Api-Interface.toc
+  - Core/Interface/Kapresoft-Wow-Api-Interface/pull-extlib.sh
+  - Core/Interface/Kapresoft-Wow-Api-Interface/script-functions.sh
+

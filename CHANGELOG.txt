@@ -1,12 +1,10 @@
-# ActionbarPlus 1.0.10 (2022-Nov-06)
+# ActionbarPlus 1.0.11.Future (2022-Nov-xx)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.10) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.9...1.0.10) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.11) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.10...1.0.11) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 11.2](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/10?closed=1)
+[Milestone 11.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/11?closed=1)
 
-- Support for version 10.x (Dragonflight) #133
-    - Add support for cvar "ActionButtonUseKeyDown" settings (this will be added as a UI option in the future). For now, players will need to manually call the SetCVar() function to switch between keydown or keyup activation for all action buttons including blizzard default actionbars.
-    - Keybind category name change due to Dragonflight restrictions
+- Story: [Dev] Use library for Wow API Interface Lua files #136
 
 # ActionbarPlus-1.0.10.zip
 

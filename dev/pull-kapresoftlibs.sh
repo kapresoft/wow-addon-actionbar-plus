@@ -7,6 +7,7 @@ IncludeBase() {
   local fnn="script-functions.sh"
   local fn="dev/${fnn}"
   if [ -f "${fn}" ]; then
+    # shellcheck disable=SC1090
     source "${fn}"
   elif [ -f "${fnn}" ]; then
     source "${fnn}"
@@ -26,6 +27,11 @@ ADDON_NAME="ActionbarPlus"
 PKGMETA_EXTRACT_DIR="Core/ExtLib/Kapresoft-LibUtil"
 SRC="${RELEASE_DIR}/${ADDON_NAME}/${PKGMETA_EXTRACT_DIR}"
 DEST="Core/ExtLib/."
+
+API_PKGMETA_EXTRACT_DIR="Core/Interface/Kapresoft-Wow-Api-Interface"
+API_SRC="${RELEASE_DIR}/${ADDON_NAME}/${API_PKGMETA_EXTRACT_DIR}"
+API_DEST="Core/Interface/."
+
 PKGMETA="-m dev/pkgmeta-kapresoftlibs.yaml"
 
 Package() {
@@ -52,7 +58,12 @@ Package() {
   echo "Executing: $rel_cmd"
   eval "$rel_cmd"
 }
-
+SyncUtil() {
+  SyncDir $SRC $DEST
+}
+SyncInterfaceLib() {
+  SyncDir $API_SRC $API_DEST
+}
 #Package $*
 #SyncDir $SRC $DEST
-Package $* && SyncDir $SRC $DEST
+Package $* && SyncUtil && SyncInterfaceLib
