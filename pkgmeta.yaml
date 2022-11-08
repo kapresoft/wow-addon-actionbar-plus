@@ -62,6 +62,7 @@ ignore:
   - Core/ExtLib/WoWAce/Ace3/Ace3_Vanilla.toc
   - Core/ExtLib/WoWAce/Ace3/Ace3_Wrath.toc
   - Core/ExtLib/WoWAce/Ace3/Bindings.xml
+  - Core/ExtLib/WoWAce/Ace3/Bindings.xml
 
 ## Potentially helpful libraries
 ## - https://www.wowace.com/projects/libactionbutton-1-0

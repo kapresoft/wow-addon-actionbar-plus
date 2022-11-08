@@ -52,3 +52,5 @@ luac.out
 !/Core/ExtLib/_ExtLib.lua
 !/Core/ExtLib/ExtLib.lua
 !/Core/ExtLib/WoWAce/_WowAce.xml
+
+/Core/Interface/Kapresoft-Wow-Api-Interface/
