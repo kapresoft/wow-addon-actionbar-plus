@@ -144,16 +144,30 @@ function L:CreateActionbarGroup(frameIndex)
     return f
 end
 
----@param frameWidget FrameWidget
-function L:CreateButtons(frameWidget, rowSize, colSize)
+---@param fw FrameWidget
+function L:CreateButtons(fw, rowSize, colSize)
+    fw:ClearButtons()
     local index = 0
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnWidget = self:CreateSingleButton(frameWidget, row, col, index)
-            frameWidget:AddButton(btnWidget:GetName())
-            if btnWidget:IsEmpty() then btnWidget:SetTextureAsEmpty() end
+            local btnUI = fw:GetButtonUI(index)
+            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).frame end
+            fw:AddButtonFrame(btnUI)
         end
+    end
+    self:HideUnusedButtons(fw)
+    fw:LayoutButtonGrid()
+end
+
+---@param fw FrameWidget
+function L:HideUnusedButtons(fw)
+    local start = fw:GetButtonCount() + 1
+    local max = start + (2 * fw:GetMaxButtonColSize())
+    for i=start, max do
+        ---@type ButtonUI
+        local existingBtn = fw:GetButtonUI(i)
+        if existingBtn then existingBtn:Hide() end
     end
 end
 
@@ -161,6 +175,7 @@ end
 ---@param row number
 ---@param col number
 ---@param btnIndex number The button index number
+---@return ButtonUIWidget
 function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
     self:SetButtonAttributes(btnWidget)

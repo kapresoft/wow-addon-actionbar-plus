@@ -4,7 +4,14 @@
 
 [Milestone 11.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/11?closed=1)
 
+- Should not have to reload when Updating button count in Options UI #15
+- Click and highlight Texture does not clear #138
 - Story: [Dev] Use library for Wow API Interface Lua files #136
+
+## Media
+
+> Watch this short video clip for updating button columns and rows without having to reload World of Warcraft
+- https://youtu.be/RTu8RdN13PU
 
 # ActionbarPlus-1.0.10.zip
 

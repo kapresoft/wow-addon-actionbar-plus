@@ -133,9 +133,9 @@ local function OnSpellCastStart(f, ...)
     local w = f.widget
     ---@param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param btn ButtonUIWidget
+        ---@param btnWidget ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
-                function(btn) btn:SetHighlightInUse() end)
+                function(btnWidget) btnWidget:SetHighlightInUse() end)
     end)
 end
 

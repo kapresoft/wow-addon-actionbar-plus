@@ -14,7 +14,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local GC, MX = O.GlobalConstants, O.Mixin
-local AO, API = O.AceLibFactory:A(), O.API
+local AO, API, BaseAPI = O.AceLibFactory:A(), O.API, O.BaseAPI
 local LSM, String = AO.AceLibSharedMedia, O.String
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
@@ -53,48 +53,33 @@ MX:Mixin(L, O.ButtonProfileMixin)
 Instance Methods
 -------------------------------------------------------------------------------]]
 function L:Init()
-    self:SetButtonLayout()
+    self:SetButtonProperties()
     self:InitTextures(emptyTexture)
     if self:IsEmpty() then self:SetTextureAsEmpty() end
 end
 
-function L:SetButtonLayout()
+function L:SetButtonLayout2()
+    p:log('index: %s', self.index)
+end
+
+function L:SetButtonProperties()
     --self.placement.rowNum, self.placement.colNum
     local widget = self:W()
-    local rowNum, colNum = widget.placement.rowNum, widget.placement.colNum
 
     ---@type FrameWidget
     local dragFrame = widget.dragFrame
     local barConfig = dragFrame:GetConfig()
     local buttonSize = barConfig.widget.buttonSize
-    local buttonPadding = widget.buttonPadding
+    local buttonPadding = widget.dragFrame.horizontalButtonPadding
     local frameStrata = widget.frameStrata
     local frameLevel = widget.frameLevel
     local button = widget.button
-    local dragFrameWidget = widget.dragFrame
-
-    local widthPaddingAdj = dragFrameWidget.padding
-    local heightPaddingAdj = dragFrameWidget.padding + dragFrameWidget.dragHandleHeight
-    local widthAdj = ((colNum - 1) * buttonSize) + widthPaddingAdj
-    local heightAdj = ((rowNum - 1) * buttonSize) + heightPaddingAdj
 
     button:SetFrameStrata(frameStrata)
     button:SetFrameLevel(frameLevel)
     button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
-    button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
-
-    --local index = widget.index
-    --if index == 1 then
-    --    button:SetPoint(C.TOPLEFT, dragFrameWidget.frame, C.TOPLEFT, widthAdj, -heightAdj)
-    --end
-    --local previous = widget.dragFrame:GetName() .. 'Button' .. (index - 1)
-    --local pb = _G[previous]
-    --if pb and index > 1 then
-    --    button:SetPoint('TOPLEFT', pb, 'TOPRIGHT', 0, 0)
-    --end
 
     self:Scale(buttonSize)
-
 end
 
 ---@param buttonSize number
@@ -585,8 +570,14 @@ function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) en
 
 function L:SetTextureAsEmpty()
     self:SetNormalTexture(emptyTexture)
+    local nilTexture
+    if BaseAPI:IsDragonflight() then nilTexture = emptyTexture end
+    self:SetPushedTexture(nilTexture)
+    self:SetHighlightTexture(nilTexture)
     self:SetNormalIconAlphaAsEmpty()
     self:SetVertexColorNormal()
+    --self:B():EnableMouse(false)
+    --self:B():SetFrameStrata('BACKGROUND')
 end
 
 function L:SetNormalIconAlphaAsEmpty()

@@ -118,6 +118,7 @@ local function GlobalConstantProperties(o)
         OnTextSettingsChanged = 'OnTextSettingsChanged',
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
         OnButtonSizeChanged = 'OnButtonSizeChanged',
+        OnButtonCountChanged = 'OnButtonCountChanged',
         OnAddonLoaded = 'OnAddonLoaded',
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
