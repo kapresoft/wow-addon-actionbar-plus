@@ -372,7 +372,7 @@ local function WidgetMethods(widget)
         -- `_` is the index
         ---@param btn ButtonUI
         for _, btn in ipairs(self.buttonFrames) do
-            if w:IsItem() then applyFunction(btn.widget) end
+            if btn.widget:IsItem() then applyFunction(btn.widget) end
         end
     end
 
