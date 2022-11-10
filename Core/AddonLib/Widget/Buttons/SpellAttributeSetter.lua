@@ -77,7 +77,7 @@ function _L:ShowTooltip(btnUI)
     local spellInfo = btnData[WAttr.SPELL]
     if not spellInfo.id then return end
     GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
-    GameTooltip:AddSpellByID(spellInfo.id)
+    GameTooltip:SetSpellByID(spellInfo.id)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
