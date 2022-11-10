@@ -1,4 +1,4 @@
-# ActionbarPlus 1.0.11.Future (2022-Nov-xx)
+# ActionbarPlus 1.0.11 (2022-Nov-10)
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.11) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.10...1.0.11) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
@@ -13,8 +13,8 @@
 > Watch this short video clip for updating button columns and rows without having to reload World of Warcraft
 - https://youtu.be/RTu8RdN13PU
 
-# ActionbarPlus-1.0.10.zip
+# ActionbarPlus-1.0.11.zip
 
 ```text
-MD5 <new>
+MD5 a9af501c29543f0ff5868010365d58e9
 ```
