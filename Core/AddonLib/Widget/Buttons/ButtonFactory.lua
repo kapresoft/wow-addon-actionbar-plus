@@ -3,6 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local TooltipDataProcessor = TooltipDataProcessor
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -74,14 +75,12 @@ local function InitButtonGameTooltipHooksUsingTooltipDataProcessor()
     local onTooltipSetSpellFunction = function(tooltip, tooltipData)
         if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         if (tooltip == GameTooltip or tooltip == EmbeddedItemTooltip) then
-            p:log('Hello tharxx!')
             WMX:SetupTooltipKeybindingInfo(tooltip)
         end
     end
     local onTooltipSetItemFunction = function(tooltip, tooltipData)
         if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         if (tooltip == GameTooltip or tooltip == ItemRefTooltip) then
-            p:log('Hello thar item!')
             WMX:SetupTooltipKeybindingInfo(tooltip)
         end
     end

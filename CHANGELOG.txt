@@ -5,7 +5,7 @@
 [Milestone 11.4](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/12?closed=1)
 
 - Fix Retail PTR GameTooltip Bugs ~ 10.0.2 #141
-
+- Fix Broken Keybind Names #142
 
 # ActionbarPlus-1.0.12.zip
 
