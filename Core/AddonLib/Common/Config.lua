@@ -156,13 +156,19 @@ local function GetRowSizeGetterHandler(frameIndex)
     return function(_) return GetBarConfig(frameIndex).widget.rowSize or 2 end
 end
 local function GetRowSizeSetterHandler(frameIndex)
-    return function(_, v) GetBarConfig(frameIndex).widget.rowSize = v end
+    return function(_, v)
+        GetBarConfig(frameIndex).widget.rowSize = v
+        BF:Fire(E.OnButtonCountChanged)
+    end
 end
 local function GetColSizeGetterHandler(frameIndex)
     return function(_) return GetBarConfig(frameIndex).widget.colSize or 6 end
 end
 local function GetColSizeSetterHandler(frameIndex)
-    return function(_, v) GetBarConfig(frameIndex).widget.colSize = v end
+    return function(_, v)
+        GetBarConfig(frameIndex).widget.colSize = v
+        BF:Fire(E.OnButtonCountChanged)
+    end
 end
 
 ---@param config Config The config instance
@@ -470,7 +476,7 @@ local methods = {
                     max = 20,
                     name = 'Rows',
                     desc = 'The number of rows for the buttons',
-                    confirm = ConfirmAndReload,
+                    --confirm = ConfirmAndReload,
                     get = GetRowSizeGetterHandler(frameIndex),
                     set = GetRowSizeSetterHandler(frameIndex)
                 },
@@ -483,7 +489,7 @@ local methods = {
                     max = 40,
                     name = 'Columns',
                     desc = 'The number of columns for the buttons',
-                    confirm = ConfirmAndReload,
+                    --confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
                 },

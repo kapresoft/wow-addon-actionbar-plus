@@ -410,7 +410,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameStrata = dragFrameWidget.frameStrata or 'MEDIUM',
         frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
         ---@type number
-        buttonPadding = 2,
+        buttonPadding = 1,
         buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
