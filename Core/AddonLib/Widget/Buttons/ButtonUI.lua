@@ -151,21 +151,12 @@ end
 local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
 ---@param widget ButtonUIWidget
----@param down boolean true if the press is KeyDown
-local function OnModifierStateChanged(widget, down)
+---@param event string
+---@param mouseButtonPressed string LMOUSECLICK, etc...
+---@param down boolean 1 or true if the press is KeyDown
+local function OnModifierStateChanged(widget, event, mouseButtonPressed, down)
     RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down)
-    if widget:IsMacro() then
-        C_Timer.After(0.05, function() widget:Fire('OnModifierStateChanged') end)
-    end
-end
-
----@param widget ButtonUIWidget
-local function OnModifierStateChangedCallback(widget, event)
-    local scd = widget:GetMacroSpellCooldown()
-    if not (scd and scd.spell) then return end
-    --p:log('OnModifierStateChangedCallback: update cooldown: %s', scd.spell.name)
-    widget:SetIcon(scd.spell.icon)
-    widget:UpdateCooldown()
+    if widget:IsMacro() then if down == 1 then widget:UpdateMacroState() end end
 end
 
 ---@param widget ButtonUIWidget

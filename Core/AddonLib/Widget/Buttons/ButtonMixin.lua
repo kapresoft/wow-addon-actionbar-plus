@@ -495,6 +495,7 @@ function L:UpdateUsable()
         isUsableSpell = self:IsUsableSpell(cd)
     elseif c.type == MACRO then
         isUsableSpell = self:IsUsableMacro(cd)
+        self:UpdateMacroState()
     end
     self:SetActionUsable(isUsableSpell)
 end
@@ -884,6 +885,13 @@ function L:IsValidMacroProfile(buttonData)
     return not (buttonData == nil or buttonData.macro == nil
             or IsBlank(buttonData.macro.index)
             or IsBlank(buttonData.macro.name))
+end
+
+function L:UpdateMacroState()
+    local scd = self:GetMacroSpellCooldown()
+    if not (scd and scd.spell) then return end
+    self:SetIcon(scd.spell.icon)
+    self:UpdateCooldown()
 end
 
 ---@return ButtonData
