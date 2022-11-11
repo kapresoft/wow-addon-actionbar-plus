@@ -3,6 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
+local TooltipDataProcessor = TooltipDataProcessor
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -14,7 +15,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 local C = O.GlobalConstants.C
-local String, A, P = O.String, O.Assert, O.Profile
+local String, A, P, BaseAPI = O.String, O.Assert, O.Profile, O.BaseAPI
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
@@ -49,9 +50,7 @@ L.FRAMES = {}
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
---TODO: Move to ButtonFactory
-local function InitButtonGameTooltipHooks()
-    ---For macros not using spells
+local function InitButtonGameTooltipHooksLegacy()
     GameTooltip:HookScript("OnShow", function(tooltip, ...)
         if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         WMX:SetupTooltipKeybindingInfo(tooltip)
@@ -64,6 +63,37 @@ local function InitButtonGameTooltipHooks()
         if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
+end
+
+local function InitButtonGameTooltipHooksUsingTooltipDataProcessor()
+    ---For macros not using spells
+    GameTooltip:HookScript("OnShow", function(tooltip, ...)
+        if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        WMX:SetupTooltipKeybindingInfo(tooltip)
+    end)
+
+    local onTooltipSetSpellFunction = function(tooltip, tooltipData)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        if (tooltip == GameTooltip or tooltip == EmbeddedItemTooltip) then
+            WMX:SetupTooltipKeybindingInfo(tooltip)
+        end
+    end
+    local onTooltipSetItemFunction = function(tooltip, tooltipData)
+        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
+        if (tooltip == GameTooltip or tooltip == ItemRefTooltip) then
+            WMX:SetupTooltipKeybindingInfo(tooltip)
+        end
+    end
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, onTooltipSetSpellFunction)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, onTooltipSetItemFunction)
+end
+
+local function InitButtonGameTooltipHooks()
+    if TooltipDataProcessor then
+        InitButtonGameTooltipHooksUsingTooltipDataProcessor()
+        return
+    end
+    InitButtonGameTooltipHooksLegacy()
 end
 
 ---@param btnWidget ButtonUIWidget
