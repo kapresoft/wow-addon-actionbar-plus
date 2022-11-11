@@ -1,13 +1,10 @@
-# ActionbarPlus 1.0.12 (2022-Nov-10)
+# ActionbarPlus 1.0.12.1 (2022-Nov-10)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.12) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.11...1.0.12) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.12.1) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.12...1.0.12.1) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 11.4](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/12?closed=1)
+- Retail PTR TOC Update
 
-- Fix Retail PTR GameTooltip Bugs ~ 10.0.2 #141
-- Fix Broken Keybind Names #142
-
-# ActionbarPlus-1.0.12.zip
+# ActionbarPlus-1.0.12.1.zip
 
 ```text
 MD5 <tbd>
