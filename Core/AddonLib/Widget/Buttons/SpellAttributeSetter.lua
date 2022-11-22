@@ -43,7 +43,7 @@ function _L:ShowTooltip(btnUI, btnData)
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
     end
-    GameTooltip:AddSpellByID(spellInfo.id)
+    GameTooltip:SetSpellByID(spellInfo.id)
 end
 
 ---@param btnUI ButtonUI The UIFrame

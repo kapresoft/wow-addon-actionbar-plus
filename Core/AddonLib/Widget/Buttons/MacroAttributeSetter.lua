@@ -66,7 +66,7 @@ function S:ShowTooltip(btnUI)
         end
         GameTooltip:SetHyperlink(itemLink)
     else
-        GameTooltip:AddSpellByID(spellId)
+        GameTooltip:SetSpellByID(spellId)
     end
     GameTooltip:AppendText(' ' .. sformat(MACRO_WITH_SPELL_FORMAT, macroInfo.name))
 end
