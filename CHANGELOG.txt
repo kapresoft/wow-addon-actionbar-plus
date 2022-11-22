@@ -5,6 +5,7 @@
 [Milestone 11.5](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/13?closed=1)
 
 - Delay in icon updates for macros with conditionals #144
+- [Retail] Toolip: Replace AddSpellByID with SetSpellByID #147
 
 # ActionbarPlus-1.0.13.zip
 
