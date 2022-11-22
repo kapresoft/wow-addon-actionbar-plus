@@ -116,7 +116,7 @@ local function attributeSetterMethods(a)
         if bd:IsInvalidCompanion(mountInfo) then return end
 
         GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
-        GameTooltip:AddSpellByID(mountInfo.spell.id)
+        GameTooltip:SetSpellByID(mountInfo.spell.id)
     end
 end
 
