@@ -91,7 +91,6 @@ end
 ---@param event string
 local function OnVehicleEvent(f, event, ...)
     local unitTarget = ...
-    p:log('UnitTarget: %s', unitTarget)
     if UnitId.player ~= unitTarget then return end
     if E.UNIT_ENTERED_VEHICLE == event then
         f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
