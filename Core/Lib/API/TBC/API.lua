@@ -121,12 +121,16 @@ function S:GetSpellInfo(spellNameOrId)
         ---@type Profile_Spell
         local spellInfo = { id = id, name = name, icon = icon,
                             link=spellLink, castTime = castTime,
-                            minRange = minRange, maxRange = maxRange, rank = subTextOrRank }
+                            minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
+                            isShapeshift = false }
         spellInfo.label = spellInfo.name
         if IsNotBlank(spellInfo.rank) then
             -- color codes format: |cAARRGGBB
             local labelFormat = '%s |c00747474(%s)|r'
             spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
+            if spellInfo.rank == 'Shapeshift' then
+                spellInfo.isShapeshift = true
+            end
         end
         return spellInfo;
     end
@@ -140,6 +144,8 @@ function S:GetMacroSpellInfo(macroIndex)
     if not spellId then return nil end
     return self:GetSpellInfo(spellId)
 end
+---@param spellNameOrId string|number
+function S:IsPassiveSpell(spellNameOrId) return IsPassiveSpell(spellNameOrId) end
 
 ---@return SpellCooldownDetails
 function S:GetSpellCooldownDetails(spellID, optionalSpell)

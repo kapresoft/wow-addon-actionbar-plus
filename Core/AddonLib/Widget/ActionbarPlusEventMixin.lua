@@ -90,6 +90,9 @@ end
 ---@param f EventFrameInterface
 ---@param event string
 local function OnVehicleEvent(f, event, ...)
+    local unitTarget = ...
+    p:log('UnitTarget: %s', unitTarget)
+    if UnitId.player ~= unitTarget then return end
     if E.UNIT_ENTERED_VEHICLE == event then
         f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
         return
@@ -185,14 +188,43 @@ local function OnSpellCastSent(f, ...)
 end
 
 ---@param f EventFrameInterface
+local function OnSpellCastSucceeded(f, ...)
+    local spellCastSentEvent = B:ParseSpellCastSentEventArgs(...)
+    if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
+    w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+        ---@param btn ButtonUIWidget
+        fw:ApplyForEachSpellOrMacroButtons(spellCastSentEvent.spellID, function(btn)
+            btn:SetButtonStateNormal()
+            local spellInfo = O.API:GetSpellInfo(spellCastSentEvent.spellID)
+            if spellInfo.isShapeshift then
+                local shapeShiftFormIndex = GetShapeshiftForm()
+                print('shapeShiftFormIndex:', shapeShiftFormIndex)
+
+                local shapeShiftActive = false
+                if shapeShiftFormIndex > 0 then
+                    local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
+                    if spellID == spellInfo.id then shapeShiftActive = true end
+                end
+                if shapeShiftActive then
+                    print('isShapeShift active')
+                end
+            end
+        end)
+    end)
+end
+
+---@param f EventFrameInterface
 ---@param event string
 local function OnActionbarEvents(f, event, ...)
+    --p:log('e[%s]: %s', event, {...})
     if E.UNIT_SPELLCAST_START == event then
         OnSpellCastStart(f, ...)
     elseif E.UNIT_SPELLCAST_STOP == event then
         OnSpellCastStop(f, ...)
     elseif E.UNIT_SPELLCAST_SENT == event then
         OnSpellCastSent(f, ...)
+    elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
+        OnSpellCastSucceeded(f, ...)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
         OnSpellCastFailed(f, ...)
     end
@@ -234,6 +266,8 @@ function L:RegisterActionbarsEventFrame()
     f:RegisterEvent(E.UNIT_SPELLCAST_STOP)
     f:RegisterEvent(E.UNIT_SPELLCAST_SENT)
     f:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET)
+    --f:RegisterEvent(E.UNIT_SPELLCAST_SUCCEEDED)
+    --f:RegisterEvent('UNIT_SPELLCAST_FAILED')
 end
 
 function L:RegisterKeybindingsEventFrame()
@@ -286,5 +320,6 @@ function L:RegisterEvents()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterCombatFrame()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
+    --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end
 end

@@ -23,7 +23,10 @@ local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitID
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class SpellAttributeSetter : BaseAttributeSetter
-local _L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
+local L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
+---@type LoggerTemplate
+local p = L:GetLogger()
+
 ---@type BaseAttributeSetter
 local Base = LibStub(Core.M.BaseAttributeSetter)
 
@@ -31,7 +34,7 @@ local Base = LibStub(Core.M.BaseAttributeSetter)
 Methods
 -------------------------------------------------------------------------------]]
 ---@param link table The blizzard `GameTooltip` link
-function _L:ShowTooltip(btnUI, btnData)
+function L:ShowTooltip(btnUI, btnData)
     if not btnUI or not btnData then return end
     local type = btnData.type
     if not type then return end
@@ -48,7 +51,7 @@ end
 
 ---@param btnUI ButtonUI The UIFrame
 ---@param btnData Profile_Button The button data
-function _L:SetAttributes(btnUI, btnData)
+function L:SetAttributes(btnUI, btnData)
     local w = btnUI.widget
     w:ResetWidgetAttributes()
 
@@ -57,18 +60,37 @@ function _L:SetAttributes(btnUI, btnData)
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
+    local shapeShiftFormIndex = GetShapeshiftForm()
+    local shapeShiftActive = false
+    if shapeShiftFormIndex > 0 then
+        local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
+        if spellID == spellInfo.id then shapeShiftActive = true end
+    end
+
+
     local spellIcon = GC.Textures.TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = spellInfo.icon end
+    --136116
+    local spellAttrValue = spellInfo.id
+    if spellInfo.rank == 'Shapeshift' then
+        spellAttrValue = spellInfo.name
+        -- if isActive then use this icon
+        if shapeShiftActive then spellIcon = 136116 end
+    end
+    --todo next: "set shapeshift icon as active icon?"
+
+
     w:SetIcon(spellIcon)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
 
-    btnUI:SetAttribute(WAttr.SPELL, spellInfo.id)
+    btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
+
 
     self:OnAfterSetAttributes(btnUI)
 end
 
-function _L:ShowTooltip(btnUI)
+function L:ShowTooltip(btnUI)
 
     local bd = btnUI.widget:GetButtonData()
     if not bd:ConfigContainsValidActionType() then return end
@@ -84,5 +106,5 @@ function _L:ShowTooltip(btnUI)
     end
 end
 
-_L.mt.__index = Base
-_L.mt.__call = _L.SetAttributes
+L.mt.__index = Base
+L.mt.__call = L.SetAttributes
