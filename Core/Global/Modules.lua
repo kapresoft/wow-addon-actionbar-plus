@@ -62,6 +62,7 @@ local M = {
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
+    RogueAPI = 'RogueAPI',
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     WidgetMixin = 'WidgetMixin',
@@ -158,6 +159,8 @@ local GlobalObjectsTemplate = {
     ProfileInitializer = {},
     ---@type ReceiveDragEventHandler
     ReceiveDragEventHandler = {},
+    ---@type RogueAPI
+    RogueAPI = {},
     ---@type SpellAttributeSetter
     SpellAttributeSetter = {},
     ---@type SpellDragEventHandler

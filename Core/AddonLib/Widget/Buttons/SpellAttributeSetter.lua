@@ -61,7 +61,7 @@ function L:SetAttributes(btnUI, btnData)
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
     local isActive = O.DruidAPI:IsActiveForm('flightform')
-    p:log('isActive|FlightForm: %s', isActive)
+    p:log(10, 'isActive|FlightForm: %s', isActive)
 
     local shapeShiftFormIndex = GetShapeshiftForm()
     local shapeShiftActive = false

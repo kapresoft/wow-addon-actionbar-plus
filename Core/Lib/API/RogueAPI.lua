@@ -10,7 +10,7 @@ New Instance
 local L = LibStub:NewLibrary(Core.M.RogueAPI)
 ---@return LoggerTemplate
 local p = L:GetLogger()
-p:log("Hello: %s", Core.M.RogueAPI)
+p:log(10, "Hello: %s", Core.M.RogueAPI)
 
 -- Add to Modules.lua
 --RogueAPI = 'RogueAPI',

@@ -10,7 +10,7 @@ New Instance
 local L = LibStub:NewLibrary(Core.M.DruidAPI)
 ---@return LoggerTemplate
 local p = L:GetLogger()
-p:log("Hello: %s", Core.M.DruidAPI)
+p:log(10, "Hello: %s", Core.M.DruidAPI)
 
 -- Add to Modules.lua
 --DruidAPI = 'DruidAPI',
