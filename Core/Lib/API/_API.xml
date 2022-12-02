@@ -2,6 +2,8 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="BaseAPI.lua"/>
+    <Script file="DruidAPI.lua"/>
+    <Script file="RogueAPI.lua"/>
     <Include file='TBC\TBC.xml'/>
 
 </Ui>

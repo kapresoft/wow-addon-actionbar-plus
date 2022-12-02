@@ -60,6 +60,9 @@ function L:SetAttributes(btnUI, btnData)
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
+    local isActive = O.DruidAPI:IsActiveForm('flightform')
+    p:log('isActive|FlightForm: %s', isActive)
+
     local shapeShiftFormIndex = GetShapeshiftForm()
     local shapeShiftActive = false
     if shapeShiftFormIndex > 0 then

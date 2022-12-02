@@ -44,6 +44,7 @@ local M = {
     CompanionDragEventHandler = 'CompanionDragEventHandler',
     CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
+    DruidAPI = 'DruidAPI',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
     Incrementer = 'Incrementer',
@@ -141,6 +142,8 @@ local GlobalObjectsTemplate = {
     CompanionDragEventHandler = {},
     ---@type CompanionAttributeSetter
     CompanionAttributeSetter = {},
+    -----@type DruidAPI
+    DruidAPI = {},
     ---@type MountAttributeSetter
     MountAttributeSetter = {},
     ---@type Kapresoft_LibUtil_Mixin
