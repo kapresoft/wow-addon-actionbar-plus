@@ -9,7 +9,7 @@ local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
     WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT,
     WAttr.COMPANION, WAttr.BATTLE_PET
-local P = O.Profile
+local P, API = O.Profile, O.API
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 
@@ -75,7 +75,16 @@ local function methods(bd)
     end
 
     ---@return Profile_Spell
-    function bd:GetSpellInfo() return self:GetConfig()[SPELL] end
+    function bd:GetSpellInfo()
+        ---@type Profile_Spell
+        local spellInfo = self:GetConfig()[SPELL]
+        if spellInfo and spellInfo.id then spellInfo = API:GetSpellInfo(spellInfo.id) end
+        return spellInfo
+    end
+    function bd:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
+    function bd:IsStealthSpell() return API:IsStealthSpell(self:GetSpellInfo().name) end
+    function bd:IsShapeshiftSpell() return API:IsShapeshiftSpell(self:GetSpellInfo()) end
+
     ---@type Profile_Item
     function bd:GetItemInfo() return self:GetConfig()[ITEM] end
     ---@type Profile_Macro

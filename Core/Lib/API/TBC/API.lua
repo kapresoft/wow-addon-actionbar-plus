@@ -7,7 +7,7 @@ local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown,
 local C_ToyBox = C_ToyBox
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
-
+local UnitClass, IsStealthed = UnitClass, IsStealthed
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -21,7 +21,7 @@ local Core, O = ns.Core, ns.O
 
 local String = O.String
 local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
-local GC = O.GlobalConstants
+local DruidAPI, GC = O.DruidAPI, O.GlobalConstants
 local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
@@ -122,17 +122,19 @@ function S:GetSpellInfo(spellNameOrId)
         local spellInfo = { id = id, name = name, icon = icon,
                             link=spellLink, castTime = castTime,
                             minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
-                            isShapeshift = false }
+                            isShapeshift = false, isStealth = false, isProwl = false }
         spellInfo.label = spellInfo.name
         if IsNotBlank(spellInfo.rank) then
             -- color codes format: |cAARRGGBB
             local labelFormat = '%s |c00747474(%s)|r'
             spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
-            if spellInfo.rank == 'Shapeshift' then
-                spellInfo.isShapeshift = true
-            end
         end
-        return spellInfo;
+        local rankLc = strlower(spellInfo.rank or '')
+        local nameLc = strlower(name or '')
+        if WAttr.SHAPESHIFT == rankLc then spellInfo.isShapeshift = true
+        elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
+        elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
+        return spellInfo
     end
     return nil
 end
@@ -172,6 +174,84 @@ function S:GetSpellCooldown(spellID, optionalSpell)
         cd.spell.details = optionalSpell
     end
     return cd
+end
+---Example:
+---@param optionalUnit string
+---@see GlobalConstants#UnitId
+---@see Blizzard_UnitId
+---@return UnitClass
+function S:GetUnitClass(optionalUnit)
+    optionalUnit = optionalUnit or UnitId.player
+    local localizedName, name, id = UnitClass(optionalUnit)
+    return { localizedName = localizedName, name = name, id = id }
+end
+
+---@param valueToMatch string
+---@return boolean
+local function IsAnyOf(valueToMatch, ...)
+    if not valueToMatch then return false end
+    local args = {...}
+    for i=1, #args do
+        local val = args[i]
+        if val and strlower(val) == strlower(valueToMatch) then return true end
+    end
+    return false
+end
+
+---@param spellInfo Profile_Spell
+function S:IsShapeShiftActive(spellInfo)
+    return DruidAPI:IsActiveForm(spellInfo.id)
+end
+
+--- Generalizes shapeshift and stealth and shapeshift form
+---@param spellInfo Profile_Spell
+function S:IsShapeshiftOrStealthSpell(spellInfo)
+    return self:IsShapeshiftSpell(spellInfo)
+            or self:IsStealthSpell(spellInfo.name)
+end
+
+--- Generalizes shapeshift and stealth and shapeshift form
+---@param spellInfo Profile_Spell
+function S:IsShapeshiftSpell(spellInfo) return true == spellInfo.isShapeshift end
+
+---@param spellName string
+function S:IsStealthSpell(spellName)
+    return IsAnyOf(spellName, WAttr.PROWL, WAttr.STEALTH)
+end
+
+---@param spellInfo Profile_Spell
+function S:GetSpellIcon(spellInfo)
+    if spellInfo.isShapeshift then
+        if self:IsShapeShiftActive(spellInfo) then
+            return GC.Textures.DRUID_FORM_ACTIVE_ICON
+        end
+    elseif self:IsStealthSpell(spellInfo.name) and IsStealthed() then
+        return GC.Textures.STEALTHED_ICON
+    end
+    return spellInfo.icon
+end
+
+---@param spellInfo Profile_Spell
+function S:GetStealthIcon(spellInfo)
+    if self:IsStealthSpell(spellInfo.name) and IsStealthed() then
+        return GC.Textures.STEALTHED_ICON
+    end
+    return spellInfo.icon
+end
+
+---@param spellInfo Profile_Spell
+function S:GetShapeshiftIcon(spellInfo)
+    if self:IsShapeShiftActive(spellInfo) then return GC.Textures.DRUID_FORM_ACTIVE_ICON end
+    return spellInfo.icon
+end
+
+---@param spellInfo Profile_Spell
+function S:GetSpellAttributeValue(spellInfo)
+    local spellAttrValue = spellInfo.id
+    if self:IsShapeshiftOrStealthSpell(spellInfo) then
+        spellAttrValue = spellInfo.name
+    end
+    return spellAttrValue
 end
 
 ---@param itemID number

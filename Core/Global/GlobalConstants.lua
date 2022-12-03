@@ -69,6 +69,10 @@ local function GlobalConstantProperties(o)
 
     ---@class Textures
     local Textures = {
+        ---@type number|string
+        DRUID_FORM_ACTIVE_ICON = 136116,
+        ---@type number|string
+        STEALTHED_ICON = 'interface/icons/spell_nature_invisibilty',
         ---@type string
         TEXTURE_EMPTY = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty',
         ---@type string
@@ -185,6 +189,8 @@ local function GlobalConstantProperties(o)
         UNIT_SPELLCAST_SUCCEEDED = 'UNIT_SPELLCAST_SUCCEEDED',
 
         UPDATE_BINDINGS = 'UPDATE_BINDINGS',
+        UPDATE_SHAPESHIFT_FORM = 'UPDATE_SHAPESHIFT_FORM',
+        UPDATE_STEALTH = 'UPDATE_STEALTH',
 
         UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
@@ -228,6 +234,10 @@ local function GlobalConstantProperties(o)
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
         MACRO = "macro",
+        DRUID = 'DRUID',
+        SHAPESHIFT = 'shapeshift',
+        STEALTH = 'stealth',
+        PROWL = 'prowl',
     }
 
     ---@class ButtonAttributes

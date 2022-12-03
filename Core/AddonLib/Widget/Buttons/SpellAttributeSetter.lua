@@ -16,7 +16,7 @@ local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local Assert, String = O.Assert, O.String
 local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
-local GC = O.GlobalConstants
+local API, GC = O.API, O.GlobalConstants
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 
 --[[-----------------------------------------------------------------------------
@@ -60,35 +60,15 @@ function L:SetAttributes(btnUI, btnData)
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
 
-    local isActive = O.DruidAPI:IsActiveForm('flightform')
-    p:log(10, 'isActive|FlightForm: %s', isActive)
-
-    local shapeShiftFormIndex = GetShapeshiftForm()
-    local shapeShiftActive = false
-    if shapeShiftFormIndex > 0 then
-        local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
-        if spellID == spellInfo.id then shapeShiftActive = true end
-    end
-
-
     local spellIcon = GC.Textures.TEXTURE_EMPTY
-    if spellInfo.icon then spellIcon = spellInfo.icon end
-    --136116
-    local spellAttrValue = spellInfo.id
-    if spellInfo.rank == 'Shapeshift' then
-        spellAttrValue = spellInfo.name
-        -- if isActive then use this icon
-        if shapeShiftActive then spellIcon = 136116 end
-    end
-    --todo next: "set shapeshift icon as active icon?"
-
-
+    if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
     w:SetIcon(spellIcon)
-    btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
 
-    btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
+    btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
+    local spellAttrValue = API:GetSpellAttributeValue(spellInfo)
+    btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
 
     self:OnAfterSetAttributes(btnUI)
 end

@@ -1,4 +1,9 @@
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GetShapeshiftForm = GetShapeshiftForm
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
@@ -25,10 +30,16 @@ Methods
 ---@class DruidAPI_Methods
 ---@param o DruidAPI
 local function Methods(o)
-    ---@param formName string
-    function o:IsActiveForm(formName)
+    ---@param formSpellId number
+    function o:IsActiveForm(formSpellId)
+        local shapeShiftFormIndex = GetShapeshiftForm()
+        local shapeShiftActive = false
+        if shapeShiftFormIndex <= 0 then return shapeShiftActive end
 
-        return false
+        local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
+        if spellID == formSpellId then shapeShiftActive = true end
+
+        return shapeShiftActive
     end
 end
 

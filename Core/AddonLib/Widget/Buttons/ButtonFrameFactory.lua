@@ -386,7 +386,7 @@ local function WidgetMethods(widget)
     end
 
     ---@param conditionFn function The condition function; Example: function(btnWidget) return true end
-    ---@param applyFn function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    ---@param applyFn function(ButtonUIWidget) Should be in format function(btnWidget) {}
     function widget:ApplyForEachButtonCondition(conditionFn, applyFn)
         if self:HasEmptyButtons() then return end
         -- `_` is the index
