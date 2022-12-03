@@ -20,7 +20,7 @@ local ns = ABP_Namespace(...)
 local Core, O = ns.Core, ns.O
 
 local String = O.String
-local IsBlank, IsNotBlank, strlower = String.IsBlank, String.IsNotBlank, string.lower
+local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
 local DruidAPI, GC = O.DruidAPI, O.GlobalConstants
 local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
@@ -184,18 +184,6 @@ function S:GetUnitClass(optionalUnit)
     optionalUnit = optionalUnit or UnitId.player
     local localizedName, name, id = UnitClass(optionalUnit)
     return { localizedName = localizedName, name = name, id = id }
-end
-
----@param valueToMatch string
----@return boolean
-local function IsAnyOf(valueToMatch, ...)
-    if not valueToMatch then return false end
-    local args = {...}
-    for i=1, #args do
-        local val = args[i]
-        if val and strlower(val) == strlower(valueToMatch) then return true end
-    end
-    return false
 end
 
 ---@param spellInfo Profile_Spell
