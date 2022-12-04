@@ -82,8 +82,16 @@ local function methods(bd)
         return spellInfo
     end
     function bd:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
-    function bd:IsStealthSpell() return API:IsStealthSpell(self:GetSpellInfo().name) end
-    function bd:IsShapeshiftSpell() return API:IsShapeshiftSpell(self:GetSpellInfo()) end
+    function bd:IsStealthSpell()
+        local spellInfo = self:GetSpellInfo()
+        if not (spellInfo and spellInfo.name) then return false end
+        return API:IsStealthSpell(spellInfo.name)
+    end
+    function bd:IsShapeshiftSpell()
+        local spellInfo = self:GetSpellInfo()
+        if not (spellInfo and spellInfo.name) then return false end
+        return API:IsShapeshiftSpell(spellInfo)
+    end
 
     ---@type Profile_Item
     function bd:GetItemInfo() return self:GetConfig()[ITEM] end

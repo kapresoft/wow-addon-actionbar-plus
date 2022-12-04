@@ -35,11 +35,8 @@ local function Methods(o)
         local shapeShiftFormIndex = GetShapeshiftForm()
         local shapeShiftActive = false
         if shapeShiftFormIndex <= 0 then return shapeShiftActive end
-
         local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
-        if spellID == formSpellId then shapeShiftActive = true end
-
-        return shapeShiftActive
+        return spellID == formSpellId and active
     end
 end
 

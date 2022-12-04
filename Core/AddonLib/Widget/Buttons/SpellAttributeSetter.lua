@@ -1,12 +1,12 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GameTooltip = GameTooltip
+local GameTooltip, C_Timer = GameTooltip, C_Timer
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local format = string.format
+local format, strlower = string.format, string.lower
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -18,7 +18,7 @@ local Assert, String = O.Assert, O.String
 local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
 local API, GC = O.API, O.GlobalConstants
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
-
+local IsAnyOf = String.IsAnyOf
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -63,6 +63,14 @@ function L:SetAttributes(btnUI, btnData)
     local spellIcon = GC.Textures.TEXTURE_EMPTY
     if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
     w:SetIcon(spellIcon)
+
+    -- when logging in for the first time, there's a delay in IsStealthed() state
+    if IsAnyOf(strlower(spellInfo.name), WAttr.STEALTH, WAttr.PROWL) then
+        C_Timer.After(3, function()
+            if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
+            w:SetIcon(spellIcon)
+        end)
+    end
 
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 

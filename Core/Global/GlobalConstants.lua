@@ -16,6 +16,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local addon, ns = ...
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
+local sformat = string.format
+local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -72,11 +74,13 @@ local function GlobalConstantProperties(o)
         ---@type number|string
         DRUID_FORM_ACTIVE_ICON = 136116,
         ---@type number|string
-        STEALTHED_ICON = 'interface/icons/spell_nature_invisibilty',
+        STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
+        ---@type number|string
+        PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
         ---@type string
-        TEXTURE_EMPTY = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty',
+        TEXTURE_EMPTY = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty'),
         ---@type string
-        TEXTURE_EMPTY_GRID = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid',
+        TEXTURE_EMPTY_GRID = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty-grid'),
         ---@type string
         TEXTURE_EMPTY_BLIZZ_DIALOG_BACKGROUND = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),
         ---@type string
@@ -236,6 +240,7 @@ local function GlobalConstantProperties(o)
         MACRO = "macro",
         DRUID = 'DRUID',
         SHAPESHIFT = 'shapeshift',
+        SHADOWFORM = 'shadowform',
         STEALTH = 'stealth',
         PROWL = 'prowl',
     }

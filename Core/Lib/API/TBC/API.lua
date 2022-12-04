@@ -131,7 +131,8 @@ function S:GetSpellInfo(spellNameOrId)
         end
         local rankLc = strlower(spellInfo.rank or '')
         local nameLc = strlower(name or '')
-        if WAttr.SHAPESHIFT == rankLc then spellInfo.isShapeshift = true
+        if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
+            spellInfo.isShapeshift = true
         elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
         elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
         return spellInfo
@@ -209,9 +210,14 @@ end
 
 ---@param spellInfo Profile_Spell
 function S:GetSpellIcon(spellInfo)
-    if spellInfo.isShapeshift then
+    if self:IsShapeshiftSpell(spellInfo) then
+        local unitClass = self:GetUnitClass(UnitId.player)
         if self:IsShapeShiftActive(spellInfo) then
-            return GC.Textures.DRUID_FORM_ACTIVE_ICON
+            if unitClass.name == 'DRUID' then
+                return GC.Textures.DRUID_FORM_ACTIVE_ICON
+            elseif unitClass.name == 'PRIEST' then
+                return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON
+            end
         end
     elseif self:IsStealthSpell(spellInfo.name) and IsStealthed() then
         return GC.Textures.STEALTHED_ICON
