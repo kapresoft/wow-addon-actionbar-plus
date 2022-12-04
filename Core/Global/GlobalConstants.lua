@@ -74,7 +74,7 @@ local function GlobalConstantProperties(o)
         ---@type number|string
         DRUID_FORM_ACTIVE_ICON = 136116,
         ---@type number|string
-        STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
+        STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active2'),
         ---@type number|string
         PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
         ---@type string
