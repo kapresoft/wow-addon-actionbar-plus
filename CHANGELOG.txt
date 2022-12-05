@@ -7,7 +7,6 @@
 - Filter UNIT_ENTERED_VEHICLE events for player only #150
 - Handle Class stance/forms/stealth abilities #146
 - Fix WOTLK PTR 3.0.4.1 Issues #151
-- Retail Fix - Disallow Passive Spells #139
 - Fix Classic Era - CURSOR_CHANGED event error #152
 
 # ActionbarPlus-1.0.14.zip
