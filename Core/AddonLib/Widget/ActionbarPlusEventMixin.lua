@@ -205,10 +205,10 @@ local function OnActionbarEvents(f, event, ...)
     end
 end
 
----@param fw FrameWidget
-local function OnStealth(fw)
+---@param eventWidget EventFrameWidgetInterface
+local function OnStealth(eventWidget)
     ---@param fw FrameWidget
-    fw.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+    eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         ---@param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:GetButtonData():IsStealthSpell() end,
@@ -220,13 +220,28 @@ local function OnStealth(fw)
     end)
 end
 
----@param fw FrameWidget
-local function OnShapeShift(fw)
+---@param eventWidget EventFrameWidgetInterface
+local function OnShapeShift(eventWidget)
     ---@param fw FrameWidget
-    fw.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+    eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         ---@param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:GetButtonData():IsShapeshiftSpell() end,
+                function(bw)
+                    local spellInfo = bw:GetButtonData():GetSpellInfo()
+                    local icon = API:GetSpellIcon(spellInfo)
+                    bw:SetIcon(icon)
+                end)
+    end)
+end
+
+---@param eventWidget EventFrameWidgetInterface
+local function OnStealthIconUpdate(eventWidget)
+    ---@param fw FrameWidget
+    eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+        ---@param bw ButtonUIWidget
+        fw:ApplyForEachButtonCondition(
+                function(bw) return bw:GetButtonData():IsStealthSpell() end,
                 function(bw)
                     local spellInfo = bw:GetButtonData():GetSpellInfo()
                     local icon = API:GetSpellIcon(spellInfo)
@@ -239,11 +254,18 @@ end
 ---@param f EventFrameInterface
 ---@param event string
 local function OnShapeshiftOrStealthEvent(f, event, ...)
+    local eventWidget = f.widget
     if E.UPDATE_STEALTH == event then
-        OnStealth(f.widget)
+        OnStealth(eventWidget)
     elseif E.UPDATE_SHAPESHIFT_FORM == event then
-        OnShapeShift(f.widget)
+        OnShapeShift(eventWidget)
     end
+end
+
+---@param f EventFrameInterface
+---@param event string
+local function OnPlayerEnteringWorld(f, event, ...)
+    OnStealthIconUpdate(f.widget)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -332,6 +354,11 @@ function L:RegisterCombatFrame()
     f:SetScript(E.OnEvent, OnPlayerCombatEvent)
     RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
 end
+function L:RegisterPlayerEnteringWorld()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
+    RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
+end
 
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
@@ -341,6 +368,7 @@ function L:RegisterEvents()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterShapeshiftOrStealthEventFrame()
     self:RegisterCombatFrame()
+    self:RegisterPlayerEnteringWorld()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end

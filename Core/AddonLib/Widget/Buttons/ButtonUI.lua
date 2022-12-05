@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 WoW Vars
 -------------------------------------------------------------------------------]]
-local ClearCursor, CreateFrame, UIParent = ClearCursor, CreateFrame, UIParent
+local GetCursorInfo, ClearCursor, CreateFrame, UIParent = GetCursorInfo, ClearCursor, CreateFrame, UIParent
 local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFontHighlightSmallOutline
 local C_Timer, C_PetJournal = C_Timer, C_PetJournal
 
@@ -107,6 +107,10 @@ local function OnPostClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     RegisterForClicks(btn.widget, 'PreClick', down)
+    if btn.widget:IsEmpty() then
+        btn.widget:SetTextureAsEmpty()
+        print('texture is empty')
+    end
 end
 
 ---@param btnUI ButtonUI
@@ -309,7 +313,6 @@ local function RegisterCallbacks(widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
-    widget:SetCallback(E.ON_MODIFIER_STATE_CHANGED, OnModifierStateChangedCallback)
 
     ---@param w ButtonUIWidget
     widget:SetCallback("OnEnter", function(w)

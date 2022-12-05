@@ -64,14 +64,6 @@ function L:SetAttributes(btnUI, btnData)
     if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
     w:SetIcon(spellIcon)
 
-    -- when logging in for the first time, there's a delay in IsStealthed() state
-    if IsAnyOf(strlower(spellInfo.name), WAttr.STEALTH, WAttr.PROWL) then
-        C_Timer.After(3, function()
-            if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
-            w:SetIcon(spellIcon)
-        end)
-    end
-
     btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
