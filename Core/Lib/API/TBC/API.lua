@@ -224,6 +224,8 @@ end
 
 ---@param spellInfo Profile_Spell
 function S:GetSpellIcon(spellInfo)
+    if not spellInfo then return nil end
+
     if self:IsShapeshiftSpell(spellInfo) then
         local unitClass = self:GetUnitClass(UnitId.player)
         if self:IsShapeShiftActive(spellInfo) then
