@@ -1,4 +1,9 @@
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GetMacroSpell = GetMacroSpell
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
@@ -78,12 +83,22 @@ local function methods(bd)
 
     ---@return Profile_Spell
     function bd:GetSpellInfo()
+        local w = self.widget
         ---@type Profile_Spell
-        local spellInfo = self:GetConfig()[SPELL]
-        if spellInfo and spellInfo.id then spellInfo = API:GetSpellInfo(spellInfo.id) end
+        local spellInfo
+        local conf = w:GetConfig()
+        if not conf and (conf.spell or conf.macro) then return false end
+        if w:IsConfigOfType(conf, SPELL) then
+            spellInfo = conf[SPELL]
+        elseif w:IsConfigOfType(conf, MACRO) and conf.macro.index then
+            local macroSpellId =  GetMacroSpell(conf.macro.index)
+            spellInfo = API:GetSpellInfo(macroSpellId)
+        end
+        if not (spellInfo and spellInfo.name) then return nil end
         return spellInfo
     end
     function bd:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
+
     function bd:IsStealthSpell()
         local spellInfo = self:GetSpellInfo()
         if not (spellInfo and spellInfo.name) then return false end
@@ -125,8 +140,8 @@ local function methods(bd)
         return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
     end
 
-    ---@param p Profile_BattlePet
-    function bd:IsInvalidBattlePet(p) return IsNil(p) and IsNil(p.guid) and IsNil(p.name) end
+    ---@param pet Profile_BattlePet
+    function bd:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
 
     function bd:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end
     function bd:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.widget.frameIndex) end

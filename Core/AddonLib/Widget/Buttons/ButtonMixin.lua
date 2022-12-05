@@ -913,7 +913,12 @@ end
 function L:UpdateMacroState()
     local scd = self:GetMacroSpellCooldown()
     if not (scd and scd.spell) then return end
-    self:SetIcon(scd.spell.icon)
+    local icon = scd.spell.icon
+    if self:GetButtonData():IsStealthSpell() then
+        local spellInfo = self:GetButtonData():GetSpellInfo()
+        icon = API:GetSpellIcon(spellInfo)
+    end
+    self:SetIcon(icon)
     self:UpdateCooldown()
 end
 
