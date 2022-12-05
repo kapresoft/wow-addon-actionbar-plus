@@ -3,6 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
 local IsUsableSpell, IsUsableItem, GetUnitName, C_Timer = IsUsableSpell, IsUsableItem, GetUnitName, C_Timer
+local IsStealthed = IsStealthed
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -565,9 +566,13 @@ function L:ResetHighlight() self:SetHighlightDefault() end
 ---@param texture string
 function L:SetNormalTexture(texture) self:B():SetNormalTexture(texture) end
 ---@param texture string
-function L:SetPushedTexture(texture) self:B():SetPushedTexture(texture) end
+function L:SetPushedTexture(texture)
+    if texture then self:B():SetPushedTexture(texture) end
+end
 ---@param texture string
-function L:SetHighlightTexture(texture) self:B():SetHighlightTexture(texture) end
+function L:SetHighlightTexture(texture)
+    if texture then  self:B():SetHighlightTexture(texture) end
+end
 
 function L:SetTextureAsEmpty()
     self:SetNormalTexture(emptyTexture)
@@ -825,7 +830,9 @@ function L:SetActionUsable(isUsable)
     local normalTexture = self:B():GetNormalTexture()
     if not normalTexture then return end
     -- energy based spells do not use 'notEnoughMana'
-    if not isUsable then
+    if IsStealthed() or API:IsShapeShiftActive(self:GetButtonData():GetSpellInfo()) then
+        normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+    elseif not isUsable then
         normalTexture:SetVertexColor(0.3, 0.3, 0.3)
     else
         normalTexture:SetVertexColor(1.0, 1.0, 1.0)

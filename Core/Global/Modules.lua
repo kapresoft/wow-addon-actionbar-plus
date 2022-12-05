@@ -44,6 +44,7 @@ local M = {
     CompanionDragEventHandler = 'CompanionDragEventHandler',
     CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
+    DruidAPI = 'DruidAPI',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
     Incrementer = 'Incrementer',
@@ -61,6 +62,7 @@ local M = {
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
+    RogueAPI = 'RogueAPI',
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     WidgetMixin = 'WidgetMixin',
@@ -141,6 +143,8 @@ local GlobalObjectsTemplate = {
     CompanionDragEventHandler = {},
     ---@type CompanionAttributeSetter
     CompanionAttributeSetter = {},
+    -----@type DruidAPI
+    DruidAPI = {},
     ---@type MountAttributeSetter
     MountAttributeSetter = {},
     ---@type Kapresoft_LibUtil_Mixin
@@ -155,6 +159,8 @@ local GlobalObjectsTemplate = {
     ProfileInitializer = {},
     ---@type ReceiveDragEventHandler
     ReceiveDragEventHandler = {},
+    ---@type RogueAPI
+    RogueAPI = {},
     ---@type SpellAttributeSetter
     SpellAttributeSetter = {},
     ---@type SpellDragEventHandler

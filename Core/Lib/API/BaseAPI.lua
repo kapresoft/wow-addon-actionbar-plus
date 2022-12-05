@@ -41,6 +41,7 @@ local function IsValidMountInfo(mountInfo)
 end
 
 function L:IsDragonflight() return select(4, GetBuildInfo()) >= 100000 end
+function L:IsClassicEra() return select(4, GetBuildInfo()) <= 11500 end
 
 ---@see Blizzard_UnitId
 function L:IsTargetFriendlyToPlayer() return UnitIsFriend(UnitId.player, UnitId.target) end

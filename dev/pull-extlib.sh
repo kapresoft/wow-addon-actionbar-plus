@@ -21,6 +21,7 @@ IncludeBase && Validate
 RELEASE_DIR="${dev_release_dir}"
 ADDON_NAME="ActionbarPlus"
 EXTLIB="Core/ExtLib"
+INTERFACE_LIB="Core/Interface"
 
 Package() {
   local arg1=$1

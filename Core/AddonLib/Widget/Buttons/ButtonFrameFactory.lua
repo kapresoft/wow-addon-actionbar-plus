@@ -183,7 +183,7 @@ end
 local function OnActionbarShowGroup(frameWidget, e, ...)
     if  true ~= P:IsBarEnabled(frameWidget.index) then return end
     frameWidget:ShowGroup()
-    C_Timer.After(3, function() frameWidget:ShowGroup() end)
+    C_Timer.After(5, function() frameWidget:ShowGroup() end)
 end
 
 ---Sometimes there's a delay. Fire immediately, then after a few seconds
@@ -196,7 +196,7 @@ end
 ---@param frameWidget FrameWidget
 local function OnActionbarHideGroup(frameWidget, e, ...)
     frameWidget:HideGroup()
-    C_Timer.After(3, function() frameWidget:HideGroup() end)
+    C_Timer.After(5, function() frameWidget:HideGroup() end)
 end
 
 ---@param frameWidget FrameWidget
@@ -386,7 +386,7 @@ local function WidgetMethods(widget)
     end
 
     ---@param conditionFn function The condition function; Example: function(btnWidget) return true end
-    ---@param applyFn function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    ---@param applyFn function(ButtonUIWidget) Should be in format function(btnWidget) {}
     function widget:ApplyForEachButtonCondition(conditionFn, applyFn)
         if self:HasEmptyButtons() then return end
         -- `_` is the index

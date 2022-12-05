@@ -16,6 +16,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local addon, ns = ...
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
+local sformat = string.format
+local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -69,10 +71,16 @@ local function GlobalConstantProperties(o)
 
     ---@class Textures
     local Textures = {
+        ---@type number|string
+        DRUID_FORM_ACTIVE_ICON = 136116,
+        ---@type number|string
+        STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
+        ---@type number|string
+        PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
         ---@type string
-        TEXTURE_EMPTY = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty',
+        TEXTURE_EMPTY = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty'),
         ---@type string
-        TEXTURE_EMPTY_GRID = 'interface/addons/actionbarplus/Core/Assets/Textures/ui-button-empty-grid',
+        TEXTURE_EMPTY_GRID = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty-grid'),
         ---@type string
         TEXTURE_EMPTY_BLIZZ_DIALOG_BACKGROUND = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),
         ---@type string
@@ -185,6 +193,8 @@ local function GlobalConstantProperties(o)
         UNIT_SPELLCAST_SUCCEEDED = 'UNIT_SPELLCAST_SUCCEEDED',
 
         UPDATE_BINDINGS = 'UPDATE_BINDINGS',
+        UPDATE_SHAPESHIFT_FORM = 'UPDATE_SHAPESHIFT_FORM',
+        UPDATE_STEALTH = 'UPDATE_STEALTH',
 
         UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
@@ -214,6 +224,11 @@ local function GlobalConstantProperties(o)
         ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
         ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
     }
+    local UnitClass = {
+        DRUID = 'DRUID',
+        PRIEST = 'PRIEST',
+        ROGUE = 'ROGUE'
+    }
 
     ---@class WidgetAttributes
     local WidgetAttributes = {
@@ -228,6 +243,11 @@ local function GlobalConstantProperties(o)
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
         MACRO = "macro",
+        DRUID = 'DRUID',
+        SHAPESHIFT = 'shapeshift',
+        SHADOWFORM = 'shadowform',
+        STEALTH = 'stealth',
+        PROWL = 'prowl',
     }
 
     ---@class ButtonAttributes
@@ -306,6 +326,7 @@ local function GlobalConstantProperties(o)
     o.AlphaMode = BlendMode
     ---@type Blizzard_UnitId
     o.UnitId = UnitId
+    o.UnitClass = UnitClass
 end
 
 ---@param o GlobalConstants

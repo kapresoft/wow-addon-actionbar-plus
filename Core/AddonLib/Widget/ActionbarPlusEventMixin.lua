@@ -3,14 +3,15 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local CreateFrame = CreateFrame
+local CreateFrame, FrameUtil = CreateFrame, FrameUtil
+local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
 local O, Core, LibStub = ns:LibPack()
-local GC = O.GlobalConstants
+local BaseAPI, API, GC = O.BaseAPI, O.API, O.GlobalConstants
 local E, UnitId = GC.E, GC.UnitId
 local B = O.BaseAPI
 local AceEvent = O.AceLibFactory:A().AceEvent
@@ -90,6 +91,8 @@ end
 ---@param f EventFrameInterface
 ---@param event string
 local function OnVehicleEvent(f, event, ...)
+    local unitTarget = ...
+    if UnitId.player ~= unitTarget then return end
     if E.UNIT_ENTERED_VEHICLE == event then
         f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
         return
@@ -187,14 +190,59 @@ end
 ---@param f EventFrameInterface
 ---@param event string
 local function OnActionbarEvents(f, event, ...)
+    --p:log('e[%s]: %s', event, {...})
     if E.UNIT_SPELLCAST_START == event then
         OnSpellCastStart(f, ...)
     elseif E.UNIT_SPELLCAST_STOP == event then
         OnSpellCastStop(f, ...)
     elseif E.UNIT_SPELLCAST_SENT == event then
         OnSpellCastSent(f, ...)
+    --elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
+          -- instant cast spells
+    --    OnSpellCastSucceeded(f, ...)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
         OnSpellCastFailed(f, ...)
+    end
+end
+
+---@param fw FrameWidget
+local function OnStealth(fw)
+    ---@param fw FrameWidget
+    fw.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+        ---@param bw ButtonUIWidget
+        fw:ApplyForEachButtonCondition(
+                function(bw) return bw:GetButtonData():IsStealthSpell() end,
+                function(bw)
+                    local spellInfo = bw:GetButtonData():GetSpellInfo()
+                    local icon = API:GetSpellIcon(spellInfo)
+                    bw:SetIcon(icon)
+                end)
+    end)
+end
+
+---@param fw FrameWidget
+local function OnShapeShift(fw)
+    ---@param fw FrameWidget
+    fw.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+        ---@param bw ButtonUIWidget
+        fw:ApplyForEachButtonCondition(
+                function(bw) return bw:GetButtonData():IsShapeshiftSpell() end,
+                function(bw)
+                    local spellInfo = bw:GetButtonData():GetSpellInfo()
+                    local icon = API:GetSpellIcon(spellInfo)
+                    bw:SetIcon(icon)
+                end)
+    end)
+end
+
+--- Sequence is UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM; for this reason
+---@param f EventFrameInterface
+---@param event string
+local function OnShapeshiftOrStealthEvent(f, event, ...)
+    if E.UPDATE_STEALTH == event then
+        OnStealth(f.widget)
+    elseif E.UPDATE_SHAPESHIFT_FORM == event then
+        OnShapeShift(f.widget)
     end
 end
 
@@ -230,43 +278,51 @@ end
 function L:RegisterActionbarsEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnActionbarEvents)
-    f:RegisterEvent(E.UNIT_SPELLCAST_START)
-    f:RegisterEvent(E.UNIT_SPELLCAST_STOP)
-    f:RegisterEvent(E.UNIT_SPELLCAST_SENT)
-    f:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET)
+    RegisterFrameForUnitEvents(f, {
+        E.UNIT_SPELLCAST_START,
+        E.UNIT_SPELLCAST_STOP,
+        E.UNIT_SPELLCAST_SENT,
+        E.UNIT_SPELLCAST_FAILED_QUIET,
+        --E.UNIT_SPELLCAST_SUCCEEDED,
+        --E.UNIT_SPELLCAST_FAILED,
+    })
+end
+
+function L:RegisterShapeshiftOrStealthEventFrame()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnShapeshiftOrStealthEvent)
+    RegisterFrameForEvents(f, { E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM })
 end
 
 function L:RegisterKeybindingsEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnUpdateBindings)
-    f:RegisterEvent(E.UPDATE_BINDINGS)
+    RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
 end
 
 function L:RegisterVehicleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnVehicleEvent)
-    f:RegisterEvent(E.UNIT_ENTERED_VEHICLE)
-    f:RegisterEvent(E.UNIT_EXITED_VEHICLE)
+    RegisterFrameForUnitEvents(f, { E.UNIT_ENTERED_VEHICLE, E.UNIT_EXITED_VEHICLE }, GC.UnitId.player)
 end
 
 function L:RegisterActionbarGridEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnActionbarGrid)
-    f:RegisterEvent(E.ACTIONBAR_SHOWGRID)
-    f:RegisterEvent(E.ACTIONBAR_HIDEGRID)
+    RegisterFrameForEvents(f, { E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID })
 end
 
 function L:RegisterCursorChangesInBagEvents()
+    if BaseAPI:IsClassicEra() then return end
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnCursorChangeInBags)
-    f:RegisterEvent(E.CURSOR_CHANGED)
+    RegisterFrameForEvents(f, { E.CURSOR_CHANGED })
 end
 
 function L:RegisterPetBattleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPetBattleEvent)
-    f:RegisterEvent(E.PET_BATTLE_OPENING_START)
-    f:RegisterEvent(E.PET_BATTLE_CLOSE)
+    RegisterFrameForEvents(f, { E.PET_BATTLE_OPENING_START, E.PET_BATTLE_CLOSE })
 end
 
 --- Use PLAYER_REGIN[ENABLED|DISABLED] is more reliable than using
@@ -274,8 +330,7 @@ end
 function L:RegisterCombatFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPlayerCombatEvent)
-    f:RegisterEvent(E.PLAYER_REGEN_ENABLED)
-    f:RegisterEvent(E.PLAYER_REGEN_DISABLED)
+    RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
 end
 
 function L:RegisterEvents()
@@ -284,7 +339,9 @@ function L:RegisterEvents()
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
+    self:RegisterShapeshiftOrStealthEventFrame()
     self:RegisterCombatFrame()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
+    --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end
 end
