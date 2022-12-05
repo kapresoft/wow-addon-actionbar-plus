@@ -107,10 +107,6 @@ local function OnPostClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     RegisterForClicks(btn.widget, 'PreClick', down)
-    if btn.widget:IsEmpty() then
-        btn.widget:SetTextureAsEmpty()
-        print('texture is empty')
-    end
 end
 
 ---@param btnUI ButtonUI
