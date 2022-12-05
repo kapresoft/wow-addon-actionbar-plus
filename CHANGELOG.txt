@@ -1,6 +1,6 @@
 # ActionbarPlus 1.0.16 (2022-Dec-05)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.16) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.16...1.0.16) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.16) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.15...1.0.16) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 - Fix for Stealth/Prowl icons on player login event #156
 
