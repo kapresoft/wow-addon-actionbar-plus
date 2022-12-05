@@ -200,6 +200,7 @@ end
 
 ---@param spellInfo Profile_Spell
 function S:IsShapeShiftActive(spellInfo)
+    if not spellInfo then return false end
     if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
         return GetShapeshiftForm() > 0
     end
