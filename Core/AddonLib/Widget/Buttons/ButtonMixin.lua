@@ -582,7 +582,7 @@ end
 function L:SetHighlightTexture(texture)
     if texture then
         self:B():SetHighlightTexture(texture)
-    self:B():GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+        self:SetHighlightTextureAlpha(highlightTextureAlpha)
         return
     end
     self:B():SetHighlightTexture(emptyTexture)

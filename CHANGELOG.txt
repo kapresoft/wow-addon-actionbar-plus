@@ -1,10 +1,8 @@
-# ActionbarPlus 1.0.15 (2022-Dec-xx)
+# ActionbarPlus 1.0.15 (2022-Dec-04)
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.15) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.14...1.0.15) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 12.2](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/15?closed=1)
-
-- TBD
+- Fix Pushed and Highlight Texture #155
 
 ### ActionbarPlus-1.0.15.zip
 
