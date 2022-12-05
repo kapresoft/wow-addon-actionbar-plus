@@ -224,6 +224,11 @@ local function GlobalConstantProperties(o)
         ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
         ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
     }
+    local UnitClass = {
+        DRUID = 'DRUID',
+        PRIEST = 'PRIEST',
+        ROGUE = 'ROGUE'
+    }
 
     ---@class WidgetAttributes
     local WidgetAttributes = {
@@ -321,6 +326,7 @@ local function GlobalConstantProperties(o)
     o.AlphaMode = BlendMode
     ---@type Blizzard_UnitId
     o.UnitId = UnitId
+    o.UnitClass = UnitClass
 end
 
 ---@param o GlobalConstants

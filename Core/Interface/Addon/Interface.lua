@@ -155,6 +155,3 @@ local Profile_Data = {
 local SpellcastSent_Data = {
     unit='unit', target='target', castGUID='castGUID', spellID=12345
 }
-
----@class UnitClass
-local UnitClass = { localizedName = 'Rogue', name = 'ROGUE', id = 4 }

@@ -1,13 +1,16 @@
-# ActionbarPlus 1.0.13 (2022-Nov-22)
+# ActionbarPlus 1.0.14 (2022-Dec-xx)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.13) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.12...1.0.13) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.13) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.13...1.0.14) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-[Milestone 11.5](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/13?closed=1)
+[Milestone 12.1](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/14?closed=1)
 
-- Delay in icon updates for macros with conditionals #144
-- [Retail] Tooltip: Replace AddSpellByID with SetSpellByID #147
+- Filter UNIT_ENTERED_VEHICLE events for player only #150
+- Handle Class stance/forms/stealth abilities #146
+- Fix WOTLK PTR 3.0.4.1 Issues #151
+- Retail Fix - Disallow Passive Spells #139
+- Fix Classic Era - CURSOR_CHANGED event error #152
 
-# ActionbarPlus-1.0.13.zip
+# ActionbarPlus-1.0.14.zip
 
 ```text
 MD5 <tbd>

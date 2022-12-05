@@ -7,7 +7,8 @@ local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown,
 local C_ToyBox = C_ToyBox
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
-local UnitClass, IsStealthed = UnitClass, IsStealthed
+local UnitClass, IsStealthed, GetShapeshiftForm = UnitClass, IsStealthed, GetShapeshiftForm
+
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -28,7 +29,7 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class API : BaseAPI
+---@class API
 local S = {}
 ---@type API
 _API = S
@@ -180,15 +181,28 @@ end
 ---@param optionalUnit string
 ---@see GlobalConstants#UnitId
 ---@see Blizzard_UnitId
----@return UnitClass
+---@return string One of DRUID, ROGUE, PRIEST, etc...
 function S:GetUnitClass(optionalUnit)
     optionalUnit = optionalUnit or UnitId.player
-    local localizedName, name, id = UnitClass(optionalUnit)
-    return { localizedName = localizedName, name = name, id = id }
+    return select(2, UnitClass(optionalUnit))
+end
+
+---Example:
+---```
+---local playerClass = 'DRUID'
+---local isValidClass = IsPlayerClassAnyOf('DRUID','ROGUE', 'PRIEST')
+---assertThat(isValidClass).IsTrue()
+---```
+function S:IsPlayerClassAnyOf(...)
+    local unitClass = self:GetUnitClass()
+    return IsAnyOf(unitClass, ...)
 end
 
 ---@param spellInfo Profile_Spell
 function S:IsShapeShiftActive(spellInfo)
+    if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
+        return GetShapeshiftForm() > 0
+    end
     return DruidAPI:IsActiveForm(spellInfo.id)
 end
 
@@ -213,9 +227,9 @@ function S:GetSpellIcon(spellInfo)
     if self:IsShapeshiftSpell(spellInfo) then
         local unitClass = self:GetUnitClass(UnitId.player)
         if self:IsShapeShiftActive(spellInfo) then
-            if unitClass.name == 'DRUID' then
+            if unitClass == GC.UnitClass.DRUID then
                 return GC.Textures.DRUID_FORM_ACTIVE_ICON
-            elseif unitClass.name == 'PRIEST' then
+            elseif unitClass == GC.UnitClass.PRIEST then
                 return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON
             end
         end

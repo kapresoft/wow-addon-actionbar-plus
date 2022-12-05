@@ -3,14 +3,15 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local CreateFrame = CreateFrame
+local CreateFrame, FrameUtil = CreateFrame, FrameUtil
+local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = ABP_Namespace(...)
 local O, Core, LibStub = ns:LibPack()
-local API, GC = O.API, O.GlobalConstants
+local BaseAPI, API, GC = O.BaseAPI, O.API, O.GlobalConstants
 local E, UnitId = GC.E, GC.UnitId
 local B = O.BaseAPI
 local AceEvent = O.AceLibFactory:A().AceEvent
@@ -277,52 +278,51 @@ end
 function L:RegisterActionbarsEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnActionbarEvents)
-    f:RegisterEvent(E.UNIT_SPELLCAST_START)
-    f:RegisterEvent(E.UNIT_SPELLCAST_STOP)
-    f:RegisterEvent(E.UNIT_SPELLCAST_SENT)
-    f:RegisterEvent(E.UNIT_SPELLCAST_FAILED_QUIET)
-    --f:RegisterEvent(E.UNIT_SPELLCAST_SUCCEEDED)
-    --f:RegisterEvent('UNIT_SPELLCAST_FAILED')
+    RegisterFrameForUnitEvents(f, {
+        E.UNIT_SPELLCAST_START,
+        E.UNIT_SPELLCAST_STOP,
+        E.UNIT_SPELLCAST_SENT,
+        E.UNIT_SPELLCAST_FAILED_QUIET,
+        --E.UNIT_SPELLCAST_SUCCEEDED,
+        --E.UNIT_SPELLCAST_FAILED,
+    })
 end
 
 function L:RegisterShapeshiftOrStealthEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnShapeshiftOrStealthEvent)
-    f:RegisterEvent(E.UPDATE_STEALTH)
-    f:RegisterEvent(E.UPDATE_SHAPESHIFT_FORM)
+    RegisterFrameForEvents(f, { E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM })
 end
 
 function L:RegisterKeybindingsEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnUpdateBindings)
-    f:RegisterEvent(E.UPDATE_BINDINGS)
+    RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
 end
 
 function L:RegisterVehicleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnVehicleEvent)
-    f:RegisterEvent(E.UNIT_ENTERED_VEHICLE)
-    f:RegisterEvent(E.UNIT_EXITED_VEHICLE)
+    RegisterFrameForUnitEvents(f, { E.UNIT_ENTERED_VEHICLE, E.UNIT_EXITED_VEHICLE }, GC.UnitId.player)
 end
 
 function L:RegisterActionbarGridEventFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnActionbarGrid)
-    f:RegisterEvent(E.ACTIONBAR_SHOWGRID)
-    f:RegisterEvent(E.ACTIONBAR_HIDEGRID)
+    RegisterFrameForEvents(f, { E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID })
 end
 
 function L:RegisterCursorChangesInBagEvents()
+    if BaseAPI:IsClassicEra() then return end
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnCursorChangeInBags)
-    f:RegisterEvent(E.CURSOR_CHANGED)
+    RegisterFrameForEvents(f, { E.CURSOR_CHANGED })
 end
 
 function L:RegisterPetBattleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPetBattleEvent)
-    f:RegisterEvent(E.PET_BATTLE_OPENING_START)
-    f:RegisterEvent(E.PET_BATTLE_CLOSE)
+    RegisterFrameForEvents(f, { E.PET_BATTLE_OPENING_START, E.PET_BATTLE_CLOSE })
 end
 
 --- Use PLAYER_REGIN[ENABLED|DISABLED] is more reliable than using
@@ -330,8 +330,7 @@ end
 function L:RegisterCombatFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPlayerCombatEvent)
-    f:RegisterEvent(E.PLAYER_REGEN_ENABLED)
-    f:RegisterEvent(E.PLAYER_REGEN_DISABLED)
+    RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
 end
 
 function L:RegisterEvents()

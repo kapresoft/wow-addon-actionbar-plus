@@ -13,6 +13,8 @@ local P, API = O.Profile, O.API
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 
+local p = __K_Core:NewLogger('ButtonData')
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
