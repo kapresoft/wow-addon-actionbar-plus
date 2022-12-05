@@ -499,7 +499,7 @@ local function WidgetMethods(widget)
         ---@param bw ButtonUIWidget
         self:ApplyForEachButton(function(bw)
             if not bw:IsEmpty() then return end
-            bw:SetNormalIconAlphaAsEmpty()
+            bw:SetTextureAsEmpty()
             bw:UpdateKeybindTextState()
         end)
     end
