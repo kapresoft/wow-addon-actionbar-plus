@@ -567,23 +567,39 @@ function L:ResetHighlight() self:SetHighlightDefault() end
 function L:SetNormalTexture(texture) self:B():SetNormalTexture(texture) end
 ---@param texture string
 function L:SetPushedTexture(texture)
-    if texture then self:B():SetPushedTexture(texture) end
+    if texture then
+        self:B():SetPushedTexture(texture)
+        self:SetPushedTextureAlpha(pushedTextureInUseAlpha)
+        return
+    end
+    self:B():SetPushedTexture(emptyTexture)
+    if not self:GetButtonData():IsShowEmptyButtons() then
+        self:SetPushedTextureAlpha(0)
+    end
 end
+
 ---@param texture string
 function L:SetHighlightTexture(texture)
-    if texture then  self:B():SetHighlightTexture(texture) end
+    if texture then
+        self:B():SetHighlightTexture(texture)
+    self:B():GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+        return
+    end
+    self:B():SetHighlightTexture(emptyTexture)
+    self:SetHighlightTextureAlpha(0)
 end
+
+---@param alpha number 1 (opaque) to zero (transparent)
+function L:SetPushedTextureAlpha(alpha) self:B():GetPushedTexture():SetAlpha(alpha or 1) end
+---@param alpha number 1 (opaque) to zero (transparent)
+function L:SetHighlightTextureAlpha(alpha) self:B():GetHighlightTexture():SetAlpha(alpha or 1) end
 
 function L:SetTextureAsEmpty()
     self:SetNormalTexture(emptyTexture)
-    local nilTexture
-    if BaseAPI:IsDragonflight() then nilTexture = emptyTexture end
-    self:SetPushedTexture(nilTexture)
-    self:SetHighlightTexture(nilTexture)
+    self:SetPushedTexture(nil)
+    self:SetHighlightTexture(nil)
     self:SetNormalIconAlphaAsEmpty()
     self:SetVertexColorNormal()
-    --self:B():EnableMouse(false)
-    --self:B():SetFrameStrata('BACKGROUND')
 end
 
 function L:SetNormalIconAlphaAsEmpty()
@@ -683,7 +699,7 @@ function L:SetHighlightEnabled(state)
         btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
         return
     end
-    btnUI:SetHighlightTexture(nil)
+    self:SetHighlightTexture(nil)
 end
 
 ---This is used for mouseover when dragging a cursor
