@@ -7,6 +7,7 @@
 - Update stealth state for macros #159
 - Mask texture matches button dimensions (instead of default square) #162
 - Some action button icons are showing a rigid dark background #90
+- Moonkin form 'active form' texture fix #165
 
 ### ActionbarPlus-1.0.17.zip
 
