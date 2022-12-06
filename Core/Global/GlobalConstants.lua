@@ -246,6 +246,7 @@ local function GlobalConstantProperties(o)
         DRUID = 'DRUID',
         SHAPESHIFT = 'shapeshift',
         SHADOWFORM = 'shadowform',
+        MOONKIN_FORM = 'moonkin form',
         STEALTH = 'stealth',
         PROWL = 'prowl',
     }

@@ -124,6 +124,7 @@ function S:GetSpellInfo(spellNameOrId)
                             link=spellLink, castTime = castTime,
                             minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
                             isShapeshift = false, isStealth = false, isProwl = false }
+        if WAttr.MOONKIN_FORM == strlower(spellNameOrId) then spellInfo.rank = WAttr.SHAPESHIFT end
         spellInfo.label = spellInfo.name
         if IsNotBlank(spellInfo.rank) then
             -- color codes format: |cAARRGGBB

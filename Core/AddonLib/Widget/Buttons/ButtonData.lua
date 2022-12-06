@@ -90,6 +90,8 @@ local function methods(bd)
         if not conf and (conf.spell or conf.macro) then return false end
         if w:IsConfigOfType(conf, SPELL) then
             spellInfo = conf[SPELL]
+            -- Retrieve the latest info
+            if spellInfo and spellInfo.name then spellInfo = API:GetSpellInfo(spellInfo.name) end
         elseif w:IsConfigOfType(conf, MACRO) and conf.macro.index then
             local macroSpellId =  GetMacroSpell(conf.macro.index)
             spellInfo = API:GetSpellInfo(macroSpellId)
