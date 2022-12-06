@@ -903,6 +903,9 @@ function L:UpdateMacroState()
     if self:GetButtonData():IsStealthSpell() then
         local spellInfo = self:GetButtonData():GetSpellInfo()
         icon = API:GetSpellIcon(spellInfo)
+    elseif self:GetButtonData():IsShapeshiftSpell() then
+        local spellInfo = self:GetButtonData():GetSpellInfo()
+        icon = API:GetSpellIcon(spellInfo)
     end
     self:SetIcon(icon)
     self:UpdateCooldown()
