@@ -27,10 +27,10 @@ local UNIT = GC.UnitIDAttributes
 
 local emptyTexture = GC.Textures.TEXTURE_EMPTY
 local emptyGridTexture = GC.Textures.TEXTURE_EMPTY_GRID
-local highlightTexture = T.TEXTURE_HIGHLIGHT2
-local pushedTextureMask = T.TEXTURE_HIGHLIGHT2
+local highlightTexture = GC.Textures.TEXTURE_EMPTY_GRID
+local pushedTextureMask = GC.Textures.TEXTURE_EMPTY_GRID
 
-local highlightTextureAlpha = 0.2
+local highlightTextureAlpha = 0.5
 local highlightTextureInUseAlpha = 0.5
 local pushedTextureInUseAlpha = 0.5
 local nonEmptySlotAlpha = 1.0
@@ -250,19 +250,14 @@ function L:InitTextures(icon)
 
     self:SetHighlightDefault(btnUI)
     btnUI:SetPushedTexture(icon)
+
     local tex = btnUI:GetPushedTexture()
     CreateMask(btnUI, tex, pushedTextureMask)
-
     tex:SetAlpha(pushedTextureInUseAlpha)
-    local mask = btnUI:CreateMaskTexture()
-    mask:SetPoint(C.TOPLEFT, tex, C.TOPLEFT, 3, -3)
-    mask:SetPoint(C.BOTTOMRIGHT, tex, C.BOTTOMRIGHT, -3, 3)
-    mask:SetTexture(pushedTextureMask, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
-    tex:AddMaskTexture(mask)
 
     local hTexture = btnUI:GetHighlightTexture()
     if hTexture and not hTexture.mask then
-        hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
+        CreateMask(btnUI, hTexture, highlightTexture)
     end
 end
 
@@ -664,24 +659,19 @@ function L:SetButtonStatePushed() self:B():SetButtonState('PUSHED') end
 
 ---Typically used when casting spells that take longer than GCD
 function L: SetHighlightInUse()
-    --todo next: action_button_mouseover_glow is different from highlight in use
-    --this feature is being masked by action_button_mouseover_glow
-    --need to highlight an action being in-use state regardless
     local btn = self:B()
+    self:SetNormalIconAlpha(highlightTextureInUseAlpha)
     local hltTexture = btn:GetHighlightTexture()
     --highlight texture could be nil if action_button_mouseover_glow is disabled
     if not hltTexture then return end
     hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
     hltTexture:SetAlpha(highlightTextureInUseAlpha)
-
-    if hltTexture and not hltTexture.mask then
-        -- so that we can show a indicator that a spell is being casted
-        hltTexture.mask = CreateMask(btn, hltTexture, GC.Textures.TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE)
-    end
+    if hltTexture and not hltTexture.mask then CreateMask(btn, hltTexture, highlightTexture) end
 end
 function L:SetHighlightDefault()
     if self:IsEmpty() then return end
     self:SetHighlightEnabled(self:P():IsActionButtonMouseoverGlowEnabled())
+    self:SetNormalIconAlpha(1.0)
 end
 
 function L:RefreshHighlightEnabled()
@@ -881,14 +871,10 @@ end
 ---@param icon string Blizzard Icon
 function L:SetIcon(icon)
     local btn = self:B()
-    btn:SetNormalTexture(icon)
-    btn:SetPushedTexture(icon)
-
+    self:SetNormalTexture(icon)
+    self:SetPushedTexture(icon)
     local nTexture = btn:GetNormalTexture()
-    if not nTexture.mask then
-        nTexture.mask = CreateMask(btn, nTexture, GC.Textures.TEXTURE_HIGHLIGHT_BUTTON_OUTLINE)
-    end
-
+    if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
 end
 
 ---@param buttonData Profile_Button

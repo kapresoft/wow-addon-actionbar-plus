@@ -127,6 +127,22 @@ local function OnDragStart(btnUI)
     w:Fire('OnDragStart')
 end
 
+---@param btn _Button
+---@param texture _Texture
+---@param texturePath string
+local function CreateMask(btn, texture, texturePath)
+    local mask = btn:CreateMaskTexture()
+    local topx, topy = 1, -1
+    local botx, boty = -1, 1
+    local C = GC.C
+    mask:SetPoint(C.TOPLEFT, texture, C.TOPLEFT, topx, topy)
+    mask:SetPoint(C.BOTTOMRIGHT, texture, C.BOTTOMRIGHT, botx, boty)
+    mask:SetTexture(texturePath, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+    texture.mask = mask
+    texture:AddMaskTexture(mask)
+    return mask
+end
+
 --- Used with `button:RegisterForDrag('LeftButton')`
 ---@param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
@@ -142,6 +158,12 @@ local function OnReceiveDrag(btnUI)
 
     ---@type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
+
+    --local hTexture = btnUI:GetHighlightTexture()
+    --if hTexture and not hTexture.mask then
+    --    print('creating mask')
+    --    hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_EMPTY_GRID)
+    --end
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
