@@ -1,4 +1,4 @@
-# ActionbarPlus 1.0.17 (2022-Dec-xx)
+# ActionbarPlus 1.0.17 (2022-Dec-06)
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.17) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.16...1.0.17) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
