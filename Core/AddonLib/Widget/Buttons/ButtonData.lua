@@ -90,8 +90,6 @@ local function methods(bd)
         if not conf and (conf.spell or conf.macro) then return false end
         if w:IsConfigOfType(conf, SPELL) then
             spellInfo = conf[SPELL]
-            -- Retrieve the latest info
-            if spellInfo and spellInfo.name then spellInfo = API:GetSpellInfo(spellInfo.name) end
         elseif w:IsConfigOfType(conf, MACRO) and conf.macro.index then
             local macroSpellId =  GetMacroSpell(conf.macro.index)
             spellInfo = API:GetSpellInfo(macroSpellId)
@@ -112,9 +110,9 @@ local function methods(bd)
         return API:IsShapeshiftSpell(spellInfo)
     end
 
-    ---@type Profile_Item
+    ---@return Profile_Item
     function bd:GetItemInfo() return self:GetConfig()[ITEM] end
-    ---@type Profile_Macro
+    ---@return Profile_Macro
     function bd:GetMacroInfo() return self:GetConfig()[MACRO] end
     ---@return Profile_Mount
     function bd:GetMountInfo() return self:GetConfig()[MOUNT] end
