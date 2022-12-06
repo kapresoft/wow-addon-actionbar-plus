@@ -3,6 +3,8 @@
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.17) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.16...1.0.17) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 - Update stealth state for macros #159
+- Mask texture matches button dimensions (instead of default square) #162
+- Some action button icons are showing a rigid dark background #90
 
 ### ActionbarPlus-1.0.17.zip
 
