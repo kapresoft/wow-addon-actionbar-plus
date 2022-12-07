@@ -18,6 +18,7 @@ local L = LibStub:NewLibrary(Core.M.SpellDragEventHandler)
 Methods
 -------------------------------------------------------------------------------]]
 ---spellCursorInfo `{ type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }`
+---@param btnUI ButtonUI
 ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
 function L:Handle(btnUI, cursorInfo)
     if not self:IsValid(btnUI, cursorInfo) then return end
@@ -29,8 +30,11 @@ function L:Handle(btnUI, cursorInfo)
     local spellInfo = API:GetSpellInfo(spellCursorInfo.id)
     if IsNil(spellInfo) then return end
 
-    local btnData = btnUI.widget:GetConfig()
-    PH:PickupExisting(btnUI.widget)
+    local w = btnUI.widget
+    if w:GetButtonData():IsPassiveSpell(spellInfo.name) then return end
+
+    local btnData = w:GetConfig()
+    PH:PickupExisting(w)
     btnData[WAttr.TYPE] = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo
 

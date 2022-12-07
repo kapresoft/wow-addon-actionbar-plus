@@ -124,23 +124,31 @@ function S:GetSpellInfo(spellNameOrId)
                             link=spellLink, castTime = castTime,
                             minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
                             isShapeshift = false, isStealth = false, isProwl = false }
-        if WAttr.MOONKIN_FORM == strlower(spellNameOrId) then spellInfo.rank = WAttr.SHAPESHIFT end
-        spellInfo.label = spellInfo.name
-        if IsNotBlank(spellInfo.rank) then
-            -- color codes format: |cAARRGGBB
-            local labelFormat = '%s |c00747474(%s)|r'
-            spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
-        end
-        local rankLc = strlower(spellInfo.rank or '')
-        local nameLc = strlower(name or '')
-        if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
-            spellInfo.isShapeshift = true
-        elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
-        elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
+        self:ApplySpellInfoAttributes(spellInfo)
         return spellInfo
     end
     return nil
 end
+
+function S:ApplySpellInfoAttributes(spellInfo)
+    if not spellInfo then return end
+    spellInfo.label = spellInfo.name
+    if IsNotBlank(spellInfo.rank) then
+        -- color codes format: |cAARRGGBB
+        local labelFormat = '%s |c00747474(%s)|r'
+        spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
+    end
+    local rankLc = strlower(spellInfo.rank or '')
+    local nameLc = strlower(spellInfo.name or '')
+
+    -- Manual correction since [Moonkin Form] doesn't have rank as 'Shapeshift'
+    if WAttr.MOONKIN_FORM == nameLc then spellInfo.rank = 'Shapeshift' end
+    if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
+        spellInfo.isShapeshift = true
+    elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
+    elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
+end
+
 ---@param macroIndex number
 ---@return Profile_Spell
 function S:GetMacroSpellInfo(macroIndex)

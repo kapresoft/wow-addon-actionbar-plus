@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetMacroSpell = GetMacroSpell
+local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -90,6 +90,7 @@ local function methods(bd)
         if not conf and (conf.spell or conf.macro) then return false end
         if w:IsConfigOfType(conf, SPELL) then
             spellInfo = conf[SPELL]
+            API:ApplySpellInfoAttributes(spellInfo)
         elseif w:IsConfigOfType(conf, MACRO) and conf.macro.index then
             local macroSpellId =  GetMacroSpell(conf.macro.index)
             spellInfo = API:GetSpellInfo(macroSpellId)
@@ -97,6 +98,7 @@ local function methods(bd)
         if not (spellInfo and spellInfo.name) then return nil end
         return spellInfo
     end
+
     function bd:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
 
     function bd:IsStealthSpell()
@@ -108,6 +110,17 @@ local function methods(bd)
         local spellInfo = self:GetSpellInfo()
         if not (spellInfo and spellInfo.name) then return false end
         return API:IsShapeshiftSpell(spellInfo)
+    end
+    ---@param optionalSpellNameOrId number|string
+    function bd:IsPassiveSpell(optionalSpellNameOrId)
+        local spellNameOrId = optionalSpellNameOrId
+        if not spellNameOrId then
+            local spellInfo = self:GetSpellInfo()
+            if spellInfo then spellNameOrId = spellInfo.name end
+        end
+        -- assume passive by default if we can't find any spell info
+        if not spellNameOrId then return true end
+        return IsPassiveSpell(spellNameOrId)
     end
 
     ---@return Profile_Item
