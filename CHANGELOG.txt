@@ -1,12 +1,13 @@
-# ActionbarPlus 1.0.17.1 (2022-Dec-06)
+# ActionbarPlus 1.0.18 (2022-Dec-07)
 
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.17.1) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.17...1.0.17.1) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
+[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.18) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.17.2...1.0.18) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
-Emergency fix to address issues with action button icons not loading during login
+[Milestone 12.3](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/16?closed=1)
 
-- Action button icons not loading during login #168
+- Retail Fix - Disallow Passive Spells #139
+- Retail Fix - Active Texture when Moonkin form is activated #170
 
-### ActionbarPlus-1.0.17.1.zip
+### ActionbarPlus-1.0.18.zip
 
 ```text
 MD5 <tbd>
