@@ -1,9 +1,15 @@
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local unpack = unpack
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
 local UIParent, CreateFrame = UIParent, CreateFrame
 local GetBuildInfo, GetAddOnMetadata = GetBuildInfo, GetAddOnMetadata
+local GetCVarBool = GetCVarBool
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -19,13 +25,13 @@ local ADDON_NAME = ns.name
 
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
-
 local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
+local GCC = GC.C
 local FRAME_NAME = ADDON_NAME .. "Frame"
 
-local Table, LogFactory = O.Table, O.LogFactory
+local String, Table, LogFactory = O.String, O.Table, O.LogFactory
 local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
-local IsBlank = O.String.IsBlank
+local IsBlank, IsAnyOf = String.IsBlank, String.IsAnyOf
 local MX, WMX, PopupDebugDialog = O.Mixin, O.WidgetMixin, O.PopupDebugDialog
 
 local AceDB, AceDBOptions, AceConfig, AceConfigDialog = AO.AceDB, AO.AceDBOptions, AO.AceConfig, AO.AceConfigDialog
@@ -76,17 +82,43 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 ---@class ActionbarPlus_Methods
+---@type string
 local methods = {
     ['ShowActionbars'] = function(self, isShown)
         WMX:ShowActionbarsDelayed(isShown, 1)
     end,
     ---@param self ActionbarPlus
     ['RegisterSlashCommands'] = function(self)
-        self:RegisterChatCommand("abp", "OpenConfig")
+        self:RegisterChatCommand("abp", "SlashCommands")
         self:RegisterChatCommand("abp_info", "SlashCommand_Info")
         self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
     end,
     ---@param self ActionbarPlus
+    ---@param spaceSeparatedArgs string
+    ['SlashCommands'] = function(self, spaceSeparatedArgs)
+        local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
+        if IsEmptyTable(args) or IsAnyOf('config', unpack(args)) then
+            self:OpenConfig()
+            return
+        end
+        if IsAnyOf('info', unpack(args)) then
+            self:SlashCommand_Info(spaceSeparatedArgs)
+            return
+        end
+        if IsAnyOf('help', unpack(args)) then
+            p:log('')
+            p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, 'ActionbarPlus console commands')
+            p:log('Usage: /abp [options]')
+            p:log('Options:')
+            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, '<none>', 'Open the config UI (default)')
+            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', 'Open the config UI (default)')
+            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', 'Show additional information about the addon')
+            --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
+            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', 'Show this help')
+        end
+    end,
+    ---@param self ActionbarPlus
+    ---@param spaceSeparatedArgs string
     ['SlashCommand_Info'] = function(self, spaceSeparatedArgs)
         local wowInterfaceVersion = select(4, GetBuildInfo())
         local lastChanged = GetAddOnMetadata(ADDON_NAME, 'X-Github-Project-Last-Changed-Date')
@@ -96,6 +128,7 @@ local methods = {
                 version, curseForge, issues, lastChanged, useKeyDown, wowInterfaceVersion)
     end,
     ---@param self ActionbarPlus
+    ---@param spaceSeparatedArgs string
     ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
         local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
         if IsEmptyTable(vars) then
@@ -115,6 +148,8 @@ local methods = {
         popupDebugDialog:EvalThenShow(firstArg)
     end,
     ---@param self ActionbarPlus
+    ---@param optionalLabel string
+    ---@param obj table An arbitrary object
     ['ShowDebugDialog'] = function(self, obj, optionalLabel)
         local text
         local label = optionalLabel or ''
