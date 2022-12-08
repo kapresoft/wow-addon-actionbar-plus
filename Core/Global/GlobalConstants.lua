@@ -45,6 +45,8 @@ local function GlobalConstantProperties(o)
         DB_NAME = 'ABP_PLUS_DB',
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
+        ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
+        ABP_CONSOLE_OPTIONS_FORMAT = '  - %-8s|cfdeab676:: %s|r',
         -- The minimum size of a button before the texts are hidden (if configured)
         MIN_BUTTON_SIZE_FOR_HIDING_TEXTS = 35,
         ALT = 'ALT',
