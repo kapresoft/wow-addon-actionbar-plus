@@ -32,6 +32,9 @@ Methods: GlobalConstants
 ---@param o GlobalConstants
 local function GlobalConstantProperties(o)
 
+    local consoleCommandTextFormat = '|cfd2db9fb%s|r'
+    local consoleKeyValueTextFormat = '|cfdfbeb2d%s|r: %s'
+
     ---@class GlobalConstants_Default
     local Default = {
         FrameAnchor = {
@@ -47,6 +50,13 @@ local function GlobalConstantProperties(o)
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
         ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
         ABP_CONSOLE_OPTIONS_FORMAT = '  - %-8s|cfdeab676:: %s|r',
+
+        ABP_CONSOLE_COMMAND_TEXT_FORMAT = consoleCommandTextFormat,
+        ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT = consoleKeyValueTextFormat,
+
+        ABP_COMMAND      = sformat(consoleCommandTextFormat, "/abp"),
+        ABP_HELP_COMMAND = sformat(consoleCommandTextFormat, "/abp help"),
+
         -- The minimum size of a button before the texts are hidden (if configured)
         MIN_BUTTON_SIZE_FOR_HIDING_TEXTS = 35,
         ALT = 'ALT',

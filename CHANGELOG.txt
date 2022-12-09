@@ -1,10 +1,11 @@
-# ActionbarPlus 1.0.19 (2022-Dec-xx)
+# ActionbarPlus 1.0.19 (2022-Dec-09)
 
 [Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.19) | [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.18...1.0.19) | [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases) | [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
 
 [Milestone 12.4](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/17?closed=1)
 
 - Refine ActionbarPlus console commands #158
+- Cleanup unused in ActionbarPlus.lua #172
 
 ### ActionbarPlus-1.0.19.zip
 

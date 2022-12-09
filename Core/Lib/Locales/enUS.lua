@@ -11,6 +11,11 @@ Lua Vars
 local sformat = string.format
 
 --[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local GCC = ABP_GlobalConstants.C
+
+--[[-----------------------------------------------------------------------------
 Defaults
 -------------------------------------------------------------------------------]]
 
@@ -19,7 +24,6 @@ ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT         = 'Action Bar #%s Button %s'
 
 ---@class Localization
 local L = LibStub("AceLocale-3.0"):NewLocale("ActionbarPlus", "enUS", true);
-
 
 --[[-----------------------------------------------------------------------------
 Localization
@@ -35,6 +39,17 @@ do
         L[left] = right
     end
 end
+
+L['ABP_CONSOLE_HELP_COMMAND_TEXT']                       = sformat('Type %s on the console to see additional commands', GCC.ABP_HELP_COMMAND)
+L['ABP_CONSOLE_COMMAND_TEXT']                            = sformat('Type %s on the console to open config dialog or right-click on drag frame located at the top of the actionbar.', GCC.ABP_COMMAND)
+L['ABP_ISSUES_TEXT']                                     = 'Issues'
+L['ABP_INITIALIZED_TEXT']                                = 'Initialized'
+L['ABP_COMMAND_NONE_TEXT']                               = 'Shows the config UI (default)'
+L['ABP_COMMAND_INFO_TEXT']                               = 'Prints additional information about the addon on this console'
+L['ABP_COMMAND_HELP_TEXT']                               = 'Shows this help'
+L['ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT']                 = 'Available console commands'
+L['ABP_USAGE_LABEL']                                     = 'usage'
+L['ABP_OPTIONS_LABEL']                                   = 'options'
 
 L['ABP_SHOW']                                            = 'Show'
 L['ABP_HIDE']                                            = 'Hide'
