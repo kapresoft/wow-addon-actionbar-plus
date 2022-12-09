@@ -7,7 +7,6 @@ local sformat = string.format
 ---@type Localization
 local L = LibStub("AceLocale-3.0"):GetLocale("ActionbarPlus")
 
-
 -- General
 ABP_TITLE                                    = "ActionbarPlus"
 ABP_CATEGORY                                 = "AddOns/" .. ABP_TITLE
@@ -37,6 +36,18 @@ do
         _G[left] = L[right]
     end
 end
+
+ABP_CURSE_FORGE                                                 = 'Curse Forge'
+ABP_CONSOLE_COMMAND_TEXT                                        = L['ABP_CONSOLE_COMMAND_TEXT']
+ABP_CONSOLE_HELP_COMMAND_TEXT                                   = L['ABP_CONSOLE_HELP_COMMAND_TEXT']
+ABP_ISSUES_TEXT                                                 = L['ABP_ISSUES_TEXT']
+ABP_INITIALIZED_TEXT                                            = L['ABP_INITIALIZED_TEXT']
+ABP_COMMAND_NONE_TEXT                                           = L['ABP_COMMAND_NONE_TEXT']
+ABP_COMMAND_INFO_TEXT                                           = L['ABP_COMMAND_INFO_TEXT']
+ABP_COMMAND_HELP_TEXT                                           = L['ABP_COMMAND_HELP_TEXT']
+ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT                             = L['ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT']
+ABP_OPTIONS_LABEL                                               = L['ABP_OPTIONS_LABEL'] .. ':'
+ABP_USAGE_LABEL                                                 = L['ABP_USAGE_LABEL'] .. sformat(': /abp [%s]', L['ABP_OPTIONS_LABEL'])
 
 ABP_SHOW                                                        = L['ABP_SHOW']
 ABP_HIDE                                                        = L['ABP_HIDE']

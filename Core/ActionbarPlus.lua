@@ -50,13 +50,13 @@ Support functions
 -------------------------------------------------------------------------------]]
 local function OnAddonLoaded(frame, event, ...)
     local isLogin, isReload = ...
-    if not ('PLAYER_ENTERING_WORLD') then return end
+    if event ~= GC.E.PLAYER_ENTERING_WORLD then return end
 
     ---@type ActionbarPlus
     local addon = frame.obj
     addon:OnAddonLoadedModules()
 
-    if UnitOnTaxi('player') == true then
+    if UnitOnTaxi(GC.UnitId.player) == true then
         local isShown = WMX:IsHideWhenTaxi() ~= true
         WMX:ShowActionbarsDelayed(isShown, 3)
     end
@@ -69,12 +69,11 @@ local function OnAddonLoaded(frame, event, ...)
 
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
-    p:log("%s initialized", versionText)
-    p:log('Available commands: /abp to open config dialog.')
-    p:log('Right-click on the button drag frame to open config dialog.')
-    p:log('Curse Forge: %s', curseForge)
-    p:log('Issues: %s', githubIssues)
-    p:log('Type /abp_info on the console to see additional details.')
+    p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
+    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_CURSE_FORGE, curseForge)
+    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_ISSUES_TEXT, githubIssues)
+    p:log(ABP_CONSOLE_HELP_COMMAND_TEXT)
+    p:log(ABP_CONSOLE_COMMAND_TEXT .. '\n\n')
 
 end
 
@@ -90,8 +89,6 @@ local methods = {
     ---@param self ActionbarPlus
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand("abp", "SlashCommands")
-        self:RegisterChatCommand("abp_info", "SlashCommand_Info")
-        self:RegisterChatCommand("cv", "SlashCommand_CheckVariable")
     end,
     ---@param self ActionbarPlus
     ---@param spaceSeparatedArgs string
@@ -102,50 +99,33 @@ local methods = {
             return
         end
         if IsAnyOf('info', unpack(args)) then
-            self:SlashCommand_Info(spaceSeparatedArgs)
+            self:SlashCommand_Info_Handler(spaceSeparatedArgs)
             return
         end
-        if IsAnyOf('help', unpack(args)) then
-            p:log('')
-            p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, 'ActionbarPlus console commands')
-            p:log('Usage: /abp [options]')
-            p:log('Options:')
-            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, '<none>', 'Open the config UI (default)')
-            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', 'Open the config UI (default)')
-            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', 'Show additional information about the addon')
-            --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
-            p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', 'Show this help')
-        end
+        -- Otherwise, show help
+        self:SlashCommand_Help_Handler()
+    end,
+    ---@param self ActionbarPlus
+    ['SlashCommand_Help_Handler'] = function(self)
+        p:log('')
+        p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT)
+        p:log(ABP_USAGE_LABEL)
+        p:log(ABP_OPTIONS_LABEL)
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, '<none>', ABP_COMMAND_NONE_TEXT)
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', ABP_COMMAND_NONE_TEXT)
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', ABP_COMMAND_INFO_TEXT)
+        --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', ABP_COMMAND_HELP_TEXT)
     end,
     ---@param self ActionbarPlus
     ---@param spaceSeparatedArgs string
-    ['SlashCommand_Info'] = function(self, spaceSeparatedArgs)
+    ['SlashCommand_Info_Handler'] = function(self, spaceSeparatedArgs)
         local wowInterfaceVersion = select(4, GetBuildInfo())
         local lastChanged = GetAddOnMetadata(ADDON_NAME, 'X-Github-Project-Last-Changed-Date')
         local version, curseForge, issues, repo = GC:GetAddonInfo()
         local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
         p:log("Addon Info:\n  Version: %s\n  Curse-Forge: %s\n  File-Bugs-At: %s\n  Last-Changed-Date: %s\n  Use-KeyDown(cvar ActionButtonUseKeyDown): %s\n  WoW-Interface-Version: %s\n",
                 version, curseForge, issues, lastChanged, useKeyDown, wowInterfaceVersion)
-    end,
-    ---@param self ActionbarPlus
-    ---@param spaceSeparatedArgs string
-    ['SlashCommand_CheckVariable'] = function(self, spaceSeparatedArgs)
-        local vars = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if IsEmptyTable(vars) then
-            p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Variable Checker Syntax", "/cv <var-name>")
-            p:log(GC.C.ABP_CHECK_VAR_SYNTAX_FORMAT, "Example", "/cv <profile> or /cv ABP.profile")
-            return
-        end
-
-        local firstArg = vars[1]
-        if firstArg == '<profile>' then
-            local profileData = self:GetCurrentProfileData()
-            local profileName = self.db:GetCurrentProfile()
-            popupDebugDialog:EvalObjectThenShow(profileData, profileName)
-            return
-        end
-
-        popupDebugDialog:EvalThenShow(firstArg)
     end,
     ---@param self ActionbarPlus
     ---@param optionalLabel string
