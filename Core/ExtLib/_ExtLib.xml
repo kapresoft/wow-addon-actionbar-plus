@@ -2,9 +2,9 @@
 ..\FrameXML\UI.xsd">
 
     <!-- LibStub needs to be at the top -->
-    <Script file="WoWAce\Ace3\LibStub\LibStub.lua"/>
+    <Script file="WowAce\Ace3\LibStub\LibStub.lua"/>
 
-    <Include file="WoWAce\_WowAce.xml"/>
+    <Include file="WowAce\_WowAce.xml"/>
 
     <!-- TODO: Start sourcing at github in pkgmeta -->
     <Include file='pprint\pprint.xml'/>

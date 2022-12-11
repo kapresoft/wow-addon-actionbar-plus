@@ -49,8 +49,8 @@ Package() {
 }
 
 SyncExtLib() {
-  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/WoWAce/"
-  local dest="${EXTLIB}/WoWAce/."
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/WowAce/"
+  local dest="${EXTLIB}/WowAce/."
   SyncDir "${src}" "${dest}"
 }
 

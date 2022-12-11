@@ -109,5 +109,5 @@ Or Equivalent
 # generate
 $ release-wow-addon -cdzulo
 # sync with local
-$ rsyncw -s .release/ActionbarPlus/Core/ExtLib/WoWAce Core/ExtLib/WoWAce/
+$ rsyncw -s .release/ActionbarPlus/Core/ExtLib/WowAce Core/ExtLib/WowAce/
 ```
