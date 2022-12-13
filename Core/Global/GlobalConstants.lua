@@ -145,9 +145,10 @@ local function GlobalConstantProperties(o)
         OnActionbarHideGrid = 'OnActionbarHideGrid',
         OnActionbarShowGroup = 'OnActionbarShowGroup',
         OnActionbarHideGroup = 'OnActionbarHideGroup',
+        OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
-        OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
+        OnHideWhenTaxiChanged = 'OnHideWhenTaxiChanged',
         OnPlayerLeaveCombat = 'OnPlayerLeaveCombat',
         OnUpdateItemStates = 'OnUpdateItemStates',
 

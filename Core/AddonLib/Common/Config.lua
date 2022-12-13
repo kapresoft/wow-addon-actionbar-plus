@@ -304,7 +304,8 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
                     desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
                     get = PGet(self, PC.hide_when_taxi, false),
-                    set = PSet(self, PC.hide_when_taxi, false)
+                    set = PSet(self, PC.hide_when_taxi, false),
+                    set = PSetWithEvent(self, PC.hide_when_taxi, false, E.OnHideWhenTaxiChanged)
                 },
                 action_button_mouseover_glow = {
                     width = 'normal',
