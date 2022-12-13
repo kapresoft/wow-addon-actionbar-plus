@@ -6,6 +6,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateAnchor, GridLayoutMixin = CreateAnchor, GridLayoutMixin
+local UnitOnTaxi = UnitOnTaxi
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -169,6 +170,14 @@ local function OnActionbarHideGrid(frameWidget, e, ...)
     frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
 end
 ---@param frameWidget FrameWidget
+local function OnHideWhenTaxiChanged(frameWidget, e, ...)
+    if not UnitOnTaxi(GC.UnitId.player) then return end
+    local WMX = O.WidgetMixin
+    local isShown = WMX:IsHideWhenTaxi() ~= true
+    WMX:ShowActionbars(isShown)
+end
+
+---@param frameWidget FrameWidget
 local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
 
 ---@param frameWidget FrameWidget
@@ -220,6 +229,7 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
     widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
 
+    widget:SetCallback(E.OnHideWhenTaxiChanged, OnHideWhenTaxiChanged)
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
     widget:SetCallback(E.OnActionbarHideGroup, OnActionbarHideGroup)
