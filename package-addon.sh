@@ -31,7 +31,7 @@ Package() {
   # -e Skip checkout of external repositories.
   # default: -cdzul
   # for checking debug tags: -edzul
-  local rel_cmd="release-wow-addon -r ${RELEASE_DIR} -du $*"
+  local rel_cmd="./release-wow-addon -r ${RELEASE_DIR} -du $*"
 
   if [[ "$arg1" == "-h" ]]; then
     echo "Usage: $0 [-o]"
