@@ -1,0 +1,176 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for tags
+  push:
+    tags: [ "0.**", "1.**" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  addonName: ActionbarPlus
+  createDraftRelease: true
+  uploadBuildArtifacts: false
+  artifact_retentionDays: 7
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    name: Build
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      ## ------------------------------------------------ ##
+      - name: "Install: zsh"
+        run: sudo apt-get update && sudo apt-get install zsh
+      ## ------------------------------------------------ ##
+      - name: "Verify: /usr/bin/env & /usr/bin/zsh exists"
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "/usr/bin/env, /usr/bin/zsh"
+          fail: true
+      ## ------------------------------------------------ ##
+      - name: "Set ENV Variable: buildDir"
+        run: |
+          echo buildDir="$HOME/.wow-pre-release"  >> $GITHUB_ENV
+      ## ------------------------------------------------ ##
+      - name: "Set ENV Variable: buildBasePath & buildArtifactFilename"
+        run: |
+          echo buildBasePath="${buildDir}/${addonName}" >> $GITHUB_ENV
+          echo buildArtifactFilename="${addonName}-${{ github.ref_name }}.zip"  >> $GITHUB_ENV
+          echo buildArtifactChecksumFilename="${addonName}-${{ github.ref_name }}.zip.md5sum"  >> $GITHUB_ENV
+      ## ------------------------------------------------ ##
+      - name: "Set ENV Variable: buildArtifact"
+        run: |
+          echo buildArtifact="${buildDir}/${buildArtifactFilename}" >> $GITHUB_ENV
+          echo buildArtifactChecksumFile="${buildDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
+      ## ------------------------------------------------ ##
+      - name: Print Environment Variables
+        run: |
+          echo HOME=${HOME}
+          echo createDraftRelease=${createDraftRelease}
+          echo buildDir=${buildDir}
+          echo addonName=${addonName}
+          echo buildArtifact=${buildArtifact}
+          echo buildArtifactChecksumFile=${buildArtifactChecksumFile}
+          echo buildBasePath=${buildBasePath}
+          echo buildArtifactFilename=${buildArtifactFilename}
+          echo buildArtifactChecksumFilename=${buildArtifactChecksumFilename}
+          echo artifact_retentionDays=${{ env.artifact_retentionDays }}
+      ## ------------------------------------------------ ##
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      ## ------------------------------------------------ ##
+      - name: "Verify: Project script files exist"
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "./package-addon.sh, ./release.sh, ./dev/md5sum.sh"
+          fail: true
+
+      ## ------------------------------------------------ ##
+      ## Runs a single command using the runners shell ##
+      - name: "Setup Build Scripts"
+        run: |
+          echo "------------------------------------"
+          echo Current working directory is: "$(pwd)"
+          chmod a+x ./release.sh ./package-addon.sh ./dev/md5sum.sh
+          ln -s ./release.sh release-wow-addon
+          echo "------------------------------------"
+          echo "Current working directory files are:"
+          echo "$(ls -l)"
+
+      ## ------------------------------------------------ ##
+      ## Runs a set of commands using the runners shell ##
+      - name: Packaging the addon
+        env:
+          hello: "there"
+        run: |
+          echo "Executing: package-addon.sh"
+          ./package-addon.sh
+      - name: List the build artifacts
+        run: |
+          echo "Build Artifacts: $buildDir" 
+          echo "$(ls -l ${{ env.buildDir }})"
+          echo "buildArtifact is $buildArtifact"
+          echo "Build Artifact Exists:"
+          echo "$(ls -l  $buildArtifact)"
+      ## ------------------------------------------------ ##
+      - name: Check Vars
+        run: |
+          echo buildArtifactChecksum="$(./dev/md5sum.sh $buildArtifact)" >> $GITHUB_ENV
+          echo "buildArtifact is $buildArtifact"
+          echo "buildArtifactChecksum is $buildArtifactChecksum"
+      - name: Create checksum file
+        run: |
+          echo "$buildArtifactChecksum" >> $buildArtifactChecksumFile
+      ## ------------------------------------------------ ##
+      - name: Notices
+        run: |
+          echo -e "::notice::HOME=${HOME}\n::notice::buildArtifact=${buildArtifact}"
+          echo "::notice::buildArtifactChecksumFile=${buildArtifactChecksumFile}"
+          echo "::notice::buildArtifact=${buildArtifact} Checksum=${buildArtifactChecksum}"
+
+      - name: Create a draft release
+        id: create_draft_release
+        if: ${{ env.createDraftRelease == 'true' }}
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          version: ${{ github.ref_name }}
+          prerelease: false
+          footer: |
+            
+            #### ${{ env.buildArtifactFilename }}
+            ```text
+            MD5 ${{ env.buildArtifactChecksum }}
+            ```
+      ## ------------------------------------------------ ##
+      ## https://github.com/actions/upload-artifact
+      - name: Upload Build Artifact File
+        if: ${{ env.uploadBuildArtifacts == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.buildArtifactFilename }}
+          path: ${{ env.buildArtifact }}
+          retention-days: ${{ env.artifact_retentionDays }}
+      ## ------------------------------------------------ ##
+      - name: Upload Build Artifact Checksum File
+        if: ${{ env.uploadBuildArtifacts == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env. buildArtifactChecksumFilename }}
+          path: ${{ env.buildArtifactChecksumFile }}
+          retention-days: ${{ env.artifact_retentionDays }}
+      ## ------------------------------------------------ ##
+      - name: Upload Release Artifact
+        if: ${{ env.createDraftRelease == 'true' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_draft_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ${{ env.buildArtifact }}
+          asset_name: ${{ env.buildArtifactFilename }}
+          asset_content_type: application/zip
+      ## ------------------------------------------------ ##
+      - name: Upload Release Artifact Checksum File
+        if: ${{ env.createDraftRelease == 'true' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_draft_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ${{ env.buildArtifactChecksumFile }}
+          asset_name: ${{ env.buildArtifactChecksumFilename }}
+          asset_content_type: plain/text
