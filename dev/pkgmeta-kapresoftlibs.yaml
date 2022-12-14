@@ -23,6 +23,7 @@ ignore:
   - README.md
   - dev
   - package-addon.sh
+  - release.sh
   - pull-extlib.sh
   - Core/Interface/Kapresoft-Wow-Api-Interface/dev
   - Core/Interface/Kapresoft-Wow-Api-Interface/External

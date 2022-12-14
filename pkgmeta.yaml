@@ -49,6 +49,7 @@ externals:
 ignore:
   - README.md
   - package-addon.sh
+  - release.sh
   - dev
   - doc
   - Core/Interface
