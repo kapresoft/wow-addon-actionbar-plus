@@ -36,6 +36,7 @@ jobs:
           files: "/usr/bin/env, /usr/bin/zsh"
           fail: true
       ## ------------------------------------------------ ##
+      ## See: https://github.com/actions/github-script
       - name: Short hash
         uses: actions/github-script@v3
         with:
