@@ -72,7 +72,7 @@ jobs:
       - name: "Verify: Project script files exist"
         uses: andstor/file-existence-action@v2
         with:
-          files: "./package-addon.sh, ./release.sh, ./dev/md5sum.sh"
+          files: "./package-addon.sh, ./dev/release.sh, ./dev/md5sum.sh"
           fail: true
 
       ## ------------------------------------------------ ##
@@ -81,8 +81,7 @@ jobs:
         run: |
           echo "------------------------------------"
           echo Current working directory is: "$(pwd)"
-          chmod a+x ./release.sh ./package-addon.sh ./dev/md5sum.sh
-          ln -s ./release.sh release-wow-addon
+          chmod a+x ./dev/release.sh ./dev/md5sum.sh ./package-addon.sh
           echo "------------------------------------"
           echo "Current working directory files are:"
           echo "$(ls -l)"

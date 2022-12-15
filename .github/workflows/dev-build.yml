@@ -71,15 +71,19 @@ jobs:
       - uses: actions/checkout@v3
 
       ## ------------------------------------------------ ##
+      - name: "Verify: /usr/bin/env & /usr/bin/zsh exists"
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "./dev/release.sh, ./package-addon.sh"
+          fail: true
+      ## ------------------------------------------------ ##
       # Runs a single command using the runners shell
       - name: Setup Build Scripts
         run: |
           echo Verify zsh exists: "$(which zsh)"
           echo pwd is: "$(pwd)"
-          chmod a+x ./release.sh ./package-addon.sh
-          ln -s ./release.sh release-wow-addon
+          chmod a+x ./dev/release.sh ./package-addon.sh
           echo "$(ls -l)"
-
       ## ------------------------------------------------ ##
       # Runs a set of commands using the runners shell
       - name: Packaging the addon

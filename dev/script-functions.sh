@@ -11,6 +11,7 @@ Print "Sourcing" "${this_file}"
 proj_dir="ActionbarPlus"
 pre_release_dir="$HOME/.wow-pre-release"
 dev_release_dir="$HOME/.wow-dev"
+release_script="./dev/release.sh"
 
 #KAPRESOFT_LIB="$HOME/sandbox/github/kapresoft/wow/wow-lib-util/"
 #PROJ_CORE_EXTLIB="./Core/ExtLib"
