@@ -1,4 +1,4 @@
-| Branch | Release  |
+|  |  |
 |--------|----------|
 |[![Branch Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml)| [![Release Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml)|
 
