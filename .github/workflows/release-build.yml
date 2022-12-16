@@ -1,10 +1,6 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Release Build
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for tags
   push:
     tags: [ "0.**", "1.**" ]
 
@@ -13,50 +9,52 @@ on:
 
 env:
   addonName: ActionbarPlus
+  curseForgeProjectId: 566626
   createDraftRelease: true
-  uploadBuildArtifacts: false
+  uploadBuildArtifacts: true
   artifact_retentionDays: 7
+  releaseDir: ./.release
+  refName: ${GITHUB_REF_NAME}
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     name: Build
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       ## ------------------------------------------------ ##
-      - name: "Install: zsh"
-        run: sudo apt-get update && sudo apt-get install zsh
-      ## ------------------------------------------------ ##
-      - name: "Verify: /usr/bin/env & /usr/bin/zsh exists"
-        uses: andstor/file-existence-action@v2
+      ## See: https://github.com/actions/github-script
+      - name: "Set Env Variable: GITHUB_SHA_SHORT"
+        uses: actions/github-script@v3
         with:
-          files: "/usr/bin/env, /usr/bin/zsh"
-          fail: true
+          script: |
+            const sha = context.sha.substring(0, 7)
+            core.exportVariable('GITHUB_SHA_SHORT', sha)
       ## ------------------------------------------------ ##
-      - name: "Set ENV Variable: buildDir"
+      - name: "Set ENV Var Option to Skip Uploads on Branch Builds and refName"
+        if: ${{ github.ref_type == 'branch' }}
         run: |
-          echo buildDir="$HOME/.wow-pre-release"  >> $GITHUB_ENV
+          echo packagerOptions="-d" >> $GITHUB_ENV
+          echo refName="${GITHUB_SHA_SHORT}" >> $GITHUB_ENV
       ## ------------------------------------------------ ##
       - name: "Set ENV Variable: buildBasePath & buildArtifactFilename"
         run: |
-          echo buildBasePath="${buildDir}/${addonName}" >> $GITHUB_ENV
-          echo buildArtifactFilename="${addonName}-${{ github.ref_name }}.zip"  >> $GITHUB_ENV
-          echo buildArtifactChecksumFilename="${addonName}-${{ github.ref_name }}.zip.md5sum"  >> $GITHUB_ENV
+          echo buildBasePath="${releaseDir}/${addonName}" >> $GITHUB_ENV
+          echo buildArtifactFilename="${addonName}-${refName}.zip"  >> $GITHUB_ENV
+          echo buildArtifactChecksumFilename="${addonName}-${refName}.zip.md5sum"  >> $GITHUB_ENV
       ## ------------------------------------------------ ##
       - name: "Set ENV Variable: buildArtifact"
         run: |
-          echo buildArtifact="${buildDir}/${buildArtifactFilename}" >> $GITHUB_ENV
-          echo buildArtifactChecksumFile="${buildDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
+          echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
+          echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
       ## ------------------------------------------------ ##
       - name: Print Environment Variables
         run: |
           echo HOME=${HOME}
           echo createDraftRelease=${createDraftRelease}
-          echo buildDir=${buildDir}
+          echo releaseDir=${releaseDir}
+          echo refName=${refName}
+          echo packagerOptions=${packagerOptions}
           echo addonName=${addonName}
           echo buildArtifact=${buildArtifact}
           echo buildArtifactChecksumFile=${buildArtifactChecksumFile}
@@ -64,43 +62,46 @@ jobs:
           echo buildArtifactFilename=${buildArtifactFilename}
           echo buildArtifactChecksumFilename=${buildArtifactChecksumFilename}
           echo artifact_retentionDays=${{ env.artifact_retentionDays }}
+          echo "------------------------"
+          echo "All ENV Vars:"
+          echo "$(env|sort)"
       ## ------------------------------------------------ ##
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
       ## ------------------------------------------------ ##
-      - name: "Verify: Project script files exist"
+      ## see: https://github.com/marketplace/actions/wow-packager
+      - uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        with:
+          args: -r ${releaseDir} -p ${curseForgeProjectId} ${packagerOptions}
+      ## ------------------------------------------------ ##
+      - name: "Verify Build Artifact Exists: ${{ env.buildArtifact }}"
         uses: andstor/file-existence-action@v2
         with:
-          files: "./package-addon.sh, ./dev/release.sh, ./dev/md5sum.sh"
+          files: "${{ env.buildArtifact }}"
           fail: true
-
       ## ------------------------------------------------ ##
-      ## Runs a single command using the runners shell ##
+      - name: "Verify: Supporting Scripts Exists"
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "./dev/md5sum.sh"
+          fail: true
+      ## ------------------------------------------------ ##
+      - name: "Setup Build Scripts"
+        run: |
+          chmod a+x ./dev/md5sum.sh
+      ## ------------------------------------------------ ##
+      ## Show Directory contents
       - name: "Setup Build Scripts"
         run: |
           echo "------------------------------------"
           echo Current working directory is: "$(pwd)"
-          chmod a+x ./dev/release.sh ./dev/md5sum.sh ./package-addon.sh
           echo "------------------------------------"
-          echo "Current working directory files are:"
+          echo "Project Files:"
           echo "$(ls -l)"
-
-      ## ------------------------------------------------ ##
-      ## Runs a set of commands using the runners shell ##
-      - name: Packaging the addon
-        env:
-          hello: "there"
-        run: |
-          echo "Executing: package-addon.sh"
-          ./package-addon.sh
-      - name: List the build artifacts
-        run: |
-          echo "Build Artifacts: $buildDir" 
-          echo "$(ls -l ${{ env.buildDir }})"
-          echo "buildArtifact is $buildArtifact"
-          echo "Build Artifact Exists:"
-          echo "$(ls -l  $buildArtifact)"
+          echo "dev:"
+          echo "$(ls -l dev/*)"
       ## ------------------------------------------------ ##
       - name: Check Vars
         run: |
@@ -124,9 +125,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          version: ${{ github.ref_name }}
+          tag: ${refName}
+          name: ${refName}
+          version: ${refName}
           prerelease: false
           footer: |
             
