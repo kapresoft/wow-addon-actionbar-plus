@@ -13,17 +13,18 @@ IncludeBase() {
     echo "${fn} not found" && exit 1
   fi
 }
-IncludeBase && Validate
+IncludeBase && Validate && InitDirs
 
 # --------------------------------------------
 # Vars / Support Functions
 # --------------------------------------------
-SRC="$HOME/sandbox/github/kapresoft/wow/wow-lib-util/"
-DEST="./Core/ExtLib/Kapresoft-LibUtil/"
+SRC="${WOW_LIB_UTIL_SANDBOX_HOME}/"
+DEST="./${EXT_UTIL_LIB_DIR}/"
+excludes="--exclude={'.idea','.*','*.sh','*.toc','*.md','dev','External','LICENSE'}"
 
 # --------------------------------------------
 # Main
 # --------------------------------------------
 
-SyncDir $SRC $DEST
+SyncDir "${SRC}" "${DEST}" "${excludes}"
 

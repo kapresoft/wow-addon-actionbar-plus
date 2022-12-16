@@ -49,6 +49,7 @@ luac.out
 # BigWigMods/packager
 /.release/
 /Core/ExtLib/
+/Core/ExtLib/WoWAce/
 !/Core/ExtLib/pprint/
 !/Core/ExtLib/_ExtLib.lua
 !/Core/ExtLib/ExtLib.lua
