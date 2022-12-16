@@ -14,7 +14,7 @@ env:
   uploadBuildArtifacts: true
   artifact_retentionDays: 7
   releaseDir: ./.release
-  refName: ${GITHUB_REF_NAME}
+  refName: ${{ github.ref_name }}
 
 jobs:
   build:
