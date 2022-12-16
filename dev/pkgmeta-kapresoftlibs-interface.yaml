@@ -1,6 +1,6 @@
 # This file is used for pulling libraries down and extracting to Core/ExtLib directory
 
-package-as: SavedDungeonsAndRaids
+package-as: ActionbarPlus
 # --------------------------
 license-output: LICENSE.txt
 enable-nolib-creation: no

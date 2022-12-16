@@ -30,9 +30,10 @@ RELEASE_DIR="${dev_release_dir}"
 # functions
 # --------------------------------------------
 Validate() {
-  local pwd_basename=${PWD:t}
-  [ "${pwd_basename}" = "${proj_dir}" ] || \
-    (echo "Current dir is \"${pwd_basename}\". Should run script in \"${proj_dir}\" dir." && exit 1)
+  local check_file="README.md"
+  if [[ ! -f "${check_file}" ]]; then
+      echo "Validation failed.  Should run script in project home dir. Current dir is $(pwd)" && exit 1
+  fi
 }
 
 SyncDir() {
