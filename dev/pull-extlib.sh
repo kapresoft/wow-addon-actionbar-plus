@@ -11,17 +11,11 @@ IncludeBase() {
     echo "${fn} not found" && exit 1
   fi
 }
-IncludeBase && Validate
+IncludeBase && Validate && InitDirs
 
 # --------------------------------------------
 # Vars / Support Functions
 # --------------------------------------------
-
-# Use Common Release Dir
-RELEASE_DIR="${dev_release_dir}"
-ADDON_NAME="ActionbarPlus"
-EXTLIB="Core/ExtLib"
-INTERFACE_LIB="Core/Interface"
 
 Package() {
   local arg1=$1
@@ -31,7 +25,7 @@ Package() {
   # -e Skip checkout of external repositories.
   # default: -cdzul
   # for checking debug tags: -edzul
-  local rel_cmd="release-wow-addon -r ${RELEASE_DIR} -cdzul $*"
+  local rel_cmd="${release_script} -r ${RELEASE_DIR} -cdzul $*"
 
   if [[ "$arg1" == "-h" ]]; then
     echo "Usage: $0 [-o]"
@@ -49,14 +43,14 @@ Package() {
 }
 
 SyncExtLib() {
-  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/WowAce/"
-  local dest="${EXTLIB}/WowAce/."
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${WOW_ACE_LIB_DIR}/"
+  local dest="${WOW_ACE_LIB_DIR}/."
   SyncDir "${src}" "${dest}"
 }
 
 SyncKapresoftLib() {
-  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXTLIB}/Kapresoft-LibUtil"
-  local dest="${EXTLIB}/."
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${EXT_UTIL_LIB_DIR}/"
+  local dest="${EXT_UTIL_LIB_DIR}/."
   SyncDir "${src}" "${dest}"
 }
 

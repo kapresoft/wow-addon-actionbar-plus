@@ -1,9 +1,13 @@
 #!/usr/bin/env zsh
+# 1. Pull down libraries from source control
+# 2. Extract to ~/.release dir
+# 3. Sync with local dev environment
 
 IncludeBase() {
   local fnn="script-functions.sh"
   local fn="dev/${fnn}"
   if [ -f "${fn}" ]; then
+    # shellcheck disable=SC1090
     source "${fn}"
   elif [ -f "${fnn}" ]; then
     source "${fnn}"
@@ -11,15 +15,21 @@ IncludeBase() {
     echo "${fn} not found" && exit 1
   fi
 }
-#IncludeBase && Validate
-IncludeBase
+IncludeBase && Validate && InitDirs
 
 # --------------------------------------------
 # Vars / Support Functions
 # --------------------------------------------
+# Source must be the same as where it is extracted in pkgmeta-kapresoftlibs-interface.yaml
+PKGMETA_EXTRACT_DIR="${EXT_LIB}/Kapresoft-LibUtil"
 
-# Use Common Release Dir
-RELEASE_DIR="${pre_release_dir}"
+SRC="${RELEASE_DIR}/${ADDON_NAME}/${PKGMETA_EXTRACT_DIR}"
+DEST="${EXT_LIB}/."
+
+API_SRC="${RELEASE_DIR}/${ADDON_NAME}/${WOW_API_INTERFACE_LIB_DIR}"
+API_DEST="${INTERFACE_LIB}/."
+
+PKGMETA="-m ${PKG_META_INTERFACE}"
 
 Package() {
   local arg1=$1
@@ -29,7 +39,7 @@ Package() {
   # -e Skip checkout of external repositories.
   # default: -cdzul
   # for checking debug tags: -edzul
-  local rel_cmd="${release_script} -r ${RELEASE_DIR} -du $*"
+  local rel_cmd="${release_script} ${PKGMETA} -r ${RELEASE_DIR} -cdzul $*"
 
   if [[ "$arg1" == "-h" ]]; then
     echo "Usage: $0 [-o]"
@@ -43,7 +53,12 @@ Package() {
     rel_cmd="${rel_cmd}"
   fi
   echo "Executing: $rel_cmd"
-  eval "$rel_cmd" && echo "Release dir is: ${rel_dir}"
+  eval "$rel_cmd"
 }
 
-Package $*
+SyncInterfaceLib() {
+  SyncDir $API_SRC $API_DEST
+}
+#Package $*
+#SyncDir $SRC $DEST
+Package $* && SyncInterfaceLib

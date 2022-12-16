@@ -21,18 +21,16 @@ IncludeBase && Validate
 # Vars / Support Functions
 # --------------------------------------------
 # Use Common Release Dir
-RELEASE_DIR="${dev_release_dir}"
-ADDON_NAME="ActionbarPlus"
+
 # Source must be the same as where it is extracted in pkgmeta-kapresoftlibs.yaml
 PKGMETA_EXTRACT_DIR="Core/ExtLib/Kapresoft-LibUtil"
 SRC="${RELEASE_DIR}/${ADDON_NAME}/${PKGMETA_EXTRACT_DIR}"
-DEST="Core/ExtLib/."
+DEST="${EXT_LIB}/."
 
-API_PKGMETA_EXTRACT_DIR="Core/Interface/Kapresoft-Wow-Api-Interface"
-API_SRC="${RELEASE_DIR}/${ADDON_NAME}/${API_PKGMETA_EXTRACT_DIR}"
-API_DEST="Core/Interface/."
+API_SRC="${RELEASE_DIR}/${ADDON_NAME}/${WOW_API_INTERFACE_LIB_DIR}"
+API_DEST="${INTERFACE_LIB}/."
 
-PKGMETA="-m dev/pkgmeta-kapresoftlibs.yaml"
+PKGMETA="-m ${PKG_META_UTIL}"
 
 Package() {
   local arg1=$1
@@ -42,7 +40,7 @@ Package() {
   # -e Skip checkout of external repositories.
   # default: -cdzul
   # for checking debug tags: -edzul
-  local rel_cmd="release-wow-addon ${PKGMETA} -r ${RELEASE_DIR} -cdzul $*"
+  local rel_cmd="${release_script} ${PKGMETA} -r ${RELEASE_DIR} -cdzul $*"
 
   if [[ "$arg1" == "-h" ]]; then
     echo "Usage: $0 [-o]"
@@ -61,9 +59,6 @@ Package() {
 SyncUtil() {
   SyncDir $SRC $DEST
 }
-SyncInterfaceLib() {
-  SyncDir $API_SRC $API_DEST
-}
 #Package $*
 #SyncDir $SRC $DEST
-Package $* && SyncUtil && SyncInterfaceLib
+Package $* && SyncUtil
