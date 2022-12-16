@@ -33,11 +33,18 @@ jobs:
           echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
           echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
       ## ------------------------------------------------ ##
+      ##
+      - name: "Set ENV Var Option to Skip Uploads on Branch Builds"
+        if: ${{ github.ref_type == 'branch' }}
+        run: |
+          echo packagerOptions="-d" >> $GITHUB_ENV
+      ## ------------------------------------------------ ##
       - name: Print Environment Variables
         run: |
           echo HOME=${HOME}
           echo createDraftRelease=${createDraftRelease}
           echo releaseDir=${releaseDir}
+          echo packagerOptions=${packagerOptions}
           echo addonName=${addonName}
           echo buildArtifact=${buildArtifact}
           echo buildArtifactChecksumFile=${buildArtifactChecksumFile}
@@ -57,7 +64,7 @@ jobs:
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         with:
-          args: -r ${releaseDir} -p ${curseForgeProjectId}
+          args: -r ${releaseDir} -p ${curseForgeProjectId} ${packagerOptions}
       ## ------------------------------------------------ ##
       - name: "Verify Build Artifact Exists: ${{ env.buildArtifact }}"
         uses: andstor/file-existence-action@v2
