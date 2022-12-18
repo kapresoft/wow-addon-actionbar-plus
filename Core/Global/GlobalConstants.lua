@@ -9,7 +9,8 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetAddOnMetadata = GetAddOnMetadata
+local GetAddOnMetadata, GetBuildInfo, GetCVarBool = GetAddOnMetadata, GetBuildInfo, GetCVarBool
+local date = date
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -50,6 +51,7 @@ local function GlobalConstantProperties(o)
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
         ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
         ABP_CONSOLE_OPTIONS_FORMAT = '  - %-8s|cfdeab676:: %s|r',
+        ADDON_INFO_FMT = '%s|cfdeab676: %s|r',
 
         ABP_CONSOLE_COMMAND_TEXT_FORMAT = consoleCommandTextFormat,
         ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT = consoleKeyValueTextFormat,
@@ -351,20 +353,41 @@ local function GlobalConstantMethods(o)
     function o:Events() return o.E end
     ---#### Example
     ---```
-    ---local version, curseForge, issues, repo = GC:GetAddonInfo()
+    ---local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = GC:GetAddonInfo()
     ---```
+    ---@return string, string, string, string, string, string, string
     function o:GetAddonInfo()
         local addonName = o.C.ADDON_NAME
-        local versionText
+        local versionText, lastUpdate
         --@non-debug@
         versionText = GetAddOnMetadata(addonName, 'Version')
+        lastUpdate = GetAddOnMetadata(ns.name, 'X-Github-Project-Last-Changed-Date')
         --@end-non-debug@
         --@debug@
         versionText = '1.0.x.dev'
+        lastUpdate = date("%m/%d/%y %H:%M:%S")
         --@end-debug@
-        return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'),
-        GetAddOnMetadata(addonName, 'X-Github-Issues'),
-        GetAddOnMetadata(addonName, 'X-Github-Repo')
+
+        local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
+        local wowInterfaceVersion = select(4, GetBuildInfo())
+
+        return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
+                    GetAddOnMetadata(addonName, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
+    end
+
+    ---@return string
+    function o:GetAddonInfoFormatted()
+        local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
+        local fmt = self.C.ADDON_INFO_FMT
+        return sformat("Addon Info:\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+                sformat(fmt, ABP_VERSION_TEXT, version),
+                sformat(fmt, 'Curse-Forge', curseForge),
+                sformat(fmt, ABP_BUGS_TEXT, issues),
+                sformat(fmt, ABP_REPO_TEXT, repo),
+                sformat(fmt, ABP_LAST_UPDATE_TEXT, lastUpdate),
+                sformat(fmt, 'Use-KeyDown(cvar ActionButtonUseKeyDown)', tostring(useKeyDown)),
+                sformat(fmt, ABP_INTERFACE_VERSION_TEXT, wowInterfaceVersion)
+        )
     end
 
     function o:GetLogLevel() return ABP_LOG_LEVEL end
