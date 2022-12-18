@@ -71,7 +71,7 @@ local function OnAddonLoaded(frame, event, ...)
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
     p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
     p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_CURSE_FORGE, curseForge)
-    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_ISSUES_TEXT, githubIssues)
+    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_BUGS_TEXT, githubIssues)
     p:log(ABP_CONSOLE_HELP_COMMAND_TEXT)
     p:log(ABP_CONSOLE_COMMAND_TEXT .. '\n\n')
 
@@ -94,15 +94,9 @@ local methods = {
     ---@param spaceSeparatedArgs string
     ['SlashCommands'] = function(self, spaceSeparatedArgs)
         local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if IsEmptyTable(args) or IsAnyOf('config', unpack(args)) then
-            self:OpenConfig()
-            return
-        end
-        if IsAnyOf('info', unpack(args)) then
-            self:SlashCommand_Info_Handler(spaceSeparatedArgs)
-            return
-        end
-        -- Otherwise, show help
+        if IsEmptyTable(args) then self:SlashCommand_Help_Handler(); return end
+        if IsAnyOf('config', unpack(args)) then self:OpenConfig(); return end
+        if IsAnyOf('info', unpack(args)) then self:SlashCommand_Info_Handler(spaceSeparatedArgs); return end
         self:SlashCommand_Help_Handler()
     end,
     ---@param self ActionbarPlus
@@ -111,8 +105,7 @@ local methods = {
         p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT)
         p:log(ABP_USAGE_LABEL)
         p:log(ABP_OPTIONS_LABEL)
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, '<none>', ABP_COMMAND_NONE_TEXT)
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', ABP_COMMAND_NONE_TEXT)
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', ABP_COMMAND_CONFIG_TEXT)
         p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', ABP_COMMAND_INFO_TEXT)
         --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
         p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', ABP_COMMAND_HELP_TEXT)
@@ -120,12 +113,7 @@ local methods = {
     ---@param self ActionbarPlus
     ---@param spaceSeparatedArgs string
     ['SlashCommand_Info_Handler'] = function(self, spaceSeparatedArgs)
-        local wowInterfaceVersion = select(4, GetBuildInfo())
-        local lastChanged = GetAddOnMetadata(ADDON_NAME, 'X-Github-Project-Last-Changed-Date')
-        local version, curseForge, issues, repo = GC:GetAddonInfo()
-        local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
-        p:log("Addon Info:\n  Version: %s\n  Curse-Forge: %s\n  File-Bugs-At: %s\n  Last-Changed-Date: %s\n  Use-KeyDown(cvar ActionButtonUseKeyDown): %s\n  WoW-Interface-Version: %s\n",
-                version, curseForge, issues, lastChanged, useKeyDown, wowInterfaceVersion)
+        p:log(GC:GetAddonInfoFormatted())
     end,
     ---@param self ActionbarPlus
     ---@param optionalLabel string
