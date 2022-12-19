@@ -10,6 +10,7 @@ local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTax
 local UIParent, CreateFrame = UIParent, CreateFrame
 local GetBuildInfo, GetAddOnMetadata = GetBuildInfo, GetAddOnMetadata
 local GetCVarBool = GetCVarBool
+local InterfaceOptionsFrame, PlaySound, SOUNDKIT = InterfaceOptionsFrame, PlaySound, SOUNDKIT
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -148,7 +149,28 @@ local methods = {
         if optionsConfigPath ~= nil then
             AceConfigDialog:SelectGroup(ADDON_NAME, optionsConfigPath)
         end
-        AceConfigDialog:Open(ADDON_NAME)
+        AceConfigDialog:Open(ADDON_NAME, self.configFrame)
+        self.onHideHooked = self.onHideHooked or false
+        self.configDialogWidget = AceConfigDialog.OpenFrames[ADDON_NAME]
+
+        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
+        if not self.onHideHooked then
+            self:HookScript(self.configDialogWidget.frame, 'OnHide', 'OnHide_Config_WithSound')
+            if InterfaceOptionsFrame then
+                self:HookScript(InterfaceOptionsFrame, 'OnHide', 'OnHide_Config_WithoutSound')
+            end
+            self.onHideHooked = true
+        end
+    end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config_WithSound'] = function(self) self:OnHide_Config(true) end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config_WithoutSound'] = function(self) self:OnHide_Config() end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config'] = function(self, enableSound)
+        enableSound = enableSound or false
+        p:log(10, 'OnHide_Config called with enableSound=%s', tostring(enableSound))
+        if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
     end,
     ---@param self ActionbarPlus
     ['OnUpdate'] = function(self) p:log('OnUpdate called...') end,
