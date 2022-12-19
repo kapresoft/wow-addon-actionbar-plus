@@ -92,6 +92,11 @@ local methods = {
         self:RegisterChatCommand("abp", "SlashCommands")
     end,
     ---@param self ActionbarPlus
+    ['RegisterHooks'] = function(self)
+        local f = SettingsPanel or InterfaceOptionsFrame
+        if f then self:HookScript(f, 'OnHide', 'OnHide_Config_WithoutSound') end
+    end,
+    ---@param self ActionbarPlus
     ---@param spaceSeparatedArgs string
     ['SlashCommands'] = function(self, spaceSeparatedArgs)
         local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
@@ -156,9 +161,6 @@ local methods = {
         PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
         if not self.onHideHooked then
             self:HookScript(self.configDialogWidget.frame, 'OnHide', 'OnHide_Config_WithSound')
-            if InterfaceOptionsFrame then
-                self:HookScript(InterfaceOptionsFrame, 'OnHide', 'OnHide_Config_WithoutSound')
-            end
             self.onHideHooked = true
         end
     end,
@@ -227,8 +229,8 @@ local methods = {
         -- Get the option table for profiles
         options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         self:RegisterSlashCommands()
+        self:RegisterHooks()
         self:SendMessage(GC.E.AddonMessage_OnAfterInitialize, self)
-
     end
 }
 
