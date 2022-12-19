@@ -10,6 +10,7 @@ local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTax
 local UIParent, CreateFrame = UIParent, CreateFrame
 local GetBuildInfo, GetAddOnMetadata = GetBuildInfo, GetAddOnMetadata
 local GetCVarBool = GetCVarBool
+local InterfaceOptionsFrame, PlaySound, SOUNDKIT = InterfaceOptionsFrame, PlaySound, SOUNDKIT
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -91,6 +92,11 @@ local methods = {
         self:RegisterChatCommand("abp", "SlashCommands")
     end,
     ---@param self ActionbarPlus
+    ['RegisterHooks'] = function(self)
+        local f = SettingsPanel or InterfaceOptionsFrame
+        if f then self:HookScript(f, 'OnHide', 'OnHide_Config_WithoutSound') end
+    end,
+    ---@param self ActionbarPlus
     ---@param spaceSeparatedArgs string
     ['SlashCommands'] = function(self, spaceSeparatedArgs)
         local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
@@ -148,7 +154,25 @@ local methods = {
         if optionsConfigPath ~= nil then
             AceConfigDialog:SelectGroup(ADDON_NAME, optionsConfigPath)
         end
-        AceConfigDialog:Open(ADDON_NAME)
+        AceConfigDialog:Open(ADDON_NAME, self.configFrame)
+        self.onHideHooked = self.onHideHooked or false
+        self.configDialogWidget = AceConfigDialog.OpenFrames[ADDON_NAME]
+
+        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
+        if not self.onHideHooked then
+            self:HookScript(self.configDialogWidget.frame, 'OnHide', 'OnHide_Config_WithSound')
+            self.onHideHooked = true
+        end
+    end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config_WithSound'] = function(self) self:OnHide_Config(true) end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config_WithoutSound'] = function(self) self:OnHide_Config() end,
+    ---@param self ActionbarPlus
+    ['OnHide_Config'] = function(self, enableSound)
+        enableSound = enableSound or false
+        p:log(10, 'OnHide_Config called with enableSound=%s', tostring(enableSound))
+        if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
     end,
     ---@param self ActionbarPlus
     ['OnUpdate'] = function(self) p:log('OnUpdate called...') end,
@@ -205,8 +229,8 @@ local methods = {
         -- Get the option table for profiles
         options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         self:RegisterSlashCommands()
+        self:RegisterHooks()
         self:SendMessage(GC.E.AddonMessage_OnAfterInitialize, self)
-
     end
 }
 
