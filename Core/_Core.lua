@@ -1,6 +1,6 @@
 -- ## External -------------------------------------------------
 local format = string.format
----@class LibStub Ace3 LibStub
+
 local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
@@ -226,11 +226,11 @@ end
 function _L:InitPrettyPrint()
 
     ---@type PrettyPrint
-    local pprint = LibStub(_S:GetMajorVersion('PrettyPrint'))
+    local pprint = Kapresoft_LibUtil.PrettyPrint
     ---@class pformat
     local o = { wrapped = pprint }
     ---@type pformat
-    pformat = o
+    pformat = pformat or o
 
     ---@return pformat
     function o:Default()
