@@ -14,16 +14,14 @@ manual-changelog:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  Core/Interface/Kapresoft-Wow-Api-Interface:
+  #Core/Interface/Kapresoft-Wow-Api-Interface:
+  Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface:
     url: https://github.com/kapresoft/wow-api-interface
 ignore:
-  - README.md
-  - dev
-  - package-addon.sh
-  - Core/Interface/Kapresoft-Wow-Api-Interface/dev
-  - Core/Interface/Kapresoft-Wow-Api-Interface/External
-  - Core/Interface/Kapresoft-Wow-Api-Interface/LICENSE
-  - Core/Interface/Kapresoft-Wow-Api-Interface/Kapresoft-Wow-Api-Interface.toc
-  - Core/Interface/Kapresoft-Wow-Api-Interface/pull-extlib.sh
-  - Core/Interface/Kapresoft-Wow-Api-Interface/script-functions.sh
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/dev
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/External
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/LICENSE
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/Kapresoft-Wow-Api-Interface.toc
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/pull-extlib.sh
+  - Core/ExtLib/_NotDeployed/Interface/Kapresoft-Wow-Api-Interface/script-functions.sh
 

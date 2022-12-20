@@ -47,12 +47,14 @@ SyncExtLib() {
   local dest="${WOW_ACE_LIB_DIR}/."
   SyncDir "${src}" "${dest}"
 }
-
 SyncKapresoftLib() {
   local src="${RELEASE_DIR}/${ADDON_NAME}/${EXT_UTIL_LIB_DIR}/"
   local dest="${EXT_UTIL_LIB_DIR}/."
   SyncDir "${src}" "${dest}"
 }
+SyncOthers() {
+  SyncKapresoftLib && ./dev/pull-kapresoftlibs-interface.sh
+}
 
 #SyncExtLib && SyncKapresoftLib
-Package $* && SyncExtLib && SyncKapresoftLib
+Package $* && SyncExtLib && SyncOthers

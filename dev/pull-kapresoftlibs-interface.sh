@@ -15,19 +15,26 @@ IncludeBase() {
     echo "${fn} not found" && exit 1
   fi
 }
-IncludeBase && Validate && InitDirs
+IncludeBase && Validate && InitInterfaceDir
+
+# --------------------------------------------
+# Sync Sandbox mode
+# --------------------------------------------
+SyncInterfaceSandbox() {
+  local src="${WOW_API_INTERFACE_SANDBOX_HOME}/"
+  local dest="./${WOW_API_INTERFACE_LIB_DIR}/"
+  echo "Pulling source from sandbox.."
+  local excludes="--exclude={'.idea','.*','*.sh','*.toc','*.md','dev','External','LICENSE'}"
+  SyncDir "${src}" "${dest}" "${excludes}"
+}
+if [[ "$1" = "sandbox" ]]; then
+  SyncInterfaceSandbox
+  return 0
+fi
 
 # --------------------------------------------
 # Vars / Support Functions
 # --------------------------------------------
-# Source must be the same as where it is extracted in pkgmeta-kapresoftlibs-interface.yaml
-PKGMETA_EXTRACT_DIR="${EXT_LIB}/Kapresoft-LibUtil"
-
-SRC="${RELEASE_DIR}/${ADDON_NAME}/${PKGMETA_EXTRACT_DIR}"
-DEST="${EXT_LIB}/."
-
-API_SRC="${RELEASE_DIR}/${ADDON_NAME}/${WOW_API_INTERFACE_LIB_DIR}"
-API_DEST="${INTERFACE_LIB}/."
 
 PKGMETA="-m ${PKG_META_INTERFACE}"
 
@@ -57,8 +64,9 @@ Package() {
 }
 
 SyncInterfaceLib() {
-  SyncDir $API_SRC $API_DEST
+  local src="${RELEASE_DIR}/${ADDON_NAME}/${WOW_API_INTERFACE_LIB_DIR}"
+  local dest="${INTERFACE_LIB}/."
+  SyncDir "${src}" "${dest}"
 }
-#Package $*
-#SyncDir $SRC $DEST
+
 Package $* && SyncInterfaceLib

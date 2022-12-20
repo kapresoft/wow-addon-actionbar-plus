@@ -15,7 +15,7 @@ release_script="./dev/release.sh"
 
 ADDON_NAME="${proj_dir}"
 EXT_LIB="Core/ExtLib"
-INTERFACE_LIB="Core/Interface"
+INTERFACE_LIB="${EXT_LIB}/_NotDeployed/Interface"
 EXT_UTIL_LIB_DIR="${EXT_LIB}/Kapresoft-LibUtil"
 WOW_ACE_LIB_DIR="${EXT_LIB}/WowAce"
 WOW_API_INTERFACE_LIB_DIR="${INTERFACE_LIB}/Kapresoft-Wow-Api-Interface"
@@ -56,29 +56,34 @@ SyncDir() {
   Print "Source" "${src}"
   Print "Dest" "${dest}"
 
-  local excludes="--exclude={'.idea','.*','*.sh'}"
-  local rsync_opts="--exclude ${excludes} --progress --inplace --out-format=\"[Modified: %M] %o %n%L\""
-  local cmd="rsync -aucv ${rsync_opts} ${src} ${dest}"
+  local rsync_opts="--delete --exclude ${excludes} --progress --inplace --out-format=\"[Modified: %M] %o %n%L\""
+  local cmd="rsync -aciv ${rsync_opts} ${src} ${dest}"
   echo "Executing: ${cmd}"
   echo "------------------------------------"
   eval "${cmd}"
 }
 
-InitDirs() {
-  if [[ ! -d "./${INTERFACE_LIB}" ]]; then
-    mkdir -p ./${INTERFACE_LIB}
-    echo "Creating dir: ./${INTERFACE_LIB}"
-  fi
+InitExtDir() {
   if [[ ! -d "./${EXT_UTIL_LIB_DIR}" ]]; then
     mkdir -p ./${EXT_UTIL_LIB_DIR}
     echo "Creating dir: ./${EXT_UTIL_LIB_DIR}"
   fi
-  if [[ ! -d "./${WOW_ACE_LIB_DIR}" ]]; then
-    mkdir -p ./${WOW_ACE_LIB_DIR}
-    echo "Creating dir: ./${WOW_ACE_LIB_DIR}"
-  fi
+}
+
+InitInterfaceDir() {
   if [[ ! -d "./${WOW_API_INTERFACE_LIB_DIR}" ]]; then
     mkdir -p ./${WOW_API_INTERFACE_LIB_DIR}
     echo "Creating dir: ./${WOW_API_INTERFACE_LIB_DIR}"
   fi
+}
+
+InitWowAceDir() {
+  if [[ ! -d "./${WOW_ACE_LIB_DIR}" ]]; then
+    mkdir -p ./${WOW_ACE_LIB_DIR}
+    echo "Creating dir: ./${WOW_ACE_LIB_DIR}"
+  fi
+}
+
+InitDirs() {
+  InitExtDir && InitWowAceDir && InitInterfaceDir
 }
