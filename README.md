@@ -18,14 +18,14 @@
 
 ## Description
 
->ActionbarPlus provides an Up to 8 additional configurable actionbars that can be freely positioned around the game. They are convenient and allow players to have additional floating actionbars to enhance your gaming experience.
+>ActionbarPlus offers the option to create and customize up to eight supplementary actionbars that can be situated at any location within the game. These floating actionbars can augment the player's gaming experience by offering additional functionality and convenience.
 
-### Features
+### Some features of ActionbarPlus include:
+
 - action buttons triggers on KeyDown (not KeyUp)
-- configurable button size
-- configurable button counts (rows, cols) [Up to 100 buttons; 10x10]
-- support for keybinding action buttons in World of Warcraft Keybinding options
-- [WowAce](https://www.wowace.com/projects/ace3) profile support (import, export, copy)
+- Customizable button size and number of buttons (rows and columns) with a maximum of 800 buttons arranged in a grid of 20 x 40
+- The ability to bind keys to action buttons using the World of Warcraft Keybinding options is supported.
+- [WowAce](https://www.wowace.com/projects/ace3) profile support includes the ability to switch between profiles, copy a profile, and reset a profile.
 
 ## Docs
 - [Wiki](../../wiki)
