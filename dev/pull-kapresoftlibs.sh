@@ -20,7 +20,7 @@ IncludeBase && Validate && InitExtDir
 # --------------------------------------------
 # Sync Sandbox mode
 # --------------------------------------------
-SyncInterfaceSandbox() {
+SyncSandbox() {
   local src="${WOW_LIB_UTIL_SANDBOX_HOME}/"
   local dest="./${EXT_UTIL_LIB_DIR}/"
   echo "Pulling source from sandbox.."
@@ -28,7 +28,7 @@ SyncInterfaceSandbox() {
   SyncDir "${src}" "${dest}" "${excludes}"
 }
 if [[ "$1" = "sandbox" ]]; then
-  SyncInterfaceSandbox
+  SyncSandbox
   return 0
 fi
 
