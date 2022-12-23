@@ -1,11 +1,8 @@
-package-as: ActionbarPlus
+package-as: Dev
 # --------------------------
-license-output: LICENSE.txt
-enable-nolib-creation: no
-#enable-toc-creation: yes
-#manual-changelog:
-#  filename: CHANGELOG.txt
-#  markup-type: markdown
+manual-changelog:
+  filename: CHANGELOG.txt
+  markup-type: markdown
 
 # Declaring the following dependencies will make curse forge app install these 3rd-party
 # libraries. Need to figure out which is best (embedded or external).
@@ -54,14 +51,27 @@ ignore:
   - dev
   - doc
   - scripts
-  - Core/ExtLib/Kapresoft-LibUtil/LICENSE
-  - Core/ExtLib/Kapresoft-LibUtil/Kapresoft-LibUtil.toc
+  - Core/_Core.lua
+  - Core/_Core.xml
+  - Core/_ExtLib.xml
+  - Core/_ExtLib_WowAce.xml
+  - Core/AddonLib
+  - Core/Assets
+  - Core/Global
+  - Core/Interface
+  - Core/Lib
+  - Retail
+  - TBC
+  - Vanilla
+  - Wrath
+  - Bindings.xml
   - Core/ExtLib/Kapresoft-LibUtil/External
+  - Core/ExtLib/Kapresoft-LibUtil/Kapresoft-LibUtil.toc
+  - Core/ExtLib/Kapresoft-LibUtil/LICENSE
   - Core/ExtLib/Kapresoft-LibUtil/dev
-  - Core/ExtLib/Kapresoft-LibUtil/sync-extlibs.sh
+  - Core/ExtLib/Kapresoft-LibUtil/doc
   - Core/ExtLib/WowAce/LibQTip/LibQTip-1.0/LibStub
   - Core/ExtLib/WowAce/LibQTip/LibQTip-1.0/LibQTip-1.0.toc
-  - Core/ExtLib/WowAce/LibCompress/LibCompress/LibCompress.toc
   - Core/ExtLib/WowAce/Ace3/tests
   - Core/ExtLib/WowAce/Ace3/Ace3.lua
   - Core/ExtLib/WowAce/Ace3/Ace3.toc
@@ -69,8 +79,14 @@ ignore:
   - Core/ExtLib/WowAce/Ace3/Ace3_Vanilla.toc
   - Core/ExtLib/WowAce/Ace3/Ace3_Wrath.toc
   - Core/ExtLib/WowAce/Ace3/Bindings.xml
-  - Core/ExtLib/WowAce/Ace3/Bindings.xml
-  - Dev.toc
+  - "*.toc"
 
 ## Potentially helpful libraries
 ## - https://www.wowace.com/projects/libactionbutton-1-0
+
+move-folders:
+  Dev/Core/ExtLib/Kapresoft-LibUtil: ../Core/ExtLib/Kapresoft-LibUtil
+  Dev/Core/ExtLib/WowAce/Ace3: ../Core/ExtLib/WowAce/Ace3
+  Dev/Core/ExtLib/WowAce/LibQTip/LibQTip-1.0: ../Core/ExtLib/WowAce/LibQTip/LibQTip-1.0
+  Dev/Core/ExtLib/WowAce/LibCompress/LibCompress: ../Core/ExtLib/WowAce/LibCompress/LibCompress
+  Dev/Core/ExtLib/WowAce/LibSharedMedia/LibSharedMedia-3.0: ../Core/ExtLib/WowAce/LibSharedMedia/LibSharedMedia-3.0

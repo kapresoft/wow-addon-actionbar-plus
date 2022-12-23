@@ -47,6 +47,7 @@ luac.out
 /Core/ExtLib/.Ace3.*
 
 # BigWigMods/packager
+/build
 /.release/
 /Core/ExtLib/*
 /Core/ExtLib/WoWAce/*

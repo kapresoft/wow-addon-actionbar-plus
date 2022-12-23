@@ -2,10 +2,10 @@
 ..\FrameXML\UI.xsd">
 
     <!-- LibStub needs to be at the top -->
-    <Script file="WowAce\Ace3\LibStub\LibStub.lua"/>
+    <Script file="ExtLib\WowAce\Ace3\LibStub\LibStub.lua"/>
 
-    <Include file="_WowAce.xml"/>
+    <Include file="_ExtLib_WowAce.xml"/>
 
-    <Include file='Kapresoft-LibUtil\_Lib.xml'/>
+    <Include file='ExtLib\Kapresoft-LibUtil\_Lib.xml'/>
 
 </Ui>
