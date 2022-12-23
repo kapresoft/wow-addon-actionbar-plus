@@ -257,7 +257,12 @@ end
 ---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
-    WMX:ShowActionbarsDelayed(false, 1)
+    C_Timer.After(1, function()
+        local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
+        p:log(10, 'Player on Taxi: %s [%s]', playerOnTaxi, GetTime())
+        if playerOnTaxi ~= true then return end
+        WMX:ShowActionbarsDelayed(false, 1)
+    end)
 end
 
 ---@param widget ButtonUIWidget
@@ -322,12 +327,12 @@ local function RegisterCallbacks(widget)
 
     --TODO next Move at the frame level
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
     widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
     widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
