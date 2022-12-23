@@ -44,7 +44,7 @@
 
 ## Donations
 
-As a software engineer I love working on this project and devote quite a bit of quality time producing this product.  If you like this World of Warcraft add-on please donate via [Paypal&trade;](https://www.curseforge.com/wow/addons/actionbarplus) or the Bitcoin Address below.  You are appreciated!  Thanks in advance.
+As a software engineer, I am passionate about this project and have dedicated a significant amount of time and effort to creating a high-quality product. If you enjoy using this World of Warcraft add-on, please consider supporting me through a donation via [Paypal&trade;](https://www.curseforge.com/wow/addons/actionbarplus) or the Bitcoin Address provided below. Your support is greatly appreciated. Thank you in advance for your generosity.
 
 **Bitcoin Address**
 
