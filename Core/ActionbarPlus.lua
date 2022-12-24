@@ -71,10 +71,6 @@ local function OnAddonLoaded(frame, event, ...)
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
     p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
-    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_CURSE_FORGE, curseForge)
-    p:log(GCC.ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT, ABP_BUGS_TEXT, githubIssues)
-    p:log(ABP_CONSOLE_HELP_COMMAND_TEXT)
-    p:log(ABP_CONSOLE_COMMAND_TEXT .. '\n\n')
 
 end
 
