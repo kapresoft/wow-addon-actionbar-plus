@@ -40,6 +40,7 @@ do
     end
 end
 
+L['ABP_INITIALIZED_TEXT']                                = sformat('Initialized.  Type %s on the console for available commands.', GCC.ABP_COMMAND)
 L['ABP_CONSOLE_HELP_COMMAND_TEXT']                       = sformat('Type %s on the console to see additional commands', GCC.ABP_HELP_COMMAND)
 L['ABP_CONSOLE_COMMAND_TEXT']                            = sformat('Type %s on the console to open config dialog or right-click on drag frame located at the top of the actionbar.', GCC.ABP_COMMAND)
 L['ABP_VERSION_TEXT']                                    = 'Version'
@@ -47,7 +48,6 @@ L['ABP_BUGS_TEXT']                                       = 'Bugs'
 L['ABP_REPO_TEXT']                                       = 'Repo'
 L['ABP_LAST_UPDATE_TEXT']                                = 'Last Update'
 L['ABP_INTERFACE_VERSION_TEXT']                          = 'Interface Version'
-L['ABP_INITIALIZED_TEXT']                                = 'Initialized'
 L['ABP_COMMAND_CONFIG_TEXT']                             = 'Shows the config UI (default)'
 L['ABP_COMMAND_INFO_TEXT']                               = 'Prints additional information about the addon on this console'
 L['ABP_COMMAND_HELP_TEXT']                               = 'Shows this help'

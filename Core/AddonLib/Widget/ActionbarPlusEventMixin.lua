@@ -43,7 +43,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class ActionbarPlusEventMixin
 local L = LibStub:NewLibrary(Core.M.ActionbarPlusEventMixin)
----@return LoggerTemplate
+---@type LoggerTemplate
 local p = L:GetLogger()
 
 AceEvent:RegisterMessage(E.AddonMessage_OnAfterInitialize, function(evt, ...)
