@@ -83,3 +83,6 @@ L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME'] = 'Combat Ov
 L['ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC'] = 'Choose when you want the tooltip to show during combat. If a modifier is chosen, then you need to hold that modifier down to show the tooltip.'
 L['ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME']     = 'Character Specific Frame Positions'
 L['ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC']     = 'By default, all frame positions (or anchors) are global across characters. If checked, the frame positions are saved at the character level.'
+
+L['ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_LABEL']                       = 'Reset Anchor'
+L['ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_DESC']                        = 'Resets the anchor (position) of the action bar group to the center of the screen.  This can be useful when the actionbar drag frame goes off screen.'
