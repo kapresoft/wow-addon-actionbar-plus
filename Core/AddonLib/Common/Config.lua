@@ -122,6 +122,9 @@ local function PGetWidget(frameIndex, key, fallback)
     end
 end
 
+---@param frameIndex number
+local function OnResetAnchor(frameIndex) return function() GetFrameWidget(frameIndex):ResetAnchor() end end
+
 local function GetFrameStateSetterHandler(frameIndex)
     return function(_, v) GetFrameWidget(frameIndex):SetFrameState(v) end
 end
@@ -519,7 +522,7 @@ local methods = {
                 frame_handle_alpha = {
                     width = "normal",
                     type = 'range',
-                    order = barSeq:reset(),
+                    order = barSeq:next(),
                     name = 'Alpha',
                     desc = 'Set the opacity of the frame handle.',
                     isPercent = true,
@@ -528,6 +531,16 @@ local methods = {
                     max = 1,
                     get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
                     set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
+                },
+                reset_anchor = {
+                    width = "full",
+                    type = 'execute',
+                    order = barSeq:reset(),
+                    name = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_LABEL,
+                    desc = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_DESC,
+                    func = OnResetAnchor(frameIndex),
+                    --get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
+                    --set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
                 }
             }
         }

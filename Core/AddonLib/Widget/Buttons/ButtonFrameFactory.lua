@@ -312,6 +312,13 @@ local function WidgetMethods(widget)
         p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, pformat:D2()(frameAnchor))
     end
 
+    function widget:ResetAnchor()
+        local f = self.frame
+        f:ClearAllPoints()
+        f:SetPoint('CENTER', nil, 'CENTER', 0, 0)
+        self:UpdateAnchor()
+    end
+
     function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
