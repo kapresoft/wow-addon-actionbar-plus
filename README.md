@@ -55,3 +55,6 @@ As a software engineer, I am passionate about this project and have dedicated a 
 - [For Developers](doc/DEV.md)
 - [Contributing](doc/CONTRIBUTING.md)
 - [Release Checklist](doc/RELEASE-CHECKLIST.md)
+
+## Please download my other addons
+- [Saved Dungeons &amp; Raids](https://www.curseforge.com/wow/addons/saved-dungeons-raids)
