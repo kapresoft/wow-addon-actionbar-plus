@@ -2,7 +2,7 @@ name: Release Build
 
 on:
   push:
-    tags: [ "0.**", "1.**", "2023.**" ]
+    tags: [ "2023.**", "[1234].**" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
