@@ -533,7 +533,7 @@ local methods = {
                     set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
                 },
                 reset_anchor = {
-                    width = "full",
+                    width = "normal",
                     type = 'execute',
                     order = barSeq:reset(),
                     name = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_LABEL,
