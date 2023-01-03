@@ -85,6 +85,28 @@ local TooltipKey = {
     }
 }
 
+---@class TooltipAnchorTypeKey
+---@see Config
+local TooltipAnchorTypeKey = {
+    names = GC.TooltipAnchor,
+    sorting = {
+        GC.TooltipAnchor.CURSOR_TOPLEFT, GC.TooltipAnchor.CURSOR_TOPRIGHT,
+        GC.TooltipAnchor.CURSOR_BOTTOMLEFT, GC.TooltipAnchor.CURSOR_BOTTOMRIGHT,
+        GC.TooltipAnchor.SCREEN_TOPLEFT, GC.TooltipAnchor.SCREEN_TOPRIGHT,
+        GC.TooltipAnchor.SCREEN_BOTTOMLEFT, GC.TooltipAnchor.SCREEN_BOTTOMRIGHT,
+    },
+    kvPairs = {
+        [GC.TooltipAnchor.CURSOR_TOPLEFT]  = 'Cursor Top Left',
+        [GC.TooltipAnchor.CURSOR_TOPRIGHT]  = 'Cursor Top Right',
+        [GC.TooltipAnchor.CURSOR_BOTTOMLEFT]  = 'Cursor Bottom Left',
+        [GC.TooltipAnchor.CURSOR_BOTTOMRIGHT]  = 'Cursor Bottom Right',
+        [GC.TooltipAnchor.SCREEN_TOPLEFT]  = 'Screen Top Left',
+        [GC.TooltipAnchor.SCREEN_TOPRIGHT]  = 'Screen Top Right',
+        [GC.TooltipAnchor.SCREEN_BOTTOMLEFT]  = 'Screen Bottom Left',
+        [GC.TooltipAnchor.SCREEN_BOTTOMRIGHT]  = 'Screen Bottom Right',
+    }
+}
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -402,8 +424,18 @@ function P:IsHideWhenTaxi()
     return self.profile[ConfigNames.hide_when_taxi] == true
 end
 
+---@param anchorType string
+---@see TooltipAnchor
+function P:SetTooltipAnchorType(anchorType) self.profile[ConfigNames.tooltip_anchor_type] = anchorType end
+---@see TooltipAnchor
+---@return string One of TooltipAnchor values
+function P:GetTooltipAnchorType() return self.profile[ConfigNames.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPRIGHT end
+
 ---@return Profile_Config_Names
 function P:GetConfigNames() return ConfigNames end
 
 ---@return TooltipKey
 function P:GetTooltipKey() return TooltipKey end
+
+---@return TooltipAnchorTypeKey
+function P:GetTooltipAnchorTypeKey() return TooltipAnchorTypeKey end

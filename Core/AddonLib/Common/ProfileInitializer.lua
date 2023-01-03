@@ -69,6 +69,7 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.hide_countdown_numbers] = false,
     [ConfigNames.tooltip_visibility_key] = '',
     [ConfigNames.tooltip_visibility_combat_override_key] = '',
+    [ConfigNames.tooltip_anchor_type] = GC.TooltipAnchor.CURSOR_TOPLEFT,
     [ConfigNames.bars] = {
         ["ActionbarPlusF1"] = {
             ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,

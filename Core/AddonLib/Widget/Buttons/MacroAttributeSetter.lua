@@ -56,7 +56,6 @@ function S:ShowTooltip(btnUI)
     local macroInfo = btnData[WAttr.MACRO]
     if not (macroInfo.index or macroInfo.name) then return end
 
-    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then
         local _, itemLink = GetMacroItem(macroInfo.index)

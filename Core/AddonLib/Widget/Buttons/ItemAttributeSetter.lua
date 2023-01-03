@@ -47,9 +47,6 @@ function S:ShowTooltip(btnUI)
     local bd = btnUI.widget:GetButtonData()
     if not bd:ConfigContainsValidActionType() then return end
 
-    ---@type Profile_Item
-    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
-
     local btnData = btnUI.widget:GetConfig()
     local itemInfo = btnData[WAttr.ITEM]
     if itemInfo and itemInfo.id then GameTooltip:SetItemByID(itemInfo.id) end

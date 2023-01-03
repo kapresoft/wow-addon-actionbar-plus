@@ -131,14 +131,16 @@ local Profile_Global_Config = {
 local Profile_Data = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
-    ---toggle action button mouseover glow
+    --- Toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
-    ---hide keybindText and indexText for smaller buttons
+    --- Hide keybindText and indexText for smaller buttons
     ["hide_text_on_small_buttons"] = true,
-    ---hide cooldown countdown numbers
+    --- Hide cooldown countdown numbers
     ["hide_countdown_numbers"] = true,
     ["tooltip_visibility_key"] = '',
     ["tooltip_visibility_combat_override_key"] = '',
+    --- @see TooltipAnchor
+    ["tooltip_anchor_type"] = '',
     ["bars"] = {
         ["ActionbarPlusF1"] = Profile_Bar,
         ["ActionbarPlusF2"] = Profile_Bar,
