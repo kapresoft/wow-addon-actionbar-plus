@@ -24,6 +24,8 @@ local PC
 local WC
 ---@type TooltipKey
 local TTK
+---@type TooltipAnchorTypeKey
+local TTAK
 ---@type ButtonFactory
 local BF
 ---@type ButtonFrameFactory
@@ -199,6 +201,7 @@ local function fetchLibs()
     PC = GC.Profile_Config_Names
     WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
+    TTAK = P:GetTooltipAnchorTypeKey()
 end
 --[[-----------------------------------------------------------------------------
 Sequence
@@ -357,6 +360,16 @@ local methods = {
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
                     get = PGet(self, PC.tooltip_visibility_combat_override_key),
                     set = PSet(self, PC.tooltip_visibility_combat_override_key)
+                },
+                tooltip_anchor_type = {
+                    width = 'normal',
+                    type = 'select', style = 'dropdown',
+                    order = mainSeq:next(),
+                    values = TTAK.kvPairs, sorting = TTAK.sorting,
+                    name = 'Tooltip Anchor',
+                    desc = 'Tooltip Anchor Type',
+                    get = PGet(self, PC.tooltip_anchor_type),
+                    set = PSet(self, PC.tooltip_anchor_type),
                 }
             }
         }

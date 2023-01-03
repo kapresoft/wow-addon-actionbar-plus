@@ -109,7 +109,6 @@ local function attributeSetterMethods(a)
         local companion = bd:GetCompanionInfo()
         if bd:IsInvalidCompanion(companion) then return end
 
-        GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
         GameTooltip:SetSpellByID(companion.spell.id)
     end
 end

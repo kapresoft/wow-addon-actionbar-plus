@@ -63,6 +63,7 @@ local function GlobalConstantProperties(o)
         MIN_BUTTON_SIZE_FOR_HIDING_TEXTS = 35,
         ALT = 'ALT',
         ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
+        ANCHOR_TOPRIGHT = 'ANCHOR_TOPRIGHT',
         ARTWORK_DRAW_LAYER = 'ARTWORK',
         BOTTOM = 'BOTTOM',
         BOTTOMLEFT = 'BOTTOMLEFT',
@@ -136,22 +137,22 @@ local function GlobalConstantProperties(o)
 
         ---################################
         --- Custom Events
-        OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
-        OnTextSettingsChanged = 'OnTextSettingsChanged',
-        OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
-        OnButtonSizeChanged = 'OnButtonSizeChanged',
-        OnButtonCountChanged = 'OnButtonCountChanged',
-        OnAddonLoaded = 'OnAddonLoaded',
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
-        OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
-        OnActionbarShowGroup = 'OnActionbarShowGroup',
         OnActionbarHideGroup = 'OnActionbarHideGroup',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
-        OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
+        OnActionbarShowGrid = 'OnActionbarShowGrid',
+        OnActionbarShowGroup = 'OnActionbarShowGroup',
+        OnAddonLoaded = 'OnAddonLoaded',
+        OnButtonCountChanged = 'OnButtonCountChanged',
+        OnButtonSizeChanged = 'OnButtonSizeChanged',
+        OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
+        OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnHideWhenTaxiChanged = 'OnHideWhenTaxiChanged',
+        OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
         OnPlayerLeaveCombat = 'OnPlayerLeaveCombat',
+        OnTextSettingsChanged = 'OnTextSettingsChanged',
         OnUpdateItemStates = 'OnUpdateItemStates',
 
         -- ################################
@@ -292,6 +293,7 @@ local function GlobalConstantProperties(o)
         ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
         ['show_button_index'] = 'show_button_index',
         ['show_keybind_text'] = 'show_keybind_text',
+        ['tooltip_anchor_type'] = 'tooltip_anchor_type',
     }
 
     ---@class Profile_Config_Widget_Names
@@ -324,6 +326,19 @@ local function GlobalConstantProperties(o)
         MOD = 'MOD',
     }
 
+    ---@class TooltipAnchor
+    local TooltipAnchor = {
+        CURSOR_TOPLEFT = 'CURSOR_TOPLEFT',
+        CURSOR_TOPRIGHT = 'CURSOR_TOPRIGHT',
+        CURSOR_BOTTOMLEFT = 'CURSOR_BOTTOMLEFT',
+        CURSOR_BOTTOMRIGHT = 'CURSOR_BOTTOMRIGHT',
+
+        SCREEN_TOPLEFT = 'SCREEN_TOPLEFT',
+        SCREEN_TOPRIGHT = 'SCREEN_TOPRIGHT',
+        SCREEN_BOTTOMLEFT = 'SCREEN_BOTTOMLEFT',
+        SCREEN_BOTTOMRIGHT = 'SCREEN_BOTTOMRIGHT',
+    }
+
     ---@param prefix string
     ---@param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
@@ -340,6 +355,7 @@ local function GlobalConstantProperties(o)
     o.DrawLayer = DrawLayer
     o.BlendMode = BlendMode
     o.AlphaMode = BlendMode
+    o.TooltipAnchor = TooltipAnchor
     ---@type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass

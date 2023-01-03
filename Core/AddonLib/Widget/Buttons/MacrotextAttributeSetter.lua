@@ -50,7 +50,7 @@ function S:ShowTooltip(btnUI)
 
     local btnData = btnUI.widget:GetConfig()
     local macroTextInfo = btnData[WAttr.MACRO_TEXT]
-    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
+
     GameTooltip:SetSpellByID(macroTextInfo.id)
 end
 

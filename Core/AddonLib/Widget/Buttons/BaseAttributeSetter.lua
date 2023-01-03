@@ -1,14 +1,16 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
+---@type _GameTooltip
+local GameTooltip = GameTooltip
 local InCombatLockdown = InCombatLockdown
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local WMX = O.WidgetMixin
-
+local GC, WMX, String, Profile = O.GlobalConstants, O.WidgetMixin, O.String, O.Profile
+local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
@@ -42,6 +44,19 @@ local function AddPostCombat(btn)
     if not InCombatLockdown() then return end
     O.ButtonFrameFactory:AddPostCombatUpdate(btn.widget)
 end
+local function GetTooltipOwner(btnUI, anchorType)
+    if StartsWithIgnoreCase(anchorType, 'cursor') then return btnUI end
+    return UIParent
+end
+local function GetAnchorKeyword(anchorType)
+    local points = { 'TOPLEFT', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOMRIGHT' }
+    for _,pt in ipairs(points) do
+        if EndsWithIgnoreCase(anchorType, pt) then
+            return 'ANCHOR_' .. pt
+        end
+    end
+    return 'ANCHOR_TOPLEFT'
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -64,6 +79,7 @@ function _L:HandleGameTooltipCallbacks(btn)
             if not w:IsTooltipModifierKeyDown() then return end
         end
 
+        self:SetToolTipOwner(w.button)
         self:ShowTooltip(w.button)
 
         if not GetCursorInfo() then return end
@@ -77,4 +93,11 @@ function _L:HandleGameTooltipCallbacks(btn)
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(false)
     end)
+end
+
+--- @see TooltipAnchor
+--- @param btnUI ButtonUI The UIFrame
+function _L:SetToolTipOwner(btnUI)
+    local anchorType =  Profile:P().tooltip_anchor_type or GC.TooltipAnchor.CURSOR_TOPRIGHT
+    GameTooltip:SetOwner(GetTooltipOwner(btnUI, anchorType), GetAnchorKeyword(anchorType))
 end

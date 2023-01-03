@@ -236,6 +236,7 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnActionbarShowGroup, OnActionbarShowGroup)
     widget:SetCallback(E.OnUpdateItemStates, OnUpdateItemStates)
     widget:SetCallback(E.OnPlayerLeaveCombat, OnPlayerLeaveCombat)
+    widget:SetCallback(E.OnTooltipAnchorChanged, OnTooltipAnchorChanged)
 
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)

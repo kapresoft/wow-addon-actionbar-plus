@@ -1,7 +1,8 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GameTooltip, C_Timer = GameTooltip, C_Timer
+---@type _GameTooltip
+local GameTooltip = GameTooltip
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -33,21 +34,6 @@ local Base = LibStub(Core.M.BaseAttributeSetter)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param link table The blizzard `GameTooltip` link
-function L:ShowTooltip(btnUI, btnData)
-    if not btnUI or not btnData then return end
-    local type = btnData.type
-    if not type then return end
-
-    local spellInfo = btnData[WAttr.SPELL]
-    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
-
-    -- Replace 'Spell' with 'Spell (Rank #Rank)'
-    if (IsNotBlank(spellInfo.rank)) then
-        GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
-    end
-    GameTooltip:SetSpellByID(spellInfo.id)
-end
 
 ---@param btnUI ButtonUI The UIFrame
 ---@param btnData Profile_Button The button data
@@ -81,12 +67,13 @@ function L:ShowTooltip(btnUI)
     local btnData = btnUI.widget:GetConfig()
     local spellInfo = btnData[WAttr.SPELL]
     if not spellInfo.id then return end
-    GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
+
     GameTooltip:SetSpellByID(spellInfo.id)
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
     end
+
 end
 
 L.mt.__index = Base

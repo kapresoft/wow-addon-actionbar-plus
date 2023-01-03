@@ -126,8 +126,6 @@ local function attributeSetterMethods(a)
         local battlePet = bd:GetBattlePetInfo()
         if bd:IsInvalidBattlePet(battlePet) then return end
 
-        --todo next: localize
-        GameTooltip:SetOwner(btnUI, GC.C.ANCHOR_TOPLEFT)
         GameTooltip:SetText(battlePet.name)
         GameTooltip:AppendText(sformat(DESC_FORMAT, 'Instant'))
         GameTooltip:AppendText(sformat(DESC_FORMAT, 'Summons and dismisses your ' .. battlePet.name))
