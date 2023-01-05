@@ -8,10 +8,13 @@ local addon = ...
 local L = LibStub("AceLocale-3.0"):NewLocale(addon, "enUS", true);
 if not L then return end
 
+local actionBarText = 'Action Bar'
+local buttonBarText = 'Button'
+
 --[[-----------------------------------------------------------------------------
 Keybinding Localization
 -------------------------------------------------------------------------------]]
-ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT         = 'Action Bar #%s Button %s'
+local buttonNameFormat = actionBarText ..' #%s %s %s'
 
 for bar = 1,8,1
 do
@@ -19,7 +22,7 @@ do
     do
         -- Example: L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]  = 'Bar #1 Action Button 1'
         local left = sformat('BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s', bar, button)
-        local right = sformat(ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT, bar, button)
+        local right = sformat(buttonNameFormat, bar, buttonBarText, button)
         L[left] = right
     end
 end
@@ -33,6 +36,12 @@ local GCC = ABP_GlobalConstants.C
 Defaults
 -------------------------------------------------------------------------------]]
 ABP_BAR_HEADER_FORMAT_DEFAULT               = '%s Bar #%s'
+
+-- Common
+L['ABP_ACTIONBAR_BASE_NAME']                             = actionBarText
+L['ABP_BUTTON_BASE_NAME']                                = buttonBarText
+L['ABP_SETTINGS_BASE_NAME']                              = 'Settings'
+L['ABP_ENABLE_BASE_NAME']                                = 'Enable'
 
 L['ABP_INITIALIZED_TEXT']                                = sformat('Initialized.  Type %s on the console for available commands.', GCC.ABP_COMMAND)
 L['ABP_CONSOLE_HELP_COMMAND_TEXT']                       = sformat('Type %s on the console to see additional commands', GCC.ABP_HELP_COMMAND)
@@ -72,10 +81,6 @@ L['ABP_DEBUGGING_DESC']                                   = 'Debug Settings for 
 L['ABP_DEBUGGING_CONFIGURATION_HEADER']                   = 'Debugging Configuration'
 L['ABP_DEBUGGING_LOG_LEVEL_NAME']                         = 'Log Level'
 L['ABP_DEBUGGING_LOG_LEVEL_DESC']                         = 'Higher log levels generate more logs'
-
-L['ABP_ACTIONBAR_BASE_NAME']                             = 'Action Bar'
-L['ABP_SETTINGS_BASE_NAME']                              = 'Settings'
-L['ABP_ENABLE_BASE_NAME']                                = 'Enable'
 
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']            = 'Lock Actionbars with SHIFT key'
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']            = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'

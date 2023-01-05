@@ -2,10 +2,12 @@
     ActionbarPlus Addon
 --]]
 
+local addon = ...
 local sformat = string.format
 
 ---@type Localization
-local L = LibStub("AceLocale-3.0"):GetLocale("ActionbarPlus")
+local L = LibStub("AceLocale-3.0"):GetLocale(addon)
+if not L then return end
 
 -- General
 ABP_TITLE                                    = "ActionbarPlus"
@@ -19,6 +21,8 @@ BINDING_HEADER_ABP_CATEGORY                  = ABP_CATEGORY
 Localization
 -------------------------------------------------------------------------------]]
 
+ABP_ACTIONBAR_BASE_NAME                      = L['ABP_ACTIONBAR_BASE_NAME']
+ABP_BUTTON_BASE_NAME                         = L['ABP_BUTTON_BASE_NAME']
 ABP_GENERAL_BAR_HEADER_FORMAT                = L['ABP_BAR_HEADER_FORMAT']
 
 -- bar max: 8, button max 50
@@ -36,6 +40,9 @@ do
         _G[left] = L[right]
     end
 end
+
+ABP_SETTINGS_BASE_NAME                                          = L['ABP_SETTINGS_BASE_NAME']
+ABP_ENABLE_BASE_NAME                                            = L['ABP_ENABLE_BASE_NAME']
 
 ABP_CURSE_FORGE                                                 = 'Curse Forge'
 ABP_CONSOLE_COMMAND_TEXT                                        = L['ABP_CONSOLE_COMMAND_TEXT']
@@ -64,10 +71,6 @@ ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT                            = L['ABP_BAR_CON
 
 ABP_GENERAL_CONFIG_HEADER                                       = L['ABP_GENERAL_CONFIG_HEADER']
 ABP_GENERAL_TOOLTIP_OPTIONS_HEADER                              = L['ABP_GENERAL_TOOLTIP_OPTIONS_HEADER']
-
-ABP_ACTIONBAR_BASE_NAME                                         = L['ABP_ACTIONBAR_BASE_NAME']
-ABP_SETTINGS_BASE_NAME                                          = L['ABP_SETTINGS_BASE_NAME']
-ABP_ENABLE_BASE_NAME                                            = L['ABP_ENABLE_BASE_NAME']
 
 ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME                        = L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']
 ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC                        = L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']
