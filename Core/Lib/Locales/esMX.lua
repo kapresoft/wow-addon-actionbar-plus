@@ -5,11 +5,12 @@
 
 local addon = ...
 
-local L = LibStub("AceLocale-3.0"):NewLocale(addon, "deDE", true);
+local L = LibStub("AceLocale-3.0"):NewLocale(addon, "esMX", true);
 if not L then return end
 
 --[[-----------------------------------------------------------------------------
 Localization Keys
 -------------------------------------------------------------------------------]]
 
---@localization(locale="deDE", format="lua_additive_table", handle-subnamespaces="concat")@
+--@localization(locale="esES", format="lua_additive_table", handle-subnamespaces="concat")@
+
