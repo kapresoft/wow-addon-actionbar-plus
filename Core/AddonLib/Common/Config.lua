@@ -11,7 +11,6 @@ local GC, Mixin = O.GlobalConstants, O.Mixin
 local E = GC.E
 local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
 local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
-local MOUSEOVER_FRAME_MOVER_DESC = "Hide the frame mover at the top of the actionbar by default.  Mouseover to make it visible for moving the frame."
 
 local p = O.LogFactory(Core.M.Config)
 
@@ -277,8 +276,8 @@ local methods = {
     ['CreateGeneralGroup'] = function(self)
         return {
             type = "group",
-            name = "General",
-            desc = "General Settings",
+            name = ABP_GENERAL_CONFIG_NAME,
+            desc = ABP_GENERAL_CONFIG_DESC,
             order = mainSeq:next(),
             args = {
                 desc = { name = GeneralConfigHeader, type = "header", order = 0 },
@@ -366,8 +365,8 @@ local methods = {
                     type = 'select', style = 'dropdown',
                     order = mainSeq:next(),
                     values = TTAK.kvPairs, sorting = TTAK.sorting,
-                    name = 'Tooltip Anchor',
-                    desc = 'Tooltip Anchor Type',
+                    name = ABP_GENERAL_CONFIG_TOOLTIP_NAME,
+                    desc = ABP_GENERAL_CONFIG_TOOLTIP_DESC,
                     get = PGet(self, PC.tooltip_anchor_type),
                     set = PSet(self, PC.tooltip_anchor_type),
                 }
@@ -378,12 +377,12 @@ local methods = {
     ['CreateDebuggingGroup'] = function(self)
         return {
             type = "group",
-            name = "Debugging",
-            desc = "Debug Settings",
+            name = ABP_DEBUGGING_NAME,
+            desc = ABP_DEBUGGING_DESC,
             -- Place right before Profiles
             order = 90,
             args = {
-                desc = { name = " Debugging Configuration ", type = "header", order = 0 },
+                desc = { name = format(" %s ", ABP_DEBUGGING_CONFIGURATION_HEADER), type = "header", order = 0 },
                 log_level = {
                     type = 'range',
                     order = 1,
@@ -391,8 +390,8 @@ local methods = {
                     min = 0,
                     max = 50,
                     width = 1.2,
-                    name = 'Log Level',
-                    desc = 'Higher log levels generate for console logs.',
+                    name = ABP_DEBUGGING_LOG_LEVEL_NAME,
+                    desc = ABP_DEBUGGING_LOG_LEVEL_DESC,
                     get = function(_) return GC:GetLogLevel() end,
                     set = function(_, v) GC:SetLogLevel(v) end,
                 },
@@ -413,20 +412,20 @@ local methods = {
     ---@param self Config
     ---@param frameIndex number
     ['CreateBarConfigDef'] = function(self, frameIndex)
-        local configName = format('Action Bar #%s', tostring(frameIndex))
+        local configName = format('%s #%s', ABP_ACTIONBAR_BASE_NAME, tostring(frameIndex))
         return {
             type = 'group',
             name = configName,
-            desc = format("%s Settings", configName),
+            desc = format("%s %s", configName, ABP_SETTINGS_BASE_NAME),
             order = mainSeq:next(),
             args = {
-                desc = { name = format("%s Settings", configName),
+                desc = { name = format("%s ", configName, ABP_SETTINGS_BASE_NAME),
                          type = "header", order = barSeq:next(), },
                 enabled = {
                     width = "full",
                     type = "toggle",
-                    name = "Enable",
-                    desc = format("Enable %s", configName),
+                    name = ABP_ENABLE_BASE_NAME,
+                    desc = format("%s %s", ABP_ACTIONBAR_BASE_NAME, configName),
                     order = barSeq:next(),
                     get = GetFrameStateGetterHandler(frameIndex),
                     set = GetFrameStateSetterHandler(frameIndex)
@@ -434,8 +433,8 @@ local methods = {
                 show_empty_buttons = {
                     width = "normal",
                     type = "toggle",
-                    name = "Show empty buttons",
-                    desc = "Check this option to always show the buttons on the action bar, even when they are empty.",
+                    name = ABP_BAR_CONFIG_SHOW_EMPTY_BUTTONS_NAME,
+                    desc = ABP_BAR_CONFIG_SHOW_EMPTY_BUTTONS_DESC,
                     order = barSeq:next(),
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
                     set = PSetSpecificWidget(frameIndex, WC.show_empty_buttons, false, E.OnActionbarShowEmptyButtonsUpdated),
@@ -443,8 +442,8 @@ local methods = {
                 showIndex = {
                     width = "normal",
                     type = "toggle",
-                    name = "Show Button Numbers",
-                    desc = format("Show each button index on %s", configName),
+                    name = ABP_BAR_CONFIG_SHOW_BUTTON_NUMBERS_NAME,
+                    desc = format("%s %s", ABP_BAR_CONFIG_SHOW_BUTTON_NUMBERS_DESC, configName),
                     order = barSeq:next(),
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
@@ -452,8 +451,8 @@ local methods = {
                 showKeybindText = {
                     width = "normal",
                     type = "toggle",
-                    name = "Show Keybind Text",
-                    desc = format("Show each button keybind text on %s", configName),
+                    name = ABP_BAR_CONFIG_SHOW_KEYBIND_TEXT_NAME,
+                    desc = format("%s %s", ABP_BAR_CONFIG_SHOW_KEYBIND_TEXT_DESC, configName),
                     order = barSeq:next(),
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
@@ -467,8 +466,8 @@ local methods = {
                     step = 0.01,
                     min = 0,
                     max = 1,
-                    name = 'Alpha',
-                    desc = 'Set the opacity of the actionbar',
+                    name = ABP_BAR_CONFIG_ALPHA_NAME,
+                    desc = ABP_BAR_CONFIG_ALPHA_DESC,
                     get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
                     set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
                 },
@@ -479,8 +478,8 @@ local methods = {
                     step = 1,
                     min = 20,
                     max = 100,
-                    name = 'Size (Width & Height)',
-                    desc = 'The width and height of a buttons',
+                    name = ABP_BAR_CONFIG_SIZE_NAME,
+                    desc = ABP_BAR_CONFIG_SIZE_DESC,
                     get = PGetWidget(frameIndex, WC.buttonSize, 36),
                     set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
                 },
@@ -491,8 +490,8 @@ local methods = {
                     step = 1,
                     min = 1,
                     max = 20,
-                    name = 'Rows',
-                    desc = 'The number of rows for the buttons',
+                    name = ABP_BAR_CONFIG_ROWS_NAME,
+                    desc = ABP_BAR_CONFIG_ROWS_DESC,
                     --confirm = ConfirmAndReload,
                     get = GetRowSizeGetterHandler(frameIndex),
                     set = GetRowSizeSetterHandler(frameIndex)
@@ -504,8 +503,8 @@ local methods = {
                     step = 1,
                     min = 1,
                     max = 40,
-                    name = 'Columns',
-                    desc = 'The number of columns for the buttons',
+                    name = ABP_BAR_CONFIG_COLS_NAME,
+                    desc = ABP_BAR_CONFIG_COLS_DESC,
                     --confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
@@ -515,20 +514,22 @@ local methods = {
                     width = "normal",
                     type = "select", style = "dropdown",
                     order = barSeq:next(),
-                    values = {[''] = "No", ['always']="Always", ['in-combat']="In-Combat"},
-                    name = "Lock Actionbar?",
-                    desc = format("Lock %s. " .. LOCK_FRAME_DESC, configName),
+                    values = { [''] = ABP_BAR_CONFIG_COMMON_TEXT_NO,
+                               ['always'] = ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS,
+                               ['in-combat'] = ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT },
+                    name = ABP_BAR_CONFIG_LOCK_NAME,
+                    desc = format("%s %s. " .. LOCK_FRAME_DESC, ABP_BAR_CONFIG_LOCK_DESC, configName),
                     get = GetLockStateGetterHandler(frameIndex),
                     set = GetLockStateSetterHandler(frameIndex)
                 },
                 spacer3 = { type="description", name=sp, width="full", order = barSeq:next() },
-                spacer4 = { type="header", name = "Frame Handle Settings", width="full", order = barSeq:next() },
+                spacer4 = { type="header", name = ABP_BAR_CONFIG_FRAME_HANDLE_SETTINGS_HEADER, width="full", order = barSeq:next() },
                 frame_handle_mouseover = {
                     width = "normal",
                     type = "toggle",
                     order = barSeq:next(),
-                    name = "Mouseover",
-                    desc = MOUSEOVER_FRAME_MOVER_DESC,
+                    name = ABP_BAR_CONFIG_MOUSEOVER_NAME,
+                    desc = ABP_BAR_CONFIG_MOUSEOVER_DESC,
                     get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
                     set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
                 },
@@ -536,8 +537,8 @@ local methods = {
                     width = "normal",
                     type = 'range',
                     order = barSeq:next(),
-                    name = 'Alpha',
-                    desc = 'Set the opacity of the frame handle.',
+                    name = ABP_BAR_CONFIG_FRAME_HANDLE_OPACITY_NAME,
+                    desc = ABP_BAR_CONFIG_FRAME_HANDLE_OPACITY_DESC,
                     isPercent = true,
                     step = 0.01,
                     min = 0,
@@ -552,8 +553,6 @@ local methods = {
                     name = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_LABEL,
                     desc = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_DESC,
                     func = OnResetAnchor(frameIndex),
-                    --get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
-                    --set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
                 }
             }
         }
