@@ -181,9 +181,7 @@ function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logN
 ---local package, versionFormat, logPrefix = Core:GetAddonInfo()
 ---```
 ---@return string, string, string
-function _L:GetAddonInfo()
-    return addon, _S.versionFormat, _S.logPrefix
-end
+function _L:GetAddonInfo() return ns.name, _S.versionFormat, _S.logPrefix end
 
 ---### Usage:
 ---```
@@ -225,7 +223,7 @@ end
 ---```
 function _L:InitPrettyPrint()
 
-    ---@type PrettyPrint
+    ---@type Kapresoft_LibUtil_PrettyPrint
     local pprint = Kapresoft_LibUtil.PrettyPrint
     ---@class pformat
     local o = { wrapped = pprint }

@@ -2,8 +2,6 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateFrame, BackdropTemplateMixin = CreateFrame, BackdropTemplateMixin
----@type _AnchorUtil
-local AnchorUtil = AnchorUtil
 local GameTooltip, StaticPopup_Show, ReloadUI = GameTooltip, StaticPopup_Show, ReloadUI
 local C_Timer, IsShiftKeyDown = C_Timer, IsShiftKeyDown
 --[[-----------------------------------------------------------------------------
@@ -15,7 +13,7 @@ local format, strlower = string.format, string.lower
 Local Vars
 -------------------------------------------------------------------------------]]
 local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local Mixin, LSM = O.Mixin, O.AceLibFactory:A().AceLibSharedMedia
+local LSM = O.AceLibFactory:A().AceLibSharedMedia
 local E = O.GlobalConstants.E
 local C = O.GlobalConstants.C
 
@@ -57,17 +55,15 @@ function MouseButtonUtil:IsRightButton(mouseButton) return C.RightButton == mous
 function MouseButtonUtil:IsButton5(mouseButton) return C.Button5 == mouseButton end
 local MBU = MouseButtonUtil
 
----@param frame FrameHandleMixin
+---@param frame FrameHandle
 local function ShowConfigTooltip(frame)
-    local widget = frame.widget
     GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
-    --todo next add: Left click to move;
     --  Shift + Left-Click to ReloadUI (on debug only)
-    GameTooltip:AddLine(format('Actionbar #%s: Right-click to open config UI', widget.index, 1, 1, 1))
+    GameTooltip:AddLine(frame.OnMouseOverTooltipText)
     GameTooltip:Show()
 end
 
----@param frame FrameHandleMixin
+---@param frame FrameHandle
 local function OnLeave(frame)
     GameTooltip:Hide()
 
@@ -75,7 +71,7 @@ local function OnLeave(frame)
     frame:HideBackdrop()
 end
 
----@param frame FrameHandleMixin
+---@param frame FrameHandle
 local function OnEnter(frame)
     ShowConfigTooltip(frame)
     C_Timer.After(3, function() GameTooltip:Hide() end)
@@ -117,7 +113,10 @@ function L:Init(widget)
 end
 
 ---@param f FrameHandle
-local function Methods(f)
+local function PropertiesAndMethods(f)
+
+    f.OnMouseOverTooltipText = format('%s #%s: %s', ABP_ACTIONBAR_BASE_NAME,
+            f.widget.index, ABP_TOOLTIP_RIGHT_CLICK_TO_OPEN_CONFIG_TEXT)
 
     function f:UpdateBackdropState()
         if self:IsMouseOverEnabled() then
@@ -165,10 +164,12 @@ function L:Constructor()
     fh:SetAlpha(0.5)
     fh:SetPoint(C.BOTTOM, self.frame, C.TOP, 0, 1)
 
-    Methods(fh)
+    PropertiesAndMethods(fh)
 
     fh:ShowBackdrop()
     self:RegisterScripts(fh)
+
+
 
     return fh
 end
@@ -187,7 +188,8 @@ end
 ---@param widget FrameWidget
 function ABP_CreateFrameHandle(widget)
     assert(widget, "FrameWidget is required.")
-    local mixin = Mixin:MixinAndInit(L, widget)
+    ---@class FrameHandleMixinInstance : FrameHandleMixin
+    local mixin = K_CreateAndInitFromMixin(L, widget)
     return mixin:Constructor()
 end
 
