@@ -2,30 +2,23 @@
 Lua Vars
 -------------------------------------------------------------------------------]]
 local sformat = string.format
-local addon = ...
+local ns = ABP_Namespace(...)
+local LocUtil = ns.O.LocalizationUtil
 
----@class Localization
-local L = LibStub("AceLocale-3.0"):NewLocale(addon, "enUS", true);
+---@type AceLocale
+local L = LibStub("AceLocale-3.0"):NewLocale(ns.name, "enUS", true);
 if not L then return end
 
-local actionBarText = 'Action Bar'
+--[[-----------------------------------------------------------------------------
+Localization Keys That need to be defined for Bindings.xml
+-------------------------------------------------------------------------------]]
+local actionBarText = 'Bar'
 local buttonBarText = 'Button'
 
---[[-----------------------------------------------------------------------------
-Keybinding Localization
--------------------------------------------------------------------------------]]
-local buttonNameFormat = actionBarText ..' #%s %s %s'
+L['ABP_ACTIONBAR_BASE_NAME']                             = actionBarText
+L['ABP_BUTTON_BASE_NAME']                                = buttonBarText
 
-for bar = 1,8,1
-do
-    for button = 1,50,1
-    do
-        -- Example: L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]  = 'Bar #1 Action Button 1'
-        local left = sformat('BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s', bar, button)
-        local right = sformat(buttonNameFormat, bar, buttonBarText, button)
-        L[left] = right
-    end
-end
+LocUtil:SetupKeybindNames(L, actionBarText, buttonBarText)
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -35,11 +28,8 @@ local GCC = ABP_GlobalConstants.C
 --[[-----------------------------------------------------------------------------
 Defaults
 -------------------------------------------------------------------------------]]
-ABP_BAR_HEADER_FORMAT_DEFAULT               = '%s Bar #%s'
 
 -- Common
-L['ABP_ACTIONBAR_BASE_NAME']                             = actionBarText
-L['ABP_BUTTON_BASE_NAME']                                = buttonBarText
 L['ABP_SETTINGS_BASE_NAME']                              = 'Settings'
 L['ABP_ENABLE_BASE_NAME']                                = 'Enable'
 
@@ -69,7 +59,6 @@ L['ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS'] = 'Always'
 L['ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT'] = 'In-Combat'
 
 L['ABP_BUTTON_NAME_TEXT_FORMAT']                         = ABP_BUTTON_NAME_TEXT_FORMAT_DEFAULT
-L['ABP_BAR_HEADER_FORMAT']                               = ABP_BAR_HEADER_FORMAT_DEFAULT
 L['ABP_GENERAL_CONFIG_HEADER']                           = 'General Configuration'
 L['ABP_GENERAL_TOOLTIP_OPTIONS_HEADER']                  = 'Tooltip Options'
 L['ABP_GENERAL_CONFIG_NAME']                              = 'General'

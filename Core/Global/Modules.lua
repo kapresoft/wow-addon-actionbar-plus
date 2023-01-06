@@ -50,6 +50,7 @@ local M = {
     Incrementer = 'Incrementer',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
+    LocalizationUtil = 'LocalizationUtil',
     MacroAttributeSetter = 'MacroAttributeSetter',
     MacroDragEventHandler = 'MacroDragEventHandler',
     MacroEventsHandler = 'MacroEventsHandler',
@@ -115,6 +116,8 @@ local GlobalObjectsTemplate = {
     ItemAttributeSetter = {},
     ---@type ItemDragEventHandler
     ItemDragEventHandler = {},
+    ---@type LocalizationUtil
+    LocalizationUtil = {},
     ---@type LogFactory
     LogFactory = {},
     ---@type Logger
