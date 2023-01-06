@@ -12,7 +12,7 @@ if not L then return end
 --[[-----------------------------------------------------------------------------
 Localization Keys That need to be defined for Bindings.xml
 -------------------------------------------------------------------------------]]
-local actionBarText = 'Bar'
+local actionBarText = 'Action Bar'
 local buttonBarText = 'Button'
 
 L['ABP_ACTIONBAR_BASE_NAME']                             = actionBarText

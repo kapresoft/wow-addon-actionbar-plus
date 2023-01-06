@@ -17,6 +17,8 @@ local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
 
 ---@class LocalizationUtil : BaseLibraryObject
 local L = LibStub:NewLibrary(Core.M.LocalizationUtil)
+if not L then return end
+
 local p = L:GetLogger()
 
 L.MAX_BARS = MAX_BARS
