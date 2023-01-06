@@ -3,7 +3,7 @@
 |[![Branch Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml)| [![Release Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml)|
 
 # ActionbarPlus
-> A World of Warcraft Addon
+> A [World of Warcraft](https://worldofwarcraft.com/) AddOn
 
 ![download-count](https://cf.way2muchnoise.eu/full_566626_downloads.svg?badge_style=for_the_badge) ![supported-wow-versions](https://cf.way2muchnoise.eu/versions/World%20of%20Warcraft%20Versions_566626_all.svg?badge_style=for_the_badge)
 
