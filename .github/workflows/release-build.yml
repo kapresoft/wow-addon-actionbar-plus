@@ -79,6 +79,8 @@ jobs:
         if: ${{ inputs.uploadWowInterface == 'yes' }}
         run: |
           echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}"
+          echo WOWI_API_TOKEN=$${ secrets.WOWI_API_TOKEN }} >> $GITHUB_ENV
+
       ## ------------------------------------------------ ##
       - name: Print Environment Variables
         run: |
@@ -111,7 +113,6 @@ jobs:
       - uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          WOWI_API_TOKEN: $${ secrets.WOWI_API_TOKEN }}
         with:
           args: -r ${releaseDir} ${bigWigsUploads} ${packagerOptions}
       ## ------------------------------------------------ ##
