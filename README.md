@@ -44,11 +44,10 @@
 
 ## Donations
 
-As a software engineer, I am passionate about this project and have dedicated a significant amount of time and effort to creating a high-quality product. If you enjoy using this World of Warcraft add-on, please consider supporting me through a donation via [Paypal&trade;](https://www.curseforge.com/wow/addons/actionbarplus) or the Bitcoin Address provided below. Your support is greatly appreciated. Thank you in advance for your generosity.
+As a software engineer, I am passionate about this project and have dedicated a significant amount of time and effort to creating a high-quality product. If you enjoy using this World of Warcraft add-on, please consider supporting me through a donation via [Paypal&trade;](https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU) or the Bitcoin Address provided below. Your support is greatly appreciated. Thank you in advance for your generosity.
 
-**Bitcoin Address**
-
-[https://www.blockchain.com/btc/address/3QQVAwJGkKHMM2oq6CLVWYgfx83TFVwp39](https://www.blockchain.com/btc/address/3QQVAwJGkKHMM2oq6CLVWYgfx83TFVwp39)
+- **[Paypal&trade; Donation](https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU)**
+- **[Bitcoin Donation](https://www.blockchain.com/btc/address/3QQVAwJGkKHMM2oq6CLVWYgfx83TFVwp39)**
 
 ## Miscellaneous
 
@@ -56,5 +55,5 @@ As a software engineer, I am passionate about this project and have dedicated a 
 - [Contributing](doc/CONTRIBUTING.md)
 - [Release Checklist](doc/RELEASE-CHECKLIST.md)
 
-## Please download my other addons
+## Try My Other AddOns
 - [Saved Dungeons &amp; Raids](https://www.curseforge.com/wow/addons/saved-dungeons-raids)
