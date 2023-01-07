@@ -7,6 +7,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
+      createDraftRelease:
+        description: 'Create Github Release Draft'
+        required: true
+        default: yes
+        type: choice
+        options:
+          - yes
+          - no
       uploadCurseForge:
         description: 'Upload to CurseForge.com'
         required: true
@@ -27,9 +35,7 @@ env:
   addonName: ActionbarPlus
   curseForgeProjectId: 566626
   wowInterfaceProjectId: 26522
-  createDraftRelease: true
   uploadBuildArtifacts: true
-  uploadWowInterface: true
   artifact_retentionDays: 7
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
@@ -148,7 +154,7 @@ jobs:
 
       - name: Create a draft release
         id: create_draft_release
-        if: ${{ env.createDraftRelease == 'true' }}
+        if: ${{ inputs.createDraftRelease == 'yes' }}
         uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
