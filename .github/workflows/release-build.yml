@@ -65,6 +65,7 @@ jobs:
         if: ${{ inputs.uploadCurseForge != false }}
         run: |
           echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}" >> $GITHUB_ENV
+          echo CF_API_KEY="${{ secrets.CF_API_KEY }}" >> $GITHUB_ENV
       - name: "Set ENV Variable: WowInterface.com Artifact"
         if: ${{ inputs.uploadWowInterface == true }}
         run: |
@@ -101,8 +102,6 @@ jobs:
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
-        env:
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
         with:
           args: -r ${releaseDir} ${bigWigsUploads} ${packagerOptions}
       ## ------------------------------------------------ ##
