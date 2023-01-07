@@ -29,6 +29,9 @@ env:
   artifact_retentionDays: 7
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
+  createDraftRelease: true
+  uploadCurseForge: true
+  uploadWowInterface: true
 
 jobs:
   build:
@@ -44,6 +47,13 @@ jobs:
           script: |
             const sha = context.sha.substring(0, 7)
             core.exportVariable('GITHUB_SHA_SHORT', sha)
+      ## ------------------------------------------------ ##
+      - name: "Set ENV for manual triggers (workflow_dispatch)"
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo createDraftRelease="${{ inputs.createDraftRelease }}" >> $GITHUB_ENV
+          echo uploadCurseForge="${{ inputs.uploadCurseForge }}" >> $GITHUB_ENV
+          echo uploadWowInterface="${{ inputs.uploadWowInterface }}" >> $GITHUB_ENV
       ## ------------------------------------------------ ##
       - name: "Set ENV Var Option to Skip Uploads on Branch Builds and refName"
         if: ${{ github.ref_type == 'branch' }}
@@ -62,13 +72,14 @@ jobs:
           echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
           echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
       - name: "Set ENV Variable: Upload to CurseForge"
-        if: ${{ inputs.uploadCurseForge != false }}
+        if: ${{ uploadCurseForge != false }}
         run: |
           echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}" >> $GITHUB_ENV
           echo CF_API_KEY="${{ secrets.CF_API_KEY }}" >> $GITHUB_ENV
-      - name: "Set ENV Variable: WowInterface.com Artifact"
-        if: ${{ inputs.uploadWowInterface == true }}
+      - name: "Set ENV Variable: Upload to WowInterface"
+        if: ${{ uploadWowInterface != false }}
         run: |
+          echo uploadWowInterface="${{ uploadWowInterface }}"
           echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}" >> $GITHUB_ENV
           echo WOWI_API_TOKEN="${{ secrets.WOWI_API_TOKEN }}" >> $GITHUB_ENV
 
@@ -78,9 +89,9 @@ jobs:
           echo HOME=${HOME}
           echo -------------------------------
           echo Inputs:
-          echo uploadCurseForge=${{ inputs.uploadCurseForge }}
-          echo uploadWowInterface=${{ inputs.uploadWowInterface }}
-          echo createDraftRelease=${{ inputs.createDraftRelease }}
+          echo uploadCurseForge=${{ uploadCurseForge }}
+          echo uploadWowInterface=${{ uploadWowInterface }}
+          echo createDraftRelease=${{ createDraftRelease }}
           echo -------------------------------
           echo bigWigsUploads=${bigWigsUploads}
           echo releaseDir=${releaseDir}
@@ -143,12 +154,12 @@ jobs:
       ## ------------------------------------------------ ##
       - name: Notices
         run: |
-          echo ::notice::Uploads CurseForge:${{ inputs.uploadCurseForge }}, WoWInterface: ${{ inputs.uploadWowInterface }}, Upload Options=${bigWigsUploads}
+          echo ::notice::Uploads CurseForge:${{ uploadCurseForge }}, WoWInterface: ${{ uploadWowInterface }}, Upload Options=${bigWigsUploads}
           echo ::notice::Build Artifact=${buildArtifactFilename}, Checksum=${buildArtifactChecksum}
 
       - name: Create a draft release
         id: create_draft_release
-        if: ${{ inputs.createDraftRelease == true }}
+        if: ${{ createDraftRelease != false }}
         uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
