@@ -38,9 +38,13 @@
 - [Releases](../../releases)
 - [About the Author (Tony Lagnada)](https://tony.resume.lagnada.com/)
 
-## Curseforge / Twitch
+## AddOn Distribution
 
+**Curse Forge**
 - https://www.curseforge.com/wow/addons/actionbarplus
+
+**WoW Interface**
+- https://www.wowinterface.com/downloads/info26522-ActionbarPlus.html
 
 ## Donations
 
@@ -57,3 +61,6 @@ As a software engineer, I am passionate about this project and have dedicated a 
 
 ## Try My Other AddOns
 - [Saved Dungeons &amp; Raids](https://www.curseforge.com/wow/addons/saved-dungeons-raids)
+- [MacrobarPlus](https://www.curseforge.com/wow/addons/macrobarplus)
+- [Addon Template](https://www.curseforge.com/wow/addons/addon-template)
+
