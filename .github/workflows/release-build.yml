@@ -74,12 +74,13 @@ jobs:
       - name: "Set ENV Variable: Upload to CurseForge"
         if: ${{ env.uploadCurseForge != false }}
         run: |
+          echo uploadCurseForge="${uploadCurseForge}"
           echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}" >> $GITHUB_ENV
           echo CF_API_KEY="${{ secrets.CF_API_KEY }}" >> $GITHUB_ENV
       - name: "Set ENV Variable: Upload to WowInterface"
         if: ${{ env.uploadWowInterface != false }}
         run: |
-          echo uploadWowInterface="${{ uploadWowInterface }}"
+          echo uploadWowInterface="${uploadWowInterface}"
           echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}" >> $GITHUB_ENV
           echo WOWI_API_TOKEN="${{ secrets.WOWI_API_TOKEN }}" >> $GITHUB_ENV
 
@@ -89,9 +90,9 @@ jobs:
           echo HOME=${HOME}
           echo -------------------------------
           echo Inputs:
-          echo uploadCurseForge=${{ uploadCurseForge }}
-          echo uploadWowInterface=${{ uploadWowInterface }}
-          echo createDraftRelease=${{ createDraftRelease }}
+          echo uploadCurseForge=${uploadCurseForge}
+          echo uploadWowInterface=${uploadWowInterface}
+          echo createDraftRelease=${createDraftRelease}
           echo -------------------------------
           echo bigWigsUploads=${bigWigsUploads}
           echo releaseDir=${releaseDir}
