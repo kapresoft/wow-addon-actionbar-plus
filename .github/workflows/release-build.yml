@@ -89,7 +89,6 @@ jobs:
         run: |
           echo HOME=${HOME}
           echo -------------------------------
-          echo Inputs:
           echo uploadCurseForge=${uploadCurseForge}
           echo uploadWowInterface=${uploadWowInterface}
           echo createDraftRelease=${createDraftRelease}
