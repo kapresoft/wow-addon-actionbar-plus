@@ -72,13 +72,13 @@ jobs:
           echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
           echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
       - name: "Set ENV Variable: Upload to CurseForge"
-        if: ${{ env.uploadCurseForge != false }}
+        if: ${{ env.uploadCurseForge != 'false' }}
         run: |
           echo uploadCurseForge="${uploadCurseForge}"
           echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}" >> $GITHUB_ENV
           echo CF_API_KEY="${{ secrets.CF_API_KEY }}" >> $GITHUB_ENV
       - name: "Set ENV Variable: Upload to WowInterface"
-        if: ${{ env.uploadWowInterface != false }}
+        if: ${{ env.uploadWowInterface != 'false' }}
         run: |
           echo uploadWowInterface="${uploadWowInterface}"
           echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}" >> $GITHUB_ENV
@@ -160,7 +160,7 @@ jobs:
 
       - name: Create a draft release
         id: create_draft_release
-        if: ${{ env.createDraftRelease != false }}
+        if: ${{ env.createDraftRelease != 'false' }}
         uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
