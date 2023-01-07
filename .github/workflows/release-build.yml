@@ -7,14 +7,22 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
+      uploadCurseForge:
+        description: 'Upload to CurseForge.com'
+        required: true
+        default: yes
+        type: choice
+        options:
+          - yes
+          - no
       uploadWowInterface:
         description: 'Upload to WoWInterface.com'
         required: false
         default: false
         type: choice
         options:
-          - true
-          - false
+          - yes
+          - no
 env:
   addonName: ActionbarPlus
   curseForgeProjectId: 566626
@@ -57,10 +65,14 @@ jobs:
         run: |
           echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
           echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
-      - name: "Set ENV Variable: WowInterface.com Artifact"
-        if: ${{ inputs.uploadWowInterface == 'true' }}
+      - name: "Set ENV Variable: Upload to CurseForge"
+        if: ${{ inputs.uploadCurseForge == 'yes' }}
         run: |
-          echo bigWigsAdditionalUploads="-w ${wowInterfaceProjectId}"
+          echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}"
+      - name: "Set ENV Variable: WowInterface.com Artifact"
+        if: ${{ inputs.uploadWowInterface == 'yes' }}
+        run: |
+          echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}"
       ## ------------------------------------------------ ##
       - name: Print Environment Variables
         run: |
@@ -76,7 +88,7 @@ jobs:
           echo buildArtifactFilename=${buildArtifactFilename}
           echo buildArtifactChecksumFilename=${buildArtifactChecksumFilename}
           echo artifact_retentionDays=${artifact_retentionDays}
-          echo bigWigsAdditionalUploads=${bigWigsAdditionalUploads}
+          echo bigWigsUploads=${bigWigsUploads}
           echo "------------------------"
           echo "All ENV Vars:"
           echo "$(env|sort)"
@@ -90,7 +102,7 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           WOWI_API_TOKEN: $${ secrets.WOWI_API_TOKEN }}
         with:
-          args: -r ${releaseDir} -p ${curseForgeProjectId} ${bigWigsAdditionalUploads} ${packagerOptions}
+          args: -r ${releaseDir} ${bigWigsUploads} ${packagerOptions}
       ## ------------------------------------------------ ##
       - name: "Verify Build Artifact Exists: ${{ env.buildArtifact }}"
         uses: andstor/file-existence-action@v2
