@@ -22,7 +22,12 @@
 ## X-Github-Project-Hash: @project-hash@
 ## X-Github-Project-Last-Changed-Date: @project-date-iso@
 ## X-Github-Project-Version: @project-version@
-# TBC is classic and Vanilla is classic-era
+
+## X-WoWI-ID: 26522
+
+## X-PayPal-Donation-ID: AX58YP3GSGXVU
+## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
+
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
