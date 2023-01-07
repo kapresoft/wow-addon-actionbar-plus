@@ -6,7 +6,15 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+    inputs:
+      uploadWowInterface:
+        description: 'Upload to WoWInterface.com'
+        required: false
+        default: false
+        type: choice
+        options:
+          - true
+          - false
 env:
   addonName: ActionbarPlus
   curseForgeProjectId: 566626
@@ -50,7 +58,7 @@ jobs:
           echo buildArtifact="${releaseDir}/${buildArtifactFilename}" >> $GITHUB_ENV
           echo buildArtifactChecksumFile="${releaseDir}/${buildArtifactChecksumFilename}" >> $GITHUB_ENV
       - name: "Set ENV Variable: WowInterface.com Artifact"
-        if: ${{ env.uploadWowInterface == 'true' }}
+        if: ${{ inputs.uploadWowInterface == 'true' }}
         run: |
           echo bigWigsAdditionalUploads="-w ${wowInterfaceProjectId}"
       ## ------------------------------------------------ ##
