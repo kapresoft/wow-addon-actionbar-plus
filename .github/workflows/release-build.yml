@@ -2,7 +2,7 @@ name: Release Build
 
 on:
   push:
-    tags: [ 'xxxx[0-9]+.[0-9]+.[0-9]+' ]
+    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,7 +18,7 @@ on:
         type: boolean
       uploadWowInterface:
         description: 'Upload to WoWInterface.com'
-        default: false
+        default: true
         type: boolean
 
 env:
@@ -78,7 +78,7 @@ jobs:
           echo HOME=${HOME}
           echo -------------------------------
           echo Inputs:
-          echo uploadCurseForge=${{ inputs.uploadWowInterface }}
+          echo uploadCurseForge=${{ inputs.uploadCurseForge }}
           echo uploadWowInterface=${{ inputs.uploadWowInterface }}
           echo createDraftRelease=${{ inputs.createDraftRelease }}
           echo -------------------------------
@@ -143,9 +143,8 @@ jobs:
       ## ------------------------------------------------ ##
       - name: Notices
         run: |
-          echo -e "::notice::HOME=${HOME}\n::notice::buildArtifact=${buildArtifact}"
-          echo "::notice::buildArtifactChecksumFile=${buildArtifactChecksumFile}"
-          echo "::notice::buildArtifact=${buildArtifact} Checksum=${buildArtifactChecksum}"
+          echo ::notice::Uploads CurseForge:${{ inputs.uploadCurseForge }}, WoWInterface: ${{ inputs.uploadWowInterface }}, Upload Options=${bigWigsUploads}
+          echo ::notice::Build Artifact=${buildArtifactFilename}, Checksum=${buildArtifactChecksum}
 
       - name: Create a draft release
         id: create_draft_release
