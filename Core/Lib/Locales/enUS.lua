@@ -33,6 +33,9 @@ Defaults
 L['ABP_SETTINGS_BASE_NAME']                              = 'Settings'
 L['ABP_ENABLE_BASE_NAME']                                = 'Enable'
 
+L["BINDING_NAME_ABP_OPTIONS_DLG"]                        = 'Options Dialog'
+L['BINDING_HEADER_ABP_GENERAL']                          = 'General'
+
 L['ABP_INITIALIZED_TEXT']                                = sformat('Initialized.  Type %s on the console for available commands.', GCC.ABP_COMMAND)
 L['ABP_CONSOLE_HELP_COMMAND_TEXT']                       = sformat('Type %s on the console to see additional commands', GCC.ABP_HELP_COMMAND)
 L['ABP_CONSOLE_COMMAND_TEXT']                            = sformat('Type %s on the console to open config dialog or right-click on drag frame located at the top of the actionbar.', GCC.ABP_COMMAND)

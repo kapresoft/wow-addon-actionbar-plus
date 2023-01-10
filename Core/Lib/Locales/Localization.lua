@@ -18,6 +18,9 @@ ABP_CATEGORY                                 = "AddOns/" .. ABP_TITLE
 -- Key binding localization text
 BINDING_HEADER_ABP                           = ABP_TITLE
 BINDING_HEADER_ABP_CATEGORY                  = ABP_CATEGORY
+BINDING_NAME_ABP_OPTIONS_DLG                 = L["BINDING_NAME_ABP_OPTIONS_DLG"]
+BINDING_HEADER_ABP_GENERAL                   = L['BINDING_HEADER_ABP_GENERAL']
+
 
 --[[-----------------------------------------------------------------------------
 Localization
