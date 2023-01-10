@@ -1,5 +1,7 @@
 <Bindings>
-
+    <Binding name="ABP_OPTIONS_DLG" category="AddOns/ActionbarPlus" header="ABP_GENERAL">
+        ABP:OpenConfig();
+    </Binding>
     <Binding name="CLICK ActionbarPlusF1Button1:LeftButton" category="AddOns/ActionbarPlus" header="ABP_HEADER_ACTIONBAR1"/>
     <Binding name="CLICK ActionbarPlusF1Button2:LeftButton" category="AddOns/ActionbarPlus"/>
     <Binding name="CLICK ActionbarPlusF1Button3:LeftButton" category="AddOns/ActionbarPlus"/>

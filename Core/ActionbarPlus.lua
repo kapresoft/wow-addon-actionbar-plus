@@ -97,7 +97,11 @@ local methods = {
     ['SlashCommands'] = function(self, spaceSeparatedArgs)
         local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
         if IsEmptyTable(args) then self:SlashCommand_Help_Handler(); return end
-        if IsAnyOf('config', unpack(args)) then self:OpenConfig(); return end
+        if IsAnyOf('config', unpack(args))
+                or IsAnyOf('conf', unpack(args)) then
+            self:OpenConfig();
+            return
+        end
         if IsAnyOf('info', unpack(args)) then self:SlashCommand_Info_Handler(spaceSeparatedArgs); return end
         self:SlashCommand_Help_Handler()
     end,
