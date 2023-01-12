@@ -6,28 +6,31 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local GC, Mixin = O.GlobalConstants, O.Mixin
-local E = GC.E
+local O, LibStub, ns = ABP_LibPack(...)
+
+local GC, Ace = O.GlobalConstants, O.AceLibrary
+local E, M = GC.E, GC.M
+local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
+
 local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
 local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
 
-local p = O.LogFactory(Core.M.Config)
+local p = O.LogFactory(ns.M.Config)
 
 ---These are loaded in #fetchLibs()
----@type Profile
+--- @type Profile
 local P
----@type Profile_Config_Names
+--- @type Profile_Config_Names
 local PC
----@type Profile_Config_Widget_Names
+--- @type Profile_Config_Widget_Names
 local WC
----@type TooltipKey
+--- @type TooltipKey
 local TTK
----@type TooltipAnchorTypeKey
+--- @type TooltipAnchorTypeKey
 local TTAK
----@type ButtonFactory
+--- @type ButtonFactory
 local BF
----@type ButtonFrameFactory
+--- @type ButtonFrameFactory
 local FF
 
 local LOCK_FRAME_DESC = [[
@@ -44,16 +47,16 @@ action items.
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
-local function ConfirmAndReload() return Core.O().WidgetMixin:ConfirmAndReload() end
----@return FrameWidget
+local function ConfirmAndReload() return O.WidgetMixin:ConfirmAndReload() end
+--- @return FrameWidget
 local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
----@return Profile_Bar
+--- @return Profile_Bar
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
 
----@param applyFunction function Format: applyFuntion(ButtonUIWidget)
+--- @param applyFunction function Format: applyFuntion(ButtonUIWidget)
 local function ApplyForEachButton(applyFunction, configVal)
     BF:ApplyForEachFrames(function(frameWidget)
-        ---@param widget ButtonUIWidget
+        --- @param widget ButtonUIWidget
         frameWidget:ApplyForEachButtons(function(widget) applyFunction(widget, configVal) end)
     end)
 end
@@ -74,9 +77,9 @@ local function SetAndApplyGeneric(config, key, fallbackVal, postFunction)
     end
 end
 
----@param fallback any The fallback value
----@param key string The key value
----@param config Config The config instance
+--- @param fallback any The fallback value
+--- @param key string The key value
+--- @param config Config The config instance
 local function SetAndApply(config, key, fallback, foreachButtonFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -87,10 +90,10 @@ local function SetAndApply(config, key, fallback, foreachButtonFunction)
     end
 end
 
----@param frameIndex number
----@param key string The key value
----@param fallback any The fallback value
----@param eventNameOrFunction string | function | nil
+--- @param frameIndex number
+--- @param key string The key value
+--- @param fallback any The fallback value
+--- @param eventNameOrFunction string | function | nil
 local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
@@ -100,10 +103,10 @@ local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
     end
 end
 
----@param frameIndex number
----@param key string The key value
----@param fallback any The fallback value
----@param eventNameOrFunction string | function | nil
+--- @param frameIndex number
+--- @param key string The key value
+--- @param fallback any The fallback value
+--- @param eventNameOrFunction string | function | nil
 local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
@@ -113,9 +116,9 @@ local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction
     end
 end
 
----@param frameIndex number
----@param key string The key value
----@param fallback any The fallback value
+--- @param frameIndex number
+--- @param key string The key value
+--- @param fallback any The fallback value
 local function PGetWidget(frameIndex, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
@@ -123,7 +126,7 @@ local function PGetWidget(frameIndex, key, fallback)
     end
 end
 
----@param frameIndex number
+--- @param frameIndex number
 local function OnResetAnchor(frameIndex) return function() GetFrameWidget(frameIndex):ResetAnchor() end end
 
 local function GetFrameStateSetterHandler(frameIndex)
@@ -175,9 +178,9 @@ local function GetColSizeSetterHandler(frameIndex)
     end
 end
 
----@param config Config The config instance
----@param key string The key value
----@param fallback any The fallback value
+--- @param config Config The config instance
+--- @param key string The key value
+--- @param fallback any The fallback value
 local function PSet(config, key, fallback)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -185,9 +188,9 @@ local function PSet(config, key, fallback)
     end
 end
 
----@param config Config The config instance
----@param fallback any The fallback value
----@param key string The key value
+--- @param config Config The config instance
+--- @param fallback any The fallback value
+--- @param key string The key value
 local function PGet(config, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -195,35 +198,36 @@ local function PGet(config, key, fallback)
     end
 end
 
-local function fetchLibs()
+local function lazyInitLibs()
     P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
     PC = GC.Profile_Config_Names
     WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
     TTAK = P:GetTooltipAnchorTypeKey()
 end
+
 --[[-----------------------------------------------------------------------------
 Sequence
 -------------------------------------------------------------------------------]]
 local sp = '                                                                   '
 
----@class SequenceMixin
+--- @class SequenceMixin
 local SequenceMixin = {
 
-    ---@param self SequenceMixin
-    ---@param startingIndex number
+    --- @param self SequenceMixin
+    --- @param startingIndex number
     ["Init"] = function(self, startingIndex)
         self.order = startingIndex or 1
     end,
-    ---@param self SequenceMixin
+    --- @param self SequenceMixin
     ["get"] = function(self) return self.order  end,
-    ---@param self SequenceMixin
-    ---@param incr number An optional increment amount
+    --- @param self SequenceMixin
+    --- @param incr number An optional increment amount
     ["next"] = function(self, incr)
         self.order = self.order + (incr or 1)
         return self.order
     end,
-    ---@param self SequenceMixin
+    --- @param self SequenceMixin
     ["reset"] = function(self)
         local lastCount = self.order + 1
         self.order = 1
@@ -231,10 +235,10 @@ local SequenceMixin = {
     end
 }
 
----@param startingSequence number Optional
----@return SequenceMixin
+--- @param startingSequence number Optional
+--- @return SequenceMixin
 local function CreateSequence(startingSequence)
-    ---@type SequenceMixin
+    --- @type SequenceMixin
     return CreateAndInitFromMixin(SequenceMixin, startingSequence)
 end
 
@@ -242,23 +246,40 @@ local mainSeq = CreateSequence()
 local barSeq = CreateSequence()
 
 --[[-----------------------------------------------------------------------------
-Methods
+Properties & Methods
 -------------------------------------------------------------------------------]]
----@class Config_Methods
-local methods = {
-    ---@param self Config
-    ['OnAfterInitialize'] = function(self) fetchLibs() end,
-    ---@param self Config
-    ['OnAfterAddonLoaded'] = function(self) end,
-    ---@param self Config
-    ['GetOptions'] = function(self)
+--- @param o Config
+local function PropsAndMethods(o)
+
+    --- Call Order: Config -> Profile -> ButtonFactory
+    --- Message triggered by ActionbarPlus#OnInitializeModules
+    --- @param msg string The message name
+    function o:OnAddOnReady(msg)
+        p:log(10, '%s received.', msg)
+        lazyInitLibs()
+        assert(ns.db.profile, "Profile is not initialized.")
+        self.profile = ns.db.profile
+        self.eventHandler = K_CreateAndInitFromMixin(O.ConfigEventHandlerMixin)
+        self:Initialize()
+        self:SendMessage(GC.M.OnConfigInitialized)
+    end
+
+    --- Sets up Ace config dialog
+    function o:Initialize()
+        local db = ns.db
+        local options = self:GetOptions()
+        AceConfig:RegisterOptionsTable(ns.name, options, { GC.C.SLASH_COMMAND_OPTIONS })
+        AceConfigDialog:AddToBlizOptions(ns.name, ns.name)
+        options.args.profiles = AceDBOptions:GetOptionsTable(db)
+    end
+
+    function o:GetOptions()
         return {
             name = GC.C.ADDON_NAME, handler = self.addon, type = "group",
             args = self:CreateConfig(),
         }
-    end,
-    ---@param self Config
-    ['CreateConfig'] = function(self)
+    end
+    function o:CreateConfig()
         local configArgs = {}
 
         configArgs['general'] = self:CreateGeneralGroup()
@@ -271,9 +292,9 @@ local methods = {
 
 
         return configArgs
-    end,
-    ---@param self Config
-    ['CreateGeneralGroup'] = function(self)
+    end
+
+    function o:CreateGeneralGroup()
         return {
             type = "group",
             name = ABP_GENERAL_CONFIG_NAME,
@@ -368,13 +389,13 @@ local methods = {
                     name = ABP_GENERAL_CONFIG_TOOLTIP_NAME,
                     desc = ABP_GENERAL_CONFIG_TOOLTIP_DESC,
                     get = PGet(self, PC.tooltip_anchor_type),
-                    set = PSet(self, PC.tooltip_anchor_type),
+                    set = self:CM(PC.tooltip_anchor_type, GC.TooltipAnchor.CURSOR_TOPLEFT, GC.M.OnTooltipFrameUpdate),
                 }
             }
         }
-    end,
-    ---@param self Config
-    ['CreateDebuggingGroup'] = function(self)
+    end
+
+    function o:CreateDebuggingGroup()
         return {
             type = "group",
             name = ABP_DEBUGGING_NAME,
@@ -397,9 +418,9 @@ local methods = {
                 },
             },
         }
-    end,
-    ---@param self Config
-    ['CreateActionBarConfigs'] = function(self)
+    end
+
+    function o:CreateActionBarConfigs()
         local count = P:GetBarSize()
         local bars = {}
         for i=1,count do
@@ -408,10 +429,10 @@ local methods = {
             bars[key] = self:CreateBarConfigDef(i)
         end
         return bars
-    end,
-    ---@param self Config
-    ---@param frameIndex number
-    ['CreateBarConfigDef'] = function(self, frameIndex)
+    end
+
+    --- @param frameIndex number
+    function o:CreateBarConfigDef(frameIndex)
         local configName = format('%s #%s', ABP_ACTIONBAR_BASE_NAME, tostring(frameIndex))
         return {
             type = 'group',
@@ -556,26 +577,31 @@ local methods = {
                 }
             }
         }
-    end,
-}
+    end
+
+    --- TODO NEXT: Migrate event-base to message-base
+    --- Creates a callback function that sends a message after
+    --- @param key string The profile key to update
+    --- @param fallbackVal any The fallback value
+    --- @param message string The message to send
+    --- @return fun(_, v:any) : void The function parameter "v" is the option value selected by the user
+    --- @see ConfigEventHandlerMixin#SetConfigWithMessage
+    function o:CM(key, fallbackVal, message) return self.eventHandler:SetConfigWithMessage(key, fallbackVal, message) end
+
+end
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@type Config
+--- properties "addon" and "profile" is injected OnAfterInitialize()
+--- @return Config
 local function NewInstance()
-
-    -- profile is injected OnAfterInitialize()
-    --local properties = {
-    --    addon = nil,
-    --    profile = nil
-    --}
-
-    ---@class Config : Config_Methods
-    local _L = LibStub:NewLibrary(Core.M.Config)
-
-    Mixin:Mixin(_L, methods)
-    return _L
+    --- @type Config
+    local L = LibStub:NewLibrary(ns.M.Config); if not L then return end
+    AceEvent:Embed(L)
+    PropsAndMethods(L)
+    L:RegisterMessage(M.OnAddOnReady, function(evt, ...) L:OnAddOnReady(evt, ...) end)
+    return L
 end
 
 NewInstance()

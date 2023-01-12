@@ -17,7 +17,7 @@ local P, LogFactory, Table = O.Profile, O.LogFactory, O.Table
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
----@class MacroEventsHandler
+--- @class MacroEventsHandler
 local _L = LibStub:NewLibrary(Core.M.MacroEventsHandler)
 local p = LogFactory(Core.M.MacroEventsHandler)
 
@@ -25,8 +25,8 @@ local p = LogFactory(Core.M.MacroEventsHandler)
 Support Functions
 -------------------------------------------------------------------------------]]
 ---### Find first-matching macro by body
----@return MacroDetails
----@param matchingBody string The macro body to match
+--- @return MacroDetails
+--- @param matchingBody string The macro body to match
 local function findMacroByBody(matchingBody)
     -- Global Macros Max: 120
     -- Per Character Max: 18  [Index starts at 121]
@@ -36,7 +36,7 @@ local function findMacroByBody(matchingBody)
 
     local globalCount, perCharCount = GetNumMacros()
     if globalCount <= 0 then return nil end
-    ---@class MacroDetails
+    --- @class MacroDetails
     local macroDetails = {}
     for macroIndex = globalMacroStartIndex, globalCount do
         local name, icon, body = GetMacroInfo(macroIndex)
@@ -154,7 +154,7 @@ end
 ---1. Macro UI Updates
 ---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
-
+    --- todo next: move to ActionbarPlusEventMixin
     if event == E.PLAYER_ENTERING_WORLD then
         _L:log(10, event)
         frame:RegisterEvent('UPDATE_MACROS')

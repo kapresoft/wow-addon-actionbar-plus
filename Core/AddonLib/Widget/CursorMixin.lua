@@ -8,25 +8,24 @@ local IsBlank = O.String.IsBlank
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class CursorMixin
-local L = LibStub:NewLibrary(Core.M.CursorMixin)
----@type LoggerTemplate
+--- @class CursorMixin : BaseLibraryObject
+local L = LibStub:NewLibrary(Core.M.CursorMixin); if not L then return end
 local p = L:GetLogger()
 
 -- Add to Modules.lua
 --CursorMixin = 'CursorMixin',
 --
------@type CursorMixin
+----- @type CursorMixin
 --CursorMixin = {},
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param cursorInfo CursorInfo
+--- @param cursorInfo CursorInfo
 function L:Init(cursorInfo)
     self.cursorInfo = cursorInfo
 end
----@return boolean
+--- @return boolean
 function L:IsValid()
     if not self.cursorInfo or IsBlank(self.cursorInfo.type) then
         p:log(20, 'Received drag event with invalid cursor info. Skipping...')
@@ -37,14 +36,8 @@ function L:IsValid()
     p:log(20, 'Cursor is valid: %s', self.cursorInfo)
     return true
 end
----@return string
+--- @return string
 function L:GetType() return self.cursorInfo.type end
----@return CursorInfo
+--- @return CursorInfo
 function L:GetCursor() return self.cursorInfo end
 
----@return CursorUtil
-function ns:CreateCursorUtil()
-    ---@class CursorUtil : CursorMixin
-    local c = K_CreateAndInitFromMixin(L, O.API:GetCursorInfo())
-    return c
-end

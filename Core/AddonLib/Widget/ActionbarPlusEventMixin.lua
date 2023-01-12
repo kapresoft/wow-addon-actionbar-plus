@@ -9,10 +9,9 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-local O, Core, LibStub = ns:LibPack()
+local O, LibStub, ns = ABP_LibPack(...)
 local BaseAPI, API, GC = O.BaseAPI, O.API, O.GlobalConstants
-local E, UnitId = GC.E, GC.UnitId
+local E, M, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI
 local AceEvent = O.AceLibFactory:A().AceEvent
 local CURSOR_ITEM_TYPE = 1
@@ -20,44 +19,43 @@ local CURSOR_ITEM_TYPE = 1
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
----@class EventFrameInterface : _Frame
+--- @class EventFrameInterface : _Frame
 local EventsFrameInterface = {
-    ---@type EventFrameWidgetInterface
+    --- @type EventFrameWidgetInterface
     widget = {}
 }
 
----@class EventFrameWidgetInterface
+--- @class EventFrameWidgetInterface
 local EventFrameWidgetInterface = {
-    ---@type EventFrameInterface
+    --- @type EventFrameInterface
     frame = {},
-    ---@type ActionbarPlus
+    --- @type ActionbarPlus
     addon = {},
-    ---@type ButtonFactory
+    --- @type ButtonFactory
     buttonFactory = {},
-    ---@type WidgetMixin
+    --- @type WidgetMixin
     widgetMixin = {},
 }
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class ActionbarPlusEventMixin
-local L = LibStub:NewLibrary(Core.M.ActionbarPlusEventMixin)
----@type LoggerTemplate
+--- @class ActionbarPlusEventMixin : BaseLibraryObject_WithAceEvent
+local L = LibStub:NewLibrary(ns.M.ActionbarPlusEventMixin)
+AceEvent:Embed(L)
 local p = L:GetLogger()
 
-AceEvent:RegisterMessage(E.AddonMessage_OnAfterInitialize, function(evt, ...)
-    ---@type ActionbarPlus
-    local addon = ...
-    p:log(30, 'RegisterMessage: %s called...', evt)
-    addon.addonEvents:RegisterEvents()
+--- @param abp ActionbarPlus
+L:RegisterMessage(M.OnAddOnInitialized, function(msg, abp)
+    p:log(10, 'RegisterMessage: %s received...', msg)
+    abp.addonEvents:RegisterEvents()
 end)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnPlayerCombatEvent(f, event, ...)
     -- p:log(40, 'Event[%s] received...', event)
     if E.PLAYER_REGEN_ENABLED == event then
@@ -69,8 +67,8 @@ local function OnPlayerCombatEvent(f, event, ...)
     C_Timer.After(2, function() f.widget.buttonFactory:Fire(E.OnUpdateItemStates) end)
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
     local addon = f.widget.addon
@@ -78,8 +76,8 @@ local function OnUpdateBindings(f, event, ...)
     if addon.barBindings then f.widget.buttonFactory:UpdateKeybindText() end
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnPetBattleEvent(f, event, ...)
     if E.PET_BATTLE_OPENING_START == event then
         f.widget.buttonFactory:Fire(E.OnActionbarHideGroup)
@@ -88,8 +86,8 @@ local function OnPetBattleEvent(f, event, ...)
     f.widget.buttonFactory:Fire(E.OnActionbarShowGroup)
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnVehicleEvent(f, event, ...)
     local unitTarget = ...
     if UnitId.player ~= unitTarget then return end
@@ -100,8 +98,8 @@ local function OnVehicleEvent(f, event, ...)
     f.widget.buttonFactory:Fire(E.OnActionbarShowGroup)
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnActionbarGrid(f, event, ...)
     if E.ACTIONBAR_SHOWGRID == event then
         f.widget.buttonFactory:Fire(E.OnActionbarShowGrid)
@@ -111,8 +109,8 @@ local function OnActionbarGrid(f, event, ...)
 end
 
 --- See Also: [https://wowpedia.fandom.com/wiki/CURSOR_CHANGED](https://wowpedia.fandom.com/wiki/CURSOR_CHANGED)
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnCursorChangeInBags(f, event, ...)
     local isDefault, newCursorType, oldCursorType, oldCursorVirtualID = ...
     --p:log(40, 'OnCursorChangeInBags: isDefault: %s new=%s old=%s', isDefault, newCursorType, oldCursorType)
@@ -134,9 +132,9 @@ local function OnSpellCastStart(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
     local w = f.widget
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param btnWidget ButtonUIWidget
+        --- @param btnWidget ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btnWidget) btnWidget:SetHighlightInUse() end)
     end)
@@ -149,9 +147,9 @@ local function OnSpellCastStop(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     p:log(50, 'OnSpellCastStop: %s', spellCastEvent)
     local w = f.widget
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param btn ButtonUIWidget
+        --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btn) btn:ResetHighlight() end)
     end)
@@ -164,9 +162,9 @@ local function OnSpellCastFailed(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     --p:log(50, 'OnSpellCastFailed: %s', spellCastEvent)
     local w = f.widget
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param btn ButtonUIWidget
+        --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btn) btn:SetButtonStateNormal() end)
     end)
@@ -174,21 +172,21 @@ end
 
 --- This handles 3-state spells like mage blizzard, hunter flares,
 --- or basic campfire in retail
----@param f EventFrameInterface
+--- @param f EventFrameInterface
 local function OnSpellCastSent(f, ...)
     local spellCastSentEvent = B:ParseSpellCastSentEventArgs(...)
     if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
     local w = f.widget
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param btn ButtonUIWidget
+        --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastSentEvent.spellID,
                 function(btn) btn:SetButtonStateNormal() end)
     end)
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnActionbarEvents(f, event, ...)
     --p:log('e[%s]: %s', event, {...})
     if E.UNIT_SPELLCAST_START == event then
@@ -205,11 +203,11 @@ local function OnActionbarEvents(f, event, ...)
     end
 end
 
----@param eventWidget EventFrameWidgetInterface
+--- @param eventWidget EventFrameWidgetInterface
 local function OnStealth(eventWidget)
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param bw ButtonUIWidget
+        --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:GetButtonData():IsStealthSpell() end,
                 function(bw)
@@ -220,11 +218,11 @@ local function OnStealth(eventWidget)
     end)
 end
 
----@param eventWidget EventFrameWidgetInterface
+--- @param eventWidget EventFrameWidgetInterface
 local function OnShapeShift(eventWidget)
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param bw ButtonUIWidget
+        --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:GetButtonData():IsShapeshiftSpell() end,
                 function(bw)
@@ -235,11 +233,11 @@ local function OnShapeShift(eventWidget)
     end)
 end
 
----@param eventWidget EventFrameWidgetInterface
+--- @param eventWidget EventFrameWidgetInterface
 local function OnStealthIconUpdate(eventWidget)
-    ---@param fw FrameWidget
+    --- @param fw FrameWidget
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        ---@param bw ButtonUIWidget
+        --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:GetButtonData():IsStealthSpell() end,
                 function(bw)
@@ -251,8 +249,8 @@ local function OnStealthIconUpdate(eventWidget)
 end
 
 --- Sequence is UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM; for this reason
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnShapeshiftOrStealthEvent(f, event, ...)
     local eventWidget = f.widget
     if E.UPDATE_STEALTH == event then
@@ -262,8 +260,8 @@ local function OnShapeshiftOrStealthEvent(f, event, ...)
     end
 end
 
----@param f EventFrameInterface
----@param event string
+--- @param f EventFrameInterface
+--- @param event string
 local function OnPlayerEnteringWorld(f, event, ...)
     OnStealthIconUpdate(f.widget)
 end
@@ -271,22 +269,22 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param addon ActionbarPlus
+--- @param addon ActionbarPlus
 function L:Init(addon)
     self.addon = addon
     self.buttonFactory = O.ButtonFactory
     self.widgetMixin = O.WidgetMixin
 end
 
----@return EventFrameInterface
+--- @return EventFrameInterface
 function L:CreateEventFrame()
     local f = CreateFrame("Frame", nil, self.addon.frame)
     f.widget = self:CreateWidget(f)
     return f
 end
 
----@param eventFrame _Frame
----@return EventFrameWidgetInterface
+--- @param eventFrame _Frame
+--- @return EventFrameWidgetInterface
 function L:CreateWidget(eventFrame)
     local widget = {
         frame = eventFrame,
