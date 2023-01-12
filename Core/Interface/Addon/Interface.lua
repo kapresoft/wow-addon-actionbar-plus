@@ -1,10 +1,56 @@
 -- Addon Interface Types for EmmyLua
 -- This file does not need to be included in _Common.xml
+--[[-----------------------------------------------------------------------------
+ActionbarPlus_AceDB
+-------------------------------------------------------------------------------]]
+--- @class ActionbarPlus_AceDB
+local _db = {
+    --- @type Profile_Global_Config
+    global = {},
+    ----- @type Profile_Config
+    profile = {},
+}
+
+--[[-----------------------------------------------------------------------------
+Namespace
+-------------------------------------------------------------------------------]]
+--- @class Namespace : LibPackMixin
+local Namespace = {
+    --- @type string
+    name = "",
+    --- @type GlobalObjects
+    O = {},
+    --- @type ActionbarPlus_AceDB,
+    db = {},
+    --- @type Core
+    Core = {},
+    --- @type Module
+    M = {},
+
+    --- @type LocalLibStub
+    LibStub = {},
+
+    --- Used in TooltipFrame and BaseAttributeSetter to coordinate the GameTooltip Anchor
+    --- @see TooltipAnchor#SCREEN_* vars
+    --- @type string
+    GameTooltipAnchor = "",
+}
+
+--- @class CursorUtil : CursorMixin
+local CursorUtil = {}
+
+--[[-----------------------------------------------------------------------------
+ActionbarPlus
+-------------------------------------------------------------------------------]]
+--- @class ActionbarPlusProperties
+local ActionbarPlusProperties = { }
+ActionbarPlusProperties.db = _db
+
 
 --[[-----------------------------------------------------------------------------
 Profile
 -------------------------------------------------------------------------------]]
----@class Profile_Spell
+--- @class Profile_Spell
 local Profile_Spell = {
     ["minRange"] = 0,
     ["id"] = 8232,
@@ -16,7 +62,7 @@ local Profile_Spell = {
     ["icon"] = 136018,
     ["rank"] = "Rank 1"
 }
----@class Profile_Item
+--- @class Profile_Item
 local Profile_Item = {
     ["name"] = "Arcane Powder",
     ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
@@ -25,7 +71,7 @@ local Profile_Item = {
     ["icon"] = 133848,
     ["count"] = 40,
 }
----@class Profile_Macro
+--- @class Profile_Macro
 local Profile_Macro = {
     ["type"] = "macro",
     ["index"] = 41,
@@ -33,9 +79,9 @@ local Profile_Macro = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
----@class Profile_Mount_Spell
+--- @class Profile_Mount_Spell
 local Profile_Mount_Spell = { id = 1, icon = 123 }
----@class Profile_Mount
+--- @class Profile_Mount
 local Profile_Mount = {
     type = 'mount',
     id = -1,
@@ -43,9 +89,9 @@ local Profile_Mount = {
     name = 'Reawakened Phase Hunter',
     spell = Profile_Mount_Spell,
 }
----@class Profile_Companion_Spell
+--- @class Profile_Companion_Spell
 local Profile_Companion_Spell = { id = 1, icon = 123 }
----@class Profile_Companion
+--- @class Profile_Companion
 local Profile_Companion = {
     type = 'companion',
     petType = 'critter',
@@ -55,7 +101,7 @@ local Profile_Companion = {
     name = 'Black Kingsnake',
     spell = Profile_Companion_Spell,
 }
----@class Profile_BattlePet
+--- @class Profile_BattlePet
 local Profile_BattlePet = {
     type='battlepet',
     petType = -1,
@@ -66,7 +112,7 @@ local Profile_BattlePet = {
     ['icon'] = 3038273,
 }
 
----@class Profile_Button
+--- @class Profile_Button
 local Profile_Button = {
     ['type'] = 'spell',
     ["spell"] = Profile_Spell,
@@ -76,7 +122,7 @@ local Profile_Button = {
     ["companion"] = Profile_Companion,
 }
 
----@class Profile_Bar_Widget
+--- @class Profile_Bar_Widget
 local Profile_Bar_Widget = {
     ["rowSize"] = 1,
     ["colSize"] = 1,
@@ -88,7 +134,7 @@ local Profile_Bar_Widget = {
 }
 
 
----@class Profile_Bar
+--- @class Profile_Bar
 local Profile_Bar = {
     -- show/hide the actionbar frame
     ["enabled"] = false,
@@ -100,20 +146,20 @@ local Profile_Bar = {
     --TODO next: show_keybind_text should be in Profile_Bar_Widget properties
     ["show_keybind_text"] = true,
     ["widget"] = Profile_Bar_Widget,
-    ---@type _RegionAnchor
+    --- @type _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = Profile_Button
     }
 }
 
----@class Global_Profile_Bar
+--- @class Global_Profile_Bar
 local Global_Profile_Bar = {
-    ---@type _RegionAnchor
+    --- @type _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
 }
 
----@class Profile_Global_Config
+--- @class Profile_Global_Config
 local Profile_Global_Config = {
     ["bars"] = {
         ["ActionbarPlusF1"] = Global_Profile_Bar,
@@ -127,7 +173,7 @@ local Profile_Global_Config = {
     }
 }
 
----@class Profile_Config
+--- @class Profile_Config
 local Profile_Data = {
     ["lock_actionbars"] = false,
     ["hide_when_taxi"] = true,
@@ -153,7 +199,21 @@ local Profile_Data = {
     }
 }
 
----@class Spellcast_Event_Data
+--- @class Spellcast_Event_Data
 local SpellcastSent_Data = {
     unit='unit', target='target', castGUID='castGUID', spellID=12345
 }
+
+--[[-----------------------------------------------------------------------------
+Config
+-------------------------------------------------------------------------------]]
+--- @class Config : BaseLibraryObject_Initialized_WithAceEvent
+local _Config_Interface = {
+    --- @type ActionbarPlus
+    addon = {},
+    --- @type Profile
+    profile = {},
+    --- @type ConfigEventHandlerMixin
+    eventHandler = {},
+}
+

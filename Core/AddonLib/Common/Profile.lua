@@ -6,12 +6,11 @@ local type, pairs, tostring = type, pairs, tostring
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local M, GC = Core.M, O.GlobalConstants
-
+local O, LibStub, ns = ABP_LibPack(...)
+local GC, Ace = O.GlobalConstants, O.AceLibrary
+local M = GC.M
 local Table, Assert = O.Table, O.Assert
-
-local WAttr = GC.WidgetAttributes
+local AceEvent, WAttr = Ace.AceEvent, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
@@ -21,47 +20,20 @@ local FrameDetails = PI:GetAllActionBarSizeDetails()
 
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
----@class Profile
-local P = LibStub:NewLibrary(M.Profile)
-
--- Implicit
--- self.adddon = ActionBarPlus
--- self.profile = profile
-
----@deprecated Use ProfileInitializer
-P.baseFrameName = 'ActionbarPlusF'
-
-
----@type LoggerTemplate
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+--- @class Profile : BaseLibraryObject_WithAceEvent
+local P = LibStub:NewLibrary(ns.M.Profile); if not P then return end
+AceEvent:Embed(P)
 local p = P:GetLogger()
-
----@type Profile
-ABP_Profile = P
-
-if not P then return end
-
----- ## Start Here ----
-
------These are the config names used by the UI
------@seexx Config.lua
------@classxx Profile_ConfigNames
---local ConfigNames = {
---    ---@deprecated lock_actionbars is to be removed
---    ['lock_actionbars'] = 'lock_actionbars',
---    ['character_specific_anchors'] = 'character_specific_anchors',
---    ['hide_when_taxi'] = 'hide_when_taxi',
---    ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
---    ['hide_text_on_small_buttons'] = 'hide_text_on_small_buttons',
---    ['hide_countdown_numbers'] = 'hide_countdown_numbers',
---    ['tooltip_visibility_key'] = 'tooltip_visibility_key',
---    ['tooltip_visibility_combat_override_key'] = 'tooltip_visibility_combat_override_key',
---    ['show_button_index'] = 'show_button_index',
---    ['show_keybind_text'] = 'show_keybind_text',
---}
 
 local ConfigNames = GC.Profile_Config_Names
 
----@class TooltipKeyName
+--[[-----------------------------------------------------------------------------
+Interface Definition
+-------------------------------------------------------------------------------]]
+--- @class TooltipKeyName
 local TooltipKeyName = {
     ['SHOW'] = '',
     ['ALT'] = 'alt',
@@ -70,7 +42,7 @@ local TooltipKeyName = {
     ['HIDE'] = 'hide',
 }
 
----@class TooltipKey
+--- @class TooltipKey
 local TooltipKey = {
     names = TooltipKeyName,
     sorting = {
@@ -85,8 +57,8 @@ local TooltipKey = {
     }
 }
 
----@class TooltipAnchorTypeKey
----@see Config
+--- @class TooltipAnchorTypeKey
+--- @see Config
 local TooltipAnchorTypeKey = {
     names = GC.TooltipAnchor,
     sorting = {
@@ -111,8 +83,8 @@ local TooltipAnchorTypeKey = {
 Support Functions
 -------------------------------------------------------------------------------]]
 
----@param source _RegionAnchor
----@param dest _RegionAnchor
+--- @param source _RegionAnchor
+--- @param dest _RegionAnchor
 local function CopyAnchor(source, dest)
     dest.point = source.point
     dest.relativeTo = source.relativeTo
@@ -121,7 +93,7 @@ local function CopyAnchor(source, dest)
     dest.y = source.y
 end
 
----@return Profile_Button
+--- @return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
     if not barData then return end
@@ -134,7 +106,7 @@ function P:GetButtonData(frameIndex, buttonName)
     return buttons[buttonName]
 end
 
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 function P:ResetButtonData(widget)
     local btnData = widget:GetConfig()
     for _, a in ipairs(ActionType) do btnData[a] = {} end
@@ -143,10 +115,6 @@ end
 
 function P:CreateDefaultProfile(profileName)
     return PI:InitNewProfile(profileName)
-end
-
-function P:OnAfterInitialize()
-    -- do nothing for now
 end
 
 function P:CreateBarsTemplate()
@@ -162,11 +130,11 @@ function P:CreateBarsTemplate()
     return bars
 end
 
----@return Profile_Config
-function P:P() return self.profile  end
----@return Profile_Global_Config
+--- @return Profile_Config
+function P:P() return ns.db.profile  end
+--- @return Profile_Global_Config
 function P:G()
-    local g = self.addon.db.global
+    local g = ns.db.global
     --g.bars = nil
     if Table.isNotTable(g.bars) then
         --p:log('G()| here')
@@ -176,7 +144,7 @@ function P:G()
 end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
----@return Profile_Bar
+--- @return Profile_Bar
 function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 
@@ -192,7 +160,7 @@ function P:GetBar(frameIndex)
 end
 
 function P:GetBars()
-    return self.profile.bars
+    return ns.db.profile.bars
 end
 
 function P:GetBarSize()
@@ -201,27 +169,27 @@ function P:GetBarSize()
     return tsize(bars)
 end
 
----@param frameIndex number The frame index number
----@param isEnabled boolean The enabled state
+--- @param frameIndex number The frame index number
+--- @param isEnabled boolean The enabled state
 function P:SetBarEnabledState(frameIndex, isEnabled)
     local bar = self:GetBar(frameIndex)
     bar.enabled = isEnabled
 end
 
----@param frameIndex number The frame index number
+--- @param frameIndex number The frame index number
 function P:IsBarEnabled(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar.enabled
 end
 
----@param frameIndex number The frame index number
+--- @param frameIndex number The frame index number
 function P:GetBarLockValue(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar.locked or ''
 end
 
----@param frameIndex number The frame index number
----@param value string Allowed values are "always", "in-combat", or nil
+--- @param frameIndex number The frame index number
+--- @param value string Allowed values are "always", "in-combat", or nil
 function P:SetBarLockValue(frameIndex, value)
     local bar = self:GetBar(frameIndex)
     local valueLower = string.lower(value or '')
@@ -237,21 +205,21 @@ function P:IsCharacterSpecificAnchor()
     return true == self.profile[ConfigNames.character_specific_anchors]
 end
 
----@param frameIndex number
----@return _RegionAnchor
+--- @param frameIndex number
+--- @return _RegionAnchor
 function P:GetAnchor(frameIndex)
     if self:IsCharacterSpecificAnchor() then return self:GetCharacterSpecificAnchor(frameIndex) end
     --p:log('GetAnchor| Is global anchor')
     return self:GetGlobalAnchor(frameIndex)
 end
 
----@param frameIndex number
----@return _RegionAnchor
+--- @param frameIndex number
+--- @return _RegionAnchor
 function P:GetGlobalAnchor(frameIndex)
-    ---@type Global_Profile_Bar
+    --- @type Global_Profile_Bar
     local g = self:G()
     local fn = P:GetFrameNameByIndex(frameIndex)
-    ---@type Profile_Global_Config
+    --- @type Profile_Global_Config
     local buttonConf = g.bars[fn]
     if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, fn) end
     if Table.isEmpty(buttonConf.anchor) then
@@ -260,12 +228,12 @@ function P:GetGlobalAnchor(frameIndex)
     return buttonConf.anchor
 end
 
----@param frameIndex number
----@return _RegionAnchor
+--- @param frameIndex number
+--- @return _RegionAnchor
 function P:GetCharacterSpecificAnchor(frameIndex) return self:GetBar(frameIndex).anchor end
 
----@param frameAnchor _RegionAnchor
----@param frameIndex number
+--- @param frameAnchor _RegionAnchor
+--- @param frameIndex number
 function P:SaveAnchor(frameAnchor, frameIndex)
     -- always sync the character specific settings
     self:SaveCharacterSpecificAnchor(frameAnchor, frameIndex)
@@ -275,23 +243,23 @@ function P:SaveAnchor(frameAnchor, frameIndex)
     end
 end
 
----@param frameIndex number
----@return Global_Profile_Bar
+--- @param frameIndex number
+--- @return Global_Profile_Bar
 function P:GetGlobalBar(frameIndex)
     local frameName = self:GetFrameNameByIndex(frameIndex)
     return frameIndex and self:G().bars[frameName]
 end
 
 --- Global
----@param frameAnchor _RegionAnchor
----@param frameIndex number
+--- @param frameAnchor _RegionAnchor
+--- @param frameIndex number
 function P:SaveGlobalAnchor(frameAnchor, frameIndex)
     local globalBarConf = self:GetGlobalBar(frameIndex)
     CopyAnchor(frameAnchor, globalBarConf.anchor)
 end
 
----@param frameAnchor _RegionAnchor
----@param frameIndex number
+--- @param frameAnchor _RegionAnchor
+--- @param frameIndex number
 function P:SaveCharacterSpecificAnchor(frameAnchor, frameIndex)
     local barProfile = self:GetBar(frameIndex)
     CopyAnchor(frameAnchor, barProfile.anchor)
@@ -310,31 +278,31 @@ function P:IsBarNameEnabled(frameName)
     return bar.enabled
 end
 
----@param frameIndex number The frame index number
----@param isEnabled boolean The enabled state
+--- @param frameIndex number The frame index number
+--- @param isEnabled boolean The enabled state
 function P:SetShowIndex(frameIndex, isEnabled)
     self:GetBar(frameIndex).show_button_index = (isEnabled == true)
 end
 
----@param frameIndex number The frame index number
----@param isEnabled boolean The enabled state
+--- @param frameIndex number The frame index number
+--- @param isEnabled boolean The enabled state
 function P:SetShowKeybindText(frameIndex, isEnabled)
     self:GetBar(frameIndex).show_keybind_text = (isEnabled == true)
 end
 
----@param frameIndex number The frame index number
----@return boolean
+--- @param frameIndex number The frame index number
+--- @return boolean
 function P:IsShowIndex(frameIndex) return self:GetBar(frameIndex).show_button_index == true end
 
----@param frameIndex number The frame index number
+--- @param frameIndex number The frame index number
 function P:IsShowKeybindText(frameIndex) return self:GetBar(frameIndex).show_keybind_text == true end
 
----@param frameIndex number The frame index number
+--- @param frameIndex number The frame index number
 function P:IsShowEmptyButtons(frameIndex) return self:GetBar(frameIndex).widget.show_empty_buttons == true end
 
 function P:GetFrameNameByIndex(frameIndex) return PI:GetFrameNameByIndex(frameIndex) end
 
----@return FrameWidget
+--- @return FrameWidget
 function P:GetFrameWidgetByIndex(frameIndex) return _G[self:GetFrameNameByIndex(frameIndex)].widget end
 
 function P:GetMaxFrames() return #FrameDetails end
@@ -349,7 +317,7 @@ function P:GetAllFrameNames()
     return fnames
 end
 
----@return table
+--- @return table
 function P:GetAllFrameWidgets()
     local fnames = {}
     for i=1, self:GetMaxFrames() do
@@ -390,7 +358,7 @@ end
 --- The number of buttons do not reflect how many buttons actually exist because
 --- the addon doesn't cleanup old data.
 -- TODO: Should we cleanup old config?
----@param btnType string spell, macro, item
+--- @param btnType string spell, macro, item
 function P:FindButtonsByType(btnType)
     local buttons = {}
     for _, bar in pairs(self:GetBars()) do
@@ -414,8 +382,8 @@ function P:GetActionBarSizeDetailsByIndex(frameIndex)
     return FrameDetails[frameIndex]
 end
 
----@deprecated No longer being used in preference of ActionBars / Pick Up Action Key
----@return boolean True if the action bar is locked
+--- @deprecated No longer being used in preference of ActionBars / Pick Up Action Key
+--- @return boolean True if the action bar is locked
 function P:IsLockActionBars()
     return self.profile[ConfigNames.lock_actionbars] == true
 end
@@ -424,18 +392,30 @@ function P:IsHideWhenTaxi()
     return self.profile[ConfigNames.hide_when_taxi] == true
 end
 
----@param anchorType string
----@see TooltipAnchor
+--- @param anchorType string
+--- @see TooltipAnchor
 function P:SetTooltipAnchorType(anchorType) self.profile[ConfigNames.tooltip_anchor_type] = anchorType end
----@see TooltipAnchor
----@return string One of TooltipAnchor values
+--- @see TooltipAnchor
+--- @return string One of TooltipAnchor values
 function P:GetTooltipAnchorType() return self.profile[ConfigNames.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPRIGHT end
 
----@return Profile_Config_Names
+--- @return Profile_Config_Names
 function P:GetConfigNames() return ConfigNames end
 
----@return TooltipKey
+--- @return TooltipKey
 function P:GetTooltipKey() return TooltipKey end
 
----@return TooltipAnchorTypeKey
+--- @return TooltipAnchorTypeKey
 function P:GetTooltipAnchorTypeKey() return TooltipAnchorTypeKey end
+
+--[[-----------------------------------------------------------------------------
+Listen to Message
+-------------------------------------------------------------------------------]]
+P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
+    p:log(10, '%s received..', msg)
+    P.profile = ns.db.profile
+end)
+--[[-----------------------------------------------------------------------------
+Global Variable
+-------------------------------------------------------------------------------]]
+ABP_Profile = P

@@ -1,7 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Modules
 -------------------------------------------------------------------------------]]
----@class Modules
+local addon, ns = ...
+
+--- @class Modules
 local L = {
     mt = {
         __tostring = function() return 'Modules' end
@@ -9,7 +11,7 @@ local L = {
 }
 setmetatable(L, L.mt)
 
----@class Module
+--- @class Module
 local M = {
     Core = 'Core',
     LibStub = 'LibStub',
@@ -26,7 +28,9 @@ local M = {
     ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
     ActionType = 'ActionType',
     Assert = 'Assert',
+    --- @deprecated Use AceLibrary
     AceLibFactory = 'AceLibFactory',
+    AceLibrary = 'AceLibrary',
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',
@@ -44,6 +48,7 @@ local M = {
     CompanionDragEventHandler = 'CompanionDragEventHandler',
     CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
+    ConfigEventHandlerMixin = 'ConfigEventHandlerMixin',
     DruidAPI = 'DruidAPI',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
@@ -69,113 +74,119 @@ local M = {
     WidgetMixin = 'WidgetMixin',
 }
 
----@class GlobalObjects
+--- @class GlobalObjects
 local GlobalObjectsTemplate = {
-    ---@type Core,
+    --- @type Core,
     Core = {},
-    ---@type LocalLibStub
+    --- @type LocalLibStub
     LibStub = {},
 
-    ---@type BaseAPI
+    --- @type BaseAPI
     BaseAPI = {},
-    ---@type API
+    --- @type API
     API = {},
-    ---@type AceLibFactory
+    --- @deprecated Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
+    --- @type AceLibFactory
     AceLibFactory = {},
-    ---@type ActionbarPlusEventMixin
+    --- @type Kapresoft_LibUtil_AceLibraryObjects
+    AceLibrary = {},
+    --- @type ActionbarPlusEventMixin
     ActionbarPlusEventMixin = {},
-    ---@type ActionType
+    --- @type ActionType
     ActionType = {},
-    ---@type Kapresoft_LibUtil_Assert
+    --- @type Kapresoft_LibUtil_Assert
     Assert = {},
-    ---@type BaseAttributeSetter
+    --- @type BaseAttributeSetter
     BaseAttributeSetter = {},
-    ---@type ButtonData
+    --- @type ButtonData
     ButtonData = {},
-    ---@type ButtonFactory
+    --- @type ButtonFactory
     ButtonFactory = {},
-    ---@type ButtonFrameFactory
+    --- @type ButtonFrameFactory
     ButtonFrameFactory = {},
-    ---@type ButtonMixin
+    --- @type ButtonMixin
     ButtonMixin = {},
-    ---@type ButtonProfileMixin
+    --- @type ButtonProfileMixin
     ButtonProfileMixin = {},
-    ---@type ButtonUI
+    --- @type ButtonUI
     ButtonUI = {},
-    ---@type ButtonUIWidgetBuilder
+    --- @type ButtonUIWidgetBuilder
     ButtonUIWidgetBuilder = {},
-    ---@type Config
+    --- @type Config
     Config = {},
-    ---@type FrameHandleMixin
+    --- @type ConfigEventHandlerMixin
+    ConfigEventHandlerMixin = {},
+    --- @type FrameHandleMixin
     FrameHandleMixin = {},
-    ---@type GlobalConstants
+    --- @type GlobalConstants
     GlobalConstants = {},
-    ---@type Kapresoft_LibUtil_Incrementer
+    --- @type Kapresoft_LibUtil_Incrementer
     Incrementer = {},
-    ---@type ItemAttributeSetter
+    --- @type ItemAttributeSetter
     ItemAttributeSetter = {},
-    ---@type ItemDragEventHandler
+    --- @type ItemDragEventHandler
     ItemDragEventHandler = {},
-    ---@type LocalizationUtil
+    --- @type LocalizationUtil
     LocalizationUtil = {},
-    ---@type LogFactory
+    --- @type LogFactory
     LogFactory = {},
-    ---@type Logger
+    --- @type Logger
     Logger = {},
-    ---@type Kapresoft_LibUtil_LuaEvaluator,
+    --- @type Kapresoft_LibUtil_LuaEvaluator,
     LuaEvaluator = {},
-    ---@type MacroAttributeSetter
+    --- @type MacroAttributeSetter
     MacroAttributeSetter = {},
-    ---@type MacroDragEventHandler
+    --- @type MacroDragEventHandler
     MacroDragEventHandler = {},
-    ---@type MacroEventsHandler
+    --- @type MacroEventsHandler
     MacroEventsHandler = {},
-    ---@type MacroTextureDialog
+    --- @type MacroTextureDialog
     MacroTextureDialog = {},
-    ---@type MacrotextAttributeSetter
+    --- @type MacrotextAttributeSetter
     MacrotextAttributeSetter = {},
-    ---@type Modules
+    --- @type Modules
     Modules = {},
-    ---@type MountDragEventHandler
+    --- @type MountDragEventHandler
     MountDragEventHandler = {},
-    ---@type BattlePetDragEventHandler
+    --- @type BattlePetDragEventHandler
     BattlePetDragEventHandler = {},
-    ---@type BattlePetAttributeSetter
+    --- @type BattlePetAttributeSetter
     BattlePetAttributeSetter = {},
-    ---@type CompanionDragEventHandler
+    --- @type CompanionDragEventHandler
     CompanionDragEventHandler = {},
-    ---@type CompanionAttributeSetter
+    --- @type CompanionAttributeSetter
     CompanionAttributeSetter = {},
-    -----@type DruidAPI
+    ----- @type DruidAPI
     DruidAPI = {},
-    ---@type MountAttributeSetter
+    --- @type MountAttributeSetter
     MountAttributeSetter = {},
-    ---@type Kapresoft_LibUtil_Mixin
+    --- @type Kapresoft_LibUtil_Mixin
     Mixin = {},
-    ---@type PickupHandler
+    --- @type PickupHandler
     PickupHandler = {},
-    ---@type PopupDebugDialog
+    --- @type PopupDebugDialog
     PopupDebugDialog = {},
-    ---@type Profile
+    --- @type Profile
     Profile = {},
-    ---@type ProfileInitializer
+    --- @type ProfileInitializer
     ProfileInitializer = {},
-    ---@type ReceiveDragEventHandler
+    --- @type ReceiveDragEventHandler
     ReceiveDragEventHandler = {},
-    ---@type RogueAPI
+    --- @type RogueAPI
     RogueAPI = {},
-    ---@type SpellAttributeSetter
+    --- @type SpellAttributeSetter
     SpellAttributeSetter = {},
-    ---@type SpellDragEventHandler
+    --- @type SpellDragEventHandler
     SpellDragEventHandler = {},
-    ---@type Kapresoft_LibUtil_String
+    --- @type Kapresoft_LibUtil_String
     String = {},
-    ---@type Kapresoft_LibUtil_Table
+    --- @type Kapresoft_LibUtil_Table
     Table = {},
-    ---@type WidgetMixin
+    --- @type WidgetMixin
     WidgetMixin = {},
 }
 L.M = M
+ns.M = M
 
----@type Modules
+--- @type Modules
 ABP_Modules = L

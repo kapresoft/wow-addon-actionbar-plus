@@ -1,6 +1,5 @@
 -- ## External -------------------------------------------------
 local format = string.format
-
 local LibStub = LibStub
 
 -- ## Local ----------------------------------------------------
@@ -18,7 +17,7 @@ local Modules = ABP_Modules
 -- ## ----------------------------------------------------------
 
 ---Version Format: ActionbarPlus-[LibName]-1.0, Example: LibStub('ActionbarPlus-Logger-1.0')
----@class LocalLibStub
+--- @class LocalLibStub
 local _S = {
     shortName = shortName,
     globalVarPrefix = globalVarPrefix,
@@ -26,7 +25,7 @@ local _S = {
     versionFormat = versionFormat,
     M = Modules.M,
 }
----@type LocalLibStub
+--- @type LocalLibStub
 ns.O[Modules.M.LibStub] = _S
 
 --- Get a local or acelibrary
@@ -38,7 +37,7 @@ ns.O[Modules.M.LibStub] = _S
 ---// OR
 ---local console = LocalLibStub:GetLibrary('Ace-Console-1.0', true)
 ---```
----@param isAceLib boolean if true, then calls Ace3 LibStub directly
+--- @param isAceLib boolean if true, then calls Ace3 LibStub directly
 function _S:GetLibrary(libName, isAceLib)
     if isAceLib then return LibStub(libName) end
     return LibStub(_S:GetLibVersionUnpacked(libName))
@@ -65,8 +64,8 @@ function _S:NewAddon(addonName)
     return LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 end
 
----@param major string The major version ~ AceGUI-3.0
----@param silent boolean set to true for verbose
+--- @param major string The major version ~ AceGUI-3.0
+--- @param silent boolean set to true for verbose
 function _S:LibStubAce(major, silent) return LibStub(major, silent) end
 
 function _S:GetMajorVersion(libName)
@@ -77,10 +76,10 @@ end
 ---```
 ---local major, minor = Core:GetLibVersionUnpacked('Logger', 1)
 ---```
----@param libName string The library name -- i.e. 'Logger', 'Assert', etc...
----@param revisionNumber number The revision number.  This should be a positive number.
----@return string, number The major, minor version info. Example: ```ActionbarPlus-Logger-1.0, 1```
----@see Core#GetLibVersion
+--- @param libName string The library name -- i.e. 'Logger', 'Assert', etc...
+--- @param revisionNumber number The revision number.  This should be a positive number.
+--- @return string, number The major, minor version info. Example: ```ActionbarPlus-Logger-1.0, 1```
+--- @see Core#GetLibVersion
 function _S:GetLibVersionUnpacked(libName, revisionNumber)
     local revNumber = revisionNumber or 1
     local revisionString = format("$Revision: %s $", revNumber)
@@ -88,14 +87,14 @@ function _S:GetLibVersionUnpacked(libName, revisionNumber)
 end
 
 function _S:Embed(o, name, major, minor)
-    ---@return string
+    --- @return string
     function o:GetModuleName() return name end
-    ---@return string, string major and minor versions
+    --- @return string, string major and minor versions
     function o:GetVersionUnpacked() return major, minor end
-    ---@return table<string, string>  major:string, minor:string
+    --- @return table<string, string>  major:string, minor:string
     function o:GetVersion() return { major = major, minor = minor } end
 
-    ---@return void
+    --- @return void
     function o:OnAddonLoaded()
         --self:log(20, '%s.%s loaded', major, minor)
         --self:log(1, 'Profile: %s', type(self.profile))
@@ -108,10 +107,12 @@ function _S:Embed(o, name, major, minor)
     ---AceAddon lifecycle template method
     ---### Example Call:
     ---```[Addon]:OnInitialized{ addon=ABP }```
-    ---@param context @vararg table A vararg parameter. ```{ addon=addon }```
-    ---@return void
+    --- @param context @vararg table A vararg parameter. ```{ addon=addon }```
+    --- @return void
     function o:OnInitialize(context)
+        --- @type ActionbarPlus
         self.addon = context.addon
+        --- @type Profile_Config
         self.profile = context.addon.profile
         if type(self.OnAfterInitialize) == 'function' then self:OnAfterInitialize() end
     end
@@ -124,11 +125,11 @@ function _S:EmbedLoggerIfAvailable(o)
     logger:EmbedModule(o)
 end
 
----@return Logger
----@see Core#_LoggerImpl
+--- @return Logger
+--- @see Core#_LoggerImpl
 function _S:_LoggerImpl() return LibStub(self:GetMajorVersion('Logger'), true) end
----@return LoggerTemplate
----@param libObj table Any library created by "NewLibrary"
+--- @return LoggerTemplate
+--- @param libObj table Any library created by "NewLibrary"
 function _S:GetLogger(libObj) return libObj:GetLogger() end
 
 _S.mt = { __call = function (_, ...) return _S:GetLibrary(...) end }
@@ -138,7 +139,7 @@ setmetatable(_S, _S.mt)
 -- ## Core -----------------------------------------------------
 -- ## ----------------------------------------------------------
 
----@class Core
+--- @class Core
 local _L = {
     addonName = addon,
     M = Modules.M
@@ -164,39 +165,39 @@ local _L = {
 ---local LibStub, Core = __K_Core:LibPack()
 ---local AceGUI = LibStub:LibStubAce('AceGUI-3.0')
 ---```
----@return LocalLibStub, Core, GlobalObjects
+--- @return LocalLibStub, Core, GlobalObjects
 function _L:LibPack() return _S, self, self:O() end
 
----@deprecated Use global namespace instead
+--- @deprecated Use global namespace instead
 ---local O, Core, LocalLibStub = __K_Core:LibPack_GlobalObjects()
----@return GlobalObjects, Core, LocalLibStub
+--- @return GlobalObjects, Core, LocalLibStub
 function _L:LibPack_GlobalObjects() return ns.O, ns.O.Core, ns.O.LibStub end
 
----@see LogFactory
----@return LoggerTemplate
+--- @see LogFactory
+--- @return LoggerTemplate
 function _L:NewLogger(logName) return _S:GetLibrary('LogFactory'):NewLogger(logName) end
 
 ---Package is also know as the "Addon Name"
 ---```
 ---local package, versionFormat, logPrefix = Core:GetAddonInfo()
 ---```
----@return string, string, string
+--- @return string, string, string
 function _L:GetAddonInfo() return ns.name, _S.versionFormat, _S.logPrefix end
 
 ---### Usage:
 ---```
 ---local major, minor = Core:GetLibVersion('Logger', 1)
 ---```
----@param libName string The library name -- i.e. 'Logger', 'Assert', etc...
----@param revisionNumber number The revision number.  This should be a positive number.
----@return string, number, string The major, minor, logPrefix. Example: ```ActionbarPlus-Logger-1.0, 1, <log-prefix>```
----@see LocalLibStub#GetLibVersionUnpacked
+--- @param libName string The library name -- i.e. 'Logger', 'Assert', etc...
+--- @param revisionNumber number The revision number.  This should be a positive number.
+--- @return string, number, string The major, minor, logPrefix. Example: ```ActionbarPlus-Logger-1.0, 1, <log-prefix>```
+--- @see LocalLibStub#GetLibVersionUnpacked
 function _L:GetLibVersion(libName, revisionNumber)
     local major, minor = _S:GetLibVersionUnpacked(libName, revisionNumber)
     return major, minor, _S.logPrefix
 end
 
----@return Logger
+--- @return Logger
 function _L:_LoggerImpl() return _S:_LoggerImpl() end
 
 ---Sets the global var name with the Addon short-name prefix
@@ -223,21 +224,21 @@ end
 ---```
 function _L:InitPrettyPrint()
 
-    ---@type Kapresoft_LibUtil_PrettyPrint
+    --- @type Kapresoft_LibUtil_PrettyPrint
     local pprint = Kapresoft_LibUtil.PrettyPrint
-    ---@class pformat
+    --- @class pformat
     local o = { wrapped = pprint }
-    ---@type pformat
+    --- @type pformat
     pformat = pformat or o
 
-    ---@return pformat
+    --- @return pformat
     function o:Default()
         pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
                    show_all=false, show_function = false })
         return self;
     end
     ---no new lines
-    ---@return pformat
+    --- @return pformat
     function o:D2()
         pprint.setup({ use_newline = false, wrap_string = false, indent_size=4, sort_keys=true, level_width=120, depth_limit = true,
                    show_all=false, show_function = false })
@@ -245,7 +246,7 @@ function _L:InitPrettyPrint()
     end
 
     ---Configured to show all
-    ---@return pformat
+    --- @return pformat
     function o:A()
         pprint.setup({ use_newline = true, wrap_string = false, indent_size=4, sort_keys=true, level_width=120,
                        show_all=true, show_function = true, depth_limit = true })
@@ -253,14 +254,14 @@ function _L:InitPrettyPrint()
     end
 
     ---Configured to print in single line
-    ---@return pformat
+    --- @return pformat
     function o:B()
         pprint.setup({ use_newline = false, wrap_string = true, indent_size=2, sort_keys=true,
                        level_width=120, show_all=true, show_function = true, depth_limit = true })
         return self;
     end
 
-    ---@return string
+    --- @return string
     function o:pformat(obj, option, printer)
         local str = pprint.pformat(obj, option, printer)
         o:Default(o)
@@ -276,15 +277,15 @@ end
 --    return self
 --end
 
----@param name string The module name
----@param o table The object
+--- @param name string The module name
+--- @param o table The object
 function _L:Register(name, o)
     if not (name or o) then return end
     ns.O[name] = o
 end
 
----@deprecated Use addon namespace
----@return GlobalObjects
+--- @deprecated Use addon namespace
+--- @return GlobalObjects
 function _L:O() return ns.O end
 
 function _L:Init() self:InitPrettyPrint() end
@@ -308,8 +309,8 @@ _LIB.mt = {
 setmetatable(_LIB, _LIB.mt)
 _L.Lib = _LIB
 
----@type Core
----@deprecated Use ns.core instead
+--- @type Core
+--- @deprecated Use ns.core instead
 __K_Core = _L
 ns.O[Modules.M.Core] = _L
 ns[Modules.M.Core] = _L

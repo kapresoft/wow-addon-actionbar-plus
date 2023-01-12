@@ -23,30 +23,31 @@ local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Te
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class GlobalConstants
+--- @class GlobalConstants
 local L = {}
 
 
 --[[-----------------------------------------------------------------------------
 Methods: GlobalConstants
 -------------------------------------------------------------------------------]]
----@param o GlobalConstants
+--- @param o GlobalConstants
 local function GlobalConstantProperties(o)
 
     local consoleCommandTextFormat = '|cfd2db9fb%s|r'
     local consoleKeyValueTextFormat = '|cfdfbeb2d%s|r: %s'
 
-    ---@class GlobalConstants_Default
+    --- @class GlobalConstants_Default
     local Default = {
         FrameAnchor = {
             point = "CENTER", relativeTo = nil, relativePoint = 'CENTER', x = 0.0, y = 0.0
         }
     }
 
-    ---@class GlobalAttributes
+    --- @class GlobalAttributes
     local C = {
         ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
+        SLASH_COMMAND_OPTIONS = "abp_options",
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
         ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
@@ -81,49 +82,46 @@ local function GlobalConstantProperties(o)
         SHIFT = 'SHIFT',
         TOP = 'TOP',
         TOPLEFT = 'TOPLEFT',
+        TOOLTIP_ANCHOR_FRAME_NAME = 'ActionbarPlusTooltipAnchorFrame',
 
     }
 
-    ---@class Textures
+    --- @class Textures
     local Textures = {
-        ---@type number|string
+        --- @type number|string
         DRUID_FORM_ACTIVE_ICON = 136116,
-        ---@type number|string
+        --- @type number|string
         STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
-        ---@type number|string
+        --- @type number|string
         PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
-        ---@type string
+        --- @type string
         TEXTURE_EMPTY = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty'),
-        ---@type string
+        --- @type string
         TEXTURE_EMPTY_GRID = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty-grid'),
-        ---@type string
+        --- @type string
         TEXTURE_EMPTY_BLIZZ_DIALOG_BACKGROUND = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background"),
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Dialog Background Gold"),
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT2 = [[Interface\Buttons\WHITE8X8]],
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT3A = [[Interface\Buttons\ButtonHilight-Square]],
-        ---@type string
+        --- @type string
         TEXTURE_BUTTON_HILIGHT_SQUARE_BLUE = [[Interface\Buttons\ButtonHilight-Square]],
         TEXTURE_BUTTON_HILIGHT_SQUARE_YELLOW = [[Interface\Buttons\checkbuttonhilight]],
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT3B = [[Interface\Buttons\ButtonHilight-SquareQuickslot]],
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT4 = [[Interface\QuestFrame\UI-QuestTitleHighlight]],
-        ---@type string
+        --- @type string
         TEXTURE_HIGHLIGHT_BUTTON_ROUND = [[Interface\Buttons\ButtonHilight-Round]],
         TEXTURE_HIGHLIGHT_BUTTON_OUTLINE = [[Interface\BUTTONS\UI-Button-Outline]],
-        ---@type string
+        --- @type string
         TEXTURE_CASTING = LibSharedMedia:Fetch(LibSharedMedia.MediaType.BACKGROUND, "Blizzard Rock"),
     }
 
-    ---@class EventNames
-    local E = {
-
-        ---################################
-        --- Addon Messages
-        AddonMessage_OnAfterInitialize = 'AddonMessage_OnAfterInitialize',
+    --- @class EventNames
+    local Events = {
 
         OnEnter = 'OnEnter',
         OnEvent = 'OnEvent',
@@ -143,7 +141,6 @@ local function GlobalConstantProperties(o)
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnActionbarShowGroup = 'OnActionbarShowGroup',
-        OnAddonLoaded = 'OnAddonLoaded',
         OnButtonCountChanged = 'OnButtonCountChanged',
         OnButtonSizeChanged = 'OnButtonSizeChanged',
         OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
@@ -156,15 +153,15 @@ local function GlobalConstantProperties(o)
         OnUpdateItemStates = 'OnUpdateItemStates',
 
         -- ################################
-        ---@deprecated DEPRECATED: Use the camel cased version
+        --- @deprecated DEPRECATED: Use the camel cased version
         ON_ENTER = 'OnEnter',
-        ---@deprecated DEPRECATED: Use the camel cased version
+        --- @deprecated DEPRECATED: Use the camel cased version
         ON_EVENT = 'OnEvent',
-        ---@deprecated DEPRECATED: Use the camel cased version
+        --- @deprecated DEPRECATED: Use the camel cased version
         ON_LEAVE = 'OnLeave',
-        ---@deprecated DEPRECATED: Use the camel cased version
+        --- @deprecated DEPRECATED: Use the camel cased version
         ON_MODIFIER_STATE_CHANGED = 'OnModifierStateChanged',
-        ---@deprecated DEPRECATED: Use the camel cased version
+        --- @deprecated DEPRECATED: Use the camel cased version
         ON_RECEIVE_DRAG = 'OnReceiveDrag',
         -- ################################
 
@@ -216,8 +213,17 @@ local function GlobalConstantProperties(o)
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
     }
 
-    ---@deprecated Use #UnitId
-    ---@class UnitIDAttributes
+    --- @class MessageNames
+    local Messages = {
+        OnAddOnInitialized    = 'OnAddOnInitialized',
+        OnAddOnReady          = 'OnAddOnReady',
+        OnDBInitialized       = 'OnDBInitialized',
+        OnConfigInitialized   = 'OnConfigInitialized',
+        OnTooltipFrameUpdate  = 'OnTooltipFrameUpdate',
+    }
+
+    --- @deprecated Use #UnitId
+    --- @class UnitIDAttributes
     local UnitIDAttributes = {
         FOCUS = 'focus',
         TARGET = 'target',
@@ -227,7 +233,7 @@ local function GlobalConstantProperties(o)
         PLAYER = 'player',
         VEHICLE = 'vehicle',
     }
-    ---@class Blizzard_UnitId
+    --- @class Blizzard_UnitId
     local UnitId = {
         ["target"] = "target",
         ["player"] = "player",
@@ -236,7 +242,7 @@ local function GlobalConstantProperties(o)
         ["none"] = "none",
         ["focus"] = "focus",
         ["mouseover"] = "mouseover",
-        ---@param raidIndex number
+        --- @param raidIndex number
         ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
         ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
     }
@@ -246,7 +252,7 @@ local function GlobalConstantProperties(o)
         ROGUE = 'ROGUE'
     }
 
-    ---@class WidgetAttributes
+    --- @class WidgetAttributes
     local WidgetAttributes = {
         TYPE = 'type',
         UNIT = 'unit',
@@ -267,7 +273,7 @@ local function GlobalConstantProperties(o)
         PROWL = 'prowl',
     }
 
-    ---@class ButtonAttributes
+    --- @class ButtonAttributes
     local ButtonAttributes = {
         SPELL = WidgetAttributes.SPELL,
         UNIT = WidgetAttributes.UNIT,
@@ -279,10 +285,10 @@ local function GlobalConstantProperties(o)
         MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
     }
 
-    ---@class Profile_Config_Names
+    --- @class Profile_Config_Names
     local Profile_Config_Names = {
         ['bars'] = 'bars',
-        ---@deprecated lock_actionbars is to be removed
+        --- @deprecated lock_actionbars is to be removed
         ['lock_actionbars'] = 'lock_actionbars',
         ['character_specific_anchors'] = 'character_specific_anchors',
         ['hide_when_taxi'] = 'hide_when_taxi',
@@ -296,7 +302,7 @@ local function GlobalConstantProperties(o)
         ['tooltip_anchor_type'] = 'tooltip_anchor_type',
     }
 
-    ---@class Profile_Config_Widget_Names
+    --- @class Profile_Config_Widget_Names
     local Profile_Config_Widget_Names = {
         ['rowSize'] = 'rowSize',
         ['colSize'] = 'colSize',
@@ -307,7 +313,7 @@ local function GlobalConstantProperties(o)
         ['frame_handle_alpha'] = 'frame_handle_alpha',
     }
 
-    ---@class Blizzard_DrawLayer : _DrawLayer
+    --- @class Blizzard_DrawLayer : _DrawLayer
     local DrawLayer = {
         BACKGROUND = 'BACKGROUND',
         BORDER = 'BORDER',
@@ -317,7 +323,7 @@ local function GlobalConstantProperties(o)
     }
 
     ---Also known as AlphaMode
-    ---@class Blizzard_BlendMode : _BlendMode
+    --- @class Blizzard_BlendMode : _BlendMode
     local BlendMode = {
         DISABLE = 'DISABLE',
         BLEND = 'BLEND',
@@ -326,7 +332,7 @@ local function GlobalConstantProperties(o)
         MOD = 'MOD',
     }
 
-    ---@class TooltipAnchor
+    --- @class TooltipAnchor
     local TooltipAnchor = {
         CURSOR_TOPLEFT = 'CURSOR_TOPLEFT',
         CURSOR_TOPRIGHT = 'CURSOR_TOPRIGHT',
@@ -339,13 +345,14 @@ local function GlobalConstantProperties(o)
         SCREEN_BOTTOMRIGHT = 'SCREEN_BOTTOMRIGHT',
     }
 
-    ---@param prefix string
-    ---@param index number
+    --- @param prefix string
+    --- @param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
 
     o.Textures = Textures
     o.C = C
-    o.E = E
+    o.E = Events
+    o.M = Messages
     o.Default = Default
     o.Profile_Config_Names = Profile_Config_Names
     o.Profile_Config_Widget_Names = Profile_Config_Widget_Names
@@ -356,12 +363,12 @@ local function GlobalConstantProperties(o)
     o.BlendMode = BlendMode
     o.AlphaMode = BlendMode
     o.TooltipAnchor = TooltipAnchor
-    ---@type Blizzard_UnitId
+    --- @type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass
 end
 
----@param o GlobalConstants
+--- @param o GlobalConstants
 local function GlobalConstantMethods(o)
 
     function o:AddonName() return o.C.ADDON_NAME end
@@ -371,7 +378,7 @@ local function GlobalConstantMethods(o)
     ---```
     ---local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = GC:GetAddonInfo()
     ---```
-    ---@return string, string, string, string, string, string, string
+    --- @return string, string, string, string, string, string, string
     function o:GetAddonInfo()
         local addonName = o.C.ADDON_NAME
         local versionText, lastUpdate
@@ -391,7 +398,7 @@ local function GlobalConstantMethods(o)
                     GetAddOnMetadata(addonName, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
     end
 
-    ---@return string
+    --- @return string
     function o:GetAddonInfoFormatted()
         local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
         local fmt = self.C.ADDON_INFO_FMT
@@ -407,9 +414,9 @@ local function GlobalConstantMethods(o)
     end
 
     function o:GetLogLevel() return ABP_LOG_LEVEL end
-    ---@param level number The log level between 1 and 100
+    --- @param level number The log level between 1 and 100
     function o:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
-    ---@param level number
+    --- @param level number
     function o:ShouldLog(level) return self:GetLogLevel() >= level end
     function o:IsVerboseLogging() return self:ShouldLog(20) end
 
@@ -422,7 +429,7 @@ local function Init()
     GlobalConstantProperties(L)
     GlobalConstantMethods(L)
 
-    ---@type GlobalConstants
+    --- @type GlobalConstants
     ABP_GlobalConstants = L
     ns.O = ns.O or {}
     ns.O.GlobalConstants = L

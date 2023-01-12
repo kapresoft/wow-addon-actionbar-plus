@@ -18,28 +18,28 @@ local AceModule = {
     AceGUI = 'AceGUI-3.0',
     AceLibSharedMedia = 'LibSharedMedia-3.0'
 }
----@class AceObjects
+--- @class AceObjects
 local AceObjectsTemplate = {
 
-    ---@type AceAddon
+    --- @type AceAddon
     AceAddon = {},
-    ---@type AceConsole
+    --- @type AceConsole
     AceConsole = {},
-    ---@type AceConfig
+    --- @type AceConfig
     AceConfig = {},
-    ---@type AceConfigDialog
+    --- @type AceConfigDialog
     AceConfigDialog = {},
-    ---@type AceDB
+    --- @type AceDB
     AceDB = {},
-    ---@type AceDBOptions
+    --- @type AceDBOptions
     AceDBOptions = {},
-    ---@type AceEvent
+    --- @type AceEvent
     AceEvent = {},
-    ---@type AceHook
+    --- @type AceHook
     AceHook = {},
-    ---@type AceGUI
+    --- @type AceGUI
     AceGUI = {},
-    ---@type AceLibSharedMedia
+    --- @type AceLibSharedMedia
     AceLibSharedMedia = {},
 
 }
@@ -49,14 +49,14 @@ local __Internal = {}
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class AceLibFactory
+--- @class AceLibFactory
 local _L = LibStub:NewLibrary(Core.M.AceLibFactory)
 _L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param aceLib string
+--- @param aceLib string
 local function LocalLibAce(name, aceLib)
     local o = LibStub:LibStubAce(aceLib)
     __Internal[name] = o
@@ -64,32 +64,32 @@ local function LocalLibAce(name, aceLib)
 end
 
 local function Init()
-    ---@class AceAddon
+    --- @type AceAddon
     LocalLibAce('AceAddon', AceModule.AceAddon)
-    ---@class AceConsole
+    --- @type AceConsole
     LocalLibAce('AceConsole', AceModule.AceConsole)
-    ---@class AceConfig
+    --- @type AceConfig
     LocalLibAce('AceConfig', AceModule.AceConfig)
-    ---@class AceConfigDialog
+    --- @type AceConfigDialog
     LocalLibAce('AceConfigDialog', AceModule.AceConfigDialog)
-    ---@class AceDB
+    --- @type AceDB
     LocalLibAce('AceDB', AceModule.AceDB)
-    ---@class AceDBOptions
+    --- @type AceDBOptions
     LocalLibAce('AceDBOptions', AceModule.AceDBOptions)
-    ---@class AceEvent
+    --- @type AceEvent
     LocalLibAce('AceEvent', AceModule.AceEvent)
-    ---@class AceHook
+    --- @type AceHook
     LocalLibAce('AceHook', AceModule.AceHook)
-    ---@class AceGUI
+    --- @type AceGUI
     LocalLibAce('AceGUI', AceModule.AceGUI)
-    ---@class AceLibSharedMedia
+    --- @type AceLibSharedMedia
     LocalLibAce('AceLibSharedMedia', AceModule.AceLibSharedMedia)
 end
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@return AceObjects
+--- @return AceObjects
 function _L:A() return __Internal end
 
 function _L:Constructor(...)

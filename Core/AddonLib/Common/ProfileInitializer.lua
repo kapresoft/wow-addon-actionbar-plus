@@ -13,15 +13,20 @@ local GC = O.GlobalConstants
 local ATTR, Table = GC.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
--- ## Functions ------------------------------------------------
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
 
----@class ProfileInitializer
+--- @class ProfileInitializer : BaseLibraryObject_Initialized
 local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
----@type LoggerTemplate
-local p = P:GetLogger()
+if not P then return end
 
+local p = P:GetLogger()
 P.baseFrameName = 'ActionbarPlusF'
 
+--[[-----------------------------------------------------------------------------
+Interface Definitions
+-------------------------------------------------------------------------------]]
 ---FrameDetails is used for initializing defaults for AceDB profile
 local FrameDetails = {
     [1] = { rowSize = 2, colSize = 6 },
@@ -58,9 +63,9 @@ local defaultWidget = {
     ["frame_handle_alpha"] = 1.0,
 }
 ---The defaults provided here will used for the default state of the settings
----@type Profile_Config
+--- @type Profile_Config
 local DEFAULT_PROFILE_DATA = {
-    ---@deprecated lock_actionbars is no longer used
+    --- @deprecated lock_actionbars is no longer used
     [ConfigNames.lock_actionbars] = false,
     [ConfigNames.character_specific_anchors] = false,
     [ConfigNames.hide_when_taxi] = true,
@@ -76,7 +81,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
             },
@@ -102,7 +107,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -114,7 +119,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -126,7 +131,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -138,7 +143,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
             },
@@ -150,7 +155,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -162,7 +167,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -174,7 +179,7 @@ local DEFAULT_PROFILE_DATA = {
             ["show_keybind_text"] = false,
             ["show_button_index"] = false,
             ["widget"] = Table.shallow_copy(defaultWidget),
-            ---@type _RegionAnchor
+            --- @type _RegionAnchor
             ["anchor"] = {
                 point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
             },
@@ -184,14 +189,14 @@ local DEFAULT_PROFILE_DATA = {
     },
 }
 
----@param frameIndex number
+--- @param frameIndex number
 function P:GetFrameNameByIndex(frameIndex)
     assert(type(frameIndex) == 'number',
             'GetFrameNameByIndex(..)| frameIndex should be a number')
     return P.baseFrameName .. tostring(frameIndex)
 end
 
----@param g Profile_Global_Config
+--- @param g Profile_Global_Config
 function P:InitGlobalSettings(g)
     g.bars = {}
 
@@ -202,19 +207,19 @@ function P:InitGlobalSettings(g)
 
 end
 
----@param g Profile_Global_Config
----@param frameName string
+--- @param g Profile_Global_Config
+--- @param frameName string
 function P:InitGlobalButtonConfig(g, frameName)
     g.bars[frameName] = { }
     self:InitGlobalButtonConfigAnchor(g, frameName)
     return g.bars[frameName]
 end
 
----@param g Profile_Global_Config
----@param frameName string
+--- @param g Profile_Global_Config
+--- @param frameName string
 function P:InitGlobalButtonConfigAnchor(g, frameName)
     local defaultBars = DEFAULT_PROFILE_DATA.bars
-    ---@type Global_Profile_Bar
+    --- @type Global_Profile_Bar
     local btnConf = g.bars[frameName]
     btnConf.anchor = Table.shallow_copy(defaultBars[frameName].anchor)
     return btnConf.anchor

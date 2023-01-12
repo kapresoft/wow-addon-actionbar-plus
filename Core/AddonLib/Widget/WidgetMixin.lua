@@ -14,8 +14,7 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-local O, Core, LibStub = ns:LibPack()
+local O, LibStub, ns = ABP_LibPack(...)
 
 local MX, String, P = O.Mixin, O.String, O.Profile
 local GC = O.GlobalConstants
@@ -32,14 +31,14 @@ StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class WidgetMixin
-local _L = LibStub:NewLibrary(Core.M.WidgetMixin)
----@type LoggerTemplate
+--- @class WidgetMixin
+local _L = LibStub:NewLibrary(ns.M.WidgetMixin)
+--- @type LoggerTemplate
 local p = _L:GetLogger()
 
----@class FontStringWidget
+--- @class FontStringWidget
 local FontStringWidget = {
-    ---@type FontStringTemplate
+    --- @type FontStringTemplate
     fontString = {}
 }
 ---type Font (see _Buttons.xml)
@@ -75,9 +74,9 @@ function FontStringWidget:ScaleWithButtonSize(buttonSize)
     fs:SetFont(fontName, fontHeight, "OVERLAY")
 end
 
----@class FontStringTemplate
+--- @class FontStringTemplate
 local FontStringTemplate = {
-    ---@type FontStringWidget
+    --- @type FontStringWidget
     widget = nil
 }
 
@@ -86,7 +85,7 @@ Methods
 -------------------------------------------------------------------------------]]
 function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
----@param button ButtonUI
+--- @param button ButtonUI
 function _L:CreateFontString(button)
     local fs = button:CreateFontString(nil, nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT", -3, 2)
@@ -97,10 +96,10 @@ end
 
 
 ---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
+--- @see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
+--- @param b ButtonUI The button UI
 function _L:CreateIndexTextFontString(b)
-    ---@type FontStringTemplate
+    --- @type FontStringTemplate
     local fs = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmallGray")
     local fontName, fontHeight = fs:GetFont()
     fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
@@ -112,17 +111,17 @@ function _L:CreateIndexTextFontString(b)
 end
 
 ---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
----@see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
----@param b ButtonUI The button UI
----@return FontStringTemplate
+--- @see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
+--- @param b ButtonUI The button UI
+--- @return FontStringTemplate
 function _L:CreateKeybindTextFontString(b)
-    ---@type FontStringTemplate
+    --- @type FontStringTemplate
     local fs = b:CreateFontString(nil, "OVERLAY", 'ABP_NumberFontNormalShadow')
     --local fontName, fontHeight = fs:GetFont()
     --fs:SetFont(fontName, fontHeight - 2, "THICKOUTLINE")
     fs:SetJustifyH("RIGHT")
     fs:SetJustifyV("TOP")
-    ---@type FontStringWidget
+    --- @type FontStringWidget
     local widget = MX:Mixin({ }, FontStringWidget)
     widget.fontString = fs
     fs.widget = widget;
@@ -140,9 +139,9 @@ function _L:ShowActionbarsDelayed(isShown, delayInSec)
     C_Timer.After(actualDelayInSec, function() self:ShowActionbars(showActionBars) end)
 end
 
----@param isShown boolean Set to true to show action bar
+--- @param isShown boolean Set to true to show action bar
 function _L:ShowActionbars(isShown)
-    ---@param frameWidget FrameWidget
+    --- @param frameWidget FrameWidget
     O.ButtonFactory:ApplyForEachVisibleFrames(function(frameWidget)
         if frameWidget:IsShownInConfig() then
             frameWidget:SetGroupState(isShown)
@@ -161,14 +160,14 @@ function _L:HideTooltipDelayed(delayInSec)
     C_Timer.After(actualDelayInSec, function() GameTooltip:Hide() end)
 end
 
----@class BindingInfo
+--- @class BindingInfo
 local BindingInfo = {
     btnName = '', category = '',
     key1 = '', key1Short = '', key2 = key2,
     details = { action = '', buttonPressed = '' }
 }
 
----@return table The binding map with button names as the key
+--- @return table The binding map with button names as the key
 function _L:GetBarBindingsMap()
     local barBindingsMap = {}
     local bindCount = GetNumBindings()
@@ -195,8 +194,8 @@ function _L:GetBarBindingsMap()
     return barBindingsMap
 end
 
----@return BindingDetails
----@param btnName string The button name
+--- @return BindingDetails
+--- @param btnName string The button name
 function _L:GetBarBindings(btnName)
     if IsBlank(btnName) then return nil end
     local bindCount = GetNumBindings()
@@ -221,10 +220,10 @@ function _L:GetBarBindings(btnName)
     end
     return nil
 end
----@param frame ButtonUI In retail owner can be any frame; should be treated as a generic frame
+--- @param frame ButtonUI In retail owner can be any frame; should be treated as a generic frame
 function _L:IsTypeMacro(frame)
     if not (frame and frame.widget and frame.widget.buttonName) then return false end
-    ---@see ButtonProfileMixin#IsMacro
+    --- @see ButtonProfileMixin#IsMacro
     return frame.widget:IsMacro()
 end
 
@@ -238,7 +237,7 @@ function _L:SetupTooltipKeybindingInfo(tooltip)
     tooltip:Show()
 end
 
----@param btnWidget ButtonUIWidget
+--- @param btnWidget ButtonUIWidget
 function _L:AddKeybindingInfo(btnWidget)
     if not btnWidget:HasKeybindings() then return end
     GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)

@@ -13,9 +13,9 @@ local format, strlower, tinsert = string.format, string.lower, table.insert
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local C = O.GlobalConstants.C
-local String, A, P, BaseAPI = O.String, O.Assert, O.Profile, O.BaseAPI
+local O, LibStub, ns = ABP_LibPack(...)
+local GC, AceEvent = O.GlobalConstants, O.AceLibrary.AceEvent
+local String, A, P = O.String, O.Assert, O.Profile
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
@@ -23,13 +23,12 @@ local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
             WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
             WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
 
----@type ButtonUILib
+--- @type ButtonUILib
 local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
 
----@class ButtonFactory
-local L = LibStub:NewLibrary(Core.M.ButtonFactory)
----@type LoggerTemplate
+--- @class ButtonFactory : BaseLibraryObject_WithAceEvent
+local L = LibStub:NewLibrary(ns.M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
 local p = L:GetLogger()
 
 local AttributeSetters = {
@@ -41,9 +40,6 @@ local AttributeSetters = {
     [BATTLE_PET]   = O.BattlePetAttributeSetter,
 }
 
--- Initialized on Logger#OnAddonLoaded()
-L.addon = nil
-L.profile = nil
 L.FRAMES = {}
 
 
@@ -96,7 +92,7 @@ local function InitButtonGameTooltipHooks()
     InitButtonGameTooltipHooksLegacy()
 end
 
----@param btnWidget ButtonUIWidget
+--- @param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
     AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
@@ -105,7 +101,7 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 
-function L:OnAfterInitialize()
+function L:Init()
     local frameNames = P:GetAllFrameNames()
     for i,_ in ipairs(frameNames) do
         local f = self:CreateActionbarGroup(i)
@@ -117,7 +113,7 @@ end
 
 function L:Fire(event, sourceEvent, ...)
     local args = ...
-    ---@param frameWidget FrameWidget
+    --- @param frameWidget FrameWidget
     self:ApplyForEachFrames(function(frameWidget)
         frameWidget:Fire(event, sourceEvent, args)
     end)
@@ -128,7 +124,7 @@ function L:FireOnFrame(frameIndex, event, sourceEvent, ...)
     self.FRAMES[frameIndex]:Fire(event, sourceEvent, args)
 end
 
----@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+--- @param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
 function L:ApplyForEachFrames(applyFunction)
     local frames = P:GetAllFrameNames()
     if #frames <= 0 then return end
@@ -136,13 +132,13 @@ function L:ApplyForEachFrames(applyFunction)
     for _,f in ipairs(frames) do applyFunction(_G[f].widget) end
 end
 
----@param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+--- @param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
 function L:ApplyForEachVisibleFrames(applyFunction)
     local frames = P:GetAllFrameNames()
     if #frames <= 0 then return end
     -- `_` is the index
     for _,f in ipairs(frames) do
-        ---@type FrameWidget
+        --- @type FrameWidget
         local fw = _G[f].widget
         if fw:IsShownInConfig() then applyFunction(fw) end
     end
@@ -153,7 +149,7 @@ function L:UpdateKeybindText()
     for i,name in ipairs(frames) do
         local f = _G[name]
         if f and f.widget then
-            ---@type FrameWidget
+            --- @type FrameWidget
             local fw = f.widget
             if P:IsBarIndexEnabled(i) then fw:UpdateKeybindText() end
         end
@@ -167,14 +163,14 @@ end
 function L:CreateActionbarGroup(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
-    ---@type FrameWidget
+    --- @type FrameWidget
     local f = ButtonFrameFactory(frameIndex)
     self:CreateButtons(f, widget.rowSize, widget.colSize)
     f:SetInitialState()
     return f
 end
 
----@param fw FrameWidget
+--- @param fw FrameWidget
 function L:CreateButtons(fw, rowSize, colSize)
     fw:ClearButtons()
     local index = 0
@@ -190,22 +186,22 @@ function L:CreateButtons(fw, rowSize, colSize)
     fw:LayoutButtonGrid()
 end
 
----@param fw FrameWidget
+--- @param fw FrameWidget
 function L:HideUnusedButtons(fw)
     local start = fw:GetButtonCount() + 1
     local max = start + (2 * fw:GetMaxButtonColSize())
     for i=start, max do
-        ---@type ButtonUI
+        --- @type ButtonUI
         local existingBtn = fw:GetButtonUI(i)
         if existingBtn then existingBtn:Hide() end
     end
 end
 
----@param frameWidget FrameWidget
----@param row number
----@param col number
----@param btnIndex number The button index number
----@return ButtonUIWidget
+--- @param frameWidget FrameWidget
+--- @param row number
+--- @param col number
+--- @param btnIndex number The button index number
+--- @return ButtonUIWidget
 function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
     self:SetButtonAttributes(btnWidget)
@@ -215,7 +211,7 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
 end
 
 
----@param btnWidget ButtonUIWidget
+--- @param btnWidget ButtonUIWidget
 function L:SetButtonAttributes(btnWidget)
     local btnData = btnWidget:GetConfig()
     if btnData == nil or String.IsBlank(btnData.type) then return end
@@ -235,10 +231,23 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
----@return AttributeSetter
+--- @return AttributeSetter
 function L:GetAttributesSetter(actionType)
     AssertNotNil(actionType, 'actionType')
     return AttributeSetters[actionType]
 end
 
-InitButtonGameTooltipHooks()
+--[[-----------------------------------------------------------------------------
+Initializer
+-------------------------------------------------------------------------------]]
+local function InitButtonFactory()
+    InitButtonGameTooltipHooks()
+
+    L:RegisterMessage(GC.M.OnAddOnInitialized, function(msg)
+        p:log(10, '%s received...%s', msg)
+        L:Init()
+    end)
+
+end
+
+InitButtonFactory()

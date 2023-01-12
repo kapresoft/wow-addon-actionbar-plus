@@ -6,23 +6,25 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-
-local O = ns:LibPack()
+local O, GC, ns = ABP_LibPack2(...)
+local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class Developer
-local L = {}
----@return LoggerTemplate
+--- @class Developer : BaseLibraryObject_WithAceEvent
+local L = {}; AceEvent:Embed(L); D = L
 local p = O.LogFactory('Developer')
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+
+function L:TT()
+    self:SendMessage(GC.M.OnTooltipFrameUpdate)
+end
 
 --- down or up
 function L:KDT()
@@ -37,7 +39,7 @@ function L:ResetBarConfig()
 
     for i = 1, 8 do
         local f = _G['ActionbarPlusF' .. i]
-        ---@type FrameWidget
+        --- @type FrameWidget
         local w = f.widget
         local cf = w:GetConfig()
         cf.enabled = nil
@@ -67,14 +69,14 @@ function L:AnchorReset(frameIndex)
     print('Anchor Reset Done')
 end
 
----@param frameIndex number
----@return FrameWidget
+--- @param frameIndex number
+--- @return FrameWidget
 function L:F(frameIndex, buttonIndex)
     if not buttonIndex then return _G['ActionbarPlusF' .. tostring(frameIndex)].widget end
     return self:B(frameIndex, buttonIndex)
 end
 
----@return Profile_Bar
+--- @return Profile_Bar
 function L:C(frameIndex) return self:F(frameIndex):GetConfig() end
 
 function L:M() return GetMouseFocus() end
@@ -88,19 +90,18 @@ function L:API() return O.BaseAPI, O.API end
 function L:NS() return ns end
 function L:O() return ns.O end
 
-D = L
+function L:SM(msg) self:SendMessage(msg) end
 
 --[[-----------------------------------------------------------------------------
 Frame
 -------------------------------------------------------------------------------]]
 local function OnEvent(frame, event, ...)
-    p:log('%s| %s', frame:GetName(), event)
-    if event == 'PLAYER_LEAVING_WORLD' then
-        --TODO: NEXT: Save Anchors for all frames
-    end
+    p:log(10, '%s', event)
+    --if event == 'PLAYER_LEAVING_WORLD' then
+    --end
 end
 
----@class DeveloperFrame
+--- @class DeveloperFrame
 local frame = CreateFrame("Frame", 'DeveloperFrame', UIParent)
 frame:SetScript('OnEvent', OnEvent)
 frame:RegisterEvent('PLAYER_ENTERING_WORLD')
