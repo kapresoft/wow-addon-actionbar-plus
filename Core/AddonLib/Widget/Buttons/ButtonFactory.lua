@@ -244,7 +244,7 @@ local function InitButtonFactory()
     InitButtonGameTooltipHooks()
 
     L:RegisterMessage(GC.M.OnAddOnInitialized, function(msg)
-        p:log(10, '%s received...%s', msg)
+        p:log(10, '%s received...', msg)
         L:Init()
     end)
 
