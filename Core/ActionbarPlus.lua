@@ -196,10 +196,6 @@ local methods = {
     ['OnInitialize'] = function(self)
         self:InitializeDb()
         self.barBindings = WMX:GetBarBindingsMap()
-        --self:OnInitializeModules()
-
-        -- Get the option table for profiles
-        --options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         self:RegisterSlashCommands()
         self:RegisterHooks()
 

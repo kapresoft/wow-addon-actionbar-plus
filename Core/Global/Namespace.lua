@@ -81,7 +81,7 @@ function ABP_Namespace(...)
     --- @param o Namespace
     local function Methods(o)
         --- @return CursorUtil
-        function o:CreateCursorUtil() return MixinAndInit(L, O.API:GetCursorInfo()) end
+        function o:CreateCursorUtil() return MixinAndInit(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
         --- @param start number
         --- @param increment number
         --- @return Kapresoft_LibUtil_Incrementer

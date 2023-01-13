@@ -254,7 +254,7 @@ local function PropsAndMethods(o)
     --- Call Order: Config -> Profile -> ButtonFactory
     --- Message triggered by ActionbarPlus#OnInitializeModules
     --- @param msg string The message name
-    function o:OnAddOnReady(msg)
+    function o:OnAddOnInitialized(msg)
         p:log(10, '%s received.', msg)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
@@ -268,6 +268,8 @@ local function PropsAndMethods(o)
     function o:Initialize()
         local db = ns.db
         local options = self:GetOptions()
+        -- Get the option table for profiles
+        -- options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         AceConfig:RegisterOptionsTable(ns.name, options, { GC.C.SLASH_COMMAND_OPTIONS })
         AceConfigDialog:AddToBlizOptions(ns.name, ns.name)
         options.args.profiles = AceDBOptions:GetOptionsTable(db)
@@ -600,7 +602,7 @@ local function NewInstance()
     local L = LibStub:NewLibrary(ns.M.Config); if not L then return end
     AceEvent:Embed(L)
     PropsAndMethods(L)
-    L:RegisterMessage(M.OnAddOnReady, function(evt, ...) L:OnAddOnReady(evt, ...) end)
+    L:RegisterMessage(M.OnAddOnInitialized, function(evt, ...) L:OnAddOnInitialized(evt, ...) end)
     return L
 end
 
