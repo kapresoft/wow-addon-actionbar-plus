@@ -2,6 +2,7 @@
 Global Variables Initialization
 -------------------------------------------------------------------------------]]
 -- log levels, 10, 20, (+10), 100
+-- TODO NEXT: Move to player login event
 if type(ABP_PLUS_DB) ~= "table" then ABP_PLUS_DB = {} end
 if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end

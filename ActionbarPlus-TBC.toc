@@ -5,7 +5,7 @@
 ## Author: kapresoft@gmail.com
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE
-## SavedVariablesPerCharacter: ABP_LOG_LEVEL, ABP_CHARACTER_DB
+## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
 
 ## X-Min-Interface: 20501
