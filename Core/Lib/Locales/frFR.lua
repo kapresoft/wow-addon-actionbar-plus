@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LocUtil = ns.O.LocalizationUtil
 
 ---@type AceLocale

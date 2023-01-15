@@ -1,3 +1,4 @@
+-- TODO NEXT: Remove this unused library.
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -6,13 +7,14 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local Mixin, WMX = O.Mixin, O.WidgetMixin
 local AO = O.AceLibFactory:A()
 local AceGUI = AO.AceGUI
 local LuaEvaluator = O.LuaEvaluator
 
-local L = LibStub:NewLibrary(Core.M.PopupDebugDialog)
+local L = LibStub:NewLibrary('PopupDebugDialog')
 ---@type LoggerTemplate
 local p = L:GetLogger()
 local FRAME_NAME = 'ABP_DebugDialog'

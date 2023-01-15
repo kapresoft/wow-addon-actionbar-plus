@@ -11,15 +11,15 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
-local P, LogFactory, Table = O.Profile, O.LogFactory, O.Table
+local O, LibStub, ns = ABP_LibPack()
+
+local P, Table = O.Profile, O.Table
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
---- @class MacroEventsHandler
-local _L = LibStub:NewLibrary(Core.M.MacroEventsHandler)
-local p = LogFactory(Core.M.MacroEventsHandler)
+--- @class MacroEventsHandler : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.MacroEventsHandler)
+local p = L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -137,7 +137,7 @@ local function HandleChangedMacros(btnName, btnData)
     end
 
     if changed then
-        _L:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        L:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
         btnWidget:Fire('OnMacroChanged')
     end
 end
@@ -156,12 +156,12 @@ end
 local function OnAddonLoaded(frame, event, ...)
     --- todo next: move to ActionbarPlusEventMixin
     if event == E.PLAYER_ENTERING_WORLD then
-        _L:log(10, event)
+        L:log(10, event)
         frame:RegisterEvent('UPDATE_MACROS')
     end
 
     if event == 'UPDATE_MACROS' then
-        _L:log(20, 'Event Received: %s', event)
+        L:log(20, 'Event Received: %s', event)
         OnMacroUpdate()
     end
 end

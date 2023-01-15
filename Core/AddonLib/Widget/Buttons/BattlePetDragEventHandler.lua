@@ -14,7 +14,7 @@ local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local Assert, String = O.Assert, O.String

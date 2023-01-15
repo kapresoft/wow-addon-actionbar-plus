@@ -1,9 +1,17 @@
-local O, Core = __K_Core:LibPack_GlobalObjects()
-
----@type String
-local String = O.String
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
 local tinsert, ipairs = table.insert, ipairs
 
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local O, GC, ns = ABP_LibPack()
+local String = O.String
+
+--[[-----------------------------------------------------------------------------
+New Library
+-------------------------------------------------------------------------------]]
 ---@class ActionType
 local AT = {
     SPELL = 'spell',
@@ -11,10 +19,11 @@ local AT = {
     MACRO = 'macro',
     MACRO_TEXT = 'macrotext',
 }
-Core:Register(Core.M.ActionType, AT)
+ns:Register(ns.M.ActionType, AT)
 
--- ## Start Here ##
-
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 AT.Types = { AT.SPELL, AT.ITEM, AT.MACRO, AT.MACRO_TEXT }
 
 function AT:GetOtherTypes(exceptMe)

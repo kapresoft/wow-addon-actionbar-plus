@@ -1,10 +1,12 @@
+-- TODO NEXT: Use Kapresoft_LibUtil_AceLibrary()
+
 --- Examle Usage:
 ---```
 ---A = O.AceLibFactory:A()
 ---AceConsole = A.AceConsole
 ---AceConfig = A.AceConfig
 --- ```
-local LibStub, Core = __K_Core:LibPack()
+local _, LibStub, ns = ABP_LibPack()
 
 local AceModule = {
     AceAddon = "AceAddon-3.0",
@@ -50,7 +52,7 @@ local __Internal = {}
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class AceLibFactory
-local _L = LibStub:NewLibrary(Core.M.AceLibFactory)
+local _L = LibStub:NewLibrary(ns.M.AceLibFactory)
 _L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
 --[[-----------------------------------------------------------------------------

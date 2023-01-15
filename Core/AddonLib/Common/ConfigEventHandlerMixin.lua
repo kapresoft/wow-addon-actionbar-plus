@@ -2,7 +2,7 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 local GC, AceEvent, String = O.GlobalConstants, O.AceLibrary.AceEvent, O.String
 local IsNotBlank = String.IsNotBlank
 

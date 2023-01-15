@@ -13,10 +13,9 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
-local LogFactory = O.LogFactory
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 
@@ -36,7 +35,7 @@ local _B = LibStub:NewLibrary(Core.M.ButtonUIWidgetBuilder)
 
 ---@class ButtonUILib
 local _L = LibStub:NewLibrary(Core.M.ButtonUI, 1)
-local p = LogFactory:NewLogger(Core.M.ButtonUI)
+local p = O.LogFactory:NewLogger(Core.M.ButtonUI)
 
 ---@return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end

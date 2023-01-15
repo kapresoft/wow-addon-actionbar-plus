@@ -13,7 +13,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local GC, MX = O.GlobalConstants, O.Mixin
 local AO, API, BaseAPI = O.AceLibFactory:A(), O.API, O.BaseAPI
 local LSM, String = AO.AceLibSharedMedia, O.String
@@ -44,8 +45,8 @@ button: widget.button
 -------------------------------------------------------------------------------]]
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
-local L = LibStub:NewLibrary(Core.M.ButtonMixin)
----@type LoggerTemplate
+local L = LibStub:NewLibrary(ns.M.ButtonMixin); if not L then return end
+---@type Logger
 local p = L:GetLogger()
 
 MX:Mixin(L, O.ButtonProfileMixin)

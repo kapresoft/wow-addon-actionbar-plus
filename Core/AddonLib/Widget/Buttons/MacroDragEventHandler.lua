@@ -6,7 +6,8 @@ local GetMacroInfo = GetMacroInfo
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local Assert, String = O.Assert, O.String
 local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
 local s_replace, IsNil = String.replace, Assert.IsNil
@@ -15,7 +16,7 @@ local s_replace, IsNil = String.replace, Assert.IsNil
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.MacroDragEventHandler)
+local L = LibStub:NewLibrary(ns.M.MacroDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods

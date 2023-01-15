@@ -11,7 +11,7 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local GC = O.GlobalConstants

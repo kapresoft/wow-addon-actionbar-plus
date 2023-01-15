@@ -12,7 +12,8 @@ local format, strlower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local LSM = O.AceLibFactory:A().AceLibSharedMedia
 local E = O.GlobalConstants.E
 local C = O.GlobalConstants.C
@@ -28,10 +29,8 @@ local FrameHandleBackdrop = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class FrameHandleMixin
-local L = LibStub:NewLibrary(Core.M.FrameHandleMixin)
-
----@type LoggerTemplate
+---@class FrameHandleMixin : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.FrameHandleMixin); if not L then return end
 local p = L:GetLogger()
 
 --Events

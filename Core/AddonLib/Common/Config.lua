@@ -6,7 +6,7 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 
 local GC, Ace = O.GlobalConstants, O.AceLibrary
 local E, M = GC.E, GC.M
@@ -600,6 +600,7 @@ New Instance
 local function NewInstance()
     --- @type Config
     local L = LibStub:NewLibrary(ns.M.Config); if not L then return end
+
     AceEvent:Embed(L)
     PropsAndMethods(L)
     L:RegisterMessage(M.OnAddOnInitialized, function(evt, ...) L:OnAddOnInitialized(evt, ...) end)

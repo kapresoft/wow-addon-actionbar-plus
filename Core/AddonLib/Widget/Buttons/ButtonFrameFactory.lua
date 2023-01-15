@@ -23,7 +23,7 @@ local C_Timer = C_Timer
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 
 local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()

@@ -9,7 +9,7 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 local BaseAPI, API, GC = O.BaseAPI, O.API, O.GlobalConstants
 local E, M, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI

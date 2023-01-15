@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler

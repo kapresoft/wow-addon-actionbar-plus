@@ -42,20 +42,20 @@ local LibPackMixin = {
 
 ---###Usage:
 ---```
----local addon, ns = ABP_Namespace(...)
+---local addon, ns = ABP_Namespace()
 ---```
 ---#### See: [https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace](https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace)
 --- @return Namespace
-function ABP_Namespace(...)
+local function CreateNamespace(...)
     --- @type string
     local addon
-
     --- @type Namespace
     local ns
-    addon, ns = ...
-    assert(ns, "Did you pass `...` when calling ABP_Namespace(...)?")
 
-    ---this is in case we are testing outside of World of Warcraft
+    addon, ns = ...
+    assert(ns, "Did you pass `...` when calling ABP_Namespace()?")
+
+    --- this is in case we are testing outside of World of Warcraft
     addon = addon or ABP_GlobalConstants.C.ADDON_NAME
 
     --- @type GlobalObjects
@@ -72,6 +72,7 @@ function ABP_Namespace(...)
     --- @type Module
     ns.M = ns.M or {}
 
+
     --- LibStub exists in both ns.LibStub and ns.O.LibStub
     --- @type LocalLibStub
     ns.LibStub = ns.LibStub or nil
@@ -86,20 +87,41 @@ function ABP_Namespace(...)
         --- @param increment number
         --- @return Kapresoft_LibUtil_Incrementer
         function o:CreateIncrementer(start, increment) return CreateIncrementer(start, increment) end
+
+        --- @param moduleName string The module name, i.e. Logger
+        --- @return string The complete module name, i.e. 'ActionbarPlus-Logger-1.0'
+        function o:LibName(moduleName) return self.name .. '-' .. moduleName .. '-1.0' end
+
+        --- @param name string The module name
+        --- @param o any The object to register
+        function o:Register(name, o)
+            if not (name or o) then return end
+            ns.O[name] = o
+        end
     end
 
     Methods(ns)
 
+    ns.mt = { __tostring = function() return addon .. '::Namespace'  end }
+    setmetatable(ns, ns.mt)
+
     return ns
 end
 
+if 'function' == type(ABP_Namespace) then return end
+
+local namespaceInstance = CreateNamespace(...)
+
+--- @return Namespace
+function ABP_Namespace() return namespaceInstance end
+
 --- ```
---- local O, LibStub, ns = ABP_LibPack(...)
+--- local O, LibStub, ns = ABP_LibPack()
 --- ```
 --- @return GlobalObjects, LocalLibStub, Namespace
-function ABP_LibPack(...) return ABP_Namespace(...):LibPack()  end
+function ABP_LibPack() return namespaceInstance:LibPack()  end
 --- ```
---- local O, GC, ns = ABP_LibPack2(...)
+--- local O, GC, ns = ABP_LibPack2()
 --- ```
 --- @return (GlobalObjects, GlobalConstants, Namespace)
-function ABP_LibPack2(...) return ABP_Namespace(...):LibPack2()  end
+function ABP_LibPack2() return namespaceInstance:LibPack2()  end

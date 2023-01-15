@@ -14,7 +14,7 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 
 local MX, String, P = O.Mixin, O.String, O.Profile
 local GC = O.GlobalConstants

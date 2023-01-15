@@ -6,7 +6,7 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, GC, ns = ABP_LibPack2(...)
+local O, GC, ns = ABP_LibPack2()
 local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile

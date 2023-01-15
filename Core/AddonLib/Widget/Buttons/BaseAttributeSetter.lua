@@ -8,7 +8,7 @@ local InCombatLockdown = InCombatLockdown
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack(...)
+local O, LibStub, ns = ABP_LibPack()
 local GC, WMX, String, Profile = O.GlobalConstants, O.WidgetMixin, O.String, O.Profile
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names

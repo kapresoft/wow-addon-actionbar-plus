@@ -13,12 +13,10 @@ local MAX_BUTTONS = 50
 --[[-----------------------------------------------------------------------------
 New Library
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
 
 ---@class LocalizationUtil : BaseLibraryObject
-local L = LibStub:NewLibrary(Core.M.LocalizationUtil)
-if not L then return end
-
+local L = LibStub:NewLibrary(ns.M.LocalizationUtil); if not L then return end
 local p = L:GetLogger()
 
 L.MAX_BARS = MAX_BARS

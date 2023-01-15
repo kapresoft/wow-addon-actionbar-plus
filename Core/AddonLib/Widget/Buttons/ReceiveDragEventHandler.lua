@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O, GC = ns.O.LibStub, ns.Core, ns.O, ns.O.GlobalConstants
 
 local A, AT, WAttr = O.Assert, O.ActionType, GC.WidgetAttributes

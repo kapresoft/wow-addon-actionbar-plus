@@ -6,7 +6,7 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
+local ns = ABP_Namespace()
 local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
 
 local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table

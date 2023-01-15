@@ -1,3 +1,4 @@
+-- TODO NEXT: Remove this unused library.
 --[[-----------------------------------------------------------------------------
 Lua vars
 -------------------------------------------------------------------------------]]
@@ -12,7 +13,8 @@ local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:A().AceGUI, O.WidgetMixin
 local GC = O.GlobalConstants
 local ICON_PREFIX = 'Interface/Icons/'
@@ -53,7 +55,7 @@ local iconOptions = {
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroTextureDialog
-local _L = LibStub:NewLibrary(Core.M.MacroTextureDialog)
+local _L = LibStub:NewLibrary('MacroTextureDialog')
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -256,7 +258,7 @@ end
 --[[-----------------------------------------------------------------------------
 Frame
 -------------------------------------------------------------------------------]]
-local f = CreateFrame("Frame", Core.addonName .. "MacroTextureDialogFrame", UIParent)
+local f = CreateFrame("Frame", ns.name .. "MacroTextureDialogFrame", UIParent)
 f:SetScript("OnEvent", function(self, event, ...)
     if event ~= 'PLAYER_ENTERING_WORLD' then return end
     --local isLogin, isReload = ...

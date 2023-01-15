@@ -6,7 +6,8 @@ local GetItemInfo = GetItemInfo
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+local O, LibStub, ns = ABP_LibPack()
+
 local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
 local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
 local IsNil = Assert.IsNil
@@ -16,7 +17,7 @@ local API = O.API
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ItemDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.ItemDragEventHandler)
+local L = LibStub:NewLibrary(ns.M.ItemDragEventHandler); if not L then return end
 
 -- ## Functions ------------------------------------------------
 --- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
