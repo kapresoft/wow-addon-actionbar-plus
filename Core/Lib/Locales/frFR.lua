@@ -1,7 +1,9 @@
 --[[-----------------------------------------------------------------------------
-Lua Vars
+Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
+--- @type Namespace
+local _, ns = ...
+
 local LocUtil = ns.O.LocalizationUtil
 
 ---@type AceLocale

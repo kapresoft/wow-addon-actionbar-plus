@@ -13,7 +13,9 @@ local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:A().AceGUI, O.WidgetMixin
 local GC = O.GlobalConstants

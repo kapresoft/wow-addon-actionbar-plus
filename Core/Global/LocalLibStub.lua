@@ -6,7 +6,8 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
+--- @type Namespace
+local _, ns = ...
 
 --- @type LibStub
 local LibStub = LibStub

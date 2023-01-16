@@ -6,7 +6,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local GC, Ace = O.GlobalConstants, O.AceLibrary
 local E, M = GC.E, GC.M

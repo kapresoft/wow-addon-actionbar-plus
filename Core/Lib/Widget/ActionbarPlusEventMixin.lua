@@ -9,9 +9,12 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
-local BaseAPI, API, GC = O.BaseAPI, O.API, O.GlobalConstants
-local E, M, UnitId = GC.E, GC.M,  GC.UnitId
+--- @type Namespace
+local _, ns = ...
+local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
+
+local BaseAPI, API = O.BaseAPI, O.API
+local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI
 local AceEvent = O.AceLibFactory:A().AceEvent
 local CURSOR_ITEM_TYPE = 1
@@ -46,7 +49,7 @@ AceEvent:Embed(L)
 local p = L:GetLogger()
 
 --- @param abp ActionbarPlus
-L:RegisterMessage(M.OnAddOnInitialized, function(msg, abp)
+L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
     p:log(10, 'RegisterMessage: %s received...', msg)
     abp.addonEvents:RegisterEvents()
 end)

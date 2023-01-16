@@ -12,7 +12,9 @@ local format, strlower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local LSM = O.AceLibFactory:A().AceLibSharedMedia
 local E = O.GlobalConstants.E

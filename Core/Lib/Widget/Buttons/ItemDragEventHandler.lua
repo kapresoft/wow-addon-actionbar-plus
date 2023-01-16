@@ -6,7 +6,9 @@ local GetItemInfo = GetItemInfo
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
 local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes

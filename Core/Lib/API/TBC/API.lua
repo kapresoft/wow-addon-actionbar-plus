@@ -17,7 +17,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, GC, ns = ABP_LibPack2()
+--- @type Namespace
+local _, ns = ...
+local O = ns.O
 
 local String = O.String
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower

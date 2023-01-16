@@ -1,16 +1,18 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local O, LibStub, ns = ABP_LibPack()
-local GC, AceEvent, String = O.GlobalConstants, O.AceLibrary.AceEvent, O.String
+local AceEvent, String = O.AceLibrary.AceEvent, O.String
 local IsNotBlank = String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class ConfigEventHandlerMixin : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(ns.M.ConfigEventHandlerMixin); if not L then return end
+local L = LibStub:NewLibrary(M.ConfigEventHandlerMixin); if not L then return end
 AceEvent:Embed(L)
 local p = L:GetLogger()
 

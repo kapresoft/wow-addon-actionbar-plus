@@ -6,7 +6,10 @@ local type, pairs, tostring = type, pairs, tostring
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
+
 local GC, Ace = O.GlobalConstants, O.AceLibrary
 local M = GC.M
 local Table, Assert = O.Table, O.Assert

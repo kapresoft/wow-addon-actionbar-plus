@@ -6,7 +6,9 @@ local GetShapeshiftForm = GetShapeshiftForm
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 --[[-----------------------------------------------------------------------------
 New Instance

@@ -6,7 +6,9 @@ local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local String, Assert = O.String, O.Assert
 local WAttr = O.GlobalConstants.WidgetAttributes

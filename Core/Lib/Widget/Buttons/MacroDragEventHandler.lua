@@ -6,7 +6,9 @@ local GetMacroInfo = GetMacroInfo
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 local Assert, String = O.Assert, O.String
 local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler

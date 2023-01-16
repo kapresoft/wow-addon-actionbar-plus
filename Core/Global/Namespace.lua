@@ -27,24 +27,17 @@ Define_InterfaceMethods(_ns)
 --- @class LibPackMixin
 local LibPackMixin = {
 
-    --- @return GlobalObjects, LocalLibStub, Namespace
-    --- @param self LibPackMixin
-    LibPack = function(self) return self.O, self.O.LibStub, self end,
+    --- @type fun(self:LibPackMixin) : GlobalObjects, LocalLibStub
+    LibPack = function(self) return self.O, self.O.LibStub end,
 
-    --- @param self LibPackMixin
-    --- @return GlobalObjects, GlobalConstants, Namespace
-    LibPack2 = function(self) return self.O, self.O.GlobalConstants, self end,
-
-    --- @param self LibPackMixin
-    AceEvent = function(self) return self.O.AceLibrary.AceEvent:Embed({}) end,
-
+    --- @type fun(self:LibPackMixin) : GlobalObjects, GlobalConstants
+    LibPack2 = function(self) return self.O, self.O.GlobalConstants end,
 }
+--- @generic A : AceEvent
+--- @return A
+function LibPackMixin:AceEvent() return self.O.AceLibrary.AceEvent:Embed({}) end
 
----###Usage:
----```
----local addon, ns = ABP_Namespace()
----```
----#### See: [https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace](https://wowpedia.fandom.com/wiki/Using_the_AddOn_namespace)
+
 --- @return Namespace
 local function CreateNamespace(...)
     --- @type string
@@ -53,7 +46,6 @@ local function CreateNamespace(...)
     local ns
 
     addon, ns = ...
-    assert(ns, "Did you pass `...` when calling ABP_Namespace()?")
 
     --- this is in case we are testing outside of World of Warcraft
     addon = addon or ABP_GlobalConstants.C.ADDON_NAME
@@ -106,20 +98,6 @@ local function CreateNamespace(...)
     return ns
 end
 
-if 'function' == type(ABP_Namespace) then return end
+if _ns.name then return end
 
-local namespaceInstance = CreateNamespace(...)
-
---- @return Namespace
-function ABP_Namespace() return namespaceInstance end
-
---- ```
---- local O, LibStub, ns = ABP_LibPack()
---- ```
---- @return GlobalObjects, LocalLibStub, Namespace
-function ABP_LibPack() return namespaceInstance:LibPack()  end
---- ```
---- local O, GC, ns = ABP_LibPack2()
---- ```
---- @return (GlobalObjects, GlobalConstants, Namespace)
-function ABP_LibPack2() return namespaceInstance:LibPack2()  end
+CreateNamespace(...)

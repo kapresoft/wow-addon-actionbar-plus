@@ -8,8 +8,11 @@ local InCombatLockdown = InCombatLockdown
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
-local GC, WMX, String, Profile = O.GlobalConstants, O.WidgetMixin, O.String, O.Profile
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+
+local WMX, String, Profile = O.WidgetMixin, O.String, O.Profile
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
 
@@ -34,8 +37,8 @@ local AttributeSetter = {
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class BaseAttributeSetter : AttributeSetter
-local _L = LibStub:NewLibrary(ns.M.BaseAttributeSetter)
-local p = _L:GetLogger()
+local L = LibStub:NewLibrary(M.BaseAttributeSetter); if not L then return end
+local p = L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -68,13 +71,13 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 --- @param btn ButtonUI
-function _L:OnAfterSetAttributes(btn)
+function L:OnAfterSetAttributes(btn)
     AddPostCombat(btn)
     self:HandleGameTooltipCallbacks(btn)
 end
 
 --- @param btn ButtonUI
-function _L:HandleGameTooltipCallbacks(btn)
+function L:HandleGameTooltipCallbacks(btn)
     --- @param w ButtonUIWidget
     btn.widget:SetCallback(GC.E.OnEnter, function(w, event)
         if InCombatLockdown() then
@@ -101,14 +104,14 @@ function _L:HandleGameTooltipCallbacks(btn)
     end)
 end
 
-function _L:GetTooltipAnchorType()
+function L:GetTooltipAnchorType()
     local profile = ns.db.profile
     return profile[PCN.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPRIGHT
 end
 
 --- @see TooltipAnchor
 --- @param btnUI ButtonUI The UIFrame
-function _L:SetToolTipOwner(btnUI)
+function L:SetToolTipOwner(btnUI)
     local anchorType = self:GetTooltipAnchorType()
     local owner = GetTooltipOwner(btnUI, anchorType)
     local resolvedAnchor = GetAnchorKeyword(anchorType)

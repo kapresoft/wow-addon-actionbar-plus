@@ -6,8 +6,10 @@ local tinsert, ipairs = table.insert, ipairs
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, GC, ns = ABP_LibPack()
-local String = O.String
+--- @type Namespace
+local _, ns = ...
+
+local String = ns.O.String
 
 --[[-----------------------------------------------------------------------------
 New Library

@@ -6,7 +6,10 @@
 ---AceConsole = A.AceConsole
 ---AceConfig = A.AceConfig
 --- ```
-local _, LibStub, ns = ABP_LibPack()
+
+--- @type Namespace
+local _, ns = ...
+local M, LibStub = ns.M, ns.O.LibStub
 
 local AceModule = {
     AceAddon = "AceAddon-3.0",
@@ -52,7 +55,7 @@ local __Internal = {}
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class AceLibFactory
-local _L = LibStub:NewLibrary(ns.M.AceLibFactory)
+local _L = LibStub:NewLibrary(M.AceLibFactory)
 _L.mt.__call = function (_, ...) return _L:Constructor(...) end
 
 --[[-----------------------------------------------------------------------------

@@ -13,10 +13,12 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
 
-local GC, MX = O.GlobalConstants, O.Mixin
-local AO, API, BaseAPI = O.AceLibFactory:A(), O.API, O.BaseAPI
+local MX = O.Mixin
+local AO = O.AceLibFactory:A()
 local LSM, String = AO.AceLibSharedMedia, O.String
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
@@ -45,7 +47,7 @@ button: widget.button
 -------------------------------------------------------------------------------]]
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
-local L = LibStub:NewLibrary(ns.M.ButtonMixin); if not L then return end
+local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end
 ---@type Logger
 local p = L:GetLogger()
 

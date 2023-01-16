@@ -1,7 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, GC, ns = ABP_LibPack2()
+--- @type Namespace
+local _, ns = ...
+local O, GC = ns.O, ns.O.GlobalConstants
+
 local AceEvent, M, TA =  O.AceLibrary.AceEvent, GC.M, GC.TooltipAnchor
 
 --[[-----------------------------------------------------------------------------

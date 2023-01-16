@@ -13,7 +13,9 @@ local format, strlower, tinsert = string.format, string.lower, table.insert
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, LibStub, ns = ABP_LibPack()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 local GC, AceEvent = O.GlobalConstants, O.AceLibrary.AceEvent
 local String, A, P = O.String, O.Assert, O.Profile
 local ButtonFrameFactory = O.ButtonFrameFactory
