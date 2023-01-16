@@ -6,16 +6,17 @@ local GetShapeshiftForm = GetShapeshiftForm
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, Core, LibStub = __K_Core:LibPack_GlobalObjects()
+--- @type Namespace
+local _, ns = ...
+local O, LibStub = ns:LibPack()
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class DruidAPI
-local L = LibStub:NewLibrary(Core.M.DruidAPI)
----@return LoggerTemplate
+---@class DruidAPI : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.DruidAPI)
+
 local p = L:GetLogger()
-p:log(10, "Hello: %s", Core.M.DruidAPI)
 
 -- Add to Modules.lua
 --DruidAPI = 'DruidAPI',

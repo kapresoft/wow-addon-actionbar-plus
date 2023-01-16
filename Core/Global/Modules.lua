@@ -13,7 +13,6 @@ setmetatable(L, L.mt)
 
 --- @class Module
 local M = {
-    Core = 'Core',
     LibStub = 'LibStub',
 
     -- Libraries
@@ -60,11 +59,10 @@ local M = {
     MacroDragEventHandler = 'MacroDragEventHandler',
     MacroEventsHandler = 'MacroEventsHandler',
     MacrotextAttributeSetter = 'MacrotextAttributeSetter',
-    MacroTextureDialog = 'MacroTextureDialog',
+    Modules = 'Modules',
     MountDragEventHandler = 'MountDragEventHandler',
     MountAttributeSetter = 'MountAttributeSetter',
     PickupHandler = 'PickupHandler',
-    PopupDebugDialog = 'PopupDebugDialog',
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
@@ -76,8 +74,6 @@ local M = {
 
 --- @class GlobalObjects
 local GlobalObjectsTemplate = {
-    --- @type Core,
-    Core = {},
     --- @type LocalLibStub
     LibStub = {},
 
@@ -140,8 +136,6 @@ local GlobalObjectsTemplate = {
     MacroDragEventHandler = {},
     --- @type MacroEventsHandler
     MacroEventsHandler = {},
-    --- @type MacroTextureDialog
-    MacroTextureDialog = {},
     --- @type MacrotextAttributeSetter
     MacrotextAttributeSetter = {},
     --- @type Modules
@@ -164,8 +158,6 @@ local GlobalObjectsTemplate = {
     Mixin = {},
     --- @type PickupHandler
     PickupHandler = {},
-    --- @type PopupDebugDialog
-    PopupDebugDialog = {},
     --- @type Profile
     Profile = {},
     --- @type ProfileInitializer
@@ -190,3 +182,5 @@ ns.M = M
 
 --- @type Modules
 ABP_Modules = L
+ns.O = ns.O or {}
+ns.O.Modules = L

@@ -16,10 +16,12 @@ Local Vars
 -------------------------------------------------------------------------------]]
 -- Bump this version for every release tag
 --
-local O, LibStub, ns = ABP_LibPack(...)
 
-local ADDON_NAME = ns.name
-local GC, AO = O.GlobalConstants, O.AceLibFactory:A()
+--- @type Namespace
+local _, ns = ...
+local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
+
+local AO = O.AceLibFactory:A()
 local GCC, M = GC.C, GC.M
 
 local String, Table, LogFactory = O.String, O.Table, O.LogFactory
@@ -54,7 +56,6 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
     p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
-
 end
 
 --- @return ActionbarPlus_Frame
@@ -141,11 +142,11 @@ local methods = {
             optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
         end
         if optionsConfigPath ~= nil then
-            AceConfigDialog:SelectGroup(ADDON_NAME, optionsConfigPath)
+            AceConfigDialog:SelectGroup(ns.name, optionsConfigPath)
         end
-        AceConfigDialog:Open(ADDON_NAME, self.configFrame)
+        AceConfigDialog:Open(ns.name, self.configFrame)
         self.onHideHooked = self.onHideHooked or false
-        self.configDialogWidget = AceConfigDialog.OpenFrames[ADDON_NAME]
+        self.configDialogWidget = AceConfigDialog.OpenFrames[ns.name]
 
         PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
         if not self.onHideHooked then
@@ -209,7 +210,7 @@ New Addon Instance
 --- @return ActionbarPlus
 local function NewInstance()
     --- @class ActionbarPlus : ActionbarPlus_Methods
-    local A = LibStub:NewAddon(GC.C.ADDON_NAME)
+    local A = LibStub:NewAddon(ns.name)
     MX:Mixin(A, methods)
     A.ActionbarEmptyGridShowing = false
 

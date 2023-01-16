@@ -16,10 +16,10 @@ local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, Unit
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
-local GC = O.GlobalConstants
 local UnitId = GC.UnitId
 local String, Assert = O.String, O.Assert
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
@@ -27,9 +27,8 @@ local WAttr = O.GlobalConstants.WidgetAttributes
 local MOUNT, COMPANION = WAttr.MOUNT, WAttr.COMPANION
 local sformat = String.format
 
----@class BaseAPI
-local L = LibStub:NewLibrary(Core.M.BaseAPI)
----@type LoggerTemplate
+---@class BaseAPI : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.BaseAPI)
 local p = L:GetLogger()
 
 --[[-----------------------------------------------------------------------------

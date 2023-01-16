@@ -17,8 +17,9 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace(...)
-local Core, O = ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O = ns.O
 
 local String = O.String
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
@@ -33,10 +34,12 @@ New Instance
 local S = {}
 ---@type API
 _API = S
---TODO: Next Deprecate Global Var _API
-Core:Register(Core.M.API, S)
 
-local p = O.LogFactory('API')
+--TODO: Next Deprecate Global Var _API
+ns:Register(ns.M.API, S)
+
+--- @type Logger
+local p = O.LogFactory(ns.M.API)
 
 --[[-----------------------------------------------------------------------------
 Methods

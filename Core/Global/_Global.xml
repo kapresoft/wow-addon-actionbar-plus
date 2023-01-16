@@ -4,5 +4,7 @@
     <Script file="GlobalConstants.lua"/>
     <Script file="Modules.lua"/>
     <Script file="Namespace.lua"/>
+    <Script file="External-Lib-Wrapper.lua"/>
+    <Script file="LocalLibStub.lua"/>
 
 </Ui>

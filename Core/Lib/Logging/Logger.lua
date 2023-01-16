@@ -1,22 +1,63 @@
--- ## External -------------------------------------------------
-local LibStub = LibStub
----@type pformat
-local pformat = pformat
-assert(pformat ~= nil, 'PrettyFormatter pformat is required')
-local format, tableUnpack = string.format, table.unpack
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+--- @type Namespace
+local _, ns = ...
 
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local format, tableUnpack = string.format, table.unpack
 local type, select, tostring, error, setmetatable = type, select, tostring, error, setmetatable
 
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+local LibStub = LibStub
 local C = LibStub('AceConsole-3.0', true)
--- ## Local ----------------------------------------------------
-local Core = __K_Core
-local major, minor, logPrefix = Core:GetLibVersion(Core.M.Logger)
----@class Logger
-local L = LibStub:NewLibrary(major, minor)
-Core:Register(Core.M.Logger, L)
 
--- ## Functions ------------------------------------------------
----@class LogUtil
+--- @type pformat
+local pformat = ns.pformat
+assert(pformat ~= nil, 'PrettyFormatter pformat is required')
+
+--- @class LogColors
+local colors = {
+    primary   = '2db9fb',
+    secondary = 'fbeb2d',
+    tertiary  = 'ffffff',
+}
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- @param c LogColors
+local function colorMethods(c)
+    --- @param text string
+    function c:pcolor(text) return format('|cfd%s%s|r', self.primary, text) end
+    --- @param text string
+    function c:scolor(text) return format('|cfd%s%s|r', self.secondary, text) end
+    --- @param text string
+    function c:tcolor(text) return format('|cfd%s%s|r', self.tertiary, text) end
+
+    function c:GetLogPrefix(logName)
+        return self:tcolor('{{') .. self:pcolor(logName) .. self:scolor('%s') .. self:tcolor('}}')
+    end
+end
+colorMethods(colors)
+local logPrefix = colors:GetLogPrefix(ns.name)
+--[[-----------------------------------------------------------------------------
+New Library
+-------------------------------------------------------------------------------]]
+local major, minor, moduleName = ns:LibName(ns.M.Logger), 1, ns.M.Logger
+
+--- @type Logger
+local L = LibStub:NewLibrary(major, minor)
+ns:Register(moduleName, L)
+
+--[[-----------------------------------------------------------------------------
+LogUtil
+-------------------------------------------------------------------------------]]
+--- @class LogUtil
 local _U = { }
 
 function _U.getSortedKeys(t)
@@ -27,7 +68,7 @@ function _U.getSortedKeys(t)
     return keys
 end
 
----@param t table The table to format
+--- @param t table The table to format
 function _U.format(t, optionalAddNewline)
     local addNewLine = optionalAddNewline or false
     if type(t) ~= 'table' then return tostring(t) end
@@ -52,7 +93,7 @@ end
 function _U.t_pack(...) return { len = select("#", ...), ... } end
 
 ---Fail-safe unpack
----@param t table The table to unpack
+--- @param t table The table to unpack
 function _U.t_unpack(t)
     if type(unpack) == 'function' then return unpack(t) end
     return tableUnpack(t)
@@ -73,7 +114,7 @@ function _U.slice(t, startIndex, stopIndex)
     return new
 end
 
----@param level number The level configured by the log function call
+--- @param level number The level configured by the log function call
 local function ShouldLog(level)
     assert(type(level) == 'number', 'Level should be a number between 1 and 100')
     local function GetLogLevel() return ABP_LOG_LEVEL end
@@ -90,8 +131,11 @@ local DEFAULT_FORMATTER = {
 }
 local TABLE_FORMATTER = { format = function(o) return _U.format(o, false) end }
 
----@param obj table
----@param optionalLogName string The optional logger name
+--[[-----------------------------------------------------------------------------
+EmbedLogger
+-------------------------------------------------------------------------------]]
+--- @param obj table
+--- @param optionalLogName string The optional logger name
 local function _EmbedLogger(obj, optionalLogName)
     local prefix = ''
     if type(optionalLogName) == 'string' then prefix = '::' .. optionalLogName end
@@ -159,13 +203,6 @@ local function _EmbedLogger(obj, optionalLogName)
             error(format('Argument #%s requires a string.format text', startIndex))
         end
 
-        --if len == 2 then
-        --    local textFormat = args[startIndex]
-        --    local o = args[startIndex + 1]
-        --    self:Printf(format(textFormat, self:format(o)))
-        --    return
-        --end
-
         args = _U.t_sliceAndPack({...}, startIndex)
         local newArgs = {}
         for i=1,args.len do
@@ -173,57 +210,10 @@ local function _EmbedLogger(obj, optionalLogName)
             newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
         self:Printf(format(_U.t_unpack(newArgs)))
-    end
-
-    function obj:logOrig(...)
-        local args = _U.t_pack(...)
-        if args.len == 1 then
-            self:Print(self:ArgToString(args[1]))
-            return
-        end
-        local level = 0
-        local startIndex = 1
-        if type(args[1]) == 'number' then
-            level = args[1]
-            startIndex = 2
-        end
-        if type(args[startIndex]) ~= 'string' then
-            error(format('Argument #%s requires a string.format text', startIndex))
-        end
-        if not ShouldLog(level) then return end
-
-        args = _U.t_sliceAndPack({...}, startIndex)
-        local newArgs = {}
-        for i=1,args.len do
-            local formatSafe = i > 1
-            newArgs[i] = self:ArgToString(args[i], formatSafe)
-        end
-        self:Printf(format(_U.t_unpack(newArgs)))
-    end
-
-    -- Log a Pretty Formatted Object
-    -- self:logp(itemInfo)
-    -- self:logp("itemInfo", itemInfo)
-    function obj:logp(...)
-        local count = select('#', ...)
-        if count == 1 then
-            self:log(pformat(select(1, ...)))
-            return
-        end
-        local label, obj = select(1, ...)
-        self:log(label .. ': %s', pformat(obj))
-    end
-
-    -- Backwards compat
-    function obj:logf(...) self:log(...) end
-    -- Backwards compat
-    -- Example print('String value')
-    function obj:print(...)
-        self:Print(...)
     end
 
     ---Convert arguments to string
-    ---@param optionalStringFormatSafe boolean Set to true to escape '%' characters used by string.forma
+    --- @param optionalStringFormatSafe boolean Set to true to escape '%' characters used by string.forma
     function obj:ArgToString(any, optionalStringFormatSafe)
         local text
         if type(any) == 'table' then text = self:format(any) else text = tostring(any) end
@@ -235,9 +225,12 @@ local function _EmbedLogger(obj, optionalLogName)
 
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 ---Embed on a generic object
----@param obj table
----@param optionalLogName string The optional log name
+--- @param obj table
+--- @param optionalLogName string The optional log name
 function L:Embed(obj, optionalLogName)
     C:Embed(obj)
     _EmbedLogger(obj, optionalLogName)

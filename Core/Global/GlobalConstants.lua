@@ -2,6 +2,7 @@
 Global Variables Initialization
 -------------------------------------------------------------------------------]]
 -- log levels, 10, 20, (+10), 100
+-- TODO NEXT: Move to player login event
 if type(ABP_PLUS_DB) ~= "table" then ABP_PLUS_DB = {} end
 if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
@@ -222,6 +223,28 @@ local function GlobalConstantProperties(o)
         OnTooltipFrameUpdate  = 'OnTooltipFrameUpdate',
     }
 
+    --- @class WidgetGlobals
+    local Widgets = {
+        BACKDROP_DIALOG_32_32 = {
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true,
+            tileEdge = true,
+            tileSize = 32,
+            edgeSize = 24,
+            insets = { left = 6, right = 5, top = 5, bottom = 6 },
+        },
+        BACKDROP_CHARACTER_CREATE_TOOLTIP_32_32 = {
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Glues\\Common\\TextPanel-Border",
+            tile = true,
+            tileEdge = true,
+            tileSize = 32,
+            edgeSize = 32,
+            insets = { left = 8, right = 4, top = 4, bottom = 8 },
+        }
+    }
+
     --- @deprecated Use #UnitId
     --- @class UnitIDAttributes
     local UnitIDAttributes = {
@@ -353,6 +376,7 @@ local function GlobalConstantProperties(o)
     o.C = C
     o.E = Events
     o.M = Messages
+    o.W = Widgets
     o.Default = Default
     o.Profile_Config_Names = Profile_Config_Names
     o.Profile_Config_Widget_Names = Profile_Config_Widget_Names
