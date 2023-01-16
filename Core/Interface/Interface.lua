@@ -206,7 +206,7 @@ local SpellcastSent_Data = {
 Config
 -------------------------------------------------------------------------------]]
 --- @class Config : BaseLibraryObject_Initialized_WithAceEvent
-local _Config_Interface = {
+local Config = {
     --- @type ActionbarPlus
     addon = {},
     --- @type Profile
