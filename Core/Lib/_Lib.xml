@@ -3,6 +3,14 @@
 
     <Include file="Logging\_Logging.xml"/>
     <Include file="Locales\_Locales.xml"/>
-    <Include file="Common\_Common.xml"/>
+    <Include file="Ace3\_Ace3.xml"/>
     <Include file='API\_API.xml'/>
+
+    <Include file='Common\_Common.xml'/>
+    <Include file='Widget\_Widget.xml'/>
+
+    <!--@debug@-->
+    <Include file='Developer\_Developer.xml'/>
+    <!--@end-debug@-->
+
 </Ui>
