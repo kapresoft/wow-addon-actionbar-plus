@@ -16,7 +16,7 @@ local LibStub = LibStub
 local C = LibStub('AceConsole-3.0', true)
 
 --- @type pformat
-local pformat = pformat
+local pformat = ns.pformat
 assert(pformat ~= nil, 'PrettyFormatter pformat is required')
 
 --- @class LogColors
@@ -202,13 +202,6 @@ local function _EmbedLogger(obj, optionalLogName)
             error(format('Argument #%s requires a string.format text', startIndex))
         end
 
-        --if len == 2 then
-        --    local textFormat = args[startIndex]
-        --    local o = args[startIndex + 1]
-        --    self:Printf(format(textFormat, self:format(o)))
-        --    return
-        --end
-
         args = _U.t_sliceAndPack({...}, startIndex)
         local newArgs = {}
         for i=1,args.len do
@@ -216,53 +209,6 @@ local function _EmbedLogger(obj, optionalLogName)
             newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
         self:Printf(format(_U.t_unpack(newArgs)))
-    end
-
-    function obj:logOrig(...)
-        local args = _U.t_pack(...)
-        if args.len == 1 then
-            self:Print(self:ArgToString(args[1]))
-            return
-        end
-        local level = 0
-        local startIndex = 1
-        if type(args[1]) == 'number' then
-            level = args[1]
-            startIndex = 2
-        end
-        if type(args[startIndex]) ~= 'string' then
-            error(format('Argument #%s requires a string.format text', startIndex))
-        end
-        if not ShouldLog(level) then return end
-
-        args = _U.t_sliceAndPack({...}, startIndex)
-        local newArgs = {}
-        for i=1,args.len do
-            local formatSafe = i > 1
-            newArgs[i] = self:ArgToString(args[i], formatSafe)
-        end
-        self:Printf(format(_U.t_unpack(newArgs)))
-    end
-
-    -- Log a Pretty Formatted Object
-    -- self:logp(itemInfo)
-    -- self:logp("itemInfo", itemInfo)
-    function obj:logp(...)
-        local count = select('#', ...)
-        if count == 1 then
-            self:log(pformat(select(1, ...)))
-            return
-        end
-        local label, obj = select(1, ...)
-        self:log(label .. ': %s', pformat(obj))
-    end
-
-    -- Backwards compat
-    function obj:logf(...) self:log(...) end
-    -- Backwards compat
-    -- Example print('String value')
-    function obj:print(...)
-        self:Print(...)
     end
 
     ---Convert arguments to string

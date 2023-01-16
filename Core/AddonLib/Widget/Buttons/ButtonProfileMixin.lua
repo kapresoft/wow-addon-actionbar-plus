@@ -6,10 +6,10 @@ local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyD
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local GC = O.GlobalConstants
 local CN = GC.Profile_Config_Names
 local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
@@ -17,14 +17,14 @@ local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
             WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
 local IsTableEmpty = Table.isEmpty
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
-local p = O.LogFactory(Core.M.ButtonProfileMixin)
+local p = O.LogFactory(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 
 ---@class ButtonProfileMixin
-local _L = LibStub:NewLibrary(Core.M.ButtonProfileMixin)
+local _L = LibStub:NewLibrary(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions

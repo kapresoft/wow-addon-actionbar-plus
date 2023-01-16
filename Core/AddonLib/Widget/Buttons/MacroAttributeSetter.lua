@@ -11,10 +11,10 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local GC = O.GlobalConstants
 local String, WAttr = O.String, GC.WidgetAttributes
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
 local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
@@ -23,9 +23,9 @@ local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.MacroAttributeSetter)
+local S = LibStub:NewLibrary(M.MacroAttributeSetter); if not S then return end
 ---@type BaseAttributeSetter
-local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
+local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods

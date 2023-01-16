@@ -6,27 +6,26 @@ local GameTooltip, C_MountJournal = GameTooltip, C_MountJournal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local Assert, String = O.Assert, O.String
-local BaseAPI, PH, GC = O.BaseAPI, O.PickupHandler, O.GlobalConstants
-local IsBlank, IsNotBlank, AssertNotNil, IsNil =
-    String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
+local BaseAPI, PH = O.BaseAPI, O.PickupHandler
+local IsNil = O.Assert.IsNil
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(Core.M.MountDragEventHandler)
+local p = O.LogFactory(M.MountDragEventHandler)
 
 ---@class MountDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.MountDragEventHandler)
+local L = LibStub:NewLibrary(M.MountDragEventHandler); if not L then return end
 
 ---@class MountAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.MountAttributeSetter)
+local S = LibStub:NewLibrary(M.MountAttributeSetter); if not S then return end
 ---@type BaseAttributeSetter
-local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
+local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
 ---@param mount MountInfo
 ---@return boolean

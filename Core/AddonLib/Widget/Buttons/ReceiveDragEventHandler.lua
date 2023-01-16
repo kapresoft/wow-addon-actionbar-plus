@@ -1,8 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O, GC = ns.O.LibStub, ns.Core, ns.O, ns.O.GlobalConstants
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local A, AT, WAttr = O.Assert, O.ActionType, GC.WidgetAttributes
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
@@ -26,7 +27,7 @@ local DragEventHandler = {
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler
-local L = LibStub:NewLibrary(Core.M.ReceiveDragEventHandler)
+local L = LibStub:NewLibrary(M.ReceiveDragEventHandler); if not L then return end
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 --- README: Also need to add the attribute setterin in ButtonFactor#AttributeSetters

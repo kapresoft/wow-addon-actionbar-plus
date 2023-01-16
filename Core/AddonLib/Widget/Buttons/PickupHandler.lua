@@ -6,27 +6,28 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table
 local IsNotBlank, IsTableEmpty = O.String.IsNotBlank, Table.isEmpty
-local WAttr = O.GlobalConstants.WidgetAttributes
+local WAttr = GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION =
     WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 
-local p = LogFactory(Core.M.PickupHandler)
+local p = LogFactory(M.PickupHandler)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class PickupHandler
-local _L = LibStub:NewLibrary(Core.M.PickupHandler)
+local L = LibStub:NewLibrary(M.PickupHandler); if not L then return end
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-function _L:IsPickingUpSomething()
+function L:IsPickingUpSomething()
     local type = GetCursorInfo()
     return IsNotBlank(type)
 end
@@ -58,12 +59,12 @@ end
 ---## Pickup APIs
 --- - see [API_PickupCompanion](https://wowpedia.fandom.com/wiki/API_PickupCompanion) for Mounts and Companion
 ---@param widget ButtonUIWidget
-function _L:PickupExisting(widget)
+function L:PickupExisting(widget)
     PickupStuff(widget)
 end
 
 ---@param widget ButtonUIWidget
-function _L:Pickup(widget)
+function L:Pickup(widget)
     PickupStuff(widget)
 end
 

@@ -6,10 +6,10 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local GC = O.GlobalConstants
 local ATTR, Table = GC.WidgetAttributes, O.Table
 local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
 
@@ -18,7 +18,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 
 --- @class ProfileInitializer : BaseLibraryObject_Initialized
-local P = LibStub:NewLibrary(Core.M.ProfileInitializer)
+local P = LibStub:NewLibrary(M.ProfileInitializer); if not P then return end
 if not P then return end
 
 local p = P:GetLogger()

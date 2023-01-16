@@ -14,11 +14,12 @@ local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local Assert, String = O.Assert, O.String
-local PH, GC = O.PickupHandler, O.GlobalConstants
+local PH = O.PickupHandler
 local IsBlank, IsNotBlank, AssertNotNil, IsNil =
     String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
@@ -27,15 +28,15 @@ local BaseAPI = O.BaseAPI
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(Core.M.CompanionDragEventHandler)
+local p = O.LogFactory(M.CompanionDragEventHandler)
 
 ---@class BattlePetDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.BattlePetDragEventHandler)
+local L = LibStub:NewLibrary(M.BattlePetDragEventHandler)
 
 ---@class BattlePetAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.BattlePetAttributeSetter)
+local S = LibStub:NewLibrary(M.BattlePetAttributeSetter)
 ---@type BaseAttributeSetter
-local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
+local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
 ---@param battlePet BattlePetInfo
 ---@return boolean

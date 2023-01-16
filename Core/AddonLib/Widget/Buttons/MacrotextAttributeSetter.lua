@@ -6,10 +6,10 @@ local GameTooltip = GameTooltip
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local GC = O.GlobalConstants
 local WAttr, Assert = GC.WidgetAttributes, O.Assert
 local AssertNotNil = Assert.AssertNotNil
 
@@ -17,7 +17,7 @@ local AssertNotNil = Assert.AssertNotNil
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacrotextAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.MacrotextAttributeSetter)
+local S = LibStub:NewLibrary(M.MacrotextAttributeSetter); if not S then return end
 ---@type BaseAttributeSetter
 local BaseAttributeSetter = O.BaseAttributeSetter
 

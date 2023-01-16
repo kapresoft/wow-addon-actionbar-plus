@@ -1,15 +1,17 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+
 local IsBlank = O.String.IsBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class CursorMixin : BaseLibraryObject
-local L = LibStub:NewLibrary(Core.M.CursorMixin); if not L then return end
+local L = LibStub:NewLibrary(M.CursorMixin); if not L then return end
 local p = L:GetLogger()
 
 -- Add to Modules.lua

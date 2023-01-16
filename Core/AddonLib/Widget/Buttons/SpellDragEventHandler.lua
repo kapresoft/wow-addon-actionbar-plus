@@ -1,18 +1,19 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
+local SpellAttributeSetter, WAttr, PH = O.SpellAttributeSetter, GC.WidgetAttributes, O.PickupHandler
 local API, Assert = O.API, O.Assert
 local IsNil = Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class SpellDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.SpellDragEventHandler)
+--- @class SpellDragEventHandler : DragEventHandler
+local L = LibStub:NewLibrary(M.SpellDragEventHandler); if not L then return end
 
 --[[-----------------------------------------------------------------------------
 Methods

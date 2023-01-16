@@ -13,15 +13,17 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 
 local String = O.String
 local A, P, PH = O.Assert, O.Profile, O.PickupHandler
-local GC, WMX = O.GlobalConstants, O.WidgetMixin
+
+local WMX = O.WidgetMixin
 local E, WAttr = GC.E, GC.WidgetAttributes
 
 local IsBlank = String.IsBlank
@@ -31,11 +33,11 @@ local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class ButtonUIWidgetBuilder : WidgetMixin
-local _B = LibStub:NewLibrary(Core.M.ButtonUIWidgetBuilder)
+local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
 
 ---@class ButtonUILib
-local _L = LibStub:NewLibrary(Core.M.ButtonUI, 1)
-local p = O.LogFactory:NewLogger(Core.M.ButtonUI)
+local _L = LibStub:NewLibrary(M.ButtonUI, 1)
+local p = O.LogFactory:NewLogger(M.ButtonUI)
 
 ---@return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end

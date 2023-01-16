@@ -6,28 +6,26 @@ local GameTooltip = GameTooltip
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local Assert, String = O.Assert, O.String
-local PH, GC = O.PickupHandler, O.GlobalConstants
-local IsBlank, IsNotBlank, AssertNotNil, IsNil =
-    String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
+local PH = O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local BaseAPI = O.BaseAPI
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(Core.M.CompanionDragEventHandler)
+local p = O.LogFactory(M.CompanionDragEventHandler)
 
 ---@class CompanionDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(Core.M.CompanionDragEventHandler)
+local L = LibStub:NewLibrary(M.CompanionDragEventHandler); if not L then return end
 
 ---@class CompanionAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(Core.M.CompanionAttributeSetter)
+local S = LibStub:NewLibrary(M.CompanionAttributeSetter); if not S then return end
 ---@type BaseAttributeSetter
-local BaseAttributeSetter = LibStub(Core.M.BaseAttributeSetter)
+local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
 ---@param companion CompanionInfo
 ---@return boolean

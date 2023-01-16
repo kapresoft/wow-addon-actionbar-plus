@@ -12,24 +12,24 @@ local format, strlower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = ABP_Namespace()
-local LibStub, Core, O = ns.O.LibStub, ns.Core, ns.O
+--- @type Namespace
+local _, ns = ...
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local Assert, String = O.Assert, O.String
 local IsBlank, IsNotBlank, AssertNotNil = String.IsBlank, String.IsNotBlank, Assert.AssertNotNil
-local API, GC = O.API, O.GlobalConstants
+local API = O.API
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
-local IsAnyOf = String.IsAnyOf
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class SpellAttributeSetter : BaseAttributeSetter
-local L = LibStub:NewLibrary(Core.M.SpellAttributeSetter)
----@type LoggerTemplate
+local L = LibStub:NewLibrary(M.SpellAttributeSetter); if not L then return end
 local p = L:GetLogger()
 
 ---@type BaseAttributeSetter
-local Base = LibStub(Core.M.BaseAttributeSetter)
+local Base = LibStub(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods

@@ -65,15 +65,13 @@ local function CreateNamespace(...)
     ns.name = addon
     --- @type ActionbarPlus_AceDB
     ns.db = ns.db or {}
-    --- Core exists in both ns.Core and ns.O.Core
-    --- @type Core
-    ns.Core = ns.Core or nil
 
     --- @type Module
     ns.M = ns.M or {}
 
 
     --- LibStub exists in both ns.LibStub and ns.O.LibStub
+    --- @see _LocalLibStub
     --- @type LocalLibStub
     ns.LibStub = ns.LibStub or nil
 

@@ -54,7 +54,6 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     if not isLogin then return end
     local versionText, curseForge, githubIssues = GC:GetAddonInfo()
     p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
-
 end
 
 --- @return ActionbarPlus_Frame

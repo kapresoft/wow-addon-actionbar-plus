@@ -22,8 +22,6 @@ local Namespace = {
     O = {},
     --- @type ActionbarPlus_AceDB,
     db = {},
-    --- @type Core
-    Core = {},
     --- @type Module
     M = {},
 

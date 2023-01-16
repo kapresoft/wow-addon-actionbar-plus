@@ -84,7 +84,7 @@ function S:NewLibrary(libName)
     ns:Register(libName, obj)
 
     if verboseLogging then
-        print(sformat('_Core::Registered:%s major=%s minor=%s', self.name, self.major, self.minor))
+        print(sformat('LocalLibStub::Registered:%s major=%s minor=%s', self.name, self.major, self.minor))
     end
 
     return obj
