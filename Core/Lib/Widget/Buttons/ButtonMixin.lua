@@ -534,7 +534,7 @@ function L:UpdateCooldown()
     local cd = self:GetCooldownInfo()
     if not cd or cd.enabled == 0 then return end
     -- Instant cast spells have zero duration, skip
-    if cd.duration <= 0 then
+    if (not cd.duration) or cd.duration <= 0 then
         self:ResetCooldown()
         return
     end
