@@ -4,7 +4,7 @@ Blizzard Vars
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
-local C_ToyBox = C_ToyBox
+local C_ToyBox, C_Container = C_ToyBox, C_Container
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
 local UnitClass, IsStealthed, GetShapeshiftForm = UnitClass, IsStealthed, GetShapeshiftForm
@@ -315,6 +315,7 @@ end
 ---@return ItemCooldown
 function S:GetItemCooldown(itemId, optionalItem)
     if not itemId then return nil end;
+    if C_Container then GetItemCooldown = C_Container.GetItemCooldown end
     local start, duration, enabled = GetItemCooldown(itemId)
     ---@class ItemCooldown
     local cd = {
