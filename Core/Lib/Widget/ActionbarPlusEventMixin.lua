@@ -271,8 +271,7 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnBagEvent(f, event, ...)
-    L:SendMessage(MSG.OnBagUpdate) end
+local function OnBagEvent(f, event, ...) L:SendMessage(MSG.OnBagUpdate) end
 
 --[[-----------------------------------------------------------------------------
 Methods
