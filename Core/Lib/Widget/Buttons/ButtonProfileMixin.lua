@@ -23,7 +23,7 @@ local p = O.LogFactory(M.ButtonProfileMixin)
 New Instance
 -------------------------------------------------------------------------------]]
 
----@class ButtonProfileMixin
+---@class ButtonProfileMixin : BaseLibraryObject
 local _L = LibStub:NewLibrary(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------

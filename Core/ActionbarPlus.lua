@@ -31,8 +31,6 @@ local MX, WMX = O.Mixin, O.WidgetMixin
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
-
---- @type LoggerTemplate
 local p = LogFactory()
 
 --[[-----------------------------------------------------------------------------

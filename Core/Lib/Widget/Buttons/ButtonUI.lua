@@ -251,6 +251,13 @@ end
 ---@param event string Event string
 local function OnBagUpdateDelayed(widget, event)
     if not widget.button:IsShown() then return end
+    --if not widget:IsEmpty() then
+    --    local item = widget:GetItemData()
+    --    if item then
+    --        p:log('OnBagUpdateDelayed[%s|%s]: IsEmpty: %s item=%s',
+    --                event, GetTime(), widget:IsEmpty(), ns.pformat(item))
+    --    end
+    --end
     widget:UpdateItemState()
 end
 
@@ -328,7 +335,8 @@ local function RegisterCallbacks(widget)
 
     --TODO next Move at the frame level
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
+    --widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
+    --widget:RegisterEvent('BAG_UPDATE', OnBagUpdateDelayed, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
@@ -403,8 +411,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local widget = {
         ---@type ActionbarPlus
         addon = ABP,
-        ---@type Logger
-        p = p,
         ---@type Profile
         profile = P,
         ---@type number

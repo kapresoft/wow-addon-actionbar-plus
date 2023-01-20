@@ -21,7 +21,7 @@ local _TooltipFrameHandlerWidget = {
 
 --- @class TooltipFrameHandler : BaseLibraryObject_WithAceEvent
 local _TooltipFrameHandler = {
-    --- @type LoggerTemplate
+    --- @type Logger
     logger = {}
 }
 

@@ -173,6 +173,9 @@ local function GlobalConstantProperties(o)
         ACTIONBAR_SHOWGRID = 'ACTIONBAR_SHOWGRID',
         ACTIONBAR_HIDEGRID = 'ACTIONBAR_HIDEGRID',
 
+        --- wow classic
+        BAG_UPDATE = 'BAG_UPDATE',
+        --- 5.0.4|Mist of Pandaria and above
         BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED',
         CURSOR_CHANGED = 'CURSOR_CHANGED',
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
@@ -218,6 +221,7 @@ local function GlobalConstantProperties(o)
     local Messages = {
         OnAddOnInitialized    = 'OnAddOnInitialized',
         OnAddOnReady          = 'OnAddOnReady',
+        OnBagUpdate           = 'OnBagUpdate',
         OnDBInitialized       = 'OnDBInitialized',
         OnConfigInitialized   = 'OnConfigInitialized',
         OnTooltipFrameUpdate  = 'OnTooltipFrameUpdate',

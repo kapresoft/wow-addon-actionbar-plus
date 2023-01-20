@@ -48,7 +48,6 @@ button: widget.button
 ---@class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 ---@see ButtonUIWidget
 local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end
----@type Logger
 local p = L:GetLogger()
 
 MX:Mixin(L, O.ButtonProfileMixin)

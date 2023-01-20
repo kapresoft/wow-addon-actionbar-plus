@@ -38,7 +38,6 @@ _API = S
 --TODO: Next Deprecate Global Var _API
 ns:Register(ns.M.API, S)
 
---- @type Logger
 local p = O.LogFactory(ns.M.API)
 
 --[[-----------------------------------------------------------------------------
