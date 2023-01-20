@@ -39,7 +39,6 @@ local function MethodsAndProperties(o)
         return function(_, v)
             assert(type(key) == 'string', 'Profile config key should be a string')
             self.profile[key] = v or fallbackVal
-            p:log(1, 'SetConfigWithMessage(): %s=[%s] msg: %s', key, self.profile[key], message)
             if IsNotBlank(message) then self:SendMessage(message, key, self.profile[key]) end
         end
     end

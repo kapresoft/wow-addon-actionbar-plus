@@ -73,11 +73,11 @@ function S:NewLibrary(libName)
         --- @return Logger
         function o:GetLogger() return ns.O.LogFactory(self:GetModuleName()) end
 
-        --- @param o BaseLibraryObject
-        local function EmbedLoggerIfAvailable(o)
+        --- @param m BaseLibraryObject
+        local function EmbedLoggerIfAvailable(m)
             local logger = CreateLogger()
             if not logger then return end
-            logger:EmbedModule(o)
+            logger:EmbedModule(m)
         end
         EmbedLoggerIfAvailable(o)
     end
@@ -116,7 +116,7 @@ function S:GetLibVersionUnpacked(libName, revisionNumber)
     return self:GetMajorVersion(libName), tonumber((revisionString):match("%d+"))
 end
 
---- @return LoggerTemplate
+--- @return Logger
 --- @param libObj table Any library created by "NewLibrary"
 function S:GetLogger(libObj) return libObj:GetLogger() end
 

@@ -15,9 +15,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
-local O, LibStub = ns:LibPack()
-local GC, AceEvent = O.GlobalConstants, O.AceLibrary.AceEvent
-local String, A, P = O.String, O.Assert, O.Profile
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+
+local AceEvent = O.AceLibrary.AceEvent
+local String, A, P, MSG = O.String, O.Assert, O.Profile, GC.M
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
@@ -30,7 +31,7 @@ local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
 
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(ns.M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
+local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
 local p = L:GetLogger()
 
 local AttributeSetters = {
@@ -102,7 +103,6 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
 function L:Init()
     local frameNames = P:GetAllFrameNames()
     for i,_ in ipairs(frameNames) do
@@ -126,7 +126,7 @@ function L:FireOnFrame(frameIndex, event, sourceEvent, ...)
     self.FRAMES[frameIndex]:Fire(event, sourceEvent, args)
 end
 
---- @param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+--- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
 function L:ApplyForEachFrames(applyFunction)
     local frames = P:GetAllFrameNames()
     if #frames <= 0 then return end
@@ -134,7 +134,7 @@ function L:ApplyForEachFrames(applyFunction)
     for _,f in ipairs(frames) do applyFunction(_G[f].widget) end
 end
 
---- @param applyFunction function(FrameWidget) Should be in format function(frameWidget) {}
+--- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
 function L:ApplyForEachVisibleFrames(applyFunction)
     local frames = P:GetAllFrameNames()
     if #frames <= 0 then return end
@@ -238,6 +238,21 @@ function L:GetAttributesSetter(actionType)
     AssertNotNil(actionType, 'actionType')
     return AttributeSetters[actionType]
 end
+--[[-----------------------------------------------------------------------------
+Event Handlers
+-------------------------------------------------------------------------------]]
+local function OnBagUpdate()
+    L:ApplyForEachVisibleFrames(function(fw)
+        fw:ApplyForEachButtonCondition(
+                function(bw) return (not bw:IsEmpty()) and bw:IsItem() end,
+                function(bw)
+                    local itemInfo = bw:GetButtonData():GetItemInfo()
+                    if not itemInfo then return end
+                    p:log(50, '(%s)::Item: %s', GetTime(), itemInfo.name)
+                    bw:UpdateItemState()
+                end)
+    end)
+end
 
 --[[-----------------------------------------------------------------------------
 Initializer
@@ -245,11 +260,11 @@ Initializer
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
 
-    L:RegisterMessage(GC.M.OnAddOnInitialized, function(msg)
+    L:RegisterMessage(MSG.OnAddOnInitialized, function(msg)
         p:log(10, '%s received...', msg)
         L:Init()
     end)
-
+    L:RegisterMessage(MSG.OnBagUpdate, function() OnBagUpdate() end)
 end
 
 InitButtonFactory()

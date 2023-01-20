@@ -33,9 +33,8 @@ StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class WidgetMixin
+--- @class WidgetMixin : BaseLibraryObject
 local _L = LibStub:NewLibrary(ns.M.WidgetMixin)
---- @type LoggerTemplate
 local p = _L:GetLogger()
 
 --- @class FontStringWidget

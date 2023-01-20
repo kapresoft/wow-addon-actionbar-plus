@@ -1,37 +1,49 @@
 --[[-----------------------------------------------------------------------------
+Alias Functions
+-------------------------------------------------------------------------------]]
+--- @alias FrameHandlerFunction fun(frameWidget:FrameWidget) : void
+--- @alias ButtonPredicateFunction fun(btnWidget:ButtonUIWidget) : boolean
+--- @alias ButtonHandlerFunction fun(btnWidget:ButtonUIWidget) : void
+
+--[[-----------------------------------------------------------------------------
 BaseLibraryObject
 -------------------------------------------------------------------------------]]
---- @class BaseLibraryObject
-local BaseLibraryObject = {
-    --- @type fun(self:BaseLibraryObject) : string
-    GetModuleName = {},
-    --- @type fun(self:BaseLibraryObject) : string, string The major and minor version
-    GetVersionUnpacked = {},
-    --- @type fun(self:BaseLibraryObject) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
-    GetVersion = {},
-    --- @type fun(self:BaseLibraryObject) : Logger
-    GetLogger = {},
+local function BaseLibraryObject_Def()
+    --- @class BaseLibraryObject
+    local o = {}
     --- @type table
-    mt = { __tostring = function() end },
-}
+    o.mt = { __tostring = function() end }
+
+    --- @return string
+    function o:GetModuleName() end
+    --- @return string, string The major and minor version
+    function o:GetVersionUnpacked() end
+    --- @type fun(self:BaseLibraryObject) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
+    --- @return table<string, string>
+    function o:GetVersion() end
+    --- @return Logger
+    function o:GetLogger() end
+end
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_WithAceEvent
 -------------------------------------------------------------------------------]]
-
---- @class BaseLibraryObject_WithAceEvent : AceEvent
-local BaseLibraryObject_WithAceEvent = {
-    --- @param self BaseLibraryObject_WithAceEvent
-    GetModuleName = function(self)  end,
-    --- @type fun(self:BaseLibraryObject_WithAceEvent) : string, string The major and minor version
-    GetVersionUnpacked = {},
-    --- @type fun(self:BaseLibraryObject_WithAceEvent) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
-    GetVersion = {},
-    --- @type fun(self:BaseLibraryObject_WithAceEvent) : LoggerTemplate
-    GetLogger = {},
+local function BaseLibraryObject_WithAceEvent_Def()
+    --- @class BaseLibraryObject_WithAceEvent : AceEvent
+    local o = {}
     --- @type table
-    mt = { __tostring = function() end },
-}
+    o.mt = { __tostring = function() end }
+
+    --- @return string
+    function o:GetModuleName() end
+    --- @return string, string The major and minor version
+    function o:GetVersionUnpacked() end
+    --- @type fun(self:BaseLibraryObject) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
+    --- @return table<string, string>
+    function o:GetVersion() end
+    --- @return Logger
+    function o:GetLogger() end
+end
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_Initialized
@@ -52,22 +64,3 @@ local BaseLibraryObject_Initialized_WithAceEvent = {}
 BaseLibraryObject_Initialized_WithAceEvent.addon = {}
 --- @type Profile_Config
 BaseLibraryObject_Initialized_WithAceEvent.profile = {}
-
-
---[[-----------------------------------------------------------------------------
-LoggerTemplate
--------------------------------------------------------------------------------]]
---- @class LoggerTemplate
---- @deprecated Use Logger
-local LoggerTemplate = {
-    --- @type fun(self:LoggerTemplate, format:string, ...)
-    log = {}
-}
-
---- @class Logger
-local Logger = {
-    --- @type fun(self:Logger, format:string, ...)
-    log = {}
-}
-
-

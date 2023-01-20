@@ -27,7 +27,7 @@ function L:EmbedLogger(obj, optionalLogName) logger:Embed(obj, optionalLogName) 
 ---```
 --- @return Logger A generic object with embedded AceConsole and Logger
 function L:NewLogger(logName, optionalObj)
-    --- @class LogFactory : LoggerTemplate
+    --- @class LogFactory : Logger
     local o = {}
     if type(optionalObj) == 'table' then
         o = optionalObj

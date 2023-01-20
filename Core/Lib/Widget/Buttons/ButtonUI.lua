@@ -248,13 +248,6 @@ local function OnSpellUpdateUsable(widget, event)
 end
 
 ---@param widget ButtonUIWidget
----@param event string Event string
-local function OnBagUpdateDelayed(widget, event)
-    if not widget.button:IsShown() then return end
-    widget:UpdateItemState()
-end
-
----@param widget ButtonUIWidget
 ---@param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
@@ -328,7 +321,6 @@ local function RegisterCallbacks(widget)
 
     --TODO next Move at the frame level
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.BAG_UPDATE_DELAYED, OnBagUpdateDelayed, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
@@ -403,8 +395,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local widget = {
         ---@type ActionbarPlus
         addon = ABP,
-        ---@type Logger
-        p = p,
         ---@type Profile
         profile = P,
         ---@type number

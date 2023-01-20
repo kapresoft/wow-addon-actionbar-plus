@@ -380,7 +380,7 @@ local function WidgetMethods(widget)
         self:ShowKeybindText(self:IsShowKeybindText())
     end
 
-    --- @param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachButton(applyFunction)
         if self:HasEmptyButtons() then return end
         -- `_` is the index
@@ -388,7 +388,7 @@ local function WidgetMethods(widget)
         for _, btn in ipairs(self.buttonFrames) do applyFunction(btn.widget) end
     end
 
-    --- @param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachItem(applyFunction)
         if self:HasEmptyButtons() then return end
         -- `_` is the index
@@ -398,8 +398,8 @@ local function WidgetMethods(widget)
         end
     end
 
-    --- @param applyFunction function(ButtonUIWidget) Should be in format function(buttonWidget) {}
     --- @param matchSpellId number
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
         --- @param btnWidget ButtonUIWidget
         return self:ApplyForEachButtonCondition(
@@ -407,14 +407,15 @@ local function WidgetMethods(widget)
                 applyFunction)
     end
 
-    --- @param conditionFn function The condition function; Example: function(btnWidget) return true end
-    --- @param applyFn function(ButtonUIWidget) Should be in format function(btnWidget) {}
-    function widget:ApplyForEachButtonCondition(conditionFn, applyFn)
+    --- Apply for each button with a filter
+    --- @param predicateFn ButtonPredicateFunction | "function(btnWidget) return true end"
+    --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:ApplyForEachButtonCondition(predicateFn, applyFn)
         if self:HasEmptyButtons() then return end
         -- `_` is the index
         --- @param btn ButtonUI
         for _, btn in ipairs(self.buttonFrames) do
-            if true == conditionFn(btn.widget) then applyFn(btn.widget) end
+            if true == predicateFn(btn.widget) then applyFn(btn.widget) end
         end
     end
 
