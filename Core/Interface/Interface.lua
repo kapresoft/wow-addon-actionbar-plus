@@ -32,6 +32,8 @@ local Namespace = {
     --- @see TooltipAnchor#SCREEN_* vars
     --- @type string
     GameTooltipAnchor = "",
+    --- @type fun(o:any, ...) : void
+    pformat = {}
 }
 
 --- @class CursorUtil : CursorMixin
