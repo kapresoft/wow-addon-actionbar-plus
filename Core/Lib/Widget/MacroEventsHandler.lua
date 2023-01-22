@@ -139,7 +139,7 @@ local function HandleChangedMacros(btnName, btnData)
     end
 
     if changed then
-        L:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        p:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
         btnWidget:Fire('OnMacroChanged')
     end
 end
