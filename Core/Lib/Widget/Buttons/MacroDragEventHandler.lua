@@ -8,6 +8,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
+local pformat = ns.pformat
 local O, LibStub = ns:LibPack()
 
 local Assert, String = O.Assert, O.String

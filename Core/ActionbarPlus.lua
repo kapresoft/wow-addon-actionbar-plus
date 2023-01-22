@@ -69,7 +69,7 @@ local function RegisterEvents(addon)
     frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
 
     --- @class ActionbarPlusEvent : ActionbarPlusEventMixin
-    local addonEvents = K_CreateAndInitFromMixin(O.ActionbarPlusEventMixin, addon)
+    local addonEvents = ns:K():CreateAndInitFromMixin(O.ActionbarPlusEventMixin, addon)
     addon.addonEvents = addonEvents
 
     return frame

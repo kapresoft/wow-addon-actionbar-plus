@@ -261,7 +261,7 @@ local function PropsAndMethods(o)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
-        self.eventHandler = K_CreateAndInitFromMixin(O.ConfigEventHandlerMixin)
+        self.eventHandler = ns:K():CreateAndInitFromMixin(O.ConfigEventHandlerMixin)
         self:Initialize()
         self:SendMessage(GC.M.OnConfigInitialized)
     end

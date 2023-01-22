@@ -14,6 +14,9 @@ local function BaseLibraryObject_Def()
     --- @type table
     o.mt = { __tostring = function() end }
 
+    --- @type Logger
+    o.logger = {}
+
     --- @return string
     function o:GetModuleName() end
     --- @return string, string The major and minor version

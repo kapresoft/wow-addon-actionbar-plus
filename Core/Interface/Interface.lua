@@ -14,6 +14,12 @@ local _db = {
 --[[-----------------------------------------------------------------------------
 Namespace
 -------------------------------------------------------------------------------]]
+--- @class LibPackMixin
+local LibPackMixin = {
+    --- @type GlobalObjects
+    O = {}
+}
+
 --- @class Namespace : LibPackMixin
 local Namespace = {
     --- @type string
@@ -24,6 +30,12 @@ local Namespace = {
     db = {},
     --- @type Module
     M = {},
+
+    --- @type Kapresoft_LibUtil
+    Kapresoft_LibUtil = {},
+
+    --- @type fun(): Kapresoft_LibUtil
+    K = {},
 
     --- @type LocalLibStub
     LibStub = {},

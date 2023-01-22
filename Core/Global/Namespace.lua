@@ -2,8 +2,7 @@
 Namespace Initialization
 -------------------------------------------------------------------------------]]
 local _addon, _ns = ...
-local MixinAndInit = K_CreateAndInitFromMixin
-local CreateIncrementer = Kapresoft_LibUtil_CreateIncrementer
+local LibStub = LibStub
 
 ---This absolutely does NOTHING but make EmmyLua work better in IDEs for code
 ---completions.
@@ -24,19 +23,15 @@ end
 
 Define_InterfaceMethods(_ns)
 
---- @class LibPackMixin
-local LibPackMixin = {
-
-    --- @type fun(self:LibPackMixin) : GlobalObjects, LocalLibStub
-    LibPack = function(self) return self.O, self.O.LibStub end,
-
-    --- @type fun(self:LibPackMixin) : GlobalObjects, GlobalConstants
-    LibPack2 = function(self) return self.O, self.O.GlobalConstants end,
-}
+--- @type LibPackMixin
+local LibPackMixin = {}
+--- @return GlobalObjects, LocalLibStub
+function LibPackMixin:LibPack() return self.O, self.O.LibStub end
+--- @return GlobalObjects, GlobalConstants
+function LibPackMixin:LibPack2() return self.O, self.O.GlobalConstants end
 --- @generic A : AceEvent
 --- @return A
 function LibPackMixin:AceEvent() return self.O.AceLibrary.AceEvent:Embed({}) end
-
 
 --- @return Namespace
 local function CreateNamespace(...)
@@ -46,6 +41,8 @@ local function CreateNamespace(...)
     local ns
 
     addon, ns = ...
+
+    function ns:K() return ns.Kapresoft_LibUtil end
 
     --- this is in case we are testing outside of World of Warcraft
     addon = addon or ABP_GlobalConstants.C.ADDON_NAME
@@ -61,22 +58,19 @@ local function CreateNamespace(...)
     --- @type Module
     ns.M = ns.M or {}
 
+    ns.pformat = ns:K().pformat
 
-    --- LibStub exists in both ns.LibStub and ns.O.LibStub
-    --- @see _LocalLibStub
-    --- @type LocalLibStub
-    ns.LibStub = ns.LibStub or nil
-
-    K_Mixin(ns, LibPackMixin)
+    ns:K():Mixin(ns, LibPackMixin)
 
     --- @param o Namespace
     local function Methods(o)
+
         --- @return CursorUtil
-        function o:CreateCursorUtil() return MixinAndInit(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
+        function o:CreateCursorUtil() return self:K():CreateAndInitFromMixin(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
         --- @param start number
         --- @param increment number
         --- @return Kapresoft_LibUtil_Incrementer
-        function o:CreateIncrementer(start, increment) return CreateIncrementer(start, increment) end
+        function o:CreateIncrementer(start, increment) return self:K():CreateIncrementer(start, increment) end
 
         --- @param moduleName string The module name, i.e. Logger
         --- @return string The complete module name, i.e. 'ActionbarPlus-Logger-1.0'
@@ -91,6 +85,21 @@ local function CreateNamespace(...)
     end
 
     Methods(ns)
+
+    --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
+    local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
+            function(name, newLibInstance)
+                --- @type Logger
+                local loggerLib = LibStub(ns:LibName(ns.M.Logger))
+                if loggerLib then
+                    newLibInstance.logger = loggerLib:NewLogger(name)
+                    newLibInstance.logger:log(30, 'New Lib: %s', newLibInstance.major)
+                    function newLibInstance:GetLogger() return self.logger end
+                end
+                ns:Register(name, newLibInstance)
+            end)
+    ns.LibStub = LocalLibStub
+    ns.O.LibStub = LocalLibStub
 
     ns.mt = { __tostring = function() return addon .. '::Namespace'  end }
     setmetatable(ns, ns.mt)
