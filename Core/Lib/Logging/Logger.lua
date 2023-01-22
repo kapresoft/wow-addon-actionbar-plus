@@ -16,8 +16,8 @@ Local Vars
 local LibStub = LibStub
 local C = LibStub('AceConsole-3.0', true)
 
---- @type pformat
 local pformat = ns.pformat
+
 assert(pformat ~= nil, 'PrettyFormatter pformat is required')
 
 --- @class LogColors
@@ -242,4 +242,12 @@ function L:EmbedModule(obj)
             'The passed object is not a valid module object.')
     C:Embed(obj)
     _EmbedLogger(obj, obj:GetModuleName())
+end
+
+--- @return Logger
+function L:NewLogger(optionalLogName)
+    local o = {}
+    C:Embed(o)
+    _EmbedLogger(o, optionalLogName)
+    return o
 end

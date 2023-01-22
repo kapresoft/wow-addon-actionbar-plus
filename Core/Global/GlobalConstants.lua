@@ -8,6 +8,11 @@ if type(ABP_LOG_LEVEL) ~= "number" then ABP_LOG_LEVEL = 1 end
 if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local sformat = string.format
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetAddOnMetadata, GetBuildInfo, GetCVarBool = GetAddOnMetadata, GetBuildInfo, GetCVarBool
@@ -17,8 +22,9 @@ local date = date
 Local Vars
 -------------------------------------------------------------------------------]]
 local addon, ns = ...
+local pformat = ns.pformat
+
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
-local sformat = string.format
 local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
 
 --[[-----------------------------------------------------------------------------

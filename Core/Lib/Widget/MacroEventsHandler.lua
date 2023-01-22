@@ -158,12 +158,12 @@ end
 local function OnAddonLoaded(frame, event, ...)
     --- todo next: move to ActionbarPlusEventMixin
     if event == E.PLAYER_ENTERING_WORLD then
-        L:log(10, event)
+        p:log(10, event)
         frame:RegisterEvent('UPDATE_MACROS')
     end
 
     if event == 'UPDATE_MACROS' then
-        L:log(20, 'Event Received: %s', event)
+        p:log(20, 'Event Received: %s', event)
         OnMacroUpdate()
     end
 end

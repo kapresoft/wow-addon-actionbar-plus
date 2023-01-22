@@ -16,7 +16,7 @@ local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 local BaseAPI, API = O.BaseAPI, O.API
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI
-local AceEvent = O.AceLibFactory:A().AceEvent
+local AceEvent = O.AceLibrary.AceEvent
 local CURSOR_ITEM_TYPE = 1
 
 --[[-----------------------------------------------------------------------------

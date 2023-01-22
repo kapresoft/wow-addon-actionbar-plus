@@ -13,13 +13,13 @@ local UnitClass, IsStealthed, GetShapeshiftForm = UnitClass, IsStealthed, GetSha
 Lua Vars
 -------------------------------------------------------------------------------]]
 local format = string.format
-
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
 local O = ns.O
+local pformat = ns.pformat
 
 local String = O.String
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower

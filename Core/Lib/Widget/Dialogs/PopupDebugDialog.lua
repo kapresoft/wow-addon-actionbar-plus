@@ -9,6 +9,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
+local pformat = ns.pformat
 local O, LibStub = ns:LibPack()
 
 local Mixin, WMX = O.Mixin, O.WidgetMixin

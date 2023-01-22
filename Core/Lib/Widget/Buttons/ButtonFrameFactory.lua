@@ -26,6 +26,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, LibStub = ns:LibPack()
+local pformat = ns.pformat
 
 local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()

@@ -63,7 +63,7 @@ Support Functions
 -------------------------------------------------------------------------------]]
 --- @param aceLib string
 local function LocalLibAce(name, aceLib)
-    local o = LibStub:LibStubAce(aceLib)
+    local o = LibStub.LibStubAce(aceLib)
     __Internal[name] = o
     return o
 end
@@ -103,10 +103,9 @@ end
 
 function _L:Get(...)
     local libNames = {...}
-    --print("AceLibFactory libNames:", pformat(libNames))
     local libs = {}
     for _, lib in ipairs(libNames) do
-        local o = LibStub:LibStubAce(lib)
+        local o = LibStub.LibStubAce(lib)
         table.insert(libs, o)
     end
     return unpack(libs)

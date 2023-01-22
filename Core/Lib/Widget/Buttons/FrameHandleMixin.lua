@@ -190,7 +190,7 @@ end
 function ABP_CreateFrameHandle(widget)
     assert(widget, "FrameWidget is required.")
     ---@class FrameHandleMixinInstance : FrameHandleMixin
-    local mixin = K_CreateAndInitFromMixin(L, widget)
+    local mixin = ns:K():CreateAndInitFromMixin(L, widget)
     return mixin:Constructor()
 end
 
