@@ -46,6 +46,9 @@ luac.out
 /.vscode/
 /Core/ExtLib/.Ace3.*
 
+# Visual Source Code Test Deployment
+/.deploy
+
 # BigWigMods/packager
 /build
 /.release/
