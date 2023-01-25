@@ -21,6 +21,7 @@ local date = date
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+-- Use the bare namespace here since this is the very first file to be loaded
 local addon, ns = ...
 local pformat = ns.pformat
 
@@ -223,14 +224,16 @@ local function GlobalConstantProperties(o)
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
     }
 
+    local function newMsg(msg) return sformat("%s::%s", addon, msg) end
+
     --- @class MessageNames
     local Messages = {
-        OnAddOnInitialized    = 'OnAddOnInitialized',
-        OnAddOnReady          = 'OnAddOnReady',
-        OnBagUpdate           = 'OnBagUpdate',
-        OnDBInitialized       = 'OnDBInitialized',
-        OnConfigInitialized   = 'OnConfigInitialized',
-        OnTooltipFrameUpdate  = 'OnTooltipFrameUpdate',
+        OnAddOnInitialized    = newMsg('OnAddOnInitialized'),
+        OnAddOnReady          = newMsg('OnAddOnReady'),
+        OnBagUpdate           = newMsg('OnBagUpdate'),
+        OnDBInitialized       = newMsg('OnDBInitialized'),
+        OnConfigInitialized   = newMsg('OnConfigInitialized'),
+        OnTooltipFrameUpdate  = newMsg('OnTooltipFrameUpdate'),
     }
 
     --- @class WidgetGlobals

@@ -48,7 +48,10 @@ Methods
 local function MethodsAndProperties(o)
 
     --- @see Config
-    o:RegisterMessage(M.OnTooltipFrameUpdate, function(msg, ...) OnTooltipFrameUpdate(msg, o, ...) end)
+    o:RegisterMessage(M.OnTooltipFrameUpdate, function(msg, ...)
+        p:log(10, 'MSG::R: %s', msg)
+        OnTooltipFrameUpdate(msg, o, ...)
+    end)
 
     --- @type TooltipFrameHandlerWidget
     o.widget = {}
@@ -59,7 +62,7 @@ local function MethodsAndProperties(o)
         self.widget.frame:SetSize(1, 1)
 
         o:RegisterMessage(GC.M.OnAddOnInitialized, function(msg, ...)
-            p:log(10, '%s received...', msg)
+            p:log(10, 'MSG::R: %s', msg)
             local names = GC.Profile_Config_Names
             local anchorType = ns.db.profile[names.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPLEFT
             self:UpdateTooltipAnchor(anchorType)
