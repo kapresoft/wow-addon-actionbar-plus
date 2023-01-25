@@ -149,8 +149,8 @@ end
 
 ---Event is fired from ActionbarPlus#OnAddonLoaded
 --- @param w FrameWidget
-local function OnAddOnReady(w)
-    p:log(10, 'OnAddOnReady: %s', w:GetName())
+local function OnAddOnReady(w, msg)
+    p:log(10, 'MSG::R::%s: %s', w:GetName(), msg)
     -- show delayed due to anchor not setting until UI is fully loaded
     C_Timer.After(1, function() w:InitAnchor() end)
     C_Timer.After(2, function() w:ShowGroupIfEnabled() end)
@@ -220,7 +220,7 @@ end
 
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    ns:AceEvent():RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget) end)
+    ns:AceEvent():RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
 
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)

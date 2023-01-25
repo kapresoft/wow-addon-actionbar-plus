@@ -261,10 +261,13 @@ local function InitButtonFactory()
     InitButtonGameTooltipHooks()
 
     L:RegisterMessage(MSG.OnAddOnInitialized, function(msg)
-        p:log(10, '%s received...', msg)
+        p:log(10, 'MSG::R: %s', msg)
         L:Init()
     end)
-    L:RegisterMessage(MSG.OnBagUpdate, function() OnBagUpdate() end)
+    L:RegisterMessage(MSG.OnBagUpdate, function(msg)
+        p:log(10, 'MSG::R: %s', msg)
+        OnBagUpdate()
+    end)
 end
 
 InitButtonFactory()
