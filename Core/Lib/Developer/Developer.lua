@@ -2,6 +2,10 @@
 -- test stuff.
 ------------------------------------------------------------------------
 local format = string.format
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local GX_MAXIMIZE, SetCVar, GetCVarBool, RestartGx = 'gxMaximize', SetCVar, GetCVarBool, RestartGx
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -24,6 +28,13 @@ local p = O.LogFactory('Developer')
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+function L:TW()
+    local isMaximized = GetCVarBool(GX_MAXIMIZE)
+    SetCVar(GX_MAXIMIZE, isMaximized and 0 or 1)
+    RestartGx()
+end
+function L:MaxScreen() SetCVar(GX_MAXIMIZE, 1); RestartGx() end
+function L:Windowed() SetCVar(GX_MAXIMIZE, 0); RestartGx() end
 
 function L:TT()
     self:SendMessage(GC.M.OnTooltipFrameUpdate)

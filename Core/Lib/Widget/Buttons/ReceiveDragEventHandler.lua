@@ -17,7 +17,7 @@ local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION, BATTLE_PET =
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
----@class DragEventHandler
+---@class DragEventHandler : BaseLibraryObject
 ---@param btnUI ButtonUI
 ---@param cursorInfo CursorInfo
 local DragEventHandler = {

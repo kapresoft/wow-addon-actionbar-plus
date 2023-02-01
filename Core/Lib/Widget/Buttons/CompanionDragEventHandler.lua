@@ -13,14 +13,14 @@ local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 local PH = O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local BaseAPI = O.BaseAPI
+local IsNil = O.Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(M.CompanionDragEventHandler)
-
 ---@class CompanionDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.CompanionDragEventHandler); if not L then return end
+local p = L.logger
 
 ---@class CompanionAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.CompanionAttributeSetter); if not S then return end
