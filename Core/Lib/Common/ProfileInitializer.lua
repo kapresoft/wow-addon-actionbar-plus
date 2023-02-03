@@ -37,6 +37,8 @@ local FrameDetails = {
     [6] = { rowSize = 2, colSize = 6 },
     [7] = { rowSize = 2, colSize = 6 },
     [8] = { rowSize = 4, colSize = 6 },
+    [9] = { rowSize = 4, colSize = 6 },
+    [10] = { rowSize = 4, colSize = 6 },
 }
 
 local ButtonDataTemplate = {
@@ -189,6 +191,26 @@ local DEFAULT_PROFILE_DATA = {
     },
 }
 
+local function CreateActionBarConfig(barsObj, index)
+    local name = 'ActionbarPlusF' .. index
+    local frameData = {
+        ["enabled"] = EnabledBars[name] or false,
+        ["show_keybind_text"] = false,
+        ["show_button_index"] = false,
+        ["widget"] = CreateFromMixins(defaultWidget),
+        --- @type _RegionAnchor
+        ["anchor"] = {
+            point = "TOPLEFT", relativeTo = nil, relativePoint = 'TOPLEFT', x = xIncr:next(), y = yIncr:get()
+        },
+        ["buttons"] = {},
+    }
+    barsObj[name] = frameData
+    F = frameData
+end
+
+CreateActionBarConfig(DEFAULT_PROFILE_DATA[ConfigNames.bars], 9)
+CreateActionBarConfig(DEFAULT_PROFILE_DATA[ConfigNames.bars], 10)
+
 --- @param frameIndex number
 function P:GetFrameNameByIndex(frameIndex)
     assert(type(frameIndex) == 'number',
@@ -227,7 +249,7 @@ end
 
 function P:GetAllActionBarSizeDetails() return FrameDetails end
 
-local function CreateNewProfile() return shallow_copy(DEFAULT_PROFILE_DATA) end
+local function CreateNewProfile() return CreateFromMixins(DEFAULT_PROFILE_DATA) end
 
 function P:InitNewProfile()
     local profile = CreateNewProfile()

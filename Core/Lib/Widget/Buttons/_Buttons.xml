@@ -23,23 +23,12 @@
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
 
-    <Frame name="ActionbarPlusF1" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF2" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF3" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF4" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF5" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF6" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF7" inherits="ActionbarPlusFrameTemplate" />
-    <Frame name="ActionbarPlusF8" inherits="ActionbarPlusFrameTemplate" />
-
-
     <Font name="ABP_NumberFontNormalShadow" inherits="NumberFontNormal" virtual="true">
         <Color r="0.9" g="0.9" b="0.9"/>
         <Shadow>
             <Offset>
                 <AbsDimension x="1" y="-1"/>
             </Offset>
-            <Color r="0" g="0" b="0"/>
         </Shadow>
     </Font>
 </Ui>
