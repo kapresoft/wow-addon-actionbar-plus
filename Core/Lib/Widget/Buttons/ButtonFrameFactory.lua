@@ -7,7 +7,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateAnchor, GridLayoutMixin = CreateAnchor, GridLayoutMixin
 local UnitOnTaxi = UnitOnTaxi
-
+local CreateFrame = CreateFrame
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -33,6 +33,9 @@ local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 local GC = O.GlobalConstants
 local E, M = GC.E, GC.M
+
+--- @see _ParentFrame.xml
+local frameTemplate = 'ActionbarPlusFrameTemplate'
 
 -- post combat updates (SetAttribute* is not allowed during combat)
 local PostCombatButtonUpdates = {}
@@ -625,6 +628,11 @@ function L:Constructor(frameIndex)
 
     --- @class ActionbarFrame : _Frame
     local f = self:GetFrameByIndex(frameIndex)
+    if not f then
+        local frameName = 'ActionbarPlusF' .. frameIndex
+        f = CreateFrame('Frame', frameName, nil, frameTemplate)
+    end
+
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
