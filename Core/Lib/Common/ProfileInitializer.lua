@@ -24,15 +24,13 @@ New Instance
 -------------------------------------------------------------------------------]]
 
 --- @class ProfileInitializer : BaseLibraryObject_Initialized
-local P = LibStub:NewLibrary(M.ProfileInitializer); if not P then return end
-if not P then return end
-
-local p = P:GetLogger()
+local L = LibStub:NewLibrary(M.ProfileInitializer); if not L then return end
+local p = L:GetLogger()
 -- todo next deprecate P.baseFrameName
-P.baseFrameName = GC.C.BASE_FRAME_NAME
+L.baseFrameName = GC.C.BASE_FRAME_NAME
 
 local ACTION_BAR_COUNT = 10
-P.ActionbarCount = ACTION_BAR_COUNT
+L.ActionbarCount = ACTION_BAR_COUNT
 
 --[[-----------------------------------------------------------------------------
 Interface Definitions
@@ -194,24 +192,24 @@ end
 ApplyLayoutStrategy(DefaultLayoutStrategy)
 
 --- @param frameIndex number
-function P:GetFrameNameByIndex(frameIndex)
+function L:GetFrameNameByIndex(frameIndex)
     assert(type(frameIndex) == 'number',
             'GetFrameNameByIndex(..)| frameIndex should be a number')
-    return P.baseFrameName .. tostring(frameIndex)
+    return L.baseFrameName .. tostring(frameIndex)
 end
 
 --- @param g Profile_Global_Config
-function P:InitGlobalSettings(g)
+function L:InitGlobalSettings(g)
     g.bars = {}
     for frameIndex=1, ACTION_BAR_COUNT do
-        local fn = P:GetFrameNameByIndex(frameIndex)
+        local fn = L:GetFrameNameByIndex(frameIndex)
         self:InitGlobalButtonConfig(g, fn)
     end
 end
 
 --- @param g Profile_Global_Config
 --- @param frameName string
-function P:InitGlobalButtonConfig(g, frameName)
+function L:InitGlobalButtonConfig(g, frameName)
     g.bars[frameName] = { }
     self:InitGlobalButtonConfigAnchor(g, frameName)
     return g.bars[frameName]
@@ -219,7 +217,7 @@ end
 
 --- @param g Profile_Global_Config
 --- @param frameName string
-function P:InitGlobalButtonConfigAnchor(g, frameName)
+function L:InitGlobalButtonConfigAnchor(g, frameName)
     local defaultBars = DEFAULT_PROFILE_DATA.bars
     --- @type Global_Profile_Bar
     local btnConf = g.bars[frameName]
@@ -227,11 +225,11 @@ function P:InitGlobalButtonConfigAnchor(g, frameName)
     return btnConf.anchor
 end
 
-function P:GetAllActionBarSizeDetails() return ActionbarInitialSettings end
+function L:GetAllActionBarSizeDetails() return ActionbarInitialSettings end
 
 local function CreateNewProfile() return CreateFromMixins(DEFAULT_PROFILE_DATA) end
 
-function P:InitNewProfile()
+function L:InitNewProfile()
     local profile = CreateNewProfile()
     -- todo next Figure out whether it is safe to not initialize these fields
     for i=1, #ActionbarInitialSettings do
@@ -240,7 +238,7 @@ function P:InitNewProfile()
     return profile
 end
 
-function P:InitializeActionbar(profile, barIndex)
+function L:InitializeActionbar(profile, barIndex)
     local barName = 'ActionbarPlusF' .. barIndex
     local frameSpec = ActionbarInitialSettings[barIndex]
     local btnCount = frameSpec.colSize * frameSpec.rowSize
@@ -249,13 +247,13 @@ function P:InitializeActionbar(profile, barIndex)
     end
 end
 
-function P:InitializeButtons(profile, barName, btnIndex)
+function L:InitializeButtons(profile, barName, btnIndex)
     local btnName = format('%sButton%s', barName, btnIndex)
     local btn = self:CreateSingleButtonTemplate()
     profile.bars[barName].buttons[btnName] = btn
 end
 
-function P:CreateSingleButtonTemplate()
+function L:CreateSingleButtonTemplate()
     local b = ButtonDataTemplate
     local keys = { ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT }
     for _,k in ipairs(keys) do
