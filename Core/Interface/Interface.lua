@@ -198,6 +198,7 @@ local Profile_Config = {
     ["tooltip_visibility_combat_override_key"] = '',
     --- @see TooltipAnchor
     ["tooltip_anchor_type"] = '',
+    --- @type table<string, Profile_Bar>
     ["bars"] = {
         ["ActionbarPlusF1"] = Profile_Bar,
         ["ActionbarPlusF2"] = Profile_Bar,

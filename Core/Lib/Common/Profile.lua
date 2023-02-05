@@ -111,9 +111,7 @@ function P:ResetButtonData(widget)
     btnData[WAttr.TYPE] = ''
 end
 
-function P:CreateDefaultProfile(profileName)
-    return PI:InitNewProfile(profileName)
-end
+function P:CreateDefaultProfile(profileName) return PI:InitNewProfile(profileName) end
 
 function P:CreateBarsTemplate()
     local bars = {}
@@ -177,7 +175,7 @@ end
 --- @param frameIndex number The frame index number
 function P:IsBarEnabled(frameIndex)
     local bar = self:GetBar(frameIndex)
-    return bar.enabled
+    return bar and bar.enabled
 end
 
 --- @param frameIndex number The frame index number
