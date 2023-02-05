@@ -59,8 +59,8 @@ function L:SetAttributes(btnUI, btnData)
     self:OnAfterSetAttributes(btnUI)
 end
 
+---@param btnUI ButtonUI
 function L:ShowTooltip(btnUI)
-
     local bd = btnUI.widget:GetButtonData()
     if not bd:ConfigContainsValidActionType() then return end
 
@@ -69,6 +69,7 @@ function L:ShowTooltip(btnUI)
     if not spellInfo.id then return end
 
     GameTooltip:SetSpellByID(spellInfo.id)
+
     -- Replace 'Spell' with 'Spell (Rank #Rank)'
     if (IsNotBlank(spellInfo.rank)) then
         GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))

@@ -3,15 +3,21 @@ Lua Vars
 -------------------------------------------------------------------------------]]
 local format = string.format
 
+ --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local CreateFromMixins = CreateFromMixins
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ConfigNames = GC.Profile_Config_Names
 
 local ATTR, Table = GC.WidgetAttributes, O.Table
-local isNotTable, shallow_copy = Table.isNotTable, Table.shallow_copy
+local isNotTable, shallow_copy, tinsert = Table.isNotTable, Table.shallow_copy, table.insert
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -22,24 +28,42 @@ local P = LibStub:NewLibrary(M.ProfileInitializer); if not P then return end
 if not P then return end
 
 local p = P:GetLogger()
-P.baseFrameName = 'ActionbarPlusF'
+-- todo next deprecate P.baseFrameName
+P.baseFrameName = GC.C.BASE_FRAME_NAME
+
+local ACTION_BAR_COUNT = 10
+P.ActionbarCount = ACTION_BAR_COUNT
 
 --[[-----------------------------------------------------------------------------
 Interface Definitions
 -------------------------------------------------------------------------------]]
 ---FrameDetails is used for initializing defaults for AceDB profile
-local FrameDetails = {
-    [1] = { rowSize = 2, colSize = 6 },
-    [2] = { rowSize = 6, colSize = 2 },
-    [3] = { rowSize = 3, colSize = 5 },
-    [4] = { rowSize = 2, colSize = 6 },
-    [5] = { rowSize = 2, colSize = 6 },
-    [6] = { rowSize = 2, colSize = 6 },
-    [7] = { rowSize = 2, colSize = 6 },
-    [8] = { rowSize = 4, colSize = 6 },
-    [9] = { rowSize = 4, colSize = 6 },
-    [10] = { rowSize = 4, colSize = 6 },
+--- @type table<number, ActionbarInitialSettings>
+local ActionbarInitialSettings = {
+    [1] = { rowSize = 2, colSize = 6, enable = true },
+    [2] = { rowSize = 2, colSize = 6, enable = true },
 }
+--- @type ActionbarInitialSettings
+local ActionbarInitialSettingsDefault = {
+    ['enable'] = false,
+    ['rowSize'] = 2, ['colSize'] = 5,
+    ['frame_handle_mouseover'] = true
+}
+
+---@param index number
+local function GetActionbarInitialSettings(index)
+    local initS = ActionbarInitialSettings[index]
+    local d = ActionbarInitialSettingsDefault
+    if not initS then
+        initS = CreateFromMixins(ActionbarInitialSettingsDefault)
+    end
+    -- fallback values
+    initS.enable = initS.enable or false
+    initS.rowSize = initS.rowSize or 2
+    initS.colSize = initS.colSize or 5
+    initS.frame_handle_mouseover = initS.frame_handle_mouseover or true
+    return initS
+end
 
 local ButtonDataTemplate = {
     [ATTR.TYPE] = ATTR.SPELL,
@@ -49,26 +73,44 @@ local ButtonDataTemplate = {
     [ATTR.MACRO_TEXT] = {},
     [ATTR.MOUNT] = {},
 }
-local EnabledBars = {
-    ["ActionbarPlusF1"] = true,
-    ["ActionbarPlusF2"] = true,
-}
 
-local ConfigNames = GC.Profile_Config_Names
-
-local xIncr = ns:CreateIncrementer(30, 220)
-local yIncr = ns:CreateIncrementer(-130, -90)
+--- @type Profile_Bar_Widget
 local defaultWidget = {
-    ["rowSize"] = 2, ["colSize"] = 6, ["buttonSize"] = 35,
-    ["alpha"] = 0.5, ["show_empty_buttons"] = true,
-    ["frame_handle_mouseover"] = false,
-    ["frame_handle_alpha"] = 1.0,
+    [ConfigNames.rowSize] = 2,
+    [ConfigNames.colSize] = 6,
+    [ConfigNames.buttonSize] = 35,
+    [ConfigNames.alpha] = 0.5,
+    [ConfigNames.show_empty_buttons] = true,
+    [ConfigNames.frame_handle_mouseover] = false,
+    [ConfigNames.frame_handle_alpha] = 1.0,
 }
+
+--- @return _RegionAnchor
+---@param x number
+---@param y number
+---@param point RegionPointString Optional
+---@param relativePoint RegionPointString Optional
+local function CreateDefaultAnchor(x, y, point, relativePoint)
+    local p = point or 'TOPLEFT'
+    local rp = relativePoint or 'TOPLEFT'
+    return { point=p, relativePoint=rp, x=x, y=y, relativeTo=nil }
+end
+
+local function CreateActionBarConfig()
+    --- @type Profile_Bar
+    local barConf = {
+        [ConfigNames.show_keybind_text] = false,
+        [ConfigNames.show_button_index] = false,
+        [ConfigNames.widget] = CreateFromMixins(defaultWidget),
+        [ConfigNames.anchor] = {},
+        [ConfigNames.buttons] = {},
+    }
+    return barConf
+end
+
 ---The defaults provided here will used for the default state of the settings
 --- @type Profile_Config
 local DEFAULT_PROFILE_DATA = {
-    --- @deprecated lock_actionbars is no longer used
-    [ConfigNames.lock_actionbars] = false,
     [ConfigNames.character_specific_anchors] = false,
     [ConfigNames.hide_when_taxi] = true,
     [ConfigNames.action_button_mouseover_glow] = true,
@@ -77,139 +119,79 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.tooltip_visibility_key] = '',
     [ConfigNames.tooltip_visibility_combat_override_key] = '',
     [ConfigNames.tooltip_anchor_type] = GC.TooltipAnchor.CURSOR_TOPLEFT,
-    [ConfigNames.bars] = {
-        ["ActionbarPlusF1"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF1"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:get(), y=yIncr:get()
-            },
-            ["buttons"] = {
-                ["ActionbarPlusF1Button1"] = {
-                    ["type"] = "spell",
-                    ["spell"] = {
-                        ["minRange"] = 0,
-                        ["id"] = 6603,
-                        ["label"] = "Attack",
-                        ["name"] = "Attack",
-                        ["castTime"] = 0,
-                        ["maxRange"] = 0,
-                        ["link"] = "|cff71d5ff|Hspell:6603:0|h[Attack]|h|r",
-                        ["icon"] = 135641,
-                        ["rank"] = "",
-                    },
-                }
-            },
-        },
-        ["ActionbarPlusF2"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF2"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF3"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF3"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF4"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF4"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF5"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF5"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:reset(), y=yIncr:next()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF6"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF6"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF7"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF7"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-        ["ActionbarPlusF8"] = {
-            ["enabled"] = EnabledBars["ActionbarPlusF8"] or false,
-            ["show_keybind_text"] = false,
-            ["show_button_index"] = false,
-            ["widget"] = Table.shallow_copy(defaultWidget),
-            --- @type _RegionAnchor
-            ["anchor"] = {
-                point="TOPLEFT", relativeTo=nil, relativePoint='TOPLEFT', x=xIncr:next(), y=yIncr:get()
-            },
-            ["buttons"] = {
-            },
-        },
-    },
+    [ConfigNames.bars] = {},
 }
+--- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
 
-local function CreateActionBarConfig(barsObj, index)
-    local name = 'ActionbarPlusF' .. index
-    local frameData = {
-        ["enabled"] = EnabledBars[name] or false,
-        ["show_keybind_text"] = false,
-        ["show_button_index"] = false,
-        ["widget"] = CreateFromMixins(defaultWidget),
-        --- @type _RegionAnchor
-        ["anchor"] = {
-            point = "TOPLEFT", relativeTo = nil, relativePoint = 'TOPLEFT', x = xIncr:next(), y = yIncr:get()
-        },
-        ["buttons"] = {},
-    }
-    barsObj[name] = frameData
-    F = frameData
+--- @type LayoutStrategyFn
+local LayoutFirstTwoTopLeft = function(frameIndex, barConfig, context)
+    local x = context.xIncr:get()
+    local y = context.yIncr:get()
+    if frameIndex == 2 then x = context.xIncr:next() end
+    barConfig.anchor = CreateDefaultAnchor(x, y, 'TOPLEFT', 'TOPLEFT')
 end
 
-CreateActionBarConfig(DEFAULT_PROFILE_DATA[ConfigNames.bars], 9)
-CreateActionBarConfig(DEFAULT_PROFILE_DATA[ConfigNames.bars], 10)
+--- First 2 at TOPLEFT, then remaining 2x3 at CENTER
+--- @type LayoutStrategyFn
+local DefaultLayoutStrategy = function(frameIndex, barConfig, context)
+    local xIncrFirstTwo = ns:CreateIncrementer(30, 220)
+    local yIncrFirstTwo = ns:CreateIncrementer(-110, -90)
+
+    if frameIndex <= 2 then
+        LayoutFirstTwoTopLeft(frameIndex, barConfig, { xIncr = xIncrFirstTwo, yIncr = yIncrFirstTwo })
+        return
+    end
+    local x,y = context.xIncr:get(), context.yIncr:get()
+    if frameIndex > 3 then
+        --x = x + 200
+        x = context.xIncr:next()
+        if math.fmod(frameIndex, 3) == 0 then
+            --x = -200
+            --y = y - 80
+            x = context.xIncr:reset()
+            y = context.yIncr:next()
+        end
+    end
+    barConfig.anchor = CreateDefaultAnchor(x, y, 'CENTER', 'CENTER')
+end
+
+--- @class LayoutStrategyContext
+local _LayoutStrategyContext = {
+    --- @type Kapresoft_LibUtil_Incrementer
+    xIncr = {},
+    --- @type Kapresoft_LibUtil_Incrementer
+    yIncr = {},
+}
+
+--- @param layoutStrategyFn LayoutStrategyFn
+local function ApplyLayoutStrategy(layoutStrategyFn)
+    local xIncr = ns:CreateIncrementer(-200, 190)
+    local yIncr = ns:CreateIncrementer(100, -80)
+
+    --- @type Profile_Bar
+    local bars = DEFAULT_PROFILE_DATA[ConfigNames.bars]
+    for i = 1, ACTION_BAR_COUNT do
+        local barName = GC:GetFrameName(i)
+        local barConf = bars[barName]
+        layoutStrategyFn(i, barConf, { xIncr = xIncr, yIncr = yIncr })
+    end
+end
+
+for i = 1, ACTION_BAR_COUNT do
+    --- @type Profile_Bar
+    local bars = DEFAULT_PROFILE_DATA[ConfigNames.bars]
+    local name = GC:GetFrameName(i)
+    local barConfig = CreateActionBarConfig(name)
+    local init = GetActionbarInitialSettings(i)
+
+    barConfig[ConfigNames.enabled] = init.enable
+    barConfig.widget[ConfigNames.rowSize] = init.rowSize
+    barConfig.widget[ConfigNames.colSize] = init.colSize
+    barConfig.widget[ConfigNames.frame_handle_mouseover] = init.frame_handle_mouseover
+    bars[name] = barConfig
+end
+
+ApplyLayoutStrategy(DefaultLayoutStrategy)
 
 --- @param frameIndex number
 function P:GetFrameNameByIndex(frameIndex)
@@ -221,12 +203,10 @@ end
 --- @param g Profile_Global_Config
 function P:InitGlobalSettings(g)
     g.bars = {}
-
-    for frameIndex=1, #FrameDetails do
+    for frameIndex=1, ACTION_BAR_COUNT do
         local fn = P:GetFrameNameByIndex(frameIndex)
         self:InitGlobalButtonConfig(g, fn)
     end
-
 end
 
 --- @param g Profile_Global_Config
@@ -247,13 +227,14 @@ function P:InitGlobalButtonConfigAnchor(g, frameName)
     return btnConf.anchor
 end
 
-function P:GetAllActionBarSizeDetails() return FrameDetails end
+function P:GetAllActionBarSizeDetails() return ActionbarInitialSettings end
 
 local function CreateNewProfile() return CreateFromMixins(DEFAULT_PROFILE_DATA) end
 
 function P:InitNewProfile()
     local profile = CreateNewProfile()
-    for i=1, #FrameDetails do
+    -- todo next Figure out whether it is safe to not initialize these fields
+    for i=1, #ActionbarInitialSettings do
         self:InitializeActionbar(profile, i)
     end
     return profile
@@ -261,7 +242,7 @@ end
 
 function P:InitializeActionbar(profile, barIndex)
     local barName = 'ActionbarPlusF' .. barIndex
-    local frameSpec = FrameDetails[barIndex]
+    local frameSpec = ActionbarInitialSettings[barIndex]
     local btnCount = frameSpec.colSize * frameSpec.rowSize
     for btnIndex=1,btnCount do
         self:InitializeButtons(profile, barName, btnIndex)

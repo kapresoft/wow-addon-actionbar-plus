@@ -99,6 +99,7 @@ local function CreateNamespace(...)
                 ns:Register(name, newLibInstance)
             end)
     ns.LibStub = LocalLibStub
+    ns.LibStubAce = LibStub
     ns.O.LibStub = LocalLibStub
 
     ns.mt = { __tostring = function() return addon .. '::Namespace'  end }

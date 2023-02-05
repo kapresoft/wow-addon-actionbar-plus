@@ -158,7 +158,7 @@ local Profile_Bar = {
     --TODO next: show_keybind_text should be in Profile_Bar_Widget properties
     ["show_keybind_text"] = true,
     ["widget"] = Profile_Bar_Widget,
-    --- @type _RegionAnchor
+    --- @see _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = Profile_Button
@@ -186,8 +186,7 @@ local Profile_Global_Config = {
 }
 
 --- @class Profile_Config
-local Profile_Data = {
-    ["lock_actionbars"] = false,
+local Profile_Config = {
     ["hide_when_taxi"] = true,
     --- Toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
@@ -229,3 +228,10 @@ local Config = {
     eventHandler = {},
 }
 
+--- @class ActionbarInitialSettings
+local ActionbarInitialSettings = {
+    ['rowSize'] = 1,
+    ['colSize'] = 1,
+    ['enable'] = false,
+    ['frame_handle_mouseover'] = true
+}

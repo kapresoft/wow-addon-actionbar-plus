@@ -3,16 +3,19 @@
 -- Creates the actionbar frame (anchor) for the buttons
 --
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local _G = _G
+local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
+local tinsert, tsort = table.insert, table.sort
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateAnchor, GridLayoutMixin = CreateAnchor, GridLayoutMixin
 local UnitOnTaxi = UnitOnTaxi
 local CreateFrame = CreateFrame
---[[-----------------------------------------------------------------------------
-Lua Vars
--------------------------------------------------------------------------------]]
-local _G = _G
-local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
+
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
@@ -155,8 +158,9 @@ end
 local function OnAddOnReady(w, msg)
     p:log(10, 'MSG::R::%s: %s', w:GetName(), msg)
     -- show delayed due to anchor not setting until UI is fully loaded
-    C_Timer.After(1, function() w:InitAnchor() end)
-    C_Timer.After(2, function() w:ShowGroupIfEnabled() end)
+    w:HideGroup()
+    C_Timer.After(0.5, function() w:InitAnchor() end)
+    C_Timer.After(1, function() w:ShowGroupIfEnabled() end)
 end
 
 ---Fired by FrameHandle when dragging stopped
@@ -624,14 +628,27 @@ function L:PostCombatUpdateComplete()
     end
 end
 
+function L:CreateActionbarFrames()
+    local frameNames = {}
+    for i=1, P:GetActionbarFrameCount() do
+        local actionbarFrame = self:CreateFrame(i)
+        tinsert(frameNames, actionbarFrame:GetName())
+    end
+    tsort(frameNames)
+    return frameNames
+end
+
+--- @param frameIndex number
+--- @return _Frame
+function L:CreateFrame(frameIndex)
+    local frameName = GC:GetFrameName(frameIndex)
+    return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
+end
+
 function L:Constructor(frameIndex)
 
     --- @class ActionbarFrame : _Frame
-    local f = self:GetFrameByIndex(frameIndex)
-    if not f then
-        local frameName = 'ActionbarPlusF' .. frameIndex
-        f = CreateFrame('Frame', frameName, nil, frameTemplate)
-    end
+    local f = self:GetFrameByIndex(frameIndex) or self:CreateFrame(frameIndex)
 
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'

@@ -10,17 +10,12 @@ Local Vars
 local _, ns = ...
 local O, LibStub = ns:LibPack()
 
-local GC, Ace = O.GlobalConstants, O.AceLibrary
-local M = GC.M
+local GC, Ace, PI = O.GlobalConstants, O.AceLibrary, O.ProfileInitializer
 local Table, Assert = O.Table, O.Assert
 local AceEvent, WAttr = Ace.AceEvent, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-
-local PI = O.ProfileInitializer
-local FrameDetails = PI:GetAllActionBarSizeDetails()
-
 local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
 
 --[[-----------------------------------------------------------------------------
@@ -122,7 +117,7 @@ end
 
 function P:CreateBarsTemplate()
     local bars = {}
-    for i=1, self:GetMaxFrames() do
+    for i=1, self:GetActionbarFrameCount() do
         local frameName = self:GetFrameNameByIndex(i)
         bars[frameName] = {
             enabled = false,
@@ -308,52 +303,16 @@ function P:GetFrameNameByIndex(frameIndex) return PI:GetFrameNameByIndex(frameIn
 --- @return FrameWidget
 function P:GetFrameWidgetByIndex(frameIndex) return _G[self:GetFrameNameByIndex(frameIndex)].widget end
 
-function P:GetMaxFrames() return #FrameDetails end
+function P:GetActionbarFrameCount() return PI.ActionbarCount end
 
 function P:GetAllFrameNames()
     local fnames = {}
-    for i=1, self:GetMaxFrames() do
+    for i=1, self:GetActionbarFrameCount() do
         local fn = self:GetFrameNameByIndex(i)
         tinsert(fnames, fn)
     end
     tsort(fnames)
     return fnames
-end
-
---- @return table
-function P:GetAllFrameWidgets()
-    local fnames = {}
-    for i=1, self:GetMaxFrames() do
-        local fn = self:GetFrameNameByIndex(i)
-        tinsert(fnames, fn)
-    end
-    tsort(fnames)
-
-    local frames = {}
-    for _, f in ipairs(fnames) do tinsert(frames, _G[f].widget) end
-    return frames
-end
-
-function P:GetButtonsByIndex(frameIndex)
-
-    local barData = self:GetBar(frameIndex)
-    if barData then
-        return barData.buttons
-    end
-
-    return nil
-end
-
-function P:FindButtonsBySpellById(spellId)
-    local buttons = {}
-    for barName, bar in pairs(self:GetBars()) do
-        for buttonName, button in pairs(bar.buttons) do
-            if 'spell' == button.type and button.spell and spellId == button.spell.id then
-                buttons[buttonName] = button.spell
-            end
-        end
-    end
-    return buttons
 end
 
 --- Only return the bars that do exist. Some old profile button info
@@ -376,24 +335,7 @@ function P:FindButtonsByType(btnType)
     return buttons
 end
 
-
-function P:GetAllActionBarSizeDetails()
-    return FrameDetails
-end
-
-function P:GetActionBarSizeDetailsByIndex(frameIndex)
-    return FrameDetails[frameIndex]
-end
-
---- @deprecated No longer being used in preference of ActionBars / Pick Up Action Key
---- @return boolean True if the action bar is locked
-function P:IsLockActionBars()
-    return self.profile[ConfigNames.lock_actionbars] == true
-end
-
-function P:IsHideWhenTaxi()
-    return self.profile[ConfigNames.hide_when_taxi] == true
-end
+function P:IsHideWhenTaxi() return self.profile[ConfigNames.hide_when_taxi] == true end
 
 --- @param anchorType string
 --- @see TooltipAnchor
@@ -418,7 +360,3 @@ P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
     p:log(10, '%s received..', msg)
     P.profile = ns.db.profile
 end)
---[[-----------------------------------------------------------------------------
-Global Variable
--------------------------------------------------------------------------------]]
-ABP_Profile = P
