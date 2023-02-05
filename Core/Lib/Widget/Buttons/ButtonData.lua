@@ -44,7 +44,13 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 --- @param bd ButtonData
-local function methods(bd)
+local function PropsAndMethods(bd)
+
+    ---@param widget ButtonUIWidget
+    function bd:Init(widget)
+        assert(widget, "ButtonUIWidget is required.")
+        self.widget = widget
+    end
 
     function bd:GetBarConfig() return self.widget.dragFrame:GetConfig() end
 
@@ -167,13 +173,13 @@ end
 New Instance
 -------------------------------------------------------------------------------]]
 local L = LibStub:NewLibrary(ns.M.ButtonData)
+PropsAndMethods(L)
 
 --- @param widget ButtonUIWidget
 --- @return ButtonData
 function L:Constructor(widget)
     --- @class ButtonData
-    local o = { widget = widget }
-    methods(o)
+    local o = O.Mixin:MixinAndInit(L, widget)
     return o
 end
 

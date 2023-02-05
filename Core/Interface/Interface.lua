@@ -236,3 +236,12 @@ local ActionbarInitialSettings = {
     ['enable'] = false,
     ['frame_handle_mouseover'] = true
 }
+
+--- @class LayoutStrategyContext
+local LayoutStrategyContext = {
+    --- @type Kapresoft_LibUtil_Incrementer
+    xIncr = {},
+    --- @type Kapresoft_LibUtil_Incrementer
+    yIncr = {},
+}
+--- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)

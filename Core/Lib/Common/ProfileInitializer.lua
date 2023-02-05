@@ -122,7 +122,6 @@ local function CreateActionBarConfig()
     return barConf
 end
 
---- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
 --- @type LayoutStrategyFn
 local LayoutFirstTwoTopLeft = function(frameIndex, barConfig, context)
     local x = context.xIncr:get()
@@ -155,14 +154,6 @@ local DefaultLayoutStrategy = function(frameIndex, barConfig, context)
     barConfig.anchor = CreateDefaultAnchor(x, y, 'CENTER', 'CENTER')
 end
 
---- @class LayoutStrategyContext
-local _LayoutStrategyContext = {
-    --- @type Kapresoft_LibUtil_Incrementer
-    xIncr = {},
-    --- @type Kapresoft_LibUtil_Incrementer
-    yIncr = {},
-}
-
 --- @param layoutStrategyFn LayoutStrategyFn
 local function ApplyLayoutStrategy(layoutStrategyFn)
     local xIncr = ns:CreateIncrementer(-200, 190)
@@ -191,10 +182,7 @@ local function InitDefaultProfileData()
         barConfig.widget[ConfigNames.frame_handle_mouseover] = init.frame_handle_mouseover
         bars[name] = barConfig
     end
-
     ApplyLayoutStrategy(DefaultLayoutStrategy)
-
-    p:log('Initialized: %s', Table.size(DEFAULT_PROFILE_DATA[ConfigNames.bars]))
 end
 
 --[[-----------------------------------------------------------------------------
@@ -236,8 +224,6 @@ local function Methods(o)
         return btnConf.anchor
     end
 
-    function o:GetAllActionBarSizeDetails() return ActionbarInitialSettings end
-
     function o:InitNewProfile()
         local profile = CreateFromMixins(DEFAULT_PROFILE_DATA)
         for name, config in pairs(DEFAULT_PROFILE_DATA.bars) do
@@ -261,7 +247,6 @@ local function Methods(o)
     ---@param barConf Profile_Bar
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
-        p:log('btnName: %s', btnName)
         local btn = self:CreateSingleButtonTemplate()
         barConf.buttons[btnName] = btn
     end
