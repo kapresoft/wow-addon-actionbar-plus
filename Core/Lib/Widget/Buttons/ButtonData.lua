@@ -174,7 +174,6 @@ function L:Constructor(widget)
     --- @class ButtonData
     local o = { widget = widget }
     PropsAndMethods(o)
-    BD = o
     return o
 end
 
