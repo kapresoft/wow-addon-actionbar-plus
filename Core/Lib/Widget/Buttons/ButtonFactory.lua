@@ -159,7 +159,7 @@ function L:ApplyForEachVisibleFrames(applyFunction)
     for _,f in ipairs(frames) do
         --- @type FrameWidget
         local fw = _G[f].widget
-        if fw:IsShownInConfig() then applyFunction(fw) end
+        if fw and fw:IsShownInConfig() then applyFunction(fw) end
     end
 end
 
