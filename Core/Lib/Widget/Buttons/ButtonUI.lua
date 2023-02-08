@@ -24,7 +24,7 @@ local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 local String = O.String
 local A, P, PH = O.Assert, O.Profile, O.PickupHandler
 
-local WMX = O.WidgetMixin
+local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local E, WAttr = GC.E, GC.WidgetAttributes
 
 local IsBlank = String.IsBlank
@@ -343,12 +343,6 @@ local function RegisterCallbacks(widget)
 end
 
 --[[-----------------------------------------------------------------------------
-Widget Methods
--------------------------------------------------------------------------------]]
----@param widget ButtonUIWidget
-local function ApplyMixins(widget) O.ButtonMixin:Mixin(widget) end
-
---[[-----------------------------------------------------------------------------
 Builder Methods
 -------------------------------------------------------------------------------]]
 
@@ -430,8 +424,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     widget.buttonData =  buttonData
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
-    --for method, func in pairs(methods) do widget[method] = func end
-    ApplyMixins(widget)
+    ButtonMX:Mixin(widget)
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
 

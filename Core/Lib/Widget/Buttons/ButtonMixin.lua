@@ -235,7 +235,7 @@ local function CreateMask(btn, texture, texturePath)
 end
 
 ---@param target any
-function L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
+function L:Mixin(target) return O.Mixin:Mixin(target, L) end
 
 --- - Call this function once only; otherwise *CRASH* if called N times
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)

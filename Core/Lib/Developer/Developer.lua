@@ -28,7 +28,6 @@ local p = O.LogFactory('Developer')
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
 function L:TT()
     self:SendMessage(GC.M.OnTooltipFrameUpdate)
 end

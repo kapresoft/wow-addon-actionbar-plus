@@ -150,6 +150,7 @@ local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFrameIndex)
+    p:log('Event received: %s', event)
     frameWidget:UpdateEmptyButtonsSettings()
 end
 
@@ -170,12 +171,13 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 
 --- @param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
+    p:log(0, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:ShowEmptyGridEvent() end)
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
-    p:log(30, '%s called...', frameWidget.index)
+    p:log(0, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
 end

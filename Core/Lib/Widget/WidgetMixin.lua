@@ -33,6 +33,7 @@ StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+-- todo next: rename to WidgetUtil?
 --- @class WidgetMixin : BaseLibraryObject
 local _L = LibStub:NewLibrary(ns.M.WidgetMixin)
 local p = _L:GetLogger()
@@ -84,7 +85,6 @@ local FontStringTemplate = {
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-function _L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
 
 --- @param button ButtonUI
 function _L:CreateFontString(button)

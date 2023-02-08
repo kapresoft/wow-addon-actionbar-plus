@@ -58,7 +58,7 @@ local function CreateNamespace(...)
     --- @type Module
     ns.M = ns.M or {}
 
-    ns.pformat = ns:K().pformat
+    ns.pformat = ns:K().pformat:B()
 
     ns:K():Mixin(ns, LibPackMixin)
 

@@ -104,6 +104,7 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarGrid(f, event, ...)
+    p:log('Event received: %s', event)
     if E.ACTIONBAR_SHOWGRID == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
         return
