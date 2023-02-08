@@ -171,13 +171,13 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 
 --- @param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
-    p:log(0, '[%s] %s called...', e, frameWidget.index)
+    p:log(30, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:ShowEmptyGridEvent() end)
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
-    p:log(0, '[%s] %s called...', e, frameWidget.index)
+    p:log(30, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
 end
