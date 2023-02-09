@@ -306,17 +306,6 @@ local function PropsAndMethods(o)
             order = mainSeq:next(),
             args = {
                 desc = { name = GeneralConfigHeader, type = "header", order = 0 },
-                -- TODO: Remove lock_actionbars; Addon now uses WOW's ActionBars / Pick Up Action Key Settings
-                lock_actionbars = {
-                    hidden = true,
-                    type = 'toggle',
-                    order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME,
-                    --desc = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.',
-                    desc = ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC,
-                    get = PGet(self, PC.lock_actionbars, false),
-                    set = PSet(self, PC.lock_actionbars, false)
-                },
                 character_specific_anchors = {
                     type = 'toggle',
                     width = 'full',

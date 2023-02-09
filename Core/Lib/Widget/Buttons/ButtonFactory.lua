@@ -1,14 +1,15 @@
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local sformat, slower, tinsert = string.format, string.lower, table.insert
+
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
     GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TooltipDataProcessor = TooltipDataProcessor
-
---[[-----------------------------------------------------------------------------
-Lua Vars
--------------------------------------------------------------------------------]]
-local format, strlower, tinsert = string.format, string.lower, table.insert
+local Enum, EmbeddedItemTooltip, ItemRefTooltip = Enum, EmbeddedItemTooltip, ItemRefTooltip
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -18,14 +19,15 @@ local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local AceEvent = O.AceLibrary.AceEvent
-local String, A, P, MSG = O.String, O.Assert, O.Profile, GC.M
+local String, Table, A, P, MSG = O.String, O.Table, O.Assert, O.Profile, GC.M
+local IsBlankString, IsEmptyTable = String.IsBlank, Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
             WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
             WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
-
+local E = GC.E
 --- @type ButtonUILib
 local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
@@ -33,6 +35,7 @@ local WMX = O.WidgetMixin
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
 local p = L:GetLogger()
+local safecall = O.Safecall:New(p)
 
 local AttributeSetters = {
     [SPELL]       = O.SpellAttributeSetter,
@@ -45,20 +48,19 @@ local AttributeSetters = {
 
 L.FRAMES = {}
 
-
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 local function InitButtonGameTooltipHooksLegacy()
-    GameTooltip:HookScript("OnShow", function(tooltip, ...)
+    GameTooltip:HookScript(E.OnShow, function(tooltip, ...)
         if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
-    GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip, ...)
+    GameTooltip:HookScript(E.OnTooltipSetSpell, function(tooltip, ...)
         if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
-    GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
+    GameTooltip:HookScript(E.OnTooltipSetItem, function(tooltip, ...)
         if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
         WMX:SetupTooltipKeybindingInfo(tooltip)
     end)
@@ -100,12 +102,27 @@ local function OnMacroChanged(btnWidget)
     AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
 end
 
+--- Autocorrect bad data if we have button data with
+--- btnData[type] but no btnData.type
+--- @param btnWidget ButtonUIWidget
+--- @param btnData Profile_Button
+local function GuessButtonType(btnWidget, btnData)
+    for buttonType in pairs(AttributeSetters) do
+        -- return the first data found
+        if not IsEmptyTable(btnData[buttonType]) then
+            p:log(10, 'btnData[%s] did not have a type and was corrected: %s', btnWidget:GetName(), btnData.type)
+            return buttonType
+        end
+    end
+    return nil
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 function L:Init()
-    local frameNames = P:GetAllFrameNames()
-    for i,_ in ipairs(frameNames) do
+    local frameNames = ButtonFrameFactory:CreateActionbarFrames()
+    for i in ipairs(frameNames) do
         local f = self:CreateActionbarGroup(i)
         tinsert(self.FRAMES, f)
         f:ShowGroupIfEnabled()
@@ -142,7 +159,7 @@ function L:ApplyForEachVisibleFrames(applyFunction)
     for _,f in ipairs(frames) do
         --- @type FrameWidget
         local fw = _G[f].widget
-        if fw:IsShownInConfig() then applyFunction(fw) end
+        if fw and fw:IsShownInConfig() then applyFunction(fw) end
     end
 end
 
@@ -212,11 +229,14 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     return btnWidget
 end
 
-
 --- @param btnWidget ButtonUIWidget
 function L:SetButtonAttributes(btnWidget)
     local btnData = btnWidget:GetConfig()
-    if btnData == nil or String.IsBlank(btnData.type) then return end
+    if not btnData then return end
+    if IsBlankString(btnData.type) then
+        btnData.type = GuessButtonType(btnWidget, btnData)
+        if IsBlankString(btnData.type) then return end
+    end
     local setter = self:GetAttributesSetter(btnData.type)
     if not setter then return end
     setter:SetAttributes(btnWidget.button, btnData)
@@ -246,8 +266,8 @@ local function OnBagUpdate()
         fw:ApplyForEachButtonCondition(
                 function(bw) return (not bw:IsEmpty()) and bw:IsItem() end,
                 function(bw)
-                    local itemInfo = bw:GetButtonData():GetItemInfo()
-                    if not itemInfo then return end
+                    local success, itemInfo = safecall(function() return bw:GetButtonData():GetItemInfo() end)
+                    if not (success and itemInfo) then return end
                     p:log(50, '(%s)::Item: %s', GetTime(), itemInfo.name)
                     bw:UpdateItemState()
                 end)

@@ -16,7 +16,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
-
+local pformat = ns.pformat
 local MX = O.Mixin
 local AO = O.AceLibFactory:A()
 local LSM, String = AO.AceLibSharedMedia, O.String
@@ -59,10 +59,6 @@ function L:Init()
     self:SetButtonProperties()
     self:InitTextures(emptyTexture)
     if self:IsEmpty() then self:SetTextureAsEmpty() end
-end
-
-function L:SetButtonLayout2()
-    p:log('index: %s', self.index)
 end
 
 function L:SetButtonProperties()
@@ -235,7 +231,7 @@ local function CreateMask(btn, texture, texturePath)
 end
 
 ---@param target any
-function L:Mixin(target, ...) return MX:MixinOrElseSelf(target, self, ...) end
+function L:Mixin(target) return O.Mixin:Mixin(target, L) end
 
 --- - Call this function once only; otherwise *CRASH* if called N times
 --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
@@ -268,10 +264,7 @@ function L:W() return self end
 ---@return ButtonUI
 function L:B() return self.button end
 
----@return ButtonUI
-function L:B() return self.button end
----@return ButtonUIWidget
-function L:W() return self end
+
 ---@return ButtonAttributes
 function L:GetButtonAttributes() return self:W().buttonAttributes end
 function L:GetIndex() return self:W().index end

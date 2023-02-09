@@ -44,7 +44,7 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 --- @param bd ButtonData
-local function methods(bd)
+local function PropsAndMethods(bd)
 
     function bd:GetBarConfig() return self.widget.dragFrame:GetConfig() end
 
@@ -173,7 +173,7 @@ local L = LibStub:NewLibrary(ns.M.ButtonData)
 function L:Constructor(widget)
     --- @class ButtonData
     local o = { widget = widget }
-    methods(o)
+    PropsAndMethods(o)
     return o
 end
 

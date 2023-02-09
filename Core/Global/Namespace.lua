@@ -16,7 +16,7 @@ local function Define_InterfaceMethods(o)
     --- @see UtilWrapper.lua
     --- @param start number
     --- @param increment number
-    --- @return Kapresoft_LibUtil_Incrementer
+    --- @return Kapresoft_Incrementer
     function o:CreateIncrementer(start, increment) end
 
 end
@@ -58,7 +58,7 @@ local function CreateNamespace(...)
     --- @type Module
     ns.M = ns.M or {}
 
-    ns.pformat = ns:K().pformat
+    ns.pformat = ns:K().pformat:B()
 
     ns:K():Mixin(ns, LibPackMixin)
 
@@ -69,7 +69,7 @@ local function CreateNamespace(...)
         function o:CreateCursorUtil() return self:K():CreateAndInitFromMixin(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
         --- @param start number
         --- @param increment number
-        --- @return Kapresoft_LibUtil_Incrementer
+        --- @return Kapresoft_Incrementer
         function o:CreateIncrementer(start, increment) return self:K():CreateIncrementer(start, increment) end
 
         --- @param moduleName string The module name, i.e. Logger
@@ -99,6 +99,7 @@ local function CreateNamespace(...)
                 ns:Register(name, newLibInstance)
             end)
     ns.LibStub = LocalLibStub
+    ns.LibStubAce = LibStub
     ns.O.LibStub = LocalLibStub
 
     ns.mt = { __tostring = function() return addon .. '::Namespace'  end }

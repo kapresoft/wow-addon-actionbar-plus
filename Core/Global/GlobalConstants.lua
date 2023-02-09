@@ -55,6 +55,9 @@ local function GlobalConstantProperties(o)
     local C = {
         ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
+        BASE_FRAME_NAME = 'ActionbarPlusF',
+        --- @see _ParentFrame.xml
+        FRAME_TEMPLATE = 'ActionbarPlusFrameTemplate',
         SLASH_COMMAND_OPTIONS = "abp_options",
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
@@ -134,6 +137,9 @@ local function GlobalConstantProperties(o)
         OnEnter = 'OnEnter',
         OnEvent = 'OnEvent',
         OnLeave = 'OnLeave',
+        OnShow = 'OnShow',
+        OnTooltipSetSpell = 'OnTooltipSetSpell',
+        OnTooltipSetItem = 'OnTooltipSetItem',
         OnModifierStateChanged = 'OnModifierStateChanged',
         OnDragStart = 'OnDragStart',
         OnDragStop = 'OnDragStop',
@@ -321,11 +327,23 @@ local function GlobalConstantProperties(o)
         MACRO_TEXT = WidgetAttributes.MACRO_TEXT,
     }
 
+    --- Flat view of all known config names
+    --- Use this for strongly-typed configs
     --- @class Profile_Config_Names
     local Profile_Config_Names = {
+        ['enabled'] = 'enabled',
+        --- @see Profile_Bar
         ['bars'] = 'bars',
-        --- @deprecated lock_actionbars is to be removed
-        ['lock_actionbars'] = 'lock_actionbars',
+        --- @see Profile_Bar_Widget Contains widget settings, i.e. colsize, etc
+        ['widget'] = 'widget',
+        --- @see _RegionAnchor
+        ['anchor'] = 'anchor',
+        ['locked'] = 'locked',
+        --- type is table<number, Profile_Button>
+        ['buttons'] = 'buttons',
+        ['rowSize'] = 'rowSize',
+        ['colSize'] = 'colSize',
+        ['buttonSize'] = 'buttonSize',
         ['character_specific_anchors'] = 'character_specific_anchors',
         ['hide_when_taxi'] = 'hide_when_taxi',
         ['action_button_mouseover_glow'] = 'action_button_mouseover_glow',
@@ -336,6 +354,10 @@ local function GlobalConstantProperties(o)
         ['show_button_index'] = 'show_button_index',
         ['show_keybind_text'] = 'show_keybind_text',
         ['tooltip_anchor_type'] = 'tooltip_anchor_type',
+        ['show_empty_buttons'] = 'show_empty_buttons',
+        ['frame_handle_mouseover'] = 'frame_handle_mouseover',
+        ['frame_handle_alpha'] = 'frame_handle_alpha',
+        ['alpha'] = 'alpha',
     }
 
     --- @class Profile_Config_Widget_Names
@@ -409,6 +431,12 @@ end
 local function GlobalConstantMethods(o)
 
     function o:AddonName() return o.C.ADDON_NAME end
+    ---@param frameIndex number
+    function o:GetFrameName(frameIndex)
+        assert(frameIndex, "frameIndex is required on GC:GetFrameName(frameIndex)")
+        assert(frameIndex > 0, "frameIndex should be > 0 on GC:GetFrameName(frameIndex)")
+        return self.C.BASE_FRAME_NAME .. frameIndex
+    end
     function o:Constants() return o.C end
     function o:Events() return o.E end
     ---#### Example

@@ -23,6 +23,7 @@ local M = {
     PrettyPrint = 'PrettyPrint',
     Table = 'Table',
     String = 'String',
+    Safecall = 'Safecall',
     LuaEvaluator = 'LuaEvaluator',
     ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
     ActionType = 'ActionType',
@@ -51,7 +52,6 @@ local M = {
     DruidAPI = 'DruidAPI',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
-    Incrementer = 'Incrementer',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     LocalizationUtil = 'LocalizationUtil',
@@ -66,7 +66,6 @@ local M = {
     Profile = 'Profile',
     ProfileInitializer = 'ProfileInitializer',
     ReceiveDragEventHandler = 'ReceiveDragEventHandler',
-    RogueAPI = 'RogueAPI',
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     WidgetMixin = 'WidgetMixin',
@@ -116,8 +115,6 @@ local GlobalObjectsTemplate = {
     FrameHandleMixin = {},
     --- @type GlobalConstants
     GlobalConstants = {},
-    --- @type Kapresoft_LibUtil_Incrementer
-    Incrementer = {},
     --- @type ItemAttributeSetter
     ItemAttributeSetter = {},
     --- @type ItemDragEventHandler
@@ -164,8 +161,8 @@ local GlobalObjectsTemplate = {
     ProfileInitializer = {},
     --- @type ReceiveDragEventHandler
     ReceiveDragEventHandler = {},
-    --- @type RogueAPI
-    RogueAPI = {},
+    --- @type Kapresoft_LibUtil_Safecall
+    Safecall = {},
     --- @type SpellAttributeSetter
     SpellAttributeSetter = {},
     --- @type SpellDragEventHandler

@@ -14,4 +14,4 @@ ns:Register(ns.M.String, K.String)
 ns:Register(ns.M.Mixin, K.Mixin)
 ns:Register(ns.M.LuaEvaluator, K.LuaEvaluator)
 ns:Register(ns.M.AceLibrary, K.AceLibrary.O)
-
+ns:Register(ns.M.Safecall, K.Safecall)
