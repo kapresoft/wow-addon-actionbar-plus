@@ -16,7 +16,7 @@ local function Define_InterfaceMethods(o)
     --- @see UtilWrapper.lua
     --- @param start number
     --- @param increment number
-    --- @return Kapresoft_LibUtil_Incrementer
+    --- @return Kapresoft_Incrementer
     function o:CreateIncrementer(start, increment) end
 
 end
@@ -69,7 +69,7 @@ local function CreateNamespace(...)
         function o:CreateCursorUtil() return self:K():CreateAndInitFromMixin(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
         --- @param start number
         --- @param increment number
-        --- @return Kapresoft_LibUtil_Incrementer
+        --- @return Kapresoft_Incrementer
         function o:CreateIncrementer(start, increment) return self:K():CreateIncrementer(start, increment) end
 
         --- @param moduleName string The module name, i.e. Logger

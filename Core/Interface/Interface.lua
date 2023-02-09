@@ -239,9 +239,9 @@ local ActionbarInitialSettings = {
 
 --- @class LayoutStrategyContext
 local LayoutStrategyContext = {
-    --- @type Kapresoft_LibUtil_Incrementer
+    --- @type Kapresoft_Incrementer
     xIncr = {},
-    --- @type Kapresoft_LibUtil_Incrementer
+    --- @type Kapresoft_Incrementer
     yIncr = {},
 }
 --- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)

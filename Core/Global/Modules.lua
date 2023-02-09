@@ -52,7 +52,6 @@ local M = {
     DruidAPI = 'DruidAPI',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
-    Incrementer = 'Incrementer',
     ItemAttributeSetter = 'ItemAttributeSetter',
     ItemDragEventHandler = 'ItemDragEventHandler',
     LocalizationUtil = 'LocalizationUtil',
@@ -116,8 +115,6 @@ local GlobalObjectsTemplate = {
     FrameHandleMixin = {},
     --- @type GlobalConstants
     GlobalConstants = {},
-    --- @type Kapresoft_LibUtil_Incrementer
-    Incrementer = {},
     --- @type ItemAttributeSetter
     ItemAttributeSetter = {},
     --- @type ItemDragEventHandler
