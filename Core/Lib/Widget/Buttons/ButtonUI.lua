@@ -92,14 +92,33 @@ end
 ---@param key string The key clicked
 ---@param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
-    if btn.widget:IsBattlePet() and C_PetJournal then
-        C_PetJournal.SummonPetByGUID(btn.widget:GetButtonData():GetBattlePetInfo().guid)
+    local w = btn.widget
+    if w:IsBattlePet() and C_PetJournal then
+        C_PetJournal.SummonPetByGUID(w:GetButtonData():GetBattlePetInfo().guid)
         return
+    elseif w:CanChangeEquipmentSet() then
+        p:log('Equipment Clicked: %s', btn.widget:GetButtonData():GetEquipmentSetInfo())
+        C_EquipmentSet.UseEquipmentSet(w:GetButtonData():GetEquipmentSetInfo().id)
+
+        -- PUT_DOWN_SMALL_CHAIN
+        -- GUILD_BANK_OPEN_BAG
+        PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
+        ActionButton_ShowOverlayGlow(btn)
+        C_Timer.After(0.8, function()
+            ActionButton_HideOverlayGlow(btn)
+        end)
+        if not PaperDollFrame:IsVisible() then
+            ToggleCharacter('PaperDollFrame')
+            --ToggleCharacter('GearManagerDialog')
+            C_Timer.After(0.1, function()
+                GearManagerToggleButton:Click()
+            end)
+        end
     end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
-    RegisterForClicks(btn.widget, 'PreClick', down)
+    RegisterForClicks(w, 'PreClick', down)
 end
 
 ---@param btn ButtonUI
@@ -357,8 +376,10 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local frameName = dragFrameWidget:GetName()
     local btnName = format('%sButton%s', frameName, tostring(btnIndex))
 
-    ---@class ButtonUI : _Button
+    --- @class __ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
+    --- @alias ButtonUI __ButtonUI|_Button
+
     --local button = CreateFrame("Button", btnName, UIParent, "SecureActionButtonTemplate,SecureHandlerBaseTemplate")
     button.text = WMX:CreateFontString(button)
     button.indexText = WMX:CreateIndexTextFontString(button)

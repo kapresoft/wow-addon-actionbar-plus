@@ -20,6 +20,7 @@
     <Script file="MountDragEventHandler.lua"/>
     <Script file="CompanionDragEventHandler.lua"/>
     <Script file="BattlePetDragEventHandler.lua"/>
+    <Script file="EquipmentSetDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
 

@@ -16,7 +16,9 @@ local AceEvent, WAttr = Ace.AceEvent, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
+local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT,
+                     WAttr.PET_ACTION, WAttr.COMPANION, WAttr.BATTLE_PET,
+                     WAttr.EQUIPMENT_SET}
 
 --[[-----------------------------------------------------------------------------
 New Instance

@@ -353,6 +353,23 @@ local function PropsAndMethods(o)
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
+
+                equipmentset_header = { order = mainSeq:next(), type = "header", name = "Equipment Set Options" },
+                equipmentset_open_character_frame = {
+                    order = mainSeq:next(),
+                    width = 'normal',
+                    type = 'toggle',
+                    name = 'Open Character Frame',
+                    desc = 'Whenever the user clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.'
+                },
+                equipmentset_open_equipment_manager = {
+                    order = mainSeq:next(),
+                    width = 1.2,
+                    type = 'toggle',
+                    name = "Open Equipment Manager",
+                    desc = 'When a user clicks on the equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information'
+                },
+
                 tooltip_header = { order = mainSeq:next(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {
                     width = 'normal',

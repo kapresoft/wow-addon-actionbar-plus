@@ -115,12 +115,21 @@ local Profile_Companion = {
 }
 --- @class Profile_BattlePet
 local Profile_BattlePet = {
-    type='battlepet',
-    petType = -1,
+    ['type'] = 'battlepet',
+    ['petType'] = -1,
     ['guid'] = 'BattlePet-0-000008C13591',
     ['speciesID'] = speciesID,
     ['creatureID'] = 157969,
     ['name'] = 'Anima Wyrmling',
+    ['icon'] = 3038273,
+}
+
+--- @class Profile_EquipmentSet
+local Profile_EquipmentSet = {
+    ['type'] ='equipmentset',
+    ['name'] = '<name of equipment>',
+    --- The set ID
+    ['id'] = 1,
     ['icon'] = 3038273,
 }
 
@@ -132,6 +141,7 @@ local Profile_Button = {
     ["macro"] = Profile_Macro,
     ["mount"] = Profile_Mount,
     ["companion"] = Profile_Companion,
+    ["equipmentset"] = Profile_EquipmentSet,
 }
 
 --- @class Profile_Bar_Widget

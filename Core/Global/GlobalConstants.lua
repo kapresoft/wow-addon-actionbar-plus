@@ -303,6 +303,7 @@ local function GlobalConstantProperties(o)
         MOUNT = 'mount',
         COMPANION = 'companion',
         BATTLE_PET = 'battlepet',
+        EQUIPMENT_SET = 'equipmentset',
         FLY_OUT = 'flyout',
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
@@ -313,11 +314,14 @@ local function GlobalConstantProperties(o)
         MOONKIN_FORM = 'moonkin form',
         STEALTH = 'stealth',
         PROWL = 'prowl',
+        --- equipmentset
+        NAME = 'name',
     }
 
     --- @class ButtonAttributes
     local ButtonAttributes = {
         SPELL = WidgetAttributes.SPELL,
+        NAME = WidgetAttributes.NAME,
         UNIT = WidgetAttributes.UNIT,
         UNIT2 = format("*%s2", WidgetAttributes.UNIT),
         TYPE = WidgetAttributes.TYPE,

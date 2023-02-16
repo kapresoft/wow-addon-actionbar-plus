@@ -24,9 +24,10 @@ local IsBlankString, IsEmptyTable = String.IsBlank, Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
 local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
+local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
             WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
-            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
+            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
+            WAttr.EQUIPMENT_SET
 local E = GC.E
 --- @type ButtonUILib
 local ButtonUI = O.ButtonUI
@@ -44,6 +45,7 @@ local AttributeSetters = {
     [MOUNT]       = O.MountAttributeSetter,
     [COMPANION]   = O.CompanionAttributeSetter,
     [BATTLE_PET]   = O.BattlePetAttributeSetter,
+    [EQUIPMENT_SET] = O.EquipmentSetAttributeSetter,
 }
 
 L.FRAMES = {}

@@ -50,6 +50,8 @@ local M = {
     Config = 'Config',
     ConfigEventHandlerMixin = 'ConfigEventHandlerMixin',
     DruidAPI = 'DruidAPI',
+    EquipmentSetDragEventHandler = 'EquipmentSetDragEventHandler',
+    EquipmentSetAttributeSetter = 'EquipmentSetAttributeSetter',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
@@ -111,6 +113,10 @@ local GlobalObjectsTemplate = {
     Config = {},
     --- @type ConfigEventHandlerMixin
     ConfigEventHandlerMixin = {},
+    --- @type EquipmentSetDragEventHandler
+    EquipmentSetDragEventHandler = {},
+    --- @type EquipmentSetAttributeSetter
+    EquipmentSetAttributeSetter = {},
     --- @type FrameHandleMixin
     FrameHandleMixin = {},
     --- @type GlobalConstants

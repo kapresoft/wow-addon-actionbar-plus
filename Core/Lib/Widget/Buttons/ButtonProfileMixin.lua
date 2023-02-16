@@ -12,9 +12,10 @@ local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local CN = GC.Profile_Config_Names
 local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
+local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
             WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
-            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
+            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
+            WAttr.EQUIPMENT_SET
 local IsTableEmpty = Table.IsEmpty
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
 local p = O.LogFactory(M.ButtonProfileMixin)
@@ -59,18 +60,18 @@ function L:GetConfig() return self:W():GetButtonData():GetConfig() end
 function L:GetProfileConfig() return self:W():GetButtonData():GetProfileConfig() end
 
 ---@param type string One of: spell, item, or macro
-function L:GetConfigActionbarData(type)
+function L:GetButtonTypeData(type)
     local btnData = self:GetConfig()
     if self:invalidButtonData(btnData, type) then return nil end
     return btnData[type]
 end
 
 ---@return Profile_Spell
-function L:GetSpellData() return self:GetConfigActionbarData(SPELL) end
+function L:GetSpellData() return self:GetButtonTypeData(SPELL) end
 ---@return Profile_Item
-function L:GetItemData() return self:GetConfigActionbarData(ITEM) end
+function L:GetItemData() return self:GetButtonTypeData(ITEM) end
 ---@return Profile_Macro
-function L:GetMacroData() return self:GetConfigActionbarData(MACRO) end
+function L:GetMacroData() return self:GetButtonTypeData(MACRO) end
 ---@return boolean
 function L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
 ---@return boolean
@@ -82,7 +83,10 @@ function L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
 ---@see Interface/FrameXML/SecureHandlers.lua
 ---@return boolean
 function L:IsCompanion() return self:IsConfigOfType(self:GetConfig(), COMPANION) end
+---@return boolean
 function L:IsBattlePet() return self:IsConfigOfType(self:GetConfig(), BATTLE_PET) end
+---@return boolean
+function L:IsEquipmentSet() return self:IsConfigOfType(self:GetConfig(), EQUIPMENT_SET) end
 
 ---@param config Profile_Button
 ---@param type string spell, item, macro, mount, etc

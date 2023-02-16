@@ -11,13 +11,14 @@ local _, ns = ...
 local O, LibStub = ns:LibPack()
 
 local String, Assert = O.String, O.Assert
-local WAttr = O.GlobalConstants.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET =
-    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT,
-    WAttr.COMPANION, WAttr.BATTLE_PET
+local W = O.GlobalConstants.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
+    W.SPELL, W.ITEM, W.MACRO, W.MOUNT,
+    W.COMPANION, W.BATTLE_PET, W.EQUIPMENT_SET
 local P, API = O.Profile, O.API
 
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
+local IsEmptyTable = O.Table.IsEmpty
 
 local p = O.LogFactory:NewLogger(ns.M.ButtonData)
 
@@ -134,13 +135,16 @@ local function PropsAndMethods(bd)
     function bd:GetCompanionInfo() return self:GetConfig()[COMPANION] end
     --- @return Profile_BattlePet
     function bd:GetBattlePetInfo() return self:GetConfig()[BATTLE_PET] end
+    --- @return Profile_EquipmentSet
+    function bd:GetEquipmentSetInfo() return self:GetConfig()[EQUIPMENT_SET] end
 
     function bd:ConfigContainsValidActionType()
         if not type then return false end
         local btnConf = self:GetConfig()
         if not btnConf then return false end
-        if IsBlank(btnConf.type) then return false end
-
+        if IsBlank(btnConf.type) and IsEmptyTable(btnConf[btnConf.type]) then
+            return false
+        end
         return true
     end
 

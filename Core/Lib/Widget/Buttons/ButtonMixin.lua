@@ -653,7 +653,7 @@ function L:SetButtonStateNormal() self:B():SetButtonState('NORMAL') end
 function L:SetButtonStatePushed() self:B():SetButtonState('PUSHED') end
 
 ---Typically used when casting spells that take longer than GCD
-function L: SetHighlightInUse()
+function L:SetHighlightInUse()
     local btn = self:B()
     self:SetNormalIconAlpha(highlightTextureInUseAlpha)
     local hltTexture = btn:GetHighlightTexture()
@@ -889,6 +889,11 @@ function L:IsValidMacroProfile(buttonData)
     return not (buttonData == nil or buttonData.macro == nil
             or IsBlank(buttonData.macro.index)
             or IsBlank(buttonData.macro.name))
+end
+
+function L:CanChangeEquipmentSet()
+    if not (C_EquipmentSet and C_EquipmentSet.CanUseEquipmentSets()) then return false end
+    return self:IsEquipmentSet()
 end
 
 function L:UpdateMacroState()
