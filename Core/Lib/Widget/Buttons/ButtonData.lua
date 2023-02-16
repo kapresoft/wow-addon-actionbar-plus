@@ -31,10 +31,11 @@ local function removeElement(tbl, value)
     end
 end
 
+--- @deprecated See ButtonProfileMixin#CleanupTypeData
 --- @param profileButton Profile_Button
 local function CleanupTypeData(profileButton)
     if profileButton == nil or profileButton.type == nil then return end
-    local btnTypes = { SPELL, MACRO, ITEM, MOUNT}
+    local btnTypes = { SPELL, MACRO, ITEM, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET }
     removeElement(btnTypes, profileButton.type)
     for _, v in ipairs(btnTypes) do
         if v ~= nil then profileButton[v] = {} end
@@ -58,6 +59,7 @@ local function PropsAndMethods(bd)
         return true
     end
 
+    --- @deprecated See ButtonProfileMixin#GetConfig2
     --- @return Profile_Button
     function bd:GetConfig()
         local w = self.widget

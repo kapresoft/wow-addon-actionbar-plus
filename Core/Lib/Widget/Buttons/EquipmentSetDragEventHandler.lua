@@ -81,15 +81,16 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local btnData = btnUI.widget:GetConfig()
+        local btnConf = btnUI.widget:GetConfig2()
+        local config = btnConf.config
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 
         PH:PickupExisting(btnUI.widget)
-        btnData[WAttr.TYPE] = equipmentSet.type
-        btnData[WAttr.EQUIPMENT_SET] = equipmentSet
+        config[WAttr.TYPE] = equipmentSet.type
+        config[WAttr.EQUIPMENT_SET] = equipmentSet
 
-        S(btnUI, btnData)
+        S(btnUI, config)
     end
 
 end
@@ -119,11 +120,13 @@ local function attributeSetterMethods(a)
     --- @param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
         if not btnUI then return end
+        local w = btnUI.widget
+        local btnConf = w:GetConfig2()
+        if btnConf:IsEmpty() then return end
+
         local bd = btnUI.widget:GetButtonData()
         if not bd:ConfigContainsValidActionType() then return end
 
-        local w = btnUI.widget
-        local btnData = w:GetButtonData():GetConfig()
         local equipmentSet = w:GetButtonData():GetEquipmentSetInfo()
         if not (equipmentSet and equipmentSet.name) then return end
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfoByName(equipmentSet.name)

@@ -28,6 +28,25 @@ New Instance
 local L = LibStub:NewLibrary(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- @param buttonData Profile_Button
+local function CleanupTypeData(buttonData)
+    local function removeElement(tbl, value)
+        for i, v in ipairs(tbl) do
+            if v == value then tbl[i] = nil end
+        end
+    end
+
+    if buttonData == nil or buttonData.type == nil then return end
+    local btnTypes = { SPELL, MACRO, ITEM, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET }
+    removeElement(btnTypes, buttonData.type)
+    for _, v in ipairs(btnTypes) do
+        if v ~= nil then buttonData[v] = {} end
+    end
+end
+
+--[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 
@@ -56,6 +75,23 @@ end
 ---#### Get Profile Button Config Data
 ---@return Profile_Button
 function L:GetConfig() return self:W():GetButtonData():GetConfig() end
+
+--- Use this from now on (We are deprecating ButtonData)
+---#### Get Profile Button Config Data
+---@return ButtonDataMixin
+function L:GetConfig2()
+    return ns:K():CreateAndInitFromMixin(O.ButtonDataMixin, self:GetProfileButtonData())
+end
+
+--- @return Profile_Button
+function L:GetProfileButtonData()
+    local w = self:W()
+    local profileButton = O.Profile:GetButtonData(w.frameIndex, w.buttonName)
+    -- self cleanup
+    CleanupTypeData(profileButton)
+    return profileButton
+end
+
 ---@return Profile_Config
 function L:GetProfileConfig() return self:W():GetButtonData():GetProfileConfig() end
 

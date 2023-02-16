@@ -41,6 +41,7 @@ local M = {
     BattlePetDragEventHandler = 'BattlePetDragEventHandler',
     BattlePetAttributeSetter = 'BattlePetAttributeSetter',
     ButtonData = 'ButtonData',
+    ButtonDataMixin = 'ButtonDataMixin',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
@@ -95,6 +96,8 @@ local GlobalObjectsTemplate = {
     Assert = {},
     --- @type BaseAttributeSetter
     BaseAttributeSetter = {},
+    --- @type ButtonDataMixin
+    ButtonDataMixin = {},
     --- @type ButtonData
     ButtonData = {},
     --- @type ButtonFactory

@@ -97,22 +97,16 @@ local function OnPreClick(btn, key, down)
         C_PetJournal.SummonPetByGUID(w:GetButtonData():GetBattlePetInfo().guid)
         return
     elseif w:CanChangeEquipmentSet() then
-        p:log('Equipment Clicked: %s', btn.widget:GetButtonData():GetEquipmentSetInfo())
+        p:log(20, 'Equipment Clicked: %s', btn.widget:GetButtonData():GetEquipmentSetInfo())
         C_EquipmentSet.UseEquipmentSet(w:GetButtonData():GetEquipmentSetInfo().id)
-
         -- PUT_DOWN_SMALL_CHAIN
         -- GUILD_BANK_OPEN_BAG
         PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
         ActionButton_ShowOverlayGlow(btn)
-        C_Timer.After(0.8, function()
-            ActionButton_HideOverlayGlow(btn)
-        end)
+        C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(btn) end)
         if not PaperDollFrame:IsVisible() then
             ToggleCharacter('PaperDollFrame')
-            --ToggleCharacter('GearManagerDialog')
-            C_Timer.After(0.1, function()
-                GearManagerToggleButton:Click()
-            end)
+            C_Timer.After(0.1, function() GearManagerToggleButton:Click() end)
         end
     end
     -- This prevents the button from being clicked

@@ -360,14 +360,22 @@ local function PropsAndMethods(o)
                     width = 'normal',
                     type = 'toggle',
                     name = 'Open Character Frame',
-                    desc = 'Whenever the user clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.'
+                    -- todo next: localize strings
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.'
                 },
                 equipmentset_open_equipment_manager = {
                     order = mainSeq:next(),
                     width = 1.2,
                     type = 'toggle',
                     name = "Open Equipment Manager",
-                    desc = 'When a user clicks on the equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information'
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information'
+                },
+                equipmentset_show_glow_when_active = {
+                    order = mainSeq:next(),
+                    width = 'normal',
+                    type = 'toggle',
+                    name = "Glow When Clicked",
+                    desc = 'When the player clicks an equipment set button, the clicked button should glow to provide visual feedback and confirm that the button has been successfully clicked.'
                 },
 
                 tooltip_header = { order = mainSeq:next(), type = "header", name = GeneralTooltipOptionsHeader },
