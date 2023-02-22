@@ -9,9 +9,10 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_Timer = C_Timer
-local PickupCompanion, GetCompanionInfo = PickupCompanion, GetCompanionInfo
+local PickupCompanion, GetCompanionInfo, GetSpellInfo = PickupCompanion, GetCompanionInfo, GetSpellInfo
 local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
 local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, UnitInVehicle
+local IsUsableSpell = IsUsableSpell
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -204,12 +205,18 @@ end
 function L:GetMountInfoLegacy(companionIndex)
     local creatureID, creatureName, creatureSpellID, icon, isSummoned =
             GetCompanionInfo(MOUNT, companionIndex)
+    local spellName = creatureName
+    if not IsUsableSpell(spellName) then
+        local spellInfoName = GetSpellInfo(creatureSpellID)
+        if spellInfoName then spellName = spellInfoName end
+        p:log(30, 'Mount creature-name=[%s] spell=[%s]', creatureName, spellName)
+    end
 
     local o = {
         ---@type number
         index = companionIndex,
         ---@type string
-        name = creatureName,
+        name = spellName,
         ---@type number
         spellID = creatureSpellID,
         ---@type number
