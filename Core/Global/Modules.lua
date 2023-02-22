@@ -98,6 +98,7 @@ local GlobalObjectsTemplate = {
     BaseAttributeSetter = {},
     --- @type ButtonDataMixin
     ButtonDataMixin = {},
+    --- @deprecated Use ButtonDataMixin
     --- @type ButtonData
     ButtonData = {},
     --- @type ButtonFactory

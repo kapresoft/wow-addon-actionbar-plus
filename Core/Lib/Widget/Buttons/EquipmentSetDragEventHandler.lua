@@ -6,7 +6,7 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
---- @type _GameTooltip
+--- @type _GamedTooltip
 local GameTooltip = GameTooltip
 ---### See: Interface/SharedXML/Constants.lua
 local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
@@ -81,8 +81,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local btnConf = btnUI.widget:GetConfig2()
-        local config = btnConf.config
+        local config = btnUI.widget:GetButtonData2():GetConfig()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 

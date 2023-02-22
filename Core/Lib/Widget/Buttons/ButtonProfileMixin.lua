@@ -79,14 +79,12 @@ function L:GetConfig() return self:W():GetButtonData():GetConfig() end
 --- Use this from now on (We are deprecating ButtonData)
 ---#### Get Profile Button Config Data
 ---@return ButtonDataMixin
-function L:GetConfig2()
-    return ns:K():CreateAndInitFromMixin(O.ButtonDataMixin, self:GetProfileButtonData())
-end
+function L:GetConfig2() return O.ButtonDataMixin:New(self:W()) end
 
 --- @return Profile_Button
 function L:GetProfileButtonData()
     local w = self:W()
-    local profileButton = O.Profile:GetButtonData(w.frameIndex, w.buttonName)
+    local profileButton = O.Profile:GetButtonData(w.frameIndex, w.index)
     -- self cleanup
     CleanupTypeData(profileButton)
     return profileButton

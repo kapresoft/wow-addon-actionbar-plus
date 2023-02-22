@@ -93,6 +93,22 @@ local function CopyAnchor(source, dest)
     dest.y = source.y
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+---@param obj any
+function P:Mixin(obj)
+    return ns:K():Mixin(obj, self)
+end
+
+--- @param frameIndex number
+--- @param btnIndex number
+--- @return Profile_Button
+function P:GetButtonDataByIndex(frameIndex, btnIndex)
+    local btnName = GC:ButtonName(frameIndex, btnIndex)
+    return self:GetButtonData(frameIndex, btnName)
+end
+
 --- @return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)

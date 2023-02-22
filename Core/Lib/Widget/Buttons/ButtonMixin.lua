@@ -913,3 +913,5 @@ end
 
 ---@return ButtonData
 function L:GetButtonData() return self:W().buttonData end
+---@return ButtonDataMixin
+function L:GetButtonData2() return O.ButtonDataMixin:New(self:W()) end

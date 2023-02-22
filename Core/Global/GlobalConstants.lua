@@ -56,6 +56,7 @@ local function GlobalConstantProperties(o)
         ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
         BASE_FRAME_NAME = 'ActionbarPlusF',
+        BUTTON_NAME_FORMAT = 'ActionbarPlusF%sButton%s',
         --- @see _ParentFrame.xml
         FRAME_TEMPLATE = 'ActionbarPlusFrameTemplate',
         SLASH_COMMAND_OPTIONS = "abp_options",
@@ -489,6 +490,11 @@ local function GlobalConstantMethods(o)
     function o:ShouldLog(level) return self:GetLogLevel() >= level end
     function o:IsVerboseLogging() return self:ShouldLog(20) end
 
+    --- @param frameIndex number
+    --- @param btnIndex number
+    function o:ButtonName(frameIndex, btnIndex)
+        return sformat(self.C.BUTTON_NAME_FORMAT, tostring(frameIndex), tostring(btnIndex))
+    end
 end
 
 --[[-----------------------------------------------------------------------------

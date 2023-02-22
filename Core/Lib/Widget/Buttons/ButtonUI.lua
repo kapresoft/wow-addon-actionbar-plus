@@ -367,8 +367,7 @@ Builder Methods
 ---@return ButtonUIWidget
 function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
-    local frameName = dragFrameWidget:GetName()
-    local btnName = format('%sButton%s', frameName, tostring(btnIndex))
+    local btnName = GC:ButtonName(dragFrameWidget.index, btnIndex)
 
     --- @class __ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
