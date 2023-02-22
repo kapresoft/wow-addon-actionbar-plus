@@ -33,20 +33,20 @@ local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class ButtonUIWidgetBuilder : WidgetMixin
+--- @class ButtonUIWidgetBuilder : WidgetMixin
 local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
 
----@class ButtonUILib
+--- @class ButtonUILib
 local _L = LibStub:NewLibrary(M.ButtonUI, 1)
 local p = O.LogFactory:NewLogger(M.ButtonUI)
 
----@return ButtonUIWidgetBuilder
+--- @return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end
 
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
----@param cursorInfo CursorInfo
+--- @param cursorInfo CursorInfo
 local function IsValidDragSource(cursorInfo)
     --p:log("IsValidDragSource| CursorInfo=%s", cursorInfo)
     if not cursorInfo or IsBlank(cursorInfo.type) then
@@ -61,8 +61,8 @@ end
 ---TODO: See the following implementation to mimic keydown
 --- - https://wowpedia.fandom.com/wiki/CVar_ActionButtonUseKeyDown
 --- - https://www.wowinterface.com/forums/showthread.php?t=58768
----@param widget ButtonUIWidget
----@param down boolean true if the press is KeyDown
+--- @param widget ButtonUIWidget
+--- @param down boolean true if the press is KeyDown
 local function RegisterForClicks(widget, event, down)
     local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
     if E.ON_LEAVE == event then
@@ -88,9 +88,9 @@ local function RegisterForClicks(widget, event, down)
     end
 end
 
----@param btn ButtonUI
----@param key string The key clicked
----@param down boolean true if the press is KeyDown
+--- @param btn ButtonUI
+--- @param key string The key clicked
+--- @param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
     local w = btn.widget
     if w:IsBattlePet() and C_PetJournal then
@@ -115,18 +115,18 @@ local function OnPreClick(btn, key, down)
     RegisterForClicks(w, 'PreClick', down)
 end
 
----@param btn ButtonUI
----@param key string The key clicked
----@param down boolean true if the press is KeyDown
+--- @param btn ButtonUI
+--- @param key string The key clicked
+--- @param down boolean true if the press is KeyDown
 local function OnPostClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     RegisterForClicks(btn.widget, 'PreClick', down)
 end
 
----@param btnUI ButtonUI
+--- @param btnUI ButtonUI
 local function OnDragStart(btnUI)
-    ---@type ButtonUIWidget
+    --- @type ButtonUIWidget
     local w = btnUI.widget
     if w:IsEmpty() then return end
 
@@ -142,9 +142,9 @@ local function OnDragStart(btnUI)
     w:Fire('OnDragStart')
 end
 
----@param btn _Button
----@param texture _Texture
----@param texturePath string
+--- @param btn _Button
+--- @param texture _Texture
+--- @param texturePath string
 local function CreateMask(btn, texture, texturePath)
     local mask = btn:CreateMaskTexture()
     local topx, topy = 1, -1
@@ -159,7 +159,7 @@ local function CreateMask(btn, texture, texturePath)
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
----@param btnUI ButtonUI
+--- @param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorUtil = ns:CreateCursorUtil()
@@ -171,7 +171,7 @@ local function OnReceiveDrag(btnUI)
     end
     ClearCursor()
 
-    ---@type ReceiveDragEventHandler
+    --- @type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
 
     --local hTexture = btnUI:GetHighlightTexture()
@@ -184,30 +184,30 @@ local function OnReceiveDrag(btnUI)
 end
 
 ---Triggered by SetCallback('event', fn)
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
----@param widget ButtonUIWidget
----@param event string
----@param mouseButtonPressed string LMOUSECLICK, etc...
----@param down boolean 1 or true if the press is KeyDown
+--- @param widget ButtonUIWidget
+--- @param event string
+--- @param mouseButtonPressed string LMOUSECLICK, etc...
+--- @param down boolean 1 or true if the press is KeyDown
 local function OnModifierStateChanged(widget, event, mouseButtonPressed, down)
     RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down)
     if widget:IsMacro() then if down == 1 then widget:UpdateMacroState() end end
 end
 
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 local function OnBeforeEnter(widget)
     RegisterForClicks(widget, E.ON_ENTER)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
 
     -- handle stuff before event
-    ---@param down boolean true if the press is KeyDown
+    --- @param down boolean true if the press is KeyDown
     --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
     --    RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
     --end, widget)
 end
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 local function OnBeforeLeave(widget)
     --RegisterMacroEvent(widget)
     if not widget:IsMacro() then
@@ -216,13 +216,13 @@ local function OnBeforeLeave(widget)
     end
     RegisterForClicks(widget, E.ON_LEAVE)
 end
----@param btn ButtonUI
+--- @param btn ButtonUI
 local function OnEnter(btn)
     OnBeforeEnter(btn.widget)
     ---Receiver will get a func(widget, event) {}
     btn.widget:Fire(E.ON_ENTER)
 end
----@param btn ButtonUI
+--- @param btn ButtonUI
 local function OnLeave(btn)
     OnBeforeLeave(btn.widget)
     ---Receiver will get a func(widget, event) {}
@@ -236,8 +236,8 @@ local function OnClick_SecureHookScript(btn, mouseButton, down)
     OnReceiveDrag(btn)
 end
 
----@param widget ButtonUIWidget
----@param event string Event string
+--- @param widget ButtonUIWidget
+--- @param event string Event string
 local function OnUpdateButtonCooldown(widget, event)
     widget:UpdateCooldown()
     local cd = widget:GetCooldownInfo();
@@ -245,15 +245,15 @@ local function OnUpdateButtonCooldown(widget, event)
     widget:SetCooldownTextures(cd.icon)
 end
 
----@param widget ButtonUIWidget
----@param event string Event string
+--- @param widget ButtonUIWidget
+--- @param event string Event string
 local function OnUpdateButtonUsable(widget, event)
     if not widget.button:IsShown() then return end
     widget:UpdateUsable()
 end
 
----@param widget ButtonUIWidget
----@param event string Event string
+--- @param widget ButtonUIWidget
+--- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
     if not widget.button:IsShown() then return end
     widget:UpdateRangeIndicator()
@@ -261,8 +261,8 @@ local function OnSpellUpdateUsable(widget, event)
     OnUpdateButtonUsable(widget, event)
 end
 
----@param widget ButtonUIWidget
----@param event string
+--- @param widget ButtonUIWidget
+--- @param event string
 local function OnPlayerControlLost(widget, event, ...)
     if not widget.buttonData:IsHideWhenTaxi() then return end
     C_Timer.After(1, function()
@@ -273,22 +273,22 @@ local function OnPlayerControlLost(widget, event, ...)
     end)
 end
 
----@param widget ButtonUIWidget
----@param event string
+--- @param widget ButtonUIWidget
+--- @param event string
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
     if not widget.buttonData:IsHideWhenTaxi() then return end
     WMX:ShowActionbarsDelayed(true, 2)
 end
 
----@see "UnitDocumentation.lua"
----@param widget ButtonUIWidget
----@param event string
+--- @see "UnitDocumentation.lua"
+--- @param widget ButtonUIWidget
+--- @param event string
 local function OnPlayerTargetChanged(widget, event) widget:UpdateRangeIndicator() end
 
----@see "UnitDocumentation.lua"
----@param widget ButtonUIWidget
----@param event string
+--- @see "UnitDocumentation.lua"
+--- @param widget ButtonUIWidget
+--- @param event string
 local function OnPlayerTargetChangedDelayed(widget, event)
     C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
 end
@@ -296,8 +296,8 @@ local function OnPlayerStartedMoving(widget, event) OnPlayerTargetChangedDelayed
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param widget ButtonUIWidget
----@param name string The widget name.
+--- @param widget ButtonUIWidget
+--- @param name string The widget name.
 local function RegisterWidget(widget, name)
     assert(widget ~= nil)
     assert(name ~= nil)
@@ -314,7 +314,7 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
----@param button ButtonUI
+--- @param button ButtonUI
 local function RegisterScripts(button)
     AceHook:SecureHookScript(button, 'OnClick', OnClick_SecureHookScript)
 
@@ -327,7 +327,7 @@ local function RegisterScripts(button)
     button:SetScript(E.ON_LEAVE, OnLeave)
 end
 
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 local function RegisterCallbacks(widget)
 
     --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
@@ -344,7 +344,7 @@ local function RegisterCallbacks(widget)
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
 
-    ---@param w ButtonUIWidget
+    --- @param w ButtonUIWidget
     widget:SetCallback("OnEnter", function(w)
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(true)
@@ -360,11 +360,11 @@ Builder Methods
 -------------------------------------------------------------------------------]]
 
 ---Creates a new ButtonUI
----@param dragFrameWidget FrameWidget The drag frame this button is attached to
----@param rowNum number The row number
----@param colNum number The column number
----@param btnIndex number The button index number
----@return ButtonUIWidget
+--- @param dragFrameWidget FrameWidget The drag frame this button is attached to
+--- @param rowNum number The row number
+--- @param colNum number The column number
+--- @param btnIndex number The button index number
+--- @return ButtonUIWidget
 function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     local btnName = GC:ButtonName(dragFrameWidget.index, btnIndex)
@@ -389,7 +389,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown", "AnyUp");
 
-    ---@class Cooldown
+    --- @class Cooldown
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
@@ -400,33 +400,33 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    ---@class ButtonUIWidget : ButtonMixin
+    --- @class ButtonUIWidget : ButtonMixin
     local widget = {
-        ---@type ActionbarPlus
+        --- @type ActionbarPlus
         addon = ABP,
-        ---@type Profile
+        --- @type Profile
         profile = P,
-        ---@type number
+        --- @type number
         index = btnIndex,
-        ---@type number
+        --- @type number
         frameIndex = dragFrameWidget:GetIndex(),
-        ---@type string
+        --- @type string
         buttonName = btnName,
-        ---@type FrameWidget
+        --- @type FrameWidget
         dragFrame = dragFrameWidget,
-        ---@type ButtonUI
+        --- @type ButtonUI
         button = button,
-        ---@type ButtonUI
+        --- @type ButtonUI
         frame = button,
-        ---@type Cooldown
+        --- @type Cooldown
         cooldown = cooldown,
-        ---@type table
+        --- @type table
         cooldownInfo = nil,
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
-        ---@type string
+        --- @type string
         frameStrata = dragFrameWidget.frameStrata or 'MEDIUM',
         frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
-        ---@type number
+        --- @type number
         buttonPadding = 1,
         buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
@@ -434,23 +434,25 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     AceEvent:Embed(widget)
     function widget:GetName() return self.button:GetName() end
 
-    local buttonData = O.ButtonData(widget)
+    local buttonData = O.ButtonData:New(widget)
+
     widget.buttonData =  buttonData
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
-    ButtonMX:Mixin(widget)
+    ns:K():Mixin(widget, ButtonMX:New(widget))
+
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
 
     -- This is for mouseover effect
-    -----@param w ButtonUIWidget
+    ----- @param w ButtonUIWidget
     --widget:SetCallback("OnEnter", function(w)
     --    w.dragFrame.frame:SetAlpha(1.0)
     --    w.dragFrame:ApplyForEachButtons(function(bw)
     --        bw.button:SetAlpha(1)
     --    end)
     --end)
-    -----@param w ButtonUIWidget
+    ----- @param w ButtonUIWidget
     --widget:SetCallback("OnLeave", function(w)
     --    w.dragFrame.frame:SetAlpha(0)
     --    w.dragFrame:ApplyForEachButtons(function(bw)
@@ -459,7 +461,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --end)
 
 
-    widget:Init()
+    widget:InitWidget()
 
     return widget
 end

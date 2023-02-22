@@ -20,7 +20,12 @@ local P, API = O.Profile, O.API
 local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 local IsEmptyTable = O.Table.IsEmpty
 
-local p = O.LogFactory:NewLogger(ns.M.ButtonData)
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+--- @class ButtonData : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.ButtonData)
+local p = L.logger
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -45,23 +50,38 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param bd ButtonData
-local function PropsAndMethods(bd)
+--- @param o ButtonData
+local function PropsAndMethods(o)
 
-    function bd:GetBarConfig() return self.widget.dragFrame:GetConfig() end
+    --- @param widget ButtonUIWidget
+    --- @return ButtonData
+    function o:New(widget)
+        local newObj = ns:K():CreateAndInitFromMixin(self, widget)
+        newObj.mt = { __tostring = function() return 'ButtonData::' .. widget:GetName()  end}
+        setmetatable(newObj, newObj.mt)
+        return newObj
+    end
 
-    function bd:invalidButtonData(o, key)
-        if type(o) ~= 'table' then return true end
-        if type(o[key]) ~= 'nil' then
-            local d = o[key]
+    --- @param widget ButtonUIWidget
+    function o:Init(widget)
+        assert(widget, "ButtonUIWidget is required")
+        self.config = P:GetButtonDataByIndex(widget.frameIndex, widget.index)
+        self.widget = widget
+    end
+
+    function o:GetBarConfig() return self.widget.dragFrame:GetConfig() end
+
+    function o:invalidButtonData(obj, key)
+        if type(obj) ~= 'table' then return true end
+        if type(obj[key]) ~= 'nil' then
+            local d = obj[key]
             if type(d) == 'table' then return (IsBlank(d['id']) and IsBlank(d['index'])) end
         end
         return true
     end
 
-    --- @deprecated See ButtonProfileMixin#GetConfig2
     --- @return Profile_Button
-    function bd:GetConfig()
+    function o:GetConfig()
         local w = self.widget
         local profile = w.profile
         local profileButton = profile:GetButtonData(w.frameIndex, w.buttonName)
@@ -71,13 +91,13 @@ local function PropsAndMethods(bd)
     end
 
     --- @return Profile_Config
-    function bd:GetProfileConfig() return self.widget.profile:P() end
+    function o:GetProfileConfig() return self.widget.profile:P() end
     --- @return boolean
-    function bd:IsHideWhenTaxi() return self.widget.profile:IsHideWhenTaxi() end
+    function o:IsHideWhenTaxi() return self.widget.profile:IsHideWhenTaxi() end
     --- @return boolean
-    function bd:ContainsValidAction() return self:GetActionName() ~= nil end
+    function o:ContainsValidAction() return self:GetActionName() ~= nil end
     --- @return string
-    function bd:GetActionName()
+    function o:GetActionName()
         local conf = self:GetConfig()
         if not self:invalidButtonData(conf, SPELL) then return conf.spell.name end
         if not self:invalidButtonData(conf, ITEM) then return conf.item.name end
@@ -86,7 +106,7 @@ local function PropsAndMethods(bd)
     end
 
     --- @return Profile_Spell
-    function bd:GetSpellInfo()
+    function o:GetSpellInfo()
         local w = self.widget
         --- @type Profile_Spell
         local spellInfo
@@ -103,20 +123,20 @@ local function PropsAndMethods(bd)
         return spellInfo
     end
 
-    function bd:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
+    function o:IsShapeshiftOrStealthSpell() return API:IsShapeshiftOrStealthSpell(self:GetSpellInfo()) end
 
-    function bd:IsStealthSpell()
+    function o:IsStealthSpell()
         local spellInfo = self:GetSpellInfo()
         if not (spellInfo and spellInfo.name) then return false end
         return API:IsStealthSpell(spellInfo.name)
     end
-    function bd:IsShapeshiftSpell()
+    function o:IsShapeshiftSpell()
         local spellInfo = self:GetSpellInfo()
         if not (spellInfo and spellInfo.name) then return false end
         return API:IsShapeshiftSpell(spellInfo)
     end
     --- @param optionalSpellNameOrId number|string
-    function bd:IsPassiveSpell(optionalSpellNameOrId)
+    function o:IsPassiveSpell(optionalSpellNameOrId)
         local spellNameOrId = optionalSpellNameOrId
         if not spellNameOrId then
             local spellInfo = self:GetSpellInfo()
@@ -128,19 +148,19 @@ local function PropsAndMethods(bd)
     end
 
     --- @return Profile_Item
-    function bd:GetItemInfo() return self:GetConfig()[ITEM] end
+    function o:GetItemInfo() return self:GetConfig()[ITEM] end
     --- @return Profile_Macro
-    function bd:GetMacroInfo() return self:GetConfig()[MACRO] end
+    function o:GetMacroInfo() return self:GetConfig()[MACRO] end
     --- @return Profile_Mount
-    function bd:GetMountInfo() return self:GetConfig()[MOUNT] end
+    function o:GetMountInfo() return self:GetConfig()[MOUNT] end
     --- @return Profile_Companion
-    function bd:GetCompanionInfo() return self:GetConfig()[COMPANION] end
+    function o:GetCompanionInfo() return self:GetConfig()[COMPANION] end
     --- @return Profile_BattlePet
-    function bd:GetBattlePetInfo() return self:GetConfig()[BATTLE_PET] end
+    function o:GetBattlePetInfo() return self:GetConfig()[BATTLE_PET] end
     --- @return Profile_EquipmentSet
-    function bd:GetEquipmentSetInfo() return self:GetConfig()[EQUIPMENT_SET] end
+    function o:GetEquipmentSetInfo() return self:GetConfig()[EQUIPMENT_SET] end
 
-    function bd:ConfigContainsValidActionType()
+    function o:ConfigContainsValidActionType()
         if not type then return false end
         local btnConf = self:GetConfig()
         if not btnConf then return false end
@@ -151,36 +171,23 @@ local function PropsAndMethods(bd)
     end
 
     --- @param m Profile_Mount
-    function bd:IsInvalidMount(m)
+    function o:IsInvalidMount(m)
         return IsNil(m) and IsNil(m.name) and IsNil(m.spell) and IsNil(m.spell.id)
     end
 
     --- @param c Profile_Companion
-    function bd:IsInvalidCompanion(c)
+    function o:IsInvalidCompanion(c)
         return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
     end
 
     --- @param pet Profile_BattlePet
-    function bd:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
+    function o:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
 
-    function bd:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end
-    function bd:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.widget.frameIndex) end
-    function bd:IsShowKeybindText() return P:IsShowKeybindText(self.widget.frameIndex) end
+    function o:IsShowIndex() return P:IsShowIndex(self.widget.frameIndex) end
+    function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.widget.frameIndex) end
+    function o:IsShowKeybindText() return P:IsShowKeybindText(self.widget.frameIndex) end
 
 end
 
---[[-----------------------------------------------------------------------------
-New Instance
--------------------------------------------------------------------------------]]
-local L = LibStub:NewLibrary(ns.M.ButtonData)
+PropsAndMethods(L)
 
---- @param widget ButtonUIWidget
---- @return ButtonData
-function L:Constructor(widget)
-    --- @class ButtonData
-    local o = { widget = widget }
-    PropsAndMethods(o)
-    return o
-end
-
-L.mt.__call = L.Constructor

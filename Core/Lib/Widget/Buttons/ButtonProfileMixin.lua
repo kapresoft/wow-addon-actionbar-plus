@@ -9,7 +9,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local P = O.Profile
 local CN = GC.Profile_Config_Names
 local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
@@ -24,7 +24,7 @@ local p = O.LogFactory(M.ButtonProfileMixin)
 New Instance
 -------------------------------------------------------------------------------]]
 
----@class ButtonProfileMixin : BaseLibraryObject
+--- @class ButtonProfileMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -50,12 +50,16 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 
----@return Profile
-function L:P() return self.profile end
----@return ButtonUIWidget
-function L:W() return self end
----@return ButtonUI
-function L:B() return self.button end
+--- @param widget ButtonUIWidget
+function L:New(widget)
+    return ns:K():CreateAndInitFromMixin(L, widget)
+end
+
+--- @param widget ButtonUIWidget
+function L:Init(widget)
+    self.w = widget
+    self.config = self.w.buttonData:GetConfig()
+end
 
 function L:invalidButtonData(o, key)
     if type(o) ~= 'table' then return true end
@@ -67,85 +71,81 @@ function L:invalidButtonData(o, key)
 end
 
 function L:IsEmpty()
-    local conf = self:GetConfig()
-    if IsTableEmpty(conf) or IsBlankStr(conf.type) then return true end
-    return IsTableEmpty(conf[conf.type])
+    if IsTableEmpty(self.config) then return true end
+    local type = self.config.type
+    if IsBlankStr(type) then return true end
+    if IsTableEmpty(self.config[type]) then return true end
+    return false
 end
 
 ---#### Get Profile Button Config Data
----@return Profile_Button
-function L:GetConfig() return self:W():GetButtonData():GetConfig() end
-
---- Use this from now on (We are deprecating ButtonData)
----#### Get Profile Button Config Data
----@return ButtonDataMixin
-function L:GetConfig2() return O.ButtonDataMixin:New(self:W()) end
+--- @return Profile_Button
+function L:GetConfig() return self.w:GetButtonData():GetConfig() end
 
 --- @return Profile_Button
 function L:GetProfileButtonData()
-    local w = self:W()
-    local profileButton = O.Profile:GetButtonData(w.frameIndex, w.index)
+    local profileButton = O.Profile:GetButtonData(self.w.frameIndex, self.w.index)
     -- self cleanup
     CleanupTypeData(profileButton)
     return profileButton
 end
 
----@return Profile_Config
-function L:GetProfileConfig() return self:W():GetButtonData():GetProfileConfig() end
+--- @return Profile_Config
+function L:GetProfileConfig() return self.w:GetButtonData():GetProfileConfig() end
 
----@param type string One of: spell, item, or macro
+--- @param type string One of: spell, item, or macro
 function L:GetButtonTypeData(type)
     local btnData = self:GetConfig()
     if self:invalidButtonData(btnData, type) then return nil end
     return btnData[type]
 end
 
----@return Profile_Spell
+--- @return Profile_Spell
 function L:GetSpellData() return self:GetButtonTypeData(SPELL) end
----@return Profile_Item
+--- @return Profile_Item
 function L:GetItemData() return self:GetButtonTypeData(ITEM) end
----@return Profile_Macro
+--- @return Profile_Macro
 function L:GetMacroData() return self:GetButtonTypeData(MACRO) end
----@return boolean
+--- @return boolean
 function L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
----@return boolean
+--- @return boolean
 function L:IsSpell() return self:IsConfigOfType(self:GetConfig(), SPELL) end
----@return boolean
+--- @return boolean
 function L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
----@return boolean
+--- @return boolean
 function L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
----@see Interface/FrameXML/SecureHandlers.lua
----@return boolean
+--- @see Interface/FrameXML/SecureHandlers.lua
+--- @return boolean
 function L:IsCompanion() return self:IsConfigOfType(self:GetConfig(), COMPANION) end
----@return boolean
+--- @return boolean
 function L:IsBattlePet() return self:IsConfigOfType(self:GetConfig(), BATTLE_PET) end
----@return boolean
+--- @return boolean
 function L:IsEquipmentSet() return self:IsConfigOfType(self:GetConfig(), EQUIPMENT_SET) end
 
----@param config Profile_Button
----@param type string spell, item, macro, mount, etc
+--- @param config Profile_Button
+--- @param type string spell, item, macro, mount, etc
 function L:IsConfigOfType(config, type)
     if IsTableEmpty(config) then return false end
     return config.type and type == config.type
 end
 
----@return boolean true if the key override is pressed
+--- @return boolean true if the key override is pressed
 function L:IsTooltipModifierKeyDown()
     local tooltipKey = self:GetTooltipVisibilityKey();
     return self:IsOverrideKeyDown(tooltipKey)
 end
 
----@return boolean true if the key override is pressed
+--- @return boolean true if the key override is pressed
 function L:IsTooltipCombatModifierKeyDown()
     local combatOverride = self:GetTooltipVisibilityCombatOverrideKeyOption();
     return self:IsOverrideKeyDown(combatOverride)
 end
 
----@see TooltipKeyName
----@param value string One of TooltipKeyName value
----@return boolean true if the key override is pressed
+--- @see TooltipKeyName
+--- @param value string One of TooltipKeyName value
+--- @return boolean true if the key override is pressed
 function L:IsOverrideKeyDown(value)
-    local tooltipKey = self:P():GetTooltipKey().names
+    local tooltipKey = P:GetTooltipKey().names
     if tooltipKey.SHOW == value then return true end
     if tooltipKey.HIDE == value then return false end
 

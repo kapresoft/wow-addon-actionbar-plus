@@ -3,7 +3,6 @@
 
     <Script file="ActionType.lua"/>
     <Script file="ButtonData.lua"/>
-    <Script file="ButtonDataMixin.lua"/>
     <Script file="PickupHandler.lua"/>
     <Script file="ButtonProfileMixin.lua"/>
     <Script file="ButtonMixin.lua"/>

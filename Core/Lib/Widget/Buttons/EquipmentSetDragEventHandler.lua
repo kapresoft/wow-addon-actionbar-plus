@@ -81,7 +81,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local config = btnUI.widget:GetButtonData2():GetConfig()
+        local config = btnUI.widget:GetConfig()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 
@@ -120,8 +120,7 @@ local function attributeSetterMethods(a)
     function a:ShowTooltip(btnUI)
         if not btnUI then return end
         local w = btnUI.widget
-        local btnConf = w:GetConfig2()
-        if btnConf:IsEmpty() then return end
+        if w:IsEmpty() then return end
 
         local bd = btnUI.widget:GetButtonData()
         if not bd:ConfigContainsValidActionType() then return end
