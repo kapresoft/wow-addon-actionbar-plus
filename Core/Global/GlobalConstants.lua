@@ -241,6 +241,10 @@ local function GlobalConstantProperties(o)
         OnDBInitialized       = newMsg('OnDBInitialized'),
         OnConfigInitialized   = newMsg('OnConfigInitialized'),
         OnTooltipFrameUpdate  = newMsg('OnTooltipFrameUpdate'),
+        OnButtonPreClick      = newMsg('OnButtonPreClick'),
+        OnButtonPostClick          = newMsg('OnButtonPostClick'),
+        OnButtonClickBattlePet     = newMsg('OnButtonClickBattlePet'),
+        OnButtonClickEquipmentSet  = newMsg('OnButtonClickEquipmentSet'),
     }
 
     --- @class WidgetGlobals

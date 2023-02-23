@@ -93,24 +93,13 @@ end
 --- @param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
     local w = btn.widget
+    w:SendMessage(GC.M.OnButtonPreClick, w)
     if w:IsBattlePet() and C_PetJournal then
-        -- todo next: use ace message
-        C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
+        w:SendMessage(GC.M.OnButtonClickBattlePet, w)
         return
-    elseif w:CanChangeEquipmentSet() then
-        if btn:IsDragging() then return end
-        -- todo next: use ace message
-        p:log(20, 'Equipment Clicked: %s', w:GetEquipmentSetData())
-        C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
-        -- PUT_DOWN_SMALL_CHAIN
-        -- GUILD_BANK_OPEN_BAG
-        PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
-        ActionButton_ShowOverlayGlow(btn)
-        C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(btn) end)
-        if not PaperDollFrame:IsVisible() then
-            ToggleCharacter('PaperDollFrame')
-            C_Timer.After(0.1, function() GearManagerToggleButton:Click() end)
-        end
+    elseif w:IsEquipmentSet() then
+        w:SendMessage(GC.M.OnButtonClickEquipmentSet, w)
+        return
     end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
@@ -122,9 +111,12 @@ end
 --- @param key string The key clicked
 --- @param down boolean true if the press is KeyDown
 local function OnPostClick(btn, key, down)
+    local w = btn.widget
+    w:SendMessage(GC.M.OnButtonPostClick, w)
+
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
-    RegisterForClicks(btn.widget, 'PreClick', down)
+    RegisterForClicks(w, 'PreClick', down)
 end
 
 --- @param btnUI ButtonUI
@@ -403,8 +395,9 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    --- @class ButtonUIWidget : ButtonMixin
-    local widget = {
+    --- @class __ButtonUIWidget : ButtonMixin
+    --- @alias ButtonUIWidget  __ButtonUIWidget | BaseLibraryObject_WithAceEvent
+    local __widget = {
         --- @type ActionbarPlus
         addon = ABP,
         --- @type Profile
@@ -434,6 +427,9 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
+    --- @type ButtonUIWidget
+    local widget = __widget
+
     button.widget, cooldown.widget = widget, widget
 
     AceEvent:Embed(widget)

@@ -31,18 +31,18 @@ New Instance
 
 --- @class EquipmentSetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
+
 local p = L.logger
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
+
 --- @type BaseAttributeSetter
 local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
---- @param battlePet BattlePetInfo
---- @return boolean
-local function IsInvalidBattlePet(battlePet)
-    return IsNil(battlePet) and IsNil(battlePet.guid) and IsNil(battlePet.name)
-end
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 
 --- @param equipmentSet EquipmentSetInfo
 --- @return Profile_EquipmentSet
@@ -55,6 +55,43 @@ local function ToProfileEquipmentSet(equipmentSet)
     }
 end
 
+--- @param evt string
+--- @param w ButtonUIWidget
+local function OnClick(evt, w, ...)
+    assert(w, "ButtonUIWidget is missing")
+    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
+
+    --- @type _Frame
+    local PDF = PaperDollFrame
+    --- @type _Frame
+    local gmDlg = GearManagerDialog
+    --- @type _Button
+    local gmButton = GearManagerToggleButton
+
+    p:log(20, 'Equipment Clicked: %s', w:GetEquipmentSetData())
+    C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
+
+    -- PUT_DOWN_SMALL_CHAIN
+    -- GUILD_BANK_OPEN_BAG
+    PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
+
+    ActionButton_ShowOverlayGlow(w.button)
+    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+
+    if not PDF:IsVisible() then
+        ToggleCharacter('PaperDollFrame')
+        C_Timer.After(0.1, function()
+            gmButton:Click()
+        end)
+    else
+        if not gmDlg:IsVisible() then
+            C_Timer.After(0.1, function()
+                gmButton:Click()
+            end)
+        end
+    end
+end
 
 --[[-----------------------------------------------------------------------------
 Methods: BattlePetDragEventHandler
@@ -149,6 +186,8 @@ local function Init()
 
     S.mt.__index = BaseAttributeSetter
     S.mt.__call = S.SetAttributes
+
+    ns:AceEvent():RegisterMessage(GC.M.OnButtonClickEquipmentSet, OnClick)
 end
 
 Init()

@@ -38,6 +38,9 @@ local S = LibStub:NewLibrary(M.BattlePetAttributeSetter)
 --- @type BaseAttributeSetter
 local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 --- @param battlePet BattlePetInfo
 --- @return boolean
 local function IsInvalidBattlePet(battlePet)
@@ -58,6 +61,13 @@ local function ToProfileBattlePet(pet)
     }
 end
 
+--- @param evt string
+--- @param w ButtonUIWidget
+local function OnClick(evt, w, ...)
+    assert(w, "ButtonUIWidget is missing")
+    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
+end
 
 --[[-----------------------------------------------------------------------------
 Methods: BattlePetDragEventHandler
@@ -145,6 +155,8 @@ local function Init()
 
     S.mt.__index = BaseAttributeSetter
     S.mt.__call = S.SetAttributes
+
+    ns:AceEvent():RegisterMessage(GC.M.OnButtonClickBattlePet, OnClick)
 end
 
 Init()
