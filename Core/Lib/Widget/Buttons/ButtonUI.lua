@@ -439,7 +439,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     widget.buttonData =  buttonData
     button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
 
-    ns:K():Mixin(widget, ButtonMX:New(widget))
+    ButtonMX:Mixin(widget)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)

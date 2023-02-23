@@ -52,8 +52,9 @@ local p = L:GetLogger()
 --[[-----------------------------------------------------------------------------
 Instance Methods
 -------------------------------------------------------------------------------]]
+--- Create a new ButtonMixin instance and
 --- @param widget ButtonUIWidget
-function L:Mixin(widget) ns:K():Mixin(widget, L) end
+function L:Mixin(widget) ns:K():Mixin(widget, self:New(widget)) end
 
 --- @param widget ButtonUIWidget
 --- @return ButtonMixin
