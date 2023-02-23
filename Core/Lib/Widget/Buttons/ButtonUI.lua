@@ -94,11 +94,14 @@ end
 local function OnPreClick(btn, key, down)
     local w = btn.widget
     if w:IsBattlePet() and C_PetJournal then
-        C_PetJournal.SummonPetByGUID(w:GetButtonData():GetBattlePetInfo().guid)
+        -- todo next: use ace message
+        C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
         return
     elseif w:CanChangeEquipmentSet() then
-        p:log(20, 'Equipment Clicked: %s', btn.widget:GetButtonData():GetEquipmentSetInfo())
-        C_EquipmentSet.UseEquipmentSet(w:GetButtonData():GetEquipmentSetInfo().id)
+        if btn:IsDragging() then return end
+        -- todo next: use ace message
+        p:log(20, 'Equipment Clicked: %s', w:GetEquipmentSetData())
+        C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
         -- PUT_DOWN_SMALL_CHAIN
         -- GUILD_BANK_OPEN_BAG
         PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
@@ -264,7 +267,7 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string
 local function OnPlayerControlLost(widget, event, ...)
-    if not widget.buttonData:IsHideWhenTaxi() then return end
+    if not widget:IsHideWhenTaxi() then return end
     C_Timer.After(1, function()
         local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
         p:log(10, 'Player on Taxi: %s [%s]', playerOnTaxi, GetTime())
@@ -277,7 +280,7 @@ end
 --- @param event string
 local function OnPlayerControlGained(widget, event, ...)
     --p:log('Event[%s] received flying=%s', event, flying)
-    if not widget.buttonData:IsHideWhenTaxi() then return end
+    if not widget:IsHideWhenTaxi() then return end
     WMX:ShowActionbarsDelayed(true, 2)
 end
 
@@ -431,18 +434,15 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
+    button.widget, cooldown.widget = widget, widget
+
     AceEvent:Embed(widget)
-    function widget:GetName() return self.button:GetName() end
-
-    local buttonData = O.ButtonData:New(widget)
-
-    widget.buttonData =  buttonData
-    button.widget, cooldown.widget, buttonData.widget = widget, widget, widget
-
     ButtonMX:Mixin(widget)
 
     RegisterWidget(widget, btnName .. '::Widget')
     RegisterCallbacks(widget)
+
+    widget:InitWidget()
 
     -- This is for mouseover effect
     ----- @param w ButtonUIWidget
@@ -459,9 +459,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --        bw.button:SetAlpha(0.4)
     --    end)
     --end)
-
-
-    widget:InitWidget()
 
     return widget
 end

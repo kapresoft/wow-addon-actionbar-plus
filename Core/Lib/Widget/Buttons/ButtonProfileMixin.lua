@@ -2,6 +2,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
+local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -9,14 +10,10 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-local P = O.Profile
+local P, API = O.Profile, O.API
 local CN = GC.Profile_Config_Names
-local String, Table, WAttr = O.String, O.Table, GC.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
-            WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
-            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
-            WAttr.EQUIPMENT_SET
-local IsTableEmpty = Table.IsEmpty
+local String, Table, W = O.String, O.Table, GC.WidgetAttributes
+local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
 local p = O.LogFactory(M.ButtonProfileMixin)
 
@@ -39,9 +36,9 @@ local function CleanupTypeData(buttonData)
     end
 
     if buttonData == nil or buttonData.type == nil then return end
-    local btnTypes = { SPELL, MACRO, ITEM, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET }
-    removeElement(btnTypes, buttonData.type)
-    for _, v in ipairs(btnTypes) do
+    local actionTypes = P:GetAllActionTypes()
+    removeElement(actionTypes, buttonData.type)
+    for _, v in ipairs(actionTypes) do
         if v ~= nil then buttonData[v] = {} end
     end
 end
@@ -49,120 +46,280 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+---@param o ButtonProfileMixin
+local function PropsAndMethods(o)
 
---- @param widget ButtonUIWidget
-function L:New(widget)
-    return ns:K():CreateAndInitFromMixin(L, widget)
-end
-
---- @param widget ButtonUIWidget
-function L:Init(widget)
-    self.w = widget
-    self.config = self.w.buttonData:GetConfig()
-end
-
-function L:invalidButtonData(o, key)
-    if type(o) ~= 'table' then return true end
-    if type(o[key]) ~= 'nil' then
-        local d = o[key]
-        if type(d) == 'table' then return (IsBlankStr(d['id']) and IsBlankStr(d['index'])) end
+    --- @param widget ButtonUIWidget
+    function o:New(widget)
+        return ns:K():CreateAndInitFromMixin(o, widget)
     end
-    return true
-end
 
-function L:IsEmpty()
-    if IsTableEmpty(self.config) then return true end
-    local type = self.config.type
-    if IsBlankStr(type) then return true end
-    if IsTableEmpty(self.config[type]) then return true end
-    return false
-end
-
----#### Get Profile Button Config Data
---- @return Profile_Button
-function L:GetConfig() return self.w:GetButtonData():GetConfig() end
-
---- @return Profile_Button
-function L:GetProfileButtonData()
-    local profileButton = O.Profile:GetButtonData(self.w.frameIndex, self.w.index)
-    -- self cleanup
-    CleanupTypeData(profileButton)
-    return profileButton
-end
-
---- @return Profile_Config
-function L:GetProfileConfig() return self.w:GetButtonData():GetProfileConfig() end
-
---- @param type string One of: spell, item, or macro
-function L:GetButtonTypeData(type)
-    local btnData = self:GetConfig()
-    if self:invalidButtonData(btnData, type) then return nil end
-    return btnData[type]
-end
-
---- @return Profile_Spell
-function L:GetSpellData() return self:GetButtonTypeData(SPELL) end
---- @return Profile_Item
-function L:GetItemData() return self:GetButtonTypeData(ITEM) end
---- @return Profile_Macro
-function L:GetMacroData() return self:GetButtonTypeData(MACRO) end
---- @return boolean
-function L:IsMacro() return self:IsConfigOfType(self:GetConfig(), MACRO) end
---- @return boolean
-function L:IsSpell() return self:IsConfigOfType(self:GetConfig(), SPELL) end
---- @return boolean
-function L:IsItem() return self:IsConfigOfType(self:GetConfig(), ITEM) end
---- @return boolean
-function L:IsMount() return self:IsConfigOfType(self:GetConfig(), MOUNT) end
---- @see Interface/FrameXML/SecureHandlers.lua
---- @return boolean
-function L:IsCompanion() return self:IsConfigOfType(self:GetConfig(), COMPANION) end
---- @return boolean
-function L:IsBattlePet() return self:IsConfigOfType(self:GetConfig(), BATTLE_PET) end
---- @return boolean
-function L:IsEquipmentSet() return self:IsConfigOfType(self:GetConfig(), EQUIPMENT_SET) end
-
---- @param config Profile_Button
---- @param type string spell, item, macro, mount, etc
-function L:IsConfigOfType(config, type)
-    if IsTableEmpty(config) then return false end
-    return config.type and type == config.type
-end
-
---- @return boolean true if the key override is pressed
-function L:IsTooltipModifierKeyDown()
-    local tooltipKey = self:GetTooltipVisibilityKey();
-    return self:IsOverrideKeyDown(tooltipKey)
-end
-
---- @return boolean true if the key override is pressed
-function L:IsTooltipCombatModifierKeyDown()
-    local combatOverride = self:GetTooltipVisibilityCombatOverrideKeyOption();
-    return self:IsOverrideKeyDown(combatOverride)
-end
-
---- @see TooltipKeyName
---- @param value string One of TooltipKeyName value
---- @return boolean true if the key override is pressed
-function L:IsOverrideKeyDown(value)
-    local tooltipKey = P:GetTooltipKey().names
-    if tooltipKey.SHOW == value then return true end
-    if tooltipKey.HIDE == value then return false end
-
-    if tooltipKey.ALT == value then
-        return IsAltKeyDown()
-    elseif tooltipKey.CTRL == value then
-        return IsControlKeyDown()
-    elseif tooltipKey.SHIFT == value then
-        return IsShiftKeyDown()
+    --- @param widget ButtonUIWidget
+    function o:Init(widget)
+        self.w = widget
+        self.config = self:GetConfig()
     end
-    return false
+
+    function o:SetButtonAttributes()
+        local conf = self.config
+        if not conf then return end
+        if IsBlankStr(conf.type) then
+            conf.type = self:GuessButtonType(conf)
+            if IsBlankStr(conf.type) then return end
+        end
+        local setter = self:GetAttributesSetter()
+        if not setter then return end
+        setter:SetAttributes(self.w.button)
+    end
+
+    --- @return table<string, AttributeSetter>
+    function o:GetAllAttributesSetters()
+        --- @type table<string, AttributeSetter>
+        local AttributeSetters = {
+            [W.SPELL]       = O.SpellAttributeSetter,
+            [W.ITEM]        = O.ItemAttributeSetter,
+            [W.MACRO]       = O.MacroAttributeSetter,
+            [W.MOUNT]       = O.MountAttributeSetter,
+            [W.COMPANION]   = O.CompanionAttributeSetter,
+            [W.BATTLE_PET]   = O.BattlePetAttributeSetter,
+            [W.EQUIPMENT_SET] = O.EquipmentSetAttributeSetter,
+        }
+        return AttributeSetters
+    end
+
+    --- @return AttributeSetter
+    function o:GetAttributesSetter(actionType)
+        local type = actionType or self.config.type
+        --p:log('type: %s', tostring(type))
+        return self:GetAllAttributesSetters()[type]
+    end
+
+    --- Autocorrect bad data if we have button data with
+    --- btnData[type] but no btnData.type field
+    ---@param btnData Profile_Button
+    function o:GuessButtonType(btnData)
+        for buttonType in pairs(self:GetAllAttributesSetters()) do
+            -- return the first data found
+            if not IsEmptyTable(btnData[buttonType]) then
+                p:log(1, 'btnData[%s] did not have a type and was corrected: %s', self.w:GetName(), btnData.type)
+                return buttonType
+            end
+        end
+        return nil
+    end
+
+    function o:IsEmpty()
+        if IsEmptyTable(self.config) then return true end
+        local type = self.config.type
+        if IsBlankStr(type) then return true end
+        if IsEmptyTable(self.config[type]) then return true end
+        return false
+    end
+
+    --- @return Profile_Bar
+    function o:GetBarConfig() return self.w.dragFrame:GetConfig() end
+
+    ---#### Get Profile Button Config Data
+    --- @return Profile_Button
+    --function L:GetConfig() return self.w:GetButtonData():GetConfig() end
+    function o:GetConfig()
+        local profile = self.w.profile
+        local profileButton = profile:GetButtonData(self.w.frameIndex, self.w.buttonName)
+        -- self cleanup
+        CleanupTypeData(profileButton)
+        return profileButton
+    end
+
+    --- @return Profile_Button
+    function o:GetProfileButtonData()
+        local profileButton = O.Profile:GetButtonData(self.w.frameIndex, self.w.index)
+        -- self cleanup
+        CleanupTypeData(profileButton)
+        return profileButton
+    end
+
+    --- @return Profile_Config
+    function o:GetProfileConfig() return self.w.profile:P() end
+
+    --- @param type string One of: spell, item, or macro
+    function o:GetButtonTypeData(type)
+        local btnData = self.config
+        if self:IsInvalidButtonData(btnData, type) then return nil end
+        return btnData[type]
+    end
+
+    --- @return Profile_Spell
+    function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
+    --- @return Profile_Item
+    function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
+    --- @return Profile_Macro
+    function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
+    --- @return Profile_MacroText
+    function o:GetMacroTextData() return self:GetButtonTypeData(W.MACRO_TEXT) end
+
+    --- @return Profile_Mount
+    function o:GetMountData() return self:GetButtonTypeData(W.MOUNT) end
+    --- @return Profile_Companion
+    function o:GetCompanionData() return self:GetButtonTypeData(W.COMPANION) end
+    --- @return Profile_BattlePet
+    function o:GetBattlePetData() return self:GetButtonTypeData(W.BATTLE_PET) end
+    --- @return Profile_EquipmentSet
+    function o:GetEquipmentSetData() return self:GetButtonTypeData(W.EQUIPMENT_SET) end
+
+    --- @return boolean
+    function o:ContainsValidAction() return self:GetActionName() ~= nil end
+
+    function o:ConfigContainsValidActionType()
+        if not type then return false end
+        local btnConf = self.config
+        if not btnConf then return false end
+        if IsBlankStr(btnConf.type) and IsEmptyTable(btnConf[btnConf.type]) then
+            return false
+        end
+        return true
+    end
+
+    function o:GetTooltipVisibilityKey()
+        return self:GetProfileConfig()[CN.tooltip_visibility_key]
+    end
+
+    function o:GetTooltipVisibilityCombatOverrideKeyOption()
+        return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
+    end
+
+    --- @return string
+    function o:GetActionName()
+        local conf = self.config
+        for i, type in ipairs(P:GetAllActionTypes()) do
+            if type == W.EQUIPMENT_SET then
+                local valid = self:IsInvalidButtonData(self.conf, type)
+                p:log('equipmentset[%s] valid: %s', tostring(conf.name), valid)
+            end
+            if not self:IsInvalidButtonData(self.conf, type) then return conf[type].name end
+        end
+        return nil
+    end
+
+    function o:IsInvalidButtonData(o, key)
+        if type(o) ~= 'table' then return true end
+        if type(o[key]) ~= 'nil' then
+            local d = o[key]
+            --- action types have id and/or index; if any is missing, we can assume it's invalid data
+            if type(d) == 'table' then return (IsBlankStr(d['id']) and IsBlankStr(d['index'])) end
+        end
+        return true
+    end
+
+    --- @return boolean
+    function o:IsMacro() return self:IsConfigOfType(self.config, W.MACRO) end
+    --- @return boolean
+    function o:IsMacroText() return self:IsConfigOfType(self.config, W.MACRO_TEXT) end
+    --- @return boolean
+    function o:IsSpell() return self:IsConfigOfType(self.config, W.SPELL) end
+    --- @return boolean
+    function o:IsItem() return self:IsConfigOfType(self.config,W. ITEM) end
+    --- @return boolean
+    function o:IsMount() return self:IsConfigOfType(self.config, W.MOUNT) end
+    --- @see Interface/FrameXML/SecureHandlers.lua
+    --- @return boolean
+    function o:IsCompanion() return self:IsConfigOfType(self.config, W.COMPANION) end
+    --- @return boolean
+    function o:IsBattlePet() return self:IsConfigOfType(self.config, W.BATTLE_PET) end
+    --- @return boolean
+    function o:IsEquipmentSet() return self:IsConfigOfType(self.config, W.EQUIPMENT_SET) end
+
+    function o:IsStealthSpell()
+        local spellInfo = self:GetSpellData()
+        if not (spellInfo and spellInfo.name) then return false end
+        return API:IsStealthSpell(spellInfo.name)
+    end
+    function o:IsShapeshiftSpell()
+        local spellInfo = self:GetSpellData()
+        if not (spellInfo and spellInfo.name) then return false end
+        return API:IsShapeshiftSpell(spellInfo)
+    end
+
+    --- @param optionalSpellNameOrId number|string
+    function o:IsPassiveSpell(optionalSpellNameOrId)
+        local spellNameOrId = optionalSpellNameOrId
+        if not spellNameOrId then
+            local spellInfo = self:GetSpellData()
+            if spellInfo then spellNameOrId = spellInfo.name end
+        end
+        -- assume passive by default if we can't find any spell info
+        if not spellNameOrId then return true end
+        return IsPassiveSpell(spellNameOrId)
+    end
+
+    --- @param config Profile_Button
+    --- @param type string spell, item, macro, mount, etc
+    function o:IsConfigOfType(config, type)
+        if IsEmptyTable(config) then return false end
+        return config.type and type == config.type
+    end
+
+    --- @return boolean true if the key override is pressed
+    function o:IsTooltipModifierKeyDown()
+        local tooltipKey = self:GetTooltipVisibilityKey();
+        return self:IsOverrideKeyDown(tooltipKey)
+    end
+
+    --- @return boolean true if the key override is pressed
+    function o:IsTooltipCombatModifierKeyDown()
+        local combatOverride = self:GetTooltipVisibilityCombatOverrideKeyOption();
+        return self:IsOverrideKeyDown(combatOverride)
+    end
+
+    --- @see TooltipKeyName
+    --- @param value string One of TooltipKeyName value
+    --- @return boolean true if the key override is pressed
+    function o:IsOverrideKeyDown(value)
+        local tooltipKey = P:GetTooltipKey().names
+        if tooltipKey.SHOW == value then return true end
+        if tooltipKey.HIDE == value then return false end
+
+        if tooltipKey.ALT == value then
+            return IsAltKeyDown()
+        elseif tooltipKey.CTRL == value then
+            return IsControlKeyDown()
+        elseif tooltipKey.SHIFT == value then
+            return IsShiftKeyDown()
+        end
+        return false
+    end
+
+    --- @return boolean
+    function o:IsHideWhenTaxi() return self.w.profile:IsHideWhenTaxi() end
+    ---@param s Profile_Spell
+    function o:IsInvalidSpell(s) return IsNil(s) and IsNil(s.name)  and IsNil(s.id) and IsNil(s.icon) end
+    ---@param m Profile_Macro
+    function o:IsInvalidMacro(m) return IsNil(m) and IsNil(m.name)  and IsNil(m.index) and IsNil(m.icon) end
+
+    ---@param i Profile_Item
+    function o:IsInvalidItem(i) return IsNil(i) and IsNil(i.name)  and IsNil(i.id) and IsNil(i.icon) end
+    --- @param m Profile_Mount
+    function o:IsInvalidMount(m)
+        return IsNil(m) and IsNil(m.name) and IsNil(m.spell) and IsNil(m.spell.id)
+    end
+    --- @param c Profile_Companion
+    function o:IsInvalidCompanion(c)
+        return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
+    end
+    --- @param e Profile_EquipmentSet
+    function o:IsInvalidEquipmentSet(e) return IsNil(e) and IsNil(e.name) and IsNil(e.index) end
+
+    --- @param pet Profile_BattlePet
+    function o:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
+    function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
+    function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
+    function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
+
+    function o:ResetButtonData()
+        local btnData = self.config
+        for _, a in ipairs(P:GetAllActionTypes()) do btnData[a] = {} end
+        btnData[W.TYPE] = ''
+    end
 end
 
-function L:GetTooltipVisibilityKey()
-    return self:GetProfileConfig()[CN.tooltip_visibility_key]
-end
+PropsAndMethods(L)
 
-function L:GetTooltipVisibilityCombatOverrideKeyOption()
-    return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
-end

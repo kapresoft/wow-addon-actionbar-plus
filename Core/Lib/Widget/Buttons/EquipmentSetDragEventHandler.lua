@@ -81,7 +81,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local config = btnUI.widget:GetConfig()
+        local config = btnUI.widget.config
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 
@@ -101,18 +101,16 @@ Methods: BattlePetAttributeSetter
 local function attributeSetterMethods(a)
 
     --- @param btnUI ButtonUI
-    --- @param btnData Profile_Button
-    function a:SetAttributes(btnUI, btnData)
+    function a:SetAttributes(btnUI)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
-        if not (btnData and btnData[WAttr.EQUIPMENT_SET]) then return end
-        local equipmentSet = btnData[WAttr.EQUIPMENT_SET]
+        local equipmentSet = w:GetEquipmentSetData()
+        if w:IsInvalidEquipmentSet(equipmentSet) then return end
 
         local icon = EMPTY_ICON
         if equipmentSet.icon then icon = equipmentSet.icon end
 
         w:SetIcon(icon)
-
         self:HandleGameTooltipCallbacks(btnUI)
     end
 
@@ -122,21 +120,16 @@ local function attributeSetterMethods(a)
         local w = btnUI.widget
         if w:IsEmpty() then return end
 
-        local bd = btnUI.widget:GetButtonData()
-        if not bd:ConfigContainsValidActionType() then return end
+        if not w:ConfigContainsValidActionType() then return end
+        local equipmentSet = w:GetEquipmentSetData()
+        if w:IsInvalidEquipmentSet(equipmentSet) then return end
 
-        local equipmentSet = w:GetButtonData():GetEquipmentSetInfo()
-        if not (equipmentSet and equipmentSet.name) then return end
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfoByName(equipmentSet.name)
-
         if equipmentSetInfo and (equipmentSet.id ~= equipmentSetInfo.id) then
             equipmentSet.id = equipmentSetInfo.id
         end
 
-        -- validate equipment set
-
-        --local battlePet = bd:GetBattlePetInfo()
-        --if bd:IsInvalidBattlePet(battlePet) then return end
+        -- todo next: add equipment set tooltip
         --
         --GameTooltip:SetText(battlePet.name)
         --GameTooltip:AppendText(sformat(DESC_FORMAT, 'Instant'))

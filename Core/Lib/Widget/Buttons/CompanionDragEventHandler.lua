@@ -63,7 +63,8 @@ local function eventHandlerMethods(e)
         if not companion then return end
 
         if IsInvalidCompanion(companion) then return end
-        local btnData = btnUI.widget:GetConfig()
+
+        local btnData = btnUI.widget.config
         local profileCompanion = ToProfileCompanion(companion)
 
         PH:PickupExisting(btnUI.widget)
@@ -81,13 +82,11 @@ Methods: CompanionAttributeSetter
 ---@param a CompanionAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
-    ---@param btnData Profile_Button
-    function a:SetAttributes(btnUI, btnData)
-        --TODO: NEXT: Remove btnData
+    function a:SetAttributes(btnUI)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
-        local companion = w:GetButtonData():GetCompanionInfo()
-        if not companion then return end
+        local companion = w:GetCompanionData()
+        if w:IsInvalidCompanion(companion) then return end
 
         local spellIcon, spell = EMPTY_ICON, companion.spell
         if spell.icon then spellIcon = spell.icon end
@@ -101,11 +100,11 @@ local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
         if not btnUI then return end
-        local bd = btnUI.widget:GetButtonData()
-        if not bd:ConfigContainsValidActionType() then return end
+        local w = btnUI.widget
 
-        local companion = bd:GetCompanionInfo()
-        if bd:IsInvalidCompanion(companion) then return end
+        if not w:ConfigContainsValidActionType() then return end
+        local companion = w:GetCompanionData()
+        if w:IsInvalidCompanion(companion) then return end
 
         GameTooltip:SetSpellByID(companion.spell.id)
     end

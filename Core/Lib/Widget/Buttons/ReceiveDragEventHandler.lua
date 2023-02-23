@@ -56,8 +56,9 @@ function L:IsSupportedCursorType(cursor)
 end
 
 -- ## Functions ------------------------------------------------
+---@param btnUI ButtonUI
 function L:CleanupProfile(btnUI, actionType)
-    local btnData = btnUI.widget:GetConfig()
+    local btnData = btnUI.widget.config
     if not btnData then return end
 
     local otherTypes = AT:GetOtherTypes(actionType)

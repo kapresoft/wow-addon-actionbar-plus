@@ -213,10 +213,9 @@ local function OnStealth(eventWidget)
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsStealthSpell() end,
+                function(bw) return bw:IsStealthSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)
@@ -228,10 +227,9 @@ local function OnShapeShift(eventWidget)
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsShapeshiftSpell() end,
+                function(bw) return bw:IsShapeshiftSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)
@@ -243,10 +241,9 @@ local function OnStealthIconUpdate(eventContext)
     eventContext.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsStealthSpell() end,
+                function(bw) return bw:IsStealthSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)

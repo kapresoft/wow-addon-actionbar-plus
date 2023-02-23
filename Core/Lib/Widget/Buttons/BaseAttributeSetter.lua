@@ -24,7 +24,7 @@ local AttributeSetter = {
     --- @param self AttributeSetter
     --- @param btnUI ButtonUI
     --- @param btnData Profile_Button
-    ['SetAttributes'] = function(self, btnUI, btnData) end,
+    ['SetAttributes'] = function(self, btnUI) end,
     --- @param self AttributeSetter
     --- @param btnUI ButtonUI
     ['OnAfterSetAttributes'] = function(self, btnUI) end,

@@ -32,9 +32,9 @@ function L:Handle(btnUI, cursorInfo)
     if IsNil(spellInfo) then return end
 
     local w = btnUI.widget
-    if w:GetButtonData():IsPassiveSpell(spellInfo.name) then return end
+    if w:IsPassiveSpell(spellInfo.name) then return end
 
-    local btnData = w:GetConfig()
+    local btnData = w.config
     PH:PickupExisting(w)
     btnData[WAttr.TYPE] = WAttr.SPELL
     btnData[WAttr.SPELL] = spellInfo

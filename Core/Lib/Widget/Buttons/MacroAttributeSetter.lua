@@ -32,11 +32,10 @@ Methods
 -------------------------------------------------------------------------------]]
 
 ---@param btnUI ButtonUI
----@param btnData Profile_Button
-function S:SetAttributes(btnUI, btnData)
-    btnUI.widget:ResetWidgetAttributes(btnUI)
-
-    local macroInfo = btnData[WAttr.MACRO]
+function S:SetAttributes(btnUI)
+    local w = btnUI.widget
+    w:ResetWidgetAttributes(btnUI)
+    local macroInfo = w:GetMacroData()
     local icon = GC.Textures.TEXTURE_EMPTY
     if macroInfo.icon then icon = macroInfo.icon end
 
@@ -49,12 +48,11 @@ end
 
 ---@param btnUI ButtonUI
 function S:ShowTooltip(btnUI)
-    local bd = btnUI.widget:GetButtonData()
-    if not bd:ConfigContainsValidActionType() then return end
-    local btnData = btnUI.widget:GetConfig()
+    local w = btnUI.widget
+    if not w:ConfigContainsValidActionType() then return end
 
-    local macroInfo = btnData[WAttr.MACRO]
-    if not (macroInfo.index or macroInfo.name) then return end
+    local macroInfo = w:GetMacroData()
+    if w:IsInvalidMacro(macroInfo) then return end
 
     local spellId = GetMacroSpell(macroInfo.index)
     if not spellId then

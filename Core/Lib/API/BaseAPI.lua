@@ -9,7 +9,7 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_Timer = C_Timer
-local PickupCompanion, GetCompanionInfo, GetSpellInfo = PickupCompanion, GetCompanionInfo, GetSpellInfo
+local GetCompanionInfo, GetSpellInfo = GetCompanionInfo, GetSpellInfo
 local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
 local C_EquipmentSet = C_EquipmentSet
 local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, UnitInVehicle
@@ -146,6 +146,23 @@ function L:GetCompanionInfo(petType, index)
     }
 end
 
+--- @param spell Profile_Spell
+function L:PickupSpell(spell)
+    if not (spell and spell.id) then return end
+    PickupSpell(spell.id)
+end
+--- @param macro Profile_Macro
+function L:PickupMacro(macro)
+    if not (macro or macro.index) then return end
+    PickupMacro(macro.index)
+end
+
+--- @param item Profile_Item
+function L:PickupItem(item)
+    if not (item or item.id) then return end
+    PickupItem(item.id)
+end
+
 --- @param mount Profile_Mount
 function L:PickupMount(mount)
     if C_MountJournal and IsNotBlank(mount.name) then
@@ -164,11 +181,11 @@ function L:PickupBattlePet(guid)
     C_PetJournal.PickupPet(guid)
 end
 
----@param setID number The set ID
----@see Profile_EquipmentSet
-function L:PickupEquipmentSet(setID)
-    if IsBlank(setID) then return end
-    C_EquipmentSet.PickupEquipmentSet(setID);
+--- @param equipmentSet Profile_EquipmentSet
+--- @see Profile_EquipmentSet
+function L:PickupEquipmentSet(equipmentSet)
+    if not (equipmentSet and equipmentSet.id) then return end
+    C_EquipmentSet.PickupEquipmentSet(equipmentSet.id);
 end
 
 --- @param companion Profile_Companion

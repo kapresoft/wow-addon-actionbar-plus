@@ -91,6 +91,13 @@ local Profile_Macro = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
+--- @class Profile_MacroText
+local Profile_MacroText = {
+    ["type"] = "macrotext",
+    ["name"] = "z#LOL",
+    ["icon"] = 132093,
+    ["body"] = "/lol\n",
+}
 --- @class Profile_Mount_Spell
 local Profile_Mount_Spell = { id = 1, icon = 123 }
 --- @class Profile_Mount

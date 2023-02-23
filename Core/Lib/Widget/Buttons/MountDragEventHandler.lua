@@ -71,7 +71,7 @@ local function eventHandlerMethods(e)
     function e:Handle(btnUI, cursorInfo)
         local mountInfoApi = BaseAPI:GetMountInfo(cursorInfo)
         if IsInvalidMount(mountInfoApi) then return end
-        local btnData = btnUI.widget:GetConfig()
+        local btnData = btnUI.widget.config
         local mount = ToProfileMount(mountInfoApi, cursorInfo)
 
         PH:PickupExisting(btnUI.widget)
@@ -91,12 +91,12 @@ local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
     ---@param btnData Profile_Button
     function a:SetAttributes(btnUI, btnData)
-        --TODO: NEXT: Remove btnData
         local w = btnUI.widget
         w:ResetWidgetAttributes()
 
-        local mount = w:GetButtonData():GetMountInfo()
-        if w:GetButtonData():IsInvalidMount(mount) then return end
+        local mount = w:GetMountData()
+        if w:IsInvalidMount(mount) then return end
+
         local spellIcon, spell = EMPTY_ICON, mount.spell
         if spell.icon then spellIcon = spell.icon end
         w:SetIcon(spellIcon)
@@ -108,11 +108,11 @@ local function attributeSetterMethods(a)
 
     ---@param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
-        local bd = btnUI.widget:GetButtonData()
-        if not bd:ConfigContainsValidActionType() then return end
+        local w = btnUI.widget
+        if not w:ConfigContainsValidActionType() then return end
 
-        local mountInfo = bd:GetMountInfo()
-        if bd:IsInvalidCompanion(mountInfo) then return end
+        local mountInfo = w:GetMountData()
+        if w:IsInvalidCompanion(mountInfo) then return end
 
         GameTooltip:SetSpellByID(mountInfo.spell.id)
     end

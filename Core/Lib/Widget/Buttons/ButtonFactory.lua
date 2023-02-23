@@ -38,6 +38,7 @@ local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEven
 local p = L:GetLogger()
 local safecall = O.Safecall:New(p)
 
+--- @type table<string, AttributeSetter>
 local AttributeSetters = {
     [SPELL]       = O.SpellAttributeSetter,
     [ITEM]        = O.ItemAttributeSetter,
@@ -101,7 +102,7 @@ end
 
 --- @param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    AttributeSetters[MACRO]:SetAttributes(btnWidget.button, btnWidget:GetConfig())
+    AttributeSetters[MACRO]:SetAttributes(btnWidget.button)
 end
 
 --- Autocorrect bad data if we have button data with
@@ -225,23 +226,10 @@ end
 --- @return ButtonUIWidget
 function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
-    self:SetButtonAttributes(btnWidget)
+    btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)
     return btnWidget
-end
-
---- @param btnWidget ButtonUIWidget
-function L:SetButtonAttributes(btnWidget)
-    local btnData = btnWidget:GetConfig()
-    if not btnData then return end
-    if IsBlankString(btnData.type) then
-        btnData.type = GuessButtonType(btnWidget, btnData)
-        if IsBlankString(btnData.type) then return end
-    end
-    local setter = self:GetAttributesSetter(btnData.type)
-    if not setter then return end
-    setter:SetAttributes(btnWidget.button, btnData)
 end
 
 function L:IsValidDragSource(cursorInfo)
@@ -255,11 +243,6 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
---- @return AttributeSetter
-function L:GetAttributesSetter(actionType)
-    AssertNotNil(actionType, 'actionType')
-    return AttributeSetters[actionType]
-end
 --[[-----------------------------------------------------------------------------
 Event Handlers
 -------------------------------------------------------------------------------]]
@@ -268,7 +251,7 @@ local function OnBagUpdate()
         fw:ApplyForEachButtonCondition(
                 function(bw) return (not bw:IsEmpty()) and bw:IsItem() end,
                 function(bw)
-                    local success, itemInfo = safecall(function() return bw:GetButtonData():GetItemInfo() end)
+                    local success, itemInfo = safecall(function() return bw:GetItemData() end)
                     if not (success and itemInfo) then return end
                     p:log(50, '(%s)::Item: %s', GetTime(), itemInfo.name)
                     bw:UpdateItemState()

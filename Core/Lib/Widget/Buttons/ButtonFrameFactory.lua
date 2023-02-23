@@ -82,15 +82,6 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
---- @param widget ButtonUIWidget
-local function SetButtonAttributes(widget)
-    if widget:IsEmpty() then return end
-
-    local btnConf = widget:GetConfig()
-    local setter = O.ButtonFactory:GetAttributesSetter(btnConf.type)
-    if setter then setter:SetAttributes(widget.frame, btnConf) end
-end
-
 --- @param frameWidget FrameWidget
 local function OnCooldownTextSettingsChanged(frameWidget, event)
     p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
@@ -625,7 +616,7 @@ function L:PostCombatUpdateComplete()
     if count <= 0 then return end
     --- @param widget ButtonUIWidget
     for i, widget in ipairs(PostCombatButtonUpdates) do
-        SetButtonAttributes(widget)
+        widget:SetButtonAttributes()
         PostCombatButtonUpdates[i] = nil
     end
 end
