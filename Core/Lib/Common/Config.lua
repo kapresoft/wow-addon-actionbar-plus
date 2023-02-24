@@ -361,23 +361,28 @@ local function PropsAndMethods(o)
                     type = 'toggle',
                     name = 'Open Character Frame',
                     -- todo next: localize strings
-                    desc = 'When the player clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.'
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.',
+                    get = PGet(self, PC.equipmentset_open_character_frame, false),
+                    set = self:CM(PC.equipmentset_open_character_frame, false),
                 },
                 equipmentset_open_equipment_manager = {
                     order = mainSeq:next(),
                     width = 1.2,
                     type = 'toggle',
                     name = "Open Equipment Manager",
-                    desc = 'When the player clicks an equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information'
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information. This setting only applies if "Open Character Frame" is enabled.',
+                    get = PGet(self, PC.equipmentset_open_equipment_manager, false),
+                    set = self:CM(PC.equipmentset_open_equipment_manager, false),
                 },
                 equipmentset_show_glow_when_active = {
                     order = mainSeq:next(),
                     width = 'normal',
                     type = 'toggle',
                     name = "Glow When Clicked",
-                    desc = 'When the player clicks an equipment set button, the clicked button should glow to provide visual feedback and confirm that the button has been successfully clicked.'
+                    desc = 'When the player clicks an equipment set button, the clicked button should glow to provide visual feedback and confirm that the button has been successfully clicked.',
+                    get = PGet(self, PC.equipmentset_show_glow_when_active, false),
+                    set = self:CM(PC.equipmentset_show_glow_when_active, false),
                 },
-
                 tooltip_header = { order = mainSeq:next(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {
                     width = 'normal',

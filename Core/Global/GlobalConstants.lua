@@ -366,6 +366,9 @@ local function GlobalConstantProperties(o)
         ['show_empty_buttons'] = 'show_empty_buttons',
         ['frame_handle_mouseover'] = 'frame_handle_mouseover',
         ['frame_handle_alpha'] = 'frame_handle_alpha',
+        ['equipmentset_open_character_frame'] = 'equipmentset_open_character_frame',
+        ['equipmentset_open_equipment_manager'] = 'equipmentset_open_equipment_manager',
+        ['equipmentset_show_glow_when_active'] = 'equipmentset_show_glow_when_active',
         ['alpha'] = 'alpha',
     }
 

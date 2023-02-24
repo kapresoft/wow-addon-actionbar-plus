@@ -55,18 +55,6 @@ function L:IsSupportedCursorType(cursor)
     return true
 end
 
--- ## Functions ------------------------------------------------
----@param btnUI ButtonUI
-function L:CleanupProfile(btnUI, actionType)
-    local btnData = btnUI.widget.config
-    if not btnData then return end
-
-    local otherTypes = AT:GetOtherTypes(actionType)
-    for _, at in ipairs(otherTypes) do
-        btnData[at] = {}
-    end
-end
-
 ---@param cursor CursorUtil
 ---@param btnUI ButtonUI
 function L:Handle(btnUI, cursor)
@@ -79,5 +67,5 @@ function L:Handle(btnUI, cursor)
     if not self:IsSupportedCursorType(cursor) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
-    self:CleanupProfile(btnUI, actionType)
+    btnUI.widget:CleanupOtherActionTypeData(actionType)
 end

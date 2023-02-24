@@ -55,6 +55,46 @@ local function ToProfileEquipmentSet(equipmentSet)
     }
 end
 
+--- @param w ButtonUIWidget
+local function ClickEquipmentSetButton(w)
+    local equipmentSet = w:GetEquipmentSetData()
+    local btnName = 'GearSetButton' .. (equipmentSet.id + 1)
+    if _G[btnName] then _G[btnName]:Click() end
+end
+--- @param w ButtonUIWidget
+local function ClickEquipmentSetButtonDelayed(w)
+    C_Timer.After(0.2, function() ClickEquipmentSetButton(w) end)
+end
+
+--- @param w ButtonUIWidget
+---@param profile Profile_Config
+local function OpenEquipmentMgrConditionally(w, profile)
+    if profile.equipmentset_open_equipment_manager == true then
+        --- @type _Frame
+        local gmDlg = GearManagerDialog
+        if gmDlg and gmDlg:IsVisible() then ClickEquipmentSetButtonDelayed(w) return end
+    end
+
+    --- Buttons:
+    --- • GearManagerToggleButton (pre-retail)
+    --- • PaperDollSidebarTab3 (retail)
+    --- @type _Button
+    local gmButton = GearManagerToggleButton or PaperDollSidebarTab3
+    if profile.equipmentset_open_equipment_manager ~= true then return end
+    C_Timer.After(0.1, function()
+        gmButton:Click()
+        ClickEquipmentSetButtonDelayed(w)
+    end)
+end
+
+--- @param w ButtonUIWidget
+---@param profile Profile_Config
+local function GlowButtonConditionally(w, profile)
+    if profile.equipmentset_show_glow_when_active ~= true then return end
+    ActionButton_ShowOverlayGlow(w.button)
+    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+end
+
 --- @param evt string
 --- @param w ButtonUIWidget
 local function OnClick(evt, w, ...)
@@ -64,10 +104,7 @@ local function OnClick(evt, w, ...)
 
     --- @type _Frame
     local PDF = PaperDollFrame
-    --- @type _Frame
-    local gmDlg = GearManagerDialog
-    --- @type _Button
-    local gmButton = GearManagerToggleButton
+    local profile = w:GetProfileConfig()
 
     p:log(20, 'Equipment Clicked: %s', w:GetEquipmentSetData())
     C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
@@ -76,20 +113,13 @@ local function OnClick(evt, w, ...)
     -- GUILD_BANK_OPEN_BAG
     PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
 
-    ActionButton_ShowOverlayGlow(w.button)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+    GlowButtonConditionally(w, profile)
 
-    if not PDF:IsVisible() then
-        ToggleCharacter('PaperDollFrame')
-        C_Timer.After(0.1, function()
-            gmButton:Click()
-        end)
-    else
-        if not gmDlg:IsVisible() then
-            C_Timer.After(0.1, function()
-                gmButton:Click()
-            end)
-        end
+    if profile.equipmentset_open_character_frame then
+        if not PDF:IsVisible() then
+            ToggleCharacter('PaperDollFrame')
+            OpenEquipmentMgrConditionally(w, profile)
+        else OpenEquipmentMgrConditionally(w, profile) end
     end
 end
 

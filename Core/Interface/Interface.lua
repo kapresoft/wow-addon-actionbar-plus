@@ -215,6 +215,9 @@ local Profile_Config = {
     ["tooltip_visibility_combat_override_key"] = '',
     --- @see TooltipAnchor
     ["tooltip_anchor_type"] = '',
+    ["equipmentset_open_character_frame"] = true,
+    ["equipmentset_open_equipment_manager"] = true,
+    ["equipmentset_show_glow_when_active"] = true,
     --- @type table<string, Profile_Bar>
     ["bars"] = {
         ["ActionbarPlusF1"] = Profile_Bar,
@@ -262,3 +265,4 @@ local LayoutStrategyContext = {
     yIncr = {},
 }
 --- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
+--- @alias ActionTypeName string | "'spell'" | "'item'" | "'macro'" | "'macrotext'" | "'companion'" | "'petaction'" | "'equipmentset'"

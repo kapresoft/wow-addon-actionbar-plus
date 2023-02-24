@@ -124,9 +124,6 @@ function P:GetButtonData(frameIndex, buttonName)
     return buttons[buttonName]
 end
 
---- @type table<number, string>
-function P:GetAllActionTypes() return ActionTypes end
-
 function P:CreateDefaultProfile(profileName) return PI:InitNewProfile(profileName) end
 
 function P:CreateBarsTemplate()

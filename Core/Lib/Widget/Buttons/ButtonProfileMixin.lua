@@ -27,20 +27,23 @@ local L = LibStub:NewLibrary(M.ButtonProfileMixin)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
---- @param buttonData Profile_Button
-local function CleanupTypeData(buttonData)
+--- Removes a particular actionType data from Profile_Button
+--- @param btnData Profile_Button
+local function CleanupActionTypeData(btnData)
     local function removeElement(tbl, value)
-        for i, v in ipairs(tbl) do
-            if v == value then tbl[i] = nil end
-        end
+        for i, v in ipairs(tbl) do if v == value then tbl[i] = nil end end
     end
+    if btnData == nil or btnData.type == nil then return end
+    local actionTypes = O.ActionType:GetOtherNamesExcept(btnData.type)
+    for _, v in ipairs(actionTypes) do if v ~= nil then btnData[v] = {} end end
+end
 
-    if buttonData == nil or buttonData.type == nil then return end
-    local actionTypes = P:GetAllActionTypes()
-    removeElement(actionTypes, buttonData.type)
-    for _, v in ipairs(actionTypes) do
-        if v ~= nil then buttonData[v] = {} end
-    end
+-- ## Functions ------------------------------------------------
+---@param currentActionType ActionTypeName The current action type data to preserve
+function L:CleanupOtherActionTypeData(currentActionType)
+    local btnData = self.w.config
+    if not btnData then return end
+    CleanupActionTypeData(btnData)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -126,7 +129,7 @@ local function PropsAndMethods(o)
         local profile = self.w.profile
         local profileButton = profile:GetButtonData(self.w.frameIndex, self.w.buttonName)
         -- self cleanup
-        CleanupTypeData(profileButton)
+        CleanupActionTypeData(profileButton)
         return profileButton
     end
 
@@ -134,7 +137,7 @@ local function PropsAndMethods(o)
     function o:GetProfileButtonData()
         local profileButton = O.Profile:GetButtonData(self.w.frameIndex, self.w.index)
         -- self cleanup
-        CleanupTypeData(profileButton)
+        CleanupActionTypeData(profileButton)
         return profileButton
     end
 
@@ -190,11 +193,7 @@ local function PropsAndMethods(o)
     --- @return string
     function o:GetActionName()
         local conf = self.config
-        for i, type in ipairs(P:GetAllActionTypes()) do
-            if type == W.EQUIPMENT_SET then
-                local valid = self:IsInvalidButtonData(self.conf, type)
-                p:log('equipmentset[%s] valid: %s', tostring(conf.name), valid)
-            end
+        for i, type in ipairs(O.ActionType:GetNames()) do
             if not self:IsInvalidButtonData(self.conf, type) then return conf[type].name end
         end
         return nil
@@ -316,7 +315,7 @@ local function PropsAndMethods(o)
 
     function o:ResetButtonData()
         local btnData = self.config
-        for _, a in ipairs(P:GetAllActionTypes()) do btnData[a] = {} end
+        for _, a in ipairs(O.ActionType:GetNames()) do btnData[a] = {} end
         btnData[W.TYPE] = ''
     end
 end
