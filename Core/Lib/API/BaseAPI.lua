@@ -76,20 +76,6 @@ function L:ToEquipmentSetCursor(cursorInfo)
     }
 end
 
---- @class EquipmentSetInfo
-local _EquipmentSetInfo = {
-    name = 'name',
-    id = 1,
-    setID = 1,
-    icon = 12345,
-    isEquipped = true,
-    numItems = 1,
-    numEquipped = 1,
-    numInInventory = 1,
-    numLost = 0,
-    numIgnored = 0,
-}
-
 --- @return EquipmentSetInfo
 function L:GetEquipmentSetInfo(cursorInfo)
     local equipmentSetCursor = self:ToEquipmentSetCursor(cursorInfo)

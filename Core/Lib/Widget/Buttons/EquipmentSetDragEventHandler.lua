@@ -121,6 +121,7 @@ local function OnClick(evt, w, ...)
             OpenEquipmentMgrConditionally(w, profile)
         else OpenEquipmentMgrConditionally(w, profile) end
     end
+    S:RefreshTooltip(w.button)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -182,6 +183,11 @@ local function attributeSetterMethods(a)
     end
 
     --- @param btnUI ButtonUI
+    function a:RefreshTooltip(btnUI)
+        C_Timer.After(0.2, function() S:ShowTooltip(btnUI) end)
+    end
+
+    --- @param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
         if not btnUI then return end
         local w = btnUI.widget
@@ -195,12 +201,12 @@ local function attributeSetterMethods(a)
         if equipmentSetInfo and (equipmentSet.id ~= equipmentSetInfo.id) then
             equipmentSet.id = equipmentSetInfo.id
         end
-
-        -- todo next: add equipment set tooltip
-        --
-        --GameTooltip:SetText(battlePet.name)
-        --GameTooltip:AppendText(sformat(DESC_FORMAT, 'Instant'))
-        --GameTooltip:AppendText(sformat(DESC_FORMAT, 'Summons and dismisses your ' .. battlePet.name))
+        GameTooltip:SetEquipmentSet(equipmentSetInfo.name)
+        if equipmentSetInfo.isEquipped then
+            -- todo next: localize
+            local equippedLabel = ns:K().CH:FormatColor('0073FF', ' (Equipped)')
+            GameTooltip:AppendText(equippedLabel)
+        end
     end
 end
 

@@ -264,5 +264,24 @@ local LayoutStrategyContext = {
     --- @type Kapresoft_Incrementer
     yIncr = {},
 }
+
+--- @class EquipmentSetInfo
+local EquipmentSetInfo = {
+    name = 'name',
+    id = 1,
+    setID = 1,
+    icon = 12345,
+    isEquipped = true,
+    numItems = 1,
+    numEquipped = 1,
+    numInInventory = 1,
+    numLost = 0,
+    numIgnored = 0,
+}
+
+--[[-----------------------------------------------------------------------------
+Aliases
+-------------------------------------------------------------------------------]]
+
 --- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
 --- @alias ActionTypeName string | "'spell'" | "'item'" | "'macro'" | "'macrotext'" | "'companion'" | "'petaction'" | "'equipmentset'"
