@@ -481,7 +481,8 @@ local function PropsAndMethods(o)
     function o:UpdateUsable()
         local cd = self:GetCooldownInfo()
         if (cd == nil or cd.details == nil or cd.details.spell == nil) then
-            if self:IsCompanion() then self:SetActionUsable(true) end
+            if self:IsCompanion() then self:SetActionUsable(true)
+            elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
             return
         end
 
