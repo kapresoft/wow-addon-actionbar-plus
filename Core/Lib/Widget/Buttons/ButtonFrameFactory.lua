@@ -159,7 +159,6 @@ local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFrameIndex)
-    p:log('Event received: %s', event)
     frameWidget:UpdateEmptyButtonsSettings()
 end
 
