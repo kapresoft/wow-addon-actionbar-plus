@@ -58,8 +58,10 @@ end
 --- @param w ButtonUIWidget
 local function ClickEquipmentSetButton(w)
     if w:IsMissingEquipmentSet() then return end
+
     local equipmentSet = w:GetEquipmentSetData()
     local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
+
     local btnName = 'GearSetButton' .. (index)
     if _G[btnName] then _G[btnName]:Click() end
 end
@@ -200,13 +202,9 @@ local function attributeSetterMethods(a)
         if not btnUI then return end
         local w = btnUI.widget
         if w:IsEmpty() or w:IsMissingEquipmentSet() then return end
-
-        local btnData = w:GetEquipmentSetData()
-        local equipmentSet = BaseAPI:GetEquipmentSetInfoByName(btnData.name)
-        if not equipmentSet then return end
-        if btnData.id ~= equipmentSet.id then btnData.id = equipmentSet.id end
-        GameTooltip:SetEquipmentSet(equipmentSet.name)
-
+        local equipmentSet = w:FindEquipmentSet()
+        -- retail GameTooltip uses setID
+        GameTooltip:SetEquipmentSet(equipmentSet.id)
         if equipmentSet.isEquipped then
             -- todo next: localize
             local equippedLabel = ns:K().CH:FormatColor('0073FF', ' (Equipped)')

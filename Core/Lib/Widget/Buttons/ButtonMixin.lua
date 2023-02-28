@@ -547,15 +547,16 @@ local function PropsAndMethods(o)
         -- if equipment set was deleted
         -- icon update
         p:log(30, 'Equipment-Set update called: %s', self:GetName())
+
         if self:IsMissingEquipmentSet() then self:SetButtonAsEmpty(); return end
 
+        local equipmentSet = self.w:FindEquipmentSet()
+        if not equipmentSet then self:SetButtonAsEmpty(); return end
+
         local btnData = self.w:GetEquipmentSetData()
-        local es = BaseAPI:GetEquipmentSetInfoByName(btnData.name)
-        if not es then return end
-        if btnData.icon ~= es.icon then
-            btnData.icon = es.icon
-            self:SetIcon(btnData.icon)
-        end
+        btnData.name = equipmentSet.name
+        btnData.icon = equipmentSet.icon
+        self:SetIcon(btnData.icon)
     end
 
     --- @return ActionBarInfo

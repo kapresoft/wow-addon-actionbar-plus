@@ -315,18 +315,31 @@ local function PropsAndMethods(o)
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
 
-    function o:IsMissingEquipmentSet()
-        if self:IsInvalidEquipmentSet() then return end
-
+    --- @return EquipmentSetInfo
+    function o:FindEquipmentSet()
         local btnData = self:GetEquipmentSetData()
+        if not btnData then return nil end
+
         local id, name = btnData.id, btnData.name
         local index = BaseAPI:GetEquipmentSetIndex(id)
-        if not index then return true end
+        if not index then return nil end
 
         local equipmentSet = BaseAPI:GetEquipmentSetInfoByName(name)
-        if not equipmentSet then return true end
+        if not equipmentSet then
+            equipmentSet = BaseAPI:GetEquipmentSetInfoBySetID(id)
+        end
+        return equipmentSet
+    end
 
-        return not (equipmentSet.id == id and equipmentSet.name == name)
+    function o:IsMissingEquipmentSet()
+        if self:IsInvalidEquipmentSet() then return end
+        local equipmentSet = self:FindEquipmentSet()
+        if not equipmentSet then return nil end
+
+        local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
+        if not index then return true end
+
+        return equipmentSet.id ~= self:GetEquipmentSetData().id
     end
 
     function o:ResetButtonData()

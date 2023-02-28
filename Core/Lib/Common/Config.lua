@@ -293,7 +293,7 @@ local function PropsAndMethods(o)
             PC.equipmentset_open_equipment_manager,
             PC.equipmentset_show_glow_when_active,
         }
-        if not BaseAPI:IsClassicEra() then
+        if BaseAPI:IsClassicEra() then
             local gen = configArgs['general'].args
             for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
         end
