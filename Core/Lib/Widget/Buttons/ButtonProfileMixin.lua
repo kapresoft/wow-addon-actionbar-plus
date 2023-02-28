@@ -307,7 +307,8 @@ local function PropsAndMethods(o)
     --- @param e Profile_EquipmentSet
     function o:IsInvalidEquipmentSet(e)
         e = e or self:GetEquipmentSetData()
-        return IsNil(e) and IsNil(e.name) and IsNil(e.index) end
+        if not e then return true end
+        return IsNil(e.name) and IsNil(e.index) end
 
     --- @param pet Profile_BattlePet
     function o:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
@@ -332,9 +333,9 @@ local function PropsAndMethods(o)
     end
 
     function o:IsMissingEquipmentSet()
-        if self:IsInvalidEquipmentSet() then return end
+        if self:IsInvalidEquipmentSet() then return true end
         local equipmentSet = self:FindEquipmentSet()
-        if not equipmentSet then return nil end
+        if not equipmentSet then return true end
 
         local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
         if not index then return true end
