@@ -91,6 +91,13 @@ local Profile_Macro = {
     ["icon"] = 132093,
     ["body"] = "/lol\n",
 }
+--- @class Profile_MacroText
+local Profile_MacroText = {
+    ["type"] = "macrotext",
+    ["name"] = "z#LOL",
+    ["icon"] = 132093,
+    ["body"] = "/lol\n",
+}
 --- @class Profile_Mount_Spell
 local Profile_Mount_Spell = { id = 1, icon = 123 }
 --- @class Profile_Mount
@@ -115,12 +122,21 @@ local Profile_Companion = {
 }
 --- @class Profile_BattlePet
 local Profile_BattlePet = {
-    type='battlepet',
-    petType = -1,
+    ['type'] = 'battlepet',
+    ['petType'] = -1,
     ['guid'] = 'BattlePet-0-000008C13591',
     ['speciesID'] = speciesID,
     ['creatureID'] = 157969,
     ['name'] = 'Anima Wyrmling',
+    ['icon'] = 3038273,
+}
+
+--- @class Profile_EquipmentSet
+local Profile_EquipmentSet = {
+    ['type'] ='equipmentset',
+    ['name'] = '<name of equipment>',
+    --- The Equipment setID
+    ['id'] = 1,
     ['icon'] = 3038273,
 }
 
@@ -132,6 +148,7 @@ local Profile_Button = {
     ["macro"] = Profile_Macro,
     ["mount"] = Profile_Mount,
     ["companion"] = Profile_Companion,
+    ["equipmentset"] = Profile_EquipmentSet,
 }
 
 --- @class Profile_Bar_Widget
@@ -198,6 +215,9 @@ local Profile_Config = {
     ["tooltip_visibility_combat_override_key"] = '',
     --- @see TooltipAnchor
     ["tooltip_anchor_type"] = '',
+    ["equipmentset_open_character_frame"] = true,
+    ["equipmentset_open_equipment_manager"] = true,
+    ["equipmentset_show_glow_when_active"] = true,
     --- @type table<string, Profile_Bar>
     ["bars"] = {
         ["ActionbarPlusF1"] = Profile_Bar,
@@ -244,4 +264,26 @@ local LayoutStrategyContext = {
     --- @type Kapresoft_Incrementer
     yIncr = {},
 }
+
+--- @class EquipmentSetInfo
+local EquipmentSetInfo = {
+    name = 'name',
+    id = 1,
+    --- The button index order
+    index = 1,
+    setID = 1,
+    icon = 12345,
+    isEquipped = true,
+    numItems = 1,
+    numEquipped = 1,
+    numInInventory = 1,
+    numLost = 0,
+    numIgnored = 0,
+}
+
+--[[-----------------------------------------------------------------------------
+Aliases
+-------------------------------------------------------------------------------]]
+
 --- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
+--- @alias ActionTypeName string | "'spell'" | "'item'" | "'macro'" | "'macrotext'" | "'companion'" | "'petaction'" | "'equipmentset'"

@@ -27,13 +27,14 @@ Methods
 function L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
 
 ---@param cursorInfo table Structure `{ -- }`
+---@param btnUI ButtonUI
 function L:Handle(btnUI, cursorInfo)
     if cursorInfo == nil or cursorInfo.info1 == nil then return end
     local macroInfo = self:GetMacroInfo(cursorInfo)
     -- replace %s in macros, has log format issues
-    local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
-    --self:log(10, 'macroInfo: %s', macroInfoText)
-    --DEVT:EvalObject(macroInfo, 'macroInfo')
+    -- local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
+    -- self:log(10, 'macroInfo: %s', macroInfoText)
+    -- DEVT:EvalObject(macroInfo, 'macroInfo')
 
     if self:IsMacrotext(macroInfo) then
         self:HandleMacrotext(btnUI, cursorInfo)
@@ -41,7 +42,7 @@ function L:Handle(btnUI, cursorInfo)
     end
     if IsNil(macroInfo) then return end
 
-    local btnData = btnUI.widget:GetConfig()
+    local btnData = btnUI.widget.config
     PH:PickupExisting(btnUI.widget)
     btnData[WAttr.TYPE] = WAttr.MACRO
     btnData[WAttr.MACRO] = macroInfo

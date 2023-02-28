@@ -12,11 +12,15 @@ local O, LibStub = ns:LibPack()
 
 local GC, Ace, PI = O.GlobalConstants, O.AceLibrary, O.ProfileInitializer
 local Table, Assert = O.Table, O.Assert
-local AceEvent, WAttr = Ace.AceEvent, GC.WidgetAttributes
+local AceEvent, W = Ace.AceEvent, GC.WidgetAttributes
 local isTable, isNotTable, tsize, tinsert, tsort
     = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-local ActionType = { WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT }
+
+--- @type table<number, string>
+local ActionTypes = { W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
+                      W.PET_ACTION, W.COMPANION, W.BATTLE_PET,
+                      W.EQUIPMENT_SET}
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -91,6 +95,22 @@ local function CopyAnchor(source, dest)
     dest.y = source.y
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+---@param obj any
+function P:Mixin(obj)
+    return ns:K():Mixin(obj, self)
+end
+
+--- @param frameIndex number
+--- @param btnIndex number
+--- @return Profile_Button
+function P:GetButtonDataByIndex(frameIndex, btnIndex)
+    local btnName = GC:ButtonName(frameIndex, btnIndex)
+    return self:GetButtonData(frameIndex, btnName)
+end
+
 --- @return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
@@ -102,13 +122,6 @@ function P:GetButtonData(frameIndex, buttonName)
         buttons[buttonName] = {}
     end
     return buttons[buttonName]
-end
-
---- @param widget ButtonUIWidget
-function P:ResetButtonData(widget)
-    local btnData = widget:GetConfig()
-    for _, a in ipairs(ActionType) do btnData[a] = {} end
-    btnData[WAttr.TYPE] = ''
 end
 
 function P:CreateDefaultProfile(profileName) return PI:InitNewProfile(profileName) end

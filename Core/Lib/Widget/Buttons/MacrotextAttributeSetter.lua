@@ -44,13 +44,13 @@ function S:SetAttributes(btnUI, btnData)
 end
 
 ---@param link table The blizzard `GameTooltip` link
+---@param btnUI ButtonUI
 function S:ShowTooltip(btnUI)
-    local bd = btnUI.widget:GetButtonData()
-    if not bd:ConfigContainsValidActionType() then return end
+    local w = btnUI.widget
+    if not w:ConfigContainsValidActionType() then return end
 
-    local btnData = btnUI.widget:GetConfig()
-    local macroTextInfo = btnData[WAttr.MACRO_TEXT]
-
+    local macroTextInfo = w:GetMacroTextData()
+    --- add if w:IsInvalidMacroTextData() then return end
     GameTooltip:SetSpellByID(macroTextInfo.id)
 end
 

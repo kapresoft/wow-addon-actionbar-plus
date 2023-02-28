@@ -56,6 +56,7 @@ local function GlobalConstantProperties(o)
         ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
         BASE_FRAME_NAME = 'ActionbarPlusF',
+        BUTTON_NAME_FORMAT = 'ActionbarPlusF%sButton%s',
         --- @see _ParentFrame.xml
         FRAME_TEMPLATE = 'ActionbarPlusFrameTemplate',
         SLASH_COMMAND_OPTIONS = "abp_options",
@@ -192,6 +193,8 @@ local function GlobalConstantProperties(o)
         BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED',
         CURSOR_CHANGED = 'CURSOR_CHANGED',
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
+        EQUIPMENT_SETS_CHANGED = 'EQUIPMENT_SETS_CHANGED',
+        EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
 
         PET_BATTLE_OPENING_START = 'PET_BATTLE_OPENING_START',
@@ -240,7 +243,15 @@ local function GlobalConstantProperties(o)
         OnDBInitialized       = newMsg('OnDBInitialized'),
         OnConfigInitialized   = newMsg('OnConfigInitialized'),
         OnTooltipFrameUpdate  = newMsg('OnTooltipFrameUpdate'),
+        OnButtonPreClick      = newMsg('OnButtonPreClick'),
+        OnButtonPostClick          = newMsg('OnButtonPostClick'),
+        OnButtonClickBattlePet     = newMsg('OnButtonClickBattlePet'),
+        OnButtonClickEquipmentSet  = newMsg('OnButtonClickEquipmentSet'),
+        --- Relayed Events
+        EQUIPMENT_SETS_CHANGED     = newMsg(Events.EQUIPMENT_SETS_CHANGED),
+        EQUIPMENT_SWAP_FINISHED    = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
     }
+
 
     --- @class WidgetGlobals
     local Widgets = {
@@ -303,6 +314,7 @@ local function GlobalConstantProperties(o)
         MOUNT = 'mount',
         COMPANION = 'companion',
         BATTLE_PET = 'battlepet',
+        EQUIPMENT_SET = 'equipmentset',
         FLY_OUT = 'flyout',
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
@@ -313,11 +325,14 @@ local function GlobalConstantProperties(o)
         MOONKIN_FORM = 'moonkin form',
         STEALTH = 'stealth',
         PROWL = 'prowl',
+        --- equipmentset
+        NAME = 'name',
     }
 
     --- @class ButtonAttributes
     local ButtonAttributes = {
         SPELL = WidgetAttributes.SPELL,
+        NAME = WidgetAttributes.NAME,
         UNIT = WidgetAttributes.UNIT,
         UNIT2 = format("*%s2", WidgetAttributes.UNIT),
         TYPE = WidgetAttributes.TYPE,
@@ -357,6 +372,9 @@ local function GlobalConstantProperties(o)
         ['show_empty_buttons'] = 'show_empty_buttons',
         ['frame_handle_mouseover'] = 'frame_handle_mouseover',
         ['frame_handle_alpha'] = 'frame_handle_alpha',
+        ['equipmentset_open_character_frame'] = 'equipmentset_open_character_frame',
+        ['equipmentset_open_equipment_manager'] = 'equipmentset_open_equipment_manager',
+        ['equipmentset_show_glow_when_active'] = 'equipmentset_show_glow_when_active',
         ['alpha'] = 'alpha',
     }
 
@@ -425,6 +443,8 @@ local function GlobalConstantProperties(o)
     --- @type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass
+
+    o.newMsg = newMsg
 end
 
 --- @param o GlobalConstants
@@ -485,6 +505,11 @@ local function GlobalConstantMethods(o)
     function o:ShouldLog(level) return self:GetLogLevel() >= level end
     function o:IsVerboseLogging() return self:ShouldLog(20) end
 
+    --- @param frameIndex number
+    --- @param btnIndex number
+    function o:ButtonName(frameIndex, btnIndex)
+        return sformat(self.C.BUTTON_NAME_FORMAT, tostring(frameIndex), tostring(btnIndex))
+    end
 end
 
 --[[-----------------------------------------------------------------------------

@@ -9,8 +9,9 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_Timer = C_Timer
-local PickupCompanion, GetCompanionInfo, GetSpellInfo = PickupCompanion, GetCompanionInfo, GetSpellInfo
+local GetCompanionInfo, GetSpellInfo = GetCompanionInfo, GetSpellInfo
 local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
+local C_EquipmentSet = C_EquipmentSet
 local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, UnitInVehicle
 local IsUsableSpell = IsUsableSpell
 
@@ -22,20 +23,20 @@ local _, ns = ...
 local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
 local UnitId = GC.UnitId
+local W = GC.WidgetAttributes
+
 local String, Assert = O.String, O.Assert
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
-local WAttr = O.GlobalConstants.WidgetAttributes
-local MOUNT, COMPANION = WAttr.MOUNT, WAttr.COMPANION
 local sformat = String.format
 
----@class BaseAPI : BaseLibraryObject
+--- @class BaseAPI : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.BaseAPI)
 local p = L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param mountInfo MountInfo
+--- @param mountInfo MountInfo
 local function IsValidMountInfo(mountInfo)
     return IsNotBlank(mountInfo.name) and IsNotNil(mountInfo.spellID) and IsNotNil(mountInfo.icon)
 end
@@ -43,34 +44,88 @@ end
 function L:IsDragonflight() return select(4, GetBuildInfo()) >= 100000 end
 function L:IsClassicEra() return select(4, GetBuildInfo()) <= 11500 end
 
----@see Blizzard_UnitId
+--- @see Blizzard_UnitId
 function L:IsTargetFriendlyToPlayer() return UnitIsFriend(UnitId.player, UnitId.target) end
 function L:IsTargetEnemyToPlayer() return UnitIsEnemy(UnitId.player, UnitId.target) end
 
----@param cursorInfo CursorInfo
----@return CompanionCursor
+--- @param cursorInfo CursorInfo
+--- @return CompanionCursor
 function L:ToCompanionCursor(cursorInfo)
     return {
-        ['type'] = cursorInfo.type or 'companion',
+        ['type'] = cursorInfo.type or W.COMPANION,
         ['index'] = cursorInfo.info1 or -1,
         ['petType'] = cursorInfo.info2 or '',
     }
 end
 
----@param cursorInfo CursorInfo
----@return BattlePetCursor
+--- @param cursorInfo CursorInfo
+--- @return BattlePetCursor
 function L:ToBattlePetCursor(cursorInfo)
     return {
-        ['type'] = cursorInfo.type or 'battlepet',
+        ['type'] = cursorInfo.type or W.BATTLE_PET,
         ['guid'] = cursorInfo.info1 or '',
+    }
+end
+
+--- @param cursorInfo CursorInfo
+--- @return EquipmentSetCursor
+function L:ToEquipmentSetCursor(cursorInfo)
+    return {
+        ['type'] = cursorInfo.type or W.EQUIPMENT_SET,
+        ['name'] = cursorInfo.info1 or '',
+    }
+end
+
+--- @return EquipmentSetInfo
+function L:GetEquipmentSetInfo(cursorInfo)
+    local equipmentSetCursor = self:ToEquipmentSetCursor(cursorInfo)
+    if not (equipmentSetCursor and equipmentSetCursor.name) then return nil end
+    return self:GetEquipmentSetInfoByName(equipmentSetCursor.name)
+end
+
+--- @param id number The equipment setID
+--- @return number The index or nil
+function L:GetEquipmentSetIndex(id)
+    local equipmentSetIDs = C_EquipmentSet.GetEquipmentSetIDs()
+    if not equipmentSetIDs then return nil end
+    for i, v in ipairs(equipmentSetIDs) do if v == id then return i end end
+    return nil
+end
+
+--- @return EquipmentSetInfo
+--- @param equipmentName string
+function L:GetEquipmentSetInfoByName(equipmentName)
+    local setID = C_EquipmentSet.GetEquipmentSetID(equipmentName)
+    if not setID then return nil end
+    return self:GetEquipmentSetInfoBySetID(setID)
+end
+
+--- @return EquipmentSetInfo
+--- @param id number The setID
+function L:GetEquipmentSetInfoBySetID(id)
+    local name, iconFileID, setID_, isEquipped, numItems, numEquipped,
+    numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(id)
+
+    return {
+        name = name,
+        id = id,
+        index = self:GetEquipmentSetIndex(id),
+        setID = id,
+        icon = iconFileID,
+        isEquipped = isEquipped,
+        numItems = numItems,
+        numEquipped = numEquipped,
+        numInInventory = numInInventory,
+        numLost = numLost,
+        numIgnored = numIgnored
     }
 end
 
 ---### See Interface_<wow-version>/FrameXML/Constants.lua#PET_TYPE_SUFFIX
 ---### See Also: GetNumCompanions('type')
----@param petType string See PET_TYPE_SUFFIX
----@param id number
----@return CompanionInfo
+--- @param petType string See PET_TYPE_SUFFIX
+--- @param id number
+--- @return CompanionInfo
 function L:GetCompanionInfo(petType, index)
     local creatureID, creatureName, creatureSpellID, icon, isSummoned, mountType
     local status, err = pcall(function()
@@ -92,7 +147,24 @@ function L:GetCompanionInfo(petType, index)
     }
 end
 
----@param mount Profile_Mount
+--- @param spell Profile_Spell
+function L:PickupSpell(spell)
+    if not (spell and spell.id) then return end
+    PickupSpell(spell.id)
+end
+--- @param macro Profile_Macro
+function L:PickupMacro(macro)
+    if not (macro or macro.index) then return end
+    PickupMacro(macro.index)
+end
+
+--- @param item Profile_Item
+function L:PickupItem(item)
+    if not (item or item.id) then return end
+    PickupItem(item.id)
+end
+
+--- @param mount Profile_Mount
 function L:PickupMount(mount)
     if C_MountJournal and IsNotBlank(mount.name) then
         C_MountJournal.SetSearch(sformat('"%s"', mount.name))
@@ -101,16 +173,23 @@ function L:PickupMount(mount)
         return
     end
 
-    PickupCompanion(MOUNT, mount.index)
+    PickupCompanion(W.MOUNT, mount.index)
 end
 
----@param guid string Pet GUID
+--- @param guid string Pet GUID
 function L:PickupBattlePet(guid)
     if IsBlank(guid) then return end
     C_PetJournal.PickupPet(guid)
 end
 
----@param companion Profile_Companion
+--- @param equipmentSet Profile_EquipmentSet
+--- @see Profile_EquipmentSet
+function L:PickupEquipmentSet(equipmentSet)
+    if not (equipmentSet and equipmentSet.id) then return end
+    C_EquipmentSet.PickupEquipmentSet(equipmentSet.id);
+end
+
+--- @param companion Profile_Companion
 function L:PickupCompanion(companion)
     if not companion then return end
     if C_PetJournal then
@@ -119,8 +198,8 @@ function L:PickupCompanion(companion)
     PickupCompanion(companion.petType, companion.index)
 end
 
----@param petGUID string Example: BattlePet-0-000008C13591
----@return boolean
+--- @param petGUID string Example: BattlePet-0-000008C13591
+--- @return boolean
 function L:CanSummonBattlePet(petGUID)
     if not (C_PetJournal and petGUID) then return false end
     return C_PetJournal.PetIsSummonable(petGUID)
@@ -131,8 +210,8 @@ end
 --- ```
 --- local type, info1 = GetCursorInfo()
 ---```
----@param petGUID string Example: BattlePet-0-000008C13591
----@return BattlePetInfo
+--- @param petGUID string Example: BattlePet-0-000008C13591
+--- @return BattlePetInfo
 function L:GetBattlePetInfo(petGUID)
     if IsBlank(petGUID) then return nil end
 
@@ -183,8 +262,8 @@ end
 --- actionType, info1, info2
 --- "mount", mountId, C_MountJournal index
 ---```
----@param cursorInfo CursorInfo
----@return MountInfo
+--- @param cursorInfo CursorInfo
+--- @return MountInfo
 function L:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
     local mountInfoAPI = self:GetMountInfoGeneric(mountIDorIndex)
@@ -192,8 +271,8 @@ function L:GetMountInfo(cursorInfo)
     return mountInfoAPI
 end
 
----@return MountInfo
----@param mountIDorIndex number
+--- @return MountInfo
+--- @param mountIDorIndex number
 function L:GetMountInfoGeneric(mountIDorIndex)
     local m = self:GetMountInfo_CJournal(mountIDorIndex)
     if m then return m end
@@ -201,10 +280,11 @@ function L:GetMountInfoGeneric(mountIDorIndex)
 end
 
 --- @return MountInfo
----@param companionIndex number
+--- @param companionIndex number
 function L:GetMountInfoLegacy(companionIndex)
     local creatureID, creatureName, creatureSpellID, icon, isSummoned =
-            GetCompanionInfo(MOUNT, companionIndex)
+            GetCompanionInfo(W.MOUNT, companionIndex)
+
     local spellName = creatureName
     if not IsUsableSpell(spellName) then
         local spellInfoName = GetSpellInfo(creatureSpellID)
@@ -213,13 +293,13 @@ function L:GetMountInfoLegacy(companionIndex)
     end
 
     local o = {
-        ---@type number
+        --- @type number
         index = companionIndex,
-        ---@type string
+        --- @type string
         name = spellName,
-        ---@type number
+        --- @type number
         spellID = creatureSpellID,
-        ---@type number
+        --- @type number
         icon = icon
     }
 
@@ -228,7 +308,7 @@ end
 
 ---The Mount Journal was added in Patch 6.0.2
 --- @return MountInfo
----@param mountID number
+--- @param mountID number
 function L:GetMountInfo_CJournal(mountID)
     if not C_MountJournal then return nil end
 
@@ -238,17 +318,17 @@ function L:GetMountInfo_CJournal(mountID)
     isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
 
     local o = {
-        ---@type number
+        --- @type number
         index = -1,
-        ---@type number
+        --- @type number
         id = -1,
-        ---@type number
+        --- @type number
         id = mountID,
-        ---@type string
+        --- @type string
         name = name,
-        ---@type number
+        --- @type number
         spellID = spellID,
-        ---@type number
+        --- @type number
         icon = icon
     }
 
@@ -258,7 +338,7 @@ end
 function L:SupportsPetBattles() return C_PetBattles ~= nil end
 function L:SupportsVehicles() return UnitInVehicle ~= nil end
 
----@return _SpellCastEventArguments
+--- @return _SpellCastEventArguments
 function L:ParseSpellCastEventArgs(...)
     local unitTarget, castGUID, spellID = ...
     return {
@@ -268,7 +348,7 @@ function L:ParseSpellCastEventArgs(...)
     }
 end
 
----@return _SpellCastSentEventArguments
+--- @return _SpellCastSentEventArguments
 function L:ParseSpellCastSentEventArgs(...)
     local unit, target, castGUID, spellID = ...
     return {

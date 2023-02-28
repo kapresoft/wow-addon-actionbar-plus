@@ -41,7 +41,7 @@ function L:SetAttributes(btnUI, btnData)
     local w = btnUI.widget
     w:ResetWidgetAttributes()
 
-    local spellInfo = w:GetButtonData():GetSpellInfo()
+    local spellInfo = w:GetSpellData()
     if type(spellInfo) ~= 'table' then return end
     if not spellInfo.id then return end
     AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
@@ -61,12 +61,11 @@ end
 
 ---@param btnUI ButtonUI
 function L:ShowTooltip(btnUI)
-    local bd = btnUI.widget:GetButtonData()
-    if not bd:ConfigContainsValidActionType() then return end
+    local w = btnUI.widget
+    if not w:ConfigContainsValidActionType() then return end
 
-    local btnData = btnUI.widget:GetConfig()
-    local spellInfo = btnData[WAttr.SPELL]
-    if not spellInfo.id then return end
+    local spellInfo = w:GetSpellData()
+    if w:IsInvalidSpell(spellInfo) then return end
 
     GameTooltip:SetSpellByID(spellInfo.id)
 

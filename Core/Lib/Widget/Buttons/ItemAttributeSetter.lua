@@ -26,12 +26,11 @@ Methods
 -------------------------------------------------------------------------------]]
 
 ---@param btnUI ButtonUI
----@param btnData Profile_Button
-function S:SetAttributes(btnUI, btnData)
-    btnUI.widget:ResetWidgetAttributes(btnUI)
-    local itemData = btnData[WAttr.ITEM]
-    if type(itemData) ~= 'table' then return end
-    if not itemData.id then return end
+function S:SetAttributes(btnUI)
+    local w = btnUI.widget
+    w:ResetWidgetAttributes(btnUI)
+    local itemData = w:GetItemData()
+    if w:IsInvalidItem(itemData) then return end
 
     AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
 
@@ -44,11 +43,12 @@ end
 
 ---@param btnUI ButtonUI
 function S:ShowTooltip(btnUI)
-    local bd = btnUI.widget:GetButtonData()
-    if not bd:ConfigContainsValidActionType() then return end
+    local w = btnUI.widget
+    if not w:ConfigContainsValidActionType() then return end
 
-    local btnData = btnUI.widget:GetConfig()
-    local itemInfo = btnData[WAttr.ITEM]
+    local itemInfo = w:GetItemData()
+    if w:IsInvalidItem(itemInfo) then return end
+
     if itemInfo and itemInfo.id then GameTooltip:SetItemByID(itemInfo.id) end
 end
 

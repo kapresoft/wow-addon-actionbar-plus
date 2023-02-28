@@ -213,10 +213,9 @@ local function OnStealth(eventWidget)
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsStealthSpell() end,
+                function(bw) return bw:IsStealthSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)
@@ -228,10 +227,9 @@ local function OnShapeShift(eventWidget)
     eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsShapeshiftSpell() end,
+                function(bw) return bw:IsShapeshiftSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)
@@ -243,10 +241,9 @@ local function OnStealthIconUpdate(eventContext)
     eventContext.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
-                function(bw) return bw:GetButtonData():IsStealthSpell() end,
+                function(bw) return bw:IsStealthSpell() end,
                 function(bw)
-                    local spellInfo = bw:GetButtonData():GetSpellInfo()
-                    local icon = API:GetSpellIcon(spellInfo)
+                    local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
                 end)
     end)
@@ -273,6 +270,10 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnBagEvent(f, event, ...) L:SendMessage(MSG.OnBagUpdate) end
+
+--- @param f EventFrameInterface
+--- @param event string
+local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event)) end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -365,6 +366,12 @@ function L:RegisterBagEvents()
     f:SetScript(E.OnEvent, OnBagEvent)
     RegisterFrameForEvents(f, { E.BAG_UPDATE, E.BAG_UPDATE_DELAYED })
 end
+function L:RegisterEventToMessageTransmitter()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnMessageTransmitter)
+    --- @see GlobalConstants#M (Messages)
+    RegisterFrameForEvents(f, { E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED })
+end
 function L:RegisterPlayerEnteringWorld()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
@@ -380,6 +387,7 @@ function L:RegisterEvents()
     self:RegisterShapeshiftOrStealthEventFrame()
     self:RegisterCombatFrame()
     self:RegisterBagEvents()
+    self:RegisterEventToMessageTransmitter()
     self:RegisterPlayerEnteringWorld()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)

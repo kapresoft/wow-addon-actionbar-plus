@@ -82,13 +82,22 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
---- @param widget ButtonUIWidget
-local function SetButtonAttributes(widget)
-    if widget:IsEmpty() then return end
+--- @param frameWidget FrameWidget
+--- @param event string
+local function OnEquipmentSetsChanged(frameWidget, event)
+    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+    frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
+            function(btnWidget) btnWidget:UpdateEquipmentSet() end)
+end
 
-    local btnConf = widget:GetConfig()
-    local setter = O.ButtonFactory:GetAttributesSetter(btnConf.type)
-    if setter then setter:SetAttributes(widget.frame, btnConf) end
+--- @param frameWidget FrameWidget
+--- @param event string
+local function OnEquipmentSwapFinished(frameWidget, event)
+    p:log(20,'OnEquipmentSwapFinished(): frame #%s', frameWidget:GetFrameIndex())
+    frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
+            function(btnWidget)
+                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button)
+            end)
 end
 
 --- @param frameWidget FrameWidget
@@ -150,7 +159,6 @@ local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFrameIndex)
-    p:log('Event received: %s', event)
     frameWidget:UpdateEmptyButtonsSettings()
 end
 
@@ -229,7 +237,10 @@ end
 
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    ns:AceEvent():RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
+    local AceEvent = ns:AceEvent()
+    AceEvent:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
+    AceEvent:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
+    AceEvent:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
 
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
@@ -625,7 +636,7 @@ function L:PostCombatUpdateComplete()
     if count <= 0 then return end
     --- @param widget ButtonUIWidget
     for i, widget in ipairs(PostCombatButtonUpdates) do
-        SetButtonAttributes(widget)
+        widget:SetButtonAttributes()
         PostCombatButtonUpdates[i] = nil
     end
 end

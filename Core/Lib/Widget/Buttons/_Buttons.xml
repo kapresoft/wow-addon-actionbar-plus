@@ -2,7 +2,6 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
     <Script file="ActionType.lua"/>
-    <Script file="ButtonData.lua"/>
     <Script file="PickupHandler.lua"/>
     <Script file="ButtonProfileMixin.lua"/>
     <Script file="ButtonMixin.lua"/>
@@ -20,6 +19,7 @@
     <Script file="MountDragEventHandler.lua"/>
     <Script file="CompanionDragEventHandler.lua"/>
     <Script file="BattlePetDragEventHandler.lua"/>
+    <Script file="EquipmentSetDragEventHandler.lua"/>
     <Script file="ReceiveDragEventHandler.lua"/>
     <Script file="ButtonFactory.lua"/>
 

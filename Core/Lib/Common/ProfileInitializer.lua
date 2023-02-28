@@ -81,6 +81,9 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.tooltip_visibility_key] = '',
     [ConfigNames.tooltip_visibility_combat_override_key] = '',
     [ConfigNames.tooltip_anchor_type] = GC.TooltipAnchor.CURSOR_TOPLEFT,
+    [ConfigNames.equipmentset_open_character_frame] = true,
+    [ConfigNames.equipmentset_open_equipment_manager] = true,
+    [ConfigNames.equipmentset_show_glow_when_active] = true,
     [ConfigNames.bars] = {},
 }
 

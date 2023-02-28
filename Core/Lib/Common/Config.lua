@@ -10,7 +10,7 @@ Local Vars
 local _, ns = ...
 local O, LibStub = ns:LibPack()
 
-local GC, Ace = O.GlobalConstants, O.AceLibrary
+local GC, Ace, BaseAPI = O.GlobalConstants, O.AceLibrary, O.BaseAPI
 local E, M = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
 
@@ -287,6 +287,16 @@ local function PropsAndMethods(o)
         local configArgs = {}
 
         configArgs['general'] = self:CreateGeneralGroup()
+        local hiddenGeneralConfigs = {
+            'equipmentset_header',
+            PC.equipmentset_open_character_frame,
+            PC.equipmentset_open_equipment_manager,
+            PC.equipmentset_show_glow_when_active,
+        }
+        if BaseAPI:IsClassicEra() then
+            local gen = configArgs['general'].args
+            for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
+        end
         configArgs['debugging'] = self:CreateDebuggingGroup()
 
         local barConfigs = self:CreateActionBarConfigs()
@@ -352,6 +362,36 @@ local function PropsAndMethods(o)
                     desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
+                },
+
+                equipmentset_header = { order = mainSeq:next(), type = "header", name = "Equipment Set Options" },
+                equipmentset_open_character_frame = {
+                    order = mainSeq:next(),
+                    width = 'normal',
+                    type = 'toggle',
+                    name = 'Open Character Frame',
+                    -- todo next: localize strings
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.',
+                    get = PGet(self, PC.equipmentset_open_character_frame, false),
+                    set = self:CM(PC.equipmentset_open_character_frame, false),
+                },
+                equipmentset_open_equipment_manager = {
+                    order = mainSeq:next(),
+                    width = 1.2,
+                    type = 'toggle',
+                    name = "Open Equipment Manager",
+                    desc = 'When the player clicks an equipment set button, the character frame should automatically open, as well as the Equipment Manager. This will allow users to quickly and easily manage their equipment while also viewing their character\'s information. This setting only applies if "Open Character Frame" is enabled.',
+                    get = PGet(self, PC.equipmentset_open_equipment_manager, false),
+                    set = self:CM(PC.equipmentset_open_equipment_manager, false),
+                },
+                equipmentset_show_glow_when_active = {
+                    order = mainSeq:next(),
+                    width = 'normal',
+                    type = 'toggle',
+                    name = "Glow After Equip",
+                    desc = 'When the player equips a set, the button should light up or glow to provide clear visual feedback and confirm that the equipment set has been successfully equipped.',
+                    get = PGet(self, PC.equipmentset_show_glow_when_active, false),
+                    set = self:CM(PC.equipmentset_show_glow_when_active, false),
                 },
                 tooltip_header = { order = mainSeq:next(), type = "header", name = GeneralTooltipOptionsHeader },
                 tooltip_visibility_key = {

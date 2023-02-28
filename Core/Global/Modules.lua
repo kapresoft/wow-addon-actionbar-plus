@@ -40,7 +40,6 @@ local M = {
     BaseAttributeSetter = 'BaseAttributeSetter',
     BattlePetDragEventHandler = 'BattlePetDragEventHandler',
     BattlePetAttributeSetter = 'BattlePetAttributeSetter',
-    ButtonData = 'ButtonData',
     ButtonFactory = 'ButtonFactory',
     ButtonFrameFactory = 'ButtonFrameFactory',
     ButtonUI = 'ButtonUI',
@@ -50,6 +49,8 @@ local M = {
     Config = 'Config',
     ConfigEventHandlerMixin = 'ConfigEventHandlerMixin',
     DruidAPI = 'DruidAPI',
+    EquipmentSetDragEventHandler = 'EquipmentSetDragEventHandler',
+    EquipmentSetAttributeSetter = 'EquipmentSetAttributeSetter',
     FrameHandleMixin = 'FrameHandleMixin',
     GlobalConstants = 'GlobalConstants',
     ItemAttributeSetter = 'ItemAttributeSetter',
@@ -93,8 +94,6 @@ local GlobalObjectsTemplate = {
     Assert = {},
     --- @type BaseAttributeSetter
     BaseAttributeSetter = {},
-    --- @type ButtonData
-    ButtonData = {},
     --- @type ButtonFactory
     ButtonFactory = {},
     --- @type ButtonFrameFactory
@@ -111,6 +110,10 @@ local GlobalObjectsTemplate = {
     Config = {},
     --- @type ConfigEventHandlerMixin
     ConfigEventHandlerMixin = {},
+    --- @type EquipmentSetDragEventHandler
+    EquipmentSetDragEventHandler = {},
+    --- @type EquipmentSetAttributeSetter
+    EquipmentSetAttributeSetter = {},
     --- @type FrameHandleMixin
     FrameHandleMixin = {},
     --- @type GlobalConstants

@@ -21,7 +21,7 @@ local p = LogFactory(M.PickupHandler)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class PickupHandler
+--- @class PickupHandler
 local L = LibStub:NewLibrary(M.PickupHandler); if not L then return end
 
 --[[-----------------------------------------------------------------------------
@@ -32,25 +32,27 @@ function L:IsPickingUpSomething()
     return IsNotBlank(type)
 end
 
----@param widget ButtonUIWidget
+--- ### See: (https://www.wowinterface.com/forums/showthread.php?t=49120)[https://www.wowinterface.com/forums/showthread.php?t=49120]
+--- ### See: Interface/FrameXML/SecureHandlers.lua # PickupAny
+--- @param widget ButtonUIWidget
 local function PickupStuff(widget)
-    local btnConf = widget:GetConfig()
+    local btnConf = widget.config
 
     if widget:IsSpell() then
-        PickupSpell(btnConf[SPELL].id)
+        BaseAPI:PickupSpell(widget:GetSpellData())
     elseif widget:IsMacro() then
-        PickupMacro(btnConf[MACRO].index)
+        BaseAPI:PickupMacro(widget:GetMacroData())
     elseif widget:IsItem() then
-        PickupItem(btnConf[ITEM].id)
+        BaseAPI:PickupItem(widget:GetItemData())
     elseif widget:IsMount() then
-        local mount = widget:GetButtonData():GetMountInfo()
-        BaseAPI:PickupMount(mount)
+        BaseAPI:PickupMount(widget:GetMountData())
     elseif widget:IsCompanion() then
-        local companion = widget:GetButtonData():GetCompanionInfo()
-        BaseAPI:PickupCompanion(companion)
+        BaseAPI:PickupCompanion(widget:GetCompanionData())
     elseif widget:IsBattlePet() then
-        local battlePet = widget:GetButtonData():GetBattlePetInfo()
-        BaseAPI:PickupBattlePet(battlePet.guid)
+        BaseAPI:PickupBattlePet(widget:GetBattlePetData().guid)
+    elseif widget:IsEquipmentSet() then
+        local equipmentSet =
+        BaseAPI:PickupEquipmentSet(widget:GetEquipmentSetData())
     else
         p:log(20, "PickupExisting | no item picked up")
     end
@@ -58,12 +60,12 @@ end
 
 ---## Pickup APIs
 --- - see [API_PickupCompanion](https://wowpedia.fandom.com/wiki/API_PickupCompanion) for Mounts and Companion
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 function L:PickupExisting(widget)
     PickupStuff(widget)
 end
 
----@param widget ButtonUIWidget
+--- @param widget ButtonUIWidget
 function L:Pickup(widget)
     PickupStuff(widget)
 end

@@ -6,11 +6,11 @@ local _, ns = ...
 local pformat = ns.pformat
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local A, AT, WAttr = O.Assert, O.ActionType, GC.WidgetAttributes
+local A, AT, W = O.Assert, O.ActionType, GC.WidgetAttributes
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION, BATTLE_PET =
-    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MACRO_TEXT,
-    WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET
+    W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
+    W.MOUNT, W.COMPANION, W.BATTLE_PET
 
 
 
@@ -34,13 +34,14 @@ local p = L.logger
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 --- README: Also need to add the attribute setterin in ButtonFactor#AttributeSetters
 local handlers = {
-    [SPELL] = O.SpellDragEventHandler,
-    [ITEM] = O.ItemDragEventHandler,
-    [MACRO] = O.MacroDragEventHandler,
-    [MOUNT] = O.MountDragEventHandler,
-    [COMPANION] = O.CompanionDragEventHandler,
-    [BATTLE_PET] = O.BattlePetDragEventHandler,
-    [MACRO_TEXT] = O.MacroDragEventHandler,
+    [W.SPELL] = O.SpellDragEventHandler,
+    [W.ITEM] = O.ItemDragEventHandler,
+    [W.MACRO] = O.MacroDragEventHandler,
+    [W.MOUNT] = O.MountDragEventHandler,
+    [W.COMPANION] = O.CompanionDragEventHandler,
+    [W.BATTLE_PET] = O.BattlePetDragEventHandler,
+    [W.MACRO_TEXT] = O.MacroDragEventHandler,
+    [W.EQUIPMENT_SET] = O.EquipmentSetDragEventHandler,
 }
 
 ---@param cursor CursorUtil
@@ -52,17 +53,6 @@ function L:IsSupportedCursorType(cursor)
     if handler.Supports then return handler:Supports(cursor:GetCursor()) end
 
     return true
-end
-
--- ## Functions ------------------------------------------------
-function L:CleanupProfile(btnUI, actionType)
-    local btnData = btnUI.widget:GetConfig()
-    if not btnData then return end
-
-    local otherTypes = AT:GetOtherTypes(actionType)
-    for _, at in ipairs(otherTypes) do
-        btnData[at] = {}
-    end
 end
 
 ---@param cursor CursorUtil
@@ -77,5 +67,5 @@ function L:Handle(btnUI, cursor)
     if not self:IsSupportedCursorType(cursor) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
-    self:CleanupProfile(btnUI, actionType)
+    btnUI.widget:CleanupOtherActionTypeData(actionType)
 end
