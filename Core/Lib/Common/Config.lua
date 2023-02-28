@@ -10,7 +10,7 @@ Local Vars
 local _, ns = ...
 local O, LibStub = ns:LibPack()
 
-local GC, Ace = O.GlobalConstants, O.AceLibrary
+local GC, Ace, BaseAPI = O.GlobalConstants, O.AceLibrary, O.BaseAPI
 local E, M = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
 
@@ -287,6 +287,16 @@ local function PropsAndMethods(o)
         local configArgs = {}
 
         configArgs['general'] = self:CreateGeneralGroup()
+        local hiddenGeneralConfigs = {
+            'equipmentset_header',
+            PC.equipmentset_open_character_frame,
+            PC.equipmentset_open_equipment_manager,
+            PC.equipmentset_show_glow_when_active,
+        }
+        if not BaseAPI:IsClassicEra() then
+            local gen = configArgs['general'].args
+            for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
+        end
         configArgs['debugging'] = self:CreateDebuggingGroup()
 
         local barConfigs = self:CreateActionBarConfigs()
