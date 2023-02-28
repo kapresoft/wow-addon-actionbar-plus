@@ -193,6 +193,8 @@ local function GlobalConstantProperties(o)
         BAG_UPDATE_DELAYED = 'BAG_UPDATE_DELAYED',
         CURSOR_CHANGED = 'CURSOR_CHANGED',
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
+        EQUIPMENT_SETS_CHANGED = 'EQUIPMENT_SETS_CHANGED',
+        EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
 
         PET_BATTLE_OPENING_START = 'PET_BATTLE_OPENING_START',
@@ -245,7 +247,11 @@ local function GlobalConstantProperties(o)
         OnButtonPostClick          = newMsg('OnButtonPostClick'),
         OnButtonClickBattlePet     = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet  = newMsg('OnButtonClickEquipmentSet'),
+        --- Relayed Events
+        EQUIPMENT_SETS_CHANGED     = newMsg(Events.EQUIPMENT_SETS_CHANGED),
+        EQUIPMENT_SWAP_FINISHED    = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
     }
+
 
     --- @class WidgetGlobals
     local Widgets = {
@@ -437,6 +443,8 @@ local function GlobalConstantProperties(o)
     --- @type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass
+
+    o.newMsg = newMsg
 end
 
 --- @param o GlobalConstants

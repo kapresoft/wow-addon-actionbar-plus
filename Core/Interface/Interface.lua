@@ -135,7 +135,7 @@ local Profile_BattlePet = {
 local Profile_EquipmentSet = {
     ['type'] ='equipmentset',
     ['name'] = '<name of equipment>',
-    --- The set ID
+    --- The Equipment setID
     ['id'] = 1,
     ['icon'] = 3038273,
 }
@@ -269,6 +269,8 @@ local LayoutStrategyContext = {
 local EquipmentSetInfo = {
     name = 'name',
     id = 1,
+    --- The button index order
+    index = 1,
     setID = 1,
     icon = 12345,
     isEquipped = true,

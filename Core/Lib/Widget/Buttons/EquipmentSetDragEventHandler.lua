@@ -57,8 +57,10 @@ end
 
 --- @param w ButtonUIWidget
 local function ClickEquipmentSetButton(w)
+    if w:IsMissingEquipmentSet() then return end
     local equipmentSet = w:GetEquipmentSetData()
-    local btnName = 'GearSetButton' .. (equipmentSet.id + 1)
+    local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
+    local btnName = 'GearSetButton' .. (index)
     if _G[btnName] then _G[btnName]:Click() end
 end
 --- @param w ButtonUIWidget
@@ -101,27 +103,22 @@ local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
     p:log(30, 'Message[%s]: %s', evt, w:GetName())
     if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
+    if w:IsMissingEquipmentSet() then return end
 
     --- @type _Frame
     local PDF = PaperDollFrame
-    local profile = w:GetProfileConfig()
-
-    p:log(20, 'Equipment Clicked: %s', w:GetEquipmentSetData())
     C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
-
     -- PUT_DOWN_SMALL_CHAIN
     -- GUILD_BANK_OPEN_BAG
     PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
 
-    GlowButtonConditionally(w, profile)
-
+    local profile = w:GetProfileConfig()
     if profile.equipmentset_open_character_frame then
         if not PDF:IsVisible() then
             ToggleCharacter('PaperDollFrame')
             OpenEquipmentMgrConditionally(w, profile)
         else OpenEquipmentMgrConditionally(w, profile) end
     end
-    S:RefreshTooltip(w.button)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -137,8 +134,6 @@ local function eventHandlerMethods(e)
 
         local equipmentSetCursor = BaseAPI:ToEquipmentSetCursor(cursorInfo)
         if not equipmentSetCursor then return false end
-        --return BaseAPI:CanSummonBattlePet(petCursor.guid)
-        --p:log('Equipment Cursor: %s', equipmentSetCursor)
         return true
     end
 
@@ -183,6 +178,19 @@ local function attributeSetterMethods(a)
     end
 
     --- @param btnUI ButtonUI
+    function a:RefreshTooltipAtMouse(btnUI)
+        --- @type ButtonUI
+        local f = GetMouseFocus()
+        if not f then return end
+        if f:GetName() ~= btnUI:GetName() then return end
+
+        self:RefreshTooltip(f)
+        local w = btnUI.widget
+        local profile = w:GetProfileConfig()
+        GlowButtonConditionally(w, profile)
+    end
+
+    --- @param btnUI ButtonUI
     function a:RefreshTooltip(btnUI)
         C_Timer.After(0.2, function() S:ShowTooltip(btnUI) end)
     end
@@ -191,18 +199,15 @@ local function attributeSetterMethods(a)
     function a:ShowTooltip(btnUI)
         if not btnUI then return end
         local w = btnUI.widget
-        if w:IsEmpty() then return end
+        if w:IsEmpty() or w:IsMissingEquipmentSet() then return end
 
-        if not w:ConfigContainsValidActionType() then return end
-        local equipmentSet = w:GetEquipmentSetData()
-        if w:IsInvalidEquipmentSet(equipmentSet) then return end
+        local btnData = w:GetEquipmentSetData()
+        local equipmentSet = BaseAPI:GetEquipmentSetInfoByName(btnData.name)
+        if not equipmentSet then return end
+        if btnData.id ~= equipmentSet.id then btnData.id = equipmentSet.id end
+        GameTooltip:SetEquipmentSet(equipmentSet.name)
 
-        local equipmentSetInfo = BaseAPI:GetEquipmentSetInfoByName(equipmentSet.name)
-        if equipmentSetInfo and (equipmentSet.id ~= equipmentSetInfo.id) then
-            equipmentSet.id = equipmentSetInfo.id
-        end
-        GameTooltip:SetEquipmentSet(equipmentSetInfo.name)
-        if equipmentSetInfo.isEquipped then
+        if equipmentSet.isEquipped then
             -- todo next: localize
             local equippedLabel = ns:K().CH:FormatColor('0073FF', ' (Equipped)')
             GameTooltip:AppendText(equippedLabel)

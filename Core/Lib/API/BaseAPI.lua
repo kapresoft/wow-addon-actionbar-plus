@@ -83,18 +83,38 @@ function L:GetEquipmentSetInfo(cursorInfo)
     return self:GetEquipmentSetInfoByName(equipmentSetCursor.name)
 end
 
+--- @param id number Equipment set ID
+--- @param name string Equipment set name
+function L:IsMissingEquipmentSet(id, name)
+    local index = self:GetEquipmentSetIndex(id)
+    if not index then return true end
+    local equipmentSet = self:GetEquipmentSetInfoByName(name)
+    if not equipmentSet then return true end
+    return not (equipmentSet.id == id and equipmentSet.name == name)
+end
+
+--- @param id number The equipment setID
+--- @return number The index or nil
+function L:GetEquipmentSetIndex(id)
+    local equipmentSetIDs = C_EquipmentSet.GetEquipmentSetIDs()
+    if not equipmentSetIDs then return nil end
+    for i, v in ipairs(equipmentSetIDs) do if v == id then return i end end
+    return nil
+end
+
 --- @return EquipmentSetInfo
 --- @param equipmentName string
 function L:GetEquipmentSetInfoByName(equipmentName)
     local setID = C_EquipmentSet.GetEquipmentSetID(equipmentName)
     if not setID then return nil end
 
-    local name, iconFileID, setID, isEquipped, numItems, numEquipped,
+    local name, iconFileID, setID_, isEquipped, numItems, numEquipped,
         numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(setID)
 
     return {
         name = name,
         id = setID,
+        index = self:GetEquipmentSetIndex(setID),
         setID = setID,
         icon = iconFileID,
         isEquipped = isEquipped,

@@ -10,7 +10,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-local P, API = O.Profile, O.API
+local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local CN = GC.Profile_Config_Names
 local String, Table, W = O.String, O.Table, GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
@@ -305,13 +305,29 @@ local function PropsAndMethods(o)
         return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
     end
     --- @param e Profile_EquipmentSet
-    function o:IsInvalidEquipmentSet(e) return IsNil(e) and IsNil(e.name) and IsNil(e.index) end
+    function o:IsInvalidEquipmentSet(e)
+        e = e or self:GetEquipmentSetData()
+        return IsNil(e) and IsNil(e.name) and IsNil(e.index) end
 
     --- @param pet Profile_BattlePet
     function o:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
     function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
+
+    function o:IsMissingEquipmentSet()
+        if self:IsInvalidEquipmentSet() then return end
+
+        local btnData = self:GetEquipmentSetData()
+        local id, name = btnData.id, btnData.name
+        local index = BaseAPI:GetEquipmentSetIndex(id)
+        if not index then return true end
+
+        local equipmentSet = BaseAPI:GetEquipmentSetInfoByName(name)
+        if not equipmentSet then return true end
+
+        return not (equipmentSet.id == id and equipmentSet.name == name)
+    end
 
     function o:ResetButtonData()
         local btnData = self.config

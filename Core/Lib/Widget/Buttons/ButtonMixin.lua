@@ -17,7 +17,7 @@ Local Vars
 local _, ns = ...
 local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
 local pformat = ns.pformat
-local P, AO = O.Profile, O.AceLibFactory:A()
+local P, AO, BaseAPI = O.Profile, O.AceLibFactory:A(), O.BaseAPI
 local LSM, String = AO.AceLibSharedMedia, O.String
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
@@ -540,6 +540,23 @@ local function PropsAndMethods(o)
     end
     function o:UpdateCooldownDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateCooldown() end) end
 
+    --- Note: Equipment Set Name cannot be updated.
+    --- The Equipment Manager always creates a new unique name.
+    function o:UpdateEquipmentSet()
+        -- if index changed (similar to how macros are updated)
+        -- if equipment set was deleted
+        -- icon update
+        p:log(30, 'Equipment-Set update called: %s', self:GetName())
+        if self:IsMissingEquipmentSet() then self:SetButtonAsEmpty(); return end
+
+        local btnData = self.w:GetEquipmentSetData()
+        local es = BaseAPI:GetEquipmentSetInfoByName(btnData.name)
+        if not es then return end
+        if btnData.icon ~= es.icon then
+            btnData.icon = es.icon
+            self:SetIcon(btnData.icon)
+        end
+    end
 
     --- @return ActionBarInfo
     function o:GetActionbarInfo()
