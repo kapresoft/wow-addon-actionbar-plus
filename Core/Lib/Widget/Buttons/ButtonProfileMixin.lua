@@ -144,12 +144,8 @@ local function PropsAndMethods(o)
     --- @return Profile_Config
     function o:GetProfileConfig() return self.w.profile:P() end
 
-    --- @param type string One of: spell, item, or macro
-    function o:GetButtonTypeData(type)
-        local btnData = self.config
-        if self:IsInvalidButtonData(btnData, type) then return nil end
-        return btnData[type]
-    end
+    --- @param type ActionTypeName One of: spell, item, or macro
+    function o:GetButtonTypeData(type) return self.config[type] end
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
@@ -201,12 +197,7 @@ local function PropsAndMethods(o)
 
     function o:IsInvalidButtonData(o, key)
         if type(o) ~= 'table' then return true end
-        if type(o[key]) ~= 'nil' then
-            local d = o[key]
-            --- action types have id and/or index; if any is missing, we can assume it's invalid data
-            if type(d) == 'table' then return (IsBlankStr(d['id']) and IsBlankStr(d['index'])) end
-        end
-        return true
+        return type(o[key]) == 'table'
     end
 
     --- @return boolean
@@ -290,28 +281,28 @@ local function PropsAndMethods(o)
     --- @return boolean
     function o:IsHideWhenTaxi() return self.w.profile:IsHideWhenTaxi() end
     ---@param s Profile_Spell
-    function o:IsInvalidSpell(s) return IsNil(s) and IsNil(s.name)  and IsNil(s.id) and IsNil(s.icon) end
+    function o:IsInvalidSpell(s) return IsNil(s) or (IsNil(s.name) and IsNil(s.id) and IsNil(s.icon)) end
     ---@param m Profile_Macro
-    function o:IsInvalidMacro(m) return IsNil(m) and IsNil(m.name)  and IsNil(m.index) and IsNil(m.icon) end
+    function o:IsInvalidMacro(m) return IsNil(m) or (IsNil(m.name) and IsNil(m.index) and IsNil(m.icon)) end
 
     ---@param i Profile_Item
-    function o:IsInvalidItem(i) return IsNil(i) and IsNil(i.name)  and IsNil(i.id) and IsNil(i.icon) end
+    function o:IsInvalidItem(i) return IsNil(i) or (IsNil(i.name)  and IsNil(i.id) and IsNil(i.icon)) end
     --- @param m Profile_Mount
     function o:IsInvalidMount(m)
-        return IsNil(m) and IsNil(m.name) and IsNil(m.spell) and IsNil(m.spell.id)
+        return IsNil(m) or (IsNil(m.name) and IsNil(m.spell) and IsNil(m.spell.id))
     end
     --- @param c Profile_Companion
     function o:IsInvalidCompanion(c)
-        return IsNil(c) and IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id)
+        return IsNil(c) or (IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id))
     end
     --- @param e Profile_EquipmentSet
     function o:IsInvalidEquipmentSet(e)
         e = e or self:GetEquipmentSetData()
         if not e then return true end
-        return IsNil(e.name) and IsNil(e.index) end
+        return IsNil(e) or (IsNil(e.name) and IsNil(e.index)) end
 
     --- @param pet Profile_BattlePet
-    function o:IsInvalidBattlePet(pet) return IsNil(pet) and IsNil(pet.guid) and IsNil(pet.name) end
+    function o:IsInvalidBattlePet(pet) return IsNil(pet) or (IsNil(pet.guid) and IsNil(pet.name)) end
     function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end

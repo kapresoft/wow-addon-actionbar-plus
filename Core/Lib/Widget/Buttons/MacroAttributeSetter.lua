@@ -36,6 +36,8 @@ function S:SetAttributes(btnUI)
     local w = btnUI.widget
     w:ResetWidgetAttributes(btnUI)
     local macroInfo = w:GetMacroData()
+    if w:IsInvalidMacro(macroInfo) then return end
+
     local icon = GC.Textures.TEXTURE_EMPTY
     if macroInfo.icon then icon = macroInfo.icon end
 

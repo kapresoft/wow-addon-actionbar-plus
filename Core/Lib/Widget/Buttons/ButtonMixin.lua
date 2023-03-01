@@ -370,7 +370,7 @@ local function PropsAndMethods(o)
     --- @return SpellCooldown
     function o:GetSpellCooldown(cd)
         local spell = self:GetSpellData()
-        if not spell then return nil end
+        if self:IsInvalidSpell(spell) then return end
         local spellCD = API:GetSpellCooldown(spell.id, spell)
         if spellCD ~= nil then
             cd.details = spellCD
@@ -386,7 +386,7 @@ local function PropsAndMethods(o)
     --- @return ItemCooldown
     function o:GetItemCooldown(cd)
         local item = self:GetItemData()
-        if not (item and item.id) then return nil end
+        if self:IsInvalidItem(item) then return nil end
         local itemCD = API:GetItemCooldown(item.id, item)
         if itemCD ~= nil then
             cd.details = itemCD
