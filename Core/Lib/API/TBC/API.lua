@@ -176,7 +176,7 @@ end
 --- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
 ---@return SpellCooldown
 function S:GetSpellCooldown(spellID, optionalSpell)
-    --print(string.format('optionalSpell: %s', pformat(optionalSpell)))
+    if not spellID then return nil end
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
     local name, _, icon, _, _, _, _ = GetSpellInfo(spellID)
     ---@class SpellCooldown
