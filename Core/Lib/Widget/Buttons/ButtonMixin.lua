@@ -460,19 +460,18 @@ local function PropsAndMethods(o)
 
     function o:UpdateItemState()
         self:ClearAllText()
-        local btnData = self.w.config
-        -- todo next: use ButtonData#invalidButtonData
-        if self:IsInvalidButtonData(btnData, ITEM) then return end
-        local itemID = btnData.item.id
+        local item = self.w:GetItemData()
+        if self:IsInvalidItem(item) then return end
+        local itemID = item.id
         local itemInfo = API:GetItemInfo(itemID)
         if itemInfo == nil then return end
         if API:IsToyItem(itemID) then self:SetActionUsable(true); return end
 
         local stackCount = itemInfo.stackCount or 1
         local count = itemInfo.count
-        btnData.item.count = count
-        btnData.item.stackCount = stackCount
-        if stackCount > 1 then self:SetText(btnData.item.count) end
+        item.count = count
+        item.stackCount = stackCount
+        if stackCount > 1 then self:SetText(item.count) end
         if count <= 0 then self:SetActionUsable(false)
         else self:SetActionUsable(self:IsUsableItem(itemID)) end
         return
