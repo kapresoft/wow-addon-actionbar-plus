@@ -73,7 +73,6 @@ local function GlobalConstantProperties(o)
         ABP_HELP_COMMAND = sformat(consoleCommandTextFormat, "/abp help"),
 
         -- The minimum size of a button before the texts are hidden (if configured)
-        MIN_BUTTON_SIZE_FOR_HIDING_TEXTS = 35,
         ALT = 'ALT',
         ANCHOR_TOPLEFT = 'ANCHOR_TOPLEFT',
         ANCHOR_TOPRIGHT = 'ANCHOR_TOPRIGHT',
@@ -88,6 +87,8 @@ local function GlobalConstantProperties(o)
         CTRL = 'CTRL',
         HIGHLIGHT_DRAW_LAYER = 'HIGHLIGHT',
         LeftButton = 'LeftButton',
+        MIN_BUTTON_SIZE_FOR_HIDING_TEXTS = 35,
+        MOUNT_ACTIVE_TEXTURE = 136116,
         RightButton = 'RightButton',
         PICKUPACTION = 'PICKUPACTION',
         SECURE_ACTION_BUTTON_TEMPLATE = 'SecureActionButtonTemplate',
@@ -202,6 +203,7 @@ local function GlobalConstantProperties(o)
 
         PLAYER_CONTROL_GAINED = 'PLAYER_CONTROL_GAINED',
         PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST',
+        PLAYER_MOUNT_DISPLAY_CHANGED = 'PLAYER_MOUNT_DISPLAY_CHANGED',
         PLAYER_ENTERING_WORLD = 'PLAYER_ENTERING_WORLD',
         PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED',
         PLAYER_REGEN_ENABLED = 'PLAYER_REGEN_ENABLED',
@@ -231,6 +233,8 @@ local function GlobalConstantProperties(o)
 
         UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
+
+        ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
     local function newMsg(msg) return sformat("%s::%s", addon, msg) end
@@ -248,8 +252,10 @@ local function GlobalConstantProperties(o)
         OnButtonClickBattlePet     = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet  = newMsg('OnButtonClickEquipmentSet'),
         --- Relayed Events
-        EQUIPMENT_SETS_CHANGED     = newMsg(Events.EQUIPMENT_SETS_CHANGED),
-        EQUIPMENT_SWAP_FINISHED    = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
+        EQUIPMENT_SETS_CHANGED       = newMsg(Events.EQUIPMENT_SETS_CHANGED),
+        EQUIPMENT_SWAP_FINISHED      = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
+        PLAYER_MOUNT_DISPLAY_CHANGED = newMsg(Events.PLAYER_MOUNT_DISPLAY_CHANGED),
+        ZONE_CHANGED_NEW_AREA = newMsg(Events.ZONE_CHANGED_NEW_AREA),
     }
 
 

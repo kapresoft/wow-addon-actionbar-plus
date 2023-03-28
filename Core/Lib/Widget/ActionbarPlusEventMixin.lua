@@ -151,9 +151,7 @@ local function OnSpellCastStop(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     p:log(50, 'OnSpellCastStop: %s', spellCastEvent)
     local w = f.ctx
-    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btn) btn:ResetHighlight() end)
     end)
@@ -166,7 +164,6 @@ local function OnSpellCastFailed(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     --p:log(50, 'OnSpellCastFailed: %s', spellCastEvent)
     local w = f.ctx
-    --- @param fw FrameWidget
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
@@ -237,9 +234,7 @@ end
 
 --- @param eventContext EventContext
 local function OnStealthIconUpdate(eventContext)
-    --- @param fw FrameWidget
     eventContext.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        --- @param bw ButtonUIWidget
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:IsStealthSpell() end,
                 function(bw)
@@ -370,7 +365,10 @@ function L:RegisterEventToMessageTransmitter()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnMessageTransmitter)
     --- @see GlobalConstants#M (Messages)
-    RegisterFrameForEvents(f, { E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED })
+    RegisterFrameForEvents(f, {
+        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
+        E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
+    })
 end
 function L:RegisterPlayerEnteringWorld()
     local f = self:CreateEventFrame()
