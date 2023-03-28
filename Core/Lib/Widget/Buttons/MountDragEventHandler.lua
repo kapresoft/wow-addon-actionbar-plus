@@ -90,20 +90,43 @@ Methods: MountAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI
     ---@param btnData Profile_Button
-    function a:SetAttributes(btnUI, btnData)
+    ---@param source string The source of the trigger, i.e. 'event'
+    function a:SetAttributes(btnUI, source)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
 
         local mount = w:GetMountData()
         if w:IsInvalidMount(mount) then return end
 
-        local spellIcon, spell = EMPTY_ICON, mount.spell
-        if spell.icon then spellIcon = spell.icon end
-        w:SetIcon(spellIcon)
         btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
         btnUI:SetAttribute(WAttr.SPELL, mount.name)
 
+        if source ~= 'event' then self:SetActiveIcon(w, mount)
+        else self:SetActiveIconDelayed(w, mount) end
+
         self:HandleGameTooltipCallbacks(btnUI)
+    end
+
+    ---@param w ButtonUIWidget
+    ---@param mount Profile_Mount
+    function a:SetActiveIconDelayed(w, mount)
+        local delayInSec = 0.2
+        if IsMounted() then delayInSec = 0 end
+        C_Timer.After(delayInSec,  function() self:SetActiveIcon(w, mount) end)
+    end
+
+    ---@param w ButtonUIWidget
+    ---@param mount Profile_Mount
+    function a:SetActiveIcon(w, mount)
+        local spellIcon, spell = EMPTY_ICON, mount.spell
+        if spell.icon then spellIcon = spell.icon end
+
+        local mountInfo = BaseAPI:GetMountInfoGeneric(mount)
+        if not mountInfo then return end
+        spellIcon = mountInfo.icon
+        if mountInfo.isActive then spellIcon = GC.C.MOUNT_ACTIVE_TEXTURE end
+        mount.spell.icon = spellIcon
+        w:SetIcon(spellIcon)
     end
 
     ---@param btnUI ButtonUI

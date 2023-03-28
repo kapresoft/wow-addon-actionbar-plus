@@ -259,6 +259,17 @@ local function OnBagUpdate()
     end)
 end
 
+--- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
+--- entering the portal and get dismounted upon zoning in to the new area
+local function OnPlayerMount()
+    L:ApplyForEachVisibleFrames(function(fw)
+        fw:ApplyForEachButtonCondition(
+                function(bw) return bw:IsMount() end,
+                function(bw) O.MountAttributeSetter:SetAttributes(bw.frame, 'event') end
+        )
+    end)
+end
+
 --[[-----------------------------------------------------------------------------
 Initializer
 -------------------------------------------------------------------------------]]
@@ -269,10 +280,10 @@ local function InitButtonFactory()
         p:log(10, 'MSG::R: %s', msg)
         L:Init()
     end)
-    L:RegisterMessage(MSG.OnBagUpdate, function(msg)
-        p:log(10, 'MSG::R: %s', msg)
-        OnBagUpdate()
-    end)
+
+    L:RegisterMessage(MSG.OnBagUpdate, OnBagUpdate)
+    L:RegisterMessage(MSG.PLAYER_MOUNT_DISPLAY_CHANGED, OnPlayerMount)
+    L:RegisterMessage(MSG.ZONE_CHANGED_NEW_AREA, OnPlayerMount)
 end
 
 InitButtonFactory()

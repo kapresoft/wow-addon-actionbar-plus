@@ -142,7 +142,6 @@ end
 
 --- @param isShown boolean Set to true to show action bar
 function _L:ShowActionbars(isShown)
-    --- @param frameWidget FrameWidget
     O.ButtonFactory:ApplyForEachVisibleFrames(function(frameWidget)
         if frameWidget:IsShownInConfig() then
             frameWidget:SetGroupState(isShown)

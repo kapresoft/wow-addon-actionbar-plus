@@ -266,17 +266,26 @@ end
 --- @return MountInfo
 function L:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
-    local mountInfoAPI = self:GetMountInfoGeneric(mountIDorIndex)
+    local mountInfoAPI = self:GetMountInfoGenericFromCursor(mountIDorIndex)
     if C_MountJournal then mountInfoAPI.index = cursorInfo.info2 end
     return mountInfoAPI
 end
 
 --- @return MountInfo
 --- @param mountIDorIndex number
-function L:GetMountInfoGeneric(mountIDorIndex)
+function L:GetMountInfoGenericFromCursor(mountIDorIndex)
     local m = self:GetMountInfo_CJournal(mountIDorIndex)
     if m then return m end
     return self:GetMountInfoLegacy(mountIDorIndex)
+end
+
+--- @return MountInfo
+--- @param mountData Profile_Mount
+function L:GetMountInfoGeneric(mountData)
+    local m
+    if C_MountJournal then m = self:GetMountInfo_CJournal(mountData.id) end
+    if m then return m end
+    return self:GetMountInfoLegacy(mountData.index)
 end
 
 --- @return MountInfo
@@ -292,7 +301,14 @@ function L:GetMountInfoLegacy(companionIndex)
         p:log(30, 'Mount creature-name=[%s] spell=[%s]', creatureName, spellName)
     end
 
+    local isActive = false
+    if AuraUtil and AuraUtil.FindAuraByName then
+        local aura = AuraUtil.FindAuraByName(spellName, UnitId.player)
+        isActive = spellName == aura
+    end
+
     local o = {
+        isActive = isActive,
         --- @type number
         index = companionIndex,
         --- @type string
@@ -318,6 +334,7 @@ function L:GetMountInfo_CJournal(mountID)
     isCollected, mountID_, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
 
     local o = {
+        isActive = isActive,
         --- @type number
         index = -1,
         --- @type number
