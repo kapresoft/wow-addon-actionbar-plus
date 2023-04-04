@@ -658,10 +658,12 @@ function L:CreateFrame(frameIndex)
     return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
 end
 
+---@param frameIndex number
 function L:Constructor(frameIndex)
 
-    --- @class ActionbarFrame : _Frame
+    --- @class __ActionbarFrame
     local f = self:GetFrameByIndex(frameIndex) or self:CreateFrame(frameIndex)
+    --- @alias ActionbarFrame __ActionbarFrame|_Frame
 
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
@@ -681,6 +683,7 @@ function L:Constructor(frameIndex)
         verticalButtonPadding = 1,
         frameStrata = frameStrata,
         frameLevel = 1,
+        --- @type ActionbarFrame
         frame = f,
         --- @type FrameHandle
         frameHandle = nil,
