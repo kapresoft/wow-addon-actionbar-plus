@@ -189,7 +189,6 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 --- @param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
     p:log(30, '[%s] %s called...', e, frameWidget.index)
-    --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw)
         bw:ShowEmptyGridEvent()
         bw:EnableMouse(true)
@@ -198,9 +197,14 @@ end
 --- @param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
     p:log(30, '[%s] %s called...', e, frameWidget.index)
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
-    DisableAllEmptyButtonsDelayed(frameWidget)
+
+    C_Timer.After(0.2, function()
+        local cursorType = GetCursorInfo()
+        p:log(30, 'CursorType: %s', tostring(cursorType))
+        if cursorType ~= nil then return end
+        frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
+        DisableAllEmptyButtonsDelayed(frameWidget)
+    end)
 end
 
 --- @param frameWidget FrameWidget
