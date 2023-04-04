@@ -83,6 +83,15 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
+local function DisableAllEmptyButtonsDelayed(frameWidget)
+    C_Timer.After(0.5, function()
+        frameWidget:ApplyForEachButton(function(bw)
+            if not bw:IsEmpty() then return end
+            bw:EnableMouse(false)
+        end)
+    end)
+end
+--- @param frameWidget FrameWidget
 --- @param event string
 local function OnEquipmentSetsChanged(frameWidget, event)
     p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
@@ -181,14 +190,19 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 local function OnActionbarShowGrid(frameWidget, e, ...)
     p:log(30, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw) bw:ShowEmptyGridEvent() end)
+    frameWidget:ApplyForEachButton(function(bw)
+        bw:ShowEmptyGridEvent()
+        bw:EnableMouse(true)
+    end)
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
     p:log(30, '[%s] %s called...', e, frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
+    DisableAllEmptyButtonsDelayed(frameWidget)
 end
+
 --- @param frameWidget FrameWidget
 local function OnHideWhenTaxiChanged(frameWidget, e, ...)
     if not UnitOnTaxi(GC.UnitId.player) then return end
@@ -525,6 +539,12 @@ local function WidgetMethods(widget)
         self:ShowKeybindText(self:IsShowKeybindText())
         self:SetInitialStateOnFrameHandle()
         self:UpdateButtonAlpha()
+        C_Timer.After(1, function()
+            self:ApplyForEachButton(function(bw)
+                if not bw:IsEmpty() then return end
+                bw.button:EnableMouse(false)
+            end)
+        end)
     end
 
     function widget:SetInitialStateOnFrameHandle() self.frameHandle:UpdateBackdropState() end
@@ -533,7 +553,6 @@ local function WidgetMethods(widget)
         local barConf = self:GetConfig()
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
-        --- @param bw ButtonUIWidget
         self:ApplyForEachButton(function(bw)
             bw.button:SetAlpha(buttonAlpha)
         end)
