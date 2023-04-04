@@ -113,7 +113,7 @@ function L:Init(widget)
     self.frame = widget.frame
 end
 
----@param f FrameHandle
+--- @param f __FrameHandle
 local function PropertiesAndMethods(f)
 
     f.OnMouseOverTooltipText = format('%s #%s: %s', ABP_ACTIONBAR_BASE_NAME,
@@ -146,8 +146,14 @@ end
 
 ---@return FrameHandle
 function L:Constructor()
-    ---@class FrameHandle : _Frame
-    local fh = CreateFrame("Frame", nil, self.widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    --- @class __FrameHandle
+    local fhf = CreateFrame("Frame", nil, self.widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
+
+    --- This is for EmmyLua
+    --- @alias FrameHandle __FrameHandle|_Frame
+    --- @type FrameHandle
+    local fh = fhf
+
     self.widget.frameHandle = fh
     fh.widget = self.widget
 
@@ -169,8 +175,6 @@ function L:Constructor()
 
     fh:ShowBackdrop()
     self:RegisterScripts(fh)
-
-
 
     return fh
 end
