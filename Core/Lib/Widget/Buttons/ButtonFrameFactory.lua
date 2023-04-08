@@ -6,7 +6,7 @@
 Lua Vars
 -------------------------------------------------------------------------------]]
 local _G = _G
-local format, type, ipairs, tinsert = string.format, type, ipairs, table.insert
+local format, type, ipairs = string.format, type, ipairs
 local tinsert, tsort = table.insert, table.sort
 
 --[[-----------------------------------------------------------------------------
@@ -83,12 +83,11 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
-local function DisableAllEmptyButtonsDelayed(frameWidget)
-    C_Timer.After(0.5, function()
-        frameWidget:ApplyForEachButton(function(bw)
-            if not bw:IsEmpty() then return end
-            bw:EnableMouse(false)
-        end)
+---@param state boolean
+local function EnableMouseAllButtons(frameWidget, state)
+    frameWidget:ApplyForEachButton(function(bw)
+        if not bw:IsEmpty() then return end
+        bw:EnableMouse(state)
     end)
 end
 --- @param frameWidget FrameWidget
@@ -191,19 +190,14 @@ local function OnActionbarShowGrid(frameWidget, e, ...)
     p:log(30, '[%s] %s called...', e, frameWidget.index)
     frameWidget:ApplyForEachButton(function(bw)
         bw:ShowEmptyGridEvent()
-        bw:EnableMouse(true)
+        C_Timer.After(0.1, function() bw:EnableMouse(true) end)
     end)
 end
 --- @param frameWidget FrameWidget
 local function OnActionbarHideGrid(frameWidget, e, ...)
-    p:log(30, '[%s] %s called...', e, frameWidget.index)
-
-    C_Timer.After(0.2, function()
-        local cursorType = GetCursorInfo()
-        p:log(30, 'CursorType: %s', tostring(cursorType))
-        if cursorType ~= nil then return end
-        frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
-        DisableAllEmptyButtonsDelayed(frameWidget)
+    frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
+    C_Timer.After(2, function()
+        EnableMouseAllButtons(frameWidget, GetCursorInfo() ~= nil)
     end)
 end
 
@@ -255,10 +249,10 @@ end
 
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    local AceEvent = ns:AceEvent()
-    AceEvent:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-    AceEvent:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
-    AceEvent:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
+    local AceEventInCallback = ns:AceEvent()
+    AceEventInCallback:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
+    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
+    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
 
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
@@ -543,7 +537,7 @@ local function WidgetMethods(widget)
         self:ShowKeybindText(self:IsShowKeybindText())
         self:SetInitialStateOnFrameHandle()
         self:UpdateButtonAlpha()
-        C_Timer.After(1, function()
+        C_Timer.After(0.1, function()
             self:ApplyForEachButton(function(bw)
                 if not bw:IsEmpty() then return end
                 bw.button:EnableMouse(false)
