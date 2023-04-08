@@ -926,6 +926,9 @@ local function PropsAndMethods(o)
         self:SetIcon(icon)
         self:UpdateCooldown()
     end
+
+    ---@param state boolean Set to true to enable mouse
+    function o:EnableMouse(state) self.w.button:EnableMouse(state) end
 end
 
 PropsAndMethods(L)
