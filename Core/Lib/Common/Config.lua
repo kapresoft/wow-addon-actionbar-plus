@@ -35,6 +35,9 @@ local BF
 --- @type ButtonFrameFactory
 local FF
 
+--- Localization Constant
+local C
+
 local LOCK_FRAME_DESC = [[
 
 
@@ -206,6 +209,7 @@ local function lazyInitLibs()
     WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
     TTAK = P:GetTooltipAnchorTypeKey()
+    C = GC:GetAceLocale()
 end
 
 --[[-----------------------------------------------------------------------------
@@ -470,15 +474,15 @@ local function PropsAndMethods(o)
         return {
             type = 'group',
             name = configName,
-            desc = format("%s %s", configName, ABP_SETTINGS_BASE_NAME),
+            desc = format("%s %s", configName, C['Settings']),
             order = mainSeq:next(),
             args = {
-                desc = { name = format("%s ", configName, ABP_SETTINGS_BASE_NAME),
+                desc = { name = format("%s ", configName, C['Settings']),
                          type = "header", order = barSeq:next(), },
                 enabled = {
                     width = "full",
                     type = "toggle",
-                    name = ABP_ENABLE_BASE_NAME,
+                    name = C['Enable'],
                     desc = format("%s %s", ABP_ACTIONBAR_BASE_NAME, configName),
                     order = barSeq:next(),
                     get = GetFrameStateGetterHandler(frameIndex),

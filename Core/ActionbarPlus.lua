@@ -52,8 +52,9 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     --@end-debug@
 
     if not isLogin then return end
-    local versionText, curseForge, githubIssues = GC:GetAddonInfo()
-    p:log("%s %s", versionText, ABP_INITIALIZED_TEXT)
+    local versionText = GC:GetAddonInfo()
+    local C = GC:GetAceLocale()
+    p:log(sformat(C['Addon Initialized Text Format'], versionText, GCC.ABP_COMMAND))
 end
 
 --- @return ActionbarPlus_Frame
@@ -110,14 +111,15 @@ local methods = {
     end,
     --- @param self ActionbarPlus
     ['SlashCommand_Help_Handler'] = function(self)
+        local C = GC:GetAceLocale()
         p:log('')
-        p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT)
-        p:log(ABP_USAGE_LABEL)
-        p:log(ABP_OPTIONS_LABEL)
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', ABP_COMMAND_CONFIG_TEXT)
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', ABP_COMMAND_INFO_TEXT)
+        p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'])
+        p:log('%s:  /abp [%s]', C['usage'], C['options'])
+        p:log('%s:', C['options'])
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'])
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'])
         --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', ABP_COMMAND_HELP_TEXT)
+        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'])
     end,
     --- @param self ActionbarPlus
     --- @param spaceSeparatedArgs string
