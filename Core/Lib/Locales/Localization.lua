@@ -25,8 +25,8 @@ ABP_CATEGORY                                 = "AddOns/" .. ABP_TITLE
 -- Key binding localization text
 BINDING_HEADER_ABP                           = ABP_TITLE
 BINDING_HEADER_ABP_CATEGORY                  = ABP_CATEGORY
-BINDING_NAME_ABP_OPTIONS_DLG                 = L["BINDING_NAME_ABP_OPTIONS_DLG"]
-BINDING_HEADER_ABP_GENERAL                   = L['BINDING_HEADER_ABP_GENERAL']
+BINDING_NAME_ABP_OPTIONS_DLG                 = L['Options Dialog']
+BINDING_HEADER_ABP_GENERAL                   = L['General']
 
 
 --[[-----------------------------------------------------------------------------
@@ -38,30 +38,6 @@ ABP_BUTTON_BASE_NAME                         = L['ABP_BUTTON_BASE_NAME']
 
 LocUtil:MapBindingsXMLNames(L, ABP_ACTIONBAR_BASE_NAME, ABP_TITLE)
 
-ABP_SETTINGS_BASE_NAME                                          = L['ABP_SETTINGS_BASE_NAME']
-ABP_ENABLE_BASE_NAME                                            = L['ABP_ENABLE_BASE_NAME']
-
-ABP_CURSE_FORGE                                                 = 'Curse Forge'
-ABP_CONSOLE_COMMAND_TEXT                                        = L['ABP_CONSOLE_COMMAND_TEXT']
-ABP_CONSOLE_HELP_COMMAND_TEXT                                   = L['ABP_CONSOLE_HELP_COMMAND_TEXT']
-ABP_BUGS_TEXT                                                   = L['ABP_BUGS_TEXT']
-ABP_VERSION_TEXT                                                = L['ABP_VERSION_TEXT']
-ABP_REPO_TEXT                                                   = L['ABP_REPO_TEXT']
-ABP_LAST_UPDATE_TEXT                                            = L['ABP_LAST_UPDATE_TEXT']
-ABP_INTERFACE_VERSION_TEXT                                      = L['ABP_INTERFACE_VERSION_TEXT']
-ABP_INITIALIZED_TEXT                                            = L['ABP_INITIALIZED_TEXT']
-ABP_COMMAND_CONFIG_TEXT                                         = L['ABP_COMMAND_CONFIG_TEXT']
-ABP_COMMAND_INFO_TEXT                                           = L['ABP_COMMAND_INFO_TEXT']
-ABP_COMMAND_HELP_TEXT                                           = L['ABP_COMMAND_HELP_TEXT']
-ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT                             = L['ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT']
-ABP_OPTIONS_LABEL                                               = L['ABP_OPTIONS_LABEL'] .. ':'
-ABP_USAGE_LABEL                                                 = L['ABP_USAGE_LABEL'] .. sformat(': /abp [%s]', L['ABP_OPTIONS_LABEL'])
-
-ABP_SHOW                                                        = L['ABP_SHOW']
-ABP_HIDE                                                        = L['ABP_HIDE']
-ABP_ALT                                                         = L['ABP_ALT']
-ABP_CTRL                                                        = L['ABP_CTRL']
-ABP_SHIFT                                                       = L['ABP_SHIFT']
 ABP_BAR_CONFIG_COMMON_TEXT_NO                                   = L['ABP_BAR_CONFIG_COMMON_TEXT_NO']
 ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS                               = L['ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS']
 ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT                            = L['ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT']

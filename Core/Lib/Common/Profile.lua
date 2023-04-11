@@ -31,6 +31,7 @@ AceEvent:Embed(P)
 local p = P:GetLogger()
 
 local ConfigNames = GC.Profile_Config_Names
+local C = GC:GetAceLocale()
 
 --[[-----------------------------------------------------------------------------
 Interface Definition
@@ -51,11 +52,11 @@ local TooltipKey = {
         TooltipKeyName.SHOW, TooltipKeyName.ALT, TooltipKeyName.CTRL,
         TooltipKeyName.SHIFT, TooltipKeyName.HIDE },
     kvPairs = {
-        [TooltipKeyName.SHOW]  = ABP_SHOW,
-        [TooltipKeyName.ALT]   = ABP_ALT,
-        [TooltipKeyName.CTRL]  = ABP_CTRL,
-        [TooltipKeyName.SHIFT] = ABP_SHIFT,
-        [TooltipKeyName.HIDE]  = ABP_HIDE,
+        [TooltipKeyName.SHOW]  = C['Show'],
+        [TooltipKeyName.ALT]   = C['ALT'],
+        [TooltipKeyName.CTRL]  = C['CTRL'],
+        [TooltipKeyName.SHIFT] = C['SHIFT'],
+        [TooltipKeyName.HIDE]  = C['Hide'],
     }
 }
 

@@ -457,6 +457,8 @@ end
 local function GlobalConstantMethods(o)
 
     function o:AddonName() return o.C.ADDON_NAME end
+    function o:GetAceLocale() return LibStub("AceLocale-3.0"):GetLocale(addon, true) end
+
     ---@param frameIndex number
     function o:GetFrameName(frameIndex)
         assert(frameIndex, "frameIndex is required on GC:GetFrameName(frameIndex)")
@@ -491,16 +493,18 @@ local function GlobalConstantMethods(o)
 
     --- @return string
     function o:GetAddonInfoFormatted()
+        local C = self:GetAceLocale()
         local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
         local fmt = self.C.ADDON_INFO_FMT
-        return sformat("Addon Info:\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
-                sformat(fmt, ABP_VERSION_TEXT, version),
-                sformat(fmt, 'Curse-Forge', curseForge),
-                sformat(fmt, ABP_BUGS_TEXT, issues),
-                sformat(fmt, ABP_REPO_TEXT, repo),
-                sformat(fmt, ABP_LAST_UPDATE_TEXT, lastUpdate),
-                sformat(fmt, 'Use-KeyDown(cvar ActionButtonUseKeyDown)', tostring(useKeyDown)),
-                sformat(fmt, ABP_INTERFACE_VERSION_TEXT, wowInterfaceVersion)
+        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+                C['Addon Info'],
+                sformat(fmt, C['Version'], version),
+                sformat(fmt, C['Curse-Forge'], curseForge),
+                sformat(fmt, C['Bugs'], issues),
+                sformat(fmt, C['Repo'], repo),
+                sformat(fmt, C['Last-Update'], lastUpdate),
+                sformat(fmt, C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown)),
+                sformat(fmt, C['Interface-Version'], wowInterfaceVersion)
         )
     end
 

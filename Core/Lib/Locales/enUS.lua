@@ -31,36 +31,40 @@ Local Vars
 local GCC = ABP_GlobalConstants.C
 
 --[[-----------------------------------------------------------------------------
-Defaults
+No Translations
 -------------------------------------------------------------------------------]]
+L['Version']                                    = true
+L['Curse-Forge']                                = true
+L['Bugs']                                       = true
+L['Repo']                                       = true
+L['Last-Update']                                = true
+L['Interface-Version']                          = true
+L['Locale']                                     = true
+L['Use-KeyDown(cvar ActionButtonUseKeyDown)']   = true
 
--- Common
-L['ABP_SETTINGS_BASE_NAME']                              = 'Settings'
-L['ABP_ENABLE_BASE_NAME']                                = 'Enable'
+--[[-----------------------------------------------------------------------------
+Defaults
+-------------------------------------------------------------------------------]]L['Addon Info']                                          = 'Addon Info'
+L['Addon Initialized Text Format']                       = '%s Initialized.  Type %s on the console for available commands.'
+L['ALT']                                                 = true
+L['Available console commands']                          = true
+L['CTRL']                                                = true
+L['Enable']                                              = true
+L['General']                                             = true
+L['Hide']                                                = true
+L['Info Console Command Text']                           = 'Prints additional info about the addon on this console'
+L['Options Dialog']                                      = true
+L['options']                                             = true
+L['Settings']                                            = true
+L['SHIFT']                                               = true
+L['Show']                                                = true
+L['Shows the config UI (default)']                       = true
+L['Shows this help']                                     = true
+L['usage']                                               = true
 
-L["BINDING_NAME_ABP_OPTIONS_DLG"]                        = 'Options Dialog'
-L['BINDING_HEADER_ABP_GENERAL']                          = 'General'
-
-L['ABP_INITIALIZED_TEXT']                                = sformat('Initialized.  Type %s on the console for available commands.', GCC.ABP_COMMAND)
-L['ABP_CONSOLE_HELP_COMMAND_TEXT']                       = sformat('Type %s on the console to see additional commands', GCC.ABP_HELP_COMMAND)
-L['ABP_CONSOLE_COMMAND_TEXT']                            = sformat('Type %s on the console to open config dialog or right-click on drag frame located at the top of the actionbar.', GCC.ABP_COMMAND)
-L['ABP_VERSION_TEXT']                                    = 'Version'
-L['ABP_BUGS_TEXT']                                       = 'Bugs'
-L['ABP_REPO_TEXT']                                       = 'Repo'
-L['ABP_LAST_UPDATE_TEXT']                                = 'Last Update'
-L['ABP_INTERFACE_VERSION_TEXT']                          = 'Interface Version'
-L['ABP_COMMAND_CONFIG_TEXT']                             = 'Shows the config UI (default)'
-L['ABP_COMMAND_INFO_TEXT']                               = 'Prints additional information about the addon on this console'
-L['ABP_COMMAND_HELP_TEXT']                               = 'Shows this help'
-L['ABP_AVAILABLE_CONSOLE_COMMANDS_TEXT']                 = 'Available console commands'
-L['ABP_USAGE_LABEL']                                     = 'usage'
-L['ABP_OPTIONS_LABEL']                                   = 'options'
-
-L['ABP_SHOW']                                            = 'Show'
-L['ABP_HIDE']                                            = 'Hide'
-L['ABP_ALT']                                             = 'ALT'
-L['ABP_CTRL']                                            = 'CTRL'
-L['ABP_SHIFT']                                           = 'SHIFT'
+--[[-----------------------------------------------------------------------------
+TODO: Need to refactor (Below)
+-------------------------------------------------------------------------------]]
 
 L['ABP_BAR_CONFIG_COMMON_TEXT_NO'] = 'No'
 L['ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS'] = 'Always'
