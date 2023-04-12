@@ -15,10 +15,11 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, LibStub = ns:LibPack()
-
+local GC = O.GlobalConstants
 local LSM = O.AceLibFactory:A().AceLibSharedMedia
-local E = O.GlobalConstants.E
-local C = O.GlobalConstants.C
+local E = GC.E
+local GCC = GC.C
+local C = GC:GetAceLocale()
 
 local FrameHandleBackdrop = {
     ---@see LibSharedMedia
@@ -47,18 +48,18 @@ Support Functions
 local MouseButtonUtil = {}
 ---@param mouseButton string
 ---@return boolean
-function MouseButtonUtil:IsLeftButton(mouseButton) return C.LeftButton == mouseButton end
+function MouseButtonUtil:IsLeftButton(mouseButton) return GCC.LeftButton == mouseButton end
 ---@param mouseButton string
 ---@return boolean
-function MouseButtonUtil:IsRightButton(mouseButton) return C.RightButton == mouseButton end
+function MouseButtonUtil:IsRightButton(mouseButton) return GCC.RightButton == mouseButton end
 ---@param mouseButton string
 ---@return boolean
-function MouseButtonUtil:IsButton5(mouseButton) return C.Button5 == mouseButton end
+function MouseButtonUtil:IsButton5(mouseButton) return GCC.Button5 == mouseButton end
 local MBU = MouseButtonUtil
 
 ---@param frame FrameHandle
 local function ShowConfigTooltip(frame)
-    GameTooltip:SetOwner(frame, C.ANCHOR_TOPLEFT)
+    GameTooltip:SetOwner(frame, GCC.ANCHOR_TOPLEFT)
     --  Shift + Left-Click to ReloadUI (on debug only)
     GameTooltip:AddLine(frame.OnMouseOverTooltipText)
     GameTooltip:Show()
@@ -89,7 +90,7 @@ local function OnMouseDown(frameHandle, mouseButton)
     elseif MBU:IsRightButton(mouseButton) then
         ABP:OpenConfig(frameHandle.widget)
     elseif MBU:IsButton5(mouseButton) then
-        StaticPopup_Show(C.CONFIRM_RELOAD_UI)
+        StaticPopup_Show(GCC.CONFIRM_RELOAD_UI)
     end
 end
 
@@ -117,7 +118,7 @@ end
 local function PropertiesAndMethods(f)
 
     f.OnMouseOverTooltipText = format('%s #%s: %s', ABP_ACTIONBAR_BASE_NAME,
-            f.widget.index, ABP_TOOLTIP_RIGHT_CLICK_TO_OPEN_CONFIG_TEXT)
+            f.widget.index, C['Right-click to open config UI'])
 
     function f:UpdateBackdropState()
         if self:IsMouseOverEnabled() then
@@ -160,7 +161,7 @@ function L:Constructor()
     ---Ignore parent alpha so the handle frame doesn't get affected when we hide the
     --- main actionbar frame
     fh:SetIgnoreParentAlpha(true)
-    fh:RegisterForDrag(C.LeftButton, C.RightButton);
+    fh:RegisterForDrag(GCC.LeftButton, GCC.RightButton);
     fh:EnableMouse(true)
     fh:SetMovable(true)
     fh:SetResizable(true)
@@ -169,7 +170,7 @@ function L:Constructor()
     fh:SetFrameStrata(self.widget.frameStrata)
     --todo next: move alpha to settings
     fh:SetAlpha(0.5)
-    fh:SetPoint(C.BOTTOM, self.frame, C.TOP, 0, 1)
+    fh:SetPoint(GCC.BOTTOM, self.frame, GCC.TOP, 0, 1)
 
     PropertiesAndMethods(fh)
 
