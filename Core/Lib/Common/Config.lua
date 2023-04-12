@@ -14,9 +14,6 @@ local GC, Ace, BaseAPI = O.GlobalConstants, O.AceLibrary, O.BaseAPI
 local E, M = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
 
-local GeneralConfigHeader = ' ' .. ABP_GENERAL_CONFIG_HEADER .. ' '
-local GeneralTooltipOptionsHeader = ' ' .. ABP_GENERAL_TOOLTIP_OPTIONS_HEADER .. ' '
-
 local p = O.LogFactory(ns.M.Config)
 
 ---These are loaded in #fetchLibs()
@@ -313,10 +310,13 @@ local function PropsAndMethods(o)
     end
 
     function o:CreateGeneralGroup()
+        local GeneralConfigHeader = ' ' .. C['General Configuration'] .. ' '
+        local GeneralTooltipOptionsHeader = ' ' .. C['Tooltip Options'] .. ' '
+
         return {
             type = "group",
-            name = ABP_GENERAL_CONFIG_NAME,
-            desc = ABP_GENERAL_CONFIG_DESC,
+            name = C['General'],
+            desc = GeneralConfigHeader,
             order = mainSeq:next(),
             args = {
                 desc = { name = GeneralConfigHeader, type = "header", order = 0 },
@@ -423,8 +423,8 @@ local function PropsAndMethods(o)
                     type = 'select', style = 'dropdown',
                     order = mainSeq:next(),
                     values = TTAK.kvPairs, sorting = TTAK.sorting,
-                    name = ABP_GENERAL_CONFIG_TOOLTIP_NAME,
-                    desc = ABP_GENERAL_CONFIG_TOOLTIP_DESC,
+                    name = C['Tooltip Anchor'],
+                    desc = C['Tooltip Anchor Description'],
                     get = PGet(self, PC.tooltip_anchor_type),
                     set = self:CM(PC.tooltip_anchor_type, GC.TooltipAnchor.CURSOR_TOPLEFT, GC.M.OnTooltipFrameUpdate),
                 }
@@ -435,12 +435,12 @@ local function PropsAndMethods(o)
     function o:CreateDebuggingGroup()
         return {
             type = "group",
-            name = ABP_DEBUGGING_NAME,
-            desc = ABP_DEBUGGING_DESC,
+            name = C['Debugging'],
+            desc = C['Debugging Description'],
             -- Place right before Profiles
             order = 90,
             args = {
-                desc = { name = format(" %s ", ABP_DEBUGGING_CONFIGURATION_HEADER), type = "header", order = 0 },
+                desc = { name = format(" %s ", C['Debugging Configuration']), type = "header", order = 0 },
                 log_level = {
                     type = 'range',
                     order = 1,
@@ -448,8 +448,8 @@ local function PropsAndMethods(o)
                     min = 0,
                     max = 50,
                     width = 1.2,
-                    name = ABP_DEBUGGING_LOG_LEVEL_NAME,
-                    desc = ABP_DEBUGGING_LOG_LEVEL_DESC,
+                    name = C['Log Level'],
+                    desc = C['Log Level Description'],
                     get = function(_) return GC:GetLogLevel() end,
                     set = function(_, v) GC:SetLogLevel(v) end,
                 },
@@ -572,9 +572,9 @@ local function PropsAndMethods(o)
                     width = "normal",
                     type = "select", style = "dropdown",
                     order = barSeq:next(),
-                    values = { [''] = ABP_BAR_CONFIG_COMMON_TEXT_NO,
-                               ['always'] = ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS,
-                               ['in-combat'] = ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT },
+                    values = { [''] = C['No'],
+                               ['always'] = C['Always'],
+                               ['in-combat'] = C['In-Combat'] },
                     name = ABP_BAR_CONFIG_LOCK_NAME,
                     desc = format("%s %s. " .. LOCK_FRAME_DESC, ABP_BAR_CONFIG_LOCK_DESC, configName),
                     get = GetLockStateGetterHandler(frameIndex),

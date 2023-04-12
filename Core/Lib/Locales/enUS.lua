@@ -1,3 +1,4 @@
+-- SEE: https://github.com/BigWigsMods/packager/wiki/Localization-Substitution
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -43,8 +44,9 @@ L['Locale']                                     = true
 L['Use-KeyDown(cvar ActionButtonUseKeyDown)']   = true
 
 --[[-----------------------------------------------------------------------------
-Defaults
--------------------------------------------------------------------------------]]L['Addon Info']                                          = 'Addon Info'
+Localized Texts
+-------------------------------------------------------------------------------]]
+L['Addon Info']                                          = 'Addon Info'
 L['Addon Initialized Text Format']                       = '%s Initialized.  Type %s on the console for available commands.'
 L['ALT']                                                 = true
 L['Available console commands']                          = true
@@ -61,29 +63,24 @@ L['Show']                                                = true
 L['Shows the config UI (default)']                       = true
 L['Shows this help']                                     = true
 L['usage']                                               = true
+L['No']                                                  = true
+L['Always']                                              = true
+L['In-Combat']                                           = true
+L['Right-click to open config UI']                       = true
+L['General']                                             = true
+L['General Configuration']                               = true
+L['Tooltip Options']                                     = true
+L['Tooltip Anchor']                                      = true
+L['Tooltip Anchor Description']                          = 'Select how and where the game tooltip should be displayed when hovering over an action button'
+L['Debugging']                                           = true
+L['Debugging Description']                               = 'Debug Settings for troubleshooting'
+L['Debugging Configuration']                             = true
+L['Log Level']                                           = true
+L['Log Level Description']                               = 'Higher log levels generate more logs'
 
 --[[-----------------------------------------------------------------------------
 TODO: Need to refactor (Below)
 -------------------------------------------------------------------------------]]
-
-L['ABP_BAR_CONFIG_COMMON_TEXT_NO'] = 'No'
-L['ABP_BAR_CONFIG_COMMON_TEXT_ALWAYS'] = 'Always'
-L['ABP_BAR_CONFIG_COMMON_TEXT_IN_COMBAT'] = 'In-Combat'
-
-L['ABP_TOOLTIP_RIGHT_CLICK_TO_OPEN_CONFIG_TEXT']         = 'Right-click to open config UI'
-
-L['ABP_GENERAL_CONFIG_HEADER']                           = 'General Configuration'
-L['ABP_GENERAL_TOOLTIP_OPTIONS_HEADER']                  = 'Tooltip Options'
-L['ABP_GENERAL_CONFIG_NAME']                             = 'General'
-L['ABP_GENERAL_CONFIG_DESC']                             = 'General Configuration'
-L['ABP_GENERAL_CONFIG_TOOLTIP_NAME']                     = 'Tooltip Anchor'
-L['ABP_GENERAL_CONFIG_TOOLTIP_DESC']                     = 'Select how and where the game tooltip should be displayed when hovering over an action button'
-L['ABP_DEBUGGING_NAME']                                  = 'Debugging'
-L['ABP_DEBUGGING_DESC']                                  = 'Debug Settings for troubleshooting'
-L['ABP_DEBUGGING_CONFIGURATION_HEADER']                  = 'Debugging Configuration'
-L['ABP_DEBUGGING_LOG_LEVEL_NAME']                        = 'Log Level'
-L['ABP_DEBUGGING_LOG_LEVEL_DESC']                        = 'Higher log levels generate more logs'
-
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_NAME']            = 'Lock Actionbars with SHIFT key'
 L['ABP_GENERAL_CONFIG_LOCK_ACTION_BARS_DESC']            = 'Prevents user from picking up or dragging spells, items, or macros from the ActionbarPlus bars.'
 L['ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME']  = 'Hide during taxi'
