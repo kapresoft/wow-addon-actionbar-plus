@@ -105,6 +105,7 @@ end
 --- @param event string
 local function OnActionbarGrid(f, event, ...)
     p:log(30, 'Event received: %s', event)
+    if InCombatLockdown() then return end
     if E.ACTIONBAR_SHOWGRID == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
         return
@@ -117,12 +118,12 @@ end
 --- @param event string
 local function OnCursorChangeInBags(f, event, ...)
     local isDefault, newCursorType, oldCursorType, oldCursorVirtualID = ...
-    --p:log(40, 'OnCursorChangeInBags: isDefault: %s new=%s old=%s', isDefault, newCursorType, oldCursorType)
     if true == isDefault and oldCursorType == CURSOR_ITEM_TYPE then
         f.ctx.buttonFactory:Fire(E.OnActionbarHideGrid)
         ABP.ActionbarEmptyGridShowing = false
         return
     end
+    if InCombatLockdown() then return end
     if newCursorType ~= CURSOR_ITEM_TYPE then return end
     f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
     ABP.ActionbarEmptyGridShowing = true
@@ -340,6 +341,8 @@ function L:RegisterCursorChangesInBagEvents()
     if BaseAPI:IsClassicEra() then return end
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnCursorChangeInBags)
+    -- Note that this event does not fire in WoW Classic (i.e. 1.14.x)
+    -- for non-consumable items in the bag like quest items
     RegisterFrameForEvents(f, { E.CURSOR_CHANGED })
 end
 
