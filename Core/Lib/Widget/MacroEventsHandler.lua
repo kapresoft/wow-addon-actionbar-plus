@@ -1,13 +1,13 @@
 --[[-----------------------------------------------------------------------------
 Lua Variables
 -------------------------------------------------------------------------------]]
-local format = string.format
+local format, str_lower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Wow Variables
 -------------------------------------------------------------------------------]]
 local CreateFrame, UIParent = CreateFrame, UIParent
 local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroInfo, GetMacroIndexByName
-
+local blankIcon = 1074161000
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
@@ -15,7 +15,7 @@ Local Variables
 local _, ns = ...
 local O, LibStub = ns:LibPack()
 
-local P, Table = O.Profile, O.Table
+local P, Table, String = O.Profile, O.Table, O.String
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
@@ -81,6 +81,23 @@ end
     return changed
 end]]
 
+---@param macroName string
+local function GetM6Icon(macroName)
+    if not M6 then return nil end
+    if not String.StartsWithIgnoreCase(macroName, '_m6') then return nil end
+
+    local _, m6SlotID = string.gmatch(macroName, "(%w+)%+s(%w+)")()
+    if not m6SlotID then return nil end
+
+    local slotID = tonumber(m6SlotID)
+    if slotID <= 0 then return nil end
+
+    local slotIcon = M6:GetActionIcon(slotID)
+    p:log(30, 'M6::Macro[%s]: m6-ID=%s, icon=%s', macroName, tostring(slotID), tostring(slotIcon))
+
+    return slotIcon
+end
+
 local function HandleChangedMacros(btnName, btnData)
     if btnData == nil or btnData.macro == nil or btnData.macro.index == nil then return false end
     local macroData = btnData.macro
@@ -112,10 +129,17 @@ local function HandleChangedMacros(btnName, btnData)
         macroData.icon = icon
         changed = true
     elseif macroData.icon ~= icon and macroData.name == name and macroData.body == body then
-        -- name and icon change (from UI)
-        changeInfo = { type = 'icon', old = macroData.icon, new = icon }
-        macroData.icon = icon
-        changed = true
+        local newIcon = icon
+        local m6Icon = GetM6Icon(macroData.name)
+        if m6Icon and m6Icon < blankIcon then newIcon = m6Icon end
+
+        changeInfo = { type = 'icon', old = macroData.icon, new = newIcon }
+        if newIcon <= blankIcon then
+            p:log(30, 'Icon[%s]::Change-Info: %s, m6Icon=%s',
+                    macroData.name, toStringSorted(changeInfo), tostring(m6Icon))
+            macroData.icon = newIcon
+            changed = true
+        end
     elseif macroIndex ~= macroData.index then
             -- macro index changed due to
             -- (1) New Macro Created that causes the index/position to change
