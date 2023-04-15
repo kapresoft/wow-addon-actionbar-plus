@@ -176,7 +176,6 @@ local function OnAddOnReady(w, msg)
     p:log(10, 'MSG::R::%s: %s', w:GetName(), msg)
     -- show delayed due to anchor not setting until UI is fully loaded
     w:HideGroup()
-    C_Timer.After(0.5, function() w:InitAnchor() end)
     C_Timer.After(1, function() w:ShowGroupIfEnabled() end)
 end
 
@@ -480,6 +479,7 @@ local function WidgetMethods(widget)
         self:HideButtons()
     end
     function widget:ShowGroup()
+        self:InitAnchor()
         frame:Show()
         self:ShowButtons()
     end
