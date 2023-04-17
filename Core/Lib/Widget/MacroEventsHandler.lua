@@ -90,7 +90,8 @@ local function GetM6Icon(macroName)
     if not m6SlotID then return nil end
 
     local slotID = tonumber(m6SlotID)
-    if slotID <= 0 then return nil end
+    p:log(30, 'M6 macro-name=[%s] SlotID: %s', tostring(macroName), tostring(slotID))
+    if not slotID or slotID <= 0 then return nil end
 
     local slotIcon = M6:GetActionIcon(slotID)
     p:log(30, 'M6::Macro[%s]: m6-ID=%s, icon=%s', macroName, tostring(slotID), tostring(slotIcon))
