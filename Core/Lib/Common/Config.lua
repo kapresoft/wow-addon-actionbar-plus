@@ -31,20 +31,8 @@ local TTAK
 local BF
 --- @type ButtonFrameFactory
 local FF
-
---- Localization Constant
-local C
-
-local LOCK_FRAME_DESC = [[
-
-
-Options:
-  Always: lock the frame at all times.
-  In-Combat: lock the frame during combat.
-
-Note: this option only prevents the frame from being moved and does not lock individual
-action items.
-]]
+--- @type table<string, string|number>
+local L
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -206,7 +194,7 @@ local function lazyInitLibs()
     WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
     TTAK = P:GetTooltipAnchorTypeKey()
-    C = GC:GetAceLocale()
+    L = GC:GetAceLocale()
 end
 
 --[[-----------------------------------------------------------------------------
@@ -310,12 +298,12 @@ local function PropsAndMethods(o)
     end
 
     function o:CreateGeneralGroup()
-        local GeneralConfigHeader = ' ' .. C['General Configuration'] .. ' '
-        local GeneralTooltipOptionsHeader = ' ' .. C['Tooltip Options'] .. ' '
+        local GeneralConfigHeader = ' ' .. L['General Configuration'] .. ' '
+        local GeneralTooltipOptionsHeader = ' ' .. L['Tooltip Options'] .. ' '
 
         return {
             type = "group",
-            name = C['General'],
+            name = L['General'],
             desc = GeneralConfigHeader,
             order = mainSeq:next(),
             args = {
@@ -325,8 +313,8 @@ local function PropsAndMethods(o)
                     width = 'full',
                     confirm = ConfirmAndReload,
                     order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_NAME,
-                    desc = ABP_GENERAL_CONFIG_CHARACTER_SPECIFIC_FRAME_POSITIONS_DESC,
+                    name = L['Character Specific Frame Positions'],
+                    desc = L['Character Specific Frame Positions::Description'],
                     get = PGet(self, PC.character_specific_anchors, false),
                     set = PSet(self, PC.character_specific_anchors, false)
                 },
@@ -334,8 +322,8 @@ local function PropsAndMethods(o)
                     width = 'normal',
                     type = 'toggle',
                     order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_NAME,
-                    desc = ABP_GENERAL_CONFIG_HIDE_WHEN_TAXI_ACTION_BARS_DESC,
+                    name = L['Hide during taxi'],
+                    desc = L['Hide during taxi::Description'],
                     get = PGet(self, PC.hide_when_taxi, false),
                     set = PSet(self, PC.hide_when_taxi, false),
                     set = PSetWithEvent(self, PC.hide_when_taxi, false, E.OnHideWhenTaxiChanged)
@@ -344,8 +332,8 @@ local function PropsAndMethods(o)
                     width = 'normal',
                     type = 'toggle',
                     order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_NAME,
-                    desc = ABP_GENERAL_CONFIG_ENABLE_ACTION_BUTTON_GLOW_DESC,
+                    name = L['Mouseover Glow'],
+                    desc = L['Mouseover Glow::Description'],
                     get = PGet(self, PC.action_button_mouseover_glow, false),
                     set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
                 },
@@ -353,8 +341,8 @@ local function PropsAndMethods(o)
                     width = 'full',
                     type = 'toggle',
                     order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_NAME,
-                    desc = ABP_GENERAL_CONFIG_HIDE_TEXTS_FOR_SMALLER_BUTTONS_DESC,
+                    name = L['Hide text for smaller buttons'],
+                    desc = L['Hide text for smaller buttons::Description'],
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
                     set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
                 },
@@ -362,8 +350,8 @@ local function PropsAndMethods(o)
                     width = 'full',
                     type = 'toggle',
                     order = mainSeq:next(),
-                    name = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_NAME,
-                    desc = ABP_GENERAL_CONFIG_HIDE_COUNTDOWN_NUMBERS_ON_COOLDOWNS_DESC,
+                    name = L['Hide countdown numbers on cooldowns'],
+                    desc = L['Hide countdown numbers on cooldowns::Description'],
                     get = PGet(self, PC.hide_countdown_numbers, false),
                     set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
                 },
@@ -403,8 +391,8 @@ local function PropsAndMethods(o)
                     type = 'select', style = 'dropdown',
                     order = mainSeq:next(),
                     values = TTK.kvPairs, sorting = TTK.sorting,
-                    name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_NAME,
-                    desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_KEY_DESC,
+                    name = L['Tooltip Visibility'],
+                    desc = L['Tooltip Visibility::Description'],
                     get = PGet(self, PC.tooltip_visibility_key, TTK.names.SHOW),
                     set = PSet(self, PC.tooltip_visibility_key, TTK.names.SHOW)
                 },
@@ -413,8 +401,8 @@ local function PropsAndMethods(o)
                     type = 'select', style = 'dropdown',
                     order = mainSeq:next(),
                     values = TTK.kvPairs, sorting = TTK.sorting,
-                    name = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_NAME,
-                    desc = ABP_GENERAL_CONFIG_TOOLTIP_VISIBILITY_COMBAT_OVERRIDE_KEY_DESC,
+                    name = L['Combat Override Key'],
+                    desc = L['Combat Override Key::Description'],
                     get = PGet(self, PC.tooltip_visibility_combat_override_key),
                     set = PSet(self, PC.tooltip_visibility_combat_override_key)
                 },
@@ -423,8 +411,8 @@ local function PropsAndMethods(o)
                     type = 'select', style = 'dropdown',
                     order = mainSeq:next(),
                     values = TTAK.kvPairs, sorting = TTAK.sorting,
-                    name = C['Tooltip Anchor'],
-                    desc = C['Tooltip Anchor Description'],
+                    name = L['Tooltip Anchor'],
+                    desc = L['Tooltip Anchor::Description'],
                     get = PGet(self, PC.tooltip_anchor_type),
                     set = self:CM(PC.tooltip_anchor_type, GC.TooltipAnchor.CURSOR_TOPLEFT, GC.M.OnTooltipFrameUpdate),
                 }
@@ -435,12 +423,12 @@ local function PropsAndMethods(o)
     function o:CreateDebuggingGroup()
         return {
             type = "group",
-            name = C['Debugging'],
-            desc = C['Debugging Description'],
+            name = L['Debugging'],
+            desc = L['Debugging::Description'],
             -- Place right before Profiles
             order = 90,
             args = {
-                desc = { name = format(" %s ", C['Debugging Configuration']), type = "header", order = 0 },
+                desc = { name = format(" %s ", L['Debugging Configuration']), type = "header", order = 0 },
                 log_level = {
                     type = 'range',
                     order = 1,
@@ -448,8 +436,8 @@ local function PropsAndMethods(o)
                     min = 0,
                     max = 50,
                     width = 1.2,
-                    name = C['Log Level'],
-                    desc = C['Log Level Description'],
+                    name = L['Log Level'],
+                    desc = L['Log Level::Description'],
                     get = function(_) return GC:GetLogLevel() end,
                     set = function(_, v) GC:SetLogLevel(v) end,
                 },
@@ -474,15 +462,15 @@ local function PropsAndMethods(o)
         return {
             type = 'group',
             name = configName,
-            desc = format("%s %s", configName, C['Settings']),
+            desc = format("%s %s", configName, L['Settings']),
             order = mainSeq:next(),
             args = {
-                desc = { name = format("%s ", configName, C['Settings']),
+                desc = { name = format("%s ", configName, L['Settings']),
                          type = "header", order = barSeq:next(), },
                 enabled = {
                     width = "full",
                     type = "toggle",
-                    name = C['Enable'],
+                    name = L['Enable'],
                     desc = format("%s %s", ABP_ACTIONBAR_BASE_NAME, configName),
                     order = barSeq:next(),
                     get = GetFrameStateGetterHandler(frameIndex),
@@ -491,8 +479,8 @@ local function PropsAndMethods(o)
                 show_empty_buttons = {
                     width = "normal",
                     type = "toggle",
-                    name = ABP_BAR_CONFIG_SHOW_EMPTY_BUTTONS_NAME,
-                    desc = ABP_BAR_CONFIG_SHOW_EMPTY_BUTTONS_DESC,
+                    name = L['Show empty buttons'],
+                    desc = L['Show empty buttons::Description'],
                     order = barSeq:next(),
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
                     set = PSetSpecificWidget(frameIndex, WC.show_empty_buttons, false, E.OnActionbarShowEmptyButtonsUpdated),
@@ -500,8 +488,8 @@ local function PropsAndMethods(o)
                 showIndex = {
                     width = "normal",
                     type = "toggle",
-                    name = ABP_BAR_CONFIG_SHOW_BUTTON_NUMBERS_NAME,
-                    desc = format("%s %s", ABP_BAR_CONFIG_SHOW_BUTTON_NUMBERS_DESC, configName),
+                    name = L['Show Button Numbers'],
+                    desc = format(L['Show Button Numbers::Description'], configName),
                     order = barSeq:next(),
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
@@ -509,8 +497,8 @@ local function PropsAndMethods(o)
                 showKeybindText = {
                     width = "normal",
                     type = "toggle",
-                    name = ABP_BAR_CONFIG_SHOW_KEYBIND_TEXT_NAME,
-                    desc = format("%s %s", ABP_BAR_CONFIG_SHOW_KEYBIND_TEXT_DESC, configName),
+                    name = L['Show Keybind Text'],
+                    desc = format(L['Show Keybind Text::Description'], configName),
                     order = barSeq:next(),
                     get = GetShowKeybindTextStateGetterHandler(frameIndex),
                     set = GetShowKeybindTextStateSetterHandler(frameIndex)
@@ -524,8 +512,8 @@ local function PropsAndMethods(o)
                     step = 0.01,
                     min = 0,
                     max = 1,
-                    name = ABP_BAR_CONFIG_ALPHA_NAME,
-                    desc = ABP_BAR_CONFIG_ALPHA_DESC,
+                    name = L['Alpha'],
+                    desc = L['Alpha::Description'],
                     get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
                     set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
                 },
@@ -536,8 +524,8 @@ local function PropsAndMethods(o)
                     step = 1,
                     min = 20,
                     max = 100,
-                    name = ABP_BAR_CONFIG_SIZE_NAME,
-                    desc = ABP_BAR_CONFIG_SIZE_DESC,
+                    name = L['Size (Width & Height)'],
+                    desc = L['Size (Width & Height)::Description'],
                     get = PGetWidget(frameIndex, WC.buttonSize, 36),
                     set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
                 },
@@ -548,8 +536,8 @@ local function PropsAndMethods(o)
                     step = 1,
                     min = 1,
                     max = 20,
-                    name = ABP_BAR_CONFIG_ROWS_NAME,
-                    desc = ABP_BAR_CONFIG_ROWS_DESC,
+                    name = L['Rows'],
+                    desc = L['Rows::Description'],
                     --confirm = ConfirmAndReload,
                     get = GetRowSizeGetterHandler(frameIndex),
                     set = GetRowSizeSetterHandler(frameIndex)
@@ -561,8 +549,8 @@ local function PropsAndMethods(o)
                     step = 1,
                     min = 1,
                     max = 40,
-                    name = ABP_BAR_CONFIG_COLS_NAME,
-                    desc = ABP_BAR_CONFIG_COLS_DESC,
+                    name = L['Columns'],
+                    desc = L['Columns::Description'],
                     --confirm = ConfirmAndReload,
                     get = GetColSizeGetterHandler(frameIndex),
                     set = GetColSizeSetterHandler(frameIndex)
@@ -572,22 +560,22 @@ local function PropsAndMethods(o)
                     width = "normal",
                     type = "select", style = "dropdown",
                     order = barSeq:next(),
-                    values = { [''] = C['No'],
-                               ['always'] = C['Always'],
-                               ['in-combat'] = C['In-Combat'] },
-                    name = ABP_BAR_CONFIG_LOCK_NAME,
-                    desc = format("%s %s. " .. LOCK_FRAME_DESC, ABP_BAR_CONFIG_LOCK_DESC, configName),
+                    values = { [''] = L['No'],
+                               ['always'] = L['Always'],
+                               ['in-combat'] = L['In-Combat'] },
+                    name = L['Lock Actionbar'],
+                    desc = L['Lock Actionbar::Description'],
                     get = GetLockStateGetterHandler(frameIndex),
                     set = GetLockStateSetterHandler(frameIndex)
                 },
                 spacer3 = { type="description", name=sp, width="full", order = barSeq:next() },
-                spacer4 = { type="header", name = ABP_BAR_CONFIG_FRAME_HANDLE_SETTINGS_HEADER, width="full", order = barSeq:next() },
+                spacer4 = { type="header", name = L['Frame Handle Settings'], width="full", order = barSeq:next() },
                 frame_handle_mouseover = {
                     width = "normal",
                     type = "toggle",
                     order = barSeq:next(),
-                    name = ABP_BAR_CONFIG_MOUSEOVER_NAME,
-                    desc = ABP_BAR_CONFIG_MOUSEOVER_DESC,
+                    name = L['Mouseover'],
+                    desc = L['Mouseover::Description'],
                     get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
                     set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
                 },
@@ -595,8 +583,8 @@ local function PropsAndMethods(o)
                     width = "normal",
                     type = 'range',
                     order = barSeq:next(),
-                    name = ABP_BAR_CONFIG_FRAME_HANDLE_OPACITY_NAME,
-                    desc = ABP_BAR_CONFIG_FRAME_HANDLE_OPACITY_DESC,
+                    name = L['Mouseover'],
+                    desc = L['Mouseover::Description'],
                     isPercent = true,
                     step = 0.01,
                     min = 0,
@@ -608,8 +596,8 @@ local function PropsAndMethods(o)
                     width = "normal",
                     type = 'execute',
                     order = barSeq:reset(),
-                    name = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_LABEL,
-                    desc = ABP_BAR_CONFIG_RESET_ANCHOR_BUTTON_DESC,
+                    name = L['Reset Anchor'],
+                    desc = L['Reset Anchor::Description'],
                     func = OnResetAnchor(frameIndex),
                 }
             }
@@ -634,12 +622,12 @@ New Instance
 --- @return Config
 local function NewInstance()
     --- @type Config
-    local L = LibStub:NewLibrary(ns.M.Config); if not L then return end
+    local newConfig = LibStub:NewLibrary(ns.M.Config); if not newConfig then return end
 
-    AceEvent:Embed(L)
-    PropsAndMethods(L)
-    L:RegisterMessage(M.OnAddOnInitialized, function(evt, ...) L:OnAddOnInitialized(evt, ...) end)
-    return L
+    AceEvent:Embed(newConfig)
+    PropsAndMethods(newConfig)
+    newConfig:RegisterMessage(M.OnAddOnInitialized, function(evt, ...) newConfig:OnAddOnInitialized(evt, ...) end)
+    return newConfig
 end
 
 NewInstance()
