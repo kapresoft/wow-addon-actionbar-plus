@@ -170,12 +170,12 @@ local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFram
     frameWidget:UpdateEmptyButtonsSettings()
 end
 
----Event is fired from ActionbarPlus#OnAddonLoaded
+--- Show delayed due to anchor not setting until UI is fully loaded
+--- Event is fired from ActionbarPlus#OnAddonLoaded.
+--- Avoid taint() and return if in combat
 --- @param w FrameWidget
 local function OnAddOnReady(w, msg)
-    p:log(10, 'MSG::R::%s: %s', w:GetName(), msg)
-    -- show delayed due to anchor not setting until UI is fully loaded
-    w:HideGroup()
+    if InCombatLockdown() then return end
     C_Timer.After(1, function() w:ShowGroupIfEnabled() end)
 end
 
@@ -335,6 +335,7 @@ local function WidgetMethods(widget)
         if GC:IsVerboseLogging() and frame:IsShown() then
             p:log('InitAnchor| anchor-from-profile[f.%s]: %s', self.index, anchor)
         end
+        if InCombatLockdown() then return end
         frame:ClearAllPoints()
         frame:SetPoint(anchor.point, relativeTo , anchor.relativePoint, anchor.x, anchor.y)
     end
@@ -472,16 +473,18 @@ local function WidgetMethods(widget)
         self:ShowGroup()
     end
 
-    function widget:LockGroup() self.frameHandle:Hide() end
-    function widget:UnlockGroup() self.frameHandle:Show() end
+    function widget:LockGroup() if InCombatLockdown() then return end; self.frameHandle:Hide() end
+    function widget:UnlockGroup() if InCombatLockdown() then return end; self.frameHandle:Show() end
+    function widget:Hide() if InCombatLockdown() then return end; frame:Hide() end
+    function widget:Show() if InCombatLockdown() then return end; frame:Show() end
 
     function widget:HideGroup()
-        frame:Hide()
+        self:Hide()
         self:HideButtons()
     end
     function widget:ShowGroup()
         self:InitAnchor()
-        frame:Show()
+        self:Show()
         self:ShowButtons()
     end
     function widget:ShowGroupIfEnabled()
@@ -497,7 +500,7 @@ local function WidgetMethods(widget)
         --- @param bw ButtonUIWidget
         self:ApplyForEachButton(function(bw)
             bw:ShowKeybindText(isShowKeybindText)
-            bw.button:Show()
+            bw:Show()
         end)
     end
 
@@ -511,7 +514,9 @@ local function WidgetMethods(widget)
 
     function widget:HideButtons()
         --- @param bf ButtonUI
-        for _, bf in ipairs(self.buttonFrames) do bf:Hide() end
+        for _, bf in ipairs(self.buttonFrames) do
+            bf.widget:Hide()
+        end
     end
 
     --- @param buttonFrame ButtonUI
@@ -541,7 +546,7 @@ local function WidgetMethods(widget)
         C_Timer.After(0.1, function()
             self:ApplyForEachButton(function(bw)
                 if not bw:IsEmpty() then return end
-                bw.button:EnableMouse(false)
+                bw:EnableMouse(false)
             end)
         end)
     end
