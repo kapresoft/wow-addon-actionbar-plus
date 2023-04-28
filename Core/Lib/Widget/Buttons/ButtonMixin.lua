@@ -452,9 +452,12 @@ local function PropsAndMethods(o)
     end
 
     function o:ResetWidgetAttributes()
+        if InCombatLockdown() then return end
         local button = self.w.button
         for _, v in pairs(self:GetButtonAttributes()) do
-            button:SetAttribute(v, nil)
+            if not InCombatLockdown() then
+                button:SetAttribute(v, nil)
+            end
         end
     end
 
@@ -928,7 +931,10 @@ local function PropsAndMethods(o)
     end
 
     ---@param state boolean Set to true to enable mouse
-    function o:EnableMouse(state) self.w.button:EnableMouse(state) end
+    function o:EnableMouse(state) if InCombatLockdown() then return end; self.w.button:EnableMouse(state) end
+    function o:Hide() if InCombatLockdown() then return end; self.w.button:Hide() end
+    function o:Show() if InCombatLockdown() then return end; self.w.button:Show() end
+
 end
 
 PropsAndMethods(L)

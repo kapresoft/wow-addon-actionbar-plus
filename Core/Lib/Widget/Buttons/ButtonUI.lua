@@ -121,6 +121,7 @@ end
 
 --- @param btnUI ButtonUI
 local function OnDragStart(btnUI)
+    if InCombatLockdown() then return end
     --- @type ButtonUIWidget
     local w = btnUI.widget
     if w:IsEmpty() then return end
@@ -156,6 +157,7 @@ end
 --- Used with `button:RegisterForDrag('LeftButton')`
 --- @param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
+    if InCombatLockdown() then return end
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorUtil = ns:CreateCursorUtil()
     if not cursorUtil:IsValid() then
@@ -341,10 +343,12 @@ local function RegisterCallbacks(widget)
 
     --- @param w ButtonUIWidget
     widget:SetCallback("OnEnter", function(w)
+        if InCombatLockdown() then return end
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(true)
     end)
     widget:SetCallback("OnLeave", function(w)
+        if InCombatLockdown() then return end
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(false)
     end)

@@ -215,7 +215,7 @@ function L:HideUnusedButtons(fw)
     for i=start, max do
         --- @type ButtonUI
         local existingBtn = fw:GetButtonUI(i)
-        if existingBtn then existingBtn:Hide() end
+        if existingBtn then existingBtn.widget:Hide() end
     end
 end
 
