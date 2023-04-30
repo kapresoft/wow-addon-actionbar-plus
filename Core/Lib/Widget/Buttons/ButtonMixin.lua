@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetMacroSpell, GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
+local GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
 local IsUsableSpell, IsUsableItem, GetUnitName, C_Timer = IsUsableSpell, IsUsableItem, GetUnitName, C_Timer
 local IsStealthed = IsStealthed
 
@@ -17,8 +17,9 @@ Local Vars
 local _, ns = ...
 local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
 local pformat = ns.pformat
-local P, AO, BaseAPI = O.Profile, O.AceLibFactory:A(), O.BaseAPI
-local LSM, String = AO.AceLibSharedMedia, O.String
+local P, BaseAPI = O.Profile, O.BaseAPI
+local String = O.String
+local AceEvent = O.AceLibrary.AceEvent
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
 local WAttr = O.GlobalConstants.WidgetAttributes
@@ -46,7 +47,7 @@ button: widget.button
 -------------------------------------------------------------------------------]]
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
-local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end
+local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end; AceEvent:Embed(L)
 local p = L:GetLogger()
 
 --[[-----------------------------------------------------------------------------
@@ -295,7 +296,9 @@ local function PropsAndMethods(o)
     end
 
     function o:ResetCooldown() self:SetCooldown(0, 0) end
-    function o:SetCooldown(start, duration) self.cooldown:SetCooldown(start, duration) end
+    function o:SetCooldown(start, duration)
+        if not (start or duration) then return end
+        self.cooldown:SetCooldown(start, duration) end
 
 
     --- @type BindingInfo
@@ -307,6 +310,9 @@ local function PropsAndMethods(o)
     function o:SetText(text)
         if String.IsBlank(text) then text = '' end
         self.w.button.text:SetText(text)
+    end
+    function o:SetTextDelayed(text, optionalDelay)
+        C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
     end
     --- @param state boolean true will show the button index number
     function o:ShowIndex(state)
@@ -351,7 +357,7 @@ local function PropsAndMethods(o)
         if btnData == nil or String.IsBlank(btnData.type) then return nil end
         local type = btnData.type
 
-        --- @class CooldownInfo
+        --- @type CooldownInfo
         local cd = {
             type=type,
             start=nil,
@@ -398,6 +404,30 @@ local function PropsAndMethods(o)
         return nil
     end
 
+    --- @param itemName string The cooldown info
+    --- @return CooldownInfo
+    function o:GetItemCooldownInfo(itemName)
+        if not itemName then return nil end
+        local itemCD = API:GetItemCooldown(itemName)
+
+        --- @type CooldownInfo
+        local cd = {
+            type=type,
+            start=nil,
+            duration=nil,
+            enabled=0,
+            details = {}
+        }
+        if itemCD ~= nil then
+            cd.details = itemCD
+            cd.start = itemCD.start
+            cd.duration = itemCD.duration
+            cd.enabled = itemCD.enabled
+            return cd
+        end
+        return nil
+    end
+
     --- @param cd CooldownInfo The cooldown info
     function o:GetMacroCooldown(cd)
         local spellCD = self:GetMacroSpellCooldown();
@@ -409,33 +439,43 @@ local function PropsAndMethods(o)
             cd.enabled = spellCD.enabled
             cd.icon = spellCD.spell.icon
             return cd
-        else
-            local itemCD = self:GetMacroItemCooldown()
-            if itemCD ~= nil then
-                cd.details = itemCD
-                cd.start = itemCD.start
-                cd.duration = itemCD.duration
-                cd.enabled = itemCD.enabled
-                return cd
-            end
+        end
+        local itemCD = self:GetMacroItemCooldown()
+        if itemCD ~= nil then
+            cd.details = itemCD
+            cd.start = itemCD.start
+            cd.duration = itemCD.duration
+            cd.enabled = itemCD.enabled
+            return cd
         end
 
         return nil;
     end
 
-    --- @return SpellCooldown
+    --- @return MacroSpellCooldown
     function o:GetMacroSpellCooldown()
         local macro = self:GetMacroData();
         if not macro then return nil end
-        local spellId = GetMacroSpell(macro.index)
+
+        -- GetMacroInfo() must be called before GetMacroSpell() to get the updated spell info
+        -- This fixes the macro sequence icon issue
+        local i = macro.index
+        local name, icon = GetMacroInfo(i)
+        local macroInfo = { name = name, icon = icon }
+        local spellId = GetMacroSpell(i)
         if not spellId then return nil end
-        return API:GetSpellCooldown(spellId)
+        --- @type MacroSpellCooldown
+        local macroCooldown = API:GetSpellCooldown(spellId)
+        macroCooldown.macro = macroInfo
+        return macroCooldown
     end
 
     --- @return number The spellID for macro
     function o:GetMacroSpellId()
         local macro = self:GetMacroData();
         if not macro then return nil end
+        local name = GetMacroInfo(macro.index)
+        if not name then return nil end
         return GetMacroSpell(macro.index)
     end
 
@@ -467,20 +507,34 @@ local function PropsAndMethods(o)
         if self:IsInvalidItem(item) then return end
         local itemID = item.id
         local itemInfo = API:GetItemInfo(itemID)
+        self:UpdateItemStateByItemInfo(itemInfo)
+
+        return
+    end
+
+    --- @param itemIDOrName number|string The itemID or itemName
+    function o:UpdateItemStateByItem(itemIDOrName)
+        self:UpdateItemStateByItemInfo(API:GetItemInfo(itemIDOrName))
+    end
+
+    ---@param itemInfo ItemInfo
+    function o:UpdateItemStateByItemInfo(itemInfo)
+        self:ClearAllText()
+        if not itemInfo then return nil end
+
+        local itemID = itemInfo.id
         if itemInfo == nil then return end
         if API:IsToyItem(itemID) then self:SetActionUsable(true); return end
 
         local stackCount = itemInfo.stackCount or 1
         local count = itemInfo.count
-        item.count = count
-        item.stackCount = stackCount
-        if stackCount > 1 then self:SetText(item.count) end
+        if stackCount > 1 then self:SetText(count) end
         if count <= 0 then self:SetActionUsable(false)
         else self:SetActionUsable(self:IsUsableItem(itemID)) end
-        return
     end
 
     function o:UpdateUsable()
+        -- todo next: m6
         local cd = self:GetCooldownInfo()
         if (cd == nil or cd.details == nil or cd.details.spell == nil) then
             if self:IsCompanion() then self:SetActionUsable(true)
@@ -531,6 +585,7 @@ local function PropsAndMethods(o)
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
     function o:UpdateCooldown()
+        -- todo next: m6 cooldown
         local cd = self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end
         -- Instant cast spells have zero duration, skip
@@ -935,6 +990,18 @@ local function PropsAndMethods(o)
     function o:Hide() if InCombatLockdown() then return end; self.w.button:Hide() end
     function o:Show() if InCombatLockdown() then return end; self.w.button:Show() end
 
+    function o:GetIcon()
+        local texture = self.w.frame:GetNormalTexture()
+        if texture then return texture:GetTexture() end
+        return nil
+    end
+
+    ---@param optionalMacroName string Optional. Will pull from btn data if not supplied
+    function o:IsM6Macro(optionalMacroName)
+        if not self.w:IsMacro() then return false end
+        if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
+        return GC:IsM6Macro(self.w:GetMacroData().name)
+    end
 end
 
 PropsAndMethods(L)

@@ -290,24 +290,7 @@ local function RegisterEvents(widget)
     widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombatFrameWidget, widget)
     widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombatFrameWidget, widget)
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
-    --widget:RegisterEvent(E.UNIT_SPELLCAST_START, OnSpellCastStart, widget)
 end
-
------ @param frame _Frame
------ @param event string
---local function OnEvent(frame, event, ...)
---    local BF = O.ButtonFactory
---    p:log('[%s]: %s', event, {...})
---    --- @param frameWidget FrameWidget
---    BF:ApplyForEachFrames(function(frameWidget)
---        p:log('hiding group: %s', frameWidget.index)
---        frameWidget:HideGroup()
---        --C_Timer.After(1, function()
---        --    print('hiding group')
---        --    frameWidget:HideGroup()
---        --end)
---    end)
---end
 
 
 --[[-----------------------------------------------------------------------------
@@ -438,6 +421,13 @@ local function WidgetMethods(widget)
         --- @param btnWidget ButtonUIWidget
         return self:ApplyForEachButtonCondition(
                 function(btnWidget) return btnWidget:IsMatchingMacroOrSpell(matchSpellId) end,
+                applyFunction)
+    end
+
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:ApplyForEachMacro(applyFunction)
+        return self:ApplyForEachButtonCondition(
+                function(btnWidget) return btnWidget:IsMacro() end,
                 applyFunction)
     end
 

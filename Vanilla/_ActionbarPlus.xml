@@ -2,5 +2,6 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="..\Core\ActionbarPlus.lua"/>
+    <Script file="..\Core\ActionbarPlusAPI.lua"/>
 
 </Ui>

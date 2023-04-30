@@ -89,6 +89,8 @@ local Profile_Macro = {
     ["index"] = 41,
     ["name"] = "z#LOL",
     ["icon"] = 132093,
+    -- This macro is used by third-party plugins
+    ["icon2"] = 132093,
     ["body"] = "/lol\n",
 }
 --- @class Profile_MacroText
@@ -279,6 +281,81 @@ local EquipmentSetInfo = {
     numInInventory = 1,
     numLost = 0,
     numIgnored = 0,
+}
+
+--- @class CooldownInfo
+local CooldownInfo = {
+    type=type,
+    start=nil,
+    duration=nil,
+    enabled=0,
+    --- @type SpellCooldown | ItemCooldown | MacroSpellCooldown
+    details = {}
+}
+
+--- @class SpellCooldown_Spell
+local SpellCooldown_Spell = {
+    name = 'spell-name',
+    id = 1,
+    icon = 1234567
+}
+--- @class MacroSpellCooldown_Macro
+local MacroSpellCooldown_Macro = {
+    name = 'macro-name',
+    icon = 123467,
+}
+
+--- @class SpellCooldown
+local SpellCooldown = {
+    --- @type SpellCooldown_Spell
+    spell = {
+        name = 'spell-name',
+        id = 1,
+        icon = 1234567
+    },
+    enabled = true,
+    start = 1.0,
+    duration = 1.0,
+    modRate = 1.0
+}
+--- @class MacroSpellCooldown : SpellCooldown
+local MacroSpellCooldown = {
+    --- @type MacroSpellCooldown_Macro
+    macro = {
+        name = 'macro-name',
+        icon = 123467,
+    }
+}
+
+--[[-----------------------------------------------------------------------------
+Supported Extensions
+-------------------------------------------------------------------------------]]
+--- @class M6SupportDBProfile
+local M6Support_DB_Profile = {
+    ["slots"] = {
+        ["s01"] = 1,
+        ["s02"] = 2,
+    }
+}
+
+--- @class M6Support_DB
+local M6SupportDB = {
+    --- @type M6SupportDBProfile
+    profiles = {},
+    --- @type table<number, table>
+    actions = {},
+}
+--- @class M6Support_MacroHint
+local M6Support_MacroHint = {
+    name = 'm6-name',
+    isActive = true,
+    icon = 123456,
+    spell = 'spell-or-item',
+    itemCount = 1,
+    unknown1 = 0,
+    unknown2 = 0,
+    fn = function()  end,
+    unknown3 = 0,
 }
 
 --[[-----------------------------------------------------------------------------

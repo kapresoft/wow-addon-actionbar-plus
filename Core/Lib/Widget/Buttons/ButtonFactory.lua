@@ -137,7 +137,7 @@ function L:Fire(event, sourceEvent, ...)
     local args = ...
     --- @param frameWidget FrameWidget
     self:ApplyForEachFrames(function(frameWidget)
-        frameWidget:Fire(event, sourceEvent, args)
+        if frameWidget then frameWidget:Fire(event, sourceEvent, args) end
     end)
 end
 

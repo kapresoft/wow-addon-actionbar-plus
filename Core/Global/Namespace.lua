@@ -66,7 +66,12 @@ local function CreateNamespace(...)
     local function Methods(o)
 
         --- @return CursorUtil
-        function o:CreateCursorUtil() return self:K():CreateAndInitFromMixin(o.O.CursorMixin, o.O.API:GetCursorInfo()) end
+        ---@param cursorInfo CursorInfo Optional cursorInfo instance
+        function o:CreateCursorUtil(cursorInfo)
+            local _cursorInfo = cursorInfo or o.O.API:GetCursorInfo()
+            return self:K():CreateAndInitFromMixin(o.O.CursorMixin, _cursorInfo)
+        end
+
         --- @param start number
         --- @param increment number
         --- @return Kapresoft_Incrementer

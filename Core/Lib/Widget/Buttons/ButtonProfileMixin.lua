@@ -153,6 +153,12 @@ local function PropsAndMethods(o)
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
+    --- @return boolean
+    ---@param name string The macro name to check
+    function o:HasMacroName(name)
+        if IsBlankStr(name) or not self:IsMacro() then return false end
+        return name == self:GetMacroData().name
+    end
     --- @return Profile_MacroText
     function o:GetMacroTextData() return self:GetButtonTypeData(W.MACRO_TEXT) end
 

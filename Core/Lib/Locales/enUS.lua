@@ -127,3 +127,9 @@ L['Mouseover::Description']                              = 'Hide the frame mover
 L['Frame Handle Settings']                               = true
 L['Alpha']                                               = true
 L['Alpha::Description']                                  = 'Set the opacity of the frame handle.'
+
+--[[-----------------------------------------------------------------------------
+Needs Translations
+-------------------------------------------------------------------------------]]
+L['Requires ActionbarPlus-M6::Message']                  = "This feature requires ActionbarPlus-M6."
+L['ActionbarPlus-M6 URL']                                = "See https://www.curseforge.com/wow/addons/actionbarplus-m6"

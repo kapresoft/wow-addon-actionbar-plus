@@ -18,9 +18,9 @@
 
 ## Description
 
->ActionbarPlus offers the option to create and customize up to eight supplementary actionbars that can be situated at any location within the game. These floating actionbars can augment the player's gaming experience by offering additional functionality and convenience.
+ActionbarPlus is a versatile floating action bar add-on that enables you to create and customize up to 10 supplementary action bars. With the flexibility to place them anywhere within the game, these floating action bars can enhance your gaming experience by providing additional functionality and convenience. Whether you need quick access to frequently used spells, items, or macros, or simply want to streamline your UI, ActionbarPlus offers a powerful solution that can help you achieve your goals.
 
-### Some features of ActionbarPlus include:
+### Features
 
 - action buttons triggers on KeyDown (not KeyUp)
 - Customizable button size and number of buttons (rows and columns) with a maximum of 800 buttons arranged in a grid of 20 x 40

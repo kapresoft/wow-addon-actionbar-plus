@@ -23,7 +23,14 @@ Local Vars
 -------------------------------------------------------------------------------]]
 -- Use the bare namespace here since this is the very first file to be loaded
 local addon, ns = ...
+
+--- @type fun(o:any, ...) : void
 local pformat = ns.pformat
+
+--- @type Kapresoft_LibUtil
+local K = ns.Kapresoft_LibUtil
+local String = K.Objects.String
+local IsBlank, IsNotBlank, EqualsIgnoreCase = String.IsBlank, String.IsNotBlank, String.EqualsIgnoreCase
 
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
 local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
@@ -241,17 +248,31 @@ local function GlobalConstantProperties(o)
 
     --- @class MessageNames
     local Messages = {
-        OnAddOnInitialized    = newMsg('OnAddOnInitialized'),
-        OnAddOnReady          = newMsg('OnAddOnReady'),
-        OnBagUpdate           = newMsg('OnBagUpdate'),
-        OnDBInitialized       = newMsg('OnDBInitialized'),
-        OnConfigInitialized   = newMsg('OnConfigInitialized'),
-        OnTooltipFrameUpdate  = newMsg('OnTooltipFrameUpdate'),
-        OnButtonPreClick      = newMsg('OnButtonPreClick'),
-        OnButtonPostClick          = newMsg('OnButtonPostClick'),
-        OnButtonClickBattlePet     = newMsg('OnButtonClickBattlePet'),
-        OnButtonClickEquipmentSet  = newMsg('OnButtonClickEquipmentSet'),
+        OnAddOnInitialized           = newMsg('OnAddOnInitialized'),
+        OnAddOnReady                 = newMsg('OnAddOnReady'),
+        OnBagUpdate                  = newMsg('OnBagUpdate'),
+        OnDBInitialized              = newMsg('OnDBInitialized'),
+        OnConfigInitialized          = newMsg('OnConfigInitialized'),
+        OnTooltipFrameUpdate         = newMsg('OnTooltipFrameUpdate'),
+        OnButtonPreClick             = newMsg('OnButtonPreClick'),
+        OnButtonPostClick            = newMsg('OnButtonPostClick'),
+        OnButtonClickBattlePet       = newMsg('OnButtonClickBattlePet'),
+        OnButtonClickEquipmentSet    = newMsg('OnButtonClickEquipmentSet'),
+        OnMacroAttributesSet         = newMsg('OnMacroAttributesSet'),
+        OnUpdateMacroState           = newMsg('OnUpdateMacroState'),
+        OnUpdateItemState            = newMsg('OnUpdateItemState'),
+        OnSpellCastSucceeded         = newMsg('OnSpellCastSucceeded'),
+        MacroAttributeSetter_OnSetIcon     = newMsg('MacroAttributeSetter:OnSetIcon'),
+        MacroAttributeSetter_OnShowTooltip = newMsg('MacroAttributeSetter:OnShowTooltip'),
+        -- External Add-On Integration
+        OnBagUpdateExt               = newMsg('OnBagUpdateExt'),
+        OnButtonPostClickExt         = newMsg('OnButtonPostClickExt'),
+        OnSpellCastStartExt          = newMsg('OnSpellCastStartExt'),
+        OnSpellCastSentExt           = newMsg('OnSpellCastSentExt'),
+        OnSpellCastStopExt           = newMsg('OnSpellCastStopExt'),
+        OnSpellCastFailedExt         = newMsg('OnSpellCastFailedExt'),
         --- Relayed Events
+        PLAYER_ENTERING_WORLD        = newMsg(Events.PLAYER_ENTERING_WORLD),
         EQUIPMENT_SETS_CHANGED       = newMsg(Events.EQUIPMENT_SETS_CHANGED),
         EQUIPMENT_SWAP_FINISHED      = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
         PLAYER_MOUNT_DISPLAY_CHANGED = newMsg(Events.PLAYER_MOUNT_DISPLAY_CHANGED),
@@ -325,6 +346,7 @@ local function GlobalConstantProperties(o)
         PET_ACTION = 'petaction',
         MACRO_TEXT = "macrotext",
         MACRO = "macro",
+        MACRO_SUBTYPE_M6 = "m6",
         DRUID = 'DRUID',
         SHAPESHIFT = 'shapeshift',
         SHADOWFORM = 'shadowform',
@@ -473,11 +495,10 @@ local function GlobalConstantMethods(o)
     ---```
     --- @return string, string, string, string, string, string, string
     function o:GetAddonInfo()
-        local addonName = o.C.ADDON_NAME
         local versionText, lastUpdate
         --@non-debug@
-        versionText = GetAddOnMetadata(addonName, 'Version')
-        lastUpdate = GetAddOnMetadata(ns.name, 'X-Github-Project-Last-Changed-Date')
+        versionText = GetAddOnMetadata(addon, 'Version')
+        lastUpdate = GetAddOnMetadata(addon, 'X-Github-Project-Last-Changed-Date')
         --@end-non-debug@
         --@debug@
         versionText = '1.0.x.dev'
@@ -487,9 +508,11 @@ local function GlobalConstantMethods(o)
         local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
         local wowInterfaceVersion = select(4, GetBuildInfo())
 
-        return versionText, GetAddOnMetadata(addonName, 'X-CurseForge'), GetAddOnMetadata(addonName, 'X-Github-Issues'),
-                    GetAddOnMetadata(addonName, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
+        return versionText, GetAddOnMetadata(addon, 'X-CurseForge'), GetAddOnMetadata(addon, 'X-Github-Issues'),
+                    GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
     end
+
+    function o:IsActionbarPlusM6Enabled() return 2 == GetAddOnEnableState(nil, 'ActionbarPlus-M6') end
 
     --- @return string
     function o:GetAddonInfoFormatted()
@@ -519,6 +542,15 @@ local function GlobalConstantMethods(o)
     --- @param btnIndex number
     function o:ButtonName(frameIndex, btnIndex)
         return sformat(self.C.BUTTON_NAME_FORMAT, tostring(frameIndex), tostring(btnIndex))
+    end
+
+    --- todo next: merge with IsM6Macro
+    --- @param macroName string The macro name i.e '_M6+s01'
+    --- @return boolean Returns true if the macro name has the format '_M6+<slotID>', i.e. '_M6+s01'
+    function o:IsM6Macro(macroName)
+        if IsBlank(macroName) then return nil end
+        local _, slotID = macroName:gmatch("(%w+)%+(%w+)")()
+        return IsNotBlank(slotID)
     end
 end
 
