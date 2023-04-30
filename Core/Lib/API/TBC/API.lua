@@ -3,7 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
-local GetItemInfo, GetItemCooldown, GetItemCount = GetItemInfo, GetItemCooldown, GetItemCount
+local GetItemCooldown, GetItemCount =  GetItemCooldown, GetItemCount
 local C_ToyBox, C_Container = C_ToyBox, C_Container
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
@@ -174,12 +174,15 @@ function S:GetSpellCooldownDetails(spellID, optionalSpell)
 end
 
 --- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
----@return SpellCooldown
-function S:GetSpellCooldown(spellID, optionalSpell)
-    if not spellID then return nil end
-    local start, duration, enabled, modRate = GetSpellCooldown(spellID);
-    local name, _, icon, _, _, _, _ = GetSpellInfo(spellID)
-    ---@class SpellCooldown
+--- @param spellNameOrID number|string Spell ID or Name. When passing a name requires the spell to be in your Spellbook.
+--- @param optionalSpell Profile_Spell
+--- @return SpellCooldown
+function S:GetSpellCooldown(spellNameOrID, optionalSpell)
+    if not spellNameOrID then return nil end
+    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
+    local name, _, icon, _, _, _, spellID = GetSpellInfo(spellNameOrID)
+
+    ---@type SpellCooldown
     local cd = {
         spell = { name = name, id = spellID, icon = icon },
         start = start, duration = duration, enabled = enabled, modRate = modRate }
@@ -283,10 +286,35 @@ function S:IsToyItem(itemID)
     return not (_itemID == nil or toyName == nil)
 end
 
+function S:GetItemID(itemName)
+    if String.IsBlank(itemName) then return nil end
+    local link = select(2, GetItemInfo(itemName))
+    if not link then return nil end
+    local itemID = GetItemInfoFromHyperlink(link)
+    return itemID
+end
+
+--- @param itemIDOrName number|string The itemID or itemName
+--- @return number The numeric itemID
+function S:ResolveItemID(itemIDOrName)
+    if type(itemIDOrName) == 'string' then
+        return self:GetItemID(itemIDOrName)
+    elseif type(itemIDOrName) == 'number' then
+        return itemIDOrName
+    end
+    return nil
+end
+
+---@param spellName string
+function S:IsItemSpell(spellName) return spellName and GetItemInfo(spellName) ~= nil end
+
 --- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
 --- See: [GetItemInfoInstant](https://wowpedia.fandom.com/wiki/API_GetItemInfoInstant)
----@return ItemInfo
-function S:GetItemInfo(itemID)
+--- @param itemIDOrName number|string The itemID or itemName
+--- @return ItemInfo
+function S:GetItemInfo(itemIDOrName)
+    local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
+
     local itemName, itemLink,
         itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
         itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
@@ -311,14 +339,17 @@ function S:GetItemSpellInfo(itemIdNameOrLink)
 end
 
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
----@return ItemCooldown
-function S:GetItemCooldown(itemId, optionalItem)
-    if not itemId then return nil end;
+--- @param itemIDOrName number|string The itemID or itemName
+--- @param optionalItem Profile_Item
+--- @return ItemCooldown
+function S:GetItemCooldown(itemIDOrName, optionalItem)
+    local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
+
     if C_Container then GetItemCooldown = C_Container.GetItemCooldown end
-    local start, duration, enabled = GetItemCooldown(itemId)
+    local start, duration, enabled = GetItemCooldown(itemID)
     ---@class ItemCooldown
     local cd = {
-        item = { id = itemId },
+        item = { id = itemID },
         start=start, duration=duration, enabled=enabled
     }
     if optionalItem then

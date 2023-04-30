@@ -16,6 +16,7 @@ local M = {
     LibStub = 'LibStub',
 
     -- Libraries
+    ActionbarPlusAPI = 'ActionbarPlusAPI',
     BaseAPI = 'BaseAPI',
     API = 'API',
     Logger = 'Logger',
@@ -70,6 +71,8 @@ local M = {
     SpellAttributeSetter = 'SpellAttributeSetter',
     SpellDragEventHandler = 'SpellDragEventHandler',
     WidgetMixin = 'WidgetMixin',
+    -- Support Classes
+    M6Support = 'M6Support'
 }
 
 --- @class GlobalObjects
@@ -77,6 +80,8 @@ local GlobalObjectsTemplate = {
     --- @type LocalLibStub
     LibStub = {},
 
+    --- @type ActionbarPlusAPI
+    ActionbarPlusAPI = {},
     --- @type BaseAPI
     BaseAPI = {},
     --- @type API

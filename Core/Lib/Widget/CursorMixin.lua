@@ -4,8 +4,8 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
-local IsBlank = O.String.IsBlank
+local W = GC.WidgetAttributes
+local IsBlank, IsNotBlank = O.String.IsBlank, O.String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -19,6 +19,17 @@ local p = L:GetLogger()
 --
 ----- @type CursorMixin
 --CursorMixin = {},
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- @param cursorInfo CursorInfo
+local function GetMacroSubType(cursorInfo)
+    if cursorInfo.type ~= W.MACRO then return nil end
+    local macroSlot = cursorInfo.info1; if IsBlank(macroSlot) then return end
+    local macroName = GetMacroInfo(macroSlot)
+    if GC:IsM6Macro(macroName) then return W.MACRO_SUBTYPE_M6 end
+    return nil
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -26,7 +37,11 @@ Methods
 --- @param cursorInfo CursorInfo
 function L:Init(cursorInfo)
     self.cursorInfo = cursorInfo
+    if not self.cursorInfo then return end
+    self.cursorInfo.subType = GetMacroSubType(self.cursorInfo)
 end
+function L:IsM6Macro() return self.cursorInfo.subType == W.MACRO_SUBTYPE_M6 end
+
 --- @return boolean
 function L:IsValid()
     if not self.cursorInfo or IsBlank(self.cursorInfo.type) then
@@ -40,6 +55,10 @@ function L:IsValid()
 end
 --- @return string
 function L:GetType() return self.cursorInfo.type end
+
+--- @return string The cursor subType, i.e. 'm6'
+function L:GetSubType() return self.cursorInfo.subType end
+
 --- @return CursorInfo
 function L:GetCursor() return self.cursorInfo end
 

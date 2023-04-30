@@ -114,6 +114,10 @@ local function OnPostClick(btn, key, down)
     local w = btn.widget
     w:SendMessage(GC.M.OnButtonPostClick, w)
 
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) O.ActionbarPlusAPI:UpdateM6Macros(handlerFn) end
+    w:SendMessage(GC.M.OnButtonPostClickExt, ns.M.ButtonUI, CallbackFn)
+
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     RegisterForClicks(w, 'PreClick', down)
@@ -252,6 +256,10 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
+    if widget:IsM6Macro() then
+        -- todo next: M6 Macro
+        -- p:log('OnSpellUpdateUsable[%s](%s): %s', widget:GetName(), GetTime(), widget.config)
+    end
     if not widget.button:IsShown() then return end
     widget:UpdateRangeIndicator()
 

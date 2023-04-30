@@ -83,6 +83,8 @@ Methods
 --- @type string
 local methods = {
     --- @param self ActionbarPlus
+    ['GetLogger'] = function(self) return p end,
+    --- @param self ActionbarPlus
     --- @param isShown boolean
     ['ShowActionbars'] = function(self, isShown)
         WMX:ShowActionbarsDelayed(isShown, 1)

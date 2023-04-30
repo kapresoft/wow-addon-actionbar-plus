@@ -1,7 +1,6 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetMacroInfo = GetMacroInfo
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -9,10 +8,11 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local pformat = ns.pformat
-local O, LibStub = ns:LibPack()
+local O, LibStub, GC = ns.O, ns.LibStub, ns.O.GlobalConstants
+
 
 local Assert, String = O.Assert, O.String
-local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, O.GlobalConstants.WidgetAttributes, O.PickupHandler
+local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, GC.WidgetAttributes, O.PickupHandler
 local s_replace, IsNil = String.replace, Assert.IsNil
 
 --[[-----------------------------------------------------------------------------
@@ -20,11 +20,29 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(ns.M.MacroDragEventHandler)
+local p = L:GetLogger()
+local LL = GC:GetAceLocale()
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 function L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
+
+---@param cursorInfo CursorInfo
+function L:Supports(cursorInfo)
+    local c = ns:CreateCursorUtil(cursorInfo)
+    local isEnabled  = GC:IsActionbarPlusM6Enabled()
+    if isEnabled ~= true then
+        local msg = WARNING_FONT_COLOR:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
+                .. ' ' .. HIGHLIGHT_LIGHT_BLUE:WrapTextInColorCode(LL['ActionbarPlus-M6 URL'])
+        p:log(msg)
+    end
+    if c:IsM6Macro() then
+        p:log(10, 'm6 supported: %s', isEnabled)
+        return isEnabled
+    end
+    return true
+end
 
 ---@param cursorInfo table Structure `{ -- }`
 ---@param btnUI ButtonUI

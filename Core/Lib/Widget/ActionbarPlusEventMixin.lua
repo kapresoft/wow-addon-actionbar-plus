@@ -22,6 +22,8 @@ local CURSOR_ITEM_TYPE = 1
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
+local ABPI = function() return O.ActionbarPlusAPI  end
+
 --- @class EventFrameInterface : _Frame
 local _EventFrame = {
     --- @type EventContext
@@ -143,33 +145,46 @@ local function OnSpellCastStart(f, ...)
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btnWidget) btnWidget:SetHighlightInUse() end)
     end)
+
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+
 end
 
---- Non-Instant Stop-Cast Handler
+--- i.e. Casting a portal and moving triggers this event
 --- @param f EventFrameInterface
 local function OnSpellCastStop(f, ...)
     local spellCastEvent = B:ParseSpellCastEventArgs(...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(50, 'OnSpellCastStop: %s', spellCastEvent)
+    p:log(30, 'OnSpellCastStop: %s', spellCastEvent)
     local w = f.ctx
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btn) btn:ResetHighlight() end)
     end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastStopExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
---- Non-Instant Stop-Cast Handler
+--- i.e. Conjure mana gem when there is already a mana gem in bag
 --- @param f EventFrameInterface
 local function OnSpellCastFailed(f, ...)
     local spellCastEvent = B:ParseSpellCastEventArgs(...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
-    --p:log(50, 'OnSpellCastFailed: %s', spellCastEvent)
+    p:log(30, 'OnSpellCastFailed: %s', spellCastEvent)
     local w = f.ctx
     w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
         --- @param btn ButtonUIWidget
         fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
                 function(btn) btn:SetButtonStateNormal() end)
     end)
+
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+
 end
 
 --- This handles 3-state spells like mage blizzard, hunter flares,
@@ -185,6 +200,14 @@ local function OnSpellCastSent(f, ...)
         fw:ApplyForEachSpellOrMacroButtons(spellCastSentEvent.spellID,
                 function(btn) btn:SetButtonStateNormal() end)
     end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+end
+
+--- @param f EventFrameInterface
+local function OnSpellCastSucceeded(f, ...)
+    L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
 --- @param f EventFrameInterface
@@ -197,9 +220,8 @@ local function OnActionbarEvents(f, event, ...)
         OnSpellCastStop(f, ...)
     elseif E.UNIT_SPELLCAST_SENT == event then
         OnSpellCastSent(f, ...)
-    --elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
-          -- instant cast spells
-    --    OnSpellCastSucceeded(f, ...)
+    elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
+        OnSpellCastSucceeded(f, ...)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
         OnSpellCastFailed(f, ...)
     end
@@ -265,11 +287,18 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnBagEvent(f, event, ...) L:SendMessage(MSG.OnBagUpdate) end
+local function OnBagEvent(f, event, ...)
+
+    L:SendMessage(MSG.OnBagUpdate, ns.M.ActionbarPlusEventMixin)
+
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnBagUpdateExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event)) end
+local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name) end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -307,9 +336,8 @@ function L:RegisterActionbarsEventFrame()
         E.UNIT_SPELLCAST_START,
         E.UNIT_SPELLCAST_STOP,
         E.UNIT_SPELLCAST_SENT,
+        E.UNIT_SPELLCAST_SUCCEEDED,
         E.UNIT_SPELLCAST_FAILED_QUIET,
-        --E.UNIT_SPELLCAST_SUCCEEDED,
-        --E.UNIT_SPELLCAST_FAILED,
     })
 end
 
@@ -369,6 +397,7 @@ function L:RegisterEventToMessageTransmitter()
     f:SetScript(E.OnEvent, OnMessageTransmitter)
     --- @see GlobalConstants#M (Messages)
     RegisterFrameForEvents(f, {
+        E.PLAYER_ENTERING_WORLD,
         E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
         E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
     })
