@@ -7,6 +7,7 @@
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## LoadManagers: AddonLoader
+## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-64xe.tga
 
 ## X-Min-Interface: 90200
 ## X-LoadOn-Always: delayed
