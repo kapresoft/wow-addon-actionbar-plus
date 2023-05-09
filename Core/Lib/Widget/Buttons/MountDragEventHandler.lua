@@ -98,8 +98,10 @@ local function attributeSetterMethods(a)
         local mount = w:GetMountData()
         if w:IsInvalidMount(mount) then return end
 
-        btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
-        btnUI:SetAttribute(WAttr.SPELL, mount.name)
+        if not InCombatLockdown() then
+            btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
+            btnUI:SetAttribute(WAttr.SPELL, mount.name)
+        end
 
         if source ~= 'event' then self:SetActiveIcon(w, mount)
         else self:SetActiveIconDelayed(w, mount) end
