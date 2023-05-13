@@ -23,6 +23,8 @@ local GC = O.GlobalConstants
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
+local MAX_NAME_CHARACTER_COUNT = 3
+
 StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
     text = "Reload UI?", button1 = "Yes", button2 = "No",
     timeout = 0, whileDead = true, hideOnEscape = true,
@@ -95,6 +97,25 @@ function _L:CreateFontString(button)
     return fs
 end
 
+--- ### See: "Interface/FrameXML/ActionButtonTemplate.xml"
+--- ### See: [https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont](https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont)
+--- @param b ButtonUI The button UI
+--- @return _FontString
+function _L:CreateNameTextFontString(b)
+    --- @type _FontString
+    local fs = b:CreateFontString("$parentName", "OVERLAY", 'NumberFontNormalSmallGray')
+    local fontName, fontHeight = fs:GetFont()
+    fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
+    fs:SetPoint("BOTTOM", b,"BOTTOM", 3, 5)
+    function fs:SetEllipsesText(text)
+        if IsBlank(text) then self:SetText('') return end
+        if #text > MAX_NAME_CHARACTER_COUNT then
+            text = string.sub(text, 1, MAX_NAME_CHARACTER_COUNT) .. "..."
+        end
+        self:SetText(text)
+    end
+    return fs
+end
 
 ---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
 --- @see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
