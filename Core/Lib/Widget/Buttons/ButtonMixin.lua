@@ -311,6 +311,10 @@ local function PropsAndMethods(o)
         if String.IsBlank(text) then text = '' end
         self.w.button.text:SetText(text)
     end
+    --- Sets the name of the button (Used by Macros)
+    --- @param text string
+    function o:SetNameText(text) self.w.button.nameText:SetEllipsesText(text) end
+
     function o:SetTextDelayed(text, optionalDelay)
         C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
     end
@@ -348,7 +352,8 @@ local function PropsAndMethods(o)
     end
     function o:ClearAllText()
         self:SetText('')
-        self.button.keybindText:SetText('')
+        self.w.button.keybindText:SetText('')
+        self.w.button.nameText:SetText('')
     end
 
     --- @return CooldownInfo
@@ -519,7 +524,7 @@ local function PropsAndMethods(o)
 
     ---@param itemInfo ItemInfo
     function o:UpdateItemStateByItemInfo(itemInfo)
-        self:ClearAllText()
+        self:SetText('')
         if not itemInfo then return nil end
 
         local itemID = itemInfo.id

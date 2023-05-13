@@ -384,7 +384,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button.text = WMX:CreateFontString(button)
     button.indexText = WMX:CreateIndexTextFontString(button)
     button.keybindText = WMX:CreateKeybindTextFontString(button)
-
+    button.nameText = WMX:CreateNameTextFontString(button)
     RegisterScripts(button)
 
     -- todo next: add ActionButtonUseKeyDown to options UI; add to abp_info
