@@ -298,7 +298,7 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name) end
+local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -400,6 +400,7 @@ function L:RegisterEventToMessageTransmitter()
         E.PLAYER_ENTERING_WORLD,
         E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
         E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
+        E.MODIFIER_STATE_CHANGED,
     })
 end
 function L:RegisterPlayerEnteringWorld()

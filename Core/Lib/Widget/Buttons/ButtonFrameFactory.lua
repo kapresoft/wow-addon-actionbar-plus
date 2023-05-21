@@ -109,6 +109,14 @@ local function OnEquipmentSwapFinished(frameWidget, event)
 end
 
 --- @param frameWidget FrameWidget
+--- @param event string
+local function OnModifierStateChanged(frameWidget, event, sourceName, modifierKey, keyState)
+    frameWidget:ApplyForEachMacro(function(w)
+        C_Timer.NewTicker(0.001, function() w:UpdateMacroState() end, 1)
+    end)
+end
+
+--- @param frameWidget FrameWidget
 local function OnCooldownTextSettingsChanged(frameWidget, event)
     p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
     --- @param bw ButtonUIWidget
@@ -247,13 +255,14 @@ local function OnUpdateItemStates(frameWidget, e, ...)
     frameWidget:ApplyForEachItem(function(bw) bw:UpdateItemState() end)
 end
 
+---@param widget FrameWidget
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
     local AceEventInCallback = ns:AceEvent()
     AceEventInCallback:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
     AceEventInCallback:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
     AceEventInCallback:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
-
+    AceEventInCallback:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
@@ -273,7 +282,6 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnActionbarShowGroup, OnActionbarShowGroup)
     widget:SetCallback(E.OnUpdateItemStates, OnUpdateItemStates)
     widget:SetCallback(E.OnPlayerLeaveCombat, OnPlayerLeaveCombat)
-    widget:SetCallback(E.OnTooltipAnchorChanged, OnTooltipAnchorChanged)
 
     --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
     --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)

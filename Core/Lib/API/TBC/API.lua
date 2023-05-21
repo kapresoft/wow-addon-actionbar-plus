@@ -286,6 +286,13 @@ function S:IsToyItem(itemID)
     return not (_itemID == nil or toyName == nil)
 end
 
+---@param macroName string
+---@return ItemInfo
+function S:GetMacroItem(macroName)
+    local name = GetMacroItem(macroName); if not name then return nil end
+    return self:GetItemInfo(name)
+end
+
 function S:GetItemID(itemName)
     if String.IsBlank(itemName) then return nil end
     local link = select(2, GetItemInfo(itemName))

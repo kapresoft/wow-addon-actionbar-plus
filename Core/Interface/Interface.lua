@@ -304,6 +304,11 @@ local MacroSpellCooldown_Macro = {
     name = 'macro-name',
     icon = 123467,
 }
+--- @class MacroItemCooldown_Macro
+local MacroSpellCooldown_Macro = {
+    name = 'item-name',
+    icon = 123467,
+}
 
 --- @class SpellCooldown
 local SpellCooldown = {
@@ -323,6 +328,14 @@ local MacroSpellCooldown = {
     --- @type MacroSpellCooldown_Macro
     macro = {
         name = 'macro-name',
+        icon = 123467,
+    }
+}
+--- @class MacroItemCooldown : ItemCooldown
+local MacroItemCooldown = {
+    --- @type MacroItemCooldown_Macro
+    item = {
+        name = 'Biscuit',
         icon = 123467,
     }
 }

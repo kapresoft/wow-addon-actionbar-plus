@@ -977,16 +977,26 @@ local function PropsAndMethods(o)
 
     function o:UpdateMacroState()
         local scd = self:GetMacroSpellCooldown()
-        if not (scd and scd.spell) then return end
-        local icon = scd.spell.icon
-        if self:IsStealthSpell() then
-            local spellInfo = self:GetSpellData()
-            icon = API:GetSpellIcon(spellInfo)
-        elseif self:IsShapeshiftSpell() then
-            local spellInfo = self:GetSpellData()
-            icon = API:GetSpellIcon(spellInfo)
+        local icon
+        if scd and scd.spell then
+            if scd.macro then icon = scd.macro.icon end
+            if self:IsStealthSpell() then
+                local spellInfo = self:GetSpellData()
+                icon = API:GetSpellIcon(spellInfo)
+            elseif self:IsShapeshiftSpell() then
+                local spellInfo = self:GetSpellData()
+                icon = API:GetSpellIcon(spellInfo)
+            end
         end
-        self:SetIcon(icon)
+
+        local macroName = self:GetMacroData().name
+        if not GC:IsM6Macro(macroName) then
+            local _, mIcon = GetMacroInfo(macroName)
+            if mIcon then icon = mIcon end
+            -- todo next: update item state: wow-addon-actionbar-plus/issues/282
+        end
+
+        if icon then self:SetIcon(icon) end
         self:UpdateCooldown()
     end
 
