@@ -74,6 +74,8 @@ local function RegisterForClicks(widget, event, down)
     elseif E.ON_ENTER == event then
         --widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         if useKeyDown then
+            --- Note: Macro will not trigger on first click if Drag Key is used in 'mod:<key>' in macros
+            --- Macros should not use mod:<key> on the same drag key
             widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         else
             widget.button:RegisterForClicks('AnyUp')

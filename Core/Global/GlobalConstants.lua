@@ -183,8 +183,6 @@ local function GlobalConstantProperties(o)
         --- @deprecated DEPRECATED: Use the camel cased version
         ON_LEAVE = 'OnLeave',
         --- @deprecated DEPRECATED: Use the camel cased version
-        ON_MODIFIER_STATE_CHANGED = 'OnModifierStateChanged',
-        --- @deprecated DEPRECATED: Use the camel cased version
         ON_RECEIVE_DRAG = 'OnReceiveDrag',
         -- ################################
 
@@ -276,7 +274,8 @@ local function GlobalConstantProperties(o)
         EQUIPMENT_SETS_CHANGED       = newMsg(Events.EQUIPMENT_SETS_CHANGED),
         EQUIPMENT_SWAP_FINISHED      = newMsg(Events.EQUIPMENT_SWAP_FINISHED),
         PLAYER_MOUNT_DISPLAY_CHANGED = newMsg(Events.PLAYER_MOUNT_DISPLAY_CHANGED),
-        ZONE_CHANGED_NEW_AREA = newMsg(Events.ZONE_CHANGED_NEW_AREA),
+        ZONE_CHANGED_NEW_AREA        = newMsg(Events.ZONE_CHANGED_NEW_AREA),
+        MODIFIER_STATE_CHANGED       = newMsg(Events.MODIFIER_STATE_CHANGED),
     }
 
 
