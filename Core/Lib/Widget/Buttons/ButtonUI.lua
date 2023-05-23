@@ -398,7 +398,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown", "AnyUp");
 
-    --- @class Cooldown
+    --- @class CooldownFrame
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
@@ -428,7 +428,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         button = button,
         --- @type ButtonUI
         frame = button,
-        --- @type Cooldown
+        --- @type CooldownFrame
         cooldown = cooldown,
         --- @type table
         cooldownInfo = nil,

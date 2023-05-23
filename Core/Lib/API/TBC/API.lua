@@ -3,7 +3,6 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
-local GetItemCooldown, GetItemCount =  GetItemCooldown, GetItemCount
 local C_ToyBox, C_Container = C_ToyBox, C_Container
 local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
@@ -30,14 +29,8 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class API
-local S = {}
----@type API
-_API = S
-
---TODO: Next Deprecate Global Var _API
-ns:Register(ns.M.API, S)
-
+--- @class API
+local S = {}; ns:Register(ns.M.API, S)
 local p = O.LogFactory(ns.M.API)
 
 --[[-----------------------------------------------------------------------------
@@ -48,12 +41,12 @@ Methods
 --CursorHasMacro() - Returns 1 if the cursor is currently dragging a macro.
 --CursorHasMoney() -
 -- p:log('cursor-has-spell: %s', CursorHasSpell())
----@return CursorInfo
+--- @return CursorInfo
 function S:GetCursorInfo()
     -- actionType string spell, item, macro, mount, etc..
     local actionType, info1, info2, info3 = GetCursorInfo()
     if IsBlank(actionType) then return nil end
-    ---@type CursorInfo
+    --- @type CursorInfo
     local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
 
     local info2Lc = strlower(c.info2 or '')
@@ -66,14 +59,14 @@ function S:GetCursorInfo()
     return c
 end
 
----@see Blizzard_UnitId
+--- @see Blizzard_UnitId
 function S:IsValidActionTarget() return self:HasTarget() and not UnitIsDead(UnitId.target) end
 function S:HasTarget() return GetUnitName(UnitId.target) ~= nil end
 
 ---Note: should call ButtonData:ContainsValidAction() before calling this
----@return boolean|nil true, false or nil if not applicable; nil if spell cannot be applied to unit, i.e. targeting a harmful unit on a friendly player
----@param btnConfig Profile_Button
----@param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
+--- @return boolean|nil true, false or nil if not applicable; nil if spell cannot be applied to unit, i.e. targeting a harmful unit on a friendly player
+--- @param btnConfig Profile_Button
+--- @param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
 function S:IsActionInRange(btnConfig, targetUnit)
     if btnConfig.type == SPELL then
         local inRange = IsSpellInRange(btnConfig.spell.name, targetUnit)
@@ -98,34 +91,19 @@ end
 function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, UnitId.target) ~= nil end
 
 
---- See:
----  * https://wowpedia.fandom.com/wiki/API_GetSpellInfo
----### SpellInfo
----```
---- {
----    id = 1456,
----    name = 'Life Tap',
----    label = 'Life Tap (Rank 3)',
----    rank = 'Rank 3'
----    castTime = 0,
----    icon = 136126,
----    link = '[Life Tap]',
----    maxRange = 0,
----    minRange = 0,
---- }
----```
----@param spellNameOrId string Spell ID or Name
----@return Profile_Spell
+--- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
+--- @return SpellInfo
 function S:GetSpellInfo(spellNameOrId)
     local name, _, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     if name then
         local subTextOrRank = GetSpellSubtext(spellNameOrId)
         local spellLink = GetSpellLink(spellNameOrId)
-        ---@type Profile_Spell
-        local spellInfo = { id = id, name = name, icon = icon,
-                            link=spellLink, castTime = castTime,
-                            minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
-                            isShapeshift = false, isStealth = false, isProwl = false }
+        --- @type SpellInfo
+        local spellInfo = {
+            id = id, name = name, icon = icon,
+            link = spellLink, castTime = castTime,
+            minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
+            isShapeshift = false, isStealth = false, isProwl = false }
         self:ApplySpellInfoAttributes(spellInfo)
         return spellInfo
     end
@@ -151,51 +129,53 @@ function S:ApplySpellInfoAttributes(spellInfo)
     elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
 end
 
----@param macroIndex number
----@return Profile_Spell
+--- @param macroIndex number
+--- @return Profile_Spell
 function S:GetMacroSpellInfo(macroIndex)
     --local macroIndex = btnConfig.macro.index
     local spellId = GetMacroSpell(macroIndex)
     if not spellId then return nil end
     return self:GetSpellInfo(spellId)
 end
----@param spellNameOrId string|number
+--- @param spellNameOrId string|number
 function S:IsPassiveSpell(spellNameOrId) return IsPassiveSpell(spellNameOrId) end
 
----@return SpellCooldownDetails
+--- @return SpellCooldownDetails
 function S:GetSpellCooldownDetails(spellID, optionalSpell)
     local spell = optionalSpell or self:GetSpellInfo(spellID)
     if spell == nil then error("Spell not found: " .. spellID) end
     local start, duration, enabled, modRate = GetSpellCooldown(spellID);
     local cooldown = { start = start, duration = duration, enabled = enabled, modRate = modRate }
-    ---@class SpellCooldownDetails
+    --- @class SpellCooldownDetails
     local details = { spell = spell, cooldown = cooldown }
     return details
 end
 
 --- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
 --- @param spellNameOrID number|string Spell ID or Name. When passing a name requires the spell to be in your Spellbook.
---- @param optionalSpell Profile_Spell
 --- @return SpellCooldown
-function S:GetSpellCooldown(spellNameOrID, optionalSpell)
+function S:GetSpellCooldown(spellNameOrID)
     if not spellNameOrID then return nil end
-    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
-    local name, _, icon, _, _, _, spellID = GetSpellInfo(spellNameOrID)
+    local spell = self:GetSpellInfo(spellNameOrID)
+    if not spell then return nil end
 
-    ---@type SpellCooldown
+    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
+
+    --- @type SpellCooldown
     local cd = {
-        spell = { name = name, id = spellID, icon = icon },
-        start = start, duration = duration, enabled = enabled, modRate = modRate }
-    if optionalSpell then
-        cd.spell.details = optionalSpell
-    end
+        spell = { name = spell.name, id = spell.id, icon = spell.icon },
+        start = start,
+        duration = duration,
+        enabled = enabled,
+        modRate = modRate,
+    }
     return cd
 end
 ---Example:
----@param optionalUnit string
----@see GlobalConstants#UnitId
----@see Blizzard_UnitId
----@return string One of DRUID, ROGUE, PRIEST, etc...
+--- @param optionalUnit string
+--- @see GlobalConstants#UnitId
+--- @see Blizzard_UnitId
+--- @return string One of DRUID, ROGUE, PRIEST, etc...
 function S:GetUnitClass(optionalUnit)
     optionalUnit = optionalUnit or UnitId.player
     return select(2, UnitClass(optionalUnit))
@@ -212,7 +192,7 @@ function S:IsPlayerClassAnyOf(...)
     return IsAnyOf(unitClass, ...)
 end
 
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:IsShapeShiftActive(spellInfo)
     if not spellInfo then return false end
     if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
@@ -222,22 +202,22 @@ function S:IsShapeShiftActive(spellInfo)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:IsShapeshiftOrStealthSpell(spellInfo)
     return self:IsShapeshiftSpell(spellInfo)
             or self:IsStealthSpell(spellInfo.name)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:IsShapeshiftSpell(spellInfo) return true == spellInfo.isShapeshift end
 
----@param spellName string
+--- @param spellName string
 function S:IsStealthSpell(spellName)
     return IsAnyOf(spellName, WAttr.PROWL, WAttr.STEALTH)
 end
 
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:GetSpellIcon(spellInfo)
     if not spellInfo then return nil end
 
@@ -256,7 +236,7 @@ function S:GetSpellIcon(spellInfo)
     return spellInfo.icon
 end
 
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:GetStealthIcon(spellInfo)
     if self:IsStealthSpell(spellInfo.name) and IsStealthed() then
         return GC.Textures.STEALTHED_ICON
@@ -264,13 +244,13 @@ function S:GetStealthIcon(spellInfo)
     return spellInfo.icon
 end
 
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:GetShapeshiftIcon(spellInfo)
     if self:IsShapeShiftActive(spellInfo) then return GC.Textures.DRUID_FORM_ACTIVE_ICON end
     return spellInfo.icon
 end
 
----@param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell
 function S:GetSpellAttributeValue(spellInfo)
     local spellAttrValue = spellInfo.id
     if self:IsShapeshiftOrStealthSpell(spellInfo) then
@@ -279,15 +259,15 @@ function S:GetSpellAttributeValue(spellInfo)
     return spellAttrValue
 end
 
----@param itemID number
+--- @param itemID number
 function S:IsToyItem(itemID)
     if not C_ToyBox then return false end
     local _itemID, toyName, icon, isFavorite, hasFanfare, quality = C_ToyBox.GetToyInfo(itemID)
     return not (_itemID == nil or toyName == nil)
 end
 
----@param macroName string
----@return ItemInfo
+--- @param macroName string
+--- @return ItemInfo
 function S:GetMacroItem(macroName)
     local name = GetMacroItem(macroName); if not name then return nil end
     return self:GetItemInfo(name)
@@ -312,24 +292,25 @@ function S:ResolveItemID(itemIDOrName)
     return nil
 end
 
----@param spellName string
+--- @param spellName string
 function S:IsItemSpell(spellName) return spellName and GetItemInfo(spellName) ~= nil end
 
 --- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
 --- See: [GetItemInfoInstant](https://wowpedia.fandom.com/wiki/API_GetItemInfoInstant)
---- @param itemIDOrName number|string The itemID or itemName
+--- @param item ItemID_Link_Or_Name
 --- @return ItemInfo
-function S:GetItemInfo(itemIDOrName)
-    local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
+function S:GetItemInfo(item)
+    local itemID = self:ResolveItemID(item); if not itemID then return nil end
 
     local itemName, itemLink,
         itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
         itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
         expacID, setID, isCraftingReagent = GetItemInfo(itemID)
 
+    --- count includes charges
     local count = GetItemCount(itemID, false, true, true) or 0
 
-    ---@class ItemInfo
+    --- @type ItemInfo
     local itemInfo = { id = itemID, name = itemName, link = itemLink, icon = itemTexture,
                        quality = itemQuality, level = itemLevel, minLevel = itemMinLevel,
                        type = itemType, subType = itemSubType, stackCount = itemStackCount,
@@ -339,7 +320,7 @@ function S:GetItemInfo(itemIDOrName)
     return itemInfo
 end
 
----@return string, number
+--- @return string, number
 function S:GetItemSpellInfo(itemIdNameOrLink)
    local spellName, spellID = GetItemSpell(itemIdNameOrLink)
    return spellName, spellID
@@ -347,28 +328,31 @@ end
 
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
 --- @param itemIDOrName number|string The itemID or itemName
---- @param optionalItem Profile_Item
 --- @return ItemCooldown
-function S:GetItemCooldown(itemIDOrName, optionalItem)
+function S:GetItemCooldown(itemIDOrName)
     local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
 
     if C_Container then GetItemCooldown = C_Container.GetItemCooldown end
     local start, duration, enabled = GetItemCooldown(itemID)
-    ---@class ItemCooldown
+    local item = self:GetItemInfo(itemID)
+    if not item then return nil end
+
+    --- @type ItemCooldown
     local cd = {
-        item = { id = itemID },
-        start=start, duration=duration, enabled=enabled
+        item = { id = itemID, name = item.name, icon=item.icon },
+        start=start, duration=duration, enabled=enabled,
+        details = item
     }
-    if optionalItem then
-        cd.item.details = optionalItem
-        cd.item.name = optionalItem.name
-    end
+
     return cd
 end
 
----@return SpellCooldownDetails
+--- #### Alias for #GetSpellCooldownDetails(spellID)
+--- @return SpellCooldownDetails
 function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
----@return SpellCooldown
-function S:GSC(spellID, optionalSpellName) return S:GetSpellCooldown(spellID, optionalSpellName) end
----@return ItemCooldown
-function S:GIC(itemId, optionalItem) return S:GetItemCooldown(itemId, optionalItem) end
+--- #### Alias for #GetSpellCooldown(spellID)
+--- @return SpellCooldown
+function S:GSC(spellID) return S:GetSpellCooldown(spellID) end
+--- #### Alias for #GetItemCooldown(itemId)
+--- @return ItemCooldown
+function S:GIC(itemID) return S:GetItemCooldown(itemID) end

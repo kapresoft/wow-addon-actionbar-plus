@@ -1,11 +1,4 @@
 --[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local GetMacroItem, GetItemInfoInstant = GetMacroSpell, GetMacroItem, GetItemInfoInstant
-local IsUsableSpell, IsUsableItem, GetUnitName, C_Timer = IsUsableSpell, IsUsableItem, GetUnitName, C_Timer
-local IsStealthed = IsStealthed
-
---[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
 local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
@@ -381,16 +374,17 @@ local function PropsAndMethods(o)
     --- @return SpellCooldown
     function o:GetSpellCooldown(cd)
         local spell = self:GetSpellData()
-        if self:IsInvalidSpell(spell) then return end
-        local spellCD = API:GetSpellCooldown(spell.id, spell)
-        if spellCD ~= nil then
-            cd.details = spellCD
-            cd.start = spellCD.start
-            cd.duration = spellCD.duration
-            cd.enabled = spellCD.enabled
-            return cd
-        end
-        return nil
+        if self:IsInvalidSpell(spell) then return nil end
+
+        local spellCD = API:GetSpellCooldown(spell.id)
+        if not spellCD then return nil end
+
+        cd.details = spellCD
+        cd.start = spellCD.start
+        cd.duration = spellCD.duration
+        cd.enabled = spellCD.enabled
+
+        return cd
     end
 
     --- @param cd CooldownInfo The cooldown info
@@ -398,7 +392,7 @@ local function PropsAndMethods(o)
     function o:GetItemCooldown(cd)
         local item = self:GetItemData()
         if self:IsInvalidItem(item) then return nil end
-        local itemCD = API:GetItemCooldown(item.id, item)
+        local itemCD = API:GIC(item.id)
         if itemCD ~= nil then
             cd.details = itemCD
             cd.start = itemCD.start
@@ -413,7 +407,7 @@ local function PropsAndMethods(o)
     --- @return CooldownInfo
     function o:GetItemCooldownInfo(itemName)
         if not itemName then return nil end
-        local itemCD = API:GetItemCooldown(itemName)
+        local itemCD = API:GIC(itemName)
 
         --- @type CooldownInfo
         local cd = {
@@ -436,8 +430,7 @@ local function PropsAndMethods(o)
     --- @param cd CooldownInfo The cooldown info
     function o:GetMacroCooldown(cd)
         local spellCD = self:GetMacroSpellCooldown();
-
-        if spellCD ~= nil then
+        if spellCD and spellCD.spell then
             cd.details = spellCD
             cd.start = spellCD.start
             cd.duration = spellCD.duration
@@ -445,8 +438,9 @@ local function PropsAndMethods(o)
             cd.icon = spellCD.spell.icon
             return cd
         end
+
         local itemCD = self:GetMacroItemCooldown()
-        if itemCD ~= nil then
+        if itemCD then
             cd.details = itemCD
             cd.start = itemCD.start
             cd.duration = itemCD.duration
@@ -457,7 +451,7 @@ local function PropsAndMethods(o)
         return nil;
     end
 
-    --- @return MacroSpellCooldown
+    --- @return SpellCooldown
     function o:GetMacroSpellCooldown()
         local macro = self:GetMacroData();
         if not macro then return nil end
@@ -465,14 +459,12 @@ local function PropsAndMethods(o)
         -- GetMacroInfo() must be called before GetMacroSpell() to get the updated spell info
         -- This fixes the macro sequence icon issue
         local i = macro.index
-        local name, icon = GetMacroInfo(i)
-        local macroInfo = { name = name, icon = icon }
-        local spellId = GetMacroSpell(i)
-        if not spellId then return nil end
-        --- @type MacroSpellCooldown
-        local macroCooldown = API:GetSpellCooldown(spellId)
-        macroCooldown.macro = macroInfo
-        return macroCooldown
+        local _, icon = GetMacroInfo(i)
+        local spellID = GetMacroSpell(i); if not spellID then return nil end
+        local spellCD = API:GetSpellCooldown(spellID); if not spellCD then return nil end
+
+        spellCD.spell.icon = icon
+        return spellCD
     end
 
     --- @return number The spellID for macro
@@ -492,8 +484,15 @@ local function PropsAndMethods(o)
         local itemName = GetMacroItem(macro.index)
         if not itemName then return nil end
 
-        local itemID = GetItemInfoInstant(itemName)
-        return API:GetItemCooldown(itemID)
+        local itemCD = API:GetItemCooldown(itemName); if not itemCD then return nil end
+        -- GetMacroInfo has the updated icon
+        local _, icon = GetMacroInfo(macro.index)
+        itemCD.item = {
+            id = itemCD.item.id,
+            name = itemName,
+            icon = icon
+        }
+        return itemCD
     end
 
     function o:ResetWidgetAttributes()
@@ -506,6 +505,16 @@ local function PropsAndMethods(o)
         end
     end
 
+    --- @return boolean true if btn type is item or macro
+    function o:IsItemOrMacro()
+        return not self:IsEmpty() and (self:IsItem() or self:IsMacro())
+    end
+
+    function o:UpdateItemOrMacroState()
+        if self:IsItem() then self:UpdateItemState(); return end
+        self:UpdateMacroState()
+    end
+
     function o:UpdateItemState()
         self:ClearAllText()
         local item = self.w:GetItemData()
@@ -513,7 +522,7 @@ local function PropsAndMethods(o)
         local itemID = item.id
         local itemInfo = API:GetItemInfo(itemID)
         self:UpdateItemStateByItemInfo(itemInfo)
-
+        self:SetActionUsable(self:IsUsableItem(itemID))
         return
     end
 
@@ -533,34 +542,41 @@ local function PropsAndMethods(o)
 
         local stackCount = itemInfo.stackCount or 1
         local count = itemInfo.count
-        if stackCount > 1 then self:SetText(count) end
-        if count <= 0 then self:SetActionUsable(false)
-        else self:SetActionUsable(self:IsUsableItem(itemID)) end
+        -- health stones, mana gems/emeralds
+        local chargeCount = GetItemCount(itemInfo.name, false, true, false)
+        if chargeCount > 1 then
+            stackCount = chargeCount
+            count = chargeCount
+        end
+        if stackCount > 1 and count > 0 then self:SetText(count) end
+        if count <= 0 then
+            self:SetText('')
+            self:SetActionUsable(false)
+        end
     end
 
     function o:UpdateUsable()
-        -- todo next: m6
         local cd = self:GetCooldownInfo()
-        if (cd == nil or cd.details == nil or cd.details.spell == nil) then
+        if (cd == nil or cd.details == nil) then
             if self:IsCompanion() then self:SetActionUsable(true)
             elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
             return
         end
-
         local c = self.w.config
-        local isUsableSpell = true
+        local isUsable = true
         if c.type == SPELL then
-            isUsableSpell = self:IsUsableSpell(cd)
+            isUsable = self:IsUsableSpell(cd)
+        elseif c.type == ITEM then
+            isUsable = self:IsUsableItem(cd)
         elseif c.type == MACRO then
-            isUsableSpell = self:IsUsableMacro(cd)
-            self:UpdateMacroState()
+            isUsable = self:IsUsableMacro(cd)
         end
-        self:SetActionUsable(isUsableSpell)
+        self:SetActionUsable(isUsable)
     end
 
     function o:UpdateState()
         self:UpdateCooldown()
-        self:UpdateItemState()
+        if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end
         self:UpdateUsable()
         self:UpdateRangeIndicator()
         self:SetHighlightDefault()
@@ -589,9 +605,9 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
-    function o:UpdateCooldown()
-        -- todo next: m6 cooldown
-        local cd = self:GetCooldownInfo()
+    ---@param optionalCooldownInfo CooldownInfo
+    function o:UpdateCooldown(optionalCooldownInfo)
+        local cd = optionalCooldownInfo or self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end
         -- Instant cast spells have zero duration, skip
         if (not cd.duration) or cd.duration <= 0 then
@@ -906,6 +922,7 @@ local function PropsAndMethods(o)
         self:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
     end
 
+    --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
         local normalTexture = self.w.button:GetNormalTexture()
         if not normalTexture then return end
@@ -927,19 +944,38 @@ local function PropsAndMethods(o)
         return IsUsableSpell(spellID)
     end
 
+    function o:IsUsableToy(itemID)
+        local _, spellID = API:GetItemSpellInfo(itemID)
+        if not spellID then return false end
+        return IsUsableSpell(spellID)
+    end
+
+    ---@param itemID itemID
+    function o:IsUsableItemID(itemID)
+        if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
+        return IsUsableItem(itemID)
+    end
+
     --- @param cdOrItemID CooldownInfo|number
     function o:IsUsableItem(cdOrItemID)
-        if 'number' == type(cdOrItemID) then return IsUsableItem(cdOrItemID) end
+        if 'number' == type(cdOrItemID) then return self:IsUsableItemID(cdOrItemID) end
         local itemID = cdOrItemID.details.item.id
         if IsBlank(itemID) then return true end
+        if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
         return IsUsableItem(itemID)
     end
 
     --- @param cd CooldownInfo
     function o:IsUsableMacro(cd)
-        local spellID = cd.details.spell.id
-        if IsBlank(spellID) then return true end
-        return IsUsableSpell(spellID)
+        if not (cd or cd.details) then return false end
+        if cd.details.spell then
+            local spellID = cd.details.spell.id
+            if IsBlank(spellID) then return true end
+            return IsUsableSpell(spellID)
+        elseif cd.details.item then
+            return IsUsableItem(cd.details.item.id)
+        end
+        return false
     end
 
     --- @param icon string Blizzard Icon
@@ -976,10 +1012,13 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateMacroState()
+        --- @type SpellCooldown
         local scd = self:GetMacroSpellCooldown()
-        local icon
         if scd and scd.spell then
-            if scd.macro then icon = scd.macro.icon end
+            -- clear the text since item counts doesn't apply for spells
+            self:SetText('')
+            local icon
+            icon = scd.spell.icon
             if self:IsStealthSpell() then
                 local spellInfo = self:GetSpellData()
                 icon = API:GetSpellIcon(spellInfo)
@@ -987,17 +1026,23 @@ local function PropsAndMethods(o)
                 local spellInfo = self:GetSpellData()
                 icon = API:GetSpellIcon(spellInfo)
             end
+            if icon then self:SetIcon(icon) end
+            self:UpdateCooldown(scd)
+            return
         end
 
-        local macroName = self:GetMacroData().name
-        if not GC:IsM6Macro(macroName) then
-            local _, mIcon = GetMacroInfo(macroName)
-            if mIcon then icon = mIcon end
-            -- todo next: update item state: wow-addon-actionbar-plus/issues/282
+        local icd = self:GetMacroItemCooldown()
+        if icd and icd.item then
+            local item = icd.item
+            local icon = item.icon
+            self:SetNameText(self:GetMacroName())
+            self:UpdateItemStateByItem(item.name)
+            if icon then self:SetIcon(icon) end
+            self:UpdateCooldown(icd)
+            return
         end
 
-        if icon then self:SetIcon(icon) end
-        self:UpdateCooldown()
+        -- todo next: UpdateCooldown() is being called twice when called via self:UpdateState()
     end
 
     ---@param state boolean Set to true to enable mouse

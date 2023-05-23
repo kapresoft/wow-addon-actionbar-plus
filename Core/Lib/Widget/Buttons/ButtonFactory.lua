@@ -165,6 +165,9 @@ function L:ApplyForEachVisibleFrames(applyFunction)
         if fw and fw:IsShownInConfig() then applyFunction(fw) end
     end
 end
+--- Alias for #ApplyForEachVisibleFrames(applyFunction)
+--- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
+function L:fevf(applyFunction) self:ApplyForEachVisibleFrames(applyFunction) end
 
 function L:UpdateKeybindText()
     local frames = P:GetAllFrameNames()
@@ -246,15 +249,15 @@ end
 --[[-----------------------------------------------------------------------------
 Event Handlers
 -------------------------------------------------------------------------------]]
+--- Update Items and Macros referencing items
 local function OnBagUpdate()
     L:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachButtonCondition(
-                function(bw) return (not bw:IsEmpty()) and bw:IsItem() end,
+                function(bw) return bw:IsItemOrMacro() end,
                 function(bw)
                     local success, itemInfo = safecall(function() return bw:GetItemData() end)
                     if not (success and itemInfo) then return end
-                    p:log(50, '(%s)::Item: %s', GetTime(), itemInfo.name)
-                    bw:UpdateItemState()
+                    bw:UpdateItemOrMacroState()
                 end)
     end)
 end

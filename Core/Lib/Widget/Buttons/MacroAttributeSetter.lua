@@ -51,6 +51,7 @@ function S:SetAttributes(btnUI)
         self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, ns.name, function() return w, macroInfo.name end)
     end
 
+    C_Timer.NewTicker(0.01, function() w:UpdateMacroState() end, 2)
     self:OnAfterSetAttributes(btnUI)
 end
 

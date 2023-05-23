@@ -285,11 +285,11 @@ local EquipmentSetInfo = {
 
 --- @class CooldownInfo
 local CooldownInfo = {
-    type=type,
+    type='spell',
     start=nil,
     duration=nil,
     enabled=0,
-    --- @type SpellCooldown | ItemCooldown | MacroSpellCooldown
+    --- @type SpellCooldown | ItemCooldown
     details = {}
 }
 
@@ -299,45 +299,27 @@ local SpellCooldown_Spell = {
     id = 1,
     icon = 1234567
 }
---- @class MacroSpellCooldown_Macro
-local MacroSpellCooldown_Macro = {
-    name = 'macro-name',
-    icon = 123467,
-}
---- @class MacroItemCooldown_Macro
-local MacroSpellCooldown_Macro = {
-    name = 'item-name',
-    icon = 123467,
-}
 
---- @class SpellCooldown
+--- @class SpellCooldown : Cooldown
 local SpellCooldown = {
     --- @type SpellCooldown_Spell
     spell = {
         name = 'spell-name',
         id = 1,
+        --- @type number
         icon = 1234567
-    },
-    enabled = true,
-    start = 1.0,
-    duration = 1.0,
-    modRate = 1.0
-}
---- @class MacroSpellCooldown : SpellCooldown
-local MacroSpellCooldown = {
-    --- @type MacroSpellCooldown_Macro
-    macro = {
-        name = 'macro-name',
-        icon = 123467,
     }
 }
---- @class MacroItemCooldown : ItemCooldown
-local MacroItemCooldown = {
-    --- @type MacroItemCooldown_Macro
+
+--- @class ItemCooldown : Cooldown
+local ItemCooldown = {
     item = {
-        name = 'Biscuit',
-        icon = 123467,
-    }
+        id = 1,
+        name='Water',
+        icon=1234567
+    },
+    --- @type ItemInfo
+    details = {}
 }
 
 --[[-----------------------------------------------------------------------------

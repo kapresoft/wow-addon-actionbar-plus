@@ -112,7 +112,10 @@ end
 --- @param event string
 local function OnModifierStateChanged(frameWidget, event, sourceName, modifierKey, keyState)
     frameWidget:ApplyForEachMacro(function(w)
-        C_Timer.NewTicker(0.001, function() w:UpdateMacroState() end, 1)
+        C_Timer.NewTicker(0.01, function()
+            w:UpdateMacroState()
+            w:UpdateUsable()
+        end, 3)
     end)
 end
 
@@ -426,17 +429,20 @@ local function WidgetMethods(widget)
     --- @param matchSpellId number
     --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
-        --- @param btnWidget ButtonUIWidget
-        return self:ApplyForEachButtonCondition(
-                function(btnWidget) return btnWidget:IsMatchingMacroOrSpell(matchSpellId) end,
-                applyFunction)
+        self:fevb(function(btnWidget)
+            return btnWidget:IsMatchingMacroOrSpell(matchSpellId)
+        end, applyFunction)
+    end
+    --- Alias for #ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
+    --- @param matchSpellId number
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:fesmb(matchSpellId, applyFunction)
+        self:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
     end
 
     --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachMacro(applyFunction)
-        return self:ApplyForEachButtonCondition(
-                function(btnWidget) return btnWidget:IsMacro() end,
-                applyFunction)
+        self:fevb(function(btnWidget) return btnWidget:IsMacro() end, applyFunction)
     end
 
     --- Apply for each button with a filter
@@ -450,6 +456,11 @@ local function WidgetMethods(widget)
             if true == predicateFn(btn.widget) then applyFn(btn.widget) end
         end
     end
+    --- Alias for #ApplyForEachButtonCondition(predicateFn, applyFn)
+    --- @param predicateFn ButtonPredicateFunction | "function(btnWidget) return true end"
+    --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:fevb(predicateFn, applyFn) self:ApplyForEachButtonCondition(predicateFn, applyFn) end
+
 
     function widget:SetGroupState(isShown)
         if isShown == true then
