@@ -140,10 +140,9 @@ local function OnSpellCastStart(f, ...)
     --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
     local w = f.ctx
     --- @param fw FrameWidget
-    w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        --- @param btnWidget ButtonUIWidget
-        fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
-                function(btnWidget) btnWidget:SetHighlightInUse() end)
+    w.buttonFactory:fevf(function(fw)
+        fw:fesmb(spellCastEvent.spellID, function(btnWidget)
+            btnWidget:SetHighlightInUse() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
@@ -159,9 +158,9 @@ local function OnSpellCastStop(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     p:log(30, 'OnSpellCastStop: %s', spellCastEvent)
     local w = f.ctx
-    w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
-                function(btn) btn:ResetHighlight() end)
+    w.buttonFactory:fevf(function(fw)
+        fw:fesmb(spellCastEvent.spellID, function(btn)
+            btn:ResetHighlight() end)
     end)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
@@ -175,10 +174,9 @@ local function OnSpellCastFailed(f, ...)
     if UnitId.player ~= spellCastEvent.unitTarget then return end
     p:log(30, 'OnSpellCastFailed: %s', spellCastEvent)
     local w = f.ctx
-    w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        --- @param btn ButtonUIWidget
-        fw:ApplyForEachSpellOrMacroButtons(spellCastEvent.spellID,
-                function(btn) btn:SetButtonStateNormal() end)
+    w.buttonFactory:fevf(function(fw)
+        fw:fesmb(spellCastEvent.spellID, function(btn)
+            btn:SetButtonStateNormal() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
@@ -195,10 +193,9 @@ local function OnSpellCastSent(f, ...)
     if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
     local w = f.ctx
     --- @param fw FrameWidget
-    w.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        --- @param btn ButtonUIWidget
-        fw:ApplyForEachSpellOrMacroButtons(spellCastSentEvent.spellID,
-                function(btn) btn:SetButtonStateNormal() end)
+    w.buttonFactory:fevf(function(fw)
+        fw:fesmb(spellCastSentEvent.spellID, function(btn)
+            btn:SetButtonStateNormal() end)
     end)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
@@ -207,6 +204,14 @@ end
 
 --- @param f EventFrameInterface
 local function OnSpellCastSucceeded(f, ...)
+    local bf = f.ctx.buttonFactory
+    bf:fevf(function(fw)
+        fw:fevb(function(bw) return bw:IsItemOrMacro() end,
+                function(bw)
+                    C_Timer.NewTicker(0.5, function()
+                        bw:UpdateItemOrMacroState() end, 2)
+                end)
+    end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
@@ -230,9 +235,9 @@ end
 --- @param eventWidget EventContext
 local function OnStealth(eventWidget)
     --- @param fw FrameWidget
-    eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+    eventWidget.buttonFactory:fevf(function(fw)
         --- @param bw ButtonUIWidget
-        fw:ApplyForEachButtonCondition(
+        fw:fevb(
                 function(bw) return bw:IsStealthSpell() end,
                 function(bw)
                     local icon = API:GetSpellIcon(bw:GetSpellData())
@@ -244,10 +249,9 @@ end
 --- @param eventWidget EventContext
 local function OnShapeShift(eventWidget)
     --- @param fw FrameWidget
-    eventWidget.buttonFactory:ApplyForEachVisibleFrames(function(fw)
+    eventWidget.buttonFactory:fevf(function(fw)
         --- @param bw ButtonUIWidget
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsShapeshiftSpell() end,
+        fw:fevb(function(bw) return bw:IsShapeshiftSpell() end,
                 function(bw)
                     local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
@@ -257,9 +261,8 @@ end
 
 --- @param eventContext EventContext
 local function OnStealthIconUpdate(eventContext)
-    eventContext.buttonFactory:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsStealthSpell() end,
+    eventContext.buttonFactory:fevf(function(fw)
+        fw:fevb(function(bw) return bw:IsStealthSpell() end,
                 function(bw)
                     local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
