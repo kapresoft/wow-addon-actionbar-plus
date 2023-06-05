@@ -34,6 +34,18 @@ local Mapping = {
                     spell = { id = 30455, name='Ice Lance' }
                 }
             }
+        },
+        ['WARLOCK'] = {
+            [2] = {
+                [264173] = {
+                    aura = { spell = { id = 264173, name ='Demonic Core'} },
+                    spell = { id = 264178, name = 'Demonbolt'},
+                },
+                [205146] = {
+                    aura = { spell = { id = 205146, name ='Demonic Calling'} },
+                    spell = { id = 104316, name ='Call Dreadstalkers'},
+                }
+            }
         }
     },
     --- @type PlayerAuraUnitMap
