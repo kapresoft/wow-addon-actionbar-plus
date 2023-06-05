@@ -29,9 +29,8 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, LibStub = ns:LibPack()
-local pformat = ns.pformat
 
-local Assert, Table, P = O.Assert, O.Table, O.Profile
+local Assert, Table, P, pformat = O.Assert, O.Table, O.Profile, ns.pformat
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 local GC = O.GlobalConstants
@@ -263,9 +262,14 @@ local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
     local AceEventInCallback = ns:AceEvent()
     AceEventInCallback:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
-    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
-    AceEventInCallback:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
+    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(msg) OnEquipmentSetsChanged(widget, msg) end)
+    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(msg) OnEquipmentSwapFinished(widget, msg) end)
+    AceEventInCallback:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(msg, ...) OnModifierStateChanged(widget, msg, ...) end)
+    AceEventInCallback:RegisterMessage(M.OnPlayerAurasAdded, function(msg, playerAuras)
+        O.PlayerAuraUtil.OnPlayerAurasAdded(widget, playerAuras) end)
+    AceEventInCallback:RegisterMessage(M.OnPlayerAuraRemoved, function(msg, playerAura)
+        O.PlayerAuraUtil.OnPlayerAuraRemoved(widget, playerAura) end)
+
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)

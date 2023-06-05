@@ -13,16 +13,18 @@ Local Vars
 local _, ns = ...
 local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
-local BaseAPI, API = O.BaseAPI, O.API
+local BaseAPI, API, pformat = O.BaseAPI, O.API, ns.pformat
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI
-local AceEvent = O.AceLibrary.AceEvent
+local AceEvent, Table = O.AceLibrary.AceEvent, O.Table
+local SizeOfTable, IsEmptyTable = Table.Size, Table.IsEmpty
 local CURSOR_ITEM_TYPE = 1
 
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
 local ABPI = function() return O.ActionbarPlusAPI  end
+local AU = function() return O.PlayerAuraUtil  end
 
 --- @class EventFrameInterface : _Frame
 local _EventFrame = {
@@ -284,8 +286,20 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnPlayerEnteringWorld(f, event, ...)
-    OnStealthIconUpdate(f.ctx)
+---@param updateInfo UnitAuraUpdateInfo
+local function OnPlayerAura(f, event, unitTarget, updateInfo)
+    if GC.UnitId.player ~= unitTarget then return end
+
+    local playerAuras = AU():GetPlayerSpellsFromAura(updateInfo)
+    if SizeOfTable(playerAuras) > 0 then L:SendMessage(MSG.OnPlayerAurasAdded, playerAuras) end
+
+    local removedAuras = AU():GetRemovedAuras(updateInfo)
+    if SizeOfTable(removedAuras) > 0 then
+        for rID, aura in pairs(removedAuras) do
+            L:SendMessage(MSG.OnPlayerAuraRemoved, aura)
+            AU():RemoveAura(aura)
+        end
+    end
 end
 
 --- @param f EventFrameInterface
@@ -411,6 +425,11 @@ function L:RegisterPlayerEnteringWorld()
     f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
     RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
 end
+function L:RegisterPlayerAura()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnPlayerAura)
+    RegisterFrameForUnitEvents(f, { E.UNIT_AURA }, GC.UnitId.player)
+end
 
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
@@ -423,6 +442,7 @@ function L:RegisterEvents()
     self:RegisterBagEvents()
     self:RegisterEventToMessageTransmitter()
     self:RegisterPlayerEnteringWorld()
+    self:RegisterPlayerAura()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end

@@ -65,6 +65,23 @@ local function CreateNamespace(...)
     --- @param o Namespace
     local function Methods(o)
 
+        --- @return GameVersion
+        function o:IsVanilla()
+            return self.gameVersion == 'classic'
+        end
+        --- @return GameVersion
+        function o:IsTBC()
+            return self.gameVersion == 'tbc-classic'
+        end
+        --- @return GameVersion
+        function o:IsWOTLK()
+            return self.gameVersion == 'wotlk-classic'
+        end
+        --- @return GameVersion
+        function o:IsRetail()
+            return self.gameVersion == 'retail'
+        end
+
         --- @return CursorUtil
         ---@param cursorInfo CursorInfo Optional cursorInfo instance
         function o:CreateCursorUtil(cursorInfo)
