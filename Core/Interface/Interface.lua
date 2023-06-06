@@ -24,6 +24,9 @@ local LibPackMixin = {
 local Namespace = {
     --- @type string
     name = "",
+    --- @type GameVersion
+    gameVersion = "",
+
     --- @type GlobalObjects
     O = {},
     --- @type ActionbarPlus_AceDB,
@@ -40,12 +43,21 @@ local Namespace = {
     --- @type LocalLibStub
     LibStub = {},
 
+    --- @type fun(self:Namespace) : boolean
+    IsVanilla = false,
+    --- @type fun(self:Namespace) : boolean
+    IsTBC = false,
+    --- @type fun(self:Namespace) : boolean
+    IsWOTLK = false,
+    --- @type fun(self:Namespace) : boolean
+    IsRetail = false,
+
     --- Used in TooltipFrame and BaseAttributeSetter to coordinate the GameTooltip Anchor
     --- @see TooltipAnchor#SCREEN_* vars
     --- @type string
     GameTooltipAnchor = "",
     --- @type fun(o:any, ...) : void
-    pformat = {}
+    pformat = {},
 }
 
 --- @class CursorUtil : CursorMixin
@@ -321,6 +333,50 @@ local ItemCooldown = {
     --- @type ItemInfo
     details = {}
 }
+
+--- @class AuraInfo
+local AuraInfo = {
+    aura = {
+        --- @type SpellInfo
+        spell = { id = 123, name = 'Aura Spell Name' },
+        instanceID = 123,
+        --- @type AuraData
+        data = {},
+    },
+    --- @type SpellInfo
+    spell = {
+        id = 123,
+        name = 'Spell name'
+    }
+}
+
+--- @alias AuraInstanceID number
+--- @alias PlayerAuraMap table<AuraInstanceID, AuraInfo>
+--- @alias PlayerAuraSpecializationMap table<SpecializationIndex, PlayerAuraMap>
+--- @alias PlayerAuraUnitMap table<UnitClass, PlayerAuraSpecializationMap>
+
+--- @class AuraMap : table<GameVersion, PlayerClassMap>
+local AuraMap = {
+    ['classic'] = {
+        --- @type PlayerAuraMap
+        ['MAGE'] = {
+            {
+                [190446] = AuraInfo
+            },
+            {
+                [44544] = AuraInfo
+            },
+        }
+    },
+    --[[--- @type PlayerClassMap
+    ['tbc_classic'] = { },
+    --- @type PlayerClassMap
+    ['wotlk_classic'] = { },
+    --- @type PlayerClassMap
+    ['retail'] = { },]]
+}
+local c = AuraMap.classic
+
 
 --[[-----------------------------------------------------------------------------
 Supported Extensions

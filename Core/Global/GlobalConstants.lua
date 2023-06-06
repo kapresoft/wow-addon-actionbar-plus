@@ -219,6 +219,7 @@ local function GlobalConstantProperties(o)
         SPELL_UPDATE_COOLDOWN = 'SPELL_UPDATE_COOLDOWN',
         SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
 
+        UNIT_AURA = 'UNIT_AURA',
         UNIT_HEALTH = 'UNIT_HEALTH',
         --- It fires when:
         --- 1) A mage is casting a non-instant spell (i.e. teleport) and while still casting,
@@ -269,6 +270,8 @@ local function GlobalConstantProperties(o)
         OnSpellCastSentExt           = newMsg('OnSpellCastSentExt'),
         OnSpellCastStopExt           = newMsg('OnSpellCastStopExt'),
         OnSpellCastFailedExt         = newMsg('OnSpellCastFailedExt'),
+        OnPlayerAurasAdded           = newMsg('OnPlayerAurasAdded'),
+        OnPlayerAuraRemoved          = newMsg('OnPlayerAuraRemoved'),
         --- Relayed Events
         PLAYER_ENTERING_WORLD        = newMsg(Events.PLAYER_ENTERING_WORLD),
         EQUIPMENT_SETS_CHANGED       = newMsg(Events.EQUIPMENT_SETS_CHANGED),
@@ -550,6 +553,17 @@ local function GlobalConstantMethods(o)
         if IsBlank(macroName) then return nil end
         local _, slotID = macroName:gmatch("(%w+)%+(%w+)")()
         return IsNotBlank(slotID)
+    end
+
+    --- @return SpecializationIndex
+    function o:GetSpecializationIndex()
+        if GetSpecialization then return GetSpecialization()
+        elseif GetActiveTalentGroup then return GetActiveTalentGroup() end; return 1
+    end
+
+    --- @return UnitClass
+    function o:GetPlayerClass()
+        local _, c = UnitClass('player'); return c
     end
 end
 

@@ -4,6 +4,7 @@ Alias Functions
 --- @alias FrameHandlerFunction fun(frameWidget:FrameWidget) : void
 --- @alias ButtonPredicateFunction fun(btnWidget:ButtonUIWidget) : boolean
 --- @alias ButtonHandlerFunction fun(btnWidget:ButtonUIWidget) : void
+--- @alias ButtonHandlerSpellAuraFunction fun(btnWidget:ButtonUIWidget, auraInfo:AuraInfo) : void
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject
