@@ -465,6 +465,9 @@ local function WidgetMethods(widget)
     --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:fevb(predicateFn, applyFn) self:ApplyForEachButtonCondition(predicateFn, applyFn) end
 
+    --- Alias for #ApplyForEachButton(applyFn)
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:feb(applyFunction) self:ApplyForEachButton(applyFunction) end
 
     function widget:SetGroupState(isShown)
         if isShown == true then

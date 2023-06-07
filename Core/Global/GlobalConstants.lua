@@ -260,12 +260,12 @@ local function GlobalConstantProperties(o)
         OnMacroAttributesSet         = newMsg('OnMacroAttributesSet'),
         OnUpdateMacroState           = newMsg('OnUpdateMacroState'),
         OnUpdateItemState            = newMsg('OnUpdateItemState'),
-        OnSpellCastSucceeded         = newMsg('OnSpellCastSucceeded'),
         MacroAttributeSetter_OnSetIcon     = newMsg('MacroAttributeSetter:OnSetIcon'),
         MacroAttributeSetter_OnShowTooltip = newMsg('MacroAttributeSetter:OnShowTooltip'),
         -- External Add-On Integration
         OnBagUpdateExt               = newMsg('OnBagUpdateExt'),
         OnButtonPostClickExt         = newMsg('OnButtonPostClickExt'),
+        OnSpellCastSucceeded         = newMsg('OnSpellCastSucceeded'),
         OnSpellCastStartExt          = newMsg('OnSpellCastStartExt'),
         OnSpellCastSentExt           = newMsg('OnSpellCastSentExt'),
         OnSpellCastStopExt           = newMsg('OnSpellCastStopExt'),

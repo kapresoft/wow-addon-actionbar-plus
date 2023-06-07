@@ -206,13 +206,17 @@ end
 
 --- @param f EventFrameInterface
 local function OnSpellCastSucceeded(f, ...)
+    --- @type ButtonFactory
     local bf = f.ctx.buttonFactory
+
     bf:fevf(function(fw)
-        fw:fevb(function(bw) return bw:IsItemOrMacro() end,
-                function(bw)
-                    C_Timer.NewTicker(0.5, function()
-                        bw:UpdateItemOrMacroState() end, 2)
-                end)
+        fw:feb(function(bw)
+            if bw:IsSpell() then
+                C_Timer.NewTicker(0.1, function() bw:UpdateSpellState() end, 2)
+            elseif bw:IsItemOrMacro() then
+                C_Timer.NewTicker(0.1, function() bw:UpdateItemOrMacroState() end, 2)
+            end
+        end)
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
