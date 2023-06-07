@@ -103,7 +103,7 @@ local function OnEquipmentSwapFinished(frameWidget, event)
     p:log(20,'OnEquipmentSwapFinished(): frame #%s', frameWidget:GetFrameIndex())
     frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
             function(btnWidget)
-                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button)
+                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button())
             end)
 end
 
@@ -574,7 +574,7 @@ local function WidgetMethods(widget)
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
         self:ApplyForEachButton(function(bw)
-            bw.button:SetAlpha(buttonAlpha)
+            bw.button():SetAlpha(buttonAlpha)
         end)
     end
 

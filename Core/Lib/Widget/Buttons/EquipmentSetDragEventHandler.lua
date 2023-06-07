@@ -95,8 +95,8 @@ end
 ---@param profile Profile_Config
 local function GlowButtonConditionally(w, profile)
     if profile.equipmentset_show_glow_when_active ~= true then return end
-    ActionButton_ShowOverlayGlow(w.button)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+    ActionButton_ShowOverlayGlow(w.button())
+    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button()) end)
 end
 
 --- @param evt string

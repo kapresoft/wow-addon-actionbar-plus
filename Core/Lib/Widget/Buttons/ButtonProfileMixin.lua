@@ -72,7 +72,7 @@ local function PropsAndMethods(o)
         end
         local setter = self:GetAttributesSetter()
         if not setter then return end
-        setter:SetAttributes(self.w.button)
+        setter:SetAttributes(self.w.button())
     end
 
     --- @return table<string, AttributeSetter>
