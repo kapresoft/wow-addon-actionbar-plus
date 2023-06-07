@@ -55,7 +55,7 @@ local p = L:GetLogger()
 --- @param abp ActionbarPlus
 L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
     p:log(10, 'MSG::R: %s', msg)
-    abp.addonEvents:RegisterEvents()
+    abp.addonEvents():RegisterEvents()
 end)
 
 --[[-----------------------------------------------------------------------------
