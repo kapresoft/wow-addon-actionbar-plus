@@ -36,7 +36,7 @@ local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 --[[-----------------------------------------------------------------------------
 New Instance
 self: widget
-button: widget.button
+button: widget.btn()
 -------------------------------------------------------------------------------]]
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
@@ -67,7 +67,7 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
-    function o:GetName() return self.w.button:GetName() end
+    function o:GetName() return self.w.button():GetName() end
 
     function o:InitWidget()
         self:SetButtonProperties()
@@ -83,7 +83,7 @@ local function PropsAndMethods(o)
         local buttonPadding = self.w.dragFrame.horizontalButtonPadding
         local frameStrata = self.w.frameStrata
         local frameLevel = self.w.frameLevel
-        local button = self.w.button
+        local button = self.w.button()
 
         button:SetFrameStrata(frameStrata)
         button:SetFrameLevel(frameLevel)
@@ -94,7 +94,7 @@ local function PropsAndMethods(o)
 
     --- @param buttonSize number
     function o:Scale(buttonSize)
-        local button = self.w.button
+        local button = self.w.button()
         button.keybindText.widget:ScaleWithButtonSize(buttonSize)
         --todo next: move to a ButtonScaleMixin?
         self:ScaleButtonTextsWithButtonSize(buttonSize)
@@ -110,7 +110,7 @@ local function PropsAndMethods(o)
         offsetX = (buttonSize/100) - (offsetX + buttonSize/15)
         local scaleXOffset = buttonSize/scaleFactorX * offsetX
         local scaleYOffset = buttonSize/scaleFactorY * offsetY
-        self.w.button.text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
+        self.w.button().text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
     end
 
     --- @see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
@@ -123,7 +123,7 @@ local function PropsAndMethods(o)
         local countdownFont
         local itemCountFont
         local profile = self.w:GetProfileConfig()
-        local textUI = self.w.button.text
+        local textUI = self.w.button().text
         local itemCountFontHeight = textUI.textDefaultFontHeight
 
         if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
@@ -194,7 +194,7 @@ local function PropsAndMethods(o)
     ---This is the item count text
     --- @param state boolean
     function o:SetHideItemCountText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.text:Hide()
             return
@@ -205,7 +205,7 @@ local function PropsAndMethods(o)
 
     --- @param state boolean
     function o:SetHideKeybindText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.keybindText:Hide()
             return
@@ -215,7 +215,7 @@ local function PropsAndMethods(o)
     end
     --- @param state boolean
     function o:SetHideIndexText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.indexText:Hide()
             return
@@ -245,7 +245,7 @@ local function PropsAndMethods(o)
     --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
     --- @param icon string The icon texture path
     function o:InitTextures(icon)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
 
         -- DrawLayer is 'ARTWORK' by default for icons
         btnUI:SetNormalTexture(icon)
@@ -296,17 +296,19 @@ local function PropsAndMethods(o)
 
     --- @type BindingInfo
     function o:GetBindings()
-        return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
+        --- @type ActionbarPlus
+        local addon = self.addon()
+        return (addon.barBindings and addon.barBindings[self.buttonName]) or nil
     end
 
     --- @param text string
     function o:SetText(text)
         if String.IsBlank(text) then text = '' end
-        self.w.button.text:SetText(text)
+        self.w.button().text:SetText(text)
     end
     --- Sets the name of the button (Used by Macros)
     --- @param text string
-    function o:SetNameText(text) self.w.button.nameText:SetEllipsesText(text) end
+    function o:SetNameText(text) self.w.button().nameText:SetEllipsesText(text) end
 
     function o:SetTextDelayed(text, optionalDelay)
         C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
@@ -315,14 +317,14 @@ local function PropsAndMethods(o)
     function o:ShowIndex(state)
         local text = ''
         if true == state then text = self.w.index end
-        self.w.button.indexText:SetText(text)
+        self.w.button().indexText:SetText(text)
         self:RefreshTexts()
     end
 
     --- @param state boolean true will show the button index number
     function o:ShowKeybindText(state)
         local text = ''
-        local button = self.w.button
+        local button = self.w.button()
         if not self:HasKeybindings() then
             button.keybindText:SetText(text)
             return
@@ -345,8 +347,8 @@ local function PropsAndMethods(o)
     end
     function o:ClearAllText()
         self:SetText('')
-        self.w.button.keybindText:SetText('')
-        self.w.button.nameText:SetText('')
+        self.w.button().keybindText:SetText('')
+        self.w.button().nameText:SetText('')
     end
 
     --- @return CooldownInfo
@@ -497,7 +499,7 @@ local function PropsAndMethods(o)
 
     function o:ResetWidgetAttributes()
         if InCombatLockdown() then return end
-        local button = self.w.button
+        local button = self.w.button()
         for _, v in pairs(self:GetButtonAttributes()) do
             if not InCombatLockdown() then
                 button:SetAttribute(v, nil)
@@ -609,20 +611,20 @@ local function PropsAndMethods(o)
     --the actionbar grid event
     function o:UpdateKeybindTextState()
         if not self:IsShowKeybindText() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
             return
         end
 
         if self:IsEmpty() then
             if self:IsShowEmptyButtons() then
-                self.w.button.keybindText:Show()
+                self.w.button().keybindText:Show()
             else
-                self.w.button.keybindText:Hide()
+                self.w.button().keybindText:Hide()
             end
             return
         end
 
-        if not self:IsEmpty() then self.w.button.keybindText:Show() end
+        if not self:IsEmpty() then self.w.button().keybindText:Show() end
     end
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
@@ -673,19 +675,19 @@ local function PropsAndMethods(o)
         return info
     end
 
-    function o:ClearHighlight() self.w.button:SetHighlightTexture(nil) end
+    function o:ClearHighlight() self.w.button():SetHighlightTexture(nil) end
     function o:ResetHighlight() self:SetHighlightDefault() end
 
     --- @param texture string
-    function o:SetNormalTexture(texture) self.w.button:SetNormalTexture(texture) end
+    function o:SetNormalTexture(texture) self.w.button():SetNormalTexture(texture) end
     --- @param texture string
     function o:SetPushedTexture(texture)
         if texture then
-            self.w.button:SetPushedTexture(texture)
+            self.w.button():SetPushedTexture(texture)
             self:SetPushedTextureAlpha(pushedTextureInUseAlpha)
             return
         end
-        self.w.button:SetPushedTexture(emptyTexture)
+        self.w.button():SetPushedTexture(emptyTexture)
         if not self:IsShowEmptyButtons() then
             self:SetPushedTextureAlpha(0)
         end
@@ -694,18 +696,18 @@ local function PropsAndMethods(o)
     --- @param texture string
     function o:SetHighlightTexture(texture)
         if texture then
-            self.w.button:SetHighlightTexture(texture)
+            self.w.button():SetHighlightTexture(texture)
             self:SetHighlightTextureAlpha(highlightTextureAlpha)
             return
         end
-        self.w.button:SetHighlightTexture(emptyTexture)
+        self.w.button():SetHighlightTexture(emptyTexture)
         self:SetHighlightTextureAlpha(0)
     end
 
     --- @param alpha number 1 (opaque) to zero (transparent)
-    function o:SetPushedTextureAlpha(alpha) self.w.button:GetPushedTexture():SetAlpha(alpha or 1) end
+    function o:SetPushedTextureAlpha(alpha) self.w.button():GetPushedTexture():SetAlpha(alpha or 1) end
     --- @param alpha number 1 (opaque) to zero (transparent)
-    function o:SetHighlightTextureAlpha(alpha) self.w.button:GetHighlightTexture():SetAlpha(alpha or 1) end
+    function o:SetHighlightTextureAlpha(alpha) self.w.button():GetHighlightTexture():SetAlpha(alpha or 1) end
 
     function o:SetTextureAsEmpty()
         self:SetNormalTexture(emptyTexture)
@@ -722,8 +724,8 @@ local function PropsAndMethods(o)
     end
 
     --- @param alpha number 0.0 to 1.0
-    function o:SetNormalIconAlpha(alpha) self.w.button:GetNormalTexture():SetAlpha(alpha or 1.0) end
-    function o:SetVertexColorNormal() self.w.button:GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
+    function o:SetNormalIconAlpha(alpha) self.w.button():GetNormalTexture():SetAlpha(alpha or 1.0) end
+    function o:SetVertexColorNormal() self.w.button():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
 
     function o:SetNormalIconAlphaDefault()
         if self:IsEmpty() then
@@ -733,7 +735,7 @@ local function PropsAndMethods(o)
         self:SetNormalIconAlpha(nonEmptySlotAlpha)
     end
 
-    function o:SetPushedTextureDisabled() self.w.button:SetPushedTexture(nil) end
+    function o:SetPushedTextureDisabled() self.w.button():SetPushedTexture(nil) end
 
     ---This is used when an action button starts dragging to highlight other drag targets (empty slots).
     function o:ShowEmptyGrid()
@@ -749,9 +751,9 @@ local function PropsAndMethods(o)
         self:ShowKeybindText(true)
 
         if not self:IsShowKeybindText() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
         elseif self:IsEmpty() then
-            self.w.button.keybindText:Show()
+            self.w.button().keybindText:Show()
         end
     end
 
@@ -762,22 +764,22 @@ local function PropsAndMethods(o)
         self:SetNormalTexture(emptyTexture)
         self:SetNormalIconAlphaAsEmpty()
         if self:IsEmpty() and not self:IsShowEmptyButtons() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
         end
     end
 
     function o:SetCooldownTextures(icon)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
         btnUI:SetNormalTexture(icon)
         btnUI:SetPushedTexture(icon)
     end
 
-    function o:SetButtonStateNormal() self.w.button:SetButtonState('NORMAL') end
-    function o:SetButtonStatePushed() self.w.button:SetButtonState('PUSHED') end
+    function o:SetButtonStateNormal() self.w.button():SetButtonState('NORMAL') end
+    function o:SetButtonStatePushed() self.w.button():SetButtonState('PUSHED') end
 
     ---Typically used when casting spells that take longer than GCD
     function o:SetHighlightInUse()
-        local btn = self.w.button
+        local btn = self.w.button()
         self:SetNormalIconAlpha(highlightTextureInUseAlpha)
         local hltTexture = btn:GetHighlightTexture()
         --highlight texture could be nil if action_button_mouseover_glow is disabled
@@ -799,7 +801,7 @@ local function PropsAndMethods(o)
 
     --- @param state boolean true, to enable highlight
     function o:SetHighlightEnabled(state)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
         if state == true then
             btnUI:SetHighlightTexture(highlightTexture)
             btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
@@ -889,7 +891,7 @@ local function PropsAndMethods(o)
     --- @param hasTarget boolean Player has a target
     function o:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
         local show = self.w.frameIndex == 1 and (self.w.index == 1 or self.w.index == 2)
-        local fs = self.w.button.keybindText
+        local fs = self.w.button().keybindText
         if not hasTarget then fs.widget:SetVertexColorNormal(); return end
 
         if not self.w:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
@@ -910,7 +912,7 @@ local function PropsAndMethods(o)
         local show = self.w.frameIndex == 1 and self.w.index == 1
         --if show then p:log('UpdateRangeIndicatorWithShowKeybindOff: %s', hasTarget) end
         -- if no target, clear text and return
-        local fs = self.w.button.keybindText
+        local fs = self.w.button().keybindText
         if not hasTarget then
             fs.widget:ClearText()
             fs.widget:SetVertexColorNormal()
@@ -945,7 +947,7 @@ local function PropsAndMethods(o)
 
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
-        local normalTexture = self.w.button:GetNormalTexture()
+        local normalTexture = self.w.button():GetNormalTexture()
         if not normalTexture then return end
         -- energy based spells do not use 'notEnoughMana'
         if IsStealthed() or API:IsShapeShiftActive(self:GetSpellData()) then
@@ -1001,7 +1003,7 @@ local function PropsAndMethods(o)
 
     --- @param icon string Blizzard Icon
     function o:SetIcon(icon)
-        local btn = self.w.button
+        local btn = self.w.button()
         self:SetNormalTexture(icon)
         self:SetPushedTexture(icon)
         local nTexture = btn:GetNormalTexture()
@@ -1067,9 +1069,9 @@ local function PropsAndMethods(o)
     end
 
     ---@param state boolean Set to true to enable mouse
-    function o:EnableMouse(state) if InCombatLockdown() then return end; self.w.button:EnableMouse(state) end
-    function o:Hide() if InCombatLockdown() then return end; self.w.button:Hide() end
-    function o:Show() if InCombatLockdown() then return end; self.w.button:Show() end
+    function o:EnableMouse(state) if InCombatLockdown() then return end; self.w.button():EnableMouse(state) end
+    function o:Hide() if InCombatLockdown() then return end; self.w.button():Hide() end
+    function o:Show() if InCombatLockdown() then return end; self.w.button():Show() end
 
     function o:GetIcon()
         local texture = self.w.frame:GetNormalTexture()

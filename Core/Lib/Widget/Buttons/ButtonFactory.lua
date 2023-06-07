@@ -102,7 +102,7 @@ end
 
 --- @param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    AttributeSetters[MACRO]:SetAttributes(btnWidget.button)
+    AttributeSetters[MACRO]:SetAttributes(btnWidget.button())
 end
 
 --- Autocorrect bad data if we have button data with
