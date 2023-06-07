@@ -148,14 +148,13 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
+    function o:GetSpellName() local sp = self:GetSpellData(); return sp and sp.name end
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
     --- @return string The macro name
-    function o:GetMacroName()
-        local md = self:GetMacroData(); if not md then return nil end
-        return md.name
+    function o:GetMacroName() local md = self:GetMacroData(); return md and md.name
     end
     --- @return boolean
     ---@param name string The macro name to check
