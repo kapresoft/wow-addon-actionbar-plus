@@ -14,7 +14,7 @@ local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local CN = GC.Profile_Config_Names
 local String, Table, W = O.String, O.Table, GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
-local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
+local IsEmptyStr, IsBlankStr, IsNotBlankStr = String.IsEmpty, String.IsBlank, String.IsNotBlank
 local p = O.LogFactory(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -216,7 +216,10 @@ local function PropsAndMethods(o)
     --- @return boolean
     function o:IsMacroText() return self:IsConfigOfType(self.config, W.MACRO_TEXT) end
     --- @return boolean
-    function o:IsSpell() return self:IsConfigOfType(self.config, W.SPELL) end
+    function o:IsSpell()
+        return self:IsConfigOfType(self.config, W.SPELL)
+                and IsNotBlankStr(self:GetSpellData().name)
+    end
     --- @return boolean
     function o:IsItem() return self:IsConfigOfType(self.config,W. ITEM) end
     --- @return boolean

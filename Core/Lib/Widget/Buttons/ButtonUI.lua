@@ -409,8 +409,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    --- @class __ButtonUIWidget : ButtonMixin
     --- @alias ButtonUIWidget  __ButtonUIWidget | BaseLibraryObject_WithAceEvent
+    --- @class __ButtonUIWidget : ButtonMixin
     local __widget = {
         --- @type ActionbarPlus
         addon = ABP,

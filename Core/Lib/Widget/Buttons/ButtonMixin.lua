@@ -511,8 +511,28 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateItemOrMacroState()
-        if self:IsItem() then self:UpdateItemState(); return end
-        self:UpdateMacroState()
+        if self:IsItem() then
+            self:UpdateItemState()
+            return
+        end
+        if self:IsMacro() then self:UpdateMacroState() end
+    end
+
+    function o:UpdateSpellState()
+        if not self:IsSpell() then return end
+        self:UpdateSpellCharges()
+    end
+
+    function o:UpdateSpellCharges()
+        local sp = self:GetSpellData()
+        local currentCharge, maxCharge = GetSpellCharges(sp.name)
+        if String.IsAnyOf(sp.name, 'Ice Lance', 'Flurry') then
+            p:log(10, 'Spell[%s]: %s c[%s] m[%s]',
+                self:GetName(), tostring(sp.name),
+                tostring(currentCharge), tostring(maxCharge))
+        end
+        if not maxCharge or (maxCharge <= 1) then return end
+        self:SetText(currentCharge)
     end
 
     function o:UpdateItemState()
@@ -576,7 +596,8 @@ local function PropsAndMethods(o)
 
     function o:UpdateState()
         self:UpdateCooldown()
-        if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end
+        self:UpdateItemOrMacroState()
+        self:UpdateSpellState()
         self:UpdateUsable()
         self:UpdateRangeIndicator()
         self:SetHighlightDefault()
