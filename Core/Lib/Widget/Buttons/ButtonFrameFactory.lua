@@ -73,7 +73,7 @@ local function RegisterWidget(widget, name)
     widget.userdata = {}
     widget.events = {}
     widget.base = WidgetBase
-    widget.frame.obj = widget
+    --widget.frame.obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -315,7 +315,6 @@ Methods
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
-    local profile = widget.profile
     local frame = widget.frame
 
     function widget:GetName() return widget.frame:GetName() end
@@ -325,7 +324,7 @@ local function WidgetMethods(widget)
     function widget:GetIndex() return self.index end
 
     --- @return Profile_Bar
-    function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
+    function widget:GetConfig() return P:GetBar(self:GetIndex()) end
 
     function widget:InitAnchor()
         local anchor = P:GetAnchor(self.index)
@@ -356,7 +355,7 @@ local function WidgetMethods(widget)
         self:UpdateAnchor()
     end
 
-    function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
+    function widget:IsLockedInCombat() return P:IsBarLockedInCombat(self:GetFrameIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
 
