@@ -198,7 +198,6 @@ local methods = {
     --- @param self ActionbarPlus
     ['OnInitialize'] = function(self)
         self:InitializeDb()
-        self.barBindings = WMX:GetBarBindingsMap()
         self:RegisterSlashCommands()
         self:RegisterHooks()
 
