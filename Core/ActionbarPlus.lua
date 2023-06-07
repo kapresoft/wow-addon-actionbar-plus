@@ -187,11 +187,11 @@ local methods = {
         local profileName = self.db:GetCurrentProfile()
         local defaultProfile = P:CreateDefaultProfile(profileName)
         local defaults = { profile =  defaultProfile }
+        -- todo next: move db to Namespace (don't store here)
         self.db:RegisterDefaults(defaults)
         self.profile = self.db.profile
         if IsEmptyTable(ABP_PLUS_DB.profiles[profileName]) then
             ABP_PLUS_DB.profiles[profileName] = defaultProfile
-            --error(profileName .. ': ' .. ABP_Table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
         end
     end,
     --- This is called automatically by Ace
