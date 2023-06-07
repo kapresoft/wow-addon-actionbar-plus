@@ -78,9 +78,7 @@ end
 --- @param event string
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
-    local addon = f.ctx.addon
-    addon.barBindings = f.ctx.widgetMixin:GetBarBindingsMap()
-    if addon.barBindings then f.ctx.buttonFactory:UpdateKeybindText() end
+    f.ctx.buttonFactory:UpdateKeybindText()
 end
 
 --- @param f EventFrameInterface

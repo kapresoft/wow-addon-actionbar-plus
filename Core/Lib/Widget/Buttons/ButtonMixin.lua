@@ -11,7 +11,7 @@ local _, ns = ...
 local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
 local pformat = ns.pformat
 local P, BaseAPI = O.Profile, O.BaseAPI
-local String = O.String
+local String, WMX = O.String, O.WidgetMixin
 local AceEvent = O.AceLibrary.AceEvent
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
@@ -293,13 +293,8 @@ local function PropsAndMethods(o)
         if not (start or duration) then return end
         self.cooldown():SetCooldown(start, duration) end
 
-
     --- @type BindingInfo
-    function o:GetBindings()
-        --- @type ActionbarPlus
-        local addon = self.addon()
-        return (addon.barBindings and addon.barBindings[self.buttonName]) or nil
-    end
+    function o:GetBindings() return WMX:GetBarBindings(self.buttonName) end
 
     --- @param text string
     function o:SetText(text)
@@ -327,26 +322,37 @@ local function PropsAndMethods(o)
     function o:ShowKeybindText(state)
         local text = ''
         local button = self.w.button()
-        if not self:HasKeybindings() then
+
+        if true ~= state then
             button.keybindText:SetText(text)
+            self:RefreshTexts()
             return
         end
 
-        if true == state then
-            local bindings = self:GetBindings()
-            if bindings and bindings.key1Short then
-                text = bindings.key1Short
-            end
+        local bindings = self:GetBindings()
+        if not self:HasValidKeybindings(bindings) then
+            button.keybindText:SetText(text)
+            self:RefreshTexts()
+            return
         end
+
+        if bindings and bindings.key1Short then
+            text = bindings.key1Short
+        end
+
         button.keybindText:SetText(text)
         self:RefreshTexts()
     end
 
-    function o:HasKeybindings()
-        local b = self:GetBindings()
-        if not b then return false end
-        return b and String.IsNotBlank(b.key1)
+    function o:HasKeybindings() return self:HasValidKeybindings(self:GetBindings()) end
+
+    --- @param bindingDetails BindingDetails
+    function o:HasValidKeybindings(bindingDetails)
+        if not bindingDetails then return false end
+        return bindingDetails and String.IsNotBlank(bindingDetails.key1)
     end
+
+
     function o:ClearAllText()
         self:SetText('')
         self.w.button().keybindText:SetText('')
@@ -970,7 +976,7 @@ local function PropsAndMethods(o)
         return IsUsableSpell(spellID)
     end
 
-    ---@param itemID itemID
+    ---@param itemID ItemID
     function o:IsUsableItemID(itemID)
         if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
         return IsUsableItem(itemID)
