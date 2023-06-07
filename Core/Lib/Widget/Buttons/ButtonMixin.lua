@@ -522,17 +522,12 @@ local function PropsAndMethods(o)
 
     function o:UpdateSpellState()
         if not self:IsSpell() then return end
-        self:UpdateSpellCharges()
+        self:UpdateSpellCharges(self:GetSpellName())
     end
 
-    function o:UpdateSpellCharges()
-        local sp = self:GetSpellData()
-        local currentCharge, maxCharge = GetSpellCharges(sp.name)
-        if String.IsAnyOf(sp.name, 'Ice Lance', 'Flurry') then
-            p:log(10, 'Spell[%s]: %s c[%s] m[%s]',
-                self:GetName(), tostring(sp.name),
-                tostring(currentCharge), tostring(maxCharge))
-        end
+    ---@param spellName SpellName
+    function o:UpdateSpellCharges(spellName)
+        local currentCharge, maxCharge = GetSpellCharges(spellName)
         if not maxCharge or (maxCharge <= 1) then return end
         self:SetText(currentCharge)
     end
@@ -1042,6 +1037,8 @@ local function PropsAndMethods(o)
             self:SetText('')
             local icon
             icon = scd.spell.icon
+            self:UpdateSpellCharges(scd.spell.name)
+
             if self:IsStealthSpell() then
                 local spellInfo = self:GetSpellData()
                 icon = API:GetSpellIcon(spellInfo)
