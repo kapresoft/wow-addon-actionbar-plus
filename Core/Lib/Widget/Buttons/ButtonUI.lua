@@ -313,7 +313,6 @@ local function RegisterWidget(widget, name)
     widget.userdata = {}
     widget.events = {}
     widget.base = WidgetBase
-    widget.frame.obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -414,22 +413,20 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local __widget = {
         --- @return ActionbarPlus
         addon = function() return ABP  end,
-        --- @type Profile
-        profile = P,
         --- @type number
         index = btnIndex,
         --- @type number
         frameIndex = dragFrameWidget:GetIndex(),
         --- @type string
         buttonName = btnName,
-        --- @type FrameWidget
-        dragFrame = dragFrameWidget,
-        --- @return ButtonUI
+        --- @type fun() : FrameWidget
+        dragFrame = function() return dragFrameWidget end,
+        --- @type fun() :  ButtonUI
         button = function() return button  end,
-        --- @type ButtonUI
-        frame = button,
-        --- @type CooldownFrame
-        cooldown = cooldown,
+        --- @type fun() : ButtonUI
+        frame = function() return button end,
+        --- @type fun() : CooldownFrame
+        cooldown = function() return cooldown end,
         --- @type table
         cooldownInfo = nil,
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
@@ -438,7 +435,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
         --- @type number
         buttonPadding = 1,
-        buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
     --- @type ButtonUIWidget
@@ -456,14 +452,14 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     -- This is for mouseover effect
     --widget:SetCallback("OnEnter", function(w)
-    --    w.dragFrame.frame:SetAlpha(1.0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
+    --    w.dragFrame().frame:SetAlpha(1.0)
+    --    w.dragFrame():ApplyForEachButtons(function(bw)
     --        bw.btn():SetAlpha(1)
     --    end)
     --end)
     --widget:SetCallback("OnLeave", function(w)
-    --    w.dragFrame.frame:SetAlpha(0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
+    --    w.dragFrame().frame:SetAlpha(0)
+    --    w.dragFrame():ApplyForEachButtons(function(bw)
     --        bw.btn():SetAlpha(0.4)
     --    end)
     --end)

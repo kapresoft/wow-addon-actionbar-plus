@@ -30,9 +30,8 @@ New Instance
 -------------------------------------------------------------------------------]]
 
 --- @class EquipmentSetDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
-
-local p = L.logger
+local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler); if not L then return end
+local p = L.logger()
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
@@ -146,7 +145,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local config = btnUI.widget.config
+        local config = btnUI.widget.config()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 

@@ -77,10 +77,10 @@ local function PropsAndMethods(o)
 
     function o:SetButtonProperties()
         --- @type FrameWidget
-        local dragFrame = self.w.dragFrame
+        local dragFrame = self.w.dragFrame()
         local barConfig = dragFrame:GetConfig()
         local buttonSize = barConfig.widget.buttonSize
-        local buttonPadding = self.w.dragFrame.horizontalButtonPadding
+        local buttonPadding = self.w.dragFrame().horizontalButtonPadding
         local frameStrata = self.w.frameStrata
         local frameLevel = self.w.frameLevel
         local button = self.w.button()
@@ -156,7 +156,7 @@ local function PropsAndMethods(o)
         local fontName, _, fontAttr = textUI:GetFont()
         textUI:SetFont(fontName, itemCountFontHeight, fontAttr)
 
-        self.w.cooldown:SetCountdownFont(countdownFont)
+        self.w.cooldown():SetCountdownFont(countdownFont)
         self:HideCountdownNumbers(hideCountdownNumbers)
         self:SetHideItemCountText(hideItemCountText)
         self:SetHideIndexText(hideIndexText)
@@ -169,7 +169,7 @@ local function PropsAndMethods(o)
         self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
         local hideTexts = true == profile.hide_text_on_small_buttons
         if not hideTexts then
-            local fw = self.w.dragFrame
+            local fw = self.w.dragFrame()
             local barConf = fw:GetConfig()
             if true == barConf.show_button_index then
                 self:SetHideIndexText(false)
@@ -177,7 +177,7 @@ local function PropsAndMethods(o)
             return
         end
 
-        local barConfig = self.w.dragFrame:GetConfig()
+        local barConfig = self.w.dragFrame():GetConfig()
         local buttonSize = barConfig.widget.buttonSize
         if buttonSize > MIN_BUTTON_SIZE then return end
 
@@ -188,7 +188,7 @@ local function PropsAndMethods(o)
 
     --- @param state boolean
     function o:HideCountdownNumbers(state)
-        self.w.cooldown:SetHideCountdownNumbers(state)
+        self.w.cooldown():SetHideCountdownNumbers(state)
     end
 
     ---This is the item count text
@@ -266,12 +266,12 @@ local function PropsAndMethods(o)
     end
 
     --- @return ButtonAttributes
-    function o:GetButtonAttributes() return self.w.buttonAttributes end
+    function o:GetButtonAttributes() return GC.ButtonAttributes end
     function o:GetIndex() return self.w.index end
     function o:GetFrameIndex() return self.w.frameIndex end
     ---Only used for prefixing logs
     function o:N() return "F" .. self.frameIndex .. "_B" .. self.index end
-    function o:IsParentFrameShown() return self.dragFrame:IsShown() end
+    function o:IsParentFrameShown() return self.dragFrame():IsShown() end
 
     function o:ResetConfig()
         self.w:ResetButtonData()
@@ -291,7 +291,7 @@ local function PropsAndMethods(o)
     function o:ResetCooldown() self:SetCooldown(0, 0) end
     function o:SetCooldown(start, duration)
         if not (start or duration) then return end
-        self.cooldown:SetCooldown(start, duration) end
+        self.cooldown():SetCooldown(start, duration) end
 
 
     --- @type BindingInfo
@@ -353,7 +353,7 @@ local function PropsAndMethods(o)
 
     --- @return CooldownInfo
     function o:GetCooldownInfo()
-        local btnData = self.w.config
+        local btnData = self.w.config()
         if btnData == nil or String.IsBlank(btnData.type) then return nil end
         local type = btnData.type
 
@@ -584,7 +584,7 @@ local function PropsAndMethods(o)
             elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
             return
         end
-        local c = self.w.config
+        local c = self.w.config()
         local isUsable = true
         if c.type == SPELL then
             isUsable = self:IsUsableSpell(cd)
@@ -663,7 +663,7 @@ local function PropsAndMethods(o)
     --- @return ActionBarInfo
     function o:GetActionbarInfo()
         local index = self.index
-        local dragFrame = self.dragFrame;
+        local dragFrame = self.dragFrame();
         local frameName = dragFrame:GetName()
         local btnName = format('%sButton%s', frameName, tostring(index))
 
@@ -839,7 +839,7 @@ local function PropsAndMethods(o)
     --- @param optionalBtnConf Profile_Button
     --- @return boolean
     function o:IsMatchingSpellID(spellID, optionalBtnConf)
-        local buttonData = optionalBtnConf or self.w.config
+        local buttonData = optionalBtnConf or self.w.config()
         local w = self.w
         if w:IsSpell() then
             return spellID == buttonData.spell.id
@@ -855,7 +855,7 @@ local function PropsAndMethods(o)
     --- @param spellName string The spell name
     --- @param buttonData Profile_Button
     function o:IsMatchingSpellName(spellName, buttonData)
-        local s = buttonData or self.w.config
+        local s = buttonData or self.w.config()
         if not (s.spell and s.spell.name) then return false end
         if not (s and spellName == s.spell.name) then return false end
         return true
@@ -864,7 +864,7 @@ local function PropsAndMethods(o)
     --- @param spellID string
     --- @param optionalProfileButton Profile_Button
     function o:IsMatchingMacroSpellID(spellID, optionalProfileButton)
-        optionalProfileButton = optionalProfileButton or self.w.config
+        optionalProfileButton = optionalProfileButton or self.w.config()
         if not self:IsValidMacroProfile(optionalProfileButton) then return end
         local macroSpellId =  GetMacroSpell(optionalProfileButton.macro.index)
         if not macroSpellId then return false end
@@ -876,7 +876,7 @@ local function PropsAndMethods(o)
     --- @return boolean
     function o:IsMatchingMacroOrSpell(spellID)
         --- @type Profile_Button
-        local conf = self.w.config
+        local conf = self.w.config()
         if not conf and (conf.spell or conf.macro) then return false end
         if self:IsConfigOfType(conf, SPELL) then
             return spellID == conf.spell.id
@@ -897,7 +897,7 @@ local function PropsAndMethods(o)
         if not self.w:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
         -- else if in range, color is "white"
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
+        local inRange = API:IsActionInRange(self.w.config(), UNIT.TARGET)
         fs.widget:SetVertexColorNormal()
         if inRange == false then
             fs.widget:SetVertexColorOutOfRange()
@@ -922,7 +922,7 @@ local function PropsAndMethods(o)
         -- has target, set text as range indicator
         fs.widget:SetTextWithRangeIndicator()
 
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
+        local inRange = API:IsActionInRange(self.w.config(), UNIT.TARGET)
 
         --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
         fs.widget:SetVertexColorNormal()
@@ -935,7 +935,7 @@ local function PropsAndMethods(o)
 
     function o:UpdateRangeIndicator()
         if not self:ContainsValidAction() then return end
-        local configIsShowKeybindText = self.w.dragFrame:IsShowKeybindText()
+        local configIsShowKeybindText = self.w.dragFrame():IsShowKeybindText()
         self.w:ShowKeybindText(configIsShowKeybindText)
 
         local hasTarget = API:IsValidActionTarget()
@@ -1074,7 +1074,7 @@ local function PropsAndMethods(o)
     function o:Show() if InCombatLockdown() then return end; self.w.button():Show() end
 
     function o:GetIcon()
-        local texture = self.w.frame:GetNormalTexture()
+        local texture = self.w.frame():GetNormalTexture()
         if texture then return texture:GetTexture() end
         return nil
     end

@@ -11,7 +11,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class PlayerAuraUtil : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.PlayerAuraUtil)
-local p = L.logger
+local p = L.logger()
 local pformat = ns.pformat
 
 --[[-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ local function OnPlayerAuraRemoved(fw, playerAura)
             local asp = auraInfo.aura.spell
             local sp = auraInfo.spell
             p:log(30, 'Hiding[%s=>%s]: expiry=%s', asp.name, sp.name, expiry)
-            ActionButton_HideOverlayGlow(bw.frame)
+            ActionButton_HideOverlayGlow(bw.frame())
         end)
     end)
 end
@@ -52,7 +52,7 @@ local function OnPlayerAurasAdded(fw, playerAuras)
         p:log(30, 'Aura[%s]: %s', aura.spell.name, pformat(aura))
         if L:IsActiveAura(aura.instanceID) then
             p:log(30, 'Aura[%s]: is active', aura.spell.name)
-            ActionButton_ShowOverlayGlow(bw.frame)
+            ActionButton_ShowOverlayGlow(bw.frame())
         end
     end)
 end

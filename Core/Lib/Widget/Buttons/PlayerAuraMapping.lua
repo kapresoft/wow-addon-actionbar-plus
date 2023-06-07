@@ -10,7 +10,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class PlayerAuraMapping : BaseLibraryObject
 local L = LibStub:NewLibrary(M.PlayerAuraMapping); if not L then return end
-local p = L.logger
+local p = L.logger()
 
 local Mapping = {
     --- @type PlayerAuraUnitMap
