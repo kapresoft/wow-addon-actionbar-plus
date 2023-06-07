@@ -306,6 +306,7 @@ local function PropsAndMethods(o)
         if String.IsBlank(text) then text = '' end
         self.w.button().text:SetText(text)
     end
+
     --- Sets the name of the button (Used by Macros)
     --- @param text string
     function o:SetNameText(text) self.w.button().nameText:SetEllipsesText(text) end
@@ -313,6 +314,7 @@ local function PropsAndMethods(o)
     function o:SetTextDelayed(text, optionalDelay)
         C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
     end
+
     --- @param state boolean true will show the button index number
     function o:ShowIndex(state)
         local text = ''
