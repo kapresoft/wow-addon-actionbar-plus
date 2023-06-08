@@ -33,27 +33,15 @@ end
 --- @param playerAura AuraInfo
 local function OnPlayerAuraRemoved(fw, playerAura)
     fw:ApplyForEachSpellOrMacroButtons(playerAura.spell.id, function(bw)
-        L:ApplyIfAuraSpellMatches(bw, playerAura, function(bw, auraInfo)
-            local auraData = auraInfo.aura.data
-            local expiry = auraData.expirationTime
-            local asp = auraInfo.aura.spell
-            local sp = auraInfo.spell
-            p:log(30, 'Hiding[%s=>%s]: expiry=%s', asp.name, sp.name, expiry)
-            ActionButton_HideOverlayGlow(bw.frame())
-        end)
+        L:ApplyIfAuraSpellMatches(bw, playerAura, function(bw, auraInfo) bw:HideOverlayGlow() end)
     end)
 end
 
 --- @param fw FrameWidget
 --- @param playerAuras PlayerAuraMap The player auras table will never be empty.
 local function OnPlayerAurasAdded(fw, playerAuras)
-    L:ApplyToMatchingButtons(fw, playerAuras,function(bw, auraInfo)
-        local aura = auraInfo.aura
-        p:log(30, 'Aura[%s]: %s', aura.spell.name, pformat(aura))
-        if L:IsActiveAura(aura.instanceID) then
-            p:log(30, 'Aura[%s]: is active', aura.spell.name)
-            ActionButton_ShowOverlayGlow(bw.frame())
-        end
+    L:ApplyToMatchingButtons(fw, playerAuras, function(bw, auraInfo)
+        if L:IsActiveAura(auraInfo.aura.instanceID) then bw:ShowOverlayGlow() end
     end)
 end
 
@@ -80,6 +68,9 @@ local function PropsAndMethods(o)
 
     o.OnPlayerAurasAdded = OnPlayerAurasAdded
     o.OnPlayerAuraRemoved = OnPlayerAuraRemoved
+
+    --- @type PlayerAuraMap
+    function o:GetActiveAuras() return self.addedAuras end
 
     --- if AuraData exists, then the aura is active
     --- @param instanceID AuraInstanceID
@@ -161,6 +152,18 @@ local function PropsAndMethods(o)
         end
         if spellId and playerSpell.id == spellId then
             applyFunction(bw, playerAura)
+        end
+    end
+
+    ---@param w ButtonUIWidget
+    function o:OnAfterButtonAttributesSet(w)
+        local activeAuras = self:GetActiveAuras()
+        if O.Table.IsEmpty(activeAuras) then return end
+        for aID, aInfo in pairs(activeAuras) do
+            if self:IsActiveAura(aID) and w:SpellNameEquals(aInfo.spell.name) then
+                w:ShowOverlayGlow()
+                return
+            end
         end
     end
 end
