@@ -151,6 +151,7 @@ local function PropsAndMethods(o)
     function o:GetSpellName() local sp = self:GetSpellData(); return sp and sp.name end
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
+    function o:GetItemName() local i = self:GetItemData(); return i and i.name end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
     --- @return string The macro name

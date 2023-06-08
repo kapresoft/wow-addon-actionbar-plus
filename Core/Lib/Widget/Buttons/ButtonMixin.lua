@@ -285,6 +285,7 @@ local function PropsAndMethods(o)
 
     function o:Reset()
         self:ResetCooldown()
+        self:HideOverlayGlow()
         self:ClearAllText()
     end
 
@@ -477,13 +478,38 @@ local function PropsAndMethods(o)
         return spellCD
     end
 
-    --- @return number The spellID for macro
+    --- @return SpellID The current spellID for macro
     function o:GetMacroSpellId()
         local macro = self:GetMacroData();
         if not macro then return nil end
         local name = GetMacroInfo(macro.index)
         if not name then return nil end
         return GetMacroSpell(macro.index)
+    end
+
+    --- @return SpellName The current spell name for macro
+    function o:GetMacroSpellName()
+        local spellId = self:GetMacroSpellId()
+        return spellId and GetSpellInfo(spellId)
+    end
+
+    --- @param spellName SpellName
+    --- @return boolean true if the spell, macro or item name is equal to spellName
+    function o:SpellNameEquals(spellName)
+        return IsNotBlank(spellName)
+                and spellName == self:GetActiveSpellName()
+    end
+
+    --- @return SpellName
+    function o:GetActiveSpellName()
+        if self:IsSpell() then
+            return self:GetSpellName()
+        elseif self:IsMacro() then
+            return self:GetMacroSpellName()
+        elseif self:IsItem() then
+            return API:GetItemSpellInfo(API:GetItemID(self:GetItemName()))
+        end
+        return nil
     end
 
     --- @return ItemCooldown
@@ -1090,6 +1116,10 @@ local function PropsAndMethods(o)
         if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
         return GC:IsM6Macro(self.w:GetMacroData().name)
     end
+
+    function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.w.frame()) end
+    function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.w.frame()) end
+
 end
 
 PropsAndMethods(L)

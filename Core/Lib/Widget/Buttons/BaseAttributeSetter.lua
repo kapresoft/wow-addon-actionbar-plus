@@ -12,7 +12,7 @@ Local Vars
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local WMX, String, Profile = O.WidgetMixin, O.String, O.Profile
+local WMX, String, PAU = O.WidgetMixin, O.String, O.PlayerAuraUtil
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
 
@@ -74,6 +74,7 @@ Methods
 function L:OnAfterSetAttributes(btn)
     AddPostCombat(btn)
     self:HandleGameTooltipCallbacks(btn)
+    PAU:OnAfterButtonAttributesSet(btn.widget)
 end
 
 --- @param btn ButtonUI
