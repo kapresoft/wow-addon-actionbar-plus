@@ -158,12 +158,12 @@ end
 function P:GetBar(frameIndex)
     AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
 
-    if isNotTable(self.profile.bars) then return end
+    if isNotTable(self.profile().bars) then return end
     local frameName = self:GetFrameNameByIndex(frameIndex)
-    local bar = self.profile.bars[frameName]
+    local bar = self.profile().bars[frameName]
     if isNotTable(bar) then
-        self.profile.bars[frameName] = self:CreateBarsTemplate()
-        bar = self.profile.bars[frameName]
+        self.profile().bars[frameName] = self:CreateBarsTemplate()
+        bar = self.profile().bars[frameName]
     end
 
     return bar
@@ -212,7 +212,7 @@ function P:SetBarLockValue(frameIndex, value)
 end
 
 function P:IsCharacterSpecificAnchor()
-    return true == self.profile[ConfigNames.character_specific_anchors]
+    return true == self.profile()[ConfigNames.character_specific_anchors]
 end
 
 --- @param frameIndex number
@@ -282,8 +282,8 @@ function P:IsBarLockedAlways(frameIndex) return self:GetBarLockValue(frameIndex)
 function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(self:GetFrameNameByIndex(frameIndex)) end
 
 function P:IsBarNameEnabled(frameName)
-    if not self.profile.bars then return false end
-    local bar = self.profile.bars[frameName]
+    if not self.profile().bars then return false end
+    local bar = self.profile().bars[frameName]
     if isNotTable(bar) then return false end
     return bar.enabled
 end
@@ -347,14 +347,14 @@ function P:FindButtonsByType(btnType)
     return buttons
 end
 
-function P:IsHideWhenTaxi() return self.profile[ConfigNames.hide_when_taxi] == true end
+function P:IsHideWhenTaxi() return self.profile()[ConfigNames.hide_when_taxi] == true end
 
 --- @param anchorType string
 --- @see TooltipAnchor
-function P:SetTooltipAnchorType(anchorType) self.profile[ConfigNames.tooltip_anchor_type] = anchorType end
+function P:SetTooltipAnchorType(anchorType) self.profile()[ConfigNames.tooltip_anchor_type] = anchorType end
 --- @see TooltipAnchor
 --- @return string One of TooltipAnchor values
-function P:GetTooltipAnchorType() return self.profile[ConfigNames.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPRIGHT end
+function P:GetTooltipAnchorType() return self.profile()[ConfigNames.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPRIGHT end
 
 --- @return Profile_Config_Names
 function P:GetConfigNames() return ConfigNames end
@@ -370,5 +370,7 @@ Listen to Message
 -------------------------------------------------------------------------------]]
 P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
     p:log(10, '%s received..', msg)
-    P.profile = ns.db.profile
+
+    P.profile = function() return ns.db.profile end
+
 end)

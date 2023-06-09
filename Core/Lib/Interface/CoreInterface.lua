@@ -15,7 +15,7 @@ local function BaseLibraryObject_Def()
     --- @type table
     o.mt = { __tostring = function() end }
 
-    --- @type Logger
+    --- @type fun() : Logger
     o.logger = {}
 
     --- @return string

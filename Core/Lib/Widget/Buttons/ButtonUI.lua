@@ -67,25 +67,25 @@ local function RegisterForClicks(widget, event, down)
     local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
     if E.ON_LEAVE == event then
         if useKeyDown then
-            widget.button:RegisterForClicks('AnyDown')
+            widget.button():RegisterForClicks('AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            widget.button():RegisterForClicks('AnyUp')
         end
     elseif E.ON_ENTER == event then
-        --widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        --widget.btn():RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         if useKeyDown then
             --- Note: Macro will not trigger on first click if Drag Key is used in 'mod:<key>' in macros
             --- Macros should not use mod:<key> on the same drag key
-            widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+            widget.button():RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            widget.button():RegisterForClicks('AnyUp')
         end
     elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event or 'PostClick' == event then
-        --widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+        --widget.btn():RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         if useKeyDown then
-            widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+            widget.button():RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            widget.button():RegisterForClicks('AnyUp')
         end
     end
 end
@@ -251,7 +251,7 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnUpdateButtonUsable(widget, event)
-    if not widget.button:IsShown() then return end
+    if not widget.button():IsShown() then return end
     widget:UpdateUsable()
 end
 
@@ -262,7 +262,7 @@ local function OnSpellUpdateUsable(widget, event)
         -- todo next: M6 Macro
         -- p:log('OnSpellUpdateUsable[%s](%s): %s', widget:GetName(), GetTime(), widget.config)
     end
-    if not widget.button:IsShown() then return end
+    if not widget.button():IsShown() then return end
     widget:UpdateRangeIndicator()
 
     OnUpdateButtonUsable(widget, event)
@@ -313,7 +313,6 @@ local function RegisterWidget(widget, name)
     widget.userdata = {}
     widget.events = {}
     widget.base = WidgetBase
-    widget.frame.obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -409,27 +408,25 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    --- @class __ButtonUIWidget : ButtonMixin
     --- @alias ButtonUIWidget  __ButtonUIWidget | BaseLibraryObject_WithAceEvent
+    --- @class __ButtonUIWidget : ButtonMixin
     local __widget = {
-        --- @type ActionbarPlus
-        addon = ABP,
-        --- @type Profile
-        profile = P,
+        --- @return ActionbarPlus
+        addon = function() return ABP  end,
         --- @type number
         index = btnIndex,
         --- @type number
         frameIndex = dragFrameWidget:GetIndex(),
         --- @type string
         buttonName = btnName,
-        --- @type FrameWidget
-        dragFrame = dragFrameWidget,
-        --- @type ButtonUI
-        button = button,
-        --- @type ButtonUI
-        frame = button,
-        --- @type CooldownFrame
-        cooldown = cooldown,
+        --- @type fun() : FrameWidget
+        dragFrame = function() return dragFrameWidget end,
+        --- @type fun() :  ButtonUI
+        button = function() return button  end,
+        --- @type fun() : ButtonUI
+        frame = function() return button end,
+        --- @type fun() : CooldownFrame
+        cooldown = function() return cooldown end,
         --- @type table
         cooldownInfo = nil,
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
@@ -438,7 +435,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
         --- @type number
         buttonPadding = 1,
-        buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
     --- @type ButtonUIWidget
@@ -455,18 +451,16 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     widget:InitWidget()
 
     -- This is for mouseover effect
-    ----- @param w ButtonUIWidget
     --widget:SetCallback("OnEnter", function(w)
-    --    w.dragFrame.frame:SetAlpha(1.0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
-    --        bw.button:SetAlpha(1)
+    --    w.dragFrame().frame:SetAlpha(1.0)
+    --    w.dragFrame():ApplyForEachButtons(function(bw)
+    --        bw.btn():SetAlpha(1)
     --    end)
     --end)
-    ----- @param w ButtonUIWidget
     --widget:SetCallback("OnLeave", function(w)
-    --    w.dragFrame.frame:SetAlpha(0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
-    --        bw.button:SetAlpha(0.4)
+    --    w.dragFrame().frame:SetAlpha(0)
+    --    w.dragFrame():ApplyForEachButtons(function(bw)
+    --        bw.btn():SetAlpha(0.4)
     --    end)
     --end)
 

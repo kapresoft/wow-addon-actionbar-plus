@@ -73,7 +73,7 @@ local function RegisterWidget(widget, name)
     widget.userdata = {}
     widget.events = {}
     widget.base = WidgetBase
-    widget.frame.obj = widget
+    --widget.frame.obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -103,7 +103,7 @@ local function OnEquipmentSwapFinished(frameWidget, event)
     p:log(20,'OnEquipmentSwapFinished(): frame #%s', frameWidget:GetFrameIndex())
     frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
             function(btnWidget)
-                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button)
+                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button())
             end)
 end
 
@@ -315,7 +315,6 @@ Methods
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
-    local profile = widget.profile
     local frame = widget.frame
 
     function widget:GetName() return widget.frame:GetName() end
@@ -325,7 +324,7 @@ local function WidgetMethods(widget)
     function widget:GetIndex() return self.index end
 
     --- @return Profile_Bar
-    function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
+    function widget:GetConfig() return P:GetBar(self:GetIndex()) end
 
     function widget:InitAnchor()
         local anchor = P:GetAnchor(self.index)
@@ -356,7 +355,7 @@ local function WidgetMethods(widget)
         self:UpdateAnchor()
     end
 
-    function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
+    function widget:IsLockedInCombat() return P:IsBarLockedInCombat(self:GetFrameIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
 
@@ -465,6 +464,9 @@ local function WidgetMethods(widget)
     --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:fevb(predicateFn, applyFn) self:ApplyForEachButtonCondition(predicateFn, applyFn) end
 
+    --- Alias for #ApplyForEachButton(applyFn)
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:feb(applyFunction) self:ApplyForEachButton(applyFunction) end
 
     function widget:SetGroupState(isShown)
         if isShown == true then
@@ -571,7 +573,7 @@ local function WidgetMethods(widget)
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
         self:ApplyForEachButton(function(bw)
-            bw.button:SetAlpha(buttonAlpha)
+            bw.button():SetAlpha(buttonAlpha)
         end)
     end
 

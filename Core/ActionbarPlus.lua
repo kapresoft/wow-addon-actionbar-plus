@@ -71,7 +71,7 @@ local function RegisterEvents(addon)
 
     --- @class ActionbarPlusEvent : ActionbarPlusEventMixin
     local addonEvents = ns:K():CreateAndInitFromMixin(O.ActionbarPlusEventMixin, addon)
-    addon.addonEvents = addonEvents
+    addon.addonEvents = function() return addonEvents end
 
     return frame
 end
@@ -187,18 +187,17 @@ local methods = {
         local profileName = self.db:GetCurrentProfile()
         local defaultProfile = P:CreateDefaultProfile(profileName)
         local defaults = { profile =  defaultProfile }
+        -- todo next: move db to Namespace (don't store here)
         self.db:RegisterDefaults(defaults)
         self.profile = self.db.profile
         if IsEmptyTable(ABP_PLUS_DB.profiles[profileName]) then
             ABP_PLUS_DB.profiles[profileName] = defaultProfile
-            --error(profileName .. ': ' .. ABP_Table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
         end
     end,
     --- This is called automatically by Ace
     --- @param self ActionbarPlus
     ['OnInitialize'] = function(self)
         self:InitializeDb()
-        self.barBindings = WMX:GetBarBindingsMap()
         self:RegisterSlashCommands()
         self:RegisterHooks()
 

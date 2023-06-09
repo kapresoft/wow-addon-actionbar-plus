@@ -29,7 +29,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(M.ReceiveDragEventHandler); if not L then return end
-local p = L.logger
+local p = L.logger()
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 --- README: Also need to add the attribute setterin in ButtonFactor#AttributeSetters

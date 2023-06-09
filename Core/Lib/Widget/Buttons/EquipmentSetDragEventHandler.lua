@@ -30,9 +30,8 @@ New Instance
 -------------------------------------------------------------------------------]]
 
 --- @class EquipmentSetDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
-
-local p = L.logger
+local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler); if not L then return end
+local p = L.logger()
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
@@ -95,8 +94,8 @@ end
 ---@param profile Profile_Config
 local function GlowButtonConditionally(w, profile)
     if profile.equipmentset_show_glow_when_active ~= true then return end
-    ActionButton_ShowOverlayGlow(w.button)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+    ActionButton_ShowOverlayGlow(w.button())
+    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button()) end)
 end
 
 --- @param evt string
@@ -146,7 +145,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local config = btnUI.widget.config
+        local config = btnUI.widget.config()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 

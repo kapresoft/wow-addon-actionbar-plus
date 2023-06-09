@@ -11,7 +11,7 @@ local _, ns = ...
 local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
 local pformat = ns.pformat
 local P, BaseAPI = O.Profile, O.BaseAPI
-local String = O.String
+local String, WMX = O.String, O.WidgetMixin
 local AceEvent = O.AceLibrary.AceEvent
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 
@@ -36,7 +36,7 @@ local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
 --[[-----------------------------------------------------------------------------
 New Instance
 self: widget
-button: widget.button
+button: widget.btn()
 -------------------------------------------------------------------------------]]
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
@@ -67,7 +67,7 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
-    function o:GetName() return self.w.button:GetName() end
+    function o:GetName() return self.w.button():GetName() end
 
     function o:InitWidget()
         self:SetButtonProperties()
@@ -77,13 +77,13 @@ local function PropsAndMethods(o)
 
     function o:SetButtonProperties()
         --- @type FrameWidget
-        local dragFrame = self.w.dragFrame
+        local dragFrame = self.w.dragFrame()
         local barConfig = dragFrame:GetConfig()
         local buttonSize = barConfig.widget.buttonSize
-        local buttonPadding = self.w.dragFrame.horizontalButtonPadding
+        local buttonPadding = self.w.dragFrame().horizontalButtonPadding
         local frameStrata = self.w.frameStrata
         local frameLevel = self.w.frameLevel
-        local button = self.w.button
+        local button = self.w.button()
 
         button:SetFrameStrata(frameStrata)
         button:SetFrameLevel(frameLevel)
@@ -94,7 +94,7 @@ local function PropsAndMethods(o)
 
     --- @param buttonSize number
     function o:Scale(buttonSize)
-        local button = self.w.button
+        local button = self.w.button()
         button.keybindText.widget:ScaleWithButtonSize(buttonSize)
         --todo next: move to a ButtonScaleMixin?
         self:ScaleButtonTextsWithButtonSize(buttonSize)
@@ -110,7 +110,7 @@ local function PropsAndMethods(o)
         offsetX = (buttonSize/100) - (offsetX + buttonSize/15)
         local scaleXOffset = buttonSize/scaleFactorX * offsetX
         local scaleYOffset = buttonSize/scaleFactorY * offsetY
-        self.w.button.text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
+        self.w.button().text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
     end
 
     --- @see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
@@ -123,7 +123,7 @@ local function PropsAndMethods(o)
         local countdownFont
         local itemCountFont
         local profile = self.w:GetProfileConfig()
-        local textUI = self.w.button.text
+        local textUI = self.w.button().text
         local itemCountFontHeight = textUI.textDefaultFontHeight
 
         if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
@@ -156,7 +156,7 @@ local function PropsAndMethods(o)
         local fontName, _, fontAttr = textUI:GetFont()
         textUI:SetFont(fontName, itemCountFontHeight, fontAttr)
 
-        self.w.cooldown:SetCountdownFont(countdownFont)
+        self.w.cooldown():SetCountdownFont(countdownFont)
         self:HideCountdownNumbers(hideCountdownNumbers)
         self:SetHideItemCountText(hideItemCountText)
         self:SetHideIndexText(hideIndexText)
@@ -169,7 +169,7 @@ local function PropsAndMethods(o)
         self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
         local hideTexts = true == profile.hide_text_on_small_buttons
         if not hideTexts then
-            local fw = self.w.dragFrame
+            local fw = self.w.dragFrame()
             local barConf = fw:GetConfig()
             if true == barConf.show_button_index then
                 self:SetHideIndexText(false)
@@ -177,7 +177,7 @@ local function PropsAndMethods(o)
             return
         end
 
-        local barConfig = self.w.dragFrame:GetConfig()
+        local barConfig = self.w.dragFrame():GetConfig()
         local buttonSize = barConfig.widget.buttonSize
         if buttonSize > MIN_BUTTON_SIZE then return end
 
@@ -188,13 +188,13 @@ local function PropsAndMethods(o)
 
     --- @param state boolean
     function o:HideCountdownNumbers(state)
-        self.w.cooldown:SetHideCountdownNumbers(state)
+        self.w.cooldown():SetHideCountdownNumbers(state)
     end
 
     ---This is the item count text
     --- @param state boolean
     function o:SetHideItemCountText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.text:Hide()
             return
@@ -205,7 +205,7 @@ local function PropsAndMethods(o)
 
     --- @param state boolean
     function o:SetHideKeybindText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.keybindText:Hide()
             return
@@ -215,7 +215,7 @@ local function PropsAndMethods(o)
     end
     --- @param state boolean
     function o:SetHideIndexText(state)
-        local btn = self.w.button
+        local btn = self.w.button()
         if true == state then
             btn.indexText:Hide()
             return
@@ -245,7 +245,7 @@ local function PropsAndMethods(o)
     --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
     --- @param icon string The icon texture path
     function o:InitTextures(icon)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
 
         -- DrawLayer is 'ARTWORK' by default for icons
         btnUI:SetNormalTexture(icon)
@@ -266,12 +266,12 @@ local function PropsAndMethods(o)
     end
 
     --- @return ButtonAttributes
-    function o:GetButtonAttributes() return self.w.buttonAttributes end
+    function o:GetButtonAttributes() return GC.ButtonAttributes end
     function o:GetIndex() return self.w.index end
     function o:GetFrameIndex() return self.w.frameIndex end
     ---Only used for prefixing logs
     function o:N() return "F" .. self.frameIndex .. "_B" .. self.index end
-    function o:IsParentFrameShown() return self.dragFrame:IsShown() end
+    function o:IsParentFrameShown() return self.dragFrame():IsShown() end
 
     function o:ResetConfig()
         self.w:ResetButtonData()
@@ -285,73 +285,84 @@ local function PropsAndMethods(o)
 
     function o:Reset()
         self:ResetCooldown()
+        self:HideOverlayGlow()
         self:ClearAllText()
     end
 
     function o:ResetCooldown() self:SetCooldown(0, 0) end
     function o:SetCooldown(start, duration)
         if not (start or duration) then return end
-        self.cooldown:SetCooldown(start, duration) end
-
+        self.cooldown():SetCooldown(start, duration) end
 
     --- @type BindingInfo
-    function o:GetBindings()
-        return (self.addon.barBindings and self.addon.barBindings[self.buttonName]) or nil
-    end
+    function o:GetBindings() return WMX:GetBarBindings(self.buttonName) end
 
     --- @param text string
     function o:SetText(text)
         if String.IsBlank(text) then text = '' end
-        self.w.button.text:SetText(text)
+        self.w.button().text:SetText(text)
     end
+
     --- Sets the name of the button (Used by Macros)
     --- @param text string
-    function o:SetNameText(text) self.w.button.nameText:SetEllipsesText(text) end
+    function o:SetNameText(text) self.w.button().nameText:SetEllipsesText(text) end
 
     function o:SetTextDelayed(text, optionalDelay)
         C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
     end
+
     --- @param state boolean true will show the button index number
     function o:ShowIndex(state)
         local text = ''
         if true == state then text = self.w.index end
-        self.w.button.indexText:SetText(text)
+        self.w.button().indexText:SetText(text)
         self:RefreshTexts()
     end
 
     --- @param state boolean true will show the button index number
     function o:ShowKeybindText(state)
         local text = ''
-        local button = self.w.button
-        if not self:HasKeybindings() then
+        local button = self.w.button()
+
+        if true ~= state then
             button.keybindText:SetText(text)
+            self:RefreshTexts()
             return
         end
 
-        if true == state then
-            local bindings = self:GetBindings()
-            if bindings and bindings.key1Short then
-                text = bindings.key1Short
-            end
+        local bindings = self:GetBindings()
+        if not self:HasValidKeybindings(bindings) then
+            button.keybindText:SetText(text)
+            self:RefreshTexts()
+            return
         end
+
+        if bindings and bindings.key1Short then
+            text = bindings.key1Short
+        end
+
         button.keybindText:SetText(text)
         self:RefreshTexts()
     end
 
-    function o:HasKeybindings()
-        local b = self:GetBindings()
-        if not b then return false end
-        return b and String.IsNotBlank(b.key1)
+    function o:HasKeybindings() return self:HasValidKeybindings(self:GetBindings()) end
+
+    --- @param bindingDetails BindingDetails
+    function o:HasValidKeybindings(bindingDetails)
+        if not bindingDetails then return false end
+        return bindingDetails and String.IsNotBlank(bindingDetails.key1)
     end
+
+
     function o:ClearAllText()
         self:SetText('')
-        self.w.button.keybindText:SetText('')
-        self.w.button.nameText:SetText('')
+        self.w.button().keybindText:SetText('')
+        self.w.button().nameText:SetText('')
     end
 
     --- @return CooldownInfo
     function o:GetCooldownInfo()
-        local btnData = self.w.config
+        local btnData = self.w.config()
         if btnData == nil or String.IsBlank(btnData.type) then return nil end
         local type = btnData.type
 
@@ -467,13 +478,38 @@ local function PropsAndMethods(o)
         return spellCD
     end
 
-    --- @return number The spellID for macro
+    --- @return SpellID The current spellID for macro
     function o:GetMacroSpellId()
         local macro = self:GetMacroData();
         if not macro then return nil end
         local name = GetMacroInfo(macro.index)
         if not name then return nil end
         return GetMacroSpell(macro.index)
+    end
+
+    --- @return SpellName The current spell name for macro
+    function o:GetMacroSpellName()
+        local spellId = self:GetMacroSpellId()
+        return spellId and GetSpellInfo(spellId)
+    end
+
+    --- @param spellName SpellName
+    --- @return boolean true if the spell, macro or item name is equal to spellName
+    function o:SpellNameEquals(spellName)
+        return IsNotBlank(spellName)
+                and spellName == self:GetActiveSpellName()
+    end
+
+    --- @return SpellName
+    function o:GetActiveSpellName()
+        if self:IsSpell() then
+            return self:GetSpellName()
+        elseif self:IsMacro() then
+            return self:GetMacroSpellName()
+        elseif self:IsItem() then
+            return API:GetItemSpellInfo(API:GetItemID(self:GetItemName()))
+        end
+        return nil
     end
 
     --- @return ItemCooldown
@@ -497,7 +533,7 @@ local function PropsAndMethods(o)
 
     function o:ResetWidgetAttributes()
         if InCombatLockdown() then return end
-        local button = self.w.button
+        local button = self.w.button()
         for _, v in pairs(self:GetButtonAttributes()) do
             if not InCombatLockdown() then
                 button:SetAttribute(v, nil)
@@ -511,8 +547,23 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateItemOrMacroState()
-        if self:IsItem() then self:UpdateItemState(); return end
-        self:UpdateMacroState()
+        if self:IsItem() then
+            self:UpdateItemState()
+            return
+        end
+        if self:IsMacro() then self:UpdateMacroState() end
+    end
+
+    function o:UpdateSpellState()
+        if not self:IsSpell() then return end
+        self:UpdateSpellCharges(self:GetSpellName())
+    end
+
+    ---@param spellName SpellName
+    function o:UpdateSpellCharges(spellName)
+        local currentCharge, maxCharge = GetSpellCharges(spellName)
+        if not maxCharge or (maxCharge <= 1) then return end
+        self:SetText(currentCharge)
     end
 
     function o:UpdateItemState()
@@ -562,7 +613,7 @@ local function PropsAndMethods(o)
             elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
             return
         end
-        local c = self.w.config
+        local c = self.w.config()
         local isUsable = true
         if c.type == SPELL then
             isUsable = self:IsUsableSpell(cd)
@@ -576,7 +627,8 @@ local function PropsAndMethods(o)
 
     function o:UpdateState()
         self:UpdateCooldown()
-        if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end
+        self:UpdateItemOrMacroState()
+        self:UpdateSpellState()
         self:UpdateUsable()
         self:UpdateRangeIndicator()
         self:SetHighlightDefault()
@@ -588,20 +640,20 @@ local function PropsAndMethods(o)
     --the actionbar grid event
     function o:UpdateKeybindTextState()
         if not self:IsShowKeybindText() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
             return
         end
 
         if self:IsEmpty() then
             if self:IsShowEmptyButtons() then
-                self.w.button.keybindText:Show()
+                self.w.button().keybindText:Show()
             else
-                self.w.button.keybindText:Hide()
+                self.w.button().keybindText:Hide()
             end
             return
         end
 
-        if not self:IsEmpty() then self.w.button.keybindText:Show() end
+        if not self:IsEmpty() then self.w.button().keybindText:Show() end
     end
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
@@ -640,7 +692,7 @@ local function PropsAndMethods(o)
     --- @return ActionBarInfo
     function o:GetActionbarInfo()
         local index = self.index
-        local dragFrame = self.dragFrame;
+        local dragFrame = self.dragFrame();
         local frameName = dragFrame:GetName()
         local btnName = format('%sButton%s', frameName, tostring(index))
 
@@ -652,19 +704,19 @@ local function PropsAndMethods(o)
         return info
     end
 
-    function o:ClearHighlight() self.w.button:SetHighlightTexture(nil) end
+    function o:ClearHighlight() self.w.button():SetHighlightTexture(nil) end
     function o:ResetHighlight() self:SetHighlightDefault() end
 
     --- @param texture string
-    function o:SetNormalTexture(texture) self.w.button:SetNormalTexture(texture) end
+    function o:SetNormalTexture(texture) self.w.button():SetNormalTexture(texture) end
     --- @param texture string
     function o:SetPushedTexture(texture)
         if texture then
-            self.w.button:SetPushedTexture(texture)
+            self.w.button():SetPushedTexture(texture)
             self:SetPushedTextureAlpha(pushedTextureInUseAlpha)
             return
         end
-        self.w.button:SetPushedTexture(emptyTexture)
+        self.w.button():SetPushedTexture(emptyTexture)
         if not self:IsShowEmptyButtons() then
             self:SetPushedTextureAlpha(0)
         end
@@ -673,18 +725,18 @@ local function PropsAndMethods(o)
     --- @param texture string
     function o:SetHighlightTexture(texture)
         if texture then
-            self.w.button:SetHighlightTexture(texture)
+            self.w.button():SetHighlightTexture(texture)
             self:SetHighlightTextureAlpha(highlightTextureAlpha)
             return
         end
-        self.w.button:SetHighlightTexture(emptyTexture)
+        self.w.button():SetHighlightTexture(emptyTexture)
         self:SetHighlightTextureAlpha(0)
     end
 
     --- @param alpha number 1 (opaque) to zero (transparent)
-    function o:SetPushedTextureAlpha(alpha) self.w.button:GetPushedTexture():SetAlpha(alpha or 1) end
+    function o:SetPushedTextureAlpha(alpha) self.w.button():GetPushedTexture():SetAlpha(alpha or 1) end
     --- @param alpha number 1 (opaque) to zero (transparent)
-    function o:SetHighlightTextureAlpha(alpha) self.w.button:GetHighlightTexture():SetAlpha(alpha or 1) end
+    function o:SetHighlightTextureAlpha(alpha) self.w.button():GetHighlightTexture():SetAlpha(alpha or 1) end
 
     function o:SetTextureAsEmpty()
         self:SetNormalTexture(emptyTexture)
@@ -701,8 +753,8 @@ local function PropsAndMethods(o)
     end
 
     --- @param alpha number 0.0 to 1.0
-    function o:SetNormalIconAlpha(alpha) self.w.button:GetNormalTexture():SetAlpha(alpha or 1.0) end
-    function o:SetVertexColorNormal() self.w.button:GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
+    function o:SetNormalIconAlpha(alpha) self.w.button():GetNormalTexture():SetAlpha(alpha or 1.0) end
+    function o:SetVertexColorNormal() self.w.button():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
 
     function o:SetNormalIconAlphaDefault()
         if self:IsEmpty() then
@@ -712,7 +764,7 @@ local function PropsAndMethods(o)
         self:SetNormalIconAlpha(nonEmptySlotAlpha)
     end
 
-    function o:SetPushedTextureDisabled() self.w.button:SetPushedTexture(nil) end
+    function o:SetPushedTextureDisabled() self.w.button():SetPushedTexture(nil) end
 
     ---This is used when an action button starts dragging to highlight other drag targets (empty slots).
     function o:ShowEmptyGrid()
@@ -728,9 +780,9 @@ local function PropsAndMethods(o)
         self:ShowKeybindText(true)
 
         if not self:IsShowKeybindText() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
         elseif self:IsEmpty() then
-            self.w.button.keybindText:Show()
+            self.w.button().keybindText:Show()
         end
     end
 
@@ -741,22 +793,22 @@ local function PropsAndMethods(o)
         self:SetNormalTexture(emptyTexture)
         self:SetNormalIconAlphaAsEmpty()
         if self:IsEmpty() and not self:IsShowEmptyButtons() then
-            self.w.button.keybindText:Hide()
+            self.w.button().keybindText:Hide()
         end
     end
 
     function o:SetCooldownTextures(icon)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
         btnUI:SetNormalTexture(icon)
         btnUI:SetPushedTexture(icon)
     end
 
-    function o:SetButtonStateNormal() self.w.button:SetButtonState('NORMAL') end
-    function o:SetButtonStatePushed() self.w.button:SetButtonState('PUSHED') end
+    function o:SetButtonStateNormal() self.w.button():SetButtonState('NORMAL') end
+    function o:SetButtonStatePushed() self.w.button():SetButtonState('PUSHED') end
 
     ---Typically used when casting spells that take longer than GCD
     function o:SetHighlightInUse()
-        local btn = self.w.button
+        local btn = self.w.button()
         self:SetNormalIconAlpha(highlightTextureInUseAlpha)
         local hltTexture = btn:GetHighlightTexture()
         --highlight texture could be nil if action_button_mouseover_glow is disabled
@@ -778,7 +830,7 @@ local function PropsAndMethods(o)
 
     --- @param state boolean true, to enable highlight
     function o:SetHighlightEnabled(state)
-        local btnUI = self.w.button
+        local btnUI = self.w.button()
         if state == true then
             btnUI:SetHighlightTexture(highlightTexture)
             btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
@@ -816,7 +868,7 @@ local function PropsAndMethods(o)
     --- @param optionalBtnConf Profile_Button
     --- @return boolean
     function o:IsMatchingSpellID(spellID, optionalBtnConf)
-        local buttonData = optionalBtnConf or self.w.config
+        local buttonData = optionalBtnConf or self.w.config()
         local w = self.w
         if w:IsSpell() then
             return spellID == buttonData.spell.id
@@ -832,7 +884,7 @@ local function PropsAndMethods(o)
     --- @param spellName string The spell name
     --- @param buttonData Profile_Button
     function o:IsMatchingSpellName(spellName, buttonData)
-        local s = buttonData or self.w.config
+        local s = buttonData or self.w.config()
         if not (s.spell and s.spell.name) then return false end
         if not (s and spellName == s.spell.name) then return false end
         return true
@@ -841,7 +893,7 @@ local function PropsAndMethods(o)
     --- @param spellID string
     --- @param optionalProfileButton Profile_Button
     function o:IsMatchingMacroSpellID(spellID, optionalProfileButton)
-        optionalProfileButton = optionalProfileButton or self.w.config
+        optionalProfileButton = optionalProfileButton or self.w.config()
         if not self:IsValidMacroProfile(optionalProfileButton) then return end
         local macroSpellId =  GetMacroSpell(optionalProfileButton.macro.index)
         if not macroSpellId then return false end
@@ -853,7 +905,7 @@ local function PropsAndMethods(o)
     --- @return boolean
     function o:IsMatchingMacroOrSpell(spellID)
         --- @type Profile_Button
-        local conf = self.w.config
+        local conf = self.w.config()
         if not conf and (conf.spell or conf.macro) then return false end
         if self:IsConfigOfType(conf, SPELL) then
             return spellID == conf.spell.id
@@ -868,13 +920,13 @@ local function PropsAndMethods(o)
     --- @param hasTarget boolean Player has a target
     function o:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
         local show = self.w.frameIndex == 1 and (self.w.index == 1 or self.w.index == 2)
-        local fs = self.w.button.keybindText
+        local fs = self.w.button().keybindText
         if not hasTarget then fs.widget:SetVertexColorNormal(); return end
 
         if not self.w:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
 
         -- else if in range, color is "white"
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
+        local inRange = API:IsActionInRange(self.w.config(), UNIT.TARGET)
         fs.widget:SetVertexColorNormal()
         if inRange == false then
             fs.widget:SetVertexColorOutOfRange()
@@ -889,7 +941,7 @@ local function PropsAndMethods(o)
         local show = self.w.frameIndex == 1 and self.w.index == 1
         --if show then p:log('UpdateRangeIndicatorWithShowKeybindOff: %s', hasTarget) end
         -- if no target, clear text and return
-        local fs = self.w.button.keybindText
+        local fs = self.w.button().keybindText
         if not hasTarget then
             fs.widget:ClearText()
             fs.widget:SetVertexColorNormal()
@@ -899,7 +951,7 @@ local function PropsAndMethods(o)
         -- has target, set text as range indicator
         fs.widget:SetTextWithRangeIndicator()
 
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
+        local inRange = API:IsActionInRange(self.w.config(), UNIT.TARGET)
 
         --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
         fs.widget:SetVertexColorNormal()
@@ -912,7 +964,7 @@ local function PropsAndMethods(o)
 
     function o:UpdateRangeIndicator()
         if not self:ContainsValidAction() then return end
-        local configIsShowKeybindText = self.w.dragFrame:IsShowKeybindText()
+        local configIsShowKeybindText = self.w.dragFrame():IsShowKeybindText()
         self.w:ShowKeybindText(configIsShowKeybindText)
 
         local hasTarget = API:IsValidActionTarget()
@@ -924,7 +976,7 @@ local function PropsAndMethods(o)
 
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
-        local normalTexture = self.w.button:GetNormalTexture()
+        local normalTexture = self.w.button():GetNormalTexture()
         if not normalTexture then return end
         -- energy based spells do not use 'notEnoughMana'
         if IsStealthed() or API:IsShapeShiftActive(self:GetSpellData()) then
@@ -950,7 +1002,7 @@ local function PropsAndMethods(o)
         return IsUsableSpell(spellID)
     end
 
-    ---@param itemID itemID
+    ---@param itemID ItemID
     function o:IsUsableItemID(itemID)
         if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
         return IsUsableItem(itemID)
@@ -980,7 +1032,7 @@ local function PropsAndMethods(o)
 
     --- @param icon string Blizzard Icon
     function o:SetIcon(icon)
-        local btn = self.w.button
+        local btn = self.w.button()
         self:SetNormalTexture(icon)
         self:SetPushedTexture(icon)
         local nTexture = btn:GetNormalTexture()
@@ -1019,6 +1071,8 @@ local function PropsAndMethods(o)
             self:SetText('')
             local icon
             icon = scd.spell.icon
+            self:UpdateSpellCharges(scd.spell.name)
+
             if self:IsStealthSpell() then
                 local spellInfo = self:GetSpellData()
                 icon = API:GetSpellIcon(spellInfo)
@@ -1046,12 +1100,12 @@ local function PropsAndMethods(o)
     end
 
     ---@param state boolean Set to true to enable mouse
-    function o:EnableMouse(state) if InCombatLockdown() then return end; self.w.button:EnableMouse(state) end
-    function o:Hide() if InCombatLockdown() then return end; self.w.button:Hide() end
-    function o:Show() if InCombatLockdown() then return end; self.w.button:Show() end
+    function o:EnableMouse(state) if InCombatLockdown() then return end; self.w.button():EnableMouse(state) end
+    function o:Hide() if InCombatLockdown() then return end; self.w.button():Hide() end
+    function o:Show() if InCombatLockdown() then return end; self.w.button():Show() end
 
     function o:GetIcon()
-        local texture = self.w.frame:GetNormalTexture()
+        local texture = self.w.frame():GetNormalTexture()
         if texture then return texture:GetTexture() end
         return nil
     end
@@ -1062,6 +1116,10 @@ local function PropsAndMethods(o)
         if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
         return GC:IsM6Macro(self.w:GetMacroData().name)
     end
+
+    function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.w.frame()) end
+    function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.w.frame()) end
+
 end
 
 PropsAndMethods(L)

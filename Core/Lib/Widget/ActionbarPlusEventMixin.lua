@@ -55,7 +55,7 @@ local p = L:GetLogger()
 --- @param abp ActionbarPlus
 L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
     p:log(10, 'MSG::R: %s', msg)
-    abp.addonEvents:RegisterEvents()
+    abp.addonEvents():RegisterEvents()
 end)
 
 --[[-----------------------------------------------------------------------------
@@ -78,9 +78,7 @@ end
 --- @param event string
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
-    local addon = f.ctx.addon
-    addon.barBindings = f.ctx.widgetMixin:GetBarBindingsMap()
-    if addon.barBindings then f.ctx.buttonFactory:UpdateKeybindText() end
+    f.ctx.buttonFactory:UpdateKeybindText()
 end
 
 --- @param f EventFrameInterface
@@ -206,13 +204,17 @@ end
 
 --- @param f EventFrameInterface
 local function OnSpellCastSucceeded(f, ...)
+    --- @type ButtonFactory
     local bf = f.ctx.buttonFactory
+
     bf:fevf(function(fw)
-        fw:fevb(function(bw) return bw:IsItemOrMacro() end,
-                function(bw)
-                    C_Timer.NewTicker(0.5, function()
-                        bw:UpdateItemOrMacroState() end, 2)
-                end)
+        fw:feb(function(bw)
+            if bw:IsSpell() then
+                C_Timer.NewTicker(0.1, function() bw:UpdateSpellState() end, 2)
+            elseif bw:IsItemOrMacro() then
+                C_Timer.NewTicker(0.1, function() bw:UpdateItemOrMacroState() end, 2)
+            end
+        end)
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end

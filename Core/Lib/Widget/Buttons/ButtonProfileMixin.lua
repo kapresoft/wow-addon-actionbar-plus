@@ -14,7 +14,7 @@ local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local CN = GC.Profile_Config_Names
 local String, Table, W = O.String, O.Table, GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
-local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
+local IsEmptyStr, IsBlankStr, IsNotBlankStr = String.IsEmpty, String.IsBlank, String.IsNotBlank
 local p = O.LogFactory(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ end
 -- ## Functions ------------------------------------------------
 ---@param currentActionType ActionTypeName The current action type data to preserve
 function L:CleanupOtherActionTypeData(currentActionType)
-    local btnData = self.w.config
+    local btnData = self.w.config()
     if not btnData then return end
     CleanupActionTypeData(btnData)
 end
@@ -60,11 +60,11 @@ local function PropsAndMethods(o)
     --- @param widget ButtonUIWidget
     function o:Init(widget)
         self.w = widget
-        self.config = self:GetConfig()
+        self.config = function() return self:GetConfig() end
     end
 
     function o:SetButtonAttributes()
-        local conf = self.config
+        local conf = self.config()
         if not conf then return end
         if IsBlankStr(conf.type) then
             conf.type = self:GuessButtonType(conf)
@@ -72,7 +72,7 @@ local function PropsAndMethods(o)
         end
         local setter = self:GetAttributesSetter()
         if not setter then return end
-        setter:SetAttributes(self.w.button)
+        setter:SetAttributes(self.w.button())
     end
 
     --- @return table<string, AttributeSetter>
@@ -92,7 +92,7 @@ local function PropsAndMethods(o)
 
     --- @return AttributeSetter
     function o:GetAttributesSetter(actionType)
-        local type = actionType or self.config.type
+        local type = actionType or self.config().type
         --p:log('type: %s', tostring(type))
         return self:GetAllAttributesSetters()[type]
     end
@@ -112,22 +112,21 @@ local function PropsAndMethods(o)
     end
 
     function o:IsEmpty()
-        if IsEmptyTable(self.config) then return true end
-        local type = self.config.type
+        if IsEmptyTable(self.config()) then return true end
+        local type = self.config().type
         if IsBlankStr(type) then return true end
-        if IsEmptyTable(self.config[type]) then return true end
+        if IsEmptyTable(self.config()[type]) then return true end
         return false
     end
 
     --- @return Profile_Bar
-    function o:GetBarConfig() return self.w.dragFrame:GetConfig() end
+    function o:GetBarConfig() return self.w.dragFrame():GetConfig() end
 
     ---#### Get Profile Button Config Data
     --- @return Profile_Button
     --function L:GetConfig() return self.w:GetButtonData():GetConfig() end
     function o:GetConfig()
-        local profile = self.w.profile
-        local profileButton = profile:GetButtonData(self.w.frameIndex, self.w.buttonName)
+        local profileButton = P:GetButtonData(self.w.frameIndex, self.w.buttonName)
         -- self cleanup
         CleanupActionTypeData(profileButton)
         return profileButton
@@ -135,28 +134,28 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Button
     function o:GetProfileButtonData()
-        local profileButton = O.Profile:GetButtonData(self.w.frameIndex, self.w.index)
+        local profileButton = P:GetButtonData(self.w.frameIndex, self.w.index)
         -- self cleanup
         CleanupActionTypeData(profileButton)
         return profileButton
     end
 
     --- @return Profile_Config
-    function o:GetProfileConfig() return self.w.profile:P() end
+    function o:GetProfileConfig() return P:P() end
 
     --- @param type ActionTypeName One of: spell, item, or macro
-    function o:GetButtonTypeData(type) return self.config[type] end
+    function o:GetButtonTypeData(type) return self.config()[type] end
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
+    function o:GetSpellName() local sp = self:GetSpellData(); return sp and sp.name end
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
+    function o:GetItemName() local i = self:GetItemData(); return i and i.name end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
     --- @return string The macro name
-    function o:GetMacroName()
-        local md = self:GetMacroData(); if not md then return nil end
-        return md.name
+    function o:GetMacroName() local md = self:GetMacroData(); return md and md.name
     end
     --- @return boolean
     ---@param name string The macro name to check
@@ -181,7 +180,7 @@ local function PropsAndMethods(o)
 
     function o:ConfigContainsValidActionType()
         if not type then return false end
-        local btnConf = self.config
+        local btnConf = self.config()
         if not btnConf then return false end
         if IsBlankStr(btnConf.type) and IsEmptyTable(btnConf[btnConf.type]) then
             return false
@@ -199,7 +198,7 @@ local function PropsAndMethods(o)
 
     --- @return string
     function o:GetActionName()
-        local conf = self.config
+        local conf = self.config()
         for i, type in ipairs(O.ActionType:GetNames()) do
             if not self:IsInvalidButtonData(self.conf, type) then return conf[type].name end
         end
@@ -212,22 +211,25 @@ local function PropsAndMethods(o)
     end
 
     --- @return boolean
-    function o:IsMacro() return self:IsConfigOfType(self.config, W.MACRO) end
+    function o:IsMacro() return self:IsConfigOfType(self.config(), W.MACRO) end
     --- @return boolean
-    function o:IsMacroText() return self:IsConfigOfType(self.config, W.MACRO_TEXT) end
+    function o:IsMacroText() return self:IsConfigOfType(self.config(), W.MACRO_TEXT) end
     --- @return boolean
-    function o:IsSpell() return self:IsConfigOfType(self.config, W.SPELL) end
+    function o:IsSpell()
+        return self:IsConfigOfType(self.config(), W.SPELL)
+                and IsNotBlankStr(self:GetSpellData().name)
+    end
     --- @return boolean
-    function o:IsItem() return self:IsConfigOfType(self.config,W. ITEM) end
+    function o:IsItem() return self:IsConfigOfType(self.config(),W. ITEM) end
     --- @return boolean
-    function o:IsMount() return self:IsConfigOfType(self.config, W.MOUNT) end
+    function o:IsMount() return self:IsConfigOfType(self.config(), W.MOUNT) end
     --- @see Interface/FrameXML/SecureHandlers.lua
     --- @return boolean
-    function o:IsCompanion() return self:IsConfigOfType(self.config, W.COMPANION) end
+    function o:IsCompanion() return self:IsConfigOfType(self.config(), W.COMPANION) end
     --- @return boolean
-    function o:IsBattlePet() return self:IsConfigOfType(self.config, W.BATTLE_PET) end
+    function o:IsBattlePet() return self:IsConfigOfType(self.config(), W.BATTLE_PET) end
     --- @return boolean
-    function o:IsEquipmentSet() return self:IsConfigOfType(self.config, W.EQUIPMENT_SET) end
+    function o:IsEquipmentSet() return self:IsConfigOfType(self.config(), W.EQUIPMENT_SET) end
 
     function o:IsStealthSpell()
         local spellInfo = self:GetSpellData()
@@ -290,7 +292,7 @@ local function PropsAndMethods(o)
     end
 
     --- @return boolean
-    function o:IsHideWhenTaxi() return self.w.profile:IsHideWhenTaxi() end
+    function o:IsHideWhenTaxi() return O.Profile:IsHideWhenTaxi() end
     ---@param s Profile_Spell
     function o:IsInvalidSpell(s) return IsNil(s) or (IsNil(s.name) and IsNil(s.id) and IsNil(s.icon)) end
     ---@param m Profile_Macro
@@ -346,7 +348,7 @@ local function PropsAndMethods(o)
     end
 
     function o:ResetButtonData()
-        local btnData = self.config
+        local btnData = self.config()
         for _, a in ipairs(O.ActionType:GetNames()) do btnData[a] = {} end
         btnData[W.TYPE] = ''
     end
