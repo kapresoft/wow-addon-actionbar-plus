@@ -290,6 +290,7 @@ end
 --- @param event string
 ---@param updateInfo UnitAuraUpdateInfo
 local function OnPlayerAura(f, event, unitTarget, updateInfo)
+    --p:log('E[%s]: unit=%s u=[%s] (%s)', event, unitTarget, pformat(updateInfo), GetTime())
     if GC.UnitId.player ~= unitTarget then return end
 
     local playerAuras = AU():GetPlayerSpellsFromAura(updateInfo)
@@ -444,7 +445,7 @@ function L:RegisterEvents()
     self:RegisterBagEvents()
     self:RegisterEventToMessageTransmitter()
     self:RegisterPlayerEnteringWorld()
-    self:RegisterPlayerAura()
+    --self:RegisterPlayerAura()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end
