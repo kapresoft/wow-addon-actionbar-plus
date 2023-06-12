@@ -242,6 +242,9 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnUpdateButtonCooldown(widget, event)
+    if not widget.button():IsShown() then return end
+    --p:log(10, 'UpdateCooldown[%s] (%s)', widget:GetName(), GetTime())
+
     widget:UpdateCooldown()
     local cd = widget:GetCooldownInfo();
     if (cd == nil or cd.icon == nil) then return end
@@ -251,21 +254,17 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnUpdateButtonUsable(widget, event)
-    if not widget.button():IsShown() then return end
     widget:UpdateUsable()
 end
 
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
-    if widget:IsM6Macro() then
-        -- todo next: M6 Macro
-        -- p:log('OnSpellUpdateUsable[%s](%s): %s', widget:GetName(), GetTime(), widget.config)
-    end
+    --p:log(10, 'OnSpellUpdateUsable[%s] (%s)', widget:GetName(), GetTime())
     if not widget.button():IsShown() then return end
-    widget:UpdateRangeIndicator()
-
-    OnUpdateButtonUsable(widget, event)
+    --TODO NEXT: PERF UpdateRangeIndicator()
+    --widget:UpdateRangeIndicator()
+    widget:UpdateUsable()
 end
 
 --- @param widget ButtonUIWidget
@@ -336,16 +335,17 @@ end
 --- @param widget ButtonUIWidget
 local function RegisterCallbacks(widget)
 
-    --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
-    --SPELL_UPDATE_ICON
+    --TODO NEXT: Tracks changing spells such as Covenant abilities in Shadowlands.
 
-    --TODO next Move at the frame level
+    -- TODO NEXT: PERF for OnUpdateButtonCooldown()
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-    widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
-    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
+    -- TODO NEXT: PERF for OnPlayerStartedMoving()
+    -- widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
+    -- TODO NEXT: PERF for OnSpellUpdateUsable()
+    --widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
