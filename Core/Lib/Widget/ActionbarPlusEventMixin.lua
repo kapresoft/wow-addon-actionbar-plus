@@ -133,33 +133,28 @@ end
 
 --- Non-Instant Start-Cast Handler
 --- @param f EventFrameInterface
-local function OnSpellCastStart(f, ...)
-    --todo next: include item spells (i.e., quest items)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
+--- @param spellID number
+local function OnSpellCastStart(f, spellID)
+    --p:log(10, 'OSCStart[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
     local w = f.ctx
     --- @param fw FrameWidget
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btnWidget)
+        fw:fesmb(spellID, function(btnWidget)
             btnWidget:SetHighlightInUse() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
 end
 
 --- i.e. Casting a portal and moving triggers this event
 --- @param f EventFrameInterface
-local function OnSpellCastStop(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastStop: %s', spellCastEvent)
+---@param spellID number
+local function OnSpellCastStop(f, spellID)
     local w = f.ctx
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
+        fw:fesmb(spellID, function(btn)
             btn:ResetHighlight() end)
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -169,32 +164,30 @@ end
 
 --- i.e. Conjure mana gem when there is already a mana gem in bag
 --- @param f EventFrameInterface
-local function OnSpellCastFailed(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastFailed: %s', spellCastEvent)
+---@param spellID number
+local function OnSpellCastFailed(f, spellID)
+    --p:log(10, 'OSCFailed[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
+
     local w = f.ctx
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
+        fw:fesmb(spellID, function(btn)
             btn:SetButtonStateNormal() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
 end
 
 --- This handles 3-state spells like mage blizzard, hunter flares,
 --- or basic campfire in retail
 --- @param f EventFrameInterface
-local function OnSpellCastSent(f, ...)
-    local spellCastSentEvent = B:ParseSpellCastSentEventArgs(...)
-    if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
+---@param spellID number
+local function OnSpellCastSent(f, spellID)
     local w = f.ctx
     --- @param fw FrameWidget
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastSentEvent.spellID, function(btn)
+        fw:fesmb(spellID, function(btn)
             btn:SetButtonStateNormal() end)
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -203,7 +196,10 @@ local function OnSpellCastSent(f, ...)
 end
 
 --- @param f EventFrameInterface
-local function OnSpellCastSucceeded(f, ...)
+---@param spellID number
+local function OnSpellCastSucceeded(f, spellID)
+    --p:log(10, 'OSCSucceeded[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
+
     --- @type ButtonFactory
     local bf = f.ctx.buttonFactory
 
@@ -222,17 +218,22 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarEvents(f, event, ...)
-    --p:log('e[%s]: %s', event, {...})
+    local spellCastEvent = B:ParseSpellCastEventArgs(...)
+    if not spellCastEvent then return end
+    if UnitId.player ~= spellCastEvent.unitTarget then return end
+    local spellID = spellCastEvent.spellID
+    if not spellID then return end
+
     if E.UNIT_SPELLCAST_START == event then
-        OnSpellCastStart(f, ...)
+        OnSpellCastStart(f, spellID)
     elseif E.UNIT_SPELLCAST_STOP == event then
-        OnSpellCastStop(f, ...)
+        OnSpellCastStop(f, spellID)
     elseif E.UNIT_SPELLCAST_SENT == event then
-        OnSpellCastSent(f, ...)
+        OnSpellCastSent(f, spellID)
     elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
-        OnSpellCastSucceeded(f, ...)
+        OnSpellCastSucceeded(f, spellID)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
-        OnSpellCastFailed(f, ...)
+        OnSpellCastFailed(f, spellID)
     end
 end
 
