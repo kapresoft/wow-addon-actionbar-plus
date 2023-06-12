@@ -260,7 +260,10 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
-    --p:log(10, 'OnSpellUpdateUsable[%s] (%s)', widget:GetName(), GetTime())
+    --TODO NEXT: PERF Only Update once
+    -- • Event[SPELL_UPDATE_USABLE] is very costly: keeps firing until mana/energy is full.
+    -- • Separate update from items/spells
+    -- p:log(30, 'OnSpellUpdateUsable[%s] (%s)', widget:GetName(), GetTime())
     if not widget.button():IsShown() then return end
     --TODO NEXT: PERF UpdateRangeIndicator()
     --widget:UpdateRangeIndicator()
@@ -345,7 +348,7 @@ local function RegisterCallbacks(widget)
     -- TODO NEXT: PERF for OnPlayerStartedMoving()
     -- widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
     -- TODO NEXT: PERF for OnSpellUpdateUsable()
-    --widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
+    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
