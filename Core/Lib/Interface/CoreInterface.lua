@@ -56,8 +56,6 @@ BaseLibraryObject_Initialized
 local BaseLibraryObject_Initialized = {}
 --- @type ActionbarPlus
 BaseLibraryObject_Initialized.addon = {}
---- @type Profile_Config
-BaseLibraryObject_Initialized.profile = {}
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_Initialized_WithAceEvent
@@ -66,5 +64,3 @@ BaseLibraryObject_Initialized_WithAceEvent
 local BaseLibraryObject_Initialized_WithAceEvent = {}
 --- @type ActionbarPlus
 BaseLibraryObject_Initialized_WithAceEvent.addon = {}
---- @type Profile_Config
-BaseLibraryObject_Initialized_WithAceEvent.profile = {}

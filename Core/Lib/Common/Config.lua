@@ -257,13 +257,12 @@ local function PropsAndMethods(o)
 
     --- Sets up Ace config dialog
     function o:Initialize()
-        local db = ns.db
         local options = self:GetOptions()
         -- Get the option table for profiles
         -- options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
         AceConfig:RegisterOptionsTable(ns.name, options, { GC.C.SLASH_COMMAND_OPTIONS })
         AceConfigDialog:AddToBlizOptions(ns.name, ns.name)
-        options.args.profiles = AceDBOptions:GetOptionsTable(db)
+        options.args.profiles = AceDBOptions:GetOptionsTable(ns.db)
     end
 
     function o:GetOptions()
