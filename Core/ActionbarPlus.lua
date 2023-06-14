@@ -173,23 +173,20 @@ local methods = {
     --- @param self ActionbarPlus
     ['InitializeDb'] = function(self)
         -- Set up our database
-        self.db = AceDB:New(GC.C.DB_NAME)
-        ns.db = self.db
-        self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
-        self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
-        self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
-        self:InitDbDefaults()
+        ns.db = AceDB:New(GC.C.DB_NAME)
+        ns.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+        ns.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+        ns.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+        self:InitDbDefaults(ns.db)
         self:SendMessage(M.OnDBInitialized, self)
     end,
 
     --- @param self ActionbarPlus
     ['InitDbDefaults'] = function(self)
-        local profileName = self.db:GetCurrentProfile()
+        local profileName = ns.db:GetCurrentProfile()
         local defaultProfile = P:CreateDefaultProfile(profileName)
         local defaults = { profile =  defaultProfile }
-        -- todo next: move db to Namespace (don't store here)
-        self.db:RegisterDefaults(defaults)
-        self.profile = self.db.profile
+        ns.db:RegisterDefaults(defaults)
         if IsEmptyTable(ABP_PLUS_DB.profiles[profileName]) then
             ABP_PLUS_DB.profiles[profileName] = defaultProfile
         end
