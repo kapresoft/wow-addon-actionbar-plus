@@ -191,6 +191,8 @@ function P:IsBarEnabled(frameIndex)
     local bar = self:GetBar(frameIndex)
     return bar and bar.enabled
 end
+--- @param frameIndex number The frame index number
+function P:IsShownInConfig(frameIndex) return self:IsBarEnabled(frameIndex) end
 
 --- @param frameIndex number The frame index number
 function P:GetBarLockValue(frameIndex)
@@ -365,6 +367,15 @@ function P:GetTooltipKey() return TooltipKey end
 --- @return TooltipAnchorTypeKey
 function P:GetTooltipAnchorTypeKey() return TooltipAnchorTypeKey end
 
+function P:GetRowSize(frameIndex)
+    return self:GetBar(frameIndex).widget.rowSize or 2
+end
+
+function P:GetColumnSize(frameIndex)
+    return self:GetBar(frameIndex).widget.colSize or 6
+end
+
+
 --[[-----------------------------------------------------------------------------
 Listen to Message
 -------------------------------------------------------------------------------]]
@@ -372,5 +383,4 @@ P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
     p:log(10, '%s received..', msg)
 
     P.profile = function() return ns.db.profile end
-
 end)
