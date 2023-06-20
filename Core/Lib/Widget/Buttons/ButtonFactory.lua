@@ -246,30 +246,54 @@ function L:IsValidDragSource(cursorInfo)
     return true
 end
 
---[[-----------------------------------------------------------------------------
-Event Handlers
--------------------------------------------------------------------------------]]
---- Update Items and Macros referencing items
-local function OnBagUpdate()
-    L:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsItemOrMacro() end,
-                function(bw)
-                    local success, itemInfo = safecall(function() return bw:GetItemData() end)
-                    if not (success and itemInfo) then return end
-                    bw:UpdateItemOrMacroState()
-                end)
+---@param bw ButtonUIWidget
+local function IsValidButtonFn(bw) return bw.button():IsShown() and bw:IsEmpty() ~= true end
+---@param bw ButtonUIWidget
+local function IsMountFn(bw) return bw:IsMount() end
+---@param bw ButtonUIWidget
+local function IsShapeshiftFn(bw) return bw:IsShapeshiftSpell() end
+---@param bw ButtonUIWidget
+local function IsItemOrMacroFn(bw) return bw:IsItemOrMacro() end
+
+function L:UpdateShapeshiftActions()
+    self:fevf(function(fw)
+        --- @param bw ButtonUIWidget
+        fw:fevb(IsShapeshiftFn, function(bw)
+            local icon = O.API:GetSpellIcon(bw:GetSpellData())
+            bw:SetIcon(icon)
+        end)
     end)
 end
 
---- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
---- entering the portal and get dismounted upon zoning in to the new area
-local function OnPlayerMount()
-    L:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsMount() end,
-                function(bw) O.MountAttributeSetter:SetAttributes(bw.frame(), 'event') end
-        )
+function L:UpdateItems()
+    self:fevf(function(fw)
+        fw:fevb(IsItemOrMacroFn, function(bw)
+            local success, itemInfo = safecall(function() return bw:GetItemData() end)
+            if not (success and itemInfo) then return end
+            bw:UpdateItemOrMacroState()
+        end)
+    end)
+end
+
+function L:UpdateMounts()
+    L:fevf(function(fw)
+        fw:fevb(IsMountFn, function(bw)
+            O.MountAttributeSetter:SetAttributes(bw.frame(), 'event') end)
+    end)
+end
+
+function L:UpdateCooldownsAndState()
+    self:fevf(function(fw)
+        fw:fevb(IsValidButtonFn, function(bw)
+            bw:UpdateCooldown()
+            bw:UpdateStateLight()
+        end)
+    end)
+end
+
+function L:UpdateUsable()
+    self:fevf(function(fw)
+        fw:fevb(IsValidButtonFn, function(bw) bw:UpdateUsable() end)
     end)
 end
 
@@ -283,10 +307,6 @@ local function InitButtonFactory()
         p:log(10, 'MSG::R: %s', msg)
         L:Init()
     end)
-
-    L:RegisterMessage(MSG.OnBagUpdate, OnBagUpdate)
-    L:RegisterMessage(MSG.PLAYER_MOUNT_DISPLAY_CHANGED, OnPlayerMount)
-    L:RegisterMessage(MSG.ZONE_CHANGED_NEW_AREA, OnPlayerMount)
 end
 
 InitButtonFactory()
