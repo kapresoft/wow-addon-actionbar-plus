@@ -61,7 +61,6 @@ end
 function L:PlayerInPetBattle()
     local inPetBattle = false
     if C_PetBattles then inPetBattle = C_PetBattles.IsInBattle() end
-    p:log('InPetBattle: %s', inPetBattle)
     return inPetBattle
 end
 
