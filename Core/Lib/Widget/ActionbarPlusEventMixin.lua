@@ -16,10 +16,11 @@ local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 local BaseAPI, API, pformat = O.BaseAPI, O.API, ns.pformat
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B = O.BaseAPI
-local AceEvent, AceHook, Table = O.AceLibrary.AceEvent, O.AceLibrary.AceHook, O.Table
+local AceEvent, Table = O.AceLibrary.AceEvent, O.Table
 local SizeOfTable, IsEmptyTable = Table.Size, Table.IsEmpty
 local CURSOR_ITEM_TYPE = 1
 local AceBucket = ns:AceBucket()
+local PAM = O.PlayerAuraMapping
 
 --[[-----------------------------------------------------------------------------
 Interface
@@ -182,34 +183,75 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastSent(f, spellID)
+    p:log('OSCSent: %s', spellID)
     local w = f.ctx
-    --- @param fw FrameWidget
+    --[[--- @param fw FrameWidget
     w.buttonFactory:fevf(function(fw)
         fw:fesmb(spellID, function(btn)
             btn:SetButtonStateNormal() end)
-    end)
+    end)]]
+    O.ButtonFactory:UpdateCooldownsAndState()
+
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
+--- @alias NumberOfIterations number
+--- @alias AdditionalDelay Time
+---
+--- @return AdditionalDelay
+--- @param spellInfo SpellInfo
+local function GetAdditionalDelay(spellInfo)
+    assert(spellInfo, 'SpellInfo is required.')
+    p:log('wotlk?=%s game=%s has forms: %s', ns:IsWOTLK(),
+            ns.gameVersion,
+            API:HasShapeshiftForms())
+    local hasForms = API:HasShapeshiftForms()
+    local isShapeshiftSpell = false
+    local delay = 0.1
+    if hasForms then isShapeshiftSpell = API:IsShapeshiftSpell(spellInfo) end
+    if ns:IsWOTLK() and hasForms and isShapeshiftSpell then
+        delay = delay + 0.2
+    elseif spellInfo.castTime > 0 then
+        delay = delay + spellInfo.castTime/1000
+        p:log('delay with castTime: %s', delay)
+    end
+    return delay
+end
+
+--- @param spellInfo SpellInfo
+local function GetIterationCount(spellInfo)
+    if ns:IsWOTLK() and API:HasShapeshiftForms() then return 2 end
+    return 0
+end
+
+--- @param spellID number
+local function OnAfterSpellCastSucceeded(spellID)
+    local spellInfo = API:GetSpellInfo(spellID)
+    p:log(0, 'OAfterSCSucceeded[%s]: %s castTime=%s (%s)',
+            spellID, spellInfo.name, spellInfo.castTime, GetTime())
+    local initialDelay = 0.3
+    local delay = 0.1 + GetAdditionalDelay(spellInfo)
+    local iter = GetIterationCount(spellInfo)
+    C_Timer.After(initialDelay, function()
+        BF():UpdateCooldownsAndState()
+        local shifted = API:IsPlayerShapeshifted()
+        p:log(0, 'shifted=%s', shifted)
+        if shifted then
+            C_Timer.NewTicker(delay, function()
+                p:log(0, 'delay: %s', delay)
+                BF():UpdateCooldownsAndState()
+            end, iter)
+        end
+    end)
+end
+
 --- @param f EventFrameInterface
----@param spellID number
+--- @param spellID number
 local function OnSpellCastSucceeded(f, spellID)
     --p:log(10, 'OSCSucceeded[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
-
-    --- @type ButtonFactory
-    local bf = f.ctx.buttonFactory
-
-    bf:fevf(function(fw)
-        fw:feb(function(bw)
-            if bw:IsSpell() then
-                C_Timer.NewTicker(0.1, function() bw:UpdateSpellState() end, 2)
-            elseif bw:IsItemOrMacro() then
-                C_Timer.NewTicker(0.1, function() bw:UpdateItemOrMacroState() end, 2)
-            end
-        end)
-    end)
+    OnAfterSpellCastSucceeded(spellID)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
@@ -333,9 +375,6 @@ local function OnEvent(f, event, ...)
     end
 end
 
-local function OnUpdateCooldownsAndState() BF():UpdateCooldownsAndState() end
-local function OnSpellUpdateUsable() BF():UpdateUsable() end
-
 --- @param f EventFrameInterface
 --- @param event string
 local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
@@ -354,7 +393,9 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ActionbarPlusEventMixin | AceBucket
+--- @alias AceHookHandle table
+
+--- @param o ActionbarPlusEventMixin | AceBucket
 local function PropsAndMethods(o)
 
     --- @param addon ActionbarPlus
@@ -363,7 +404,51 @@ local function PropsAndMethods(o)
         self.buttonFactory = O.ButtonFactory
         self.widgetMixin = O.WidgetMixin
 
+        --- @type AceHookHandle
+        self.idleTimeHandle = nil
+        --- @type AceHookHandle
+        self.updateCooldownHandle = nil
+        --- @type Time
+        self.idleTime = GetTime()
+
+        --- @type Number The number in seconds
+        self.expiryTimeInSeconds = 10
+
         OnAddOnInitializedMessage(self)
+    end
+
+    function o:GetIdleTimeInSeconds() return RoundToSignificantDigits(GetTime() - self.idleTime, 2) end
+    function o:IsIdleTimeExpired() return self:GetIdleTimeInSeconds() > self.expiryTimeInSeconds end
+
+    function o:UpdateIdleTime()
+        self.idleTime = GetTime()
+        if not self.updateCooldownHandle then self:RegisterEventCD() end
+    end
+
+    function o:RegisterEventCD()
+        self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
+                0.5, function() self:OnUpdateCooldownsAndState() end)
+        p:log('Registered UpdateCooldownHandle')
+    end
+
+    function o:UnRegisterEventCD()
+        if self:IsIdleTimeExpired() and self.updateCooldownHandle then
+            self:UnregisterBucket(self.updateCooldownHandle)
+            self.updateCooldownHandle = nil
+            p:log('Unregistered UpdateCooldownHandle')
+        end
+    end
+
+    function o:OnUpdateCooldownsAndState()
+        local idleSeconds = self:GetIdleTimeInSeconds()
+        --p:log('Idle duration: %s', idleSeconds)
+        local expired = self:IsIdleTimeExpired()
+
+        p:log('Last activity: %s expired: %s idleTimeHandle: %s since: %s',
+                self.idleTime, expired, tostring(self.idleTimeHandle), idleSeconds)
+        if expired then self:UnRegisterEventCD(); return end
+
+        BF():UpdateCooldownsAndState()
     end
 
     --- @return EventFrameInterface
@@ -392,11 +477,11 @@ local function PropsAndMethods(o)
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
             E.UPDATE_STEALTH
         })
-
-        self:RegisterBucketEvent({ E.SPELL_UPDATE_COOLDOWN },
-                0.3, OnUpdateCooldownsAndState)
-        self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE, E.UNIT_POWER_FREQUENT },
-                1.2, OnSpellUpdateUsable)
+        self.idleTimeHandle = self:RegisterBucketEvent({ E.PLAYER_STOPPED_MOVING,
+                                                    'UNIT_SPELLCAST_SENT',
+                                                    'UNIT_POWER_FREQUENT',
+                                                    'PLAYER_STOPPED_LOOKING',
+        }, 2, function() self:UpdateIdleTime() end)
     end
 
 
@@ -474,6 +559,11 @@ local function PropsAndMethods(o)
         RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
     end
     function o:RegisterPlayerAura()
+        local classMapping = O.PlayerAuraMapping:GetPlayerClassMapping()
+        if not classMapping or SizeOfTable(classMapping) <= 0 then
+            p:log('Player class has no registered Auras')
+            return
+        end
         local f = self:CreateEventFrame()
         f:SetScript(E.OnEvent, OnPlayerAura)
         RegisterFrameForUnitEvents(f, { E.UNIT_AURA }, GC.UnitId.player)

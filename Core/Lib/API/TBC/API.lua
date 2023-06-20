@@ -219,7 +219,9 @@ function S:IsShapeShiftActive(spellInfo)
     return DruidAPI:IsActiveForm(spellInfo.id)
 end
 
-function S:IsPlayerShapeShifted() return GetShapeshiftForm() > 0 end
+function S:HasShapeshiftForms() return GetNumShapeshiftForms() > 0 end
+
+function S:IsPlayerShapeshifted() return GetShapeshiftForm() > 0 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
 --- @param spellInfo Profile_Spell
