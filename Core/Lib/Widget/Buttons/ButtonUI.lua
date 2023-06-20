@@ -233,63 +233,9 @@ local function OnLeave(btn)
 end
 
 local function OnClick_SecureHookScript(btn, mouseButton, down)
-    --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
     btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
-end
-
---- @param widget ButtonUIWidget
---- @param event string Event string
-local function OnUpdateButtonCooldown(widget, event)
-    if not widget.button():IsShown() then return end
-    --p:log(10, 'UpdateCooldown[%s] (%s)', widget:GetName(), GetTime())
-
-    widget:UpdateCooldown()
-    local cd = widget:GetCooldownInfo();
-    if (cd == nil or cd.icon == nil) then return end
-    widget:SetCooldownTextures(cd.icon)
-end
-
---- @param widget ButtonUIWidget
---- @param event string Event string
-local function OnUpdateButtonUsable(widget, event)
-    widget:UpdateUsable()
-end
-
---- @param widget ButtonUIWidget
---- @param event string Event string
-local function OnSpellUpdateUsable(widget, event)
-    --TODO NEXT: PERF Only Update once
-    -- • Event[SPELL_UPDATE_USABLE] is very costly: keeps firing until mana/energy is full.
-    -- • Separate update from items/spells
-    -- p:log(30, 'OnSpellUpdateUsable[%s] (%s)', widget:GetName(), GetTime())
-    if not widget.button():IsShown() then return end
-    --TODO NEXT: PERF UpdateRangeIndicator()
-    --widget:UpdateRangeIndicator()
-    widget:UpdateUsable()
-end
-
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerControlLost(widget, event, ...)
-    if not widget:IsHideWhenTaxi() then return end
-    C_Timer.NewTicker(1, function()
-        local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
-        --p:log(0, 'Player on Taxi: %s [%s]', playerOnTaxi, GetTime())
-        if playerOnTaxi ~= true then return end
-        WMX:ShowActionbars(false)
-    end, 2)
-end
-
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerControlGained(widget, event, ...)
-    --p:log('Event[%s] received flying=%s', event, flying)
-    if not widget:IsHideWhenTaxi() then return end
-    C_Timer.NewTicker(1, function()
-        WMX:ShowActionbars(false)
-    end, 2)
 end
 
 --- @see "UnitDocumentation.lua"
@@ -341,16 +287,9 @@ end
 local function RegisterCallbacks(widget)
 
     --TODO NEXT: Tracks changing spells such as Covenant abilities in Shadowlands.
-
-    -- TODO NEXT: PERF for OnUpdateButtonCooldown()
-    widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
-    widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
     -- TODO NEXT: PERF for OnPlayerStartedMoving()
     -- widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
-    -- TODO NEXT: PERF for OnSpellUpdateUsable()
-    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)

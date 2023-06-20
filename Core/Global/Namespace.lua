@@ -104,6 +104,9 @@ local function CreateNamespace(...)
             if not (name or o) then return end
             ns.O[name] = o
         end
+
+        --- @return AceBucket
+        function o:AceBucket() return self.LibStubAce('AceBucket-3.0') end
     end
 
     Methods(ns)

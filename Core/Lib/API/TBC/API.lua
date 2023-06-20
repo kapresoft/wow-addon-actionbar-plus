@@ -118,11 +118,11 @@ function S:ApplySpellInfoAttributes(spellInfo)
         local labelFormat = '%s |c00747474(%s)|r'
         spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
     end
-    local rankLc = strlower(spellInfo.rank or '')
     local nameLc = strlower(spellInfo.name or '')
-
     -- Manual correction since [Moonkin Form] doesn't have rank as 'Shapeshift'
     if WAttr.MOONKIN_FORM == nameLc then spellInfo.rank = 'Shapeshift' end
+    local rankLc = strlower(spellInfo.rank or '')
+
     if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
         spellInfo.isShapeshift = true
     elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
@@ -171,6 +171,24 @@ function S:GetSpellCooldown(spellNameOrID)
     }
     return cd
 end
+
+--- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
+--- @param spellNameOrID number|string Spell ID or Name. When passing a name requires the spell to be in your Spellbook.
+--- @return SpellCooldown
+function S:GetSpellCooldownLight(spellNameOrID)
+    if not spellNameOrID then return nil end
+    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
+    --- @type SpellCooldown
+    local cd = {
+        spell = { name = spellNameOrID, id = spellNameOrID, icon=nil },
+        start = start,
+        duration = duration,
+        enabled = enabled,
+        modRate = modRate,
+    }
+    return cd
+end
+
 ---Example:
 --- @param optionalUnit string
 --- @see GlobalConstants#UnitId
@@ -200,6 +218,8 @@ function S:IsShapeShiftActive(spellInfo)
     end
     return DruidAPI:IsActiveForm(spellInfo.id)
 end
+
+function S:IsPlayerShapeShifted() return GetShapeshiftForm() > 0 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
 --- @param spellInfo Profile_Spell
@@ -347,6 +367,24 @@ function S:GetItemCooldown(itemIDOrName)
     return cd
 end
 
+--- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
+--- @param itemIDOrName number|string The itemID or itemName
+--- @return ItemCooldown
+function S:GetItemCooldownLight(itemIDOrName)
+    local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
+
+    if C_Container then GetItemCooldown = C_Container.GetItemCooldown end
+    local start, duration, enabled = GetItemCooldown(itemID)
+
+    --- @type ItemCooldown
+    local cd = {
+        item = { id = itemID, name = itemIDOrName },
+        start=start, duration=duration, enabled=enabled,
+    }
+
+    return cd
+end
+
 --- #### Alias for #GetSpellCooldownDetails(spellID)
 --- @return SpellCooldownDetails
 function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
@@ -355,4 +393,4 @@ function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID
 function S:GSC(spellID) return S:GetSpellCooldown(spellID) end
 --- #### Alias for #GetItemCooldown(itemId)
 --- @return ItemCooldown
-function S:GIC(itemID) return S:GetItemCooldown(itemID) end
+function S:GIC(itemID) return S:GetItemCooldownLight(itemID) end
