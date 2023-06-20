@@ -248,12 +248,18 @@ end
 
 ---@param bw ButtonUIWidget
 local function IsValidButtonFn(bw)
-    local type = nil
     local d = bw:GetConfig()
-    type = d and d.type
+    local type = d and d.type
     local validType = String.IsAnyOf(type, WAttr.SPELL, WAttr.ITEM, WAttr.MACRO)
+    if type == 'item' then
+        local item = d.item
+        local isConsumable = O.API:IsItemConsumable(item, true)
+        validType = validType and isConsumable
+        --if validType then p:log(10, 'IsConsumable[%s]: %s validType=%s', item.name, isConsumable, validType) end
+    end
     return bw.button():IsShown() and validType and bw:IsEmpty() ~= true
 end
+
 ---@param bw ButtonUIWidget
 local function IsMountFn(bw) return bw:IsMount() end
 ---@param bw ButtonUIWidget
@@ -297,7 +303,7 @@ function L:UpdateCooldownsAndState()
             c = c + 1
         end)
     end)
-    p:log(0, 'UpdateCooldownsAndState c=%s [%s]', c, GetTime())
+    --p:log(0, 'UpdateCooldownsAndState c=%s [%s]', c, GetTime())
 end
 
 function L:UpdateUsable()

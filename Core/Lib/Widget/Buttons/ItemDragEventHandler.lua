@@ -32,6 +32,7 @@ function L:Handle(btnUI, cursorInfo)
     ---@type ItemInfo
     local itemInfo = API:GetItemInfo(itemID)
     local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
+                       classID = itemInfo.classID, subclassID = itemInfo.subclassID,
                        link = itemInfo.link, count = itemInfo.count, stackCount=itemInfo.stackCount }
     local actionbarInfo = btnUI.widget:GetActionbarInfo()
 
