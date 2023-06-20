@@ -283,6 +283,7 @@ function L:UpdateMounts()
 end
 
 function L:UpdateCooldownsAndState()
+    p:log('UpdateCooldownsAndState [%s]', GetTime())
     self:fevf(function(fw)
         fw:fevb(IsValidButtonFn, function(bw)
             bw:UpdateCooldown()

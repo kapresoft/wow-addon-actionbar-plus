@@ -394,9 +394,9 @@ local function PropsAndMethods(o)
         })
 
         self:RegisterBucketEvent({ E.SPELL_UPDATE_COOLDOWN },
-                0.1, OnUpdateCooldownsAndState)
+                0.3, OnUpdateCooldownsAndState)
         self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE, E.UNIT_POWER_FREQUENT },
-                1, OnSpellUpdateUsable)
+                1.2, OnSpellUpdateUsable)
     end
 
 
