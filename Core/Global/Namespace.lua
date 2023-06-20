@@ -71,11 +71,11 @@ local function CreateNamespace(...)
         end
         --- @return GameVersion
         function o:IsTBC()
-            return self.gameVersion == 'tbc-classic'
+            return self.gameVersion == 'tbc_classic'
         end
         --- @return GameVersion
         function o:IsWOTLK()
-            return self.gameVersion == 'wotlk-classic'
+            return self.gameVersion == 'wotlk_classic'
         end
         --- @return GameVersion
         function o:IsRetail()

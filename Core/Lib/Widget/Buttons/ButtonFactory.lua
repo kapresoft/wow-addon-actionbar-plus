@@ -247,7 +247,13 @@ function L:IsValidDragSource(cursorInfo)
 end
 
 ---@param bw ButtonUIWidget
-local function IsValidButtonFn(bw) return bw.button():IsShown() and bw:IsEmpty() ~= true end
+local function IsValidButtonFn(bw)
+    local type = nil
+    local d = bw:GetConfig()
+    type = d and d.type
+    local validType = String.IsAnyOf(type, WAttr.SPELL, WAttr.ITEM, WAttr.MACRO)
+    return bw.button():IsShown() and validType and bw:IsEmpty() ~= true
+end
 ---@param bw ButtonUIWidget
 local function IsMountFn(bw) return bw:IsMount() end
 ---@param bw ButtonUIWidget
@@ -283,16 +289,20 @@ function L:UpdateMounts()
 end
 
 function L:UpdateCooldownsAndState()
-    p:log('UpdateCooldownsAndState [%s]', GetTime())
+    local c = 0
     self:fevf(function(fw)
         fw:fevb(IsValidButtonFn, function(bw)
             bw:UpdateCooldown()
             bw:UpdateStateLight()
+            c = c + 1
         end)
     end)
+    p:log(0, 'UpdateCooldownsAndState c=%s [%s]', c, GetTime())
 end
 
 function L:UpdateUsable()
+    p:log(0, 'UpdateUsable [%s]', GetTime())
+
     self:fevf(function(fw)
         fw:fevb(IsValidButtonFn, function(bw) bw:UpdateUsable() end)
     end)
