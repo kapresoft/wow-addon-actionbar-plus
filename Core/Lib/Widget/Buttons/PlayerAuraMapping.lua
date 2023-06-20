@@ -72,7 +72,7 @@ local Mapping = {
 --[[-----------------------------------------------------------------------------
 Methods & Properties
 -------------------------------------------------------------------------------]]
----@param o PlayerAuraMapping
+---@param o PlayerAuraMapping | AceEvent
 local function MethodsAndProperties(o)
 
     --- @type PlayerAuraSpecializationMap
@@ -80,11 +80,11 @@ local function MethodsAndProperties(o)
 
     --- @return PlayerAuraSpecializationMap
     function o:GetPlayerClassMapping()
-        if self.playerClassMapping then return self.playerClassMapping end
-
-        local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
-        self.playerClassMapping = gameMapping[GC:GetPlayerClass()]
-    end
+        if not self.playerClassMapping then
+            local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
+            self.playerClassMapping = gameMapping[GC:GetPlayerClass()]
+        end
+        return self.playerClassMapping end
 
     --- @param auraSpellID number The aura SpellID
     --- @return AuraInfo
@@ -95,6 +95,5 @@ local function MethodsAndProperties(o)
         return playerMapping[auraSpellID]
     end
 
-end
+end; MethodsAndProperties(L)
 
-MethodsAndProperties(L)

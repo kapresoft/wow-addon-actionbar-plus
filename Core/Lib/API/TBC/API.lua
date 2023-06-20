@@ -387,6 +387,57 @@ function S:GetItemCooldownLight(itemIDOrName)
     return cd
 end
 
+--- @param item Profile_Item
+--- @return Profile_Item
+function S:UpdateAndGetItemData(item)
+    if not item.classID then
+        local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
+        p:log('Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
+        item.classID = classID
+        item.subclassID = subclassID
+    end
+    return item
+end
+
+--- ### See: Enum.ItemClass
+--- ```
+--- Enum.ItemClass = {
+---    Armor = 4,
+---    Battlepet = 17,
+---    Consumable = 0,
+---    Container = 1,
+---    CurrencyTokenObsolete = 10,
+---    Gem = 3,
+---    Glyph = 16,
+---    ItemEnhancement = 8,
+---    Key = 13,
+---    Miscellaneous = 15,
+---    PermanentObsolete = 14,
+---    Profession = 19,
+---    Projectile = 6,
+---    Questitem = 12,
+---    Quiver = 11,
+---    Reagent = 5,
+---    Recipe = 9,
+---    Tradegoods = 7,
+---    Weapon = 2,
+---    WoWToken = 18
+--- }
+--- ```
+---
+--- This updates the item config and retrieve the classID and subClassID data
+---@param item Profile_Item
+---@param retrieveUpdate OptionalFlag Set to true to retrieve updated item if classID is missing
+function S:IsItemConsumable(item, retrieveUpdate)
+    local itemData = item
+    local doUpdate = retrieveUpdate or true
+    if itemData.classID == nil and doUpdate == true then
+        itemData = self:UpdateAndGetItemData(item)
+        p:log('Retrieved updated item data: %s', item.name)
+    end
+    return itemData.classID == Enum.ItemClass.Consumable
+end
+
 --- #### Alias for #GetSpellCooldownDetails(spellID)
 --- @return SpellCooldownDetails
 function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
