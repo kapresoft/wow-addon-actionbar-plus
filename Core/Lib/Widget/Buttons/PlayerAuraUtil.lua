@@ -6,6 +6,8 @@ local _, ns = ...
 local O, LibStub = ns:LibPack()
 local PAM, KC = O.PlayerAuraMapping, ns:K().Objects.Constants
 local PR = function() return O.Profile end
+local IsEmptyTable = O.Table.IsEmpty
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -98,6 +100,12 @@ local function PropsAndMethods(o)
             end
         end
 
+        PR():IfLogPlayerAuraEvents(function()
+            p:log(5, "Triggered Auras: %s", O.Table.Size(playerAuras))
+            for aID, info in pairs(playerAuras) do
+                p:log(5, "  • Aura[%s]=>%s", info.aura.spell.name, info.spell.name)
+            end
+        end, not IsEmptyTable(playerAuras))
         return playerAuras
     end
 
@@ -123,10 +131,10 @@ local function PropsAndMethods(o)
         local auraInstanceID = aura.aura.instanceID
         C_Timer.After(1, function()
             self.addedAuras[auraInstanceID] = nil
-            if PR():G().logPlayerAuraEvents then
+            PR():IfLogPlayerAuraEvents(function()
                 p:log(5, 'Removed[%s=>%s]: aid=%s expiry=%s',
                         aura.aura.spell.name, aura.spell.name, auraInstanceID, aura.aura.data.expirationTime)
-            end
+            end)
         end)
     end
 

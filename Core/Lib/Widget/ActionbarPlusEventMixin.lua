@@ -217,11 +217,11 @@ local function OnAfterSpellCastSucceeded(spellID)
     --        spellID, spellInfo.name, spellInfo.castTime, GetTime())
     local initialDelay = 0.3
     local delay = 0.1 + GetAdditionalDelay(spellInfo)
-    if PR():G().logCooldownEvents then
+    PR():IfLogCooldownEvents(function()
         local castTimeInSec = RoundToSignificantDigits(spellInfo.castTime/1000, 2)
         p:log('AdditionalDelay[%s]: %s castTime=%s gameVersion=%s playerHasForms=%s',
                 spellInfo.name, delay, castTimeInSec, ns.gameVersion, API:HasShapeshiftForms())
-    end
+    end)
     local iter = GetIterationCount(spellInfo)
     C_Timer.After(initialDelay, function()
         BF():UpdateCooldownsAndState()
@@ -414,9 +414,9 @@ local function PropsAndMethods(o)
     function o:RegisterEventCD()
         self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
                 0.5, function() self:OnUpdateCooldownsAndState() end)
-        if PR():G().logCooldownEvents == true then
+        PR():IfLogCooldownEvents(function()
             p:log(1, 'Registered UpdateCooldownHandle')
-        end
+        end)
     end
 
     function o:ShouldRegisterEventCD()
@@ -427,22 +427,20 @@ local function PropsAndMethods(o)
         if self:IsIdleTimeExpired() and self.updateCooldownHandle then
             self:UnregisterBucket(self.updateCooldownHandle)
             self.updateCooldownHandle = nil
-            if PR():G().logCooldownEvents == true then
+            PR():IfLogCooldownEvents(function()
                 p:log(1, 'Unregistered UpdateCooldownHandle')
-            end
+            end)
         end
     end
 
     function o:OnUpdateCooldownsAndState()
-        local logActivity = PR():G().logCooldownEvents or false
-
         local expired = self:IsIdleTimeExpired()
         local idleSeconds = self:GetIdleTimeInSeconds()
 
-        if logActivity then
+        PR():IfLogCooldownEvents(function()
             p:log(10, 'IdleInSeconds=%s lastActivity=%s hasEventHandle=%s expired=%s flying=%s',
                     idleSeconds, self.idleTime, self.idleTimeHandle ~= nil, expired, IsFlying())
-        end
+        end)
         if expired then self:UnRegisterEventCD(); return end
 
         BF():UpdateCooldownsAndState()

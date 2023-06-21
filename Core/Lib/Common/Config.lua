@@ -446,7 +446,7 @@ local function PropsAndMethods(o)
                     width = 'full',
                     name = L['Log Cooldown Events'],
                     desc = L['Log Cooldown Events::Description'],
-                    get = function(_) return P:G().logCooldownEvents or false end,
+                    get = function(_) return P:LogCooldownEvents() end,
                     set = function(_, v) P:G().logCooldownEvents = v end,
                 },
                 log_playerAuraEvents = {
@@ -455,7 +455,7 @@ local function PropsAndMethods(o)
                     width = 'full',
                     name = L['Log Player Aura Events'],
                     desc = L['Log Player Aura Events::Description'],
-                    get = function(_) return P:G().logPlayerAuraEvents or false end,
+                    get = function(_) return P:LogPlayerAuraEvents() end,
                     set = function(_, v) P:G().logPlayerAuraEvents = v end,
                 },
             },

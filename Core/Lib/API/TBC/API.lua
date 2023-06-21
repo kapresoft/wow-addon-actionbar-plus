@@ -392,7 +392,7 @@ end
 function S:UpdateAndGetItemData(item)
     if not item.classID then
         local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
-        p:log('Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
+        --p:log(10, 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
         item.classID = classID
         item.subclassID = subclassID
     end
