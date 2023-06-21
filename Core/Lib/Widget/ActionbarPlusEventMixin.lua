@@ -558,7 +558,7 @@ local function PropsAndMethods(o)
     function o:RegisterPlayerAura()
         local classMapping = O.PlayerAuraMapping:GetPlayerClassMapping()
         if not classMapping or SizeOfTable(classMapping) <= 0 then
-            p:log('Player class has no registered Auras')
+            p:log('Player class has no registered auras glows')
             return
         end
         local f = self:CreateEventFrame()
