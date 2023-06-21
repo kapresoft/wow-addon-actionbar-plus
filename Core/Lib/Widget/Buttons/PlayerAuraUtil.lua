@@ -5,7 +5,7 @@ Local Vars
 local _, ns = ...
 local O, LibStub = ns:LibPack()
 local PAM, KC = O.PlayerAuraMapping, ns:K().Objects.Constants
-
+local PR = function() return O.Profile end
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -123,8 +123,10 @@ local function PropsAndMethods(o)
         local auraInstanceID = aura.aura.instanceID
         C_Timer.After(1, function()
             self.addedAuras[auraInstanceID] = nil
-            p:log(10, 'Removed[%s=>%s]: aid=%s expiry=%s',
-                    aura.aura.spell.name, aura.spell.name, auraInstanceID, aura.aura.data.expirationTime)
+            if PR():G().logPlayerAuraEvents then
+                p:log(5, 'Removed[%s=>%s]: aid=%s expiry=%s',
+                        aura.aura.spell.name, aura.spell.name, auraInstanceID, aura.aura.data.expirationTime)
+            end
         end)
     end
 

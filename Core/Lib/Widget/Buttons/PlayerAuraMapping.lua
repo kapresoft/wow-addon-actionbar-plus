@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub, pformat = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.pformat
-
+local G = function() return O.Profile:G() end
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -82,7 +82,12 @@ local function MethodsAndProperties(o)
     function o:GetPlayerClassMapping()
         if not self.playerClassMapping then
             local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
-            self.playerClassMapping = gameMapping[GC:GetPlayerClass()]
+            local playerClass = GC:GetPlayerClass()
+            self.playerClassMapping = gameMapping[playerClass]
+            if G().logPlayerAuraEvents == true and self.playerClassMapping then
+                p:log(5, 'Player Auras[%s]: %s',
+                        playerClass, pformat(self.playerClassMapping))
+            end
         end
         return self.playerClassMapping end
 
