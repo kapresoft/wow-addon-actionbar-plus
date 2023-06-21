@@ -387,7 +387,7 @@ local function PropsAndMethods(o)
         local spell = self:GetSpellData()
         if self:IsInvalidSpell(spell) then return nil end
 
-        local spellCD = API:GetSpellCooldown(spell.id)
+        local spellCD = API:GetSpellCooldownLight(spell.id)
         if not spellCD then return nil end
 
         cd.details = spellCD
@@ -558,6 +558,16 @@ local function PropsAndMethods(o)
         if not self:IsSpell() then return end
         self:UpdateSpellCharges(self:GetSpellName())
     end
+    function o:UpdateSpellShapeshiftState()
+        if not self:IsShapeshiftSpell() then return end
+        local icon = API:GetSpellIcon(self:GetSpellData())
+        self:SetIcon(icon)
+    end
+    function o:UpdateSpellStealthState()
+        if not self:IsStealthSpell() then return end
+        local icon = API:GetSpellIcon(self:GetSpellData())
+        self:SetIcon(icon)
+    end
 
     ---@param spellName SpellName
     function o:UpdateSpellCharges(spellName)
@@ -606,13 +616,16 @@ local function PropsAndMethods(o)
         end
     end
 
-    function o:UpdateUsable()
-        local cd = self:GetCooldownInfo()
-        if (cd == nil or cd.details == nil) then
-            if self:IsCompanion() then self:SetActionUsable(true)
-            elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
-            return
+    function o:UpdateUsable(optionalCooldownInfo)
+        if self:IsCompanion() then
+            self:SetActionUsable(true)
+        elseif self:IsEquipmentSet() then
+            self:SetActionUsable(not InCombatLockdown())
         end
+
+        local cd = optionalCooldownInfo or self:GetCooldownInfo()
+        if (cd == nil or cd.details == nil) then return end
+
         local c = self.w.config()
         local isUsable = true
         if c.type == SPELL then
@@ -630,10 +643,24 @@ local function PropsAndMethods(o)
         self:UpdateItemOrMacroState()
         self:UpdateSpellState()
         self:UpdateUsable()
-        self:UpdateRangeIndicator()
+        --todo: disable range for now
+        --self:UpdateRangeIndicator()
         self:SetHighlightDefault()
         self:SetNormalIconAlphaDefault()
         self:UpdateKeybindTextState()
+    end
+
+    function o:UpdateStateLight()
+        self:UpdateCooldown()
+        self:UpdateItemOrMacroState()
+        self:UpdateSpellState()
+        self:UpdateSpellShapeshiftState()
+        self:UpdateUsable()
+        --todo: disable range for now
+        --self:UpdateRangeIndicator()
+        --self:SetHighlightDefault()
+        --self:SetNormalIconAlphaDefault()
+        --self:UpdateKeybindTextState()
     end
 
     --Dynamic toggling of keybind text for
@@ -667,7 +694,9 @@ local function PropsAndMethods(o)
             return
         end
         self:SetCooldown(cd.start, cd.duration)
+        self:SetCooldownTextures(cd.icon)
     end
+
     function o:UpdateCooldownDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateCooldown() end) end
 
     --- Note: Equipment Set Name cannot be updated.
@@ -798,6 +827,7 @@ local function PropsAndMethods(o)
     end
 
     function o:SetCooldownTextures(icon)
+        if not icon then return end
         local btnUI = self.w.button()
         btnUI:SetNormalTexture(icon)
         btnUI:SetPushedTexture(icon)

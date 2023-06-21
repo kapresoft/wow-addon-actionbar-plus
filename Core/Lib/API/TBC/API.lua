@@ -118,11 +118,11 @@ function S:ApplySpellInfoAttributes(spellInfo)
         local labelFormat = '%s |c00747474(%s)|r'
         spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
     end
-    local rankLc = strlower(spellInfo.rank or '')
     local nameLc = strlower(spellInfo.name or '')
-
     -- Manual correction since [Moonkin Form] doesn't have rank as 'Shapeshift'
     if WAttr.MOONKIN_FORM == nameLc then spellInfo.rank = 'Shapeshift' end
+    local rankLc = strlower(spellInfo.rank or '')
+
     if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
         spellInfo.isShapeshift = true
     elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
@@ -171,6 +171,24 @@ function S:GetSpellCooldown(spellNameOrID)
     }
     return cd
 end
+
+--- See: [GetSpellCooldown](https://wowpedia.fandom.com/wiki/API_GetSpellCooldown)
+--- @param spellNameOrID number|string Spell ID or Name. When passing a name requires the spell to be in your Spellbook.
+--- @return SpellCooldown
+function S:GetSpellCooldownLight(spellNameOrID)
+    if not spellNameOrID then return nil end
+    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
+    --- @type SpellCooldown
+    local cd = {
+        spell = { name = spellNameOrID, id = spellNameOrID, icon=nil },
+        start = start,
+        duration = duration,
+        enabled = enabled,
+        modRate = modRate,
+    }
+    return cd
+end
+
 ---Example:
 --- @param optionalUnit string
 --- @see GlobalConstants#UnitId
@@ -200,6 +218,10 @@ function S:IsShapeShiftActive(spellInfo)
     end
     return DruidAPI:IsActiveForm(spellInfo.id)
 end
+
+function S:HasShapeshiftForms() return GetNumShapeshiftForms() > 0 end
+
+function S:IsPlayerShapeshifted() return GetShapeshiftForm() > 0 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
 --- @param spellInfo Profile_Spell
@@ -347,6 +369,75 @@ function S:GetItemCooldown(itemIDOrName)
     return cd
 end
 
+--- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
+--- @param itemIDOrName number|string The itemID or itemName
+--- @return ItemCooldown
+function S:GetItemCooldownLight(itemIDOrName)
+    local itemID = self:ResolveItemID(itemIDOrName); if not itemID then return nil end
+
+    if C_Container then GetItemCooldown = C_Container.GetItemCooldown end
+    local start, duration, enabled = GetItemCooldown(itemID)
+
+    --- @type ItemCooldown
+    local cd = {
+        item = { id = itemID, name = itemIDOrName },
+        start=start, duration=duration, enabled=enabled,
+    }
+
+    return cd
+end
+
+--- @param item Profile_Item
+--- @return Profile_Item
+function S:UpdateAndGetItemData(item)
+    if not item.classID then
+        local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
+        --p:log(10, 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
+        item.classID = classID
+        item.subclassID = subclassID
+    end
+    return item
+end
+
+--- ### See: Enum.ItemClass
+--- ```
+--- Enum.ItemClass = {
+---    Armor = 4,
+---    Battlepet = 17,
+---    Consumable = 0,
+---    Container = 1,
+---    CurrencyTokenObsolete = 10,
+---    Gem = 3,
+---    Glyph = 16,
+---    ItemEnhancement = 8,
+---    Key = 13,
+---    Miscellaneous = 15,
+---    PermanentObsolete = 14,
+---    Profession = 19,
+---    Projectile = 6,
+---    Questitem = 12,
+---    Quiver = 11,
+---    Reagent = 5,
+---    Recipe = 9,
+---    Tradegoods = 7,
+---    Weapon = 2,
+---    WoWToken = 18
+--- }
+--- ```
+---
+--- This updates the item config and retrieve the classID and subClassID data
+---@param item Profile_Item
+---@param retrieveUpdate OptionalFlag Set to true to retrieve updated item if classID is missing
+function S:IsItemConsumable(item, retrieveUpdate)
+    local itemData = item
+    local doUpdate = retrieveUpdate or true
+    if itemData.classID == nil and doUpdate == true then
+        itemData = self:UpdateAndGetItemData(item)
+        p:log('Retrieved updated item data: %s', item.name)
+    end
+    return itemData.classID == Enum.ItemClass.Consumable
+end
+
 --- #### Alias for #GetSpellCooldownDetails(spellID)
 --- @return SpellCooldownDetails
 function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
@@ -355,4 +446,4 @@ function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID
 function S:GSC(spellID) return S:GetSpellCooldown(spellID) end
 --- #### Alias for #GetItemCooldown(itemId)
 --- @return ItemCooldown
-function S:GIC(itemID) return S:GetItemCooldown(itemID) end
+function S:GIC(itemID) return S:GetItemCooldownLight(itemID) end

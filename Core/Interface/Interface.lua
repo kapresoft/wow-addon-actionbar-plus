@@ -91,6 +91,8 @@ local Profile_Item = {
     ["name"] = "Arcane Powder",
     ["link"] = "|cffffffff|Hitem:17020::::::::70:::::::::|h[Arcane Powder]|h|r",
     ["id"] = 17020,
+    ["classID"] = 0,
+    ["subclassID"] = 0,
     ["stackCount"] = 20,
     ["icon"] = 133848,
     ["count"] = 40,
@@ -204,6 +206,8 @@ local Global_Profile_Bar = {
 
 --- @class Profile_Global_Config
 local Profile_Global_Config = {
+    ["logCooldownEvents"] = false,
+    ["logPlayerAuraEvents"] = false,
     ["bars"] = {
         ["ActionbarPlusF1"] = Global_Profile_Bar,
         ["ActionbarPlusF2"] = Global_Profile_Bar,

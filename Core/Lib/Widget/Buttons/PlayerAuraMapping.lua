@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub, pformat = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.pformat
+local PR = function() return O.Profile end
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -72,7 +73,7 @@ local Mapping = {
 --[[-----------------------------------------------------------------------------
 Methods & Properties
 -------------------------------------------------------------------------------]]
----@param o PlayerAuraMapping
+---@param o PlayerAuraMapping | AceEvent
 local function MethodsAndProperties(o)
 
     --- @type PlayerAuraSpecializationMap
@@ -80,11 +81,16 @@ local function MethodsAndProperties(o)
 
     --- @return PlayerAuraSpecializationMap
     function o:GetPlayerClassMapping()
-        if self.playerClassMapping then return self.playerClassMapping end
-
-        local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
-        self.playerClassMapping = gameMapping[GC:GetPlayerClass()]
-    end
+        if not self.playerClassMapping then
+            local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
+            local playerClass = GC:GetPlayerClass()
+            self.playerClassMapping = gameMapping[playerClass]
+            PR():IfLogPlayerAuraEvents(function()
+                p:log(5, 'Player Auras[%s]: %s',
+                        playerClass, pformat(self.playerClassMapping))
+            end)
+        end
+        return self.playerClassMapping end
 
     --- @param auraSpellID number The aura SpellID
     --- @return AuraInfo
@@ -95,6 +101,5 @@ local function MethodsAndProperties(o)
         return playerMapping[auraSpellID]
     end
 
-end
+end; MethodsAndProperties(L)
 
-MethodsAndProperties(L)

@@ -19,12 +19,16 @@ local B = O.BaseAPI
 local AceEvent, Table = O.AceLibrary.AceEvent, O.Table
 local SizeOfTable, IsEmptyTable = Table.Size, Table.IsEmpty
 local CURSOR_ITEM_TYPE = 1
+local AceBucket = ns:AceBucket()
+local PAM = O.PlayerAuraMapping
 
 --[[-----------------------------------------------------------------------------
 Interface
 -------------------------------------------------------------------------------]]
 local ABPI = function() return O.ActionbarPlusAPI  end
 local AU = function() return O.PlayerAuraUtil  end
+local PR = function() return O.Profile  end
+local BF = function() return O.ButtonFactory end
 
 --- @class EventFrameInterface : _Frame
 local _EventFrame = {
@@ -50,13 +54,8 @@ New Instance
 --- @class ActionbarPlusEventMixin : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(ns.M.ActionbarPlusEventMixin)
 AceEvent:Embed(L)
+AceBucket:Embed(L)
 local p = L:GetLogger()
-
---- @param abp ActionbarPlus
-L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
-    p:log(10, 'MSG::R: %s', msg)
-    abp.addonEvents():RegisterEvents()
-end)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -64,7 +63,6 @@ Support Functions
 --- @param f EventFrameInterface
 --- @param event string
 local function OnPlayerCombatEvent(f, event, ...)
-    -- p:log(40, 'Event[%s] received...', event)
     if E.PLAYER_REGEN_ENABLED == event then
         f.ctx.buttonFactory:Fire(E.OnPlayerLeaveCombat)
     end
@@ -106,7 +104,6 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarGrid(f, event, ...)
-    p:log(30, 'Event received: %s', event)
     if InCombatLockdown() then return end
     if E.ACTIONBAR_SHOWGRID == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
@@ -133,33 +130,27 @@ end
 
 --- Non-Instant Start-Cast Handler
 --- @param f EventFrameInterface
-local function OnSpellCastStart(f, ...)
-    --todo next: include item spells (i.e., quest items)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
+--- @param spellID number
+local function OnSpellCastStart(f, spellID)
     local w = f.ctx
     --- @param fw FrameWidget
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btnWidget)
+        fw:fesmb(spellID, function(btnWidget)
             btnWidget:SetHighlightInUse() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
 end
 
 --- i.e. Casting a portal and moving triggers this event
 --- @param f EventFrameInterface
-local function OnSpellCastStop(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastStop: %s', spellCastEvent)
+---@param spellID number
+local function OnSpellCastStop(f, spellID)
     local w = f.ctx
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
+        fw:fesmb(spellID, function(btn)
             btn:ResetHighlight() end)
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -169,70 +160,143 @@ end
 
 --- i.e. Conjure mana gem when there is already a mana gem in bag
 --- @param f EventFrameInterface
-local function OnSpellCastFailed(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastFailed: %s', spellCastEvent)
+---@param spellID number
+local function OnSpellCastFailed(f, spellID)
     local w = f.ctx
     w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
+        fw:fesmb(spellID, function(btn)
             btn:SetButtonStateNormal() end)
     end)
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
 end
 
 --- This handles 3-state spells like mage blizzard, hunter flares,
 --- or basic campfire in retail
 --- @param f EventFrameInterface
-local function OnSpellCastSent(f, ...)
-    local spellCastSentEvent = B:ParseSpellCastSentEventArgs(...)
-    if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
-    local w = f.ctx
-    --- @param fw FrameWidget
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastSentEvent.spellID, function(btn)
-            btn:SetButtonStateNormal() end)
-    end)
+---@param spellID number
+local function OnSpellCastSent(f, spellID)
+    BF():UpdateCooldownsAndState()
+
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
---- @param f EventFrameInterface
-local function OnSpellCastSucceeded(f, ...)
-    --- @type ButtonFactory
-    local bf = f.ctx.buttonFactory
+--- @alias NumberOfIterations number
+--- @alias AdditionalDelay Time
+---
+--- @return AdditionalDelay
+--- @param spellInfo SpellInfo
+local function GetAdditionalDelay(spellInfo)
+    assert(spellInfo, 'SpellInfo is required.')
+    local hasForms = API:HasShapeshiftForms()
+    local isShapeshiftSpell = false
+    local delay = 0.1
+    if hasForms then isShapeshiftSpell = API:IsShapeshiftSpell(spellInfo) end
+    if ns:IsWOTLK() and hasForms and isShapeshiftSpell then
+        delay = delay + 0.2
+    elseif spellInfo.castTime > 0 then
+        delay = delay + spellInfo.castTime/1000
+    end
+    return delay
+end
 
-    bf:fevf(function(fw)
-        fw:feb(function(bw)
-            if bw:IsSpell() then
-                C_Timer.NewTicker(0.1, function() bw:UpdateSpellState() end, 2)
-            elseif bw:IsItemOrMacro() then
-                C_Timer.NewTicker(0.1, function() bw:UpdateItemOrMacroState() end, 2)
-            end
-        end)
+--- @param spellInfo SpellInfo
+local function GetIterationCount(spellInfo)
+    if ns:IsWOTLK() and API:HasShapeshiftForms() then return 2 end
+    return 0
+end
+
+--- @param spellID number
+local function OnAfterSpellCastSucceeded(spellID)
+    local spellInfo = API:GetSpellInfo(spellID)
+    --p:log(0, 'OAfterSCSucceeded[%s]: %s castTime=%s (%s)',
+    --        spellID, spellInfo.name, spellInfo.castTime, GetTime())
+    local initialDelay = 0.3
+    local delay = 0.1 + GetAdditionalDelay(spellInfo)
+    PR():IfLogCooldownEvents(function()
+        local castTimeInSec = RoundToSignificantDigits(spellInfo.castTime/1000, 2)
+        p:log('AdditionalDelay[%s]: %s castTime=%s gameVersion=%s playerHasForms=%s',
+                spellInfo.name, delay, castTimeInSec, ns.gameVersion, API:HasShapeshiftForms())
     end)
+    local iter = GetIterationCount(spellInfo)
+    C_Timer.After(initialDelay, function()
+        BF():UpdateCooldownsAndState()
+        local shifted = API:IsPlayerShapeshifted()
+        if shifted then
+            C_Timer.NewTicker(delay, function()
+                BF():UpdateCooldownsAndState()
+            end, iter)
+        end
+    end)
+end
+
+--- @param f EventFrameInterface
+--- @param spellID number
+local function OnSpellCastSucceeded(f, spellID)
+    --p:log(10, 'OSCSucceeded[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
+    OnAfterSpellCastSucceeded(spellID)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
+end
+
+--- @param eventCtx EventContext
+local function OnPlayerControlLost(eventCtx)
+
+    C_Timer.NewTicker(1, function()
+        local inPetBattle = O.BaseAPI:PlayerInPetBattle()
+        local onTaxi = UnitOnTaxi(GC.UnitId.player)
+        p:log(10, 'ControlLost: onTaxi=%s inPetBattle=%s [%s]',
+                onTaxi, inPetBattle, GetTime())
+        if inPetBattle then return end
+        if not (onTaxi == true and PR():IsHideWhenTaxi() == true) then return end
+
+        O.WidgetMixin:ShowActionbars(false)
+
+    end, 2)
+
+end
+
+--- @param eventCtx EventContext
+local function OnPlayerControlGained(eventCtx)
+
+    C_Timer.NewTicker(1, function()
+        local inPetBattle = O.BaseAPI:PlayerInPetBattle()
+        local onTaxi = UnitOnTaxi(GC.UnitId.player)
+        p:log(10, 'ControlGained: onTaxi=%s inPetBattle=%s [%s]',
+                onTaxi, inPetBattle, GetTime())
+        if inPetBattle then return end
+
+        O.WidgetMixin:ShowActionbars(true)
+        eventCtx.buttonFactory:fevf(function(fw)
+            fw:feb(function(bw) bw:UpdateState() end)
+        end)
+
+    end, 2)
+
 end
 
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarEvents(f, event, ...)
-    --p:log('e[%s]: %s', event, {...})
+    local spellCastEvent = B:ParseSpellCastEventArgs(...)
+    if not spellCastEvent then return end
+    if UnitId.player ~= spellCastEvent.unitTarget then return end
+    local spellID = spellCastEvent.spellID
+    if not spellID then return end
+
     if E.UNIT_SPELLCAST_START == event then
-        OnSpellCastStart(f, ...)
+        OnSpellCastStart(f, spellID)
     elseif E.UNIT_SPELLCAST_STOP == event then
-        OnSpellCastStop(f, ...)
+        OnSpellCastStop(f, spellID)
     elseif E.UNIT_SPELLCAST_SENT == event then
-        OnSpellCastSent(f, ...)
+        OnSpellCastSent(f, spellID)
     elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
-        OnSpellCastSucceeded(f, ...)
+        OnSpellCastSucceeded(f, spellID)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
-        OnSpellCastFailed(f, ...)
+        OnSpellCastFailed(f, spellID)
     end
 end
 
@@ -246,44 +310,9 @@ local function OnStealth(eventWidget)
                 function(bw)
                     local icon = API:GetSpellIcon(bw:GetSpellData())
                     bw:SetIcon(icon)
+                    bw:UpdateSpellStealthState()
                 end)
     end)
-end
-
---- @param eventWidget EventContext
-local function OnShapeShift(eventWidget)
-    --- @param fw FrameWidget
-    eventWidget.buttonFactory:fevf(function(fw)
-        --- @param bw ButtonUIWidget
-        fw:fevb(function(bw) return bw:IsShapeshiftSpell() end,
-                function(bw)
-                    local icon = API:GetSpellIcon(bw:GetSpellData())
-                    bw:SetIcon(icon)
-                end)
-    end)
-end
-
---- @param eventContext EventContext
-local function OnStealthIconUpdate(eventContext)
-    eventContext.buttonFactory:fevf(function(fw)
-        fw:fevb(function(bw) return bw:IsStealthSpell() end,
-                function(bw)
-                    local icon = API:GetSpellIcon(bw:GetSpellData())
-                    bw:SetIcon(icon)
-                end)
-    end)
-end
-
---- Sequence is UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM; for this reason
---- @param f EventFrameInterface
---- @param event string
-local function OnShapeshiftOrStealthEvent(f, event, ...)
-    local eventWidget = f.ctx
-    if E.UPDATE_STEALTH == event then
-        OnStealth(eventWidget)
-    elseif E.UPDATE_SHAPESHIFT_FORM == event then
-        OnShapeShift(eventWidget)
-    end
 end
 
 --- @param f EventFrameInterface
@@ -316,137 +345,247 @@ local function OnBagEvent(f, event, ...)
     L:SendMessage(MSG.OnBagUpdateExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
+--- ShapeShift Sequence:
+---     UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM
+--- @param f EventFrameInterface
+--- @param event string
+local function OnEvent(f, event, ...)
+    local eventCtx = f.ctx
+
+    if E.UPDATE_STEALTH == event then
+        OnStealth(eventCtx)
+    elseif E.PLAYER_CONTROL_LOST == event then
+        OnPlayerControlLost(eventCtx)
+    elseif E.PLAYER_CONTROL_GAINED == event then
+        OnPlayerControlGained(eventCtx)
+    end
+end
+
 --- @param f EventFrameInterface
 --- @param event string
 local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
 
+---@param o ActionbarPlusEventMixin | AceBucket
+local function OnAddOnInitializedMessage(o)
+    --- @param abp ActionbarPlus
+    o:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
+        p:log(10, 'MSG::R: %s', msg)
+        local AddOnEvents = abp.addonEvents()
+        AddOnEvents:RegisterEvents()
+        AddOnEvents:RegisterMessages()
+    end)
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param addon ActionbarPlus
-function L:Init(addon)
-    self.addon = addon
-    self.buttonFactory = O.ButtonFactory
-    self.widgetMixin = O.WidgetMixin
-end
+--- @alias AceHookHandle table
 
---- @return EventFrameInterface
-function L:CreateEventFrame()
-    local f = CreateFrame("Frame", nil, self.addon.frame)
-    f.ctx = self:CreateContext(f)
-    return f
-end
+--- @param o ActionbarPlusEventMixin | AceBucket
+local function PropsAndMethods(o)
 
---- @param eventFrame _Frame
---- @return EventContext
-function L:CreateContext(eventFrame)
-    local ctx = {
-        frame = eventFrame,
-        addon = self.addon,
-        buttonFactory = self.buttonFactory,
-        widgetMixin = self.widgetMixin
-    }
-    return ctx
-end
+    --- @param addon ActionbarPlus
+    function o:Init(addon)
+        self.addon = addon
+        self.buttonFactory = O.ButtonFactory
+        self.widgetMixin = O.WidgetMixin
 
-function L:RegisterActionbarsEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnActionbarEvents)
-    RegisterFrameForUnitEvents(f, {
-        E.UNIT_SPELLCAST_START,
-        E.UNIT_SPELLCAST_STOP,
-        E.UNIT_SPELLCAST_SENT,
-        E.UNIT_SPELLCAST_SUCCEEDED,
-        E.UNIT_SPELLCAST_FAILED_QUIET,
-    })
-end
+        --- @type AceHookHandle
+        self.idleTimeHandle = nil
+        --- @type AceHookHandle
+        self.updateCooldownHandle = nil
+        --- @type Time
+        self.idleTime = GetTime()
 
-function L:RegisterShapeshiftOrStealthEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnShapeshiftOrStealthEvent)
-    RegisterFrameForEvents(f, { E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM })
-end
+        --- @type Number The number in seconds
+        self.expiryTimeInSeconds = 10
 
-function L:RegisterKeybindingsEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnUpdateBindings)
-    RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
-end
+        OnAddOnInitializedMessage(self)
+    end
 
-function L:RegisterVehicleFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnVehicleEvent)
-    RegisterFrameForUnitEvents(f, { E.UNIT_ENTERED_VEHICLE, E.UNIT_EXITED_VEHICLE }, GC.UnitId.player)
-end
+    function o:GetIdleTimeInSeconds() return RoundToSignificantDigits(GetTime() - self.idleTime, 2) end
+    function o:IsIdleTimeExpired() return IsFlying() or self:GetIdleTimeInSeconds() > self.expiryTimeInSeconds end
 
-function L:RegisterActionbarGridEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnActionbarGrid)
-    RegisterFrameForEvents(f, { E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID })
-end
+    function o:UpdateIdleTime()
+        self.idleTime = GetTime()
+        if self:ShouldRegisterEventCD() then self:RegisterEventCD() end
+    end
 
-function L:RegisterCursorChangesInBagEvents()
-    if BaseAPI:IsClassicEra() then return end
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnCursorChangeInBags)
-    -- Note that this event does not fire in WoW Classic (i.e. 1.14.x)
-    -- for non-consumable items in the bag like quest items
-    RegisterFrameForEvents(f, { E.CURSOR_CHANGED })
-end
+    function o:RegisterEventCD()
+        self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
+                0.5, function() self:OnUpdateCooldownsAndState() end)
+        PR():IfLogCooldownEvents(function()
+            p:log(1, 'Registered UpdateCooldownHandle')
+        end)
+    end
 
-function L:RegisterPetBattleFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnPetBattleEvent)
-    RegisterFrameForEvents(f, { E.PET_BATTLE_OPENING_START, E.PET_BATTLE_CLOSE })
-end
+    function o:ShouldRegisterEventCD()
+        return self.updateCooldownHandle == nil and IsFlying() ~= true
+    end
 
---- Use PLAYER_REGIN[ENABLED|DISABLED] is more reliable than using
---- PLAYER_[ENTER|LEAVE]_COMBAT event
-function L:RegisterCombatFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnPlayerCombatEvent)
-    RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
-end
-function L:RegisterBagEvents()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnBagEvent)
-    RegisterFrameForEvents(f, { E.BAG_UPDATE, E.BAG_UPDATE_DELAYED })
-end
-function L:RegisterEventToMessageTransmitter()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnMessageTransmitter)
-    --- @see GlobalConstants#M (Messages)
-    RegisterFrameForEvents(f, {
-        E.PLAYER_ENTERING_WORLD,
-        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
-        E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
-        E.MODIFIER_STATE_CHANGED,
-    })
-end
-function L:RegisterPlayerEnteringWorld()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
-    RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
-end
-function L:RegisterPlayerAura()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnPlayerAura)
-    RegisterFrameForUnitEvents(f, { E.UNIT_AURA }, GC.UnitId.player)
-end
+    function o:UnRegisterEventCD()
+        if self:IsIdleTimeExpired() and self.updateCooldownHandle then
+            self:UnregisterBucket(self.updateCooldownHandle)
+            self.updateCooldownHandle = nil
+            PR():IfLogCooldownEvents(function()
+                p:log(1, 'Unregistered UpdateCooldownHandle')
+            end)
+        end
+    end
 
-function L:RegisterEvents()
-    p:log(30, 'RegisterEvents called..')
-    self:RegisterActionbarsEventFrame()
-    self:RegisterKeybindingsEventFrame()
-    self:RegisterActionbarGridEventFrame()
-    self:RegisterCursorChangesInBagEvents()
-    self:RegisterShapeshiftOrStealthEventFrame()
-    self:RegisterCombatFrame()
-    self:RegisterBagEvents()
-    self:RegisterEventToMessageTransmitter()
-    self:RegisterPlayerEnteringWorld()
-    --self:RegisterPlayerAura()
-    if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
-    --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
-    if B:SupportsVehicles() then self:RegisterVehicleFrame() end
-end
+    function o:OnUpdateCooldownsAndState()
+        local expired = self:IsIdleTimeExpired()
+        local idleSeconds = self:GetIdleTimeInSeconds()
+
+        PR():IfLogCooldownEvents(function()
+            p:log(10, 'IdleInSeconds=%s lastActivity=%s hasEventHandle=%s expired=%s flying=%s',
+                    idleSeconds, self.idleTime, self.idleTimeHandle ~= nil, expired, IsFlying())
+        end)
+        if expired then self:UnRegisterEventCD(); return end
+
+        BF():UpdateCooldownsAndState()
+    end
+
+    --- @return EventFrameInterface
+    function o:CreateEventFrame()
+        local f = CreateFrame("Frame", nil, self.addon.frame)
+        f.ctx = self:CreateContext(f)
+        return f
+    end
+
+    --- @param eventFrame _Frame
+    --- @return EventContext
+    function o:CreateContext(eventFrame)
+        local ctx = {
+            frame = eventFrame,
+            addon = self.addon,
+            buttonFactory = self.buttonFactory,
+            widgetMixin = self.widgetMixin
+        }
+        return ctx
+    end
+
+    function o:RegisterDefaultEventFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnEvent)
+        RegisterFrameForEvents(f, {
+            E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
+            E.UPDATE_STEALTH
+        })
+        self.idleTimeHandle = self:RegisterBucketEvent({ E.PLAYER_STOPPED_MOVING,
+                                                    'UNIT_SPELLCAST_SENT',
+                                                    'UNIT_POWER_FREQUENT',
+                                                    'PLAYER_STOPPED_LOOKING',
+        }, 2, function() self:UpdateIdleTime() end)
+    end
+
+
+    function o:RegisterActionbarsEventFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnActionbarEvents)
+        RegisterFrameForUnitEvents(f, {
+            E.UNIT_SPELLCAST_START,
+            E.UNIT_SPELLCAST_STOP,
+            E.UNIT_SPELLCAST_SENT,
+            E.UNIT_SPELLCAST_SUCCEEDED,
+            E.UNIT_SPELLCAST_FAILED_QUIET,
+        })
+    end
+
+    function o:RegisterKeybindingsEventFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnUpdateBindings)
+        RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
+    end
+
+    function o:RegisterVehicleFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnVehicleEvent)
+        RegisterFrameForUnitEvents(f, { E.UNIT_ENTERED_VEHICLE, E.UNIT_EXITED_VEHICLE }, GC.UnitId.player)
+    end
+
+    function o:RegisterActionbarGridEventFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnActionbarGrid)
+        RegisterFrameForEvents(f, { E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID })
+    end
+
+    function o:RegisterCursorChangesInBagEvents()
+        if BaseAPI:IsClassicEra() then return end
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnCursorChangeInBags)
+        -- Note that this event does not fire in WoW Classic (i.e. 1.14.x)
+        -- for non-consumable items in the bag like quest items
+        RegisterFrameForEvents(f, { E.CURSOR_CHANGED })
+    end
+
+    function o:RegisterPetBattleFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnPetBattleEvent)
+        RegisterFrameForEvents(f, { E.PET_BATTLE_OPENING_START, E.PET_BATTLE_CLOSE })
+    end
+
+    --- Use PLAYER_REGIN[ENABLED|DISABLED] is more reliable than using
+    --- PLAYER_[ENTER|LEAVE]_COMBAT event
+    function o:RegisterCombatFrame()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnPlayerCombatEvent)
+        RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
+    end
+    function o:RegisterBagEvents()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnBagEvent)
+        RegisterFrameForEvents(f, { E.BAG_UPDATE, E.BAG_UPDATE_DELAYED })
+    end
+    function o:RegisterEventToMessageTransmitter()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnMessageTransmitter)
+        --- @see GlobalConstants#M (Messages)
+        RegisterFrameForEvents(f, {
+            E.PLAYER_ENTERING_WORLD,
+            E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
+            E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
+            E.MODIFIER_STATE_CHANGED,
+        })
+    end
+    function o:RegisterPlayerEnteringWorld()
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
+        RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
+    end
+    function o:RegisterPlayerAura()
+        local classMapping = O.PlayerAuraMapping:GetPlayerClassMapping()
+        if not classMapping or SizeOfTable(classMapping) <= 0 then
+            p:log('Player class has no registered auras glows')
+            return
+        end
+        local f = self:CreateEventFrame()
+        f:SetScript(E.OnEvent, OnPlayerAura)
+        RegisterFrameForUnitEvents(f, { E.UNIT_AURA }, GC.UnitId.player)
+    end
+
+    function o:RegisterEvents()
+        p:log(30, 'RegisterEvents called..')
+        self:RegisterActionbarsEventFrame()
+        self:RegisterDefaultEventFrame()
+        self:RegisterKeybindingsEventFrame()
+        self:RegisterActionbarGridEventFrame()
+        self:RegisterCursorChangesInBagEvents()
+        self:RegisterCombatFrame()
+        self:RegisterBagEvents()
+        self:RegisterEventToMessageTransmitter()
+        self:RegisterPlayerEnteringWorld()
+        self:RegisterPlayerAura()
+        if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
+        --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
+        if B:SupportsVehicles() then self:RegisterVehicleFrame() end
+    end
+
+    function o:RegisterMessages()
+        self:RegisterMessage(MSG.OnAddOnReady, function() BF():UpdateShapeshiftActions() end)
+        self:RegisterMessage(MSG.OnBagUpdate, function() BF():UpdateItems() end)
+        self:RegisterMessage(MSG.PLAYER_MOUNT_DISPLAY_CHANGED, function() BF():UpdateMounts() end)
+        self:RegisterMessage(MSG.ZONE_CHANGED_NEW_AREA, function() BF():UpdateMounts() end)
+    end
+
+end; PropsAndMethods(L)

@@ -153,6 +153,44 @@ function P:G()
     return g
 end
 
+--- @param evalFnOrBoolean function|boolean
+local function evalBooleanOrFn(evalFnOrBoolean)
+    if 'boolean' == type(evalFnOrBoolean) then
+        return evalFnOrBoolean == true
+    elseif 'function' == type(evalFnOrBoolean) then
+        return evalFnOrBoolean() == true
+    end
+    return false
+end
+
+--- @param callbackFn HandlerFnNoARg
+--- @param booleanOrConditionFn boolean|HandlerFnNoARg
+--- @return any
+function P:IfLogCooldownEvents(callbackFn, booleanOrConditionFn)
+    if not self:LogCooldownEvents() then return end
+    if booleanOrConditionFn == nil then
+        return callbackFn()
+    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
+        return callbackFn()
+    end
+    return nil
+end
+
+--- @param callbackFn HandlerFnNoARg
+--- @param booleanOrConditionFn boolean|HandlerFnNoARg
+--- @return any
+function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
+    if not self:LogPlayerAuraEvents() then return end
+    if booleanOrConditionFn == nil then
+        return callbackFn()
+    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
+        return callbackFn()
+    end
+    return nil
+end
+function P:LogCooldownEvents() return P:G().logCooldownEvents or false end
+function P:LogPlayerAuraEvents() return P:G().logPlayerAuraEvents or false end
+
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @return Profile_Bar
 function P:GetBar(frameIndex)

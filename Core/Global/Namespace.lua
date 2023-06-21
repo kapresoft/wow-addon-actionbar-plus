@@ -71,11 +71,11 @@ local function CreateNamespace(...)
         end
         --- @return GameVersion
         function o:IsTBC()
-            return self.gameVersion == 'tbc-classic'
+            return self.gameVersion == 'tbc_classic'
         end
         --- @return GameVersion
         function o:IsWOTLK()
-            return self.gameVersion == 'wotlk-classic'
+            return self.gameVersion == 'wotlk_classic'
         end
         --- @return GameVersion
         function o:IsRetail()
@@ -104,6 +104,9 @@ local function CreateNamespace(...)
             if not (name or o) then return end
             ns.O[name] = o
         end
+
+        --- @return AceBucket
+        function o:AceBucket() return self.LibStubAce('AceBucket-3.0') end
     end
 
     Methods(ns)
