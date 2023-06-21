@@ -63,7 +63,6 @@ Support Functions
 --- @param f EventFrameInterface
 --- @param event string
 local function OnPlayerCombatEvent(f, event, ...)
-    -- p:log(40, 'Event[%s] received...', event)
     if E.PLAYER_REGEN_ENABLED == event then
         f.ctx.buttonFactory:Fire(E.OnPlayerLeaveCombat)
     end
@@ -105,7 +104,6 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarGrid(f, event, ...)
-    p:log(30, 'Event received: %s', event)
     if InCombatLockdown() then return end
     if E.ACTIONBAR_SHOWGRID == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
@@ -134,7 +132,6 @@ end
 --- @param f EventFrameInterface
 --- @param spellID number
 local function OnSpellCastStart(f, spellID)
-    --p:log(10, 'OSCStart[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
     local w = f.ctx
     --- @param fw FrameWidget
     w.buttonFactory:fevf(function(fw)
@@ -165,8 +162,6 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastFailed(f, spellID)
-    --p:log(10, 'OSCFailed[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
-
     local w = f.ctx
     w.buttonFactory:fevf(function(fw)
         fw:fesmb(spellID, function(btn)
@@ -183,14 +178,7 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastSent(f, spellID)
-    --p:log('OSCSent: %s', spellID)
-    local w = f.ctx
-    --[[--- @param fw FrameWidget
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellID, function(btn)
-            btn:SetButtonStateNormal() end)
-    end)]]
-    O.ButtonFactory:UpdateCooldownsAndState()
+    BF():UpdateCooldownsAndState()
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
@@ -204,9 +192,6 @@ end
 --- @param spellInfo SpellInfo
 local function GetAdditionalDelay(spellInfo)
     assert(spellInfo, 'SpellInfo is required.')
-    --p:log('wotlk?=%s game=%s has forms: %s', ns:IsWOTLK(),
-    --        ns.gameVersion,
-    --        API:HasShapeshiftForms())
     local hasForms = API:HasShapeshiftForms()
     local isShapeshiftSpell = false
     local delay = 0.1
@@ -215,7 +200,6 @@ local function GetAdditionalDelay(spellInfo)
         delay = delay + 0.2
     elseif spellInfo.castTime > 0 then
         delay = delay + spellInfo.castTime/1000
-        p:log(10, 'delay with castTime: %s', delay)
     end
     return delay
 end
@@ -233,6 +217,11 @@ local function OnAfterSpellCastSucceeded(spellID)
     --        spellID, spellInfo.name, spellInfo.castTime, GetTime())
     local initialDelay = 0.3
     local delay = 0.1 + GetAdditionalDelay(spellInfo)
+    if PR():G().logCooldownEvents then
+        local castTimeInSec = RoundToSignificantDigits(spellInfo.castTime/1000, 2)
+        p:log('AdditionalDelay[%s]: %s castTime=%s gameVersion=%s playerHasForms=%s',
+                spellInfo.name, delay, castTimeInSec, ns.gameVersion, API:HasShapeshiftForms())
+    end
     local iter = GetIterationCount(spellInfo)
     C_Timer.After(initialDelay, function()
         BF():UpdateCooldownsAndState()
@@ -364,7 +353,6 @@ local function OnEvent(f, event, ...)
     local eventCtx = f.ctx
 
     if E.UPDATE_STEALTH == event then
-        p:log(10, '%s [%s]', event, GetTime())
         OnStealth(eventCtx)
     elseif E.PLAYER_CONTROL_LOST == event then
         OnPlayerControlLost(eventCtx)
@@ -426,7 +414,9 @@ local function PropsAndMethods(o)
     function o:RegisterEventCD()
         self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
                 0.5, function() self:OnUpdateCooldownsAndState() end)
-        p:log(1, 'Registered UpdateCooldownHandle')
+        if PR():G().logCooldownEvents == true then
+            p:log(1, 'Registered UpdateCooldownHandle')
+        end
     end
 
     function o:ShouldRegisterEventCD()
@@ -437,19 +427,21 @@ local function PropsAndMethods(o)
         if self:IsIdleTimeExpired() and self.updateCooldownHandle then
             self:UnregisterBucket(self.updateCooldownHandle)
             self.updateCooldownHandle = nil
-            p:log(1, 'Unregistered UpdateCooldownHandle')
+            if PR():G().logCooldownEvents == true then
+                p:log(1, 'Unregistered UpdateCooldownHandle')
+            end
         end
     end
 
     function o:OnUpdateCooldownsAndState()
-        local logActivity = false
+        local logActivity = PR():G().logCooldownEvents or false
 
         local expired = self:IsIdleTimeExpired()
         local idleSeconds = self:GetIdleTimeInSeconds()
 
         if logActivity then
-            p:log('Last activity: %s expired=%s idleTimeHandle=%s since=%s flying=%s',
-                    self.idleTime, expired, tostring(self.idleTimeHandle), idleSeconds, IsFlying())
+            p:log(10, 'IdleInSeconds=%s lastActivity=%s hasEventHandle=%s expired=%s flying=%s',
+                    idleSeconds, self.idleTime, self.idleTimeHandle ~= nil, expired, IsFlying())
         end
         if expired then self:UnRegisterEventCD(); return end
 

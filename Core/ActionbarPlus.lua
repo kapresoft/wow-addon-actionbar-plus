@@ -163,7 +163,6 @@ local methods = {
     --- @param self ActionbarPlus
     ['OnHide_Config'] = function(self, enableSound)
         enableSound = enableSound or false
-        p:log(10, 'OnHide_Config called with enableSound=%s', tostring(enableSound))
         if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
     end,
     --- @param self ActionbarPlus

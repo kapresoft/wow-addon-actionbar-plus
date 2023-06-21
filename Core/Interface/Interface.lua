@@ -206,6 +206,8 @@ local Global_Profile_Bar = {
 
 --- @class Profile_Global_Config
 local Profile_Global_Config = {
+    ["logCooldownEvents"] = false,
+    ["logPlayerAuraEvents"] = false,
     ["bars"] = {
         ["ActionbarPlusF1"] = Global_Profile_Bar,
         ["ActionbarPlusF2"] = Global_Profile_Bar,

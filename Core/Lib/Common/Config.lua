@@ -440,6 +440,24 @@ local function PropsAndMethods(o)
                     get = function(_) return GC:GetLogLevel() end,
                     set = function(_, v) GC:SetLogLevel(v) end,
                 },
+                log_cooldownActivations = {
+                    type = 'toggle',
+                    order = 2,
+                    width = 'full',
+                    name = L['Log Cooldown Events'],
+                    desc = L['Log Cooldown Events::Description'],
+                    get = function(_) return P:G().logCooldownEvents or false end,
+                    set = function(_, v) P:G().logCooldownEvents = v end,
+                },
+                log_playerAuraEvents = {
+                    type = 'toggle',
+                    order = 3,
+                    width = 'full',
+                    name = L['Log Player Aura Events'],
+                    desc = L['Log Player Aura Events::Description'],
+                    get = function(_) return P:G().logPlayerAuraEvents or false end,
+                    set = function(_, v) P:G().logPlayerAuraEvents = v end,
+                },
             },
         }
     end

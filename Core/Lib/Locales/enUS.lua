@@ -80,6 +80,11 @@ L['Log Level::Description']                              = 'Higher log levels ge
 
 -- new
 
+L['Log Cooldown Events']                                 = true
+L['Log Cooldown Events::Description']                    = 'Log events that deals with cooldowns on action buttons'
+L['Log Player Aura Events']                              = true
+L['Log Player Aura Events::Description']                 = 'Log events that deals with player auras on action buttons'
+
 L['Hide during taxi']                                    = true
 L['Hide during taxi::Description']                       = 'Hides the action bars while the player is in taxi; flying from one point to another.'
 L['Mouseover Glow']                                      = true
