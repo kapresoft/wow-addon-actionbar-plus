@@ -139,8 +139,10 @@ local function HandleChangedMacros(btnName, btnData)
     end
 
     if changed then
-        PR():IfLogMacroEvents(function()
-            p:log(10, '[10] %s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        ---@param cat string Category
+        PR():IfLogMacroEvents(function(cat)
+            p:log(10, '[%s::10] %s::Changed? %s [%s]',
+                    cat, btnName, changed, toStringSorted(changeInfo))
         end)
 
         btnWidget:Fire('OnMacroChanged')
@@ -165,8 +167,8 @@ local function OnAddonLoaded(frame, event, ...)
     end
 
     if event == 'UPDATE_MACROS' then
-        PR():IfLogMacroEvents(function()
-            p:log(10, '[10] Event Received: %s', event)
+        PR():IfLogMacroEvents(function(cat)
+            p:log(10, '[%s::10] Event Received: %s', cat, event)
         end)
         OnMacroUpdate()
     end

@@ -100,8 +100,9 @@ local function PropsAndMethods(o)
             end
         end
 
-        PR():IfLogPlayerAuraEvents(function()
-            p:log(5, "Triggered Auras: %s", O.Table.Size(playerAuras))
+        PR():IfLogPlayerAuraEvents(function(cat)
+            p:log(5, "[%s::5] Triggered Auras: %s",
+                    cat, O.Table.Size(playerAuras))
             for aID, info in pairs(playerAuras) do
                 p:log(5, "  • Aura[%s]=>%s", info.aura.spell.name, info.spell.name)
             end
@@ -131,9 +132,9 @@ local function PropsAndMethods(o)
         local auraInstanceID = aura.aura.instanceID
         C_Timer.After(1, function()
             self.addedAuras[auraInstanceID] = nil
-            PR():IfLogPlayerAuraEvents(function()
-                p:log(5, 'Removed[%s=>%s]: aid=%s expiry=%s',
-                        aura.aura.spell.name, aura.spell.name, auraInstanceID, aura.aura.data.expirationTime)
+            PR():IfLogPlayerAuraEvents(function(cat)
+                p:log(5, '[%s::5] Removed[%s=>%s]: aid=%s expiry=%s',
+                        cat, aura.aura.spell.name, aura.spell.name, auraInstanceID, aura.aura.data.expirationTime)
             end)
         end)
     end

@@ -167,37 +167,39 @@ end
 --- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogCooldownEvents(callbackFn, booleanOrConditionFn)
-    if not self:LogCooldownEvents() then return end
-    if booleanOrConditionFn == nil then
-        return callbackFn()
-    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
-        return callbackFn()
-    end
-    return nil
+    return self:IfConfigCondition(self:LogCooldownEvents(), 'CooldownEvents',
+            callbackFn, booleanOrConditionFn)
 end
 
---- @param callbackFn HandlerFnNoArg
+--- @param callbackFn HandlerWithArgFn
 --- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
-    if not self:LogPlayerAuraEvents() then return end
-    if booleanOrConditionFn == nil then
-        return callbackFn()
-    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
-        return callbackFn()
-    end
-    return nil
+    return self:IfConfigCondition(self:LogPlayerAuraEvents(), 'PlayerAuraEvents',
+            callbackFn, booleanOrConditionFn)
 end
 
---- @param callbackFn HandlerFnNoArg
+--- @param callbackFn HandlerWithArgFn
 --- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogMacroEvents(callbackFn, booleanOrConditionFn)
-    if not self:LogMacroEvents() then return end
+    return self:IfConfigCondition(self:LogMacroEvents(), 'MacroEvents',
+            callbackFn, booleanOrConditionFn)
+end
+
+--- @alias HandlerWithArgFn fun(cat:string) | "function(cat) end"
+
+--- @param configVal The boolean config value
+--- @param category string Category name
+--- @param callbackFn HandlerWithArgFn
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
+--- @return any
+function P:IfConfigCondition(configVal, category, callbackFn, booleanOrConditionFn)
+    if not configVal then return end
     if booleanOrConditionFn == nil then
-        return callbackFn()
+        return callbackFn(category)
     elseif evalBooleanOrFn(booleanOrConditionFn) == true then
-        return callbackFn()
+        return callbackFn(category)
     end
     return nil
 end
