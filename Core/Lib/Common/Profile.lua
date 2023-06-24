@@ -163,8 +163,8 @@ local function evalBooleanOrFn(evalFnOrBoolean)
     return false
 end
 
---- @param callbackFn HandlerFnNoARg
---- @param booleanOrConditionFn boolean|HandlerFnNoARg
+--- @param callbackFn HandlerFnNoArg
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogCooldownEvents(callbackFn, booleanOrConditionFn)
     if not self:LogCooldownEvents() then return end
@@ -176,8 +176,8 @@ function P:IfLogCooldownEvents(callbackFn, booleanOrConditionFn)
     return nil
 end
 
---- @param callbackFn HandlerFnNoARg
---- @param booleanOrConditionFn boolean|HandlerFnNoARg
+--- @param callbackFn HandlerFnNoArg
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
     if not self:LogPlayerAuraEvents() then return end
@@ -188,8 +188,23 @@ function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
     end
     return nil
 end
+
+--- @param callbackFn HandlerFnNoArg
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
+--- @return any
+function P:IfLogMacroEvents(callbackFn, booleanOrConditionFn)
+    if not self:LogMacroEvents() then return end
+    if booleanOrConditionFn == nil then
+        return callbackFn()
+    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
+        return callbackFn()
+    end
+    return nil
+end
+
 function P:LogCooldownEvents() return P:G().logCooldownEvents or false end
 function P:LogPlayerAuraEvents() return P:G().logPlayerAuraEvents or false end
+function P:LogMacroEvents() return P:G().logMacroEvents or false end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @return Profile_Bar

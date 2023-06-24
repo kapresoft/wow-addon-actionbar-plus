@@ -86,7 +86,7 @@ local function MethodsAndProperties(o)
             local playerClass = GC:GetPlayerClass()
             self.playerClassMapping = gameMapping[playerClass]
             PR():IfLogPlayerAuraEvents(function()
-                p:log(5, 'Player Auras[%s]: %s',
+                p:log(5, '[5] Player Auras[%s]: %s',
                         playerClass, pformat(self.playerClassMapping))
             end)
         end
