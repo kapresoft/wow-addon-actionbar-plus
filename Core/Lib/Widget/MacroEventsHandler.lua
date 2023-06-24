@@ -18,6 +18,7 @@ local O, LibStub = ns:LibPack()
 local P, Table, String = O.Profile, O.Table, O.String
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
+local PR = function() return O.Profile end
 
 --- @class MacroEventsHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.MacroEventsHandler)
@@ -138,7 +139,12 @@ local function HandleChangedMacros(btnName, btnData)
     end
 
     if changed then
-        p:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        ---@param cat string Category
+        PR():IfLogMacroEvents(function(cat)
+            p:log(10, '[%s::10] %s::Changed? %s [%s]',
+                    cat, btnName, changed, toStringSorted(changeInfo))
+        end)
+
         btnWidget:Fire('OnMacroChanged')
     end
 end
@@ -161,7 +167,9 @@ local function OnAddonLoaded(frame, event, ...)
     end
 
     if event == 'UPDATE_MACROS' then
-        p:log(20, 'Event Received: %s', event)
+        PR():IfLogMacroEvents(function(cat)
+            p:log(10, '[%s::10] Event Received: %s', cat, event)
+        end)
         OnMacroUpdate()
     end
 end

@@ -244,12 +244,13 @@ end
 
 --- @param eventCtx EventContext
 local function OnPlayerControlLost(eventCtx)
+    if InCombatLockdown() then return end
 
     C_Timer.NewTicker(1, function()
         local inPetBattle = O.BaseAPI:PlayerInPetBattle()
         local onTaxi = UnitOnTaxi(GC.UnitId.player)
-        p:log(10, 'ControlLost: onTaxi=%s inPetBattle=%s [%s]',
-                onTaxi, inPetBattle, GetTime())
+        --p:log(10, 'ControlLost: onTaxi=%s inPetBattle=%s [%s]',
+        --        onTaxi, inPetBattle, GetTime())
         if inPetBattle then return end
         if not (onTaxi == true and PR():IsHideWhenTaxi() == true) then return end
 
@@ -265,8 +266,8 @@ local function OnPlayerControlGained(eventCtx)
     C_Timer.NewTicker(1, function()
         local inPetBattle = O.BaseAPI:PlayerInPetBattle()
         local onTaxi = UnitOnTaxi(GC.UnitId.player)
-        p:log(10, 'ControlGained: onTaxi=%s inPetBattle=%s [%s]',
-                onTaxi, inPetBattle, GetTime())
+        --p:log(10, 'ControlGained: onTaxi=%s inPetBattle=%s [%s]',
+        --        onTaxi, inPetBattle, GetTime())
         if inPetBattle then return end
 
         O.WidgetMixin:ShowActionbars(true)
@@ -345,6 +346,12 @@ local function OnBagEvent(f, event, ...)
     L:SendMessage(MSG.OnBagUpdateExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
+--- @param f EventFrameInterface
+--- @param event string
+local function OnPlayerEnteringWorld(f, event, ...)
+    p:log(30, 'OnPlayerEnteringWorld')
+end
+
 --- ShapeShift Sequence:
 ---     UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM
 --- @param f EventFrameInterface
@@ -353,8 +360,10 @@ local function OnEvent(f, event, ...)
     local eventCtx = f.ctx
 
     if E.UPDATE_STEALTH == event then
-        OnStealth(eventCtx)
-    elseif E.PLAYER_CONTROL_LOST == event then
+        return OnStealth(eventCtx)
+    end
+
+    if E.PLAYER_CONTROL_LOST == event then
         OnPlayerControlLost(eventCtx)
     elseif E.PLAYER_CONTROL_GAINED == event then
         OnPlayerControlGained(eventCtx)
@@ -553,6 +562,7 @@ local function PropsAndMethods(o)
         f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
         RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
     end
+    
     function o:RegisterPlayerAura()
         local classMapping = O.PlayerAuraMapping:GetPlayerClassMapping()
         if not classMapping or SizeOfTable(classMapping) <= 0 then

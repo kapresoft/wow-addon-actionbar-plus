@@ -85,9 +85,9 @@ local function MethodsAndProperties(o)
             local gameMapping = Mapping[ns.gameVersion]; if not gameMapping then return nil end
             local playerClass = GC:GetPlayerClass()
             self.playerClassMapping = gameMapping[playerClass]
-            PR():IfLogPlayerAuraEvents(function()
-                p:log(5, 'Player Auras[%s]: %s',
-                        playerClass, pformat(self.playerClassMapping))
+            PR():IfLogPlayerAuraEvents(function(cat)
+                p:log(5, '[%s::5] Player Auras[%s]: %s',
+                        cat, playerClass, pformat(self.playerClassMapping))
             end)
         end
         return self.playerClassMapping end

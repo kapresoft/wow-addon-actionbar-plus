@@ -458,6 +458,15 @@ local function PropsAndMethods(o)
                     get = function(_) return P:LogPlayerAuraEvents() end,
                     set = function(_, v) P:G().logPlayerAuraEvents = v end,
                 },
+                log_MacroEvents = {
+                    type = 'toggle',
+                    order = 4,
+                    width = 'full',
+                    name = L['Log Macro Events'],
+                    desc = L['Log Macro Events::Description'],
+                    get = function(_) return P:LogMacroEvents() end,
+                    set = function(_, v) P:G().logMacroEvents = v end,
+                },
             },
         }
     end

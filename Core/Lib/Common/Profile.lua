@@ -163,33 +163,50 @@ local function evalBooleanOrFn(evalFnOrBoolean)
     return false
 end
 
---- @param callbackFn HandlerFnNoARg
---- @param booleanOrConditionFn boolean|HandlerFnNoARg
+--- @param callbackFn HandlerFnNoArg
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
 --- @return any
 function P:IfLogCooldownEvents(callbackFn, booleanOrConditionFn)
-    if not self:LogCooldownEvents() then return end
+    return self:IfConfigCondition(self:LogCooldownEvents(), 'CooldownEvents',
+            callbackFn, booleanOrConditionFn)
+end
+
+--- @param callbackFn HandlerWithArgFn
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
+--- @return any
+function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
+    return self:IfConfigCondition(self:LogPlayerAuraEvents(), 'PlayerAuraEvents',
+            callbackFn, booleanOrConditionFn)
+end
+
+--- @param callbackFn HandlerWithArgFn
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
+--- @return any
+function P:IfLogMacroEvents(callbackFn, booleanOrConditionFn)
+    return self:IfConfigCondition(self:LogMacroEvents(), 'MacroEvents',
+            callbackFn, booleanOrConditionFn)
+end
+
+--- @alias HandlerWithArgFn fun(cat:string) | "function(cat) end"
+
+--- @param configVal The boolean config value
+--- @param category string Category name
+--- @param callbackFn HandlerWithArgFn
+--- @param booleanOrConditionFn boolean|HandlerFnNoArg
+--- @return any
+function P:IfConfigCondition(configVal, category, callbackFn, booleanOrConditionFn)
+    if not configVal then return end
     if booleanOrConditionFn == nil then
-        return callbackFn()
+        return callbackFn(category)
     elseif evalBooleanOrFn(booleanOrConditionFn) == true then
-        return callbackFn()
+        return callbackFn(category)
     end
     return nil
 end
 
---- @param callbackFn HandlerFnNoARg
---- @param booleanOrConditionFn boolean|HandlerFnNoARg
---- @return any
-function P:IfLogPlayerAuraEvents(callbackFn, booleanOrConditionFn)
-    if not self:LogPlayerAuraEvents() then return end
-    if booleanOrConditionFn == nil then
-        return callbackFn()
-    elseif evalBooleanOrFn(booleanOrConditionFn) == true then
-        return callbackFn()
-    end
-    return nil
-end
 function P:LogCooldownEvents() return P:G().logCooldownEvents or false end
 function P:LogPlayerAuraEvents() return P:G().logPlayerAuraEvents or false end
+function P:LogMacroEvents() return P:G().logMacroEvents or false end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @return Profile_Bar
