@@ -238,7 +238,7 @@ end
 --- @param spellID number
 local function OnSpellCastSucceeded(f, spellID)
     --p:log(10, 'OSCSucceeded[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
-    OnAfterSpellCastSucceeded(spellID)
+    --OnAfterSpellCastSucceeded(spellID)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
