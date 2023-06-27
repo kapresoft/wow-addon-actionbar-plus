@@ -212,33 +212,14 @@ end
 
 --- @param spellID number
 local function OnAfterSpellCastSucceeded(spellID)
-    local spellInfo = API:GetSpellInfo(spellID)
-    --p:log(0, 'OAfterSCSucceeded[%s]: %s castTime=%s (%s)',
-    --        spellID, spellInfo.name, spellInfo.castTime, GetTime())
-    local initialDelay = 0.3
-    local delay = 0.1 + GetAdditionalDelay(spellInfo)
-    PR():IfLogCooldownEvents(function()
-        local castTimeInSec = RoundToSignificantDigits(spellInfo.castTime/1000, 2)
-        p:log('AdditionalDelay[%s]: %s castTime=%s gameVersion=%s playerHasForms=%s',
-                spellInfo.name, delay, castTimeInSec, ns.gameVersion, API:HasShapeshiftForms())
-    end)
-    local iter = GetIterationCount(spellInfo)
-    C_Timer.After(initialDelay, function()
-        BF():UpdateCooldownsAndState()
-        local shifted = API:IsPlayerShapeshifted()
-        if shifted then
-            C_Timer.NewTicker(delay, function()
-                BF():UpdateCooldownsAndState()
-            end, iter)
-        end
-    end)
+    BF():UpdateCooldownsAndState()
 end
 
 --- @param f EventFrameInterface
 --- @param spellID number
 local function OnSpellCastSucceeded(f, spellID)
     --p:log(10, 'OSCSucceeded[%s]: %s (%s)', spellID, GetSpellInfo(spellID), GetTime())
-    --OnAfterSpellCastSucceeded(spellID)
+    OnAfterSpellCastSucceeded(spellID)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
@@ -412,7 +393,7 @@ local function PropsAndMethods(o)
         OnAddOnInitializedMessage(self)
     end
 
-    function o:GetIdleTimeInSeconds() return RoundToSignificantDigits(GetTime() - self.idleTime, 2) end
+    function o:GetIdleTimeInSeconds() return GetTime() - self.idleTime end
     function o:IsIdleTimeExpired() return IsFlying() or self:GetIdleTimeInSeconds() > self.expiryTimeInSeconds end
 
     function o:UpdateIdleTime()
@@ -422,7 +403,7 @@ local function PropsAndMethods(o)
 
     function o:RegisterEventCD()
         self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
-                0.5, function() self:OnUpdateCooldownsAndState() end)
+                0.2, function() self:OnUpdateCooldownsAndState() end)
         PR():IfLogCooldownEvents(function()
             p:log(1, 'Registered UpdateCooldownHandle')
         end)
