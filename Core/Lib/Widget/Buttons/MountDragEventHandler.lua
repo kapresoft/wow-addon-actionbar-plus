@@ -30,7 +30,8 @@ local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 ---@param mount MountInfo
 ---@return boolean
 local function IsInvalidMount(mount)
-    return IsNil(mount) and IsNil(mount.name) and IsNil(mount.spellID)
+    if not mount then return true end
+    return IsNil(mount.name) and IsNil(mount.spellID)
 end
 
 ---@param mountInfo MountInfo

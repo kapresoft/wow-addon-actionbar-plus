@@ -272,9 +272,10 @@ end
 --- @return MountInfo
 function L:GetMountInfo(cursorInfo)
     local mountIDorIndex = cursorInfo.info1
-    local mountInfoAPI = self:GetMountInfoGenericFromCursor(mountIDorIndex)
-    if C_MountJournal then mountInfoAPI.index = cursorInfo.info2 end
-    return mountInfoAPI
+    local mountInfo = self:GetMountInfoGenericFromCursor(mountIDorIndex)
+    if not mountInfo then return nil end
+    if C_MountJournal then mountInfo.index = cursorInfo.info2 end
+    return mountInfo
 end
 
 --- @return MountInfo

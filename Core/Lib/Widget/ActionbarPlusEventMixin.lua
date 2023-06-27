@@ -132,13 +132,9 @@ end
 --- @param f EventFrameInterface
 --- @param spellID number
 local function OnSpellCastStart(f, spellID)
-    local w = f.ctx
-    --- @param fw FrameWidget
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellID, function(btnWidget)
-            btnWidget:SetHighlightInUse() end)
-    end)
-
+    ns:AB():SetChecked(spellID, true)
+    ns:AB():UpdateAll()
+    -- todo next: update cooldown
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
@@ -148,11 +144,7 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastStop(f, spellID)
-    local w = f.ctx
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellID, function(btn)
-            btn:ResetHighlight() end)
-    end)
+    ns:AB():SetChecked(spellID, false)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastStopExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
@@ -162,12 +154,7 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastFailed(f, spellID)
-    local w = f.ctx
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellID, function(btn)
-            btn:SetButtonStateNormal() end)
-    end)
-
+    ns:AB():SetChecked(spellID, false)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
@@ -178,8 +165,6 @@ end
 --- @param f EventFrameInterface
 ---@param spellID number
 local function OnSpellCastSent(f, spellID)
-    BF():UpdateCooldownsAndState()
-
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
@@ -212,7 +197,10 @@ end
 
 --- @param spellID number
 local function OnAfterSpellCastSucceeded(spellID)
-    BF():UpdateCooldownsAndState()
+    --BF():UpdateCooldownsAndState()
+    --BF():UpdateUsable()
+    --ns:AB():UpdateUsable()
+    C_Timer.After(0.2, function() ns:AB():UpdateAll() end)
 end
 
 --- @param f EventFrameInterface
@@ -355,14 +343,13 @@ end
 --- @param event string
 local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
 
----@param o ActionbarPlusEventMixin | AceBucket
-local function OnAddOnInitializedMessage(o)
+--- @param self ActionbarPlusEvent ActionbarPlusEventMixin instance
+local function OnAddOnInitializedMessage(self)
     --- @param abp ActionbarPlus
-    o:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
+    self:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
         p:log(10, 'MSG::R: %s', msg)
-        local AddOnEvents = abp.addonEvents()
-        AddOnEvents:RegisterEvents()
-        AddOnEvents:RegisterMessages()
+        self:RegisterEvents()
+        self:RegisterMessages()
     end)
 end
 
@@ -388,7 +375,7 @@ local function PropsAndMethods(o)
         self.idleTime = GetTime()
 
         --- @type Number The number in seconds
-        self.expiryTimeInSeconds = 10
+        self.expiryTimeInSeconds = 30
 
         OnAddOnInitializedMessage(self)
     end
@@ -404,9 +391,9 @@ local function PropsAndMethods(o)
     function o:RegisterEventCD()
         self.updateCooldownHandle = self:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE },
                 0.2, function() self:OnUpdateCooldownsAndState() end)
-        PR():IfLogCooldownEvents(function()
+        --[[PR():IfLogCooldownEvents(function()
             p:log(1, 'Registered UpdateCooldownHandle')
-        end)
+        end)]]
     end
 
     function o:ShouldRegisterEventCD()
@@ -427,13 +414,14 @@ local function PropsAndMethods(o)
         local expired = self:IsIdleTimeExpired()
         local idleSeconds = self:GetIdleTimeInSeconds()
 
-        PR():IfLogCooldownEvents(function()
-            p:log(10, 'IdleInSeconds=%s lastActivity=%s hasEventHandle=%s expired=%s flying=%s',
+        --[[PR():IfLogCooldownEvents(function()
+            p:log(5, 'IdleInSeconds=%s lastActivity=%s hasEventHandle=%s expired=%s flying=%s',
                     idleSeconds, self.idleTime, self.idleTimeHandle ~= nil, expired, IsFlying())
-        end)
+        end)]]
         if expired then self:UnRegisterEventCD(); return end
 
-        BF():UpdateCooldownsAndState()
+        -- todo next: secure hook on ActionButton_UpdateUsable
+        ns:AB():UpdateAll()
     end
 
     --- @return EventFrameInterface
@@ -462,11 +450,14 @@ local function PropsAndMethods(o)
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
             E.UPDATE_STEALTH
         })
-        self.idleTimeHandle = self:RegisterBucketEvent({ E.PLAYER_STOPPED_MOVING,
-                                                    'UNIT_SPELLCAST_SENT',
-                                                    'UNIT_POWER_FREQUENT',
-                                                    'PLAYER_STOPPED_LOOKING',
-        }, 2, function() self:UpdateIdleTime() end)
+        local enableCooldowns = true
+        if enableCooldowns == true then
+            self.idleTimeHandle = self:RegisterBucketEvent({ E.PLAYER_STOPPED_MOVING,
+                                                        'UNIT_SPELLCAST_SENT',
+                                                        'UNIT_POWER_FREQUENT',
+                                                        'PLAYER_STOPPED_LOOKING',
+            }, 2, function() self:UpdateIdleTime() end)
+        end
     end
 
 
@@ -557,6 +548,52 @@ local function PropsAndMethods(o)
 
     function o:RegisterEvents()
         p:log(30, 'RegisterEvents called..')
+
+        if GC.F.ENABLE_ACTION_BUTTON_GLOW then
+            ---@param checkButton _CheckButton
+            hooksecurefunc("ActionButton_ShowOverlayGlow", function(checkButton)
+                if checkButton:GetObjectType() == 'CheckButton' and checkButton.action then
+                    ns:AB():HandleShowOverlayGlow(checkButton)
+                end
+            end)
+            hooksecurefunc("ActionButton_HideOverlayGlow", function(checkButton)
+                if checkButton:GetObjectType() == 'CheckButton' and checkButton.action then
+                    ns:AB():HandleHideOverlayGlow(checkButton)
+                end
+            end)
+
+        end
+
+        -- secure hook on update usable?
+        hooksecurefunc("ActionButton_UpdateCooldown", function(checkButton)
+            local spellID = ns:AB():GetActionSpellID(checkButton)
+            if not spellID then return end
+            if spellID ~= 18562 then return end
+            local spellName = GetSpellInfo(spellID) or ''
+            p:log('UpdateUsable: %s %s [%s]', tostring(spellID), spellName, GetTime())
+        end)
+
+        local enableSecureButtonOnClickHandler = true
+        if enableSecureButtonOnClickHandler == true then
+            --- @param down ButtonName
+            --- @param btn _CheckButton | ButtonUI
+            hooksecurefunc("SecureActionButton_OnClick", function(btn, down)
+                if not btn.widget then return end
+                local bw = btn.widget
+                --p:log('SAB_OnClick:: data=%s', pformat(bw:GetConfig()))
+                local spellID = bw:GetEffectiveSpellID() or ''
+                local spellName
+                if spellID then spellName = GetSpellInfo(spellID) end
+                --p:log('SAB_OnClick::Hook: %s sp=%s [b4]', btn:GetName(), tostring(spellName))
+                C_Timer.After(0.2, function()
+                    --bw:UpdateStateLight()
+                    bw:UpdateUsable()
+                    bw:UpdateCooldown()
+                end)
+                p:log('SAB_OnClick: %s sp=%s', btn:GetName(), btn.widget:GetAbilityName())
+            end)
+        end
+
         self:RegisterActionbarsEventFrame()
         self:RegisterDefaultEventFrame()
         self:RegisterKeybindingsEventFrame()
@@ -566,7 +603,7 @@ local function PropsAndMethods(o)
         self:RegisterBagEvents()
         self:RegisterEventToMessageTransmitter()
         self:RegisterPlayerEnteringWorld()
-        self:RegisterPlayerAura()
+        --self:RegisterPlayerAura()
         if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
         --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
         if B:SupportsVehicles() then self:RegisterVehicleFrame() end

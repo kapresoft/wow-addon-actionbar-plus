@@ -58,6 +58,11 @@ local function GlobalConstantProperties(o)
         }
     }
 
+    --- @class AddOnFeatures
+    local AddOnFeatures = {
+        ENABLE_ACTION_BUTTON_GLOW = true
+    }
+
     --- @class GlobalAttributes
     local C = {
         ADDON_NAME = addon,
@@ -457,6 +462,7 @@ local function GlobalConstantProperties(o)
     --- @param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
 
+    o.F = AddOnFeatures
     o.Textures = Textures
     o.C = C
     o.E = Events

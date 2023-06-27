@@ -71,7 +71,7 @@ local function RegisterEvents(addon)
 
     --- @class ActionbarPlusEvent : ActionbarPlusEventMixin
     local addonEvents = ns:K():CreateAndInitFromMixin(O.ActionbarPlusEventMixin, addon)
-    addon.addonEvents = function() return addonEvents end
+    ns.O.ActionbarPlusEvent = addonEvents
 
     return frame
 end

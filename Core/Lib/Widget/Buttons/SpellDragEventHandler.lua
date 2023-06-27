@@ -14,6 +14,8 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class SpellDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.SpellDragEventHandler); if not L then return end
+---@type LoggerTemplate
+local p = L.logger()
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -29,10 +31,27 @@ function L:Handle(btnUI, cursorInfo)
                               bookType = cursorInfo.info2 }
 
     local spellInfo = API:GetSpellInfo(spellCursorInfo.id)
+
     if IsNil(spellInfo) then return end
 
     local w = btnUI.widget
     if w:IsPassiveSpell(spellInfo.name) then return end
+
+    if C_TradeSkillUI then
+        -- https://wowpedia.fandom.com/wiki/API_GetProfessions
+        local tradeSkillName = GetSpellInfo(cursorInfo.info1, BOOKTYPE_PROFESSION)
+        if spellInfo.name == tradeSkillName then
+            local prof1, prof2 = GetProfessions()
+            if prof1 then
+                local skillName, _, _, _, _, _, skillLineID = GetProfessionInfo(prof1)
+                if tradeSkillName == skillName then
+                    spellInfo.skillLineID = skillLineID
+                    p:log('TradeSkill[%s]: skillLineID=%s', tradeSkillName, spellInfo.skillLineID)
+                end
+            end
+        end
+    end
+
 
     local btnData = w.config()
     PH:PickupExisting(w)

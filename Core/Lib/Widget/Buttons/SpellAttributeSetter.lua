@@ -55,7 +55,6 @@ function L:SetAttributes(btnUI, btnData)
     btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
     local spellAttrValue = API:GetSpellAttributeValue(spellInfo)
     btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
-
     self:OnAfterSetAttributes(btnUI)
 end
 

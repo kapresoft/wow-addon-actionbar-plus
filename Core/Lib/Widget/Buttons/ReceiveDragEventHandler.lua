@@ -11,8 +11,7 @@ local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION, BATTLE_PET =
     W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
     W.MOUNT, W.COMPANION, W.BATTLE_PET
-
-
+local BF = function() return O.ButtonFactory end
 
 --[[-----------------------------------------------------------------------------
 Interface
@@ -68,4 +67,5 @@ function L:Handle(btnUI, cursor)
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
     btnUI.widget:CleanupOtherActionTypeData(actionType)
+    ns:AB():UpdateActiveButtons()
 end

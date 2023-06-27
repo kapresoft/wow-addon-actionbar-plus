@@ -26,6 +26,7 @@ local M = {
     String = 'String',
     Safecall = 'Safecall',
     LuaEvaluator = 'LuaEvaluator',
+    ActionbarButtons = 'ActionbarButtons',
     ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
     ActionType = 'ActionType',
     Assert = 'Assert',
@@ -93,8 +94,12 @@ local GlobalObjectsTemplate = {
     AceLibFactory = {},
     --- @type Kapresoft_LibUtil_AceLibraryObjects
     AceLibrary = {},
+    --- @type ActionbarButtons
+    ActionbarButtons = {},
     --- @type ActionbarPlusEventMixin
     ActionbarPlusEventMixin = {},
+    --- @type ActionbarPlusEvent
+    ActionbarPlusEvent = {},
     --- @type ActionType
     ActionType = {},
     --- @type Kapresoft_LibUtil_Assert

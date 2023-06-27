@@ -107,6 +107,11 @@ local function CreateNamespace(...)
 
         --- @return AceBucket
         function o:AceBucket() return self.LibStubAce('AceBucket-3.0') end
+
+        --- @return ActionbarButtons
+        function o:AB() return ns.O.ActionbarButtons end
+        --- @return ButtonFactory
+        function o:BF() return ns.O.ButtonFactory end
     end
 
     Methods(ns)

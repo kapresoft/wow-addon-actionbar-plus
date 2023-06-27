@@ -6,6 +6,7 @@
     <Script file="WidgetMixin.lua"/>
 
     <Script file="MacroEventsHandler.lua"/>
+    <Script file="ActionbarButtons.lua"></Script>
     <Script file="ActionbarPlusEventMixin.lua"/>
 
     <Include file="Buttons\_Buttons.xml"/>

@@ -29,6 +29,7 @@ local E, WAttr = GC.E, GC.WidgetAttributes
 
 local IsBlank = String.IsBlank
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
+local BF = function() return O.ButtonFactory end
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -103,6 +104,15 @@ local function OnPreClick(btn, key, down)
         w:SendMessage(GC.M.OnButtonClickEquipmentSet, w)
         return
     end
+
+    if C_TradeSkillUI then
+        local skillLineID = w:GetSpellData().skillLineID
+        if String.IsNotBlank(skillLineID) then
+            C_TradeSkillUI.OpenTradeSkill(skillLineID)
+            return
+        end
+    end
+
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
@@ -141,6 +151,9 @@ local function OnDragStart(btnUI)
     w:SetButtonAsEmpty()
     w:ShowEmptyGrid()
     w:ShowKeybindText(true)
+
+    --BF():UpdateActiveButtons()
+    ns:AB():UpdateActiveButtons()
     w:Fire('OnDragStart')
 end
 
@@ -170,7 +183,7 @@ local function OnReceiveDrag(btnUI)
         p:log(20, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()))
         return false
     else
-        p:log(20, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()))
+        p:log(0, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()))
     end
     ClearCursor()
 
@@ -182,6 +195,7 @@ local function OnReceiveDrag(btnUI)
     --    print('creating mask')
     --    hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_EMPTY_GRID)
     --end
+    --BF():UpdateActiveButtons()
 
     btnUI.widget:Fire('OnReceiveDrag')
 end

@@ -186,7 +186,11 @@ end
 --- @param w FrameWidget
 local function OnAddOnReady(w, msg)
     if InCombatLockdown() then return end
-    C_Timer.After(1, function() w:ShowGroupIfEnabled() end)
+    C_Timer.After(1, function()
+        w:ShowGroupIfEnabled()
+        --O.ButtonFactory:UpdateActiveButtons();
+        ns:AB():UpdateActiveButtons()
+    end)
 end
 
 ---Fired by FrameHandle when dragging stopped
@@ -367,7 +371,8 @@ local function WidgetMethods(widget)
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'SetFrameState(frameIndex)')
         P:SetBarEnabledState(frameIndex, isEnabled)
         if isEnabled then
-            if self.ShowGroup then self:ShowGroup() end
+            self:ShowGroup()
+            ns:AB():UpdateActiveButtons()
             return
         end
         if self.HideGroup then self:HideGroup() end

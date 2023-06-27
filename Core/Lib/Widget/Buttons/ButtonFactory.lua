@@ -17,6 +17,7 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local pformat = ns.pformat
 
 local AceEvent = O.AceLibrary.AceEvent
 local String, Table, A, P, MSG = O.String, O.Table, O.Assert, O.Profile, GC.M
@@ -35,6 +36,10 @@ local WMX = O.WidgetMixin
 
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
+-- todo next: move to ActionbarPlusEventMixin
+--- @type table<SpellID, table>
+L.activeButtons = {}
+
 local p = L:GetLogger()
 local safecall = O.Safecall:New(p)
 
@@ -313,6 +318,71 @@ function L:UpdateUsable()
         fw:fevb(IsValidButtonFn, function(bw) bw:UpdateUsable() end)
     end)
 end
+
+--[[--- @return table<number, ButtonUI>
+--- @param spellID SpellID
+function L:GetActiveButtons(spellID)
+    local buttons = self.activeButtons[spellID]
+    if not buttons then buttons = {} end
+    return buttons
+end]]
+
+--[[
+--- @param spellID SpellID
+--- @param spellName SpellName
+function L:ShowOverlayGlow(spellID, spellName)
+    local buttons = self:GetActiveButtons(spellID)
+    local size = #buttons
+    --p:log('btns: spellID=%s/%s btns=%s', spellID, spellName, size)
+    if size <= 0 then return end
+    for i, btn in ipairs(buttons) do
+        p:log(10, 'Show[%s]: s=%s spell=%s b=%s', spellID, size, spellName, btn:GetName())
+        btn.widget:ShowOverlayGlow()
+    end
+end
+]]
+
+--[[--- @param spellID SpellID
+--- @param spellName SpellName
+function L:HideOverlayGlow(spellID, spellName)
+    local buttons = self:GetActiveButtons(spellID)
+    local size = #buttons
+    --p:log('btns: spellID=%s/%s btns=%s', spellID, spellName, size)
+    if size <= 0 then return end
+    for i, btn in ipairs(buttons) do
+        p:log(10, 'Hide[%s]: s=%s spell=%s b=%s', spellID, size, spellName, btn:GetName())
+        btn.widget:HideOverlayGlow()
+    end
+end]]
+
+--[[function L:ClearActiveButtons()
+    for k in pairs (self.activeButtons) do self.activeButtons[k] = nil end
+    p:log(10, 'ClearActiveButtons: size=%s', #self.activeButtons)
+end]]
+
+--[[function L:UpdateActiveButtons()
+    self:ClearActiveButtons()
+
+    self:fevf(function(fw)
+        fw:fevb(function(bw)
+            local c = bw:GetConfig(); if not c then return false end
+            return c.type == 'spell' or c.type == 'macro'
+        end, function(bw)
+            --table.insert(self.enabledButtons, bw.button())
+            local spellID
+            if bw:IsSpell() then
+                spellID = bw:GetSpellData().id
+            elseif bw:IsMacro() then
+                spellID = bw:GetMacroSpellId()
+            end
+            if not spellID then return end
+            if not self.activeButtons[spellID] then self.activeButtons[spellID] = {} end
+            table.insert(self.activeButtons[spellID], bw.button())
+        end)
+    end)
+
+    p:log(0, 'UpdateActiveButtons: size=%s', #self.activeButtons)
+end]]
 
 --[[-----------------------------------------------------------------------------
 Initializer

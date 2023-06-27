@@ -274,7 +274,7 @@ end
 
 --- @param spellInfo Profile_Spell
 function S:GetSpellAttributeValue(spellInfo)
-    local spellAttrValue = spellInfo.id
+    local spellAttrValue = spellInfo.name
     if self:IsShapeshiftOrStealthSpell(spellInfo) then
         spellAttrValue = spellInfo.name
     end
@@ -342,7 +342,7 @@ function S:GetItemInfo(item)
     return itemInfo
 end
 
---- @return string, number
+--- @return SpellName, SpellID
 function S:GetItemSpellInfo(itemIdNameOrLink)
    local spellName, spellID = GetItemSpell(itemIdNameOrLink)
    return spellName, spellID
@@ -433,7 +433,7 @@ function S:IsItemConsumable(item, retrieveUpdate)
     local doUpdate = retrieveUpdate or true
     if itemData.classID == nil and doUpdate == true then
         itemData = self:UpdateAndGetItemData(item)
-        p:log('Retrieved updated item data: %s', item.name)
+        p:log(10, 'Retrieved updated item data: %s', item.name)
     end
     return itemData.classID == Enum.ItemClass.Consumable
 end

@@ -64,7 +64,7 @@ local function eventHandlerMethods(e)
 
         if IsInvalidCompanion(companion) then return end
 
-        local btnData = btnUI.widget.config
+        local btnData = btnUI.widget.config()
         local profileCompanion = ToProfileCompanion(companion)
 
         PH:PickupExisting(btnUI.widget)

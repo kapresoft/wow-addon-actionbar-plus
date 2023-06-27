@@ -146,6 +146,12 @@ local function PropsAndMethods(o)
     --- @param type ActionTypeName One of: spell, item, or macro
     function o:GetButtonTypeData(type) return self.config()[type] end
 
+    function o:GetAbilityName()
+        if self:IsSpell() then return self:GetSpellName()
+        elseif self:IsMacro() then return self:GetMacroName()
+        elseif self:IsItem() then return self:GetItemName() end
+    end
+
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
     function o:GetSpellName() local sp = self:GetSpellData(); return sp and sp.name end
@@ -219,6 +225,25 @@ local function PropsAndMethods(o)
         return self:IsConfigOfType(self.config(), W.SPELL)
                 and IsNotBlankStr(self:GetSpellData().name)
     end
+    --- @return boolean
+    function o:IsSpellOrMacro()
+        local config = self.config()
+        return self:IsConfigOfType(config, W.MACRO)
+                or (self:IsConfigOfType(config, W.SPELL) and IsNotBlankStr(self:GetSpellData().name))
+    end
+
+    function o:GetEffectiveSpellID()
+        if self:IsSpell() then
+            return self:GetSpellData().id
+        elseif self:IsMacro() then
+            return self:GetMacroSpellId()
+        elseif self:IsItem() then
+            local _, spellID = API:GetItemSpellInfo(self:GetItemName())
+            return spellID
+        end
+        return nil
+    end
+
     --- @return boolean
     function o:IsItem() return self:IsConfigOfType(self.config(),W. ITEM) end
     --- @return boolean
