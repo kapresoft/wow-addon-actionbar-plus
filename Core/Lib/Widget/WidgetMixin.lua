@@ -58,9 +58,10 @@ end
 function FontStringWidget:SetTextWithRangeIndicator()
     self.fontString:SetText(RANGE_INDICATOR)
 end
-function FontStringWidget:ClearText()
-    self.fontString:SetText('')
-end
+function FontStringWidget:ClearText() self.fontString:SetText('') end
+function FontStringWidget:Show() self.fontString:Show() end
+function FontStringWidget:Hide() self.fontString:Hide() end
+
 function FontStringWidget:ScaleWithButtonSize(buttonSize)
     local fs = self.fontString
     local adjustX = buttonSize * 0.1
@@ -70,7 +71,7 @@ function FontStringWidget:ScaleWithButtonSize(buttonSize)
     local fontName, fontHeight = fs:GetFont()
     fontHeight = defaultFontHeight
     if buttonSize > 30 then
-        local increase = math.ceil((buttonSize - 20) / 10)
+        local increase = math.ceil((buttonSize - 20) / 5)
         fontHeight = fontHeight + increase
     else
         fontHeight = defaultFontHeight
@@ -139,8 +140,6 @@ end
 function _L:CreateKeybindTextFontString(b)
     --- @type FontStringTemplate
     local fs = b:CreateFontString(nil, "OVERLAY", 'ABP_NumberFontNormalShadow')
-    --local fontName, fontHeight = fs:GetFont()
-    --fs:SetFont(fontName, fontHeight - 2, "THICKOUTLINE")
     fs:SetJustifyH("RIGHT")
     fs:SetJustifyV("TOP")
     --- @type FontStringWidget

@@ -47,7 +47,7 @@ local p = L:GetLogger()
 Instance Methods
 -------------------------------------------------------------------------------]]
 
----@param o ButtonMixin
+--- @param o ButtonMixin|ButtonUIWidget
 local function PropsAndMethods(o)
 
     --- Create a new ButtonMixin instance and
@@ -272,6 +272,8 @@ local function PropsAndMethods(o)
     ---Only used for prefixing logs
     function o:N() return "F" .. self.frameIndex .. "_B" .. self.index end
     function o:IsParentFrameShown() return self.dragFrame:IsShown() end
+    function o:IsShown() return self:IsParentFrameShown() end
+    function o:IsHidden() return self:IsParentFrameShown() ~= true end
 
     function o:ResetConfig()
         self.w:ResetButtonData()
@@ -467,15 +469,6 @@ local function PropsAndMethods(o)
         return spellCD
     end
 
-    --- @return number The spellID for macro
-    function o:GetMacroSpellId()
-        local macro = self:GetMacroData();
-        if not macro then return nil end
-        local name = GetMacroInfo(macro.index)
-        if not name then return nil end
-        return GetMacroSpell(macro.index)
-    end
-
     --- @return ItemCooldown
     function o:GetMacroItemCooldown()
         local macro = self:GetMacroData();
@@ -566,22 +559,24 @@ local function PropsAndMethods(o)
         local isUsable = true
         if c.type == SPELL then
             isUsable = self:IsUsableSpell(cd)
-        elseif c.type == ITEM then
-            isUsable = self:IsUsableItem(cd)
         elseif c.type == MACRO then
             isUsable = self:IsUsableMacro(cd)
+        elseif c.type == ITEM then
+            isUsable = self:IsUsableItem(cd)
         end
         self:SetActionUsable(isUsable)
     end
+
 
     function o:UpdateState()
         self:UpdateCooldown()
         if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end
         self:UpdateUsable()
-        self:UpdateRangeIndicator()
         self:SetHighlightDefault()
         self:SetNormalIconAlphaDefault()
+
         self:UpdateKeybindTextState()
+        self:UpdateRangeIndicator()
     end
 
     --Dynamic toggling of keybind text for
@@ -635,6 +630,14 @@ local function PropsAndMethods(o)
         btnData.name = equipmentSet.name
         btnData.icon = equipmentSet.icon
         self:SetIcon(btnData.icon)
+    end
+
+    function o:UpdateGlow()
+        local spell = self:GetEffectiveSpellName(); if not spell then return end
+        local spellID = select(7, GetSpellInfo(spell)); if not spellID then return end
+        local isGlowing = IsSpellOverlayed(spellID)
+        if isGlowing then self:ShowOverlayGlow(); return else end
+        self:HideOverlayGlow()
     end
 
     --- @return ActionBarInfo
@@ -828,8 +831,7 @@ local function PropsAndMethods(o)
         return false
     end
 
-    --- @param widget ButtonUIWidget
-    --- @param spellName string The spell name
+    --- @param spellName SpellName
     --- @param buttonData Profile_Button
     function o:IsMatchingSpellName(spellName, buttonData)
         local s = buttonData or self.w.config
@@ -865,61 +867,59 @@ local function PropsAndMethods(o)
         return false;
     end
 
-    --- @param hasTarget boolean Player has a target
-    function o:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
-        local show = self.w.frameIndex == 1 and (self.w.index == 1 or self.w.index == 2)
-        local fs = self.w.button.keybindText
-        if not hasTarget then fs.widget:SetVertexColorNormal(); return end
-
-        if not self.w:HasKeybindings() then fs.widget:SetTextWithRangeIndicator() end
-
-        -- else if in range, color is "white"
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
-        fs.widget:SetVertexColorNormal()
-        if inRange == false then
-            fs.widget:SetVertexColorOutOfRange()
-        elseif inRange == nil then
-            -- spells, items, macros where range is not applicable
-            if not self.w:HasKeybindings() then fs.widget:ClearText() end
-        end
-    end
-
-    --- @param hasTarget boolean Player has a target
-    function o:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
-        local show = self.w.frameIndex == 1 and self.w.index == 1
-        --if show then p:log('UpdateRangeIndicatorWithShowKeybindOff: %s', hasTarget) end
-        -- if no target, clear text and return
-        local fs = self.w.button.keybindText
-        if not hasTarget then
-            fs.widget:ClearText()
-            fs.widget:SetVertexColorNormal()
-            return
-        end
-
-        -- has target, set text as range indicator
-        fs.widget:SetTextWithRangeIndicator()
-
-        local inRange = API:IsActionInRange(self.w.config, UNIT.TARGET)
-
-        --self:log('%s in-range: %s', widget:GetName(), tostring(inRange))
-        fs.widget:SetVertexColorNormal()
-        if inRange == false then
-            fs.widget:SetVertexColorOutOfRange()
-        elseif inRange == nil then
-            fs.widget:ClearText()
-        end
-    end
-
     function o:UpdateRangeIndicator()
-        if not self:ContainsValidAction() then return end
-        local configIsShowKeybindText = self.w.dragFrame:IsShowKeybindText()
-        self.w:ShowKeybindText(configIsShowKeybindText)
+        if self:IsHidden() then return end
+        local spell = self:GetEffectiveSpellName()
+        if not self:SpellRequiresTarget(spell) then return end
+
+        local configIsShowKeybindText = self.dragFrame:IsShowKeybindText()
+        self:ShowKeybindText(configIsShowKeybindText)
 
         local hasTarget = API:IsValidActionTarget()
         if configIsShowKeybindText == true then
-            return self:UpdateRangeIndicatorWithShowKeybindOn(hasTarget)
+            return self:UpdateRangeIndicatorWithShowKeybindOn(spell, hasTarget)
         end
-        self:UpdateRangeIndicatorWithShowKeybindOff(hasTarget)
+        self:UpdateRangeIndicatorWithShowKeybindOff(spell, hasTarget)
+    end
+
+    --- @param spell SpellName Effective spell name for spell, item, macro
+    --- @param hasTarget boolean Player has a target
+    function o:UpdateRangeIndicatorWithShowKeybindOn(spell, hasTarget)
+        local kb = self:GetKeybindText()
+        if not hasTarget then kb:SetVertexColorNormal(); return end
+        if not self:HasKeybindings() then kb:SetTextWithRangeIndicator() end
+
+        -- else if in range, color is "white"
+        local inRange = API:IsSpellInRange(spell, UNIT.TARGET)
+        kb:SetVertexColorNormal()
+        if inRange == false then
+            kb:SetVertexColorOutOfRange()
+        elseif inRange == nil then
+            if not self.w:HasKeybindings() then kb:ClearText() end
+        end
+    end
+
+    --- @param spell SpellName Effective spell name for spell, item, macro
+    --- @param hasTarget boolean Player has a target
+    function o:UpdateRangeIndicatorWithShowKeybindOff(spell, hasTarget)
+        local kb = self:GetKeybindText()
+        if not hasTarget then
+            kb:ClearText()
+            kb:SetVertexColorNormal()
+            return
+        end
+
+        -- inRange can return nil if item/spell is invalid or target is invalid
+        local inRange = API:IsSpellInRange(spell, UNIT.TARGET)
+        kb:SetTextWithRangeIndicator()
+        kb:SetVertexColorNormal()
+        kb:Show()
+
+        if inRange == false then
+            kb:SetVertexColorOutOfRange()
+        elseif inRange == nil then
+            kb:ClearText()
+        end
     end
 
     --- @param isUsable boolean
@@ -950,7 +950,7 @@ local function PropsAndMethods(o)
         return IsUsableSpell(spellID)
     end
 
-    ---@param itemID itemID
+    --- @param itemID ItemID
     function o:IsUsableItemID(itemID)
         if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
         return IsUsableItem(itemID)
@@ -1050,8 +1050,20 @@ local function PropsAndMethods(o)
     function o:Hide() if InCombatLockdown() then return end; self.w.button:Hide() end
     function o:Show() if InCombatLockdown() then return end; self.w.button:Show() end
 
+    --- @return FontStringWidget
+    function o:GetKeybindText() return self.button.keybindText.widget end
+
+    ---@param spell SpellName
+    function o:SpellRequiresTarget(spell)
+        if not spell then return false end
+        if SpellHasRange and SpellHasRange(spell) then
+            return true
+        end
+        return false
+    end
+
     function o:GetIcon()
-        local texture = self.w.frame:GetNormalTexture()
+        local texture = self.frame():GetNormalTexture()
         if texture then return texture:GetTexture() end
         return nil
     end
@@ -1062,6 +1074,9 @@ local function PropsAndMethods(o)
         if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
         return GC:IsM6Macro(self.w:GetMacroData().name)
     end
+
+    function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.frame()) end
+    function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.frame()) end
 end
 
 PropsAndMethods(L)

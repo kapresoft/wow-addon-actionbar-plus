@@ -203,7 +203,7 @@ function L:CreateButtons(fw, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             local btnUI = fw:GetButtonUI(index)
-            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).frame end
+            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).frame() end
             fw:AddButtonFrame(btnUI)
         end
     end
@@ -268,7 +268,7 @@ local function OnPlayerMount()
     L:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:IsMount() end,
-                function(bw) O.MountAttributeSetter:SetAttributes(bw.frame, 'event') end
+                function(bw) O.MountAttributeSetter:SetAttributes(bw.frame(), 'event') end
         )
     end)
 end

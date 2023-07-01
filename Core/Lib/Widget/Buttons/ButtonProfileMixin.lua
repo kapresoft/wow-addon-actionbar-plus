@@ -153,10 +153,16 @@ local function PropsAndMethods(o)
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
-    --- @return string The macro name
-    function o:GetMacroName()
+
+    --- @return MacroName The macro name
+    function o:GetMacroName() return self:GetMacroInfo() end
+    --- @return Index
+    function o:GetMacroIndex() return select(2, self:GetMacroInfo()) end
+
+    --- @return MacroName, Index
+    function o:GetMacroInfo()
         local md = self:GetMacroData(); if not md then return nil end
-        return md.name
+        return md and md.name, md.index
     end
     --- @return boolean
     ---@param name string The macro name to check
@@ -177,7 +183,7 @@ local function PropsAndMethods(o)
     function o:GetEquipmentSetData() return self:GetButtonTypeData(W.EQUIPMENT_SET) end
 
     --- @return boolean
-    function o:ContainsValidAction() return self:GetActionName() ~= nil end
+    function o:ContainsValidAction() return self:GetEffectiveSpellName() ~= nil end
 
     function o:ConfigContainsValidActionType()
         if not type then return false end
@@ -198,12 +204,23 @@ local function PropsAndMethods(o)
     end
 
     --- @return string
-    function o:GetActionName()
+    function o:GetEffectiveSpellName()
         local conf = self.config
-        for i, type in ipairs(O.ActionType:GetNames()) do
-            if not self:IsInvalidButtonData(self.conf, type) then return conf[type].name end
+        local actionType = conf and conf.type
+        if IsBlankStr(actionType) then return nil end
+
+        local spellName
+        if actionType == 'spell' and not IsBlankStr(conf.spell.name) then
+            spellName = conf.spell.name
+        elseif actionType == 'macro' then
+            spellName = API:GetMacroSpell(self:GetMacroIndex())
+        elseif actionType == 'item' then
+            spellName = API:GetItemSpellInfo(conf.item.name)
+        elseif actionType == 'mount' then
+            spellName = conf.mount.name
         end
-        return nil
+
+        return not IsBlankStr(spellName) and spellName
     end
 
     function o:IsInvalidButtonData(o, key)

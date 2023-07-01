@@ -144,22 +144,6 @@ local function OnDragStart(btnUI)
     w:Fire('OnDragStart')
 end
 
---- @param btn _Button
---- @param texture _Texture
---- @param texturePath string
-local function CreateMask(btn, texture, texturePath)
-    local mask = btn:CreateMaskTexture()
-    local topx, topy = 1, -1
-    local botx, boty = -1, 1
-    local C = GC.C
-    mask:SetPoint(C.TOPLEFT, texture, C.TOPLEFT, topx, topy)
-    mask:SetPoint(C.BOTTOMRIGHT, texture, C.BOTTOMRIGHT, botx, boty)
-    mask:SetTexture(texturePath, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
-    texture.mask = mask
-    texture:AddMaskTexture(mask)
-    return mask
-end
-
 --- Used with `button:RegisterForDrag('LeftButton')`
 --- @param btnUI ButtonUI
 local function OnReceiveDrag(btnUI)
@@ -176,12 +160,6 @@ local function OnReceiveDrag(btnUI)
 
     --- @type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
-
-    --local hTexture = btnUI:GetHighlightTexture()
-    --if hTexture and not hTexture.mask then
-    --    print('creating mask')
-    --    hTexture.mask = CreateMask(btnUI, hTexture, GC.Textures.TEXTURE_EMPTY_GRID)
-    --end
 
     btnUI.widget:Fire('OnReceiveDrag')
 end
@@ -250,22 +228,12 @@ end
 
 --- @param widget ButtonUIWidget
 --- @param event string Event string
-local function OnUpdateButtonUsable(widget, event)
-    if not widget.button:IsShown() then return end
-    widget:UpdateUsable()
-end
-
---- @param widget ButtonUIWidget
---- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
-    if widget:IsM6Macro() then
-        -- todo next: M6 Macro
-        -- p:log('OnSpellUpdateUsable[%s](%s): %s', widget:GetName(), GetTime(), widget.config)
-    end
     if not widget.button:IsShown() then return end
-    widget:UpdateRangeIndicator()
 
-    OnUpdateButtonUsable(widget, event)
+    widget:UpdateRangeIndicator()
+    widget:UpdateUsable()
+    widget:UpdateGlow()
 end
 
 --- @param widget ButtonUIWidget
@@ -313,7 +281,7 @@ local function RegisterWidget(widget, name)
     widget.userdata = {}
     widget.events = {}
     widget.base = WidgetBase
-    widget.frame.obj = widget
+    widget.frame().obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -426,8 +394,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         dragFrame = dragFrameWidget,
         --- @type ButtonUI
         button = button,
-        --- @type ButtonUI
-        frame = button,
+        --- @type fun() : ButtonUI
+        frame = function() return button end,
         --- @type CooldownFrame
         cooldown = cooldown,
         --- @type table
@@ -453,22 +421,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     RegisterCallbacks(widget)
 
     widget:InitWidget()
-
-    -- This is for mouseover effect
-    ----- @param w ButtonUIWidget
-    --widget:SetCallback("OnEnter", function(w)
-    --    w.dragFrame.frame:SetAlpha(1.0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
-    --        bw.button:SetAlpha(1)
-    --    end)
-    --end)
-    ----- @param w ButtonUIWidget
-    --widget:SetCallback("OnLeave", function(w)
-    --    w.dragFrame.frame:SetAlpha(0)
-    --    w.dragFrame:ApplyForEachButtons(function(bw)
-    --        bw.button:SetAlpha(0.4)
-    --    end)
-    --end)
 
     return widget
 end
