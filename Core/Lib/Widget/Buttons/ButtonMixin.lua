@@ -632,7 +632,9 @@ local function PropsAndMethods(o)
         self:SetIcon(btnData.icon)
     end
 
+    --- IsSpellOverlayed() is available in Retail Version
     function o:UpdateGlow()
+        if not IsSpellOverlayed then return end
         local spell = self:GetEffectiveSpellName(); if not spell then return end
         local spellID = select(7, GetSpellInfo(spell)); if not spellID then return end
         local isGlowing = IsSpellOverlayed(spellID)
