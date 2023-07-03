@@ -112,6 +112,26 @@ function P:GetButtonDataByIndex(frameIndex, btnIndex)
     return self:GetButtonData(frameIndex, btnName)
 end
 
+--- Removes a particular actionType data from Profile_Button
+--- @param btnData Profile_Button
+function P:CleanupActionTypeData(btnData)
+    local function removeElement(tbl, value)
+        for i, v in ipairs(tbl) do if v == value then tbl[i] = nil end end
+    end
+    if btnData == nil or btnData.type == nil then return end
+    local actionTypes = O.ActionType:GetOtherNamesExcept(btnData.type)
+    for _, v in ipairs(actionTypes) do if v ~= nil then btnData[v] = {} end end
+end
+
+---@param frameIndex Index
+---@param buttonName string
+function P:GetButtonConfig(frameIndex, buttonName)
+    local profileButton = self:GetButtonData(frameIndex, buttonName)
+    -- self cleanup
+    self:CleanupActionTypeData(profileButton)
+    return profileButton
+end
+
 --- @return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
@@ -165,7 +185,6 @@ function P:GetBar(frameIndex)
         self.profile.bars[frameName] = self:CreateBarsTemplate()
         bar = self.profile.bars[frameName]
     end
-
     return bar
 end
 

@@ -67,7 +67,11 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
-    function o:GetName() return self.w.button:GetName() end
+    function o:GetName() return self.button:GetName() end
+
+    --- Only used for prefixing logs
+    --- @return string F1-B1 for Frame 1 and Button 1
+    function o:GN() return format(GC.C.BUTTON_NAME_SHORT_FORMAT, tostring(self.frameIndex), tostring(self.index)) end
 
     function o:InitWidget()
         self:SetButtonProperties()
@@ -267,13 +271,27 @@ local function PropsAndMethods(o)
 
     --- @return ButtonAttributes
     function o:GetButtonAttributes() return self.w.buttonAttributes end
+    --- @return Index
     function o:GetIndex() return self.w.index end
+    --- @return Index
     function o:GetFrameIndex() return self.w.frameIndex end
-    ---Only used for prefixing logs
-    function o:N() return "F" .. self.frameIndex .. "_B" .. self.index end
+
+    --- @return boolean
     function o:IsParentFrameShown() return self.dragFrame:IsShown() end
+    --- @return boolean
     function o:IsShown() return self:IsParentFrameShown() end
+    --- @return boolean
     function o:IsHidden() return self:IsParentFrameShown() ~= true end
+    --- @return boolean
+    function o:IsUpdatable() return self:IsSpellUpdatable(self:GetEffectiveSpellName()) end
+    --- @return boolean
+    function o:IsNotUpdatable() return self:IsSpellNotUpdatable(self:GetEffectiveSpellName()) end
+    --- @param spellName SpellName
+    --- @return boolean
+    function o:IsSpellNotUpdatable(spellName) return self:IsHidden() or IsBlank(spellName) end
+    --- @param spellName SpellName
+    --- @return boolean
+    function o:IsSpellUpdatable(spellName) return not self:IsSpellNotUpdatable(spellName) end
 
     function o:ResetConfig()
         self.w:ResetButtonData()
@@ -869,10 +887,30 @@ local function PropsAndMethods(o)
         return false;
     end
 
+
+    --- @param optionalSpell SpellName|nil
+    --- @return SpellName, Boolean  returns true if spell is a ranged and updatable spell
+    function o:GetEffectiveRangedSpellName(optionalSpell)
+        local spell = optionalSpell or self:GetEffectiveSpellName()
+        if not spell then return nil, false end
+        if self:IsSpellNotUpdatable(spell) then return spell, false end
+        if not self:SpellRequiresTarget(spell) then return spell, false end
+        return spell, true
+    end
+
     function o:UpdateRangeIndicator()
         if self:IsHidden() then return end
-        local spell = self:GetEffectiveSpellName()
-        if not self:SpellRequiresTarget(spell) then return end
+
+        local spell, ranged = self:GetEffectiveRangedSpellName()
+        if ranged == false then return end
+
+        self:UpdateRangeIndicatorBySpell(spell)
+    end
+
+    ---@param spell SpellName
+    function o:UpdateRangeIndicatorBySpell(spell)
+        if self:IsHidden() then return end
+        if not spell then return nil end
 
         local configIsShowKeybindText = self.dragFrame:IsShowKeybindText()
         self:ShowKeybindText(configIsShowKeybindText)
@@ -1055,11 +1093,14 @@ local function PropsAndMethods(o)
     --- @return FontStringWidget
     function o:GetKeybindText() return self.button.keybindText.widget end
 
-    ---@param spell SpellName
+    ---@param spell SpellName|SpellID
     function o:SpellRequiresTarget(spell)
         if not spell then return false end
-        if SpellHasRange and SpellHasRange(spell) then
-            return true
+
+        if 'string' == type(spell) then
+            return SpellHasRange(spell) == true
+        elseif 'number' == type(spell) then
+            return SpellHasRange(GetSpellInfo(spell)) == true
         end
         return false
     end
@@ -1079,6 +1120,12 @@ local function PropsAndMethods(o)
 
     function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.frame()) end
     function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.frame()) end
+
+    function o:LogSpellName() p:log('SpellName: %s', tostring(self:GetEffectiveSpellName())) end
+
+    --- @param label string
+    function o:LogSpellNameWithDetails(label) p:log('[%s::%s]: %s [%s]', label or 'SpellDetails',
+            self:GN(), tostring(self:GetEffectiveSpellName()), tostring(self:GetConfig().type)) end
 end
 
 PropsAndMethods(L)

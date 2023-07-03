@@ -67,5 +67,5 @@ function L:Handle(btnUI, cursor)
     if not self:IsSupportedCursorType(cursor) then return end
 
     handlers[actionType]:Handle(btnUI, cursorInfo)
-    btnUI.widget:CleanupOtherActionTypeData(actionType)
+    btnUI.widget:CleanupActionTypeData()
 end

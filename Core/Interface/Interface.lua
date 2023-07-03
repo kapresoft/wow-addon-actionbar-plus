@@ -24,6 +24,10 @@ local LibPackMixin = {
 local Namespace = {
     --- @type string
     name = "",
+
+    --- @type GameVersion
+    gameVersion = "retail",
+
     --- @type GlobalObjects
     O = {},
     --- @type ActionbarPlus_AceDB,

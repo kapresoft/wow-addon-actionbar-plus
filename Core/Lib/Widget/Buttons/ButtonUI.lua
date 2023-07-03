@@ -102,6 +102,8 @@ local function OnPreClick(btn, key, down)
     elseif w:IsEquipmentSet() then
         w:SendMessage(GC.M.OnButtonClickEquipmentSet, w)
         return
+    else
+        w:UpdateRangeIndicator()
     end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
@@ -220,6 +222,8 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnUpdateButtonCooldown(widget, event)
+    if widget:IsNotUpdatable() then return end
+
     widget:UpdateCooldown()
     local cd = widget:GetCooldownInfo();
     if (cd == nil or cd.icon == nil) then return end
@@ -229,8 +233,7 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string Event string
 local function OnSpellUpdateUsable(widget, event)
-    if not widget.button:IsShown() then return end
-
+    if widget:IsNotUpdatable() then return end
     widget:UpdateRangeIndicator()
     widget:UpdateUsable()
     widget:UpdateGlow()
@@ -251,7 +254,6 @@ end
 --- @param widget ButtonUIWidget
 --- @param event string
 local function OnPlayerControlGained(widget, event, ...)
-    --p:log('Event[%s] received flying=%s', event, flying)
     if not widget:IsHideWhenTaxi() then return end
     WMX:ShowActionbarsDelayed(true, 2)
 end
@@ -303,18 +305,45 @@ local function RegisterScripts(button)
 end
 
 --- @param widget ButtonUIWidget
+local function RegisterSpellUpdateUsable(widget)
+    if not ns:IsVanilla() then
+        widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
+    else
+        -- In Vanilla, SPELL_UPDATE_USABLE does not fire very often
+        widget:RegisterBucketEvent({ E.SPELL_UPDATE_USABLE, E.ACTIONBAR_UPDATE_USABLE }, 0.1, function(units)
+            OnSpellUpdateUsable(widget)
+        end);
+    end
+end
+
+--- see: Interface_[Vanilla|TBC|etc.]/FrameXML/Constants.lua
+--- ClassicExpansionAtLeast(LE_EXPANSION_CLASSIC)
+--- ClassicExpansionAtLeast(LE_EXPANSION_BURNING_CRUSADE)
+--- @param widget ButtonUIWidget
+local function RegisterUpdateRangeIndicatorOnSpellCast(widget)
+    if not GC.F.ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST then return end
+    local bucketEvents = { E.UNIT_SPELLCAST_SENT, E.UNIT_SPELLCAST_FAILED }
+    widget:RegisterBucketEvent(bucketEvents, 0.5, function(units)
+        if not units.player then return end
+        if widget:IsHidden() or O.API:HasTarget() ~= true then return end
+        local spell, ranged = widget:GetEffectiveRangedSpellName()
+        if ranged == false then return end
+        widget:LogSpellNameWithDetails('URIBS')
+        widget:UpdateRangeIndicatorBySpell(spell)
+    end, widget)
+end
+
+--- @param widget ButtonUIWidget
 local function RegisterCallbacks(widget)
 
-    --TODO: Tracks changing spells such as Covenant abilities in Shadowlands.
-    --SPELL_UPDATE_ICON
-
-    --TODO next Move at the frame level
+    -- TODO Next: Tracks changing spells such as Covenant abilities in Shadowlands.
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
     widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
-    widget:RegisterEvent(E.SPELL_UPDATE_USABLE, OnSpellUpdateUsable, widget)
+    RegisterSpellUpdateUsable(widget)
+    RegisterUpdateRangeIndicatorOnSpellCast(widget)
 
     -- Callbacks (fired via Ace Events)
     widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
@@ -382,8 +411,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local __widget = {
         --- @type ActionbarPlus
         addon = ABP,
-        --- @type Profile
-        profile = P,
         --- @type number
         index = btnIndex,
         --- @type number
@@ -415,6 +442,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button.widget, cooldown.widget = widget, widget
 
     AceEvent:Embed(widget)
+    ns:AceBucketEmbed(widget)
+
     ButtonMX:Mixin(widget)
 
     RegisterWidget(widget, btnName .. '::Widget')
