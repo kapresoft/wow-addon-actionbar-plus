@@ -328,7 +328,6 @@ local function RegisterUpdateRangeIndicatorOnSpellCast(widget)
         if widget:IsHidden() or O.API:HasTarget() ~= true then return end
         local spell, ranged = widget:GetEffectiveRangedSpellName()
         if ranged == false then return end
-        widget:LogSpellNameWithDetails('URIBS')
         widget:UpdateRangeIndicatorBySpell(spell)
     end, widget)
 end
