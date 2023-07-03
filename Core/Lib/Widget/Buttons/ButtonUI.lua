@@ -260,7 +260,10 @@ end
 --- @see "UnitDocumentation.lua"
 --- @param widget ButtonUIWidget
 --- @param event string
-local function OnPlayerTargetChanged(widget, event) widget:UpdateRangeIndicator() end
+local function OnPlayerTargetChanged(widget, event)
+    if widget:IsNotUpdatable() then return end
+    widget:UpdateRangeIndicator()
+end
 
 --- @see "UnitDocumentation.lua"
 --- @param widget ButtonUIWidget
@@ -268,7 +271,13 @@ local function OnPlayerTargetChanged(widget, event) widget:UpdateRangeIndicator(
 local function OnPlayerTargetChangedDelayed(widget, event)
     C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
 end
-local function OnPlayerStartedMoving(widget, event) OnPlayerTargetChangedDelayed(widget, event) end
+
+---@param widget ButtonUIWidget
+local function OnPlayerStoppedMoving(widget, event)
+    --if widget:IsNotUpdatable() then return end
+    --p:log('moving-stopped[%s]: %s', widget:GN(), GetTime())
+    OnPlayerTargetChangedDelayed(widget, event)
+end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -337,7 +346,7 @@ local function RegisterCallbacks(widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
     widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-    widget:RegisterEvent(E.PLAYER_STARTED_MOVING, OnPlayerStartedMoving, widget)
+    widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
     RegisterSpellUpdateUsable(widget)
     RegisterUpdateRangeIndicatorOnSpellCast(widget)
 

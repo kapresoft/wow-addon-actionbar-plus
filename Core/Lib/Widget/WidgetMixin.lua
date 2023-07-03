@@ -90,6 +90,7 @@ Methods
 -------------------------------------------------------------------------------]]
 
 --- @param button ButtonUI
+--- @return _FontString
 function _L:CreateFontString(button)
     local fs = button:CreateFontString(nil, nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT", -3, 2)

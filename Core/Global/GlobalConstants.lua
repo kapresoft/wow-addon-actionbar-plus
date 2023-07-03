@@ -60,6 +60,7 @@ local function GlobalConstantProperties(o)
 
     --- @Class AddonFeatures
     local FEATURES = {
+        ENABLE_LOGGING = false,
         ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST = true
     }
 
@@ -486,6 +487,7 @@ end
 --- @param o GlobalConstants
 local function GlobalConstantMethods(o)
 
+    --- @return string
     function o:AddonName() return o.C.ADDON_NAME end
     function o:GetAceLocale() return LibStub("AceLocale-3.0"):GetLocale(addon, true) end
 
@@ -517,7 +519,7 @@ local function GlobalConstantMethods(o)
         local wowInterfaceVersion = select(4, GetBuildInfo())
 
         return versionText, GetAddOnMetadata(addon, 'X-CurseForge'), GetAddOnMetadata(addon, 'X-Github-Issues'),
-                    GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
+        GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
     end
 
     function o:IsActionbarPlusM6Enabled() return 2 == GetAddOnEnableState(nil, 'ActionbarPlus-M6') end

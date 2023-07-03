@@ -77,6 +77,11 @@ local function CreateNamespace(...)
         --- @return Profile_Config
         function o.p() return ns.db.profile end
 
+        --- @return BooleanOptional
+        function o:IsLoggingEnabled() return true == ns.O.GlobalConstants.F.ENABLE_LOGGING end
+        --- @return BooleanOptional
+        function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
+
         --- @return GameVersion
         function o:IsVanilla() return self.gameVersion == 'classic' end
         --- @return GameVersion
