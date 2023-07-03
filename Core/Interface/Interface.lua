@@ -7,7 +7,7 @@ ActionbarPlus_AceDB
 local _db = {
     --- @type Profile_Global_Config
     global = {},
-    ----- @type Profile_Config
+    --- @type Profile_Config
     profile = {},
 }
 
@@ -30,7 +30,7 @@ local Namespace = {
 
     --- @type GlobalObjects
     O = {},
-    --- @type ActionbarPlus_AceDB,
+    --- @type ActionbarPlus_AceDB
     db = {},
     --- @type Module
     M = {},
@@ -183,6 +183,7 @@ local Profile_Bar = {
     ["widget"] = Profile_Bar_Widget,
     --- @see _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
+    --- @type table<number, Profile_Button>
     ["buttons"] = {
         ['ActionbarPlusF1Button1'] = Profile_Button
     }
@@ -253,6 +254,8 @@ local Config = {
     profile = {},
     --- @type ConfigEventHandlerMixin
     eventHandler = {},
+    maxRows = 20,
+    maxCols = 40,
 }
 
 --- @class ActionbarInitialSettings

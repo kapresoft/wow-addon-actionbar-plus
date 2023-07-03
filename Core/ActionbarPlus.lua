@@ -173,6 +173,7 @@ local methods = {
     --- @param self ActionbarPlus
     ['InitializeDb'] = function(self)
         -- Set up our database
+        --- @type ActionbarPlus_AceDB
         self.db = AceDB:New(GC.C.DB_NAME)
         ns.db = self.db
         self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")

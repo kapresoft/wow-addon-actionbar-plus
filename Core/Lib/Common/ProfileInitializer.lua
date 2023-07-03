@@ -50,13 +50,14 @@ local ActionbarInitialSettingsDefault = {
     ['frame_handle_mouseover'] = true
 }
 
+local ACTION_TYPE_NAMES = {
+    ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT, ATTR.COMPANION,
+    ATTR.MOUNT, ATTR.BATTLE_PET, ATTR.PET_ACTION, ATTR.EQUIPMENT_SET
+}
+
+--- @type Profile_Button
 local ButtonDataTemplate = {
-    [ATTR.TYPE] = ATTR.SPELL,
-    [ATTR.SPELL] = {},
-    [ATTR.ITEM] = {},
-    [ATTR.MACRO] = {},
-    [ATTR.MACRO_TEXT] = {},
-    [ATTR.MOUNT] = {},
+    [ATTR.TYPE] = '',
 }
 
 --- @type Profile_Bar_Widget
@@ -90,7 +91,7 @@ local DEFAULT_PROFILE_DATA = {
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param index number
+--- @param index number
 local function GetActionbarInitialSettings(index)
     local initS = ActionbarInitialSettings[index]
     if not initS then initS = CreateFromMixins(ActionbarInitialSettingsDefault) end
@@ -191,7 +192,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ProfileInitializer
+--- @param o ProfileInitializer
 local function Methods(o)
     --- @param frameIndex number
     function o:GetFrameNameByIndex(frameIndex)
@@ -228,36 +229,39 @@ local function Methods(o)
     end
 
     function o:InitNewProfile()
+        --- @type Profile_Config
         local profile = CreateFromMixins(DEFAULT_PROFILE_DATA)
         for name, config in pairs(DEFAULT_PROFILE_DATA.bars) do
             self:InitializeActionbar(profile, name, config)
         end
-        P = profile
         return profile
     end
 
-    ---@param barName string
-    ---@param barConf Profile_Bar
+    --- @param profile Profile_Config
+    --- @param barName string
+    --- @param barConf Profile_Bar
     function o:InitializeActionbar(profile, barName, barConf)
-        local widgetConf = barConf.widget
-        local btnCount = widgetConf.colSize * widgetConf.rowSize
-        for btnIndex=1,btnCount do
+        local btnCount = O.Config.maxButtons
+        for btnIndex = 1, btnCount do
             self:InitializeButtons(profile, barName, barConf, btnIndex)
         end
     end
 
-    ---@param barName string
-    ---@param barConf Profile_Bar
+    --- @param profile Profile_Config
+    --- @param barName string
+    --- @param barConf Profile_Bar
+    --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
         local btn = self:CreateSingleButtonTemplate()
         barConf.buttons[btnName] = btn
     end
 
+    --- @return Profile_Button
     function o:CreateSingleButtonTemplate()
-        local b = ButtonDataTemplate
-        local keys = { ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT }
-        for _,k in ipairs(keys) do
+        --- @type Profile_Button
+        local b = CreateFromMixins(ButtonDataTemplate)
+        for _,k in ipairs(ACTION_TYPE_NAMES) do
             if isNotTable(b[k]) then b[k] = {} end
         end
         return b

@@ -535,7 +535,7 @@ local function PropsAndMethods(o)
                     order = barSeq:next(),
                     step = 1,
                     min = 1,
-                    max = 20,
+                    max = self.maxCols,
                     name = L['Rows'],
                     desc = L['Rows::Description'],
                     --confirm = ConfirmAndReload,
@@ -548,7 +548,7 @@ local function PropsAndMethods(o)
                     order = barSeq:next(),
                     step = 1,
                     min = 1,
-                    max = 40,
+                    max = self.maxRows,
                     name = L['Columns'],
                     desc = L['Columns::Description'],
                     --confirm = ConfirmAndReload,
@@ -623,6 +623,9 @@ New Instance
 local function NewInstance()
     --- @type Config
     local newConfig = LibStub:NewLibrary(ns.M.Config); if not newConfig then return end
+    newConfig.maxRows = 20
+    newConfig.maxCols = 40
+    newConfig.maxButtons = newConfig.maxRows * newConfig.maxCols
 
     AceEvent:Embed(newConfig)
     PropsAndMethods(newConfig)

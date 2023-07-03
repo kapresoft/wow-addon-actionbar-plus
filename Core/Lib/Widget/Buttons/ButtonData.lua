@@ -69,11 +69,11 @@ local function PropsAndMethods(o)
     --- @param widget ButtonUIWidget
     function o:Init(widget)
         assert(widget, "ButtonUIWidget is required")
-        self.config = P:GetButtonDataByIndex(widget.frameIndex, widget.index)
+        self.config = P:GetButtonConfig(widget.frameIndex, widget.index)
         self.widget = widget
     end
 
-    function o:GetBarConfig() return self.widget.dragFrame:GetConfig() end
+    function o:GetBarConfig() return self.widget.dragFrame():GetConfig() end
 
     function o:invalidButtonData(obj, key)
         if type(obj) ~= 'table' then return true end

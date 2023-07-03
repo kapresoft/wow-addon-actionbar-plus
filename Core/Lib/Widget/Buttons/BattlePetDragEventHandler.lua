@@ -95,7 +95,7 @@ local function eventHandlerMethods(e)
 
         PH:PickupExisting(btnUI.widget)
 
-        local btnData = btnUI.widget.config
+        local btnData = btnUI.widget:conf()
         btnData[WAttr.TYPE] = WAttr.BATTLE_PET
         btnData[WAttr.BATTLE_PET] = profileBattlePet
 

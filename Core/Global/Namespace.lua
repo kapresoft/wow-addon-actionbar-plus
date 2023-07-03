@@ -74,6 +74,9 @@ local function CreateNamespace(...)
     --- @param o Namespace
     local function Methods(o)
 
+        --- @return Profile_Config
+        function o.p() return ns.db.profile end
+
         --- @return GameVersion
         function o:IsVanilla() return self.gameVersion == 'classic' end
         --- @return GameVersion

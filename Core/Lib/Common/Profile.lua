@@ -99,17 +99,9 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param obj any
+--- @param obj any
 function P:Mixin(obj)
     return ns:K():Mixin(obj, self)
-end
-
---- @param frameIndex number
---- @param btnIndex number
---- @return Profile_Button
-function P:GetButtonDataByIndex(frameIndex, btnIndex)
-    local btnName = GC:ButtonName(frameIndex, btnIndex)
-    return self:GetButtonData(frameIndex, btnName)
 end
 
 --- Removes a particular actionType data from Profile_Button
@@ -123,25 +115,33 @@ function P:CleanupActionTypeData(btnData)
     for _, v in ipairs(actionTypes) do if v ~= nil then btnData[v] = {} end end
 end
 
----@param frameIndex Index
----@param buttonName string
-function P:GetButtonConfig(frameIndex, buttonName)
+--- @type table<number, Profile_Bar>
+local barProfiles = {}
+
+--- @type table<string, Profile_Button>
+local buttonProfiles = {}
+
+--- @param frameIndex Index
+--- @param buttonName string
+--- @return Profile_Button
+function P:GetButtonConfig(frameIndex, buttonName) return self:GetBar(frameIndex).buttons[buttonName] end
+
+--- @deprecated To be deleted
+--- @param frameIndex Index
+--- @param buttonName string
+function P:RetrieveButtonConfig(frameIndex, buttonName)
     local profileButton = self:GetButtonData(frameIndex, buttonName)
-    -- self cleanup
-    self:CleanupActionTypeData(profileButton)
+    buttonProfiles[buttonName] = profileButton
     return profileButton
 end
 
+--- @deprecated To be deleted
+--- Object buttons[buttonName] is guaranteed to exist by the default profile (see #CreateDefaultProfile())
 --- @return Profile_Button
 function P:GetButtonData(frameIndex, buttonName)
     local barData = self:GetBar(frameIndex)
     if not barData then return end
     local buttons = barData.buttons
-    --if not buttons then return nil end
-    local btnData = buttons[buttonName]
-    if type(buttons[buttonName]) ~= 'table' then
-        buttons[buttonName] = {}
-    end
     return buttons[buttonName]
 end
 
@@ -175,18 +175,19 @@ end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @return Profile_Bar
-function P:GetBar(frameIndex)
-    AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'GetBar(frameIndex)')
+function P:GetBar(frameIndex) return barProfiles[frameIndex] or self:RetrieveBar(frameIndex) end
 
-    if isNotTable(self.profile.bars) then return end
+--- @return Profile_Bar
+---@param frameIndex number
+function P:RetrieveBar(frameIndex)
+    assert(frameIndex, "RetrieveBar: frameIndex is required.")
     local frameName = self:GetFrameNameByIndex(frameIndex)
-    local bar = self.profile.bars[frameName]
-    if isNotTable(bar) then
-        self.profile.bars[frameName] = self:CreateBarsTemplate()
-        bar = self.profile.bars[frameName]
-    end
+    local profile = ns.p()
+    local bar = profile.bars[frameName]
+    barProfiles[frameIndex] = bar
     return bar
 end
+
 
 function P:GetBars()
     return ns.db.profile.bars

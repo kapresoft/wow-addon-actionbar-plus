@@ -65,27 +65,26 @@ end
 --- @param down boolean true if the press is KeyDown
 local function RegisterForClicks(widget, event, down)
     local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
+    local btn = widget.button()
     if E.ON_LEAVE == event then
         if useKeyDown then
-            widget.button:RegisterForClicks('AnyDown')
+            btn:RegisterForClicks('AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            btn:RegisterForClicks('AnyUp')
         end
     elseif E.ON_ENTER == event then
-        --widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         if useKeyDown then
             --- Note: Macro will not trigger on first click if Drag Key is used in 'mod:<key>' in macros
             --- Macros should not use mod:<key> on the same drag key
-            widget.button:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+            btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            btn:RegisterForClicks('AnyUp')
         end
     elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event or 'PostClick' == event then
-        --widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         if useKeyDown then
-            widget.button:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+            btn:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
         else
-            widget.button:RegisterForClicks('AnyUp')
+            btn:RegisterForClicks('AnyUp')
         end
     end
 end
@@ -282,8 +281,6 @@ local function RegisterWidget(widget, name)
     local WidgetBase = AceGUI.WidgetBase
     widget.userdata = {}
     widget.events = {}
-    widget.base = WidgetBase
-    widget.frame().obj = widget
     local mt = {
         __tostring = function() return name  end,
         __index = WidgetBase
@@ -394,7 +391,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     button:RegisterForDrag("LeftButton", "RightButton");
     button:RegisterForClicks("AnyDown", "AnyUp");
 
-    --- @class CooldownFrame
+    --- see: Interface/AddOns/Blizzard_APIDocumentationGenerated/CooldownFrameAPIDocumentation.lua
+    --- @class CooldownFrame : _CooldownFrame
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
@@ -405,25 +403,23 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
+    --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent
     --- @class __ButtonUIWidget : ButtonMixin
-    --- @alias ButtonUIWidget  __ButtonUIWidget | BaseLibraryObject_WithAceEvent
     local __widget = {
-        --- @type ActionbarPlus
-        addon = ABP,
+        --- @type fun() : ActionbarPlus
+        addon = function() return ABP end,
         --- @type number
         index = btnIndex,
         --- @type number
         frameIndex = dragFrameWidget:GetIndex(),
         --- @type string
         buttonName = btnName,
-        --- @type FrameWidget
-        dragFrame = dragFrameWidget,
-        --- @type ButtonUI
-        button = button,
+        --- @type fun() : FrameWidget
+        dragFrame = function() return dragFrameWidget end,
         --- @type fun() : ButtonUI
-        frame = function() return button end,
-        --- @type CooldownFrame
-        cooldown = cooldown,
+        button = function() return button  end,
+        --- @type fun() : CooldownFrame
+        cooldown = function() return cooldown end,
         --- @type table
         cooldownInfo = nil,
         ---Don't make this 'LOW'. ElvUI AFK Disables it after coming back from AFK
@@ -432,7 +428,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameLevel = (dragFrameWidget.frameLevel + 100) or 100,
         --- @type number
         buttonPadding = 1,
-        buttonAttributes = GC.ButtonAttributes,
         placement = { rowNum = rowNum, colNum = colNum },
     }
     --- @type ButtonUIWidget

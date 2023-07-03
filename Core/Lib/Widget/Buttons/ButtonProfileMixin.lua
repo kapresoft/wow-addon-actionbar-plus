@@ -43,11 +43,13 @@ local function PropsAndMethods(o)
     --- @param widget ButtonUIWidget
     function o:Init(widget)
         self.w = widget
-        self.config = self:GetConfig()
     end
 
+    --- @return Profile_Button
+    function o:conf() return self:GetConfig() end
+
     function o:SetButtonAttributes()
-        local conf = self.config
+        local conf = self:conf()
         if not conf then return end
         if IsBlankStr(conf.type) then
             conf.type = self:GuessButtonType(conf)
@@ -55,7 +57,7 @@ local function PropsAndMethods(o)
         end
         local setter = self:GetAttributesSetter()
         if not setter then return end
-        setter:SetAttributes(self.w.button)
+        setter:SetAttributes(self.button())
     end
 
     --- @return table<string, AttributeSetter>
@@ -75,7 +77,7 @@ local function PropsAndMethods(o)
 
     --- @return AttributeSetter
     function o:GetAttributesSetter(actionType)
-        local type = actionType or self.config.type
+        local type = actionType or self:conf().type
         --p:log('type: %s', tostring(type))
         return self:GetAllAttributesSetters()[type]
     end
@@ -95,15 +97,15 @@ local function PropsAndMethods(o)
     end
 
     function o:IsEmpty()
-        if IsEmptyTable(self.config) then return true end
-        local type = self.config.type
+        if IsEmptyTable(self:conf()) then return true end
+        local type = self:conf().type
         if IsBlankStr(type) then return true end
-        if IsEmptyTable(self.config[type]) then return true end
+        if IsEmptyTable(self:conf()[type]) then return true end
         return false
     end
 
     --- @return Profile_Bar
-    function o:GetBarConfig() return self.w.dragFrame:GetConfig() end
+    function o:GetBarConfig() return self.dragFrame():GetConfig() end
 
     ---#### Get Profile Button Config Data
     --- @return Profile_Button
@@ -113,7 +115,7 @@ local function PropsAndMethods(o)
     function o:GetProfileConfig() return PR():P() end
 
     --- @param type ActionTypeName One of: spell, item, or macro
-    function o:GetButtonTypeData(type) return self.config[type] end
+    function o:GetButtonTypeData(type) return self:conf()[type] end
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
@@ -155,7 +157,7 @@ local function PropsAndMethods(o)
 
     function o:ConfigContainsValidActionType()
         if not type then return false end
-        local btnConf = self.config
+        local btnConf = self:conf()
         if not btnConf then return false end
         if IsBlankStr(btnConf.type) and IsEmptyTable(btnConf[btnConf.type]) then
             return false
@@ -174,7 +176,7 @@ local function PropsAndMethods(o)
     --- @return SpellName|nil
     function o:GetEffectiveSpellName()
         self:IsActionType()
-        local conf = self.config
+        local conf = self:conf()
         local actionType = conf and conf.type
         if IsBlankStr(actionType) then return nil end
 
@@ -194,7 +196,7 @@ local function PropsAndMethods(o)
 
     --- @return SpellID|nil
     function o:GetEffectiveSpellID()
-        local conf = self.config
+        local conf = self:conf()
         local actionType = conf and conf.type
         if IsBlankStr(actionType) then return nil end
 
@@ -223,7 +225,7 @@ local function PropsAndMethods(o)
     function o:IsMacroText() return self:IsActionType(W.MACRO_TEXT) end
     --- @return boolean
     function o:IsSpell() return self:IsActionType(W.SPELL)
-            and self:IsValidSpellProfile(self.config) end
+            and self:IsValidSpellProfile(self:conf()) end
     --- @return boolean
     function o:IsItem() return self:IsActionType(W.ITEM) end
     --- @return boolean
@@ -269,7 +271,7 @@ local function PropsAndMethods(o)
     --- @param type ActionTypeName
     --- @param optionalConfig Profile_Button|nil
     function o:IsActionType(type, optionalConfig)
-        local config = optionalConfig or self.config
+        local config = optionalConfig or self:conf()
         --p:log('type: %s', ns.pformat(config))
         return config.type and type == config.type
     end
@@ -361,12 +363,12 @@ local function PropsAndMethods(o)
     end
 
     function o:ResetButtonData()
-        local btnData = self.config
-        for _, a in ipairs(O.ActionType:GetNames()) do btnData[a] = {} end
-        btnData[W.TYPE] = ''
+        local conf = self:conf()
+        for _, a in ipairs(O.ActionType:GetNames()) do conf[a] = {} end
+        conf[W.TYPE] = ''
     end
 
-    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self.config) end
+    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self:conf()) end
 
 end
 
