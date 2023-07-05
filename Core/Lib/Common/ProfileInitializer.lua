@@ -32,7 +32,15 @@ Instance Properties
 -- todo next deprecate P.baseFrameName
 L.baseFrameName = GC.C.BASE_FRAME_NAME
 
+--- This is the hard limit
 local ACTION_BAR_COUNT = 10
+
+--- The additional rows and cols settings are so that the Profile Defaults will create more row data
+--- Having additional row data for profile template means that empty button profiles will
+--- be cleaned up more and does not clutter the user conf.
+--- WARNING: This will increase addon memory usage
+local DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS = 5
+
 L.ActionbarCount = ACTION_BAR_COUNT
 --- For new profile creation, this is the default visiblity state
 L.ActionbarEnableByDefault = false
@@ -48,11 +56,6 @@ local ActionbarInitialSettingsDefault = {
     ['enable'] = false,
     ['rowSize'] = 2, ['colSize'] = 5,
     ['frame_handle_mouseover'] = true
-}
-
-local ACTION_TYPE_NAMES = {
-    ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT, ATTR.COMPANION,
-    ATTR.MOUNT, ATTR.BATTLE_PET, ATTR.PET_ACTION, ATTR.EQUIPMENT_SET
 }
 
 --- @type Profile_Button
@@ -172,6 +175,8 @@ local function ApplyLayoutStrategy(layoutStrategyFn)
     end
 end
 
+--- This function initializes the DEFAULT_PROFILE_DATA var
+--- to populate the default Profile Data
 local function InitDefaultProfileData()
     for i = 1, ACTION_BAR_COUNT do
         --- @type Profile_Bar
@@ -228,11 +233,16 @@ local function Methods(o)
         return btnConf.anchor
     end
 
+    --- DEFAULT_PROFILE_DATA is initialized in #InitDefaultProfileData()
+    --- @return Profile_Config
     function o:InitNewProfile()
         --- @type Profile_Config
         local profile = CreateFromMixins(DEFAULT_PROFILE_DATA)
-        for name, config in pairs(DEFAULT_PROFILE_DATA.bars) do
-            self:InitializeActionbar(profile, name, config)
+        for i=1, ACTION_BAR_COUNT do
+            local barName = GC:GetFrameName(i)
+            local barConf = profile.bars[barName]
+            self:InitializeActionbar(profile, barName, barConf)
+
         end
         return profile
     end
@@ -241,8 +251,11 @@ local function Methods(o)
     --- @param barName string
     --- @param barConf Profile_Bar
     function o:InitializeActionbar(profile, barName, barConf)
-        local btnCount = O.Config.maxButtons
-        for btnIndex = 1, btnCount do
+        local widgetConf = barConf.widget
+        local colSize = widgetConf.colSize + DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS
+        local rowSize = widgetConf.rowSize + DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS
+        local btnCount = colSize * rowSize
+        for btnIndex=1,btnCount do
             self:InitializeButtons(profile, barName, barConf, btnIndex)
         end
     end
@@ -253,19 +266,11 @@ local function Methods(o)
     --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
-        local btn = self:CreateSingleButtonTemplate()
-        barConf.buttons[btnName] = btn
+        barConf.buttons[btnName] = self:CreateSingleButtonTemplate()
     end
 
     --- @return Profile_Button
-    function o:CreateSingleButtonTemplate()
-        --- @type Profile_Button
-        local b = CreateFromMixins(ButtonDataTemplate)
-        for _,k in ipairs(ACTION_TYPE_NAMES) do
-            if isNotTable(b[k]) then b[k] = {} end
-        end
-        return b
-    end
+    function o:CreateSingleButtonTemplate() return CreateFromMixins(ButtonDataTemplate) end
 end
 
 Methods(L)

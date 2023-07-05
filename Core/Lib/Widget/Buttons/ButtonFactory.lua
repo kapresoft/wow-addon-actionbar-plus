@@ -113,7 +113,6 @@ local function GuessButtonType(btnWidget, btnData)
     for buttonType in pairs(AttributeSetters) do
         -- return the first data found
         if not IsEmptyTable(btnData[buttonType]) then
-            p:log(10, 'btnData[%s] did not have a type and was corrected: %s', btnWidget:GetName(), btnData.type)
             return buttonType
         end
     end
@@ -129,8 +128,8 @@ function L:Init()
         local f = self:CreateActionbarGroup(i)
         tinsert(self.FRAMES, f)
         f:ShowGroupIfEnabled()
+        f:ScrubEmptyButtons()
     end
-    p:log(10, 'Total ActionbarPlus frames loaded: %s', #self.FRAMES)
 end
 
 function L:Fire(event, sourceEvent, ...)
@@ -207,19 +206,7 @@ function L:CreateButtons(fw, rowSize, colSize)
             fw:AddButtonFrame(btnUI)
         end
     end
-    self:HideUnusedButtons(fw)
     fw:LayoutButtonGrid()
-end
-
---- @param fw FrameWidget
-function L:HideUnusedButtons(fw)
-    local start = fw:GetButtonCount() + 1
-    local max = start + (2 * fw:GetMaxButtonColSize())
-    for i=start, max do
-        --- @type ButtonUI
-        local existingBtn = fw:GetButtonUI(i)
-        if existingBtn then existingBtn.widget:Hide() end
-    end
 end
 
 --- @param frameWidget FrameWidget
@@ -232,6 +219,7 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)
+    btnWidget:CleanupActionTypeData()
     return btnWidget
 end
 

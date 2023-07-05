@@ -272,7 +272,6 @@ local function PropsAndMethods(o)
     --- @param optionalConfig Profile_Button|nil
     function o:IsActionType(type, optionalConfig)
         local config = optionalConfig or self:conf()
-        --p:log('type: %s', ns.pformat(config))
         return config.type and type == config.type
     end
 
@@ -364,11 +363,11 @@ local function PropsAndMethods(o)
 
     function o:ResetButtonData()
         local conf = self:conf()
-        for _, a in ipairs(O.ActionType:GetNames()) do conf[a] = {} end
+        for _, a in ipairs(O.ActionType:GetNames()) do conf[a] = nil end
         conf[W.TYPE] = ''
     end
 
-    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self:conf()) end
+    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self.w) end
 
 end
 

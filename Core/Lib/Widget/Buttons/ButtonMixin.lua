@@ -618,7 +618,7 @@ local function PropsAndMethods(o)
         if not self:IsEmpty() then button.keybindText:Show() end
     end
 
-    function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateState() end) end
+    function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds or 1, function() self:UpdateState() end) end
     ---@param optionalCooldownInfo CooldownInfo
     function o:UpdateCooldown(optionalCooldownInfo)
         local cd = optionalCooldownInfo or self:GetCooldownInfo()
@@ -638,8 +638,6 @@ local function PropsAndMethods(o)
         -- if index changed (similar to how macros are updated)
         -- if equipment set was deleted
         -- icon update
-        p:log(30, 'Equipment-Set update called: %s', self:GetName())
-
         if self:IsMissingEquipmentSet() then self:SetButtonAsEmpty(); return end
 
         local equipmentSet = self.w:FindEquipmentSet()

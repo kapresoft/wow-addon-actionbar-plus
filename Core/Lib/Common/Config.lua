@@ -155,7 +155,7 @@ end
 local function GetRowSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.rowSize = v
-        BF:Fire(E.OnButtonCountChanged)
+        BF:Fire(E.OnButtonCountChanged, frameIndex)
     end
 end
 local function GetColSizeGetterHandler(frameIndex)
@@ -164,7 +164,7 @@ end
 local function GetColSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.colSize = v
-        BF:Fire(E.OnButtonCountChanged)
+        BF:Fire(E.OnButtonCountChanged, frameIndex)
     end
 end
 
@@ -246,7 +246,6 @@ local function PropsAndMethods(o)
     --- Message triggered by ActionbarPlus#OnInitializeModules
     --- @param msg string The message name
     function o:OnAddOnInitialized(msg)
-        p:log(10, '%s received.', msg)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile

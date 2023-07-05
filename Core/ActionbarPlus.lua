@@ -184,16 +184,17 @@ local methods = {
     end,
 
     --- @param self ActionbarPlus
+    ['InitDefaultProfile'] = function(self)
+        local defaultProfile = P:CreateDefaultProfile()
+        self.defaultDB = { profile =  defaultProfile }
+        self.db:RegisterDefaults(self.defaultDB)
+    end,
+
+    --- @param self ActionbarPlus
     ['InitDbDefaults'] = function(self)
-        local profileName = self.db:GetCurrentProfile()
-        local defaultProfile = P:CreateDefaultProfile(profileName)
-        local defaults = { profile =  defaultProfile }
-        self.db:RegisterDefaults(defaults)
+        self:InitDefaultProfile()
+        -- TODO next: remove self.profile in favor of ns.p()
         self.profile = self.db.profile
-        if IsEmptyTable(ABP_PLUS_DB.profiles[profileName]) then
-            ABP_PLUS_DB.profiles[profileName] = defaultProfile
-            --error(profileName .. ': ' .. ABP_Table.toStringSorted(ABP_PLUS_DB.profiles[profileName]))
-        end
     end,
     --- This is called automatically by Ace
     --- @param self ActionbarPlus

@@ -11,16 +11,12 @@ local _, ns = ...
 local O, LibStub = ns:LibPack()
 
 local GC, Ace, PI = O.GlobalConstants, O.AceLibrary, O.ProfileInitializer
-local Table, Assert = O.Table, O.Assert
+local Table, Assert, String = O.Table, O.Assert, O.String
 local AceEvent, W = Ace.AceEvent, GC.WidgetAttributes
-local isTable, isNotTable, tsize, tinsert, tsort
-    = Table.isTable, Table.isNotTable, Table.size, table.insert, table.sort
+local IsEmptyTable, isNotTable, tsize, tinsert, tsort
+    = Table.IsEmpty, Table.isNotTable, Table.size, table.insert, table.sort
+local IsBlankStr = String.IsBlank
 local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
-
---- @type table<number, string>
-local ActionTypes = { W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
-                      W.PET_ACTION, W.COMPANION, W.BATTLE_PET,
-                      W.EQUIPMENT_SET}
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -104,15 +100,23 @@ function P:Mixin(obj)
     return ns:K():Mixin(obj, self)
 end
 
+--local function removeElement(tbl, value)
+--    for i, v in ipairs(tbl) do if v == value then tbl[i] = nil end end
+--end
+
 --- Removes a particular actionType data from Profile_Button
---- @param btnData Profile_Button
-function P:CleanupActionTypeData(btnData)
-    local function removeElement(tbl, value)
-        for i, v in ipairs(tbl) do if v == value then tbl[i] = nil end end
+--- @param bw ButtonUIWidget
+function P:CleanupActionTypeData(bw)
+    local btnConf = P:GetButtonConfigForScrubbing(bw.frameIndex, bw:GetName())
+    if not btnConf then return end
+
+    if IsEmptyTable(btnConf) or IsBlankStr(btnConf.type) then
+        self:ResetButtonConfig(bw)
+        return
     end
-    if btnData == nil or btnData.type == nil then return end
-    local actionTypes = O.ActionType:GetOtherNamesExcept(btnData.type)
-    for _, v in ipairs(actionTypes) do if v ~= nil then btnData[v] = {} end end
+
+    local actionTypes = O.ActionType:GetOtherNamesExcept(btnConf.type)
+    for _, v in ipairs(actionTypes) do if v ~= nil then btnConf[v] = nil end end
 end
 
 --- @type table<number, Profile_Bar>
@@ -124,7 +128,27 @@ local buttonProfiles = {}
 --- @param frameIndex Index
 --- @param buttonName string
 --- @return Profile_Button
-function P:GetButtonConfig(frameIndex, buttonName) return self:GetBar(frameIndex).buttons[buttonName] end
+function P:GetButtonConfig(frameIndex, buttonName)
+    local bar = self:GetBar(frameIndex)
+    local buttons = bar.buttons or {}
+    bar.buttons = buttons
+    if not buttons[buttonName] then
+        local btn = O.ProfileInitializer:CreateSingleButtonTemplate()
+        buttons[buttonName] = btn
+    end
+    return buttons[buttonName]
+end
+
+--- @param frameIndex Index
+--- @param buttonName string
+--- @return Profile_Button
+function P:GetButtonConfigForScrubbing(frameIndex, buttonName)
+    local bar = self:GetBar(frameIndex)
+    local buttons = bar.buttons or {}
+    bar.buttons = buttons
+    if not buttons then return nil end
+    return self:GetBar(frameIndex).buttons[buttonName]
+end
 
 --- @deprecated To be deleted
 --- @param frameIndex Index
@@ -145,7 +169,7 @@ function P:GetButtonData(frameIndex, buttonName)
     return buttons[buttonName]
 end
 
-function P:CreateDefaultProfile(profileName) return PI:InitNewProfile(profileName) end
+function P:CreateDefaultProfile() return PI:InitNewProfile() end
 
 function P:CreateBarsTemplate()
     local bars = {}
@@ -165,17 +189,16 @@ function P:P() return ns.db.profile  end
 --- @return Profile_Global_Config
 function P:G()
     local g = ns.db.global
-    --g.bars = nil
-    if Table.isNotTable(g.bars) then
-        --p:log('G()| here')
-        PI:InitGlobalSettings(g)
-    end
+    if Table.isNotTable(g.bars) then PI:InitGlobalSettings(g) end
     return g
 end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @return Profile_Bar
 function P:GetBar(frameIndex) return barProfiles[frameIndex] or self:RetrieveBar(frameIndex) end
+
+---@param bw ButtonUIWidget
+function P:ResetButtonConfig(bw) P:GetBar(bw.frameIndex).buttons[bw:GetName()] = nil end
 
 --- @return Profile_Bar
 ---@param frameIndex number
@@ -239,7 +262,6 @@ end
 --- @return _RegionAnchor
 function P:GetAnchor(frameIndex)
     if self:IsCharacterSpecificAnchor() then return self:GetCharacterSpecificAnchor(frameIndex) end
-    --p:log('GetAnchor| Is global anchor')
     return self:GetGlobalAnchor(frameIndex)
 end
 
@@ -389,6 +411,5 @@ function P:GetTooltipAnchorTypeKey() return TooltipAnchorTypeKey end
 Listen to Message
 -------------------------------------------------------------------------------]]
 P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
-    p:log(10, '%s received..', msg)
     P.profile = ns.db.profile
 end)
