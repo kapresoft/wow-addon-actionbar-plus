@@ -40,6 +40,7 @@ L['Bugs']                                       = true
 L['Repo']                                       = true
 L['Last-Update']                                = true
 L['Interface-Version']                          = true
+L['Game-Version']                               = true
 L['Locale']                                     = true
 L['Use-KeyDown(cvar ActionButtonUseKeyDown)']   = true
 

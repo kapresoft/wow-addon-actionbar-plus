@@ -4,7 +4,6 @@ Blizzard Vars
 local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local C_ToyBox, C_Container = C_ToyBox, C_Container
-local IsSpellInRange, GetItemSpell = IsSpellInRange, GetItemSpell
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
 local UnitClass, IsStealthed, GetShapeshiftForm = UnitClass, IsStealthed, GetShapeshiftForm
 
@@ -63,29 +62,92 @@ end
 function S:IsValidActionTarget() return self:HasTarget() and not UnitIsDead(UnitId.target) end
 function S:HasTarget() return GetUnitName(UnitId.target) ~= nil end
 
+--- @param spell SpellName
+--- @param target UnitID
+--- @return boolean
+function S:IsSpellInRange(spell, target)
+    local inRange = IsSpellInRange(spell, target);
+    if inRange == nil then return nil end
+    return inRange == true or inRange == 1
+end
+
+--- @param item ItemName
+--- @param target UnitID
+--- @return BooleanOptional A return of nil means that the item is not applicable for the target unit
+function S:IsItemInRange(item, target)
+    local inRange = IsItemInRange(item, target)
+    if inRange == nil then return nil end
+    return inRange == true or inRange == 1
+end
+
 ---Note: should call ButtonData:ContainsValidAction() before calling this
---- @return boolean|nil true, false or nil if not applicable; nil if spell cannot be applied to unit, i.e. targeting a harmful unit on a friendly player
 --- @param btnConfig Profile_Button
 --- @param targetUnit string one of "target", "focus", "mouseover", etc.. See Blizz APIs
+--- @return BooleanOptional true, false or nil if not applicable; nil if spell cannot be applied to unit, i.e. targeting a harmful unit on a friendly player
 function S:IsActionInRange(btnConfig, targetUnit)
     if btnConfig.type == SPELL then
-        local inRange = IsSpellInRange(btnConfig.spell.name, targetUnit)
-        if inRange == nil then return nil end
-        return inRange == true or inRange == 1
-    elseif btnConfig.type == ITEM then
-        local inRange = IsSpellInRange(btnConfig.item.name, targetUnit)
-        if inRange == nil then return nil end
-        return inRange == true or inRange == 1
+        return self:IsSpellInRange(btnConfig.spell.name, targetUnit)
     elseif btnConfig.type == MACRO then
         local macroIndex = btnConfig.macro.index
-        local spell = self:GetMacroSpellInfo(macroIndex)
-        if not spell then return nil end
-        local inRange = IsSpellInRange(spell.name, targetUnit)
-        if inRange == nil then return nil end
-        return inRange == true or inRange == 1
+        local spellName = self:GetMacroSpell(macroIndex)
+        return self:IsSpellInRange(spellName, targetUnit)
+    elseif btnConfig.type == ITEM then
+        local itemName = btnConfig.item.name
+        return self:IsItemInRange(itemName, targetUnit)
     end
 
     return false
+end
+
+--- @param item Profile_Item
+--- @return Profile_Item
+function S:UpdateAndGetItemData(item)
+    if not item.classID then
+        local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
+        --p:log(10, 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
+        item.classID = classID
+        item.subclassID = subclassID
+    end
+    return item
+end
+
+--- ### See: Enum.ItemClass
+--- ```
+--- Enum.ItemClass = {
+---    Armor = 4,
+---    Battlepet = 17,
+---    Consumable = 0,
+---    Container = 1,
+---    CurrencyTokenObsolete = 10,
+---    Gem = 3,
+---    Glyph = 16,
+---    ItemEnhancement = 8,
+---    Key = 13,
+---    Miscellaneous = 15,
+---    PermanentObsolete = 14,
+---    Profession = 19,
+---    Projectile = 6,
+---    Questitem = 12,
+---    Quiver = 11,
+---    Reagent = 5,
+---    Recipe = 9,
+---    Tradegoods = 7,
+---    Weapon = 2,
+---    WoWToken = 18
+--- }
+--- ```
+---
+--- This updates the item config and retrieve the classID and subClassID data
+---@param item Profile_Item
+---@param retrieveUpdate OptionalFlag Set to true to retrieve updated item if classID is missing
+function S:IsItemConsumable(item, retrieveUpdate)
+    local itemData = item
+    local doUpdate = retrieveUpdate or true
+    if itemData.classID == nil and doUpdate == true then
+        itemData = self:UpdateAndGetItemData(item)
+        p:log('Retrieved updated item data: %s', item.name)
+    end
+    return itemData.classID == Enum.ItemClass.Consumable
 end
 
 function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, UnitId.target) ~= nil end
@@ -94,20 +156,22 @@ function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, Uni
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
 --- @return SpellInfo
 function S:GetSpellInfo(spellNameOrId)
+    if not spellNameOrId then return nil end
+
     local name, _, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
-    if name then
-        local subTextOrRank = GetSpellSubtext(spellNameOrId)
-        local spellLink = GetSpellLink(spellNameOrId)
-        --- @type SpellInfo
-        local spellInfo = {
-            id = id, name = name, icon = icon,
-            link = spellLink, castTime = castTime,
-            minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
-            isShapeshift = false, isStealth = false, isProwl = false }
-        self:ApplySpellInfoAttributes(spellInfo)
-        return spellInfo
-    end
-    return nil
+    if not name then return end
+
+    local subTextOrRank = GetSpellSubtext(spellNameOrId)
+    local spellLink = GetSpellLink(spellNameOrId)
+    --- @type SpellInfo
+    local spellInfo = {
+        id = id, name = name, icon = icon,
+        link = spellLink, castTime = castTime,
+        minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
+        isShapeshift = false, isStealth = false, isProwl = false }
+    self:ApplySpellInfoAttributes(spellInfo)
+
+    return spellInfo
 end
 
 function S:ApplySpellInfoAttributes(spellInfo)
@@ -130,12 +194,21 @@ function S:ApplySpellInfoAttributes(spellInfo)
 end
 
 --- @param macroIndex number
+--- @return SpellID
+function S:GetMacroSpellID(macroIndex) return macroIndex and GetMacroSpell(macroIndex) end
+
+--- @param macroIndex number
+--- @return SpellName, SpellID
+function S:GetMacroSpell(macroIndex)
+    local spellID = self:GetMacroSpellID(macroIndex)
+    return spellID and GetSpellInfo(spellID), spellID
+end
+
+--- @param macroIndex number
 --- @return Profile_Spell
 function S:GetMacroSpellInfo(macroIndex)
-    --local macroIndex = btnConfig.macro.index
-    local spellId = GetMacroSpell(macroIndex)
-    if not spellId then return nil end
-    return self:GetSpellInfo(spellId)
+    local spellId = self:GetMacroSpellID(macroIndex)
+    return spellId and self:GetSpellInfo(spellId)
 end
 --- @param spellNameOrId string|number
 function S:IsPassiveSpell(spellNameOrId) return IsPassiveSpell(spellNameOrId) end
@@ -252,11 +325,11 @@ end
 
 --- @param spellInfo Profile_Spell
 function S:GetSpellAttributeValue(spellInfo)
-    local spellAttrValue = spellInfo.id
+    --[[local spellAttrValue = spellInfo.id
     if self:IsShapeshiftOrStealthSpell(spellInfo) then
         spellAttrValue = spellInfo.name
-    end
-    return spellAttrValue
+    end]]
+    return spellInfo.name
 end
 
 --- @param itemID number

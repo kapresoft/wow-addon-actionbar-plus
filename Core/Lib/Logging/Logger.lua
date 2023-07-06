@@ -170,6 +170,8 @@ local function _EmbedLogger(obj, optionalLogName)
     -- 3: log('String', arg1, arg2, etc...) or log(N, 'String', arg1, arg2, etc...)
     -- Where N = 1 to 100
     function obj:log(...)
+        if ns:IsLoggingDisabled() then return end
+
         local args = _U.t_pack(...)
         local level = 0
         local startIndex = 1

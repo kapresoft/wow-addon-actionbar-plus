@@ -71,7 +71,7 @@ local function eventHandlerMethods(e)
     function e:Handle(btnUI, cursorInfo)
         local mountInfoApi = BaseAPI:GetMountInfo(cursorInfo)
         if IsInvalidMount(mountInfoApi) then return end
-        local btnData = btnUI.widget.config
+        local btnData = btnUI.widget:conf()
         local mount = ToProfileMount(mountInfoApi, cursorInfo)
 
         PH:PickupExisting(btnUI.widget)
@@ -86,11 +86,10 @@ end
 --[[-----------------------------------------------------------------------------
 Methods: MountAttributeSetter
 -------------------------------------------------------------------------------]]
----@param a MountAttributeSetter
+--- @param a MountAttributeSetter
 local function attributeSetterMethods(a)
-    ---@param btnUI ButtonUI
-    ---@param btnData Profile_Button
-    ---@param source string The source of the trigger, i.e. 'event'
+    --- @param btnUI ButtonUI
+    --- @param source string The source of the trigger, i.e. 'event'
     function a:SetAttributes(btnUI, source)
         local w = btnUI.widget
         w:ResetWidgetAttributes()

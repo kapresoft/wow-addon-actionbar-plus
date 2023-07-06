@@ -36,8 +36,6 @@ end
 --- ### See: Interface/FrameXML/SecureHandlers.lua # PickupAny
 --- @param widget ButtonUIWidget
 local function PickupStuff(widget)
-    local btnConf = widget.config
-
     if widget:IsSpell() then
         BaseAPI:PickupSpell(widget:GetSpellData())
     elseif widget:IsMacro() then

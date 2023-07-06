@@ -36,6 +36,7 @@ local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 local GC = O.GlobalConstants
 local E, M = GC.E, GC.M
+local configHandler = O.Config
 
 --- @see _ParentFrame.xml
 local frameTemplate = 'ActionbarPlusFrameTemplate'
@@ -93,7 +94,6 @@ end
 --- @param frameWidget FrameWidget
 --- @param event string
 local function OnEquipmentSetsChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
     frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
             function(btnWidget) btnWidget:UpdateEquipmentSet() end)
 end
@@ -101,10 +101,9 @@ end
 --- @param frameWidget FrameWidget
 --- @param event string
 local function OnEquipmentSwapFinished(frameWidget, event)
-    p:log(20,'OnEquipmentSwapFinished(): frame #%s', frameWidget:GetFrameIndex())
     frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
             function(btnWidget)
-                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button)
+                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button())
             end)
 end
 
@@ -121,27 +120,22 @@ end
 
 --- @param frameWidget FrameWidget
 local function OnCooldownTextSettingsChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:RefreshTexts()  end)
 end
 --- @param frameWidget FrameWidget
 local function OnTextSettingsChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:RefreshTexts()  end)
 end
 --- @param frameWidget FrameWidget
 local function OnMouseOverGlowSettingsChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:RefreshHighlightEnabled() end)
 end
 
 --- @param frameWidget FrameWidget
 local function OnButtonSizeChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
-
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw)
         bw:SetButtonProperties()
@@ -153,14 +147,18 @@ local function OnButtonSizeChanged(frameWidget, event)
 end
 
 --- @param frameWidget FrameWidget
-local function OnButtonCountChanged(frameWidget, event)
-    p:log(20,'%s: frame #%s', event, frameWidget:GetFrameIndex())
+local function OnButtonCountChanged(frameWidget, event, sourceFrameIndex)
+    if sourceFrameIndex ~= frameWidget:GetFrameIndex() then return end
+    if not frameWidget:IsShownInConfig() then return end
 
     local barConfig = frameWidget:GetConfig()
     local widget = barConfig.widget
-
+    local bf = O.ButtonFactory
     frameWidget:SetFrameDimensions()
-    O.ButtonFactory:CreateButtons(frameWidget, widget.rowSize, widget.colSize)
+
+    bf:CreateButtons(frameWidget, widget.rowSize, widget.colSize)
+    frameWidget:HideUnusedButtons()
+
     frameWidget:SetInitialState()
     frameWidget:ShowGroupIfEnabled()
 
@@ -170,6 +168,8 @@ local function OnButtonCountChanged(frameWidget, event)
         bw:RefreshTexts()
         bw:UpdateKeybindTextState()
     end)
+
+    frameWidget:SaveAndScrubDeletedButtons(true)
 end
 
 --- @param frameWidget FrameWidget
@@ -187,7 +187,7 @@ end
 --- @param w FrameWidget
 local function OnAddOnReady(w, msg)
     if InCombatLockdown() then return end
-    C_Timer.After(1, function() w:ShowGroupIfEnabled() end)
+    C_Timer.After(0.1, function() w:InitAnchor() end)
 end
 
 ---Fired by FrameHandle when dragging stopped
@@ -197,7 +197,6 @@ local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnch
 
 --- @param frameWidget FrameWidget
 local function OnActionbarShowGrid(frameWidget, e, ...)
-    p:log(30, '[%s] %s called...', e, frameWidget.index)
     frameWidget:ApplyForEachButton(function(bw)
         bw:ShowEmptyGridEvent()
         C_Timer.After(0.1, function() bw:EnableMouse(true) end)
@@ -224,7 +223,6 @@ local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWid
 
 --- @param frameWidget FrameWidget
 local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
-    p:log(30, '%s called...', frameWidget.index)
     local barConf = frameWidget:GetConfig()
     frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
 end
@@ -232,7 +230,6 @@ end
 ---Sometimes there's a delay. Fire immediately, then after a few seconds
 --- @param frameWidget FrameWidget
 local function OnActionbarShowGroup(frameWidget, e, ...)
-    p:log(30, 'OnActionbarShowGroup|Called by event: %s', tostring(e))
     if  true ~= P:IsBarEnabled(frameWidget.index) then return end
     frameWidget:ShowGroup()
     C_Timer.After(5, function() frameWidget:ShowGroup() end)
@@ -253,7 +250,6 @@ end
 
 --- @param frameWidget FrameWidget
 local function OnUpdateItemStates(frameWidget, e, ...)
-    p:log(30, '%s called...', frameWidget.index)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachItem(function(bw) bw:UpdateItemState() end)
 end
@@ -307,7 +303,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param widget FrameWidget
+--- @param widget __FrameWidget | _Frame
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
@@ -316,10 +312,17 @@ local function WidgetMethods(widget)
 
     function widget:GetName() return widget.frame:GetName() end
 
+    ---@param btnIndex Index
+    function widget:GetButtonName(btnIndex) return self:GetName() .. 'Button' .. btnIndex end
+
     --- @deprecated Use self#GetIndex()
     function widget:GetFrameIndex() return self:GetIndex() end
     function widget:GetIndex() return self.index end
 
+    --- @return Profile_Bar
+    function widget:conf() return profile:GetBar(self:GetIndex()) end
+
+    --- @deprecated Use #conf
     --- @return Profile_Bar
     function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
 
@@ -341,8 +344,6 @@ local function WidgetMethods(widget)
         --- @type _RegionAnchor
         local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
         P:SaveAnchor(frameAnchor, self.index)
-
-        p:log(20, 'OnDragStop_FrameHandle| new-anchor[f #%s]: %s', self.index, pformat:D2()(frameAnchor))
     end
 
     function widget:ResetAnchor()
@@ -414,6 +415,14 @@ local function WidgetMethods(widget)
         -- `_` is the index
         --- @param btn ButtonUI
         for _, btn in ipairs(self.buttonFrames) do applyFunction(btn.widget) end
+    end
+
+    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    function widget:ApplyForEachButtonNoCond(applyFunction)
+        --- @param btn ButtonUI
+        for _, btn in ipairs(self.buttonFrames) do
+            applyFunction(btn.widget)
+        end
     end
 
     --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
@@ -491,11 +500,76 @@ local function WidgetMethods(widget)
         self:Hide()
         self:HideButtons()
     end
+
     function widget:ShowGroup()
         self:InitAnchor()
         self:Show()
         self:ShowButtons()
     end
+
+    --- @param predicateFn ButtonHandlerFunction | "function(btnWidget) return btnWidget:IsEmpty() end"
+    --- @return ButtonUI
+    function widget:FindFirst(predicateFn)
+        for _, btn in ipairs(self.buttonFrames) do
+            if predicateFn(btn.widget) then return btn end
+        end
+    end
+
+    ---@param btnName string
+    function widget:SaveButton(btnName)
+        --- @type ButtonUI
+        local sourceBtn = _G[btnName]; if not sourceBtn then return end
+        local sourceWidget = sourceBtn.widget; if sourceWidget:IsEmpty() then return end
+
+        local targetBtn = self:FindFirst(function(btnWidget)
+            if btnWidget:IsEmpty() then return btnWidget end
+        end)
+        if not targetBtn then return end
+        local conf = sourceWidget:conf()
+
+        local btnWidget = targetBtn.widget
+        local setter = btnWidget:GetAttributesSetter(conf.type)
+        if setter then
+            Mixin(btnWidget:conf(), conf)
+            setter:SetAttributes(btnWidget.button())
+            btnWidget:UpdateStateDelayed()
+            btnWidget:EnableMouse(true)
+        end
+        sourceWidget:SetButtonAsEmpty()
+    end
+
+    function widget:ScrubEmptyButtons()
+        local barConf = self:conf()
+        self:ApplyForEachButtonNoCond(function(bw)
+            P:CleanupActionTypeData(bw)
+        end)
+        self:SaveAndScrubDeletedButtons()
+    end
+
+    --- @param saveExisting BooleanOptional
+    function widget:SaveAndScrubDeletedButtons(saveExisting)
+        local save = saveExisting == true
+
+        local barConf = self:conf()
+        local start = (barConf.widget.rowSize * barConf.widget.colSize) + 1
+
+        for i = start, configHandler.maxButtons do
+            local btnName = self:GetButtonName(i)
+            if save == true then self:SaveButton(btnName) end
+            if barConf.buttons[btnName] then barConf.buttons[btnName] = nil end
+        end
+    end
+
+    function widget:HideUnusedButtons()
+        local start = self:GetButtonCount() + 1
+        local max =  O.Config.maxButtons
+        for i=start, max do
+            --- @type ButtonUI
+            local existingBtn = self:GetButtonUI(i)
+            if existingBtn then existingBtn.widget:Hide() end
+        end
+    end
+
     function widget:ShowGroupIfEnabled()
         if self:IsFrameEnabledInConfig() then
             self:ShowGroup()
@@ -567,7 +641,7 @@ local function WidgetMethods(widget)
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
         self:ApplyForEachButton(function(bw)
-            bw.button:SetAlpha(buttonAlpha)
+            bw.button():SetAlpha(buttonAlpha)
         end)
     end
 
@@ -624,8 +698,8 @@ local function WidgetMethods(widget)
         return format('%sButton%s', self:GetName(), tostring(buttonIndex))
     end
 
+    --- @return ButtonUI
     function widget:GetButtonUI(buttonIndex) return _G[self:GetButtonName(buttonIndex)] end
-
 
     function widget:LayoutButtonGrid()
         local barConfig = self:GetConfig()
@@ -703,8 +777,9 @@ function L:Constructor(frameIndex)
     ---Alpha needs to be zero so that we can hide the buttons
     f:SetAlpha(0)
 
-    --- @class FrameWidget : WidgetBase
-    local widget = {
+    --- @alias FrameWidget __FrameWidget | _Frame
+    --- @class __FrameWidget : WidgetBase
+    local __widget = {
         profile = P,
         index = frameIndex,
         frameHandleHeight = 4,
@@ -721,8 +796,13 @@ function L:Constructor(frameIndex)
         frameHandle = nil,
         rendered = false,
         buttons = {},
+        --- @type table<number, ButtonUI>
         buttonFrames = {}
     }
+
+    --- @type FrameWidget
+    local widget = __widget
+
     -- Allows call to Use callbacks / RegisterEvent
     AceEvent:Embed(widget)
 

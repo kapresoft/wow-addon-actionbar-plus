@@ -32,6 +32,15 @@ function LibPackMixin:LibPack2() return self.O, self.O.GlobalConstants end
 --- @generic A : AceEvent
 --- @return A
 function LibPackMixin:AceEvent() return self.O.AceLibrary.AceEvent:Embed({}) end
+--- @return AceBucket
+function LibPackMixin:AceBucket() return self.LibStubAce('AceBucket-3.0'):Embed({}) end
+
+--- @return AceBucket
+--- @param obj table
+function LibPackMixin:AceBucketEmbed(obj)
+    local AceBucket = self.LibStubAce('AceBucket-3.0'); if obj then AceBucket:Embed(obj) end
+    return AceBucket
+end
 
 --- @return Namespace
 local function CreateNamespace(...)
@@ -64,6 +73,23 @@ local function CreateNamespace(...)
 
     --- @param o Namespace
     local function Methods(o)
+
+        --- @return Profile_Config
+        function o.p() return ns.db.profile end
+
+        --- @return BooleanOptional
+        function o:IsLoggingEnabled() return true == ns.O.GlobalConstants.F.ENABLE_LOGGING end
+        --- @return BooleanOptional
+        function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
+
+        --- @return GameVersion
+        function o:IsVanilla() return self.gameVersion == 'classic' end
+        --- @return GameVersion
+        function o:IsTBC() return self.gameVersion == 'tbc_classic' end
+        --- @return GameVersion
+        function o:IsWOTLK() return self.gameVersion == 'wotlk_classic' end
+        --- @return GameVersion
+        function o:IsRetail() return self.gameVersion == 'retail' end
 
         --- @return CursorUtil
         ---@param cursorInfo CursorInfo Optional cursorInfo instance

@@ -29,9 +29,8 @@ local AT = {
 
     --- @type table<number, string>
     names = {
-        W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
-        W.PET_ACTION, W.COMPANION, W.MOUNT, W.BATTLE_PET,
-        W.EQUIPMENT_SET
+        W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT, W.PET_ACTION,
+        W.COMPANION, W.MOUNT, W.BATTLE_PET, W.EQUIPMENT_SET
     }
 }
 ns:Register(ns.M.ActionType, AT)

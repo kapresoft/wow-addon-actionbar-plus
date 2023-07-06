@@ -32,7 +32,15 @@ Instance Properties
 -- todo next deprecate P.baseFrameName
 L.baseFrameName = GC.C.BASE_FRAME_NAME
 
+--- This is the hard limit
 local ACTION_BAR_COUNT = 10
+
+--- The additional rows and cols settings are so that the Profile Defaults will create more row data
+--- Having additional row data for profile template means that empty button profiles will
+--- be cleaned up more and does not clutter the user conf.
+--- WARNING: This will increase addon memory usage
+local DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS = 5
+
 L.ActionbarCount = ACTION_BAR_COUNT
 --- For new profile creation, this is the default visiblity state
 L.ActionbarEnableByDefault = false
@@ -50,13 +58,9 @@ local ActionbarInitialSettingsDefault = {
     ['frame_handle_mouseover'] = true
 }
 
+--- @type Profile_Button
 local ButtonDataTemplate = {
-    [ATTR.TYPE] = ATTR.SPELL,
-    [ATTR.SPELL] = {},
-    [ATTR.ITEM] = {},
-    [ATTR.MACRO] = {},
-    [ATTR.MACRO_TEXT] = {},
-    [ATTR.MOUNT] = {},
+    [ATTR.TYPE] = '',
 }
 
 --- @type Profile_Bar_Widget
@@ -90,7 +94,7 @@ local DEFAULT_PROFILE_DATA = {
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@param index number
+--- @param index number
 local function GetActionbarInitialSettings(index)
     local initS = ActionbarInitialSettings[index]
     if not initS then initS = CreateFromMixins(ActionbarInitialSettingsDefault) end
@@ -171,6 +175,8 @@ local function ApplyLayoutStrategy(layoutStrategyFn)
     end
 end
 
+--- This function initializes the DEFAULT_PROFILE_DATA var
+--- to populate the default Profile Data
 local function InitDefaultProfileData()
     for i = 1, ACTION_BAR_COUNT do
         --- @type Profile_Bar
@@ -191,7 +197,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ProfileInitializer
+--- @param o ProfileInitializer
 local function Methods(o)
     --- @param frameIndex number
     function o:GetFrameNameByIndex(frameIndex)
@@ -227,41 +233,44 @@ local function Methods(o)
         return btnConf.anchor
     end
 
+    --- DEFAULT_PROFILE_DATA is initialized in #InitDefaultProfileData()
+    --- @return Profile_Config
     function o:InitNewProfile()
+        --- @type Profile_Config
         local profile = CreateFromMixins(DEFAULT_PROFILE_DATA)
-        for name, config in pairs(DEFAULT_PROFILE_DATA.bars) do
-            self:InitializeActionbar(profile, name, config)
+        for i=1, ACTION_BAR_COUNT do
+            local barName = GC:GetFrameName(i)
+            local barConf = profile.bars[barName]
+            self:InitializeActionbar(profile, barName, barConf)
+
         end
-        P = profile
         return profile
     end
 
-    ---@param barName string
-    ---@param barConf Profile_Bar
+    --- @param profile Profile_Config
+    --- @param barName string
+    --- @param barConf Profile_Bar
     function o:InitializeActionbar(profile, barName, barConf)
         local widgetConf = barConf.widget
-        local btnCount = widgetConf.colSize * widgetConf.rowSize
+        local colSize = widgetConf.colSize + DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS
+        local rowSize = widgetConf.rowSize + DEFAULT_PROFILE_ADDITIONAL_ROWS_AND_COLS
+        local btnCount = colSize * rowSize
         for btnIndex=1,btnCount do
             self:InitializeButtons(profile, barName, barConf, btnIndex)
         end
     end
 
-    ---@param barName string
-    ---@param barConf Profile_Bar
+    --- @param profile Profile_Config
+    --- @param barName string
+    --- @param barConf Profile_Bar
+    --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
-        local btn = self:CreateSingleButtonTemplate()
-        barConf.buttons[btnName] = btn
+        barConf.buttons[btnName] = self:CreateSingleButtonTemplate()
     end
 
-    function o:CreateSingleButtonTemplate()
-        local b = ButtonDataTemplate
-        local keys = { ATTR.SPELL, ATTR.ITEM, ATTR.MACRO, ATTR.MACRO_TEXT }
-        for _,k in ipairs(keys) do
-            if isNotTable(b[k]) then b[k] = {} end
-        end
-        return b
-    end
+    --- @return Profile_Button
+    function o:CreateSingleButtonTemplate() return CreateFromMixins(ButtonDataTemplate) end
 end
 
 Methods(L)

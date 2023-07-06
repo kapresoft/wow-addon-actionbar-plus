@@ -58,12 +58,19 @@ local function GlobalConstantProperties(o)
         }
     }
 
+    --- @Class AddonFeatures
+    local FEATURES = {
+        ENABLE_LOGGING = false,
+        ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST = true
+    }
+
     --- @class GlobalAttributes
     local C = {
         ADDON_NAME = addon,
         DB_NAME = 'ABP_PLUS_DB',
         BASE_FRAME_NAME = 'ActionbarPlusF',
         BUTTON_NAME_FORMAT = 'ActionbarPlusF%sButton%s',
+        BUTTON_NAME_SHORT_FORMAT = 'F%s-B%s',
         --- @see _ParentFrame.xml
         FRAME_TEMPLATE = 'ActionbarPlusFrameTemplate',
         SLASH_COMMAND_OPTIONS = "abp_options",
@@ -220,11 +227,13 @@ local function GlobalConstantProperties(o)
         SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
 
         UNIT_HEALTH = 'UNIT_HEALTH',
+        UNIT_POWER_FREQUENT = 'UNIT_POWER_FREQUENT',
         --- It fires when:
         --- 1) A mage is casting a non-instant spell (i.e. teleport) and while still casting,
         ---     cast another instant spell (i.e., Arcane Intellect)
         --- 2) Usually a UI error display or an error bell sound
         UNIT_SPELLCAST_FAILED_QUIET = 'UNIT_SPELLCAST_FAILED_QUIET',
+        UNIT_SPELLCAST_FAILED = 'UNIT_SPELLCAST_FAILED',
         UNIT_SPELLCAST_SENT = 'UNIT_SPELLCAST_SENT',
         -- Fired for Start of Non-Instant Spell Cast
         UNIT_SPELLCAST_START = 'UNIT_SPELLCAST_START',
@@ -452,6 +461,7 @@ local function GlobalConstantProperties(o)
     --- @param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
 
+    o.F = FEATURES
     o.Textures = Textures
     o.C = C
     o.E = Events
@@ -477,6 +487,7 @@ end
 --- @param o GlobalConstants
 local function GlobalConstantMethods(o)
 
+    --- @return string
     function o:AddonName() return o.C.ADDON_NAME end
     function o:GetAceLocale() return LibStub("AceLocale-3.0"):GetLocale(addon, true) end
 
@@ -508,7 +519,7 @@ local function GlobalConstantMethods(o)
         local wowInterfaceVersion = select(4, GetBuildInfo())
 
         return versionText, GetAddOnMetadata(addon, 'X-CurseForge'), GetAddOnMetadata(addon, 'X-Github-Issues'),
-                    GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
+        GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
     end
 
     function o:IsActionbarPlusM6Enabled() return 2 == GetAddOnEnableState(nil, 'ActionbarPlus-M6') end
@@ -518,7 +529,7 @@ local function GlobalConstantMethods(o)
         local C = self:GetAceLocale()
         local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
         local fmt = self.C.ADDON_INFO_FMT
-        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
                 C['Addon Info'],
                 sformat(fmt, C['Version'], version),
                 sformat(fmt, C['Curse-Forge'], curseForge),
@@ -526,7 +537,8 @@ local function GlobalConstantMethods(o)
                 sformat(fmt, C['Repo'], repo),
                 sformat(fmt, C['Last-Update'], lastUpdate),
                 sformat(fmt, C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown)),
-                sformat(fmt, C['Interface-Version'], wowInterfaceVersion)
+                sformat(fmt, C['Interface-Version'], wowInterfaceVersion),
+                sformat(fmt, C['Game-Version'], ns.gameVersion)
         )
     end
 

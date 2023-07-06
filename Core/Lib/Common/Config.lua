@@ -155,7 +155,7 @@ end
 local function GetRowSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.rowSize = v
-        BF:Fire(E.OnButtonCountChanged)
+        BF:Fire(E.OnButtonCountChanged, frameIndex)
     end
 end
 local function GetColSizeGetterHandler(frameIndex)
@@ -164,7 +164,7 @@ end
 local function GetColSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.colSize = v
-        BF:Fire(E.OnButtonCountChanged)
+        BF:Fire(E.OnButtonCountChanged, frameIndex)
     end
 end
 
@@ -246,7 +246,6 @@ local function PropsAndMethods(o)
     --- Message triggered by ActionbarPlus#OnInitializeModules
     --- @param msg string The message name
     function o:OnAddOnInitialized(msg)
-        p:log(10, '%s received.', msg)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
@@ -535,7 +534,7 @@ local function PropsAndMethods(o)
                     order = barSeq:next(),
                     step = 1,
                     min = 1,
-                    max = 20,
+                    max = self.maxCols,
                     name = L['Rows'],
                     desc = L['Rows::Description'],
                     --confirm = ConfirmAndReload,
@@ -548,7 +547,7 @@ local function PropsAndMethods(o)
                     order = barSeq:next(),
                     step = 1,
                     min = 1,
-                    max = 40,
+                    max = self.maxRows,
                     name = L['Columns'],
                     desc = L['Columns::Description'],
                     --confirm = ConfirmAndReload,
@@ -623,6 +622,9 @@ New Instance
 local function NewInstance()
     --- @type Config
     local newConfig = LibStub:NewLibrary(ns.M.Config); if not newConfig then return end
+    newConfig.maxRows = 20
+    newConfig.maxCols = 40
+    newConfig.maxButtons = newConfig.maxRows * newConfig.maxCols
 
     AceEvent:Embed(newConfig)
     PropsAndMethods(newConfig)

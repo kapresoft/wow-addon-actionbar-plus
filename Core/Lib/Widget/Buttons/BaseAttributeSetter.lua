@@ -87,9 +87,9 @@ function L:HandleGameTooltipCallbacks(btn)
         else
             if not w:IsTooltipModifierKeyDown() then return end
         end
-
-        self:SetToolTipOwner(w.button)
-        self:ShowTooltip(w.button)
+        local btn = w.button()
+        self:SetToolTipOwner(btn)
+        self:ShowTooltip(btn)
 
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(true)

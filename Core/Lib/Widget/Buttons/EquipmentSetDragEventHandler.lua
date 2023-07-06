@@ -95,8 +95,9 @@ end
 ---@param profile Profile_Config
 local function GlowButtonConditionally(w, profile)
     if profile.equipmentset_show_glow_when_active ~= true then return end
-    ActionButton_ShowOverlayGlow(w.button)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(w.button) end)
+    local btn = w.button()
+    ActionButton_ShowOverlayGlow(btn)
+    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(btn) end)
 end
 
 --- @param evt string
@@ -146,7 +147,7 @@ local function eventHandlerMethods(e)
         local equipmentSetInfo = BaseAPI:GetEquipmentSetInfo(cursorInfo)
         if not equipmentSetInfo then return end
 
-        local config = btnUI.widget.config
+        local config = btnUI.widget:conf()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
         p:log(30, 'equipmentSet: %s', equipmentSet)
 

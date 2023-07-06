@@ -102,7 +102,7 @@ end
 
 --- @param btnWidget ButtonUIWidget
 local function OnMacroChanged(btnWidget)
-    AttributeSetters[MACRO]:SetAttributes(btnWidget.button)
+    AttributeSetters[MACRO]:SetAttributes(btnWidget.button())
 end
 
 --- Autocorrect bad data if we have button data with
@@ -113,7 +113,6 @@ local function GuessButtonType(btnWidget, btnData)
     for buttonType in pairs(AttributeSetters) do
         -- return the first data found
         if not IsEmptyTable(btnData[buttonType]) then
-            p:log(10, 'btnData[%s] did not have a type and was corrected: %s', btnWidget:GetName(), btnData.type)
             return buttonType
         end
     end
@@ -129,8 +128,8 @@ function L:Init()
         local f = self:CreateActionbarGroup(i)
         tinsert(self.FRAMES, f)
         f:ShowGroupIfEnabled()
+        f:ScrubEmptyButtons()
     end
-    p:log(10, 'Total ActionbarPlus frames loaded: %s', #self.FRAMES)
 end
 
 function L:Fire(event, sourceEvent, ...)
@@ -203,23 +202,11 @@ function L:CreateButtons(fw, rowSize, colSize)
         for col=1, colSize do
             index = index + 1
             local btnUI = fw:GetButtonUI(index)
-            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).frame end
+            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).button() end
             fw:AddButtonFrame(btnUI)
         end
     end
-    self:HideUnusedButtons(fw)
     fw:LayoutButtonGrid()
-end
-
---- @param fw FrameWidget
-function L:HideUnusedButtons(fw)
-    local start = fw:GetButtonCount() + 1
-    local max = start + (2 * fw:GetMaxButtonColSize())
-    for i=start, max do
-        --- @type ButtonUI
-        local existingBtn = fw:GetButtonUI(i)
-        if existingBtn then existingBtn.widget:Hide() end
-    end
 end
 
 --- @param frameWidget FrameWidget
@@ -232,6 +219,7 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)
+    btnWidget:CleanupActionTypeData()
     return btnWidget
 end
 
@@ -268,7 +256,7 @@ local function OnPlayerMount()
     L:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:IsMount() end,
-                function(bw) O.MountAttributeSetter:SetAttributes(bw.frame, 'event') end
+                function(bw) O.MountAttributeSetter:SetAttributes(bw.button(), 'event') end
         )
     end)
 end
