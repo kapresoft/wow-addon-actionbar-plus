@@ -303,6 +303,7 @@ local function PropsAndMethods(o)
 
     function o:Reset()
         self:ResetCooldown()
+        self:HideOverlayGlow()
         self:ClearAllText()
     end
 
