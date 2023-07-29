@@ -14,6 +14,8 @@ local O, LibStub, GC = ns.O, ns.LibStub, ns.O.GlobalConstants
 local Assert, String = O.Assert, O.String
 local MacroAttributeSetter, WAttr, PH = O.MacroAttributeSetter, GC.WidgetAttributes, O.PickupHandler
 local s_replace, IsNil = String.replace, Assert.IsNil
+local warnColor = WARNING_FONT_COLOR or RED_FONT_COLOR
+local highlightColor =  HIGHLIGHT_LIGHT_BLUE or BLUE_FONT_COLOR
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -31,13 +33,14 @@ function L:IsMacrotext(macroInfo) return macroInfo.type == 'macrotext' end
 ---@param cursorInfo CursorInfo
 function L:Supports(cursorInfo)
     local c = ns:CreateCursorUtil(cursorInfo)
-    local isEnabled  = GC:IsActionbarPlusM6Enabled()
-    if isEnabled ~= true then
-        local msg = WARNING_FONT_COLOR:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
-                .. ' ' .. HIGHLIGHT_LIGHT_BLUE:WrapTextInColorCode(LL['ActionbarPlus-M6 URL'])
-        p:log(msg)
-    end
     if c:IsM6Macro() then
+        local isEnabled  = GC:IsActionbarPlusM6Enabled()
+        if isEnabled ~= true then
+            local msg = warnColor:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
+                    .. ' ' .. highlightColor:WrapTextInColorCode(LL['ActionbarPlus-M6 URL'])
+            p:log(msg)
+        end
+
         p:log(10, 'm6 supported: %s', isEnabled)
         return isEnabled
     end
