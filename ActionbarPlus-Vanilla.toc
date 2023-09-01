@@ -1,4 +1,4 @@
-## Interface: 11403
+## Interface: 11404
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r Classic
 ## Notes: Actionbar Addon for World of Warcraft
