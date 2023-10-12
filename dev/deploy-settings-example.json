@@ -1,0 +1,144 @@
+{
+    "deploy": {
+        "openOutputOnDeploy": false,
+        "env": {
+            "importVarsAsPlaceholders": true,
+            "vars": {
+                "addon": "ActionbarPlus",
+                "desktop-dir":"/Users/tony/Desktop",
+                "wow-dir": "/Applications/wow",
+                "wow-classic-dir": "${wow-dir}/_classic_",
+                "wow-retail-dir": "${wow-dir}/_retail_",
+                "wow-classic-deploy": "${wow-classic-dir}/Interface/AddOns/${addon}",
+                "wow-retail-deploy": "${wow-retail-dir}/Interface/AddOns/${addon}",
+                "wow-desktop-deploy": "${desktop-dir}/${addon}"
+            }
+        },
+        "packages": [
+            {
+                "deployOnSave": true,
+                "fastCheckOnSave": true,
+                "name": "Desktop",
+                "button": {
+                    "enabled": true,
+                    "text": "Desktop",
+                    "tooltip": "Deploy to PWD/.deploy",
+                    "targets": [
+                        "desktop"
+                    ]
+                },
+                "exclude": [
+                    ".idea/**",
+                    ".vscode/**",
+                    ".git/**",
+                    ".github/**",
+                    "build/**",
+                    "dev/**",
+                    "doc/**",
+                    ".gitignore",
+                    ".gitattributes",
+                ],
+            },
+            {
+                "name": "ActionbarPlus Classic",
+                "button": {
+                    "enabled": true,
+                    "text": "Deploy Classic",
+                    "tooltip": "Deploy to ${wow-classic-deploy}",
+                    "targets": [
+                        "wow-classic"
+                    ]
+                },
+                "deployOnChange": {
+                    "exclude": [
+                        ".deploy-classic/**",
+                        ".deploy-retail/**",
+                        ".deploy/**",
+                        ".idea/**",
+                        ".vscode/**",
+                        ".github/**",
+                        "build/**",
+                        "dev/**",
+                        "doc/**",
+                        ".gitignore",
+                        ".gitattributes",
+                    ],
+                    "useTargetList": true
+                },
+                "exclude": [
+                    ".deploy-classic/**",
+                    ".deploy-retail/**",
+                    ".deploy/**",
+                    ".idea/**",
+                    ".vscode/**",
+                    ".github/**",
+                    "build/**",
+                    "dev/**",
+                    "doc/**",
+                    ".gitignore",
+                    ".gitattributes",
+                ],
+            },
+            {
+                "name": "ActionbarPlus Retail",
+                "button": {
+                    "enabled": true,
+                    "text": "Deploy Retail",
+                    "tooltip": "Deploy to ${wow-retail-deploy}",
+                    "targets": [
+                        "wow-retail"
+                    ]
+                },
+                "deployOnChange": {
+                    "exclude": [
+                        ".deploy-classic/**",
+                        ".deploy-retail/**",
+                        ".deploy/**",
+                        ".idea/**",
+                        ".vscode/**",
+                        ".github/**",
+                        "build/**",
+                        "dev/**",
+                        "doc/**",
+                        ".gitignore",
+                        ".gitattributes",
+                    ],
+                    "useTargetList": true
+                },
+                "exclude": [
+                    ".deploy-classic/**",
+                    ".deploy-retail/**",
+                    ".deploy/**",
+                    ".idea/**",
+                    ".vscode/**",
+                    ".github/**",
+                    "build/**",
+                    "dev/**",
+                    "doc/**",
+                    ".gitignore",
+                    ".gitattributes",
+                ],
+            }
+        ],
+        "targets": [
+            {
+                "name": "wow-classic",
+                "type": "local",
+                "description": "Deploys to project dir ${wow-classic-dir}",
+                "dir": "${wow-classic-deploy}"
+            },
+            {
+                "name": "wow-retail",
+                "type": "local",
+                "description": "Deploys to project dir ${wow-retail-dir}",
+                "dir": "${wow-retail-deploy}"
+            },
+            {
+                "name": "desktop",
+                "type": "local",
+                "description": "Deploys to project dir Desktop",
+                "dir": "${wow-desktop-deploy}"
+            }
+        ]
+    }
+}
