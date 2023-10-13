@@ -32,6 +32,8 @@ local M = {
     --- @deprecated Use AceLibrary
     AceLibFactory = 'AceLibFactory',
     AceLibrary = 'AceLibrary',
+    APIHooks = 'APIHooks',
+
     -- Mixins
     Mixin = 'Mixin',
     ButtonMixin = 'ButtonMixin',

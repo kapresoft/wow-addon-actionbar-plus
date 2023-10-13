@@ -60,6 +60,8 @@ end
 --- - see [API_PickupCompanion](https://wowpedia.fandom.com/wiki/API_PickupCompanion) for Mounts and Companion
 --- @param widget ButtonUIWidget
 function L:PickupExisting(widget)
+    local conf = widget:conf()
+    ABP.mountID = conf.mount and conf.mount.id
     PickupStuff(widget)
 end
 

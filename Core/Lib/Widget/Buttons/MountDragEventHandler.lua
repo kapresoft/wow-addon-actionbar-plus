@@ -70,11 +70,11 @@ local function eventHandlerMethods(e)
     ---@param cursorInfo CursorInfo
     function e:Handle(btnUI, cursorInfo)
         local mountInfoApi = BaseAPI:GetMountInfo(cursorInfo)
-        if IsInvalidMount(mountInfoApi) then return end
-        local btnData = btnUI.widget:conf()
-        local mount = ToProfileMount(mountInfoApi, cursorInfo)
+        local mount = mountInfoApi and not IsInvalidMount(mountInfoApi) and ToProfileMount(mountInfoApi, cursorInfo)
 
         PH:PickupExisting(btnUI.widget)
+
+        local btnData = btnUI.widget:conf()
         btnData[WAttr.TYPE] = WAttr.MOUNT
         btnData[WAttr.MOUNT] = mount
 
