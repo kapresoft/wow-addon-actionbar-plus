@@ -14,7 +14,6 @@ local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles,
 local C_EquipmentSet = C_EquipmentSet
 local UnitIsFriend, UnitIsEnemy, UnitInVehicle = UnitIsFriend, UnitIsEnemy, UnitInVehicle
 local IsUsableSpell = IsUsableSpell
-
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -22,6 +21,7 @@ Local Vars
 local _, ns = ...
 local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
+local pformat = ns.pformat
 local UnitId = GC.UnitId
 local W = GC.WidgetAttributes
 
@@ -41,6 +41,9 @@ local function IsValidMountInfo(mountInfo)
     return IsNotBlank(mountInfo.name) and IsNotNil(mountInfo.spellID) and IsNotNil(mountInfo.icon)
 end
 
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
 function L:IsDragonflight() return select(4, GetBuildInfo()) >= 100000 end
 function L:IsClassicEra() return select(4, GetBuildInfo()) <= 11500 end
 
@@ -166,12 +169,8 @@ end
 
 --- @param mount Profile_Mount
 function L:PickupMount(mount)
-    if C_MountJournal and IsNotBlank(mount.name) then
-        C_MountJournal.SetSearch(sformat('"%s"', mount.name))
-        C_MountJournal.Pickup(1)
-        C_Timer.After(0.5, function() C_MountJournal.SetSearch('')  end)
-        return
-    end
+    local spellID = C_MountJournal and mount.spell and mount.spell.id
+    if spellID then return PickupSpell(spellID) end
 
     PickupCompanion(W.MOUNT, mount.index)
 end
@@ -265,10 +264,20 @@ end
 --- @param cursorInfo CursorInfo
 --- @return MountInfo
 function L:GetMountInfo(cursorInfo)
-    local mountIDorIndex = cursorInfo.info1
-    local mountInfoAPI = self:GetMountInfoGenericFromCursor(mountIDorIndex)
-    if C_MountJournal then mountInfoAPI.index = cursorInfo.info2 end
-    return mountInfoAPI
+    local mountID = ABP.mountID
+    local mountIDorIndex = mountID
+    ABP.mountID = nil
+    mountIDorIndex = mountIDorIndex or cursorInfo.info1
+    return mountIDorIndex and self:GetMountInfoGenericFromCursor(mountIDorIndex)
+end
+
+---@param mountDisplayIndex Index
+function L:GetMountIDFromDisplayIndex(mountDisplayIndex)
+    local name, spellID, icon,
+    isActive, isUsable, sourceType, isFavorite,
+    isFactionSpecific, faction, shouldHideOnChar,
+    isCollected, mountID, isForDragonriding = C_MountJournal.GetDisplayedMountInfo(mountDisplayIndex)
+    return mountID
 end
 
 --- @return MountInfo
@@ -282,9 +291,13 @@ end
 --- @return MountInfo
 --- @param mountData Profile_Mount
 function L:GetMountInfoGeneric(mountData)
-    local m
-    if C_MountJournal then m = self:GetMountInfo_CJournal(mountData.id) end
-    if m then return m end
+    if C_MountJournal then
+        local mountID
+        local spellID = mountData.spell and mountData.spell.id
+        mountID = spellID and C_MountJournal.GetMountFromSpell(spellID)
+                or mountData.id
+        return self:GetMountInfo_CJournal(mountID)
+    end
     return self:GetMountInfoLegacy(mountData.index)
 end
 
@@ -326,7 +339,7 @@ end
 --- @return MountInfo
 --- @param mountID number
 function L:GetMountInfo_CJournal(mountID)
-    if not C_MountJournal then return nil end
+    if not (mountID and C_MountJournal) then return nil end
 
     local name, spellID, icon,
     isActive, isUsable, sourceType, isFavorite,

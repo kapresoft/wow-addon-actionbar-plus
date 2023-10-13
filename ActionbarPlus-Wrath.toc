@@ -1,4 +1,4 @@
-## Interface: 30402
+## Interface: 30403
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r WOTLK
 ## Notes: Actionbar Addon for World of Warcraft

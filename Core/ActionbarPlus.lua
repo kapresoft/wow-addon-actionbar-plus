@@ -215,6 +215,9 @@ New Addon Instance
 local function NewInstance()
     --- @class ActionbarPlus : ActionbarPlus_Methods
     local A = LibStub:NewAddon(ns.name)
+    --- The mountID for C_MountJournal Pickup Support
+    --- @see APIHooks
+    A.mountID = nil
     MX:Mixin(A, methods)
     A.ActionbarEmptyGridShowing = false
 

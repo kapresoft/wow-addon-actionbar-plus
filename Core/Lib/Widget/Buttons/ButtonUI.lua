@@ -137,6 +137,8 @@ local function OnDragStart(btnUI)
     w:Reset()
     p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
 
+    local conf = w:conf()
+    ABP.mountID = conf and conf.mount and conf.mount.id
     PH:Pickup(btnUI.widget)
 
     w:SetButtonAsEmpty()
