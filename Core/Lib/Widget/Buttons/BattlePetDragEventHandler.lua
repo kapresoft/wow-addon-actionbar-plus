@@ -100,6 +100,8 @@ local function eventHandlerMethods(e)
         btnData[WAttr.BATTLE_PET] = profileBattlePet
 
         S(btnUI, btnData)
+
+        btnUI.widget:UpdateCompanionActiveState()
     end
 
 end

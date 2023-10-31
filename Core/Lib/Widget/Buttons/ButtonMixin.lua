@@ -1119,6 +1119,45 @@ local function PropsAndMethods(o)
     end
     function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.button()) end
     function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.button()) end
+    function o:ShowOverlayGlowAsActiveButton()
+        local btn = self.button()
+        ActionButton_ShowOverlayGlow(btn)
+
+        local overlay = btn.overlay
+        if overlay then
+            C_Timer.After(1, function()
+                overlay.ants:SetAlpha(0)
+                overlay.outerGlow:SetAlpha(0.7)
+            end)
+            return
+        end
+
+        if not btn.SpellActivationAlert then return end
+        -- retail
+        btn.SpellActivationAlert:SetAlpha(0.4)
+    end
+
+    function o:UpdateCompanionActiveState()
+        local summonedPetID, petID, isSummoned
+        if C_PetJournal.IsCurrentlySummoned and self:IsCompanion() then
+            local comp = self:GetCompanionData()
+            local petInfo = comp and comp.petID and BaseAPI:GetPetInfo_CJournal(comp.petID)
+            petID = petInfo and petInfo.petID
+            isSummoned = petID and C_PetJournal.IsCurrentlySummoned(petID)
+        elseif C_PetJournal.GetSummonedPetGUID and self:IsBattlePet() then
+            local battlePet = self:GetBattlePetData()
+            petID = battlePet.guid
+            summonedPetID = C_PetJournal.GetSummonedPetGUID()
+            isSummoned = petID == summonedPetID
+        end
+        if not petID then return end
+
+        if isSummoned ~= true then
+            self:HideOverlayGlow()
+            return
+        end
+        self:ShowOverlayGlowAsActiveButton()
+    end
 
 
     function o:LogSpellName() p:log('SpellName: %s', tostring(self:GetEffectiveSpellName())) end

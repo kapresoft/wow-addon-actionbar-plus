@@ -215,10 +215,26 @@ local function OnSpellCastSucceeded(f, ...)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
+---@param bw ButtonUIWidget
+local function IsCompanion(bw) return bw:IsCompanion() or bw:IsBattlePet() end
+
+--- Not fired in classic-era
+--- @param f EventFrameInterface
+local function OnCompanionUpdate(f, ...)
+    local bf = f.ctx.buttonFactory
+    bf:fevf(function(fw)
+        fw:fevb(function(bw) return IsCompanion(bw) end, function(bw)
+            C_Timer.NewTicker(0.5, function() bw:UpdateCompanionActiveState() end, 3)
+        end)
+    end)
+end
+
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarEvents(f, event, ...)
-    --p:log('e[%s]: %s', event, {...})
+    local unit = ...
+    if unit ~= GC.UnitId.player then return end
+
     if E.UNIT_SPELLCAST_START == event then
         OnSpellCastStart(f, ...)
     elseif E.UNIT_SPELLCAST_STOP == event then
@@ -286,6 +302,7 @@ end
 --- @param event string
 local function OnPlayerEnteringWorld(f, event, ...)
     OnStealthIconUpdate(f.ctx)
+    OnCompanionUpdate(f)
 end
 
 --- @param f EventFrameInterface
@@ -412,6 +429,12 @@ function L:RegisterPlayerEnteringWorld()
     RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
 end
 
+function L:RegisterCompanionEvents()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnCompanionUpdate)
+    RegisterFrameForEvents(f, { 'COMPANION_UPDATE' })
+end
+
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
     self:RegisterActionbarsEventFrame()
@@ -421,6 +444,7 @@ function L:RegisterEvents()
     self:RegisterShapeshiftOrStealthEventFrame()
     self:RegisterCombatFrame()
     self:RegisterBagEvents()
+    self:RegisterCompanionEvents()
     self:RegisterEventToMessageTransmitter()
     self:RegisterPlayerEnteringWorld()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end

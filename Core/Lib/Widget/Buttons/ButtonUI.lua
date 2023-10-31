@@ -95,7 +95,12 @@ end
 local function OnPreClick(btn, key, down)
     local w = btn.widget
     w:SendMessage(GC.M.OnButtonPreClick, w)
-    if w:IsBattlePet() and C_PetJournal then
+    if w:IsCompanion() then
+        -- WOTLK and below uses 'companion'
+        w:SendMessage(GC.M.OnButtonClickCompanion, w)
+        return
+    elseif w:IsBattlePet() and C_PetJournal then
+        -- Retail uses 'battlepet' for both battlepet and companions
         w:SendMessage(GC.M.OnButtonClickBattlePet, w)
         return
     elseif w:IsEquipmentSet() then

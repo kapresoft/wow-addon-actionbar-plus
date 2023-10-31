@@ -121,6 +121,8 @@ local Profile_Companion = {
     type = 'companion',
     petType = 'critter',
     mountType = 0x1,
+    --- for C_PetJournal Pet Identifier
+    petID = 'pet guid',
     id = -1,
     index = -1,
     name = 'Black Kingsnake',

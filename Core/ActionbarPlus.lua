@@ -218,6 +218,7 @@ local function NewInstance()
     --- The mountID for C_MountJournal Pickup Support
     --- @see APIHooks
     A.mountID = nil
+    A.companionID = nil
     MX:Mixin(A, methods)
     A.ActionbarEmptyGridShowing = false
 
