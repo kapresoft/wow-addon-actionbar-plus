@@ -21,13 +21,24 @@ local function OnPickupMount_Hook(abp, displayedMountIndex)
     abp.mountID = displayedMountIndex and O.BaseAPI:GetMountIDFromDisplayIndex(displayedMountIndex)
 end
 
+--- @param abp ActionbarPlus
+--- @param petGUID Identifier This is the pet GUID, i.e. 'BattlePet-0-0000001837A7'
+--- @see C_PetJournal.GetPetInfoByPetID(petID_GUID)
+--- @see C_PetJournal.SummonPetByGUID(petID_GUID)
+local function OnPickupPet_Hook(abp, petGUID) abp.companionID = petGUID end
+
 --[[-----------------------------------------------------------------------------
 Message Handler
 -------------------------------------------------------------------------------]]
 --- @param abp ActionbarPlus
+--- @see C_MountJournal.Pickup()
+--- @see C_PetJournal.PickupPet()
 L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
     p:log(10, 'MSG::R: %s', msg)
-    if not C_MountJournal then return end
-    hooksecurefunc(C_MountJournal, 'Pickup', function(index)
-        OnPickupMount_Hook(abp, index) end)
+    if C_MountJournal then
+        hooksecurefunc(C_MountJournal, 'Pickup', function(index) OnPickupMount_Hook(abp, index) end)
+    end
+    if C_PetJournal then
+        hooksecurefunc(C_PetJournal, 'PickupPet', function(petGUID, arg) OnPickupPet_Hook(abp, petGUID) end)
+    end
 end)

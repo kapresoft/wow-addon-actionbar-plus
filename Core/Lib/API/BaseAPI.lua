@@ -124,12 +124,31 @@ function L:GetEquipmentSetInfoBySetID(id)
     }
 end
 
+---@param petID Identifier The Pet ID (GUID)
+function L:GetPetInfo_CJournal(petID)
+    local speciesID, customName, level, xp, maxXp, displayID,
+    isFavorite, name, icon, petType, creatureID, sourceText,
+    description, isWild, canBattle, tradable, unique, obtainable = C_PetJournal.GetPetInfoByPetID(petID)
+
+    return {
+        ['petType'] = petType,
+        ['petID'] = petID,
+        ['creatureName'] = name,
+        ['icon'] = icon,
+    }
+end
+
 ---### See Interface_<wow-version>/FrameXML/Constants.lua#PET_TYPE_SUFFIX
 ---### See Also: GetNumCompanions('type')
 --- @param petType string See PET_TYPE_SUFFIX
---- @param id number
+--- @param index Index
 --- @return CompanionInfo
 function L:GetCompanionInfo(petType, index)
+    local petID = ABP.companionID
+    if petID and C_PetJournal and C_PetJournal.GetPetInfoByPetID then
+        return self:GetPetInfo_CJournal(petID)
+    end
+
     local creatureID, creatureName, creatureSpellID, icon, isSummoned, mountType
     local status, err = pcall(function()
         assert(petType, "Companion type is required")
@@ -188,13 +207,12 @@ function L:PickupEquipmentSet(equipmentSet)
     C_EquipmentSet.PickupEquipmentSet(equipmentSet.id);
 end
 
+--- PickupCompanion() is no longer used. Note that classic-era treats companions as 'item' types.
 --- @param companion Profile_Companion
 function L:PickupCompanion(companion)
     if not companion then return end
-    if C_PetJournal then
-        return C_PetJournal.PickupPet(companion.id)
-    end
-    PickupCompanion(companion.petType, companion.index)
+    local petID = C_PetJournal and C_PetJournal.PickupPet and companion.petID
+    return petID and C_PetJournal.PickupPet(petID)
 end
 
 --- @param petGUID string Example: BattlePet-0-000008C13591
@@ -264,10 +282,7 @@ end
 --- @param cursorInfo CursorInfo
 --- @return MountInfo
 function L:GetMountInfo(cursorInfo)
-    local mountID = ABP.mountID
-    local mountIDorIndex = mountID
-    ABP.mountID = nil
-    mountIDorIndex = mountIDorIndex or cursorInfo.info1
+    local mountIDorIndex = ABP.mountID or cursorInfo.info1
     return mountIDorIndex and self:GetMountInfoGenericFromCursor(mountIDorIndex)
 end
 

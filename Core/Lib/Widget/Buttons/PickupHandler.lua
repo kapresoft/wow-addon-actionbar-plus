@@ -49,7 +49,6 @@ local function PickupStuff(widget)
     elseif widget:IsBattlePet() then
         BaseAPI:PickupBattlePet(widget:GetBattlePetData().guid)
     elseif widget:IsEquipmentSet() then
-        local equipmentSet =
         BaseAPI:PickupEquipmentSet(widget:GetEquipmentSetData())
     else
         p:log(20, "PickupExisting | no item picked up")

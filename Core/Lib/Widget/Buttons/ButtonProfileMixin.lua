@@ -175,7 +175,6 @@ local function PropsAndMethods(o)
 
     --- @return SpellName|nil
     function o:GetEffectiveSpellName()
-        self:IsActionType()
         local conf = self:conf()
         local actionType = conf and conf.type
         if IsBlankStr(actionType) then return nil end
@@ -188,7 +187,7 @@ local function PropsAndMethods(o)
         elseif actionType == 'item' then
             spellName = API:GetItemSpellInfo(conf.item.name)
         elseif actionType == 'mount' then
-            spellName = conf.mount.name
+            spellName = conf.mount and conf.mount.name
         end
 
         return spellName

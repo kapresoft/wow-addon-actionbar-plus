@@ -265,6 +265,7 @@ local function GlobalConstantProperties(o)
         OnButtonPostClick            = newMsg('OnButtonPostClick'),
         OnButtonClickBattlePet       = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet    = newMsg('OnButtonClickEquipmentSet'),
+        OnButtonClickCompanion       = newMsg('OnButtonClickCompanion'),
         OnMacroAttributesSet         = newMsg('OnMacroAttributesSet'),
         OnUpdateMacroState           = newMsg('OnUpdateMacroState'),
         OnUpdateItemState            = newMsg('OnUpdateItemState'),
