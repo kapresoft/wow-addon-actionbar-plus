@@ -119,6 +119,9 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
+    function o:GetSpellID() local d = self:GetSpellData(); return d and d.id end
+    function o:GetSpellName() local d = self:GetSpellData(); return d and d.name end
+
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
     --- @return Profile_Macro
@@ -242,6 +245,12 @@ local function PropsAndMethods(o)
         if not (spellInfo and spellInfo.name) then return false end
         return API:IsStealthSpell(spellInfo.name)
     end
+
+    function o:IsStealthEffectiveSpell()
+        local spellID = self:GetEffectiveSpellID()
+        return spellID and API:IsStealthSpellByID(spellID), spellID
+    end
+
     function o:IsShapeshiftSpell()
         local spellInfo = self:GetSpellData()
         if not (spellInfo and spellInfo.name) then return false end
