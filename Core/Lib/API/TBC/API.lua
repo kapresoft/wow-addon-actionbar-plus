@@ -25,12 +25,17 @@ local DruidAPI, GC = O.DruidAPI, O.GlobalConstants
 local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
+local ROGUE_STEALTH_SPELL_ID = 1784
+local DRUID_PROWL_SPELL_ID = 5215
+local NIGHT_ELF_SHADOWMELD_SPELL_ID = 20580
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class API
 local S = {}; ns:Register(ns.M.API, S)
 local p = O.LogFactory(ns.M.API)
+
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -268,10 +273,15 @@ end
 --- @param spellInfo Profile_Spell
 function S:IsShapeShiftActive(spellInfo)
     if not spellInfo then return false end
+    return spellInfo and spellInfo.id and self:IsShapeShiftActiveBySpellID(spellInfo.id)
+end
+
+--- @param spellID SpellID
+function S:IsShapeShiftActiveBySpellID(spellID)
     if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
         return GetShapeshiftForm() > 0
     end
-    return DruidAPI:IsActiveForm(spellInfo.id)
+    return spellID and DruidAPI:IsActiveForm(spellID)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
@@ -288,6 +298,11 @@ function S:IsShapeshiftSpell(spellInfo) return true == spellInfo.isShapeshift en
 --- @param spellName string
 function S:IsStealthSpell(spellName)
     return IsAnyOf(spellName, WAttr.PROWL, WAttr.STEALTH)
+end
+
+---@param spellID SpellID
+function S:IsStealthSpellByID(spellID)
+    return IsAnyOf(spellID, ROGUE_STEALTH_SPELL_ID, DRUID_PROWL_SPELL_ID, NIGHT_ELF_SHADOWMELD_SPELL_ID)
 end
 
 --- @param spellInfo Profile_Spell

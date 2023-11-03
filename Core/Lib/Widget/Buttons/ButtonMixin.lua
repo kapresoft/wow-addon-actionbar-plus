@@ -966,14 +966,23 @@ local function PropsAndMethods(o)
     function o:SetActionUsable(isUsable)
         local normalTexture = self.button():GetNormalTexture()
         if not normalTexture then return end
+
+        local isStealthedOrShapeshifted = false
+        local isStealth, spellID = self:IsStealthEffectiveSpell()
+
+        if spellID and (isStealth and (IsStealthed() or API:IsShapeShiftActiveBySpellID(spellID))) then
+            isStealthedOrShapeshifted = true
+        end
+
         -- energy based spells do not use 'notEnoughMana'
-        if IsStealthed() or API:IsShapeShiftActive(self:GetSpellData()) then
-            normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+        if  isStealthedOrShapeshifted == true then
+            normalTexture:SetVertexColor(0.6, 0.6, 0.6)
         elseif not isUsable then
             normalTexture:SetVertexColor(0.3, 0.3, 0.3)
         else
             normalTexture:SetVertexColor(1.0, 1.0, 1.0)
         end
+
     end
 
     --- @param cd CooldownInfo
