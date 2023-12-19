@@ -33,12 +33,8 @@ function L:Handle(btnUI, cursorInfo)
     local itemInfo = API:GetItemInfo(itemID)
     local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
                        link = itemInfo.link, count = itemInfo.count, stackCount=itemInfo.stackCount }
-    local actionbarInfo = btnUI.widget:GetActionbarInfo()
 
-    local btnName = btnUI:GetName()
-    local barData = P:GetBar(actionbarInfo.index)
-
-    local btnData = barData.buttons[btnName]
+    local btnData = btnUI.widget:GetConfig()
     PH:PickupExisting(btnUI.widget)
     btnData.type = WAttr.ITEM
     btnData[WAttr.ITEM] = itemData
