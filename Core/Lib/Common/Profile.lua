@@ -174,7 +174,7 @@ function P:CreateDefaultProfile() return PI:InitNewProfile() end
 function P:CreateBarsTemplate()
     local bars = {}
     for i=1, self:GetActionbarFrameCount() do
-        local frameName = self:GetFrameNameByIndex(i)
+        local frameName = GC:GetFrameName(i)
         bars[frameName] = {
             enabled = false,
             buttons = {}
@@ -204,7 +204,7 @@ function P:ResetButtonConfig(bw) P:GetBar(bw.frameIndex).buttons[bw:GetName()] =
 ---@param frameIndex number
 function P:RetrieveBar(frameIndex)
     assert(frameIndex, "RetrieveBar: frameIndex is required.")
-    local frameName = self:GetFrameNameByIndex(frameIndex)
+    local frameName = GC:GetFrameName(frameIndex)
     local profile = ns.p()
     local bar = profile.bars[frameName]
     barProfiles[frameIndex] = bar
@@ -270,7 +270,7 @@ end
 function P:GetGlobalAnchor(frameIndex)
     --- @type Global_Profile_Bar
     local g = self:G()
-    local fn = P:GetFrameNameByIndex(frameIndex)
+    local fn = GC:GetFrameName(frameIndex)
     --- @type Profile_Global_Config
     local buttonConf = g.bars[fn]
     if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, fn) end
@@ -298,7 +298,7 @@ end
 --- @param frameIndex number
 --- @return Global_Profile_Bar
 function P:GetGlobalBar(frameIndex)
-    local frameName = self:GetFrameNameByIndex(frameIndex)
+    local frameName = GC:GetFrameName(frameIndex)
     return frameIndex and self:G().bars[frameName]
 end
 
@@ -321,7 +321,7 @@ function P:IsActionButtonMouseoverGlowEnabled() return self:P().action_button_mo
 function P:IsBarUnlocked(frameIndex) return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil end
 function P:IsBarLockedInCombat(frameIndex) return self:GetBarLockValue(frameIndex) == 'in-combat' end
 function P:IsBarLockedAlways(frameIndex) return self:GetBarLockValue(frameIndex) == 'always' end
-function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(self:GetFrameNameByIndex(frameIndex)) end
+function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(GC:GetFrameName(frameIndex)) end
 
 function P:IsBarNameEnabled(frameName)
     if not self.profile.bars then return false end
@@ -352,17 +352,15 @@ function P:IsShowKeybindText(frameIndex) return self:GetBar(frameIndex).show_key
 --- @param frameIndex number The frame index number
 function P:IsShowEmptyButtons(frameIndex) return self:GetBar(frameIndex).widget.show_empty_buttons == true end
 
-function P:GetFrameNameByIndex(frameIndex) return PI:GetFrameNameByIndex(frameIndex) end
-
 --- @return FrameWidget
-function P:GetFrameWidgetByIndex(frameIndex) return _G[self:GetFrameNameByIndex(frameIndex)].widget end
+function P:GetFrameWidgetByIndex(frameIndex) return _G[GC:GetFrameName(frameIndex)].widget end
 
 function P:GetActionbarFrameCount() return PI.ActionbarCount end
 
 function P:GetAllFrameNames()
     local fnames = {}
     for i=1, self:GetActionbarFrameCount() do
-        local fn = self:GetFrameNameByIndex(i)
+        local fn = GC:GetFrameName(i)
         tinsert(fnames, fn)
     end
     tsort(fnames)

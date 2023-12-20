@@ -726,7 +726,7 @@ end
 
 --- @return _Frame
 function L:GetFrameByIndex(frameIndex)
-    local frameName = P:GetFrameNameByIndex(frameIndex)
+    local frameName = GC:GetFrameName(frameIndex)
     return _G[frameName]
 end
 
