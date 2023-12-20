@@ -10,7 +10,7 @@
 [//]: # (https://cf.way2muchnoise.eu/)
 [//]: # (See more on badges at: https://support.curseforge.com/en/support/solutions/articles/9000206928-curseforge-badges)
 
-[Releases](../../releases) | [Milestones](../../milestones) | [Known Issues](../../issues)
+[Releases](../../releases) | [Milestones](../../milestones) | [Known Issues](../../issues) | [Curse Forge](https://legacy.curseforge.com/wow/addons/actionbarplus/files)
 
 ## Actionbars Everywhere, Make you click happy
 

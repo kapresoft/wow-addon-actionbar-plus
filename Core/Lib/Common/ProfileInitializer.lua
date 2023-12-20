@@ -199,18 +199,12 @@ Methods
 -------------------------------------------------------------------------------]]
 --- @param o ProfileInitializer
 local function Methods(o)
-    --- @param frameIndex number
-    function o:GetFrameNameByIndex(frameIndex)
-        assert(type(frameIndex) == 'number',
-                'GetFrameNameByIndex(..)| frameIndex should be a number')
-        return o.baseFrameName .. tostring(frameIndex)
-    end
 
     --- @param g Profile_Global_Config
     function o:InitGlobalSettings(g)
         g.bars = {}
         for frameIndex=1, ACTION_BAR_COUNT do
-            local fn = o:GetFrameNameByIndex(frameIndex)
+            local fn = GC:GetFrameName(frameIndex)
             self:InitGlobalButtonConfig(g, fn)
         end
     end
