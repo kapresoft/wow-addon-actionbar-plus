@@ -202,8 +202,14 @@ local methods = {
         self:InitializeDb()
         self.barBindings = WMX:GetBarBindingsMap()
         self:RegisterSlashCommands()
+    end,
+    --- #### See Also: [Ace-addon-3-0](https://www.wowace.com/projects/ace3/pages/api/ace-addon-3-0)
+    --- @param self ActionbarPlus
+    ['OnEnable'] = function(self)
+        -- Do more initialization here, that really enables the use of your addon.
+        -- Register Events, Hook functions, Create Frames, Get information from
+        -- the game that wasn't available in OnInitialize
         self:RegisterHooks()
-
         self:SendMessage(M.OnAddOnInitialized, self)
     end
 }
