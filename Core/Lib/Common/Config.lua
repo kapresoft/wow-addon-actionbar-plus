@@ -245,7 +245,7 @@ local function PropsAndMethods(o)
     --- Call Order: Config -> Profile -> ButtonFactory
     --- Message triggered by ActionbarPlus#OnInitializeModules
     --- @param msg string The message name
-    function o:OnAddOnInitialized(msg)
+    function o:InitConfig(msg)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
@@ -628,7 +628,7 @@ local function NewInstance()
 
     AceEvent:Embed(newConfig)
     PropsAndMethods(newConfig)
-    newConfig:RegisterMessage(M.OnAddOnInitialized, function(evt, ...) newConfig:OnAddOnInitialized(evt, ...) end)
+    newConfig:RegisterMessage(M.OnAddOnEnabled, function(evt, ...) newConfig:InitConfig(evt, ...) end)
     return newConfig
 end
 

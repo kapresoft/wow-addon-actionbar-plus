@@ -202,6 +202,13 @@ local methods = {
         self:InitializeDb()
         self.barBindings = WMX:GetBarBindingsMap()
         self:RegisterSlashCommands()
+        if ns.features.enableV2 ~= true then
+            self:SendMessage(M.OnAddOnInitialized, self)
+            return
+        end
+        p:log('IsV2Enabled: %s', ns.features.enableV2)
+        self:SendMessage(M.OnAddOnInitializedV2)
+        p:log('MSG::OnAddOnInitializedV2 Sent')
     end,
     --- #### See Also: [Ace-addon-3-0](https://www.wowace.com/projects/ace3/pages/api/ace-addon-3-0)
     --- @param self ActionbarPlus
@@ -210,7 +217,13 @@ local methods = {
         -- Register Events, Hook functions, Create Frames, Get information from
         -- the game that wasn't available in OnInitialize
         self:RegisterHooks()
-        self:SendMessage(M.OnAddOnInitialized, self)
+        if ns.features.enableV2 ~= true then
+            self:SendMessage(M.OnAddOnEnabled, self)
+            return
+        end
+
+        self:SendMessage(M.OnAddOnEnabledV2)
+        p:log('MSG::OnAddOnEnabledV2 Sent')
     end
 }
 
