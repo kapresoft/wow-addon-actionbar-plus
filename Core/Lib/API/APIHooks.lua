@@ -33,7 +33,7 @@ Message Handler
 --- @param abp ActionbarPlus
 --- @see C_MountJournal.Pickup()
 --- @see C_PetJournal.PickupPet()
-L:RegisterMessage(MSG.OnAddOnInitialized, function(msg, abp)
+L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
     p:log(10, 'MSG::R: %s', msg)
     if C_MountJournal then
         hooksecurefunc(C_MountJournal, 'Pickup', function(index) OnPickupMount_Hook(abp, index) end)

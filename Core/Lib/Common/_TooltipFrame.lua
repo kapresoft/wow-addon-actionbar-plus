@@ -61,7 +61,7 @@ local function MethodsAndProperties(o)
         if not self.widget.frame then return end
         self.widget.frame:SetSize(1, 1)
 
-        o:RegisterMessage(GC.M.OnAddOnInitialized, function(msg, ...)
+        o:RegisterMessage(GC.M.OnAddOnEnabled, function(msg, ...)
             p:log(10, 'MSG::R: %s', msg)
             local names = GC.Profile_Config_Names
             local anchorType = ns.db.profile[names.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPLEFT

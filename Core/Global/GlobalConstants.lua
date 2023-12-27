@@ -79,6 +79,7 @@ local function GlobalConstantProperties(o)
         ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
         ABP_CONSOLE_OPTIONS_FORMAT = '  - %-8s|cfdeab676:: %s|r',
         ADDON_INFO_FMT = '%s|cfdeab676: %s|r',
+        ADDON_INFO_FEATURE_FMT = '%s|cfd7c9cfb=%s|r',
 
         ABP_CONSOLE_COMMAND_TEXT_FORMAT = consoleCommandTextFormat,
         ABP_CONSOLE_KEY_VALUE_TEXT_FORMAT = consoleKeyValueTextFormat,
@@ -256,6 +257,9 @@ local function GlobalConstantProperties(o)
     --- @class MessageNames
     local Messages = {
         OnAddOnInitialized           = newMsg('OnAddOnInitialized'),
+        OnAddOnEnabled               = newMsg('OnAddOnEnabled'),
+        OnAddOnEnabledV2             = newMsg('OnAddOnEnabledV2'),
+        OnAddOnInitializedV2         = newMsg('OnAddOnInitializedV2'),
         OnAddOnReady                 = newMsg('OnAddOnReady'),
         OnBagUpdate                  = newMsg('OnBagUpdate'),
         OnDBInitialized              = newMsg('OnDBInitialized'),
@@ -535,7 +539,12 @@ local function GlobalConstantMethods(o)
         local C = self:GetAceLocale()
         local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
         local fmt = self.C.ADDON_INFO_FMT
-        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+        --- @type Namespace
+        local nss = ns
+        local ffmt = self.C.ADDON_INFO_FEATURE_FMT
+        local features = sformat(ffmt, "v2-enabled", tostring(nss.features.enableV2))
+
+        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
                 C['Addon Info'],
                 sformat(fmt, C['Version'], version),
                 sformat(fmt, C['Curse-Forge'], curseForge),
@@ -544,7 +553,8 @@ local function GlobalConstantMethods(o)
                 sformat(fmt, C['Last-Update'], lastUpdate),
                 sformat(fmt, C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown)),
                 sformat(fmt, C['Interface-Version'], wowInterfaceVersion),
-                sformat(fmt, C['Game-Version'], ns.gameVersion)
+                sformat(fmt, C['Game-Version'], ns.gameVersion),
+                sformat(fmt, "Features", features)
         )
     end
 

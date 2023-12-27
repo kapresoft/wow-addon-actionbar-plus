@@ -71,6 +71,10 @@ local function CreateNamespace(...)
 
     ns:K():Mixin(ns, LibPackMixin)
 
+    ns.features = {
+        enableV2 = false,
+    }
+
     --- @param o Namespace
     local function Methods(o)
 

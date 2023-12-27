@@ -25,6 +25,10 @@ local Namespace = {
     --- @type string
     name = "",
 
+    features = {
+        enableV2 = false,
+    },
+
     --- @type GameVersion
     gameVersion = "retail",
 

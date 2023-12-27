@@ -267,7 +267,7 @@ Initializer
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
 
-    L:RegisterMessage(MSG.OnAddOnInitialized, function(msg)
+    L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
         p:log(10, 'MSG::R: %s', msg)
         L:Init()
     end)
