@@ -12,50 +12,124 @@ local O, LibStub = ns:LibPack()
 
 local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
 local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
-local IsNil = Assert.IsNil
+local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local API = O.API
 
+
 --[[-----------------------------------------------------------------------------
-New Instance
+New Instance: ItemDragEventHandler
 -------------------------------------------------------------------------------]]
 ---@class ItemDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(ns.M.ItemDragEventHandler); if not L then return end
 
--- ## Functions ------------------------------------------------
---- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
----@param btnUI ButtonUI
----@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
-function L:Handle(btnUI, cursorInfo)
-    if not self:IsValid(btnUI, cursorInfo) then return end
+--[[-----------------------------------------------------------------------------
+New Instance: ItemAttributeSetter
+-------------------------------------------------------------------------------]]
+---@class ItemAttributeSetter : BaseAttributeSetter
+local S = LibStub:NewLibrary(ns.M.ItemAttributeSetter); if not S then return end
+---@type BaseAttributeSetter
+local BaseAttributeSetter = LibStub(ns.M.BaseAttributeSetter)
 
-    local itemID = cursorInfo.info1
-    ---@type ItemInfo
-    local itemInfo = API:GetItemInfo(itemID)
-    local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
-                       link = itemInfo.link, count = itemInfo.count, stackCount=itemInfo.stackCount }
+--[[-----------------------------------------------------------------------------
+Methods: ItemDragEventHandler
+-------------------------------------------------------------------------------]]
+---@param e ItemDragEventHandler
+local function eventHandlerMethods(e)
 
-    local btnData = btnUI.widget:GetConfig()
-    PH:PickupExisting(btnUI.widget)
-    btnData.type = WAttr.ITEM
-    btnData[WAttr.ITEM] = itemData
+    --- Item Cursor Info `{ type = cursorInfo.actionType, id=cursorInfo.info1, link=cursorInfo.info2 }`
+    ---@param btnUI ButtonUI
+    ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
+    function e:Handle(btnUI, cursorInfo)
+        if not self:IsValid(btnUI, cursorInfo) then
+            return
+        end
 
-    ItemAttributeSetter(btnUI, btnData)
-    btnUI.widget:UpdateItemState()
-end
+        local itemID = cursorInfo.info1
+        ---@type ItemInfo
+        local itemInfo = API:GetItemInfo(itemID)
+        local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
+                           link = itemInfo.link, count = itemInfo.count, stackCount = itemInfo.stackCount }
 
-function L:GetItemDetails(itemId)
-    local itemName, itemLink,
-    itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-    itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-    expacID, setID, isCraftingReagent = GetItemInfo(itemId)
-    return { id = itemId, name = itemName, link = itemLink, icon = itemTexture }
-end
+        local btnData = btnUI.widget:GetConfig()
+        PH:PickupExisting(btnUI.widget)
+        btnData.type = WAttr.ITEM
+        btnData[WAttr.ITEM] = itemData
 
-function L:IsValid(btnUI, cursorInfo)
-    if Table.isEmpty(cursorInfo) then return false end
-    if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
-        return false
+        S(btnUI, btnData)
+        btnUI.widget:UpdateItemState()
     end
 
-    return true
+    function e:GetItemDetails(itemId)
+        local itemName, itemLink,
+        itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+        itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+        expacID, setID, isCraftingReagent = GetItemInfo(itemId)
+        return { id = itemId, name = itemName, link = itemLink, icon = itemTexture }
+    end
+
+    function e:IsValid(btnUI, cursorInfo)
+        if Table.isEmpty(cursorInfo) then
+            return false
+        end
+        if IsNil(cursorInfo.type) or IsNil(cursorInfo.info1) or IsNil(cursorInfo.info2) then
+            return false
+        end
+
+        return true
+    end
 end
+
+--[[-----------------------------------------------------------------------------
+Methods: ItemAttributeSetter
+-------------------------------------------------------------------------------]]
+---@param a ItemAttributeSetter
+local function attributeSetterMethods(a)
+
+    ---@param btnUI ButtonUI
+    function a:SetAttributes(btnUI)
+        local w = btnUI.widget
+        w:ResetWidgetAttributes(btnUI)
+        local itemData = w:GetItemData()
+        if w:IsInvalidItem(itemData) then
+            return
+        end
+
+        AssertNotNil(itemData.id, 'btnData[item].itemInfo.id')
+
+        btnUI.widget:SetIcon(itemData.icon)
+        btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
+        btnUI:SetAttribute(WAttr.ITEM, itemData.name)
+
+        self:OnAfterSetAttributes(btnUI)
+    end
+
+    ---@param btnUI ButtonUI
+    function a:ShowTooltip(btnUI)
+        local w = btnUI.widget
+        if not w:ConfigContainsValidActionType() then
+            return
+        end
+
+        local itemInfo = w:GetItemData()
+        if w:IsInvalidItem(itemInfo) then
+            return
+        end
+
+        if itemInfo and itemInfo.id then
+            GameTooltip:SetItemByID(itemInfo.id)
+        end
+    end
+end
+
+--[[-----------------------------------------------------------------------------
+Init
+-------------------------------------------------------------------------------]]
+local function Init()
+    eventHandlerMethods(L)
+    attributeSetterMethods(S)
+
+    S.mt.__index = BaseAttributeSetter
+    S.mt.__call = S.SetAttributes
+end
+
+Init()

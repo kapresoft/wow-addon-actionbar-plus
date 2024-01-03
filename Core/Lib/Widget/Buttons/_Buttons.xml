@@ -10,7 +10,6 @@
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="BaseAttributeSetter.lua"/>
     <Script file="SpellAttributeSetter.lua"/>
-    <Script file="ItemAttributeSetter.lua"/>
     <Script file="MacrotextAttributeSetter.lua"/>
     <Script file="ItemDragEventHandler.lua"/>
     <Script file="SpellDragEventHandler.lua"/>
