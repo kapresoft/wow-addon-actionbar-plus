@@ -1,16 +1,1 @@
-### ActionbarPlus 1.0.20 (2022-Dec-12)
-
-[Release Notes](https://github.com/kapresoft/wow-addon-actionbar-plus/releases/tag/1.0.20)
-| [Full Changelog](https://github.com/kapresoft/wow-addon-actionbar-plus/compare/1.0.19...1.0.20)
-| [Release Page](https://github.com/kapresoft/wow-addon-actionbar-plus/releases)
-| [Older Release List](https://github.com/kapresoft/wow-addon-actionbar-plus/blob/main/doc/CHANGELOG-Previous.md)
-
-[Milestone 12.5](https://github.com/kapresoft/wow-addon-actionbar-plus/milestone/18?closed=1)
-
-- Hide During Taxi Option while flying should hide actionbars #120
-
-### ActionbarPlus-1.0.20.zip
-
-```text
-MD5 <tbd>
-```
+This is a placeholder file.
