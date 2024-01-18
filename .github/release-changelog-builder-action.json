@@ -1,20 +1,20 @@
 {
   "categories": [
     {
-      "title": "#### 🚀 Features",
+      "title": "##### Features",
       "labels": ["Enhancement"]
     },
     {
-      "title": "#### Bug Fixes",
+      "title": "##### Bug Fixes",
       "labels": ["Bug"]
     },
     {
       "key": "tests",
-      "title": "#### Tests",
+      "title": "##### Tests",
       "labels": ["Test"]
     },
     {
-      "title": "#### Miscellaneous",
+      "title": "##### Miscellaneous",
       "labels": []
     }
   ],
