@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "title": "#### 🚀 Features",
+      "labels": ["Enhancement"]
+    },
+    {
+      "title": "#### Bug Fixes",
+      "labels": ["Bug"]
+    },
+    {
+      "key": "tests",
+      "title": "#### Tests",
+      "labels": ["Test"]
+    },
+    {
+      "title": "#### Miscellaneous",
+      "labels": []
+    }
+  ],
+  "template": "#{{CHANGELOG}}",
+  "pr_template": "- #{{TITLE}} :: [PR: ##{{NUMBER}}](#{{URL}})",
+  "empty_template": "- no changes"
+}
