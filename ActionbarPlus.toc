@@ -29,7 +29,7 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-# To get the Interface/Build Info
+# To get the Interface/Build Info.
 # /dump select(4, GetBuildInfo())
 
 Core\_Core.xml
