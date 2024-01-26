@@ -320,6 +320,16 @@ end
 --- @param event string
 local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
 
+--- @param f EventFrameInterface
+--- @param event string
+local function OnSetCVarEvents(f, event, ...)
+    local varName, val = ...
+    if varName ~= 'lockActionBars' then return end
+    local isLockedActionBarsInGameOptions = val == '1'
+    if isLockedActionBarsInGameOptions == true then SetCVar('ActionButtonUseKeyDown', 1); return end
+    SetCVar('ActionButtonUseKeyDown', 0)
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -359,6 +369,12 @@ function L:RegisterActionbarsEventFrame()
         E.UNIT_SPELLCAST_SUCCEEDED,
         E.UNIT_SPELLCAST_FAILED_QUIET,
     })
+end
+
+function L:RegisterSetCVarEvents()
+    local f = self:CreateEventFrame()
+    f:SetScript(E.OnEvent, OnSetCVarEvents)
+    RegisterFrameForEvents(f, { E.CVAR_UPDATE })
 end
 
 function L:RegisterShapeshiftOrStealthEventFrame()
@@ -421,6 +437,7 @@ function L:RegisterEventToMessageTransmitter()
         E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
         E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
         E.MODIFIER_STATE_CHANGED,
+        E.CVAR_UPDATE,
     })
 end
 function L:RegisterPlayerEnteringWorld()
@@ -446,6 +463,7 @@ function L:RegisterEvents()
     self:RegisterBagEvents()
     self:RegisterCompanionEvents()
     self:RegisterEventToMessageTransmitter()
+    self:RegisterSetCVarEvents()
     self:RegisterPlayerEnteringWorld()
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
