@@ -22,7 +22,7 @@ local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
 
 local String = O.String
-local A, P, PH = O.Assert, O.Profile, O.PickupHandler
+local A, P, PH, BaseAPI = O.Assert, O.Profile, O.PickupHandler, O.BaseAPI
 
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local E, WAttr = GC.E, GC.WidgetAttributes
@@ -63,9 +63,14 @@ end
 --- - https://www.wowinterface.com/forums/showthread.php?t=58768
 --- @param widget ButtonUIWidget
 --- @param down boolean true if the press is KeyDown
+--- @see ActionbarPlusEventMixin#OnSetCVarEvents
 local function RegisterForClicks(widget, event, down)
-    local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
     local btn = widget.button()
+
+    local isLockActionBars = BaseAPI:IsLockedActionBarsInGameOptions()
+    if isLockActionBars == false then btn:RegisterForClicks('AnyUp'); return; end
+
+    local useKeyDown = BaseAPI:IsUseKeyDownActionButton()
     if E.ON_LEAVE == event then
         if useKeyDown then
             btn:RegisterForClicks('AnyDown')

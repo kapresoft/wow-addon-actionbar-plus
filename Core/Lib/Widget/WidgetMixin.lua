@@ -19,7 +19,7 @@ local _, ns = ...
 local O, LibStub = ns:LibPack()
 
 local MX, String, P = O.Mixin, O.String, O.Profile
-local GC = O.GlobalConstants
+local GC, BaseAPI = O.GlobalConstants, O.BaseAPI
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
@@ -273,10 +273,13 @@ function _L:AddItemKeybindingInfo(btnWidget)
     GameTooltip:AppendText(String.format(GC.C.ABP_KEYBIND_FORMAT, bindings.key1))
 end
 
+-- 'NONE' if not specified
 function _L:IsDragKeyDown()
-    -- 'NONE' if not specified
-    local pickupAction = GetModifiedClick(GC.C.PICKUPACTION)
-    pickupAction = pickupAction == GC.C.CTRL and GC.C.SHIFT or pickupAction
+    local isLockedActionBars = BaseAPI:IsLockedActionBarsInGameOptions()
+    if isLockedActionBars ~= true then return true end
+
+    local pickupAction =  GetModifiedClick(GC.C.PICKUPACTION) or GC.C.SHIFT
+
     local isDragKeyDown = pickupAction == GC.C.SHIFT and IsShiftKeyDown()
             or pickupAction == GC.C.ALT and IsAltKeyDown()
             or pickupAction == GC.C.CTRL and IsControlKeyDown()
