@@ -50,9 +50,9 @@ local L = LibStub:NewLibrary(ns.M.ActionbarPlusEventMixin)
 AceEvent:Embed(L)
 local p = L:GetLogger()
 
+--- @param msg string The message name
 --- @param abp ActionbarPlus
 L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
-    p:log(10, 'MSG::R: %s', msg)
     abp.addonEvents:RegisterEvents()
 end)
 
@@ -77,7 +77,7 @@ end
 local function OnUpdateBindings(f, event, ...)
     if E.UPDATE_BINDINGS ~= event then return end
     local addon = f.ctx.addon
-    addon.barBindings = f.ctx.widgetMixin:GetBarBindingsMap()
+    addon:RetrieveKeyBindingsMap();
     if addon.barBindings then f.ctx.buttonFactory:UpdateKeybindText() end
 end
 
@@ -385,6 +385,9 @@ end
 
 function L:RegisterKeybindingsEventFrame()
     local f = self:CreateEventFrame()
+    -- The process for retrieving the keyBindingsMap initially
+    -- needs to happen here when addon is fully initialized (PLAYER_LOGIN)
+    f.ctx.addon:RetrieveKeyBindingsMap();
     f:SetScript(E.OnEvent, OnUpdateBindings)
     RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
 end

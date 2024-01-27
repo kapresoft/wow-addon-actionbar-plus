@@ -196,11 +196,14 @@ local methods = {
         -- TODO next: remove self.profile in favor of ns.p()
         self.profile = self.db.profile
     end,
+    --- @see ActionbarPlusEventMixin
+    ['RetrieveKeyBindingsMap'] = function(self)
+        self.barBindings = WMX:GetBarBindingsMap()
+    end,
     --- This is called automatically by Ace
     --- @param self ActionbarPlus
     ['OnInitialize'] = function(self)
         self:InitializeDb()
-        self.barBindings = WMX:GetBarBindingsMap()
         self:RegisterSlashCommands()
         if ns.features.enableV2 ~= true then
             self:SendMessage(M.OnAddOnInitialized, self)
@@ -210,6 +213,8 @@ local methods = {
         self:SendMessage(M.OnAddOnInitializedV2)
         p:log('MSG::OnAddOnInitializedV2 Sent')
     end,
+
+    --- Called during the PLAYER_LOGIN
     --- #### See Also: [Ace-addon-3-0](https://www.wowace.com/projects/ace3/pages/api/ace-addon-3-0)
     --- @param self ActionbarPlus
     ['OnEnable'] = function(self)
