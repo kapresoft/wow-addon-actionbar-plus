@@ -63,5 +63,3 @@ As a software engineer, I am passionate about this project and have dedicated a 
 - [Saved Dungeons &amp; Raids](https://www.curseforge.com/wow/addons/saved-dungeons-raids)
 - [MacrobarPlus](https://www.curseforge.com/wow/addons/macrobarplus)
 - [Addon Template](https://www.curseforge.com/wow/addons/addon-template)
-
-.
