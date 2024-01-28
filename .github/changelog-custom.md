@@ -4,5 +4,3 @@
 
 #### Release Changes
 
-$c_CHANGES
-
