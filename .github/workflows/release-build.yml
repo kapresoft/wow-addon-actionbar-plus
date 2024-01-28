@@ -123,7 +123,8 @@ jobs:
           export c_ADDON_NAME="${{ env.addonName }}"
           export c_REPOSITORY="${{ env.repo }}"
           export c_RESOLVED_VERSION="${{ env.refName }}"
-          export c_CHANGES=$(printf '%q' "${{ steps.build_changelog.outputs.changelog }}")
+          changes=$(echo "${{ steps.build_changelog.outputs.changelog }}" | base64)
+          export c_CHANGES="$(echo $changes | base64 --decode)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           echo -e "${c_changeLog}" | tee ${CHANGELOG_FILE}
