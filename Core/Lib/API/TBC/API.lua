@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetSpellSubtext, GetSpellInfo, GetSpellLink = GetSpellSubtext, GetSpellInfo, GetSpellLink
+local GetSpellSubtext, GetSpellLink = GetSpellSubtext, GetSpellLink
 local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local C_ToyBox, C_Container = C_ToyBox, C_Container
 local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
@@ -158,16 +158,36 @@ end
 function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, UnitId.target) ~= nil end
 
 
+---@return boolean, SpellName, SpellID
+---@param id SpellID The source spell ID
+---@param name SpellName The source spell name
+---@param icon Number The source spell Icon
+local function IsRuneSpell(id, name, icon)
+    local _name, _, _icon, _, _, _, _id = GetSpellInfo(name)
+    if _name == nil or _icon == nil or id == _id or name == _name then
+        return false
+    end
+    return _icon == icon, _name, _id;
+end
+
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
 --- @return SpellInfo
 function S:GetSpellInfo(spellNameOrId)
     if not spellNameOrId then return nil end
 
-    local name, _, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
+    local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     if not name then return end
 
-    local subTextOrRank = GetSpellSubtext(spellNameOrId)
-    local spellLink = GetSpellLink(spellNameOrId)
+    if ns:IsVanilla() then
+        local isRuneSpell, spName, spID = IsRuneSpell(id, name, icon)
+        if isRuneSpell == true then
+            name = spName
+            id = spID
+        end
+    end
+
+    local subTextOrRank = GetSpellSubtext(name)
+    local spellLink = GetSpellLink(name)
     --- @type SpellInfo
     local spellInfo = {
         id = id, name = name, icon = icon,
