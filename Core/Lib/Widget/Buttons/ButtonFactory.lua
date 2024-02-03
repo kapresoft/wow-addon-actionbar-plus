@@ -155,12 +155,10 @@ end
 
 --- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
 function L:ApplyForEachVisibleFrames(applyFunction)
-    local frames = P:GetAllFrameNames()
+    local frames = P:GetAllBarFrames()
     if #frames <= 0 then return end
-    -- `_` is the index
     for _,f in ipairs(frames) do
-        --- @type FrameWidget
-        local fw = _G[f].widget
+        local fw = f.widget
         if fw and fw:IsShownInConfig() then applyFunction(fw) end
     end
 end
@@ -272,7 +270,6 @@ local function InitButtonFactory()
         L:Init()
     end)
 
-    L:RegisterMessage(MSG.OnBagUpdate, OnBagUpdate)
     L:RegisterMessage(MSG.PLAYER_MOUNT_DISPLAY_CHANGED, OnPlayerMount)
     L:RegisterMessage(MSG.ZONE_CHANGED_NEW_AREA, OnPlayerMount)
 end

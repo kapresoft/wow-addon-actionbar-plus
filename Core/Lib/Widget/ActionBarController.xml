@@ -1,0 +1,14 @@
+<!--suppress XmlPathReference -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Include file="ActionBarFrame.xml"/>
+
+    <Script file="ActionBarController.lua"/>
+    <Frame name="ABP_ActionBarController" parent="UIParent">
+        <Scripts>
+            <OnLoad function="ABP_ActionBarController_OnLoad"/>
+            <OnEvent function="ABP_ActionBarController_OnEvent"/>
+        </Scripts>
+    </Frame>
+</Ui>

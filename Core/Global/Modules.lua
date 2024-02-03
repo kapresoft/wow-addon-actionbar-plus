@@ -27,6 +27,7 @@ local M = {
     Safecall = 'Safecall',
     LuaEvaluator = 'LuaEvaluator',
     ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
+    ActionBarController = 'ActionBarController',
     ActionType = 'ActionType',
     Assert = 'Assert',
     --- @deprecated Use AceLibrary

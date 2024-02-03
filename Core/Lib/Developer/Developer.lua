@@ -18,7 +18,9 @@ local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile
 
-ns.features.enableV2 = false
+ABP_enableV2 = false
+ns.features.enableV2 = ABP_enableV2
+
 
 --[[-----------------------------------------------------------------------------
 New Instance

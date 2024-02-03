@@ -367,6 +367,34 @@ function P:GetAllFrameNames()
     return fnames
 end
 
+--- @return table<number, ActionbarFrame>
+function P:GetAllBarFrames()
+    local barFrames = {}
+    for i=1, self:GetActionbarFrameCount() do
+        local fn = GC:GetFrameName(i)
+        --- @type ActionbarFrame
+        local f = _G[fn]
+        if f and f.widget then tinsert(barFrames, f) end
+    end
+    return barFrames
+end
+
+--- @return table<number, ActionbarFrame>
+function P:GetUsableBarFrames()
+    local barFrames = {}
+    for i=1, self:GetActionbarFrameCount() do
+        local fn = GC:GetFrameName(i)
+        --- @type ActionbarFrame
+        local f = _G[fn]
+        if f and f.widget
+                and f.widget:IsShownInConfig()
+                and f.widget:HasEmptyButtons() ~= true then
+            tinsert(barFrames, f)
+        end
+    end
+    return barFrames
+end
+
 --- Only return the bars that do exist. Some old profile button info
 --- may exist even though the size of bar may not include these buttons.
 --- The number of buttons do not reflect how many buttons actually exist because
