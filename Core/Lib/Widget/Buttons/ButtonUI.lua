@@ -234,7 +234,6 @@ end
 --- @param event string Event string
 local function OnUpdateButtonCooldown(widget, event)
     if widget:IsNotUpdatable() then return end
-
     widget:UpdateCooldown()
     local cd = widget:GetCooldownInfo();
     if (cd == nil or cd.icon == nil) then return end
@@ -248,25 +247,6 @@ local function OnSpellUpdateUsable(widget, event)
     widget:UpdateRangeIndicator()
     widget:UpdateUsable()
     widget:UpdateGlow()
-end
-
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerControlLost(widget, event, ...)
-    if not widget:IsHideWhenTaxi() then return end
-    C_Timer.After(1, function()
-        local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
-        p:log(10, 'Player on Taxi: %s [%s]', playerOnTaxi, GetTime())
-        if playerOnTaxi ~= true then return end
-        WMX:ShowActionbarsDelayed(false, 1)
-    end)
-end
-
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerControlGained(widget, event, ...)
-    if not widget:IsHideWhenTaxi() then return end
-    WMX:ShowActionbarsDelayed(true, 2)
 end
 
 --- @see "UnitDocumentation.lua"
@@ -355,8 +335,6 @@ local function RegisterCallbacks(widget)
 
     -- TODO Next: Tracks changing spells such as Covenant abilities in Shadowlands.
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
-    widget:RegisterEvent(E.PLAYER_CONTROL_LOST, OnPlayerControlLost, widget)
-    widget:RegisterEvent(E.PLAYER_CONTROL_GAINED, OnPlayerControlGained, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
     widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
     RegisterSpellUpdateUsable(widget)
@@ -395,6 +373,13 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --- @class __ButtonUI
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
     --- @alias ButtonUI __ButtonUI|_Button
+
+    --- @type ButtonUI
+    local btn = button
+    ---@param self ButtonUI
+    --btn:SetScript("OnUpdate", function(self)
+    --    p:log('OnUpdate: %s', self:GetName())
+    --end)
 
     --local button = CreateFrame("Button", btnName, UIParent, "SecureActionButtonTemplate,SecureHandlerBaseTemplate")
     button.text = WMX:CreateFontString(button)

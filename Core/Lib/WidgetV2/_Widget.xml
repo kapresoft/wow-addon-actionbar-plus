@@ -2,12 +2,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <Script file="CursorMixin.lua"/>
-    <Script file="WidgetMixin.lua"/>
-
-    <Script file="MacroEventsHandler.lua"/>
-    <Script file="ActionbarPlusEventMixin.lua"/>
-
-    <Include file="ActionBarController.xml"/>
+    <Include file="BarController.xml"/>
 
 </Ui>

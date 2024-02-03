@@ -27,7 +27,7 @@ local GCC, M = GC.C, GC.M
 local String, Table, LogFactory = O.String, O.Table, O.LogFactory
 local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
 local IsBlank, IsAnyOf = String.IsBlank, String.IsAnyOf
-local MX, WMX = O.Mixin, O.WidgetMixin
+local MX, WMX, BF = O.Mixin, O.WidgetMixin, O.ButtonFactory
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
@@ -200,15 +200,18 @@ local methods = {
     ['RetrieveKeyBindingsMap'] = function(self)
         self.barBindings = WMX:GetBarBindingsMap()
     end,
+    ['UpdateKeyBindings'] = function(self)
+        self.barBindings = WMX:GetBarBindingsMap()
+        if self.barBindings then BF:UpdateKeybindText() end
+    end,
     --- This is called automatically by Ace
     --- @param self ActionbarPlus
     ['OnInitialize'] = function(self)
         self:InitializeDb()
         self:RegisterSlashCommands()
-        if ns.features.enableV2 ~= true then
-            self:SendMessage(M.OnAddOnInitialized, self)
-            return
-        end
+        self:SendMessage(M.OnAddOnInitialized, self)
+
+        if ns.features.enableV2 ~= true then return end
         p:log('IsV2Enabled: %s', ns.features.enableV2)
         self:SendMessage(M.OnAddOnInitializedV2)
         p:log('MSG::OnAddOnInitializedV2 Sent')
@@ -222,10 +225,8 @@ local methods = {
         -- Register Events, Hook functions, Create Frames, Get information from
         -- the game that wasn't available in OnInitialize
         self:RegisterHooks()
-        if ns.features.enableV2 ~= true then
-            self:SendMessage(M.OnAddOnEnabled, self)
-            return
-        end
+        self:SendMessage(M.OnAddOnEnabled, self)
+        if ns.features.enableV2 ~= true then return end
 
         self:SendMessage(M.OnAddOnEnabledV2)
         p:log('MSG::OnAddOnEnabledV2 Sent')

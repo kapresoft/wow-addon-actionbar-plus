@@ -15,7 +15,7 @@ local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
 local BaseAPI, API = O.BaseAPI, O.API
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
-local B = O.BaseAPI
+local B, PR, WMX = O.BaseAPI, O.Profile, O.WidgetMixin
 local AceEvent = O.AceLibrary.AceEvent
 local CURSOR_ITEM_TYPE = 1
 
@@ -215,20 +215,6 @@ local function OnSpellCastSucceeded(f, ...)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
 
----@param bw ButtonUIWidget
-local function IsCompanion(bw) return bw:IsCompanion() or bw:IsBattlePet() end
-
---- Not fired in classic-era
---- @param f EventFrameInterface
-local function OnCompanionUpdate(f, ...)
-    local bf = f.ctx.buttonFactory
-    bf:fevf(function(fw)
-        fw:fevb(function(bw) return IsCompanion(bw) end, function(bw)
-            C_Timer.NewTicker(0.5, function() bw:UpdateCompanionActiveState() end, 3)
-        end)
-    end)
-end
-
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarEvents(f, event, ...)
@@ -246,74 +232,6 @@ local function OnActionbarEvents(f, event, ...)
     elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
         OnSpellCastFailed(f, ...)
     end
-end
-
---- @param eventWidget EventContext
-local function OnStealth(eventWidget)
-    --- @param fw FrameWidget
-    eventWidget.buttonFactory:fevf(function(fw)
-        --- @param bw ButtonUIWidget
-        fw:fevb(
-                function(bw) return bw:IsStealthSpell() end,
-                function(bw)
-                    local icon = API:GetSpellIcon(bw:GetSpellData())
-                    bw:SetIcon(icon)
-                end)
-    end)
-end
-
---- @param eventWidget EventContext
-local function OnShapeShift(eventWidget)
-    --- @param fw FrameWidget
-    eventWidget.buttonFactory:fevf(function(fw)
-        --- @param bw ButtonUIWidget
-        fw:fevb(function(bw) return bw:IsShapeshiftSpell() end,
-                function(bw)
-                    local icon = API:GetSpellIcon(bw:GetSpellData())
-                    bw:SetIcon(icon)
-                end)
-    end)
-end
-
---- @param eventContext EventContext
-local function OnStealthIconUpdate(eventContext)
-    eventContext.buttonFactory:fevf(function(fw)
-        fw:fevb(function(bw) return bw:IsStealthSpell() end,
-                function(bw)
-                    local icon = API:GetSpellIcon(bw:GetSpellData())
-                    bw:SetIcon(icon)
-                end)
-    end)
-end
-
---- Sequence is UPDATE_SHAPESHIFT_FORM, UPDATE_STEALTH, UPDATE_SHAPESHIFT_FORM; for this reason
---- @param f EventFrameInterface
---- @param event string
-local function OnShapeshiftOrStealthEvent(f, event, ...)
-    local eventWidget = f.ctx
-    if E.UPDATE_STEALTH == event then
-        OnStealth(eventWidget)
-    elseif E.UPDATE_SHAPESHIFT_FORM == event then
-        OnShapeShift(eventWidget)
-    end
-end
-
---- @param f EventFrameInterface
---- @param event string
-local function OnPlayerEnteringWorld(f, event, ...)
-    OnStealthIconUpdate(f.ctx)
-    OnCompanionUpdate(f)
-end
-
---- @param f EventFrameInterface
---- @param event string
-local function OnBagEvent(f, event, ...)
-
-    L:SendMessage(MSG.OnBagUpdate, ns.M.ActionbarPlusEventMixin)
-
-    ---@param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnBagUpdateExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
 end
 
 --- @param f EventFrameInterface
@@ -377,12 +295,6 @@ function L:RegisterSetCVarEvents()
     RegisterFrameForEvents(f, { E.CVAR_UPDATE })
 end
 
-function L:RegisterShapeshiftOrStealthEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnShapeshiftOrStealthEvent)
-    RegisterFrameForEvents(f, { E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM })
-end
-
 function L:RegisterKeybindingsEventFrame()
     local f = self:CreateEventFrame()
     -- The process for retrieving the keyBindingsMap initially
@@ -426,11 +338,6 @@ function L:RegisterCombatFrame()
     f:SetScript(E.OnEvent, OnPlayerCombatEvent)
     RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
 end
-function L:RegisterBagEvents()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnBagEvent)
-    RegisterFrameForEvents(f, { E.BAG_UPDATE, E.BAG_UPDATE_DELAYED })
-end
 function L:RegisterEventToMessageTransmitter()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnMessageTransmitter)
@@ -443,31 +350,18 @@ function L:RegisterEventToMessageTransmitter()
         E.CVAR_UPDATE,
     })
 end
-function L:RegisterPlayerEnteringWorld()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnPlayerEnteringWorld)
-    RegisterFrameForEvents(f, { E.PLAYER_ENTERING_WORLD })
-end
-
-function L:RegisterCompanionEvents()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnCompanionUpdate)
-    RegisterFrameForEvents(f, { 'COMPANION_UPDATE' })
-end
 
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
+
     self:RegisterActionbarsEventFrame()
     self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
-    self:RegisterShapeshiftOrStealthEventFrame()
     self:RegisterCombatFrame()
-    self:RegisterBagEvents()
-    self:RegisterCompanionEvents()
     self:RegisterEventToMessageTransmitter()
     self:RegisterSetCVarEvents()
-    self:RegisterPlayerEnteringWorld()
+
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
     if B:SupportsVehicles() then self:RegisterVehicleFrame() end

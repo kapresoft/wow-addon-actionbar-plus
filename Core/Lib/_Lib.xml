@@ -11,6 +11,7 @@
 
     <!--@debug@-->
     <Include file='Developer\_Developer.xml'/>
+    <Include file='WidgetV2\_Widget.xml'/>
     <!--@end-debug@-->
 
 </Ui>
