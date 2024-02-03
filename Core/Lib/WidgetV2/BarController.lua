@@ -34,7 +34,7 @@ Global Functions
 -------------------------------------------------------------------------------]]
 ---@param frame _Frame
 function ABP_BarController_OnLoad(frame)
-    p:log('OnLoad:: called...')
+    --p:log('OnLoad:: called...')
     --for i, v in pairs(children) do
     --
     --end
@@ -44,7 +44,7 @@ end
 function ABP_BarController_OnEvent(self, event, ...)
     local arg1, arg2 = ...;
     if ( event == E.PLAYER_ENTERING_WORLD ) then
-        p:log('event: %s', event)
+        --p:log('event: %s', event)
         --ActionBarController_UpdateAll();
     end
 end
