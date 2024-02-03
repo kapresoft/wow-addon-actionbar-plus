@@ -125,10 +125,8 @@ local function PropsAndMethods(o)
         if not PR:IsHideWhenTaxi() then return end
         C_Timer.After(1, function()
             local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
-            p:log(0, 'Player on Taxi: %s [%s]', playerOnTaxi, GetTime())
             if playerOnTaxi ~= true then return end
             WMX:ShowActionbarsDelayed(false, 1)
-            p:log('handle player control: %s', E.PLAYER_CONTROL_LOST)
         end)
     end
 
