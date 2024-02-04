@@ -133,7 +133,6 @@ local function PropsAndMethods(o)
     o[E.PLAYER_CONTROL_GAINED] = function()
         if not PR:IsHideWhenTaxi() then return end
         WMX:ShowActionbarsDelayed(true, 2)
-        p:log('handle player control: %s', E.PLAYER_CONTROL_GAINED)
     end
     o[E.UPDATE_BINDINGS]        = OnUpdateBindings
     o[E.UPDATE_STEALTH]         = OnUpdateStealth
@@ -170,7 +169,6 @@ end
 function ABP_ActionBarController_OnEvent(frame, event, ...)
     --- @type fun(evt:string, ...: any)
     local handler = L[event]; if type(L[event]) ~= 'function' then return end
-    --p:log('%s::%s: args=%s', frame:GetName(), event, pformat{args1, args2})
     handler(event, ...)
     ABP_ActionBarController_OnEvent = nil;
 end
