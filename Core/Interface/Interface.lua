@@ -76,7 +76,7 @@ ActionbarPlusProperties.db = _db
 --[[-----------------------------------------------------------------------------
 Profile
 -------------------------------------------------------------------------------]]
---- @class Profile_Spell
+--- @class Profile_Spell : SpellInfo
 local Profile_Spell = {
     ["minRange"] = 0,
     ["id"] = 8232,

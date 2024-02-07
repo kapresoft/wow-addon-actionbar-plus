@@ -170,6 +170,7 @@ local function IsRuneSpell(id, name, icon)
     return _icon == icon, _name, _id;
 end
 
+--- @see https://warcraft.wiki.gg/wiki/Category:API_namespaces/C_Engraving
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
 --- @return SpellInfo
 function S:GetSpellInfo(spellNameOrId)
@@ -178,23 +179,25 @@ function S:GetSpellInfo(spellNameOrId)
     local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     if not name then return end
 
-    if ns:IsVanilla() then
-        local isRuneSpell, spName, spID = IsRuneSpell(id, name, icon)
-        if isRuneSpell == true then
-            name = spName
-            id = spID
-        end
-    end
-
     local subTextOrRank = GetSpellSubtext(name)
     local spellLink = GetSpellLink(name)
     --- @type SpellInfo
     local spellInfo = {
         id = id, name = name, icon = icon,
+        runeSpell = nil,
         link = spellLink, castTime = castTime,
         minRange = minRange, maxRange = maxRange, rank = subTextOrRank,
         isShapeshift = false, isStealth = false, isProwl = false }
     self:ApplySpellInfoAttributes(spellInfo)
+
+    if not (C_Engraving and C_Engraving.IsKnownRuneSpell) then return spellInfo end
+    local isRuneSpell, spName, spID = IsRuneSpell(id, name, icon)
+    if not isRuneSpell then return spellInfo end
+
+    spellInfo.runeSpell = {
+        id = spID,
+        name =  spName,
+    }
 
     return spellInfo
 end
