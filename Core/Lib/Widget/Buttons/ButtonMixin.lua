@@ -394,10 +394,11 @@ local function PropsAndMethods(o)
     --- @param cd CooldownInfo The cooldown info
     --- @return SpellCooldown
     function o:GetSpellCooldown(cd)
-        local spell = self:GetSpellData()
-        if self:IsInvalidSpell(spell) then return nil end
+        local spell = self:GetSpellData(); if self:IsInvalidSpell(spell) then return nil end
 
-        local spellCD = API:GetSpellCooldown(spell.id)
+        local spellID = (spell.runeSpell and spell.runeSpell.id) or spell.id
+        local spellCD = API:GetSpellCooldown(spellID)
+
         if not spellCD then return nil end
 
         cd.details = spellCD
@@ -520,6 +521,11 @@ local function PropsAndMethods(o)
     --- @return boolean true if btn type is item or macro
     function o:IsItemOrMacro()
         return not self:IsEmpty() and (self:IsItem() or self:IsMacro())
+    end
+
+    function o:IsRuneSpell()
+        local d = self:GetSpellData()
+        return d and d.runeSpell and (d.runeSpell.id ~= nil)
     end
 
     function o:UpdateItemOrMacroState()
@@ -902,6 +908,7 @@ local function PropsAndMethods(o)
         if self:IsHidden() then return end
 
         local spell, ranged = self:GetEffectiveRangedSpellName()
+        if not spell then return end
         if ranged == false then return end
 
         self:UpdateRangeIndicatorBySpell(spell)
