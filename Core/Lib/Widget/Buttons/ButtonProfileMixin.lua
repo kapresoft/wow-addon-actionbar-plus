@@ -124,6 +124,7 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
+    function o:GetItemName() local item = self:GetItemData(); return (item and item.name) or '' end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
 
