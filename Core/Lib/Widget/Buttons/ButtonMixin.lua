@@ -574,14 +574,18 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateUsable()
-        local cd = self:GetCooldownInfo()
-        if (cd == nil or cd.details == nil) then
-            if self:IsCompanion() then self:SetActionUsable(true)
-            elseif self:IsEquipmentSet() then self:SetActionUsable(not InCombatLockdown()) end
-            return
-        end
         local c = self.w:conf()
         local isUsable = true
+        local cd = self:GetCooldownInfo()
+
+        if (cd == nil or cd.details == nil) then
+            if self:IsCompanion() then isUsable = true
+            elseif c.type == MOUNT then isUsable = not IsIndoors()
+            elseif self:IsEquipmentSet() then isUsable = not InCombatLockdown() end
+            self:SetActionUsable(isUsable)
+            return
+        end
+
         if c.type == SPELL then
             isUsable = self:IsUsableSpell(cd)
         elseif c.type == MACRO then
