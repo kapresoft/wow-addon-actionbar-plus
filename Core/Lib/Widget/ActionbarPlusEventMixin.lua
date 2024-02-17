@@ -74,15 +74,6 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnUpdateBindings(f, event, ...)
-    if E.UPDATE_BINDINGS ~= event then return end
-    local addon = f.ctx.addon
-    addon:RetrieveKeyBindingsMap();
-    if addon.barBindings then f.ctx.buttonFactory:UpdateKeybindText() end
-end
-
---- @param f EventFrameInterface
---- @param event string
 local function OnPetBattleEvent(f, event, ...)
     if E.PET_BATTLE_OPENING_START == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarHideGroup)
@@ -295,15 +286,6 @@ function L:RegisterSetCVarEvents()
     RegisterFrameForEvents(f, { E.CVAR_UPDATE })
 end
 
-function L:RegisterKeybindingsEventFrame()
-    local f = self:CreateEventFrame()
-    -- The process for retrieving the keyBindingsMap initially
-    -- needs to happen here when addon is fully initialized (PLAYER_LOGIN)
-    f.ctx.addon:RetrieveKeyBindingsMap();
-    f:SetScript(E.OnEvent, OnUpdateBindings)
-    RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
-end
-
 function L:RegisterVehicleFrame()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnVehicleEvent)
@@ -355,7 +337,6 @@ function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
 
     self:RegisterActionbarsEventFrame()
-    self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterCombatFrame()

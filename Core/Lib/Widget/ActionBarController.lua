@@ -142,7 +142,9 @@ end; PropsAndMethods(L)
 
 ---@param frame _Frame
 local function OnAddOnReady(frame)
-    OnStealthIconUpdate(); OnCompanionUpdate();
+    OnStealthIconUpdate();
+    OnCompanionUpdate();
+    OnUpdateBindings();
 
     RegisterFrameForEvents(frame, {
         E.PLAYER_TARGET_CHANGED,
