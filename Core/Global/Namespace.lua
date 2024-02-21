@@ -32,6 +32,7 @@ function LibPackMixin:LibPack2() return self.O, self.O.GlobalConstants end
 --- @generic A : AceEvent
 --- @return A
 function LibPackMixin:AceEvent() return self.O.AceLibrary.AceEvent:Embed({}) end
+function LibPackMixin:AceEventEmbed(obj) return self.O.AceLibrary.AceEvent:Embed(obj) end
 --- @return AceBucket
 function LibPackMixin:AceBucket() return self.LibStubAce('AceBucket-3.0'):Embed({}) end
 
@@ -41,16 +42,116 @@ function LibPackMixin:AceBucketEmbed(obj)
     local AceBucket = self.LibStubAce('AceBucket-3.0'); if obj then AceBucket:Embed(obj) end
     return AceBucket
 end
+--- @alias NameSpaceFn fun() : Namespace
+--- @return Namespace
+local function nsfn() return ABP_NS end
+
+--- @class __GameVersionMixin
+local GameVersionMixin = {}
+
+---@param o __GameVersionMixin
+---@param ns NameSpaceFn
+local function GameVersionMethods(o, ns)
+    --- @return GameVersion
+    function o:IsVanilla() return ns().gameVersion == 'classic' end
+    --- @return GameVersion
+    function o:IsTBC() return ns().gameVersion == 'tbc_classic' end
+    --- @return GameVersion
+    function o:IsWOTLK() return ns() == 'wotlk_classic' end
+    --- @return GameVersion
+    function o:IsRetail() return ns().gameVersion == 'retail' end
+end; GameVersionMethods(GameVersionMixin, nsfn)
+
+--- @class __NamespaceLoggerMixin
+local NamespaceLoggerMixin = {}
+---@param o __NamespaceLoggerMixin
+---@param ns NameSpaceFn
+local function NamespaceLoggerMethods(o, ns)
+    local function LoggerMixin() return ns().O.LoggerMixinV2 end
+
+    --- @return BooleanOptional
+    function o:IsLoggingEnabled() return true == ns().O.GlobalConstants.F.ENABLE_LOGGING end
+    --- @return BooleanOptional
+    function o:IsLoggingDisabled() return true ~= ns().O.GlobalConstants.F.ENABLE_LOGGING end
+
+    function o:CreateDefaultLogger(moduleName)
+        return LoggerMixin():New(moduleName)
+    end
+    function o:CreateAddonLogger()
+        return LoggerMixin():New(ns().name, 'addon', 'ad')
+    end
+    function o:CreateSpellLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'spell', 'sp')
+    end
+    function o:CreateFrameLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'frame', 'fr')
+    end
+    function o:CreateButtonLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'button', 'bn')
+    end
+    function o:CreateDragAndDropLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'drag_and_drop', 'dd')
+    end
+    function o:CreateItemLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'item', 'it')
+    end
+    function o:CreateBagLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'bag', 'bg')
+    end
+    function o:CreateMountLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'mount', 'mt')
+    end
+    function o:CreatePetLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'pet', 'pt')
+    end
+    function o:CreateUnitLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'unit', 'ua')
+    end
+    function o:CreateProfileLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'profile', 'pr')
+    end
+    function o:CreateEventLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'event', 'ev')
+    end
+    function o:CreateMessageLogger(moduleName)
+        return LoggerMixin():New(moduleName, 'message', 'ms')
+    end
+end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
+
+--- @param ns Namespace
+--- @return LocalLibStub
+local function NewLocalLibStub(ns)
+    --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
+    local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
+            function(name, newLibInstance)
+                --- @type Logger
+                local loggerLib = LibStub(ns:LibName(ns.M.Logger))
+                if loggerLib then
+                    newLibInstance.logger = loggerLib:NewLogger(name)
+                    newLibInstance.logger:log(30, 'New Lib: %s', newLibInstance.major)
+                    function newLibInstance:GetLogger() return self.logger end
+                end
+                ns:Register(name, newLibInstance)
+            end)
+    return LocalLibStub
+end
+
+--- @class __NamespaceOther
+--- @field gameVersion GameVersion
+
+--- @alias GameVersion string | "'classic'" | "'tbc_classic'" | "'wotlk_classic'" | "'retail'"
+--- @alias Namespace __Namespace | __NamespaceOther | __GameVersionMixin | __NamespaceLoggerMixin
 
 --- @return Namespace
 local function CreateNamespace(...)
     --- @type string
     local addon
-    --- @type Namespace
+    --- @class __Namespace : LibPackMixin
     local ns
 
     addon, ns = ...
 
+    --- @return Kapresoft_LibUtil
     function ns:K() return ns.Kapresoft_LibUtil end
 
     --- this is in case we are testing outside of World of Warcraft
@@ -69,31 +170,26 @@ local function CreateNamespace(...)
 
     ns.pformat = ns:K().pformat:B()
 
-    ns:K():Mixin(ns, LibPackMixin)
+    ns:K():Mixin(ns, LibPackMixin, GameVersionMixin, NamespaceLoggerMixin)
 
     ns.features = {
         enableV2 = false,
     }
+    ns.playerBuffs = ns.playerBuffs or {}
 
-    --- @param o Namespace
+    --- script handlers
+    ns.xml = {}
+
+    --- @param o __Namespace | Namespace
     local function Methods(o)
 
         --- @return Profile_Config
         function o.p() return ns.db.profile end
 
-        --- @return BooleanOptional
-        function o:IsLoggingEnabled() return true == ns.O.GlobalConstants.F.ENABLE_LOGGING end
-        --- @return BooleanOptional
-        function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
-
-        --- @return GameVersion
-        function o:IsVanilla() return self.gameVersion == 'classic' end
-        --- @return GameVersion
-        function o:IsTBC() return self.gameVersion == 'tbc_classic' end
-        --- @return GameVersion
-        function o:IsWOTLK() return self.gameVersion == 'wotlk_classic' end
-        --- @return GameVersion
-        function o:IsRetail() return self.gameVersion == 'retail' end
+        ----- @return BooleanOptional
+        --function o:IsLoggingEnabled() return true == ns.O.GlobalConstants.F.ENABLE_LOGGING end
+        ----- @return BooleanOptional
+        --function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
 
         --- @return CursorUtil
         ---@param cursorInfo CursorInfo Optional cursorInfo instance
@@ -117,25 +213,22 @@ local function CreateNamespace(...)
             if not (name or o) then return end
             ns.O[name] = o
         end
-    end
 
-    Methods(ns)
+        --- ### Namespace Helper Function
+        --- ```
+        --- local ns, O, GC, M, LibStub = ABP_NS:ns(...)
+        --- ```
+        --- @return Namespace, GlobalObjects, GlobalConstants, Module, LocalLibStub
+        function o:namespace(...)
+            --- @type Namespace
+            local _, n = ...; return n, n.O, n.O.GlobalConstants, n.M, n.O.LibStub
+        end
 
-    --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
-    local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
-            function(name, newLibInstance)
-                --- @type Logger
-                local loggerLib = LibStub(ns:LibName(ns.M.Logger))
-                if loggerLib then
-                    newLibInstance.logger = loggerLib:NewLogger(name)
-                    newLibInstance.logger:log(30, 'New Lib: %s', newLibInstance.major)
-                    function newLibInstance:GetLogger() return self.logger end
-                end
-                ns:Register(name, newLibInstance)
-            end)
-    ns.LibStub = LocalLibStub
+    end; Methods(ns)
+
     ns.LibStubAce = LibStub
-    ns.O.LibStub = LocalLibStub
+    ns.LibStub = NewLocalLibStub(ns)
+    ns.O.LibStub = ns.LibStub
 
     ns.mt = { __tostring = function() return addon .. '::Namespace'  end }
     setmetatable(ns, ns.mt)
@@ -145,4 +238,5 @@ end
 
 if _ns.name then return end
 
-CreateNamespace(...)
+--- @type Namespace
+ABP_NS = CreateNamespace(...)

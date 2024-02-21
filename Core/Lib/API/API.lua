@@ -1,11 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetSpellSubtext, GetSpellLink = GetSpellSubtext, GetSpellLink
-local GetCursorInfo, GetSpellCooldown = GetCursorInfo, GetSpellCooldown
 local C_ToyBox, C_Container = C_ToyBox, C_Container
-local UnitIsDead, GetUnitName = UnitIsDead, GetUnitName
-local UnitClass, IsStealthed, GetShapeshiftForm = UnitClass, IsStealthed, GetShapeshiftForm
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -21,8 +17,8 @@ local pformat = ns.pformat
 
 local String = O.String
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
-local DruidAPI, GC = O.DruidAPI, O.GlobalConstants
-local BaseAPI, WAttr, UnitId = O.BaseAPI, GC.WidgetAttributes, GC.UnitId
+local DruidAPI, ShamanAPI, PriestAPI, GC = O.DruidUnitMixin, O.ShamanUnitMixin, O.PriestUnitMixin, O.GlobalConstants
+local WAttr, UnitId = GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 local ROGUE_STEALTH_SPELL_ID = 1784
@@ -35,7 +31,6 @@ New Instance
 --- @class API
 local S = {}; ns:Register(ns.M.API, S)
 local p = O.LogFactory(ns.M.API)
-
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -303,6 +298,8 @@ end
 function S:IsShapeShiftActiveBySpellID(spellID)
     if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
         return GetShapeshiftForm() > 0
+    elseif ShamanAPI:IsShamanClass() then
+        return ShamanAPI:IsGhostWolfSpell(spellID) and ShamanAPI:IsInGhostWolfForm()
     end
     return spellID and DruidAPI:IsActiveForm(spellID)
 end
@@ -316,7 +313,15 @@ end
 
 --- Generalizes shapeshift and stealth and shapeshift form
 --- @param spellInfo Profile_Spell
-function S:IsShapeshiftSpell(spellInfo) return true == spellInfo.isShapeshift end
+function S:IsShapeshiftSpell(spellInfo)
+    if ShamanAPI:IsShamanClass() then
+        return ShamanAPI:IsGhostWolfSpell(spellInfo.id)
+    elseif PriestAPI:IsPriestClass() then
+        return PriestAPI:IsInShadowFormSpell(spellInfo.id)
+    end
+    return true == spellInfo.isShapeshift
+end
+
 
 --- @param spellName string
 function S:IsStealthSpell(spellName)
@@ -339,6 +344,8 @@ function S:GetSpellIcon(spellInfo)
                 return GC.Textures.DRUID_FORM_ACTIVE_ICON
             elseif unitClass == GC.UnitClass.PRIEST then
                 return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON
+            elseif unitClass == GC.UnitClass.SHAMAN then
+                return GC.Textures.GHOST_WOLF_FORM_ACTIVE_ICON
             end
         end
     elseif self:IsStealthSpell(spellInfo.name) and IsStealthed() then
@@ -431,10 +438,24 @@ function S:GetItemInfo(item)
     return itemInfo
 end
 
+--- @param itemIdNameOrLink ItemName|ItemLink|Profile_Item
 --- @return string, number
 function S:GetItemSpellInfo(itemIdNameOrLink)
-   local spellName, spellID = GetItemSpell(itemIdNameOrLink)
-   return spellName, spellID
+    if type(itemIdNameOrLink) == 'table' then
+        return self:GetItemSpellInfoFromItemData(itemIdNameOrLink)
+    end
+    local spellName, spellID = GetItemSpell(itemIdNameOrLink)
+    return spellName, spellID
+end
+
+--- @param itemInfo Profile_Item
+--- @return string, number
+function S:GetItemSpellInfoFromItemData(itemInfo)
+    local spellName, spellID = GetItemSpell(itemInfo.name)
+    if not (spellName and spellID) then
+        spellName, spellID = GetItemSpell(itemInfo.link)
+    end
+    return spellName, spellID
 end
 
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)

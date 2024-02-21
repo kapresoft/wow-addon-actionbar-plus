@@ -1,11 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local pformat = ns.pformat
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local A, AT, W = O.Assert, O.ActionType, GC.WidgetAttributes
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION, BATTLE_PET =
@@ -29,7 +25,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(M.ReceiveDragEventHandler); if not L then return end
-local p = L.logger
+local p = ns:CreateDragAndDropLogger(M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 --- README: Also need to add the attribute setterin in ButtonFactor#AttributeSetters
@@ -61,7 +57,7 @@ function L:Handle(btnUI, cursor)
     local cursorInfo = cursor:GetCursor()
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
     AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
-    p:log(10, 'Handle| CursorInfo: %s', pformat:B()(cursorInfo))
+    p:d(function() return 'Handle():CursorInfo: %s', pformat:B()(cursorInfo) end)
     local actionType = cursorInfo.type
 
     if not self:IsSupportedCursorType(cursor) then return end

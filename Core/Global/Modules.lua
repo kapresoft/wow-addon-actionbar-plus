@@ -37,9 +37,17 @@ local M = {
 
     -- Mixins
     Mixin = 'Mixin',
+    ActionBarHandlerMixin = 'ActionBarHandlerMixin',
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
     CursorMixin = 'CursorMixin',
+    LoggerMixinV2 = 'LoggerMixinV2',
+
+    UnitMixin = 'UnitMixin',
+    DruidUnitMixin = 'DruidUnitMixin',
+    PriestUnitMixin = 'PriestUnitMixin',
+    ShamanUnitMixin = 'ShamanUnitMixin',
+
     -- Addons
     BaseAttributeSetter = 'BaseAttributeSetter',
     BattlePetDragEventHandler = 'BattlePetDragEventHandler',
@@ -52,7 +60,6 @@ local M = {
     CompanionAttributeSetter = 'CompanionAttributeSetter',
     Config = 'Config',
     ConfigEventHandlerMixin = 'ConfigEventHandlerMixin',
-    DruidAPI = 'DruidAPI',
     EquipmentSetDragEventHandler = 'EquipmentSetDragEventHandler',
     EquipmentSetAttributeSetter = 'EquipmentSetAttributeSetter',
     FrameHandleMixin = 'FrameHandleMixin',
@@ -94,6 +101,8 @@ local GlobalObjectsTemplate = {
     AceLibFactory = {},
     --- @type Kapresoft_LibUtil_AceLibraryObjects
     AceLibrary = {},
+    --- @type ActionBarHandlerMixin
+    ActionBarHandlerMixin = {},
     --- @type ActionbarPlusEventMixin
     ActionbarPlusEventMixin = {},
     --- @type ActionType
@@ -118,6 +127,8 @@ local GlobalObjectsTemplate = {
     Config = {},
     --- @type ConfigEventHandlerMixin
     ConfigEventHandlerMixin = {},
+    --- @type DruidUnitMixin
+    DruidUnitMixin = { },
     --- @type EquipmentSetDragEventHandler
     EquipmentSetDragEventHandler = {},
     --- @type EquipmentSetAttributeSetter
@@ -136,6 +147,8 @@ local GlobalObjectsTemplate = {
     LogFactory = {},
     --- @type Logger
     Logger = {},
+    --- @type LoggerMixinV2
+    LoggerMixinV2 = {},
     --- @type Kapresoft_LibUtil_LuaEvaluator,
     LuaEvaluator = {},
     --- @type MacroAttributeSetter
@@ -158,14 +171,16 @@ local GlobalObjectsTemplate = {
     CompanionDragEventHandler = {},
     --- @type CompanionAttributeSetter
     CompanionAttributeSetter = {},
-    ----- @type DruidAPI
-    DruidAPI = {},
     --- @type MountAttributeSetter
     MountAttributeSetter = {},
     --- @type Kapresoft_LibUtil_Mixin
     Mixin = {},
+    --- @type NamespaceLoggerMixin
+    NamespaceLoggerMixin = {},
     --- @type PickupHandler
     PickupHandler = {},
+    --- @type PriestUnitMixin
+    PriestUnitMixin = {},
     --- @type Profile
     Profile = {},
     --- @type ProfileInitializer
@@ -184,6 +199,10 @@ local GlobalObjectsTemplate = {
     Table = {},
     --- @type WidgetMixin
     WidgetMixin = {},
+    --- @type ShamanUnitMixin
+    ShamanUnitMixin = {},
+    --- @type UnitMixin
+    UnitMixin = {},
 }
 L.M = M
 ns.M = M

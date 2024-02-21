@@ -26,15 +26,11 @@ local C_Timer = C_Timer
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
-local pformat = ns.pformat
+local ns, O, GC, _, LibStub = ABP_NS:namespace(...)
 
 local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
-local GC = O.GlobalConstants
 local E, M = GC.E, GC.M
 local configHandler = O.Config
 
@@ -49,7 +45,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class ButtonFrameFactory : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.ButtonFrameFactory); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateFrameLogger(ns.M.ButtonFrameFactory)
 
 --- @class WidgetBase
 local WidgetBaseTemplate = {
@@ -329,8 +325,10 @@ local function WidgetMethods(widget)
     function widget:InitAnchor()
         local anchor = P:GetAnchor(self.index)
         local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
-        if GC:IsVerboseLogging() and frame:IsShown() then
-            p:log('InitAnchor| anchor-from-profile[f.%s]: %s', self.index, anchor)
+        if frame:IsShown() then
+            p:f1(function()
+                return 'InitAnchor| anchor-from-profile[f.%s]: %s', self.index, pformat(anchor)
+            end)
         end
         if InCombatLockdown() then return end
         frame:ClearAllPoints()
@@ -436,7 +434,7 @@ local function WidgetMethods(widget)
     end
 
     --- @param matchSpellId number
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
     function widget:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
         self:fevb(function(btnWidget)
             return btnWidget:IsMatchingMacroOrSpell(matchSpellId)
@@ -444,18 +442,18 @@ local function WidgetMethods(widget)
     end
     --- Alias for #ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
     --- @param matchSpellId number
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
     function widget:fesmb(matchSpellId, applyFunction)
         self:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
     end
 
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
+    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
     function widget:ApplyForEachMacro(applyFunction)
         self:fevb(function(btnWidget) return btnWidget:IsMacro() end, applyFunction)
     end
 
     --- Apply for each button with a filter
-    --- @param predicateFn ButtonPredicateFunction | "function(btnWidget) return true end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
     --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:ApplyForEachButtonCondition(predicateFn, applyFn)
         if self:HasEmptyButtons() then return end

@@ -2,9 +2,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
+    <Script file="UnitMixin.lua"/>
+    <Script file="DruidUnitMixin.lua"/>
+    <Script file="PriestUnitMixin.lua"/>
+    <Script file="ShamanUnitMixin.lua"/>
+
     <Script file="APIHooks.lua"/>
     <Script file="BaseAPI.lua"/>
-    <Script file="DruidAPI.lua"/>
-    <Include file='TBC\TBC.xml'/>
+    <Script file="API.lua"/>
 
 </Ui>

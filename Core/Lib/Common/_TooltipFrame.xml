@@ -8,7 +8,7 @@
            hidden="false" enableMouse="false" movable="false" alpha="0">
         <Size x="1" y="1" />
         <Scripts>
-            <OnShow>ABP_TooltipFrame:OnShow()</OnShow>
+            <OnShow>ABP_NS.xml:TooltipFrame_OnShow(self)</OnShow>
         </Scripts>
         <Anchors>
             <Anchor point="TOPRIGHT" relativeto="UIParent" relativePoint="TOPRIGHT" x="0" y="0" />

@@ -6,11 +6,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub, API = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.O.API
-local pformat = ns.pformat
-local P, BaseAPI = O.Profile, O.BaseAPI
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local String = O.String
 local AceEvent = O.AceLibrary.AceEvent
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
@@ -541,6 +538,7 @@ local function PropsAndMethods(o)
         local itemInfo = API:GetItemInfo(itemID)
         self:UpdateItemStateByItemInfo(itemInfo)
         self:SetActionUsable(self:IsUsableItem(itemID))
+        self:UpdateCooldown()
         return
     end
 
@@ -892,6 +890,9 @@ local function PropsAndMethods(o)
         elseif self:IsConfigOfType(conf, MACRO) and conf.macro.index then
             local macroSpellId =  GetMacroSpell(conf.macro.index)
             return spellID == macroSpellId
+        elseif self:IsConfigOfType(conf, ITEM) and IsNotBlank(conf.item.link) then
+            local _, itemSpellID = API:GetItemSpellInfo(conf.item.link)
+            return spellID == itemSpellID
         end
 
         return false;

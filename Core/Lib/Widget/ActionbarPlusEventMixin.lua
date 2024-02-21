@@ -74,15 +74,6 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnUpdateBindings(f, event, ...)
-    if E.UPDATE_BINDINGS ~= event then return end
-    local addon = f.ctx.addon
-    addon:RetrieveKeyBindingsMap();
-    if addon.barBindings then f.ctx.buttonFactory:UpdateKeybindText() end
-end
-
---- @param f EventFrameInterface
---- @param event string
 local function OnPetBattleEvent(f, event, ...)
     if E.PET_BATTLE_OPENING_START == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarHideGroup)
@@ -131,109 +122,6 @@ local function OnCursorChangeInBags(f, event, ...)
     ABP.ActionbarEmptyGridShowing = true
 end
 
---- Non-Instant Start-Cast Handler
---- @param f EventFrameInterface
-local function OnSpellCastStart(f, ...)
-    --todo next: include item spells (i.e., quest items)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    --p:log(50, 'OnSpellCastStart: %s', spellCastEvent)
-    local w = f.ctx
-    --- @param fw FrameWidget
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btnWidget)
-            btnWidget:SetHighlightInUse() end)
-    end)
-
-    ---@param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
-end
-
---- i.e. Casting a portal and moving triggers this event
---- @param f EventFrameInterface
-local function OnSpellCastStop(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastStop: %s', spellCastEvent)
-    local w = f.ctx
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
-            btn:ResetHighlight() end)
-    end)
-    ---@param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastStopExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-end
-
---- i.e. Conjure mana gem when there is already a mana gem in bag
---- @param f EventFrameInterface
-local function OnSpellCastFailed(f, ...)
-    local spellCastEvent = B:ParseSpellCastEventArgs(...)
-    if UnitId.player ~= spellCastEvent.unitTarget then return end
-    p:log(30, 'OnSpellCastFailed: %s', spellCastEvent)
-    local w = f.ctx
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastEvent.spellID, function(btn)
-            btn:SetButtonStateNormal() end)
-    end)
-
-    ---@param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-
-end
-
---- This handles 3-state spells like mage blizzard, hunter flares,
---- or basic campfire in retail
---- @param f EventFrameInterface
-local function OnSpellCastSent(f, ...)
-    local spellCastSentEvent = B:ParseSpellCastSentEventArgs(...)
-    if not spellCastSentEvent or spellCastSentEvent.unit ~= UnitId.player then return end
-    local w = f.ctx
-    --- @param fw FrameWidget
-    w.buttonFactory:fevf(function(fw)
-        fw:fesmb(spellCastSentEvent.spellID, function(btn)
-            btn:SetButtonStateNormal() end)
-    end)
-    ---@param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
-end
-
---- @param f EventFrameInterface
-local function OnSpellCastSucceeded(f, ...)
-    local bf = f.ctx.buttonFactory
-    bf:fevf(function(fw)
-        fw:fevb(function(bw) return bw:IsItemOrMacro() end,
-                function(bw)
-                    C_Timer.NewTicker(0.5, function()
-                        bw:UpdateItemOrMacroState() end, 2)
-                end)
-    end)
-    L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
-end
-
---- @param f EventFrameInterface
---- @param event string
-local function OnActionbarEvents(f, event, ...)
-    local unit = ...
-    if unit ~= GC.UnitId.player then return end
-
-    if E.UNIT_SPELLCAST_START == event then
-        OnSpellCastStart(f, ...)
-    elseif E.UNIT_SPELLCAST_STOP == event then
-        OnSpellCastStop(f, ...)
-    elseif E.UNIT_SPELLCAST_SENT == event then
-        OnSpellCastSent(f, ...)
-    elseif E.UNIT_SPELLCAST_SUCCEEDED == event then
-        OnSpellCastSucceeded(f, ...)
-    elseif E.UNIT_SPELLCAST_FAILED_QUIET == event then
-        OnSpellCastFailed(f, ...)
-    end
-end
-
 --- @param f EventFrameInterface
 --- @param event string
 local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
@@ -277,31 +165,10 @@ function L:CreateContext(eventFrame)
     return ctx
 end
 
-function L:RegisterActionbarsEventFrame()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnActionbarEvents)
-    RegisterFrameForUnitEvents(f, {
-        E.UNIT_SPELLCAST_START,
-        E.UNIT_SPELLCAST_STOP,
-        E.UNIT_SPELLCAST_SENT,
-        E.UNIT_SPELLCAST_SUCCEEDED,
-        E.UNIT_SPELLCAST_FAILED_QUIET,
-    })
-end
-
 function L:RegisterSetCVarEvents()
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnSetCVarEvents)
     RegisterFrameForEvents(f, { E.CVAR_UPDATE })
-end
-
-function L:RegisterKeybindingsEventFrame()
-    local f = self:CreateEventFrame()
-    -- The process for retrieving the keyBindingsMap initially
-    -- needs to happen here when addon is fully initialized (PLAYER_LOGIN)
-    f.ctx.addon:RetrieveKeyBindingsMap();
-    f:SetScript(E.OnEvent, OnUpdateBindings)
-    RegisterFrameForEvents(f, { E.UPDATE_BINDINGS })
 end
 
 function L:RegisterVehicleFrame()
@@ -354,8 +221,6 @@ end
 function L:RegisterEvents()
     p:log(30, 'RegisterEvents called..')
 
-    self:RegisterActionbarsEventFrame()
-    self:RegisterKeybindingsEventFrame()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterCombatFrame()

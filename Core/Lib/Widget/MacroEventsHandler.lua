@@ -11,18 +11,14 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
-
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local P, Table, String = O.Profile, O.Table, O.String
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
 --- @class MacroEventsHandler : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.MacroEventsHandler)
-local p = L:GetLogger()
-
+local L = LibStub:NewLibrary(M.MacroEventsHandler)
+local p = ns:CreateEventLogger(M.MacroEventsHandler)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -60,27 +56,6 @@ local function findMacroByBody(matchingBody)
     return nil
 end
 
---[[local function HandleNameIconIndexChange(btnWidget, btnName, btnData)
-    local macroData = btnData.macro
-    local changed = false
-    -- name and index changed: find by body
-    local changedMacro = findMacroByBody(macroData.body)
-    if changedMacro ~= nil then
-        local d = {
-            index={old=macroData.index, new=changedMacro.index},
-            name={old=macroData.name, new=changedMacro.name},
-            icon={old=macroData.icon, new=changedMacro.icon},
-        }
-        _L:log(15, 'Name,Icon,Index(%s) changed: %s', btnName, toStringSorted(d))
-        macroData.name = changedMacro.name
-        macroData.icon = changedMacro.icon
-        macroData.index = changedMacro.index
-        changed = true
-    end
-
-    return changed
-end]]
-
 local function HandleChangedMacros(btnName, btnData)
     if btnData == nil or btnData.macro == nil or btnData.macro.index == nil then return false end
     local macroData = btnData.macro
@@ -93,13 +68,11 @@ local function HandleChangedMacros(btnName, btnData)
     local changeInfo = { type = '', old = '', new = '' }
     if macroData.body ~= body and macroData.name == name and macroData.icon == icon then
         -- body change
-        --_L:log(15, '%s::body changed: %s', btnName, toStringSorted({ old=macroData.body, new=body }))
         changeInfo = { type = 'body', old = macroData.body, new = body }
         macroData.body = body
         changed = true
     elseif macroData.name ~= name and macroData.icon == icon and macroData.body == body then
         -- name change
-        --_L:log(15, '%s::name changed: %s', btnName, toStringSorted({ old=macroData.name, new=name }))
         changeInfo = { type = 'name', old = macroData.name, new = name }
         macroData.name = name
         changed = true
@@ -138,7 +111,7 @@ local function HandleChangedMacros(btnName, btnData)
     end
 
     if changed then
-        p:log(15, '%s::Changed? %s [%s]', btnName, changed, toStringSorted(changeInfo))
+        p:d( function() return '%s::Changed? %s [%s]', btnName, tostring(changed), toStringSorted(changeInfo) end)
         btnWidget:Fire('OnMacroChanged')
     end
 end
@@ -155,23 +128,17 @@ end
 ---1. Macro UI Updates
 ---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
-    --- todo next: move to ActionbarPlusEventMixin
-    if event == E.PLAYER_ENTERING_WORLD then
-        p:log(10, event)
-        frame:RegisterEvent('UPDATE_MACROS')
-    end
-
-    if event == 'UPDATE_MACROS' then
-        p:log(20, 'Event Received: %s', event)
-        OnMacroUpdate()
-    end
+    p:t(function() return 'Event Received: %s', event end)
+    OnMacroUpdate()
 end
-
 
 --[[-----------------------------------------------------------------------------
 Event Hook
 -------------------------------------------------------------------------------]]
-local frame = CreateFrame("Frame", ns.name .. "Frame", UIParent)
-frame:SetScript(E.OnEvent, OnAddonLoaded)
-frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
-
+ns:AceEvent():RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
+    local pm = ns:CreateMessageLogger(M.MacroEventsHandler)
+    pm:d(function() return "MSG:R: %s", evt end)
+    local frame = CreateFrame("Frame", M.MacroEventsHandler .. "Frame", UIParent)
+    frame:SetScript(E.OnEvent, OnAddonLoaded)
+    FrameUtil.RegisterFrameForEvents(frame, { E.UPDATE_MACROS })
+end)

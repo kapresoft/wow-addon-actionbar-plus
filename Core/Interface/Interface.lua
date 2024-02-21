@@ -26,41 +26,9 @@ local LibPackMixin = {
     O = {}
 }
 
---- @class Namespace : LibPackMixin
-local Namespace = {
-    --- @type string
-    name = "",
-
-    features = {
-        enableV2 = false,
-    },
-
-    --- @type GameVersion
-    gameVersion = "retail",
-
-    --- @type GlobalObjects
-    O = {},
-    --- @type ActionbarPlus_AceDB
-    db = {},
-    --- @type Module
-    M = {},
-
-    --- @type Kapresoft_LibUtil
-    Kapresoft_LibUtil = {},
-
-    --- @type fun(): Kapresoft_LibUtil
-    K = {},
-
-    --- @type LocalLibStub
-    LibStub = {},
-
-    --- Used in TooltipFrame and BaseAttributeSetter to coordinate the GameTooltip Anchor
-    --- @see TooltipAnchor#SCREEN_* vars
-    --- @type string
-    GameTooltipAnchor = "",
-    --- @type fun(o:any, ...) : void
-    pformat = {}
-}
+--- @class SpellInfoShort
+--- @field id SpellID The unique identifier for the class.
+--- @field name SpellName The name of the class.
 
 --- @class CursorUtil : CursorMixin
 local CursorUtil = {}

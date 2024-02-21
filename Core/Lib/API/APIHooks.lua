@@ -1,15 +1,13 @@
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local MSG, AceEvent = GC.M, O.AceLibrary.AceEvent
 
 --[[-----------------------------------------------------------------------------
 New Library: APIHooks
 -------------------------------------------------------------------------------]]
 --- @class APIHooks
-local L = LibStub:NewLibrary(ns.M.APIHooks); if not L then return end
+local L = LibStub:NewLibrary(M.APIHooks); if not L then return end
 AceEvent:Embed(L)
-local p = L:GetLogger()
+local p = ns:CreateDefaultLogger(M.APIHooks)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -34,7 +32,9 @@ Message Handler
 --- @see C_MountJournal.Pickup()
 --- @see C_PetJournal.PickupPet()
 L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
-    p:log(10, 'MSG::R: %s', msg)
+    local pm = ns:CreateMessageLogger(M.APIHooks)
+    pm:d( function() return 'MSG::R: %s', msg end)
+
     if C_MountJournal then
         hooksecurefunc(C_MountJournal, 'Pickup', function(index) OnPickupMount_Hook(abp, index) end)
     end
