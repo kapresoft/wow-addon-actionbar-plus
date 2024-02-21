@@ -131,6 +131,22 @@ local DEFAULT_FORMATTER = {
 }
 local TABLE_FORMATTER = { format = function(o) return _U.format(o, false) end }
 
+--- A wrapper for string.format that substitutes missing arguments with a default value.
+-- @param formatStr string The format string.
+-- @param ... any The values to format.
+-- @return string The formatted string with missing values substituted.
+local function safeFormat(formatStr, ...)
+    local args = {...}
+    local expectedArgs = select(2, formatStr:gsub("%%[^%%]", ""))
+
+    -- Fill in missing arguments with a default value
+    for i = #args + 1, expectedArgs do
+        args[i] = "<missing>" -- Default value for missing arguments
+    end
+
+    return string.format(formatStr, unpack(args))
+end
+
 --[[-----------------------------------------------------------------------------
 EmbedLogger
 -------------------------------------------------------------------------------]]
@@ -164,6 +180,13 @@ local function _EmbedLogger(obj, optionalLogName)
     ---log:D():log(obj)
     ---```
     function obj:D() formatter = DEFAULT_FORMATTER; return self end
+
+    --- p:logc(1, function() end)
+    --- @alias LogCallbackFn fun(log:Logger) | "function(log) end"
+    function obj:logc(level, callbackFn)
+        if not ShouldLog(level) then return end
+        callbackFn(self)
+    end
 
     -- 1: log('String') or log(N, 'String')
     -- 2: log('String', obj) or log(N, 'String', obj)
@@ -211,7 +234,7 @@ local function _EmbedLogger(obj, optionalLogName)
             local formatSafe = i > 1
             newArgs[i] = self:ArgToString(args[i], formatSafe)
         end
-        self:Printf(format(_U.t_unpack(newArgs)))
+        self:Printf(safeFormat(_U.t_unpack(newArgs)))
     end
 
     ---Convert arguments to string
@@ -222,7 +245,7 @@ local function _EmbedLogger(obj, optionalLogName)
         if optionalStringFormatSafe == true then
             return _U.s_replace(text, '%', '$')
         end
-        return text
+        return text or ''
     end
 
 end

@@ -7,15 +7,13 @@ local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local CN = GC.Profile_Config_Names
 local String, Table, W = O.String, O.Table, GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
 local IsEmptyStr, IsBlankStr = String.IsEmpty, String.IsBlank
-local p = O.LogFactory(M.ButtonProfileMixin)
+local p = ns:CreateProfileLogger(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -89,7 +87,7 @@ local function PropsAndMethods(o)
         for buttonType in pairs(self:GetAllAttributesSetters()) do
             -- return the first data found
             if not IsEmptyTable(btnData[buttonType]) then
-                p:log(1, 'btnData[%s] did not have a type and was corrected: %s', self.w:GetName(), btnData.type)
+                p:w(function() return 'btnData[%s] did not have a type and was corrected: %s', self:GetName(), btnData.type end)
                 return buttonType
             end
         end
@@ -189,7 +187,7 @@ local function PropsAndMethods(o)
         elseif actionType == 'macro' then
             spellName = API:GetMacroSpell(self:GetMacroIndex())
         elseif actionType == 'item' then
-            spellName = API:GetItemSpellInfo(conf.item.name)
+            spellName = API:GetItemSpellInfo(conf.item)
         elseif actionType == 'mount' then
             spellName = conf.mount and conf.mount.name
         end
@@ -209,9 +207,7 @@ local function PropsAndMethods(o)
         elseif actionType == 'macro' then
             _, spellID = API:GetMacroSpell(self:GetMacroIndex())
         elseif actionType == 'item' then
-            _, spellID = API:GetItemSpellInfo(conf.item.name)
-        --elseif actionType == 'mount' then
-            --spellID = conf.mount.name
+            _, spellID = API:GetItemSpellInfo(conf.item)
         end
 
         return spellID
@@ -238,6 +234,8 @@ local function PropsAndMethods(o)
     function o:IsCompanion() return self:IsActionType(W.COMPANION) end
     --- @return boolean
     function o:IsBattlePet() return self:IsActionType(W.BATTLE_PET) end
+    --- @return boolean
+    function o:IsCompanionWOTLK() return self:IsCompanion() or self:IsBattlePet() end
     --- @return boolean
     function o:IsEquipmentSet() return self:IsActionType(W.EQUIPMENT_SET) end
 

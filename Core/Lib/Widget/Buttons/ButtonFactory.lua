@@ -14,10 +14,7 @@ local Enum, EmbeddedItemTooltip, ItemRefTooltip = Enum, EmbeddedItemTooltip, Ite
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local AceEvent = O.AceLibrary.AceEvent
 local String, Table, A, P, MSG = O.String, O.Table, O.Assert, O.Profile, GC.M
 local IsBlankString, IsEmptyTable = String.IsBlank, Table.isEmpty
@@ -235,19 +232,6 @@ end
 --[[-----------------------------------------------------------------------------
 Event Handlers
 -------------------------------------------------------------------------------]]
---- Update Items and Macros referencing items
-local function OnBagUpdate()
-    L:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsItemOrMacro() end,
-                function(bw)
-                    local success, itemInfo = safecall(function() return bw:GetItemData() end)
-                    if not (success and itemInfo) then return end
-                    bw:UpdateItemOrMacroState()
-                end)
-    end)
-end
-
 --- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
 --- entering the portal and get dismounted upon zoning in to the new area
 local function OnPlayerMount()
@@ -264,9 +248,9 @@ Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
-
+    local pm = ns:CreateMessageLogger(M.ButtonFactory)
     L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
-        p:log(10, 'MSG::R: %s', msg)
+        pm:d(function() return 'MSG::R: %s', msg end)
         L:Init()
     end)
 

@@ -1,9 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Alias Functions
 -------------------------------------------------------------------------------]]
---- @alias FrameHandlerFunction fun(frameWidget:FrameWidget) : void
---- @alias ButtonPredicateFunction fun(btnWidget:ButtonUIWidget) : boolean
---- @alias ButtonHandlerFunction fun(btnWidget:ButtonUIWidget) : void
+--- @alias FrameHandlerFunction fun(fw:FrameWidget) : void | "function(fw) print(fw:GetName()) end"
+--- @alias ButtonPredicateFunction fun(bw:ButtonUIWidget) : boolean | "function(bw) print(bw:GetName()) end"
+--- @alias ButtonHandlerFunction fun(bw:ButtonUIWidget) : void | "function(bw) print(bw:GetName()) end"
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject

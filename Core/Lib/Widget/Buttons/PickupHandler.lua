@@ -6,23 +6,20 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table
 local IsNotBlank, IsTableEmpty = O.String.IsNotBlank, Table.isEmpty
 local WAttr = GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION =
     WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
 
-local p = LogFactory(M.PickupHandler)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class PickupHandler
 local L = LibStub:NewLibrary(M.PickupHandler); if not L then return end
+local p = ns:CreateDragAndDropLogger(M.PickupHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -51,7 +48,7 @@ local function PickupStuff(widget)
     elseif widget:IsEquipmentSet() then
         BaseAPI:PickupEquipmentSet(widget:GetEquipmentSetData())
     else
-        p:log(20, "PickupExisting | no item picked up")
+        p:f1("PickupStuff(): No item was picked up")
     end
 end
 

@@ -21,6 +21,19 @@ local P = O.Profile
 ABP_enableV2 = false
 ns.features.enableV2 = ABP_enableV2
 
+O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
+    --- @type table<string, boolean|number>
+    ABP_DEBUG_ENABLED_CATEGORIES = {
+        ADDON=1, FRAME=1, BUTTON=1,
+        DRAG_AND_DROP=1,
+        SPELL=1,
+        EVENT=1, MESSAGE=1,
+        BAG=1,
+        ITEM=1, PET=1, MOUNT=1,
+        UNIT=1,
+        PROFILE=1,
+    }
+end)
 
 --[[-----------------------------------------------------------------------------
 New Instance

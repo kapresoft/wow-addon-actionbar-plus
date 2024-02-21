@@ -1,9 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local W = GC.WidgetAttributes
 local IsBlank, IsNotBlank = O.String.IsBlank, O.String.IsNotBlank
 
@@ -12,7 +10,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class CursorMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.CursorMixin); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateDragAndDropLogger(M.CursorMixin)
 
 -- Add to Modules.lua
 --CursorMixin = 'CursorMixin',
@@ -45,12 +43,12 @@ function L:IsM6Macro() return self.cursorInfo.subType == W.MACRO_SUBTYPE_M6 end
 --- @return boolean
 function L:IsValid()
     if not self.cursorInfo or IsBlank(self.cursorInfo.type) then
-        p:log(20, 'Received drag event with invalid cursor info. Skipping...')
+        p:d( 'Received drag event with invalid cursor info. Skipping...')
         -- This can happen if a chat tab or others
         -- is dragged into the action bar.
         return false
     end
-    p:log(20, 'Cursor is valid: %s', self.cursorInfo)
+    p:d(function() return 'Cursor is valid: %s', pformat(self.cursorInfo) end)
     return true
 end
 --- @return string

@@ -1,10 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local API, Assert, String, PH = O.API, O.Assert, O.String, O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank = String.IsNotBlank
@@ -15,6 +12,7 @@ New Instance: SpellDragEventHandler
 -------------------------------------------------------------------------------]]
 --- @class SpellDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.SpellDragEventHandler); if not L then return end
+local p = ns:CreateDragAndDropLogger(M.SpellDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 New Instance: SpellAttributeSetter
@@ -39,7 +37,7 @@ local function eventHandlerMethods(e)
                                   id = cursorInfo.info3,
                                   bookIndex = cursorInfo.info1,
                                   bookType = cursorInfo.info2 }
-
+        p:d(function() return 'cursor: %s', pformat:B()(spellCursorInfo) end)
         local spellInfo = API:GetSpellInfo(spellCursorInfo.id)
         if IsNil(spellInfo) then return end
 

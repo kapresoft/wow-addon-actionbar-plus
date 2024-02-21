@@ -6,17 +6,9 @@ local InCombatLockdown, GameFontHighlightSmallOutline = InCombatLockdown, GameFo
 local C_Timer, C_PetJournal = C_Timer, C_PetJournal
 
 --[[-----------------------------------------------------------------------------
-LUA Vars
--------------------------------------------------------------------------------]]
-local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
-
---[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local pformat = ns.pformat
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
@@ -38,7 +30,8 @@ local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
 
 --- @class ButtonUILib
 local _L = LibStub:NewLibrary(M.ButtonUI, 1)
-local p = O.LogFactory:NewLogger(M.ButtonUI)
+local p = ns:CreateButtonLogger(M.ButtonUI)
+local pd = ns:CreateDragAndDropLogger(M.ButtonUI)
 
 --- @return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end
@@ -48,11 +41,9 @@ Scripts
 -------------------------------------------------------------------------------]]
 --- @param cursorInfo CursorInfo
 local function IsValidDragSource(cursorInfo)
-    --p:log("IsValidDragSource| CursorInfo=%s", cursorInfo)
     if not cursorInfo or IsBlank(cursorInfo.type) then
         -- This can happen if a chat tab or others is dragged into
         -- the action bar.
-        --p:log(20, 'Received drag event with invalid cursor info. Skipping...')w
         return false
     end
     return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo)
@@ -145,7 +136,7 @@ local function OnDragStart(btnUI)
 
     if InCombatLockdown() or not WMX:IsDragKeyDown() then return end
     w:Reset()
-    p:log(20, 'DragStarted| Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()))
+    pd:d(function() return 'OnDragStart():Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()) end)
 
     local conf = w:conf()
     ABP.mountID = conf and conf.mount and conf.mount.id
@@ -164,10 +155,10 @@ local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorUtil = ns:CreateCursorUtil()
     if not cursorUtil:IsValid() then
-        p:log(20, 'OnReceiveDrag| CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()))
+        pd:d(function() return 'OnReceiveDrag():CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()) end)
         return false
     else
-        p:log(20, 'OnReceiveDrag| CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()))
+        pd:d(function() return 'OnReceiveDrag():CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()) end)
     end
     ClearCursor()
 

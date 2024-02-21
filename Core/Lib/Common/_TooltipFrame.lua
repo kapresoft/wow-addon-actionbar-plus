@@ -20,14 +20,10 @@ local _TooltipFrameHandlerWidget = {
 }
 
 --- @class TooltipFrameHandler : BaseLibraryObject_WithAceEvent
-local _TooltipFrameHandler = {
-    --- @type Logger
-    logger = {}
-}
-
---- @type TooltipFrameHandler
-local L = AceEvent:Embed({ logger = ns.O.LogFactory('TooltipFrameHandler') })
-local p = L.logger
+local L = ns:AceEvent()
+local libName = 'TooltipFrameHandler'
+local p = ns:CreateDefaultLogger(libName)
+local pm = ns:CreateMessageLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -36,7 +32,7 @@ Support Functions
 --- @param handler TooltipFrameHandler
 local OnTooltipFrameUpdate = function(evt, handler, ...)
     local position, val = ...
-    p:log(10, '[TooltipFrameHandler|%s] Received: %s=%s', evt, tostring(position), tostring(val))
+    pm:d(function() return 'MSG::R: %s %s=%s', evt, tostring(position), tostring(val) end)
     if not val then return end
     handler:UpdateTooltipAnchor(val)
 end
@@ -49,24 +45,24 @@ local function MethodsAndProperties(o)
 
     --- @see Config
     o:RegisterMessage(M.OnTooltipFrameUpdate, function(msg, ...)
-        p:log(10, 'MSG::R: %s', msg)
         OnTooltipFrameUpdate(msg, o, ...)
     end)
 
     --- @type TooltipFrameHandlerWidget
     o.widget = {}
 
-    function o:OnShow()
-        self.widget.frame = _G[GC.C.TOOLTIP_ANCHOR_FRAME_NAME]
+    function o:OnShow(frame)
+        self.widget.frame = frame
         if not self.widget.frame then return end
         self.widget.frame:SetSize(1, 1)
 
-        o:RegisterMessage(GC.M.OnAddOnEnabled, function(msg, ...)
-            p:log(10, 'MSG::R: %s', msg)
+        self:RegisterMessage(GC.M.OnAddOnEnabled, function(msg, ...)
+            pm:d(function() return 'MSG::R: %s', msg end)
             local names = GC.Profile_Config_Names
             local anchorType = ns.db.profile[names.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPLEFT
             self:UpdateTooltipAnchor(anchorType)
         end)
+
     end
 
     function o:IsCursorAnchorType(anchorType) return O.String.StartsWithIgnoreCase(anchorType, 'cursor_') end
@@ -98,5 +94,7 @@ local function MethodsAndProperties(o)
 end
 
 MethodsAndProperties(L)
-
-ABP_TooltipFrame = L
+--- @see _TooltipFrame.xml
+function ABP_NS.xml:TooltipFrame_OnShow(frame)
+    L:OnShow(frame)
+end

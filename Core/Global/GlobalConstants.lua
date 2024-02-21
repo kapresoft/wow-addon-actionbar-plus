@@ -119,6 +119,8 @@ local function GlobalConstantProperties(o)
         --- @type number|string
         DRUID_FORM_ACTIVE_ICON = 136116,
         --- @type number|string
+        GHOST_WOLF_FORM_ACTIVE_ICON = 136116,
+        --- @type number|string
         STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
         --- @type number|string
         PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
@@ -229,6 +231,7 @@ local function GlobalConstantProperties(o)
         SPELL_UPDATE_COOLDOWN = 'SPELL_UPDATE_COOLDOWN',
         SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
 
+        UNIT_AURA = 'UNIT_AURA',
         UNIT_HEALTH = 'UNIT_HEALTH',
         UNIT_POWER_FREQUENT = 'UNIT_POWER_FREQUENT',
         --- It fires when:
@@ -237,6 +240,7 @@ local function GlobalConstantProperties(o)
         --- 2) Usually a UI error display or an error bell sound
         UNIT_SPELLCAST_FAILED_QUIET = 'UNIT_SPELLCAST_FAILED_QUIET',
         UNIT_SPELLCAST_FAILED = 'UNIT_SPELLCAST_FAILED',
+        --- This applies to all players
         UNIT_SPELLCAST_SENT = 'UNIT_SPELLCAST_SENT',
         -- Fired for Start of Non-Instant Spell Cast
         UNIT_SPELLCAST_START = 'UNIT_SPELLCAST_START',
@@ -251,6 +255,7 @@ local function GlobalConstantProperties(o)
         UNIT_ENTERED_VEHICLE = 'UNIT_ENTERED_VEHICLE',
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
 
+        UPDATE_MACROS = 'UPDATE_MACROS',
         ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
@@ -341,10 +346,52 @@ local function GlobalConstantProperties(o)
         ["partyN"] = function(raidIndex) return toSuffix("party", raidIndex) end,
         ["raidN"] = function(raidIndex) return toSuffix("raid", raidIndex) end,
     }
+
+    -- Note: Monk class was added in Mists of Pandaria.
+    -- Note: Demon Hunter class was added in Legion.
     local UnitClass = {
-        DRUID = 'DRUID',
-        PRIEST = 'PRIEST',
-        ROGUE = 'ROGUE'
+        WARRIOR = "WARRIOR",
+        PALADIN = "PALADIN",
+        HUNTER = "HUNTER",
+        ROGUE = "ROGUE",
+        PRIEST = "PRIEST",
+        DEATHKNIGHT = "DEATHKNIGHT",
+        SHAMAN = "SHAMAN",
+        MAGE = "MAGE",
+        WARLOCK = "WARLOCK",
+        MONK = "MONK",
+        DRUID = "DRUID",
+        DEMONHUNTER = "DEMONHUNTER"
+    }
+
+    local UnitClassID = {
+        WARRIOR = 1,
+        PALADIN = 2,
+        HUNTER = 3,
+        ROGUE = 4,
+        PRIEST = 5,
+        DEATHKNIGHT = 6,
+        SHAMAN = 7,
+        MAGE = 8,
+        WARLOCK = 9,
+        MONK = 10,      -- Note: Monk class was added in Mists of Pandaria
+        DRUID = 11,
+        DEMONHUNTER = 12 -- Note: Demon Hunter class was added in Legion
+    }
+
+    local UnitClasses = {
+        WARRIOR = { id = UnitClassID.WARRIOR, name = UnitClass.WARRIOR },
+        PALADIN = { id = UnitClassID.PALADIN, name = UnitClass.PALADIN },
+        HUNTER = { id = UnitClassID.HUNTER, name = UnitClass.HUNTER },
+        ROGUE = { id = UnitClassID.ROGUE, name = UnitClass.ROGUE },
+        PRIEST = { id = UnitClassID.PRIEST, name = UnitClass.PRIEST },
+        DEATHKNIGHT = { id = UnitClassID.DEATHKNIGHT, name = UnitClass.DEATHKNIGHT },
+        SHAMAN = { id = UnitClassID.SHAMAN, name = UnitClass.SHAMAN },
+        MAGE = { id = UnitClassID.MAGE, name = UnitClass.MAGE },
+        WARLOCK = { id = UnitClassID.WARLOCK, name = UnitClass.WARLOCK },
+        MONK = { id = UnitClassID.MONK, name = UnitClass.MONK },
+        DRUID = { id = UnitClassID.DRUID, name = UnitClass.DRUID },
+        DEMONHUNTER = { id = UnitClassID.DEMONHUNTER, name = UnitClass.DEMONHUNTER },
     }
 
     --- @class WidgetAttributes
@@ -487,12 +534,25 @@ local function GlobalConstantProperties(o)
     --- @type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass
+    o.UnitClasses = UnitClasses
 
     o.newMsg = newMsg
 end
 
 --- @param o GlobalConstants
 local function GlobalConstantMethods(o)
+
+    --- Checks if the first argument matches any of the subsequent arguments.
+    --- @param toMatch number The value to match against the varargs.
+    --- @param ... any The list of values to check for a match.
+    --- @return boolean True if `toMatch` is found in the varargs, false otherwise.
+    function o:IsAnyOfNumber(toMatch, ...)
+        for i = 1, select('#', ...) do
+            local val = select(i, ...)
+            if toMatch == val then return true end
+        end
+        return false
+    end
 
     --- @return string
     function o:AddonName() return o.C.ADDON_NAME end

@@ -1,9 +1,7 @@
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
-local PR, WMX = O.Profile, O.WidgetMixin
-local AceEvent = O.AceLibrary.AceEvent
+local PR, WMX, B = O.Profile, O.WidgetMixin, O.BaseAPI
+local Un = O.UnitMixin:New()
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -13,18 +11,22 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local libName = M.ActionBarController
---- @class ActionBarController : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(libName); if not L then return end; AceEvent:Embed(L);
-local p = L:GetLogger()
-local safecall = O.Safecall:New(p)
+--- @return ActionBarController, Logger, Kapresoft_Safecall
+local function CreateLib()
+    local libName = M.ActionBarController
+    --- @class __ActionBarController : BaseLibraryObject_WithAceEvent
+    local lib = LibStub:NewLibrary(libName); if not lib then return end;
+    ns:AceEventEmbed(lib)
+    ns:K():Mixin(lib, O.ActionBarHandlerMixin)
+    local logger = O.Logger:NewLogger(libName)
+    return lib, logger, O.Safecall:New(logger)
+end; local L, p, safecall = CreateLib()
+local sp = ns:CreateSpellLogger(M.ActionBarController)
+local bagL = ns:CreateBagLogger(M.ActionBarController)
+local df = ns:CreateDefaultLogger(M.ActionBarController)
+local ua = ns:CreateUnitLogger(M.ActionBarController)
 
--- Add to Modules.lua
---ActionBarController = 'ActionBarController',
---
------ @type ActionBarController
---ActionBarController = {},
-
+--- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -34,87 +36,132 @@ local addon = function() return ABP  end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-
----@param bw ButtonUIWidget
-local function IsCompanion(bw) return bw:IsCompanion() or bw:IsBattlePet() end
 ---@param bw ButtonUIWidget
 local function UpdateIcon(bw)
     local icon = O.API:GetSpellIcon(bw:GetSpellData())
     if icon then bw:SetIcon(icon) end
 end
 
---- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
-function ForEachVisibleFrames(applyFn)
-    local frames = PR:GetUsableBarFrames()
-    if #frames <= 0 then return end
-    for _,f in ipairs(frames) do applyFn(f.widget) end
-end
-
---- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-function ForEachCompanionButton(applyFn)
-    ForEachVisibleFrames(function(fw)
-        fw:fevb(function(bw) return IsCompanion(bw) end, applyFn)
-    end)
-end
-
---- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-local function ForEachStealthButton(applyFn)
-    ForEachVisibleFrames(function(fw)
-        fw:fevb(function(bw) return bw:IsStealthSpell() end, applyFn)
-    end)
-end
---- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-local function ForEachShapeshiftButton(applyFn)
-    ForEachVisibleFrames(function(fw)
-        fw:fevb(function(bw) return bw:IsShapeshiftSpell() end, applyFn)
-    end)
-end
-
 --[[-----------------------------------------------------------------------------
 Event Handlers
 -------------------------------------------------------------------------------]]
-local function OnStealthIconUpdate()
-    ForEachStealthButton(UpdateIcon)
-end
+local function OnStealthIconUpdate() L:ForEachStealthButton(UpdateIcon) end
 
 --- Update Items and Macros referencing items
 local function OnBagUpdate()
-    ForEachVisibleFrames(function(fw)
-        fw:fevb(
-            function(bw) return bw:IsItemOrMacro() end,
-            function(bw)
-                local success, itemInfo = safecall(function() return bw:GetItemData() end)
-                if not (success and itemInfo) then return end
-                bw:UpdateItemOrMacroState()
-            end)
+    bagL:t( 'OnBagU(): called..')
+    L:ForEachItemButton(function(bw)
+        local success, itemInfo = safecall(function() return bw:GetItemData() end)
+        if not (success and itemInfo) then return end
+        bw:UpdateItemOrMacroState()
     end)
-    ---@param handlerFn ButtonHandlerFunction
+
+    --- @param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnBagUpdateExt, libName, CallbackFn)
 end
 
 --- Not fired in classic-era
---- @param f EventFrameInterface
 local function OnCompanionUpdate()
-    ForEachCompanionButton(function(bw)
+    L:ForEachCompanionButton(function(bw)
         C_Timer.NewTicker(0.5, function() bw:UpdateCompanionActiveState() end, 3)
     end)
 end
 
 local function OnUpdateStealth() OnStealthIconUpdate() end
-local function OnShapeShift() ForEachShapeshiftButton(UpdateIcon) end
+local function OnShapeShift()
+    C_Timer.NewTicker(0.2, function()
+        L:ForEachShapeshiftButton(UpdateIcon)
+    end, 2)
+end
 local function OnUpdateBindings() addon():UpdateKeyBindings() end
+
+--- @param event string The event name
+local function OnPlayerUnitAura(event, unit)
+    ua:t('OnPlayerUnitAura(): called...')
+    Un:UpdateShapeshiftBuffs()
+end
+
+--- Order is: SENT, START, SUCCEEDED
+--- START is triggered for spell duration > 0
+--- @param event string The event name
+local function OnPlayerSpellCastStart(event, ...)
+    local spellCastEvent = B:ParseSpellCastEventArgs(...)
+    L:ForEachMatchingSpellButton(spellCastEvent.spellID, function(bw)
+        sp:d(function()
+            local spellName, spellID = bw:GetEffectiveSpellName(), bw:GetEffectiveSpellID()
+            return 'cast started: %s,id=%s [%s]', spellName, spellID, bw:GN()
+        end)
+        bw:SetHighlightInUse()
+    end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionBarController, CallbackFn)
+end
+
+--- Triggered for non channeled spells, both instant and non-instant
+--- @param evt _SpellCastSentEventArguments
+local function OnPlayerSpellCastSent(evt)
+    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
+        sp:d(function() return 'cast sent: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        bw:SetButtonStateNormal();
+    end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+end
+
+--- @param event string The event name
+local function OnSpellCastSentAllUnits(event, ...)
+    local evt = B:ParseSpellCastSentEventArgs(...)
+    local unit = evt and evt.unit
+    if UnitId.player ~= unit then return end
+    OnPlayerSpellCastSent(evt)
+end
+
+--- @param event string The event name
+local function OnSpellCastSucceeded(event, ...)
+    local evt = B:ParseSpellCastEventArgs(...)
+    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
+        sp:d(function() return 'cast succeeded: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        bw:UpdateItemOrMacroState();
+    end)
+    L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
+end
+
+--- i.e. Conjure mana gem when there is already a mana gem in bag
+--- @param event string The event name
+local function OnPlayerSpellCastFailedQuietly(event, ...)
+    local evt = B:ParseSpellCastEventArgs(...)
+    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
+        bw:SetButtonStateNormal()
+    end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+end
+
+--- @param event string The event name
+local function OnPlayerSpellCastStop(event, ...)
+    local evt = B:ParseSpellCastEventArgs(...)
+    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
+        sp:d(function() return 'cast stopped: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        bw:ResetHighlight()
+    end)
+    ---@param handlerFn ButtonHandlerFunction
+    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
+    L:SendMessage(MSG.OnSpellCastStopExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ActionBarController
+---@param o __ActionBarController | ActionBarHandlerMixin
 local function PropsAndMethods(o)
-
     ---@param evt string
     o[E.PLAYER_TARGET_CHANGED] = function(evt, ...)
         local t = UnitName('target') or 'NONE'
-        p:log(10, 'PLAYER_TARGET_CHANGED: %s', t)
+        df:i(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
     end
 
     o[E.BAG_UPDATE] = OnBagUpdate
@@ -138,11 +185,21 @@ local function PropsAndMethods(o)
     o[E.UPDATE_STEALTH]         = OnUpdateStealth
     o[E.UPDATE_SHAPESHIFT_FORM] = OnShapeShift
 
+    o[E.UNIT_AURA] = OnPlayerUnitAura
+    o[E.UNIT_SPELLCAST_SENT] = OnSpellCastSentAllUnits
+    o[E.UNIT_SPELLCAST_START] = OnPlayerSpellCastStart
+    o[E.UNIT_SPELLCAST_STOP] = OnPlayerSpellCastStop
+    o[E.UNIT_SPELLCAST_SUCCEEDED] = OnSpellCastSucceeded
+    o[E.UNIT_SPELLCAST_FAILED_QUIET] = OnPlayerSpellCastFailedQuietly
+
 end; PropsAndMethods(L)
 
 ---@param frame _Frame
 local function OnAddOnReady(frame)
+    Un:UpdateShapeshiftBuffs();
+
     OnStealthIconUpdate();
+    OnShapeShift()
     OnCompanionUpdate();
     OnUpdateBindings();
 
@@ -155,6 +212,15 @@ local function OnAddOnReady(frame)
         E.UPDATE_BINDINGS,
         E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM,
     })
+    RegisterFrameForUnitEvents(frame, {
+        E.UNIT_AURA,
+        E.UNIT_SPELLCAST_START,
+        E.UNIT_SPELLCAST_STOP,
+        E.UNIT_SPELLCAST_SUCCEEDED,
+        E.UNIT_SPELLCAST_FAILED_QUIET,
+    }, 'player')
+
+    RegisterFrameForUnitEvents(frame, { E.UNIT_SPELLCAST_SENT, })
 end
 
 --[[-----------------------------------------------------------------------------
