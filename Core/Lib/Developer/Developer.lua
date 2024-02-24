@@ -10,18 +10,17 @@ local SetCVar, GetCVarBool  = SetCVar, GetCVarBool
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC = ns:LibPack2()
+local ns = abp_ns(...)
+local O, GC = ns.O, ns.O.GlobalConstants
 
 local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile
 
-ABP_enableV2 = false
+ABP_enableV2 = true
 ns.features.enableV2 = ABP_enableV2
 
-O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
+--[[O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
     --- @type table<string, boolean|number>
     ABP_DEBUG_ENABLED_CATEGORIES = {
         ADDON=1, FRAME=1, BUTTON=1,
@@ -33,7 +32,7 @@ O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, .
         UNIT=1,
         PROFILE=1,
     }
-end)
+end)]]
 
 --[[-----------------------------------------------------------------------------
 New Instance

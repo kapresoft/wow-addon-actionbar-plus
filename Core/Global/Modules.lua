@@ -41,6 +41,7 @@ local M = {
     ButtonMixin = 'ButtonMixin',
     ButtonProfileMixin = 'ButtonProfileMixin',
     CursorMixin = 'CursorMixin',
+    DebuggingConfigGroup = 'DebuggingConfigGroup',
     LoggerMixinV2 = 'LoggerMixinV2',
 
     UnitMixin = 'UnitMixin',
@@ -127,6 +128,8 @@ local GlobalObjectsTemplate = {
     Config = {},
     --- @type ConfigEventHandlerMixin
     ConfigEventHandlerMixin = {},
+    --- @type DebuggingConfigGroup
+    DebuggingConfigGroup = {},
     --- @type DruidUnitMixin
     DruidUnitMixin = { },
     --- @type EquipmentSetDragEventHandler
@@ -175,8 +178,6 @@ local GlobalObjectsTemplate = {
     MountAttributeSetter = {},
     --- @type Kapresoft_LibUtil_Mixin
     Mixin = {},
-    --- @type NamespaceLoggerMixin
-    NamespaceLoggerMixin = {},
     --- @type PickupHandler
     PickupHandler = {},
     --- @type PriestUnitMixin
@@ -207,7 +208,5 @@ local GlobalObjectsTemplate = {
 L.M = M
 ns.M = M
 
---- @type Modules
-ABP_Modules = L
 ns.O = ns.O or {}
 ns.O.Modules = L
