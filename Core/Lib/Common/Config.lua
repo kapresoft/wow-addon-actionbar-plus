@@ -6,15 +6,13 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns, O, GC, Mod, LibStub = ABP_NS:namespace(...)
 
-local GC, Ace, BaseAPI = O.GlobalConstants, O.AceLibrary, O.BaseAPI
+local Ace, BaseAPI = O.AceLibrary, O.BaseAPI
 local E, M = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
-
-local p = O.LogFactory(ns.M.Config)
+local debugGroup = O.DebuggingConfigGroup
+local p = ns:CreateDefaultLogger(Mod.Config);
 
 ---These are loaded in #fetchLibs()
 --- @type Profile
@@ -34,6 +32,13 @@ local FF
 --- @type table<string, string|number>
 local L
 
+--- spacer
+local sp = '                                                                   '
+
+--- sequence
+local mainSeq = ns:CreateSequence()
+local barSeq = ns:CreateSequence()
+
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
@@ -43,7 +48,8 @@ local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).
 --- @return Profile_Bar
 local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
 
---- @param applyFunction function Format: applyFuntion(ButtonUIWidget)
+--- @param applyFunction ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+--- @param configVal any
 local function ApplyForEachButton(applyFunction, configVal)
     BF:ApplyForEachFrames(function(frameWidget)
         --- @param widget ButtonUIWidget
@@ -198,45 +204,6 @@ local function lazyInitLibs()
 end
 
 --[[-----------------------------------------------------------------------------
-Sequence
--------------------------------------------------------------------------------]]
-local sp = '                                                                   '
-
---- @class SequenceMixin
-local SequenceMixin = {
-
-    --- @param self SequenceMixin
-    --- @param startingIndex number
-    ["Init"] = function(self, startingIndex)
-        self.order = startingIndex or 1
-    end,
-    --- @param self SequenceMixin
-    ["get"] = function(self) return self.order  end,
-    --- @param self SequenceMixin
-    --- @param incr number An optional increment amount
-    ["next"] = function(self, incr)
-        self.order = self.order + (incr or 1)
-        return self.order
-    end,
-    --- @param self SequenceMixin
-    ["reset"] = function(self)
-        local lastCount = self.order + 1
-        self.order = 1
-        return lastCount
-    end
-}
-
---- @param startingSequence number Optional
---- @return SequenceMixin
-local function CreateSequence(startingSequence)
-    --- @type SequenceMixin
-    return CreateAndInitFromMixin(SequenceMixin, startingSequence)
-end
-
-local mainSeq = CreateSequence()
-local barSeq = CreateSequence()
-
---[[-----------------------------------------------------------------------------
 Properties & Methods
 -------------------------------------------------------------------------------]]
 --- @param o Config
@@ -285,7 +252,7 @@ local function PropsAndMethods(o)
             local gen = configArgs['general'].args
             for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
         end
-        configArgs['debugging'] = self:CreateDebuggingGroup()
+        configArgs['debugging'] = debugGroup:CreateDebuggingGroup()
 
         local barConfigs = self:CreateActionBarConfigs()
         for bName, bConf in pairs(barConfigs) do
@@ -416,31 +383,6 @@ local function PropsAndMethods(o)
                     set = self:CM(PC.tooltip_anchor_type, GC.TooltipAnchor.CURSOR_TOPLEFT, GC.M.OnTooltipFrameUpdate),
                 }
             }
-        }
-    end
-
-    function o:CreateDebuggingGroup()
-        return {
-            type = "group",
-            name = L['Debugging'],
-            desc = L['Debugging::Description'],
-            -- Place right before Profiles
-            order = 90,
-            args = {
-                desc = { name = format(" %s ", L['Debugging Configuration']), type = "header", order = 0 },
-                log_level = {
-                    type = 'range',
-                    order = 1,
-                    step = 5,
-                    min = 0,
-                    max = 50,
-                    width = 1.2,
-                    name = L['Log Level'],
-                    desc = L['Log Level::Description'],
-                    get = function(_) return GC:GetLogLevel() end,
-                    set = function(_, v) GC:SetLogLevel(v) end,
-                },
-            },
         }
     end
 

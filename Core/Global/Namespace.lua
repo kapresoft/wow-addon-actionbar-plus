@@ -67,6 +67,8 @@ local NamespaceLoggerMixin = {}
 ---@param o __NamespaceLoggerMixin
 ---@param ns NameSpaceFn
 local function NamespaceLoggerMethods(o, ns)
+    ABP_DEBUG_ENABLED_CATEGORIES = ABP_DEBUG_ENABLED_CATEGORIES or {}
+
     local function LoggerMixin() return ns().O.LoggerMixinV2 end
 
     --- @return BooleanOptional
@@ -77,45 +79,39 @@ local function NamespaceLoggerMethods(o, ns)
     function o:CreateDefaultLogger(moduleName)
         return LoggerMixin():New(moduleName)
     end
-    function o:CreateAddonLogger()
-        return LoggerMixin():New(ns().name, 'addon', 'ad')
+
+    --- @param name string | "'ADDON'" | "'BAG'" | "'BUTTON'" | "'DRAG_AND_DROP'" | "'EVENT'" | "'FRAME'" | "'ITEM'" | "'MESSAGE'" | "'MOUNT'" | "'PET'" | "'PROFILE'" | "'SPELL'"
+    --- @param v boolean|number | "1" | "0" | "true" | "false"
+    function o:SetLogCategory(name, val)
+        assert(name, 'Debug category name is missing.')
+        ---@param v boolean|nil
+        local function normalizeVal(v) if v == 1 or v == true then return 1 end; return 0 end
+        ABP_DEBUG_ENABLED_CATEGORIES[name] = normalizeVal(val)
     end
-    function o:CreateSpellLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'spell', 'sp')
+    function o:IsLogCategoryEnabled(name)
+        assert(name, 'Debug category name is missing.')
+        local val = ABP_DEBUG_ENABLED_CATEGORIES[name]
+        return val == 1 or val == true
     end
-    function o:CreateFrameLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'frame', 'fr')
-    end
-    function o:CreateButtonLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'button', 'bn')
-    end
-    function o:CreateDragAndDropLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'drag_and_drop', 'dd')
-    end
-    function o:CreateItemLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'item', 'it')
-    end
-    function o:CreateBagLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'bag', 'bg')
-    end
-    function o:CreateMountLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'mount', 'mt')
-    end
-    function o:CreatePetLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'pet', 'pt')
-    end
-    function o:CreateUnitLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'unit', 'ua')
-    end
-    function o:CreateProfileLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'profile', 'pr')
-    end
-    function o:CreateEventLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'event', 'ev')
-    end
-    function o:CreateMessageLogger(moduleName)
-        return LoggerMixin():New(moduleName, 'message', 'ms')
-    end
+
+    function o.LogCategory() return LoggerMixin().Category end
+    function o.LogCategories() return o.LogCategory():GetCategories() end
+
+    local function L() return o.LogCategories() end
+    function o:CreateAddonLogger() return LoggerMixin():New(ns().name, o.LogCategories().ADDON) end
+    function o:CreateBagLogger(moduleName) return L().BAG:NewLogger(moduleName) end
+    function o:CreateButtonLogger(moduleName) return L().BUTTON:NewLogger(moduleName) end
+    function o:CreateDragAndDropLogger(moduleName) return L().DRAG_AND_DROP:NewLogger(moduleName) end
+    function o:CreateEventLogger(moduleName) return L().EVENT:NewLogger(moduleName) end
+    function o:CreateFrameLogger(moduleName) return L().FRAME:NewLogger(moduleName) end
+    function o:CreateItemLogger(moduleName) return L().ITEM:NewLogger(moduleName) end
+    function o:CreateMountLogger(moduleName) return L().MOUNT:NewLogger(moduleName) end
+    function o:CreateMessageLogger(moduleName) return L().MESSAGE:NewLogger(moduleName) end
+    function o:CreatePetLogger(moduleName) return L().PET:NewLogger(moduleName) end
+    function o:CreateProfileLogger(moduleName) return L().PROFILE:NewLogger(moduleName) end
+    function o:CreateSpellLogger(moduleName) return L().SPELL:NewLogger(moduleName) end
+    function o:CreateUnitLogger(moduleName) return L().UNIT:NewLogger(moduleName) end
+
 end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
 
 --- @param ns Namespace
@@ -203,6 +199,12 @@ local function CreateNamespace(...)
         --- @return Kapresoft_Incrementer
         function o:CreateIncrementer(start, increment) return self:K():CreateIncrementer(start, increment) end
 
+        --- @return SequenceMixin
+        --- @param startingSequence number|nil
+        function o:CreateSequence(startingSequence)
+            return self:K().Objects.SequenceMixin:New(startingSequence)
+        end
+
         --- @param moduleName string The module name, i.e. Logger
         --- @return string The complete module name, i.e. 'ActionbarPlus-Logger-1.0'
         function o:LibName(moduleName) return self.name .. '-' .. moduleName .. '-1.0' end
@@ -240,3 +242,6 @@ if _ns.name then return end
 
 --- @type Namespace
 ABP_NS = CreateNamespace(...)
+
+--- @return Namespace
+function abp_ns(...) local _, namespace = ...; return namespace end

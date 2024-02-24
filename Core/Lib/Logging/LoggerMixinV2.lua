@@ -1,11 +1,12 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, _, _, M = ABP_NS:namespace(...)
-local K = ns:K()
-local KC = K.Objects.Constants
-
 local sformat, stru, strl = string.format, string.upper, string.len
+
+local ns = abp_ns(...)
+local K, KO = ns:K(), ns:K().Objects
+local KC, M, LibStub = KO.Constants, ns.M, ns.O.LibStub
+--local KC, String, Table = KO.Constants, KO.String, KO.Table
 
 local addon = ns.name
 local libName = M.LoggerMixinV2
@@ -18,23 +19,72 @@ local FINE_LEVEL = 25
 local FINER_LEVEL = 30
 local FINEST_LEVEL = 35
 local TRACE_LEVEL = 50
+
+--- @alias LoggerV2 LoggerMixinV2
+--- @alias LM_LogCallbackFn fun() : string, any, any, any, any | "function() end"
+--- @alias LogLevel number A number 0 or greater
+
+--- @class LogCategory
+--- @field name string Category name
+--- @field short string Category Short name
+--- @field labelFn fun() : string The label string
+--- @field NewLogger fun(self:LogCategory, logName:string) : LoggerV2
+
+local LC = {
+    --- @type LogCategory
+    ADDON = "AD",
+    --- @type LogCategory
+    BAG = "BG",
+    --- @type LogCategory
+    BUTTON = "BN",
+    --- @type LogCategory
+    DRAG_AND_DROP = "DD",
+    --- @type LogCategory
+    EVENT = "EV",
+    --- @type LogCategory
+    FRAME = "FR",
+    --- @type LogCategory
+    ITEM = "IT",
+    --- @type LogCategory
+    MESSAGE = "MS",
+    --- @type LogCategory
+    MOUNT = "MT",
+    --- @type LogCategory
+    PET = "PT",
+    --- @type LogCategory
+    PROFILE = "PR",
+    --- @type LogCategory
+    SPELL = "SP",
+    --- @type LogCategory
+    UNIT = "UN",
+}
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @return LoggerMixinV2
 local function CreateLib()
+    --- Use LibStub Ace here
+    local MAJOR, MINOR = ns:LibName(libName), 1
     --- @class LoggerMixinV2
-    local newLib = {}
+    local newLib = ns.LibStubAce:NewLibrary(MAJOR, MINOR); if not newLib then return end;
     ns:Register(libName, newLib)
     return newLib
 end; local L = CreateLib(); if not L then return end
---print(string.format("{{%s:%s}}::Loaded: %s", ns.name, libName, libName))
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 local function GetLogLevel() return ABP_LOG_LEVEL end
 local function GetCategoryData() return ABP_DEBUG_ENABLED_CATEGORIES  or {} end
+
+local function GetSortedKeys(t)
+    local keys = {}
+    for k in pairs(t) do table.insert(keys, k) end
+    table.sort(keys)
+    return keys
+end
+
 --- Checks if a string is completely blank, including whitespace characters.
 ---@param str string The string to check.
 ---@return boolean Returns true if the string is blank; otherwise, false.
@@ -117,24 +167,77 @@ local function safeFormat(formatStr, ...)
         return "Formatting error: " .. result
     end
 end
+
+local function InitCategories()
+    for k, v in pairs(LC) do
+        --- @type LogCategory
+        local lc = {
+            name = k, short = v,
+            labelFn = function() return sformat("%s [%s]", k, v) end,
+            --- @param self LogCategory
+            --- @param name string
+            NewLogger = function(self, name) return L:New(name, self) end,
+            mt = { __tostring = function() return "LogCategory::" .. k end }
+        }
+        setmetatable(lc, lc.mt)
+        LC[k] = lc
+    end
+end
+
 --[[-----------------------------------------------------------------------------
-Methods
+Methods: CategoryMixin
 -------------------------------------------------------------------------------]]
---- @alias LM_LogCallbackFn fun() : string, any, any, any, any | "function() end"
---- @alias LogLevel number A number 0 or greater
+---@param o CategoryMixin
+local function CategoryMixinMethods(o)
+    InitCategories();
 
---- @class LoggerV2 : LoggerMixinV2
+    ---@param cat LogCategory
+    function o:NewLogger(cat) return L:NewByCat(cat) end
 
---- @param o LoggerV2 | LoggerMixinV2
+    function o:GetCategories() return LC end
+
+    --- @return table<number, string>
+    function o:GetNames() return GetSortedKeys(LC) end
+    --- @param catName string
+    --- @return LogCategory
+    function o:GetCategory(catName) return LC[catName] end
+
+    ---@param consumerFn fun(cat:LogCategory) | "function(cat)  end"
+    function o:ForEachCategory(consumerFn)
+        assert(consumerFn, libName .. ":: consumerFn function is missing.")
+        ---@param cat LogCategory
+        for _, cat in pairs(LC) do
+            consumerFn(cat)
+        end
+    end
+
+end
+--- @class CategoryMixin
+local CategoryMixin = {}; CategoryMixinMethods(CategoryMixin)
+
+--[[-----------------------------------------------------------------------------
+Methods: LoggerMixinV2
+-------------------------------------------------------------------------------]]
+--- @param o LoggerMixinV2
 local function PropsAndMethods(o)
 
+    o.Category = CategoryMixin
+
     --- @param name string The log name
-    --- @param cat string|nil Category name
+    --- @param cat string|LogCategory|nil Category name
     --- @param catSN string|nil Category name (short form)
     function o:Init(name, cat, catSN)
-        assert(name, sformat(GetLogPrefix(libName) .. "log name is required."))
+        assert(name, sformat(GetLogPrefix(libName) .. " Log name is missing."))
+        assert(type(name) == 'string', sformat(GetLogPrefix(libName)
+                    .. " Expected log name to be a string but got: %s", tostring(name)))
         self.name = name
         self.category = nil
+
+        if cat and cat.name then
+            cat = cat.name
+            catSN = cat.short
+        end
+
         self.categorySuffix = ''
 
         --- @type string|boolean
@@ -152,8 +255,11 @@ local function PropsAndMethods(o)
         self.logPrefix = pfn(name, self.categorySuffix)
     end
 
+    --- @param name string The log name
+    --- @param cat string|LogCategory|nil LogCategory or string category name
+    --- @param catSN string|nil Category name (short form)
     --- @return LoggerV2
-    function o:New(...) return K:CreateAndInitFromMixin(self, ...) end
+    function o:New(name, cat, catSN) return K:CreateAndInitFromMixin(self, name, cat, catSN) end
 
     --- @param level LogLevel
     --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"
@@ -169,7 +275,10 @@ local function PropsAndMethods(o)
     --- Verbose, Always Log
     --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"
     function o:v(strOrCallbackFn)
-        self:log(0, strOrCallbackFn, 'V')
+        local val
+        if type(strOrCallbackFn) == 'function' then val = safeFormat(strOrCallbackFn())
+        else val = tostring(strOrCallbackFn) end
+        self.logfn(self.logPrefix, val, self.categorySuffix, 'V')
     end
 
     --- ERROR_LEVEL = 5
@@ -228,6 +337,8 @@ local function PropsAndMethods(o)
         local enabled = val == true or val == 1
         return enabled
     end
+
+    local mt = { __tostring = function() return "LoggerMixinV2" end }; setmetatable(L, mt)
 
 end; PropsAndMethods(L)
 

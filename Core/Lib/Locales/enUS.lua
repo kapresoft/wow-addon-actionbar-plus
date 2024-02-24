@@ -76,8 +76,12 @@ L['Tooltip Anchor::Description']                         = 'Select how and where
 L['Debugging']                                           = true
 L['Debugging::Description']                              = 'Debug Settings for troubleshooting'
 L['Debugging Configuration']                             = true
+L['Debugging::Category::Enable All::Button']             = 'Enable All'
+L['Debugging::Category::Enable All::Button::Desc']       = 'Enables all log categories below.'
+L['Debugging::Category::Disable All::Button']            = 'Disable All'
+L['Debugging::Category::Disable All::Button::Desc']      = 'Disables all log categories below. Note that the default category (not shown here) will always be active.'
 L['Log Level']                                           = true
-L['Log Level::Description']                              = 'Higher log levels generate more logs'
+L['Log Level::Description']                              = 'Higher log levels generate more logs:\nLog Levels: ERROR(5), WARN(10), INFO(15), DEBUG(20), FINE(25), FINER(30), FINEST(35), TRACE(50)'
 
 -- new
 

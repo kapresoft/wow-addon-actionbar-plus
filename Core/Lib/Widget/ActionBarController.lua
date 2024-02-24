@@ -1,4 +1,6 @@
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local PR, WMX, B = O.Profile, O.WidgetMixin, O.BaseAPI
 local Un = O.UnitMixin:New()
@@ -161,7 +163,7 @@ local function PropsAndMethods(o)
     ---@param evt string
     o[E.PLAYER_TARGET_CHANGED] = function(evt, ...)
         local t = UnitName('target') or 'NONE'
-        df:i(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
+        df:f1(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
     end
 
     o[E.BAG_UPDATE] = OnBagUpdate
