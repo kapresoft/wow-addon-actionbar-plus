@@ -575,11 +575,13 @@ local function PropsAndMethods(o)
         local c = self.w:conf()
         local isUsable = true
         local cd = self:GetCooldownInfo()
-
+        local inCombat = InCombatLockdown()
         if (cd == nil or cd.details == nil) then
             if self:IsCompanion() then isUsable = true
-            elseif c.type == MOUNT then isUsable = not IsIndoors()
-            elseif self:IsEquipmentSet() then isUsable = not InCombatLockdown() end
+            elseif c.type == MOUNT then
+                if inCombat then isUsable = false
+                else isUsable = not IsIndoors() end
+            elseif self:IsEquipmentSet() then isUsable = not inCombat end
             self:SetActionUsable(isUsable)
             return
         end
