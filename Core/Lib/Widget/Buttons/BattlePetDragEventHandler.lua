@@ -14,21 +14,16 @@ local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
-local Assert, String = O.Assert, O.String
-local PH = O.PickupHandler
-local IsBlank, IsNotBlank, AssertNotNil, IsNil =
-    String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local PH, IsNil = O.PickupHandler, O.Assert.IsNil
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local BaseAPI = O.BaseAPI
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(M.CompanionDragEventHandler)
+local p = LC.DRAG_AND_DROP:NewLogger(M.CompanionDragEventHandler)
 
 --- @class BattlePetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.BattlePetDragEventHandler)
@@ -65,7 +60,7 @@ end
 --- @param w ButtonUIWidget
 local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
-    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    p:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
     C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
 end
 

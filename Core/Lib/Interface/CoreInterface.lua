@@ -8,62 +8,31 @@ Alias Functions
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject
 -------------------------------------------------------------------------------]]
-local function BaseLibraryObject_Def()
-    --- @class BaseLibraryObject
-    local o = {}
-    --- @type table
-    o.mt = { __tostring = function() end }
-
-    --- @type Logger
-    o.logger = {}
-
-    --- @return string
-    function o:GetModuleName() end
-    --- @return string, string The major and minor version
-    function o:GetVersionUnpacked() end
-    --- @type fun(self:BaseLibraryObject) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
-    --- @return table<string, string>
-    function o:GetVersion() end
-    --- @return Logger
-    function o:GetLogger() end
-end
+--- @class BaseLibraryObject A base library object class definition.
+--- @field mt table The metatable for objects of this class, including a custom `__tostring` function for debugging or logging purposes.
+--- @field name string Retrieves the module's name. This is an instance method that should be implemented to return the name of the module.
+--- @field major string Retrieves the major version of the module. i.e., <LibName>-1.0
+--- @field minor string Retrieves the minor version of the module. i.e., <LibName>-1.0
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_WithAceEvent
 -------------------------------------------------------------------------------]]
-local function BaseLibraryObject_WithAceEvent_Def()
-    --- @class BaseLibraryObject_WithAceEvent : AceEvent
-    local o = {}
-    --- @type table
-    o.mt = { __tostring = function() end }
-
-    --- @return string
-    function o:GetModuleName() end
-    --- @return string, string The major and minor version
-    function o:GetVersionUnpacked() end
-    --- @type fun(self:BaseLibraryObject) : table<string, string>  With keys "major" and "minor"; major:string, minor:string
-    --- @return table<string, string>
-    function o:GetVersion() end
-    --- @return Logger
-    function o:GetLogger() end
-end
+--- @class BaseLibraryObject_WithAceEvent : AceEvent A base library object that includes AceEvent functionality.
+--- @field mt table The metatable for objects of this class, including a custom `__tostring` function for debugging or logging purposes.
+--- @field name string Retrieves the module's name. This is an instance method that should be implemented to return the name of the module.
+--- @field major string Retrieves the major version of the module. i.e., <LibName>-1.0
+--- @field minor string Retrieves the minor version of the module. i.e., <LibName>-1.0
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_Initialized
 -------------------------------------------------------------------------------]]
---- @class BaseLibraryObject_Initialized : BaseLibraryObject
-local BaseLibraryObject_Initialized = {}
---- @type ActionbarPlus
-BaseLibraryObject_Initialized.addon = {}
---- @type Profile_Config
-BaseLibraryObject_Initialized.profile = {}
+--- @class BaseLibraryObject_Initialized : BaseLibraryObject A derived class from BaseLibraryObject that has been initialized.
+--- @field addon ActionbarPlus An instance of the ActionbarPlus class associated with this object.
+--- @field profile Profile_Config The profile configuration for this object, containing settings and preferences.
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_Initialized_WithAceEvent
 -------------------------------------------------------------------------------]]
---- @class BaseLibraryObject_Initialized_WithAceEvent : BaseLibraryObject_WithAceEvent
-local BaseLibraryObject_Initialized_WithAceEvent = {}
---- @type ActionbarPlus
-BaseLibraryObject_Initialized_WithAceEvent.addon = {}
---- @type Profile_Config
-BaseLibraryObject_Initialized_WithAceEvent.profile = {}
+--- @class BaseLibraryObject_Initialized_WithAceEvent : BaseLibraryObject_WithAceEvent A derived class from BaseLibraryObject_WithAceEvent that has been initialized.
+--- @field addon ActionbarPlus An instance of the ActionbarPlus class associated with this object, indicating integration with the ActionbarPlus addon.
+--- @field profile Profile_Config The profile configuration for this object, tailored for use with AceEvent functionalities.

@@ -1,14 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
-local A, AT, W = O.Assert, O.ActionType, GC.WidgetAttributes
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local A, W = O.Assert, GC.WidgetAttributes
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
-local SPELL, ITEM, MACRO, MACRO_TEXT, MOUNT, COMPANION, BATTLE_PET =
-    W.SPELL, W.ITEM, W.MACRO, W.MACRO_TEXT,
-    W.MOUNT, W.COMPANION, W.BATTLE_PET
-
-
 
 --[[-----------------------------------------------------------------------------
 Interface
@@ -25,7 +21,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class ReceiveDragEventHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(M.ReceiveDragEventHandler); if not L then return end
-local p = ns:CreateDragAndDropLogger(M.ReceiveDragEventHandler)
+local p = LC.DRAG_AND_DROP:NewLogger(M.ReceiveDragEventHandler)
 
 --- Handlers with Interface Method ==> `Handler:Handle(btnUI, spellCursorInfo)`
 --- README: Also need to add the attribute setterin in ButtonFactor#AttributeSetters

@@ -6,7 +6,7 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
---- @type _GamedTooltip
+--- @type __GameTooltip
 local GameTooltip = GameTooltip
 ---### See: Interface/SharedXML/Constants.lua
 local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
@@ -16,23 +16,18 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
-local Assert, String = O.Assert, O.String
-local PH = O.PickupHandler
-local IsBlank, IsNotBlank, AssertNotNil, IsNil =
-String.IsBlank, String.IsNotBlank, Assert.AssertNotNil, Assert.IsNil
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
-local BaseAPI = O.BaseAPI
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-
 --- @class EquipmentSetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
 
-local p = L.logger
+local p = LC.DRAG_AND_DROP:NewLogger(M.EquipmentSetDragEventHandler)
+local pe = LC.EVENT:NewLogger(M.EquipmentSetDragEventHandler)
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
@@ -104,7 +99,7 @@ end
 --- @param w ButtonUIWidget
 local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
-    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    pe:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
     if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
     if w:IsMissingEquipmentSet() then return end
 
@@ -149,7 +144,7 @@ local function eventHandlerMethods(e)
 
         local config = btnUI.widget:conf()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
-        p:log(30, 'equipmentSet: %s', equipmentSet)
+        p:d(30, function() return 'equipmentSet: %s', pformat(equipmentSet) end)
 
         PH:PickupExisting(btnUI.widget)
         config[WAttr.TYPE] = equipmentSet.type

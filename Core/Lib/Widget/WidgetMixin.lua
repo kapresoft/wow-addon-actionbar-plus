@@ -1,7 +1,6 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GameTooltip, IsUsableSpell, C_Timer = GameTooltip, IsUsableSpell, C_Timer
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
 local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 local UISpecialFrames, StaticPopup_Visible, StaticPopup_Show = UISpecialFrames, StaticPopup_Visible, StaticPopup_Show
@@ -14,12 +13,11 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local MX, String, P = O.Mixin, O.String, O.Profile
-local GC, BaseAPI = O.GlobalConstants, O.BaseAPI
+local BaseAPI = O.BaseAPI
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
@@ -37,8 +35,8 @@ New Instance
 -------------------------------------------------------------------------------]]
 -- todo next: rename to WidgetUtil?
 --- @class WidgetMixin : BaseLibraryObject
-local _L = LibStub:NewLibrary(ns.M.WidgetMixin)
-local p = _L:GetLogger()
+local _L = LibStub:NewLibrary(M.WidgetMixin)
+local p = ns:CreateDefaultLogger(M.WidgetMixin)
 
 --- @class FontStringWidget
 local FontStringWidget = {

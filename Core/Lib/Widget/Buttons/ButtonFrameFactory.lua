@@ -6,7 +6,7 @@
 Lua Vars
 -------------------------------------------------------------------------------]]
 local _G = _G
-local format, type, ipairs = string.format, type, ipairs
+local format, ipairs = string.format, ipairs
 local tinsert, tsort = table.insert, table.sort
 
 --[[-----------------------------------------------------------------------------
@@ -21,18 +21,17 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 --- @type _AnchorUtil
 local AnchorUtil = AnchorUtil
-local C_Timer = C_Timer
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, _, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.O.LibStub, ns.LogCategories()
 
-local Assert, Table, P = O.Assert, O.Table, O.Profile
-local AO = O.AceLibFactory:A()
-local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
+local Assert, P = O.Assert, O.Profile
+local AceGUI = O.AceLibrary.AceGUI
 local E, M = GC.E, GC.M
-local configHandler = O.Config
+local configHandler = O.Settings
 
 --- @see _ParentFrame.xml
 local frameTemplate = 'ActionbarPlusFrameTemplate'
@@ -45,18 +44,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class ButtonFrameFactory : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.ButtonFrameFactory); if not L then return end
-local p = ns:CreateFrameLogger(ns.M.ButtonFrameFactory)
-
---- @class WidgetBase
-local WidgetBaseTemplate = {
-    --- @param self WidgetBase
-    --- @param name string
-    ['Fire'] = function(self, name, ...) end,
-    --- @param self WidgetBase
-    --- @param name string
-    --- @param func function The callback function
-    ['SetCallback'] = function(self, name, func) end,
-}
+local p = LC.FRAME:NewLogger(ns.M.ButtonFrameFactory)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -253,11 +241,11 @@ end
 ---@param widget FrameWidget
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    local AceEventInCallback = ns:AceEvent()
-    AceEventInCallback:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
-    AceEventInCallback:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
-    AceEventInCallback:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
+    local AceEventIC = ns:AceEvent()
+    AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
+    AceEventIC:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
+    AceEventIC:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
+    AceEventIC:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
@@ -560,7 +548,7 @@ local function WidgetMethods(widget)
 
     function widget:HideUnusedButtons()
         local start = self:GetButtonCount() + 1
-        local max =  O.Config.maxButtons
+        local max =  O.Settings.maxButtons
         for i=start, max do
             --- @type ButtonUI
             local existingBtn = self:GetButtonUI(i)
@@ -802,7 +790,7 @@ function L:Constructor(frameIndex)
     local widget = __widget
 
     -- Allows call to Use callbacks / RegisterEvent
-    AceEvent:Embed(widget)
+    ns:AceEvent(widget)
 
     widget.frame = f
     f.widget = widget

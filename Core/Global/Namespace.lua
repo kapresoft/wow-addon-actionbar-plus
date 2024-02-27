@@ -1,47 +1,30 @@
 --[[-----------------------------------------------------------------------------
 Namespace Initialization
 -------------------------------------------------------------------------------]]
-local _addon, _ns = ...
+--- treat this as a base generic namespace (not the Namespace type)
+local _ns = select(2, ...)
+--- @type LibStub
 local LibStub = LibStub
+--[[-----------------------------------------------------------------------------
+Type: LibPackMixin
+-------------------------------------------------------------------------------]]
+--- @class LibPackMixin
+--- @field O GlobalObjects
+local LibPackMixin = { };
 
----This absolutely does NOTHING but make EmmyLua work better in IDEs for code
----completions.
---- @param o Namespace
-local function Define_InterfaceMethods(o)
+---@param o LibPackMixin
+local function LibPackMixinMethods(o)
+    --- Create a new instance of AceEvent or embed to an obj if passed
+    --- @return AceEvent
+    --- @param obj|nil The object to embed or nil
+    function o:AceEvent(obj) return self.O.AceLibrary.AceEvent:Embed(obj or {}) end
 
-    --- @see CursorMixin.lua
-    --- @return CursorUtil
-    --function o:CreateCursorUtil() end
+    --- Create a new instance of AceBucket or embed to an obj if passed
+    --- @return AceBucket
+    --- @param obj|nil The object to embed or nil
+    function o:AceBucket(obj) return self.LibStubAce('AceBucket-3.0'):Embed(obj or {}) end
+end; LibPackMixinMethods(LibPackMixin)
 
-    --- @see UtilWrapper.lua
-    --- @param start number
-    --- @param increment number
-    --- @return Kapresoft_Incrementer
-    function o:CreateIncrementer(start, increment) end
-
-end
-
-Define_InterfaceMethods(_ns)
-
---- @type LibPackMixin
-local LibPackMixin = {}
---- @return GlobalObjects, LocalLibStub
-function LibPackMixin:LibPack() return self.O, self.O.LibStub end
---- @return GlobalObjects, GlobalConstants
-function LibPackMixin:LibPack2() return self.O, self.O.GlobalConstants end
---- @generic A : AceEvent
---- @return A
-function LibPackMixin:AceEvent() return self.O.AceLibrary.AceEvent:Embed({}) end
-function LibPackMixin:AceEventEmbed(obj) return self.O.AceLibrary.AceEvent:Embed(obj) end
---- @return AceBucket
-function LibPackMixin:AceBucket() return self.LibStubAce('AceBucket-3.0'):Embed({}) end
-
---- @return AceBucket
---- @param obj table
-function LibPackMixin:AceBucketEmbed(obj)
-    local AceBucket = self.LibStubAce('AceBucket-3.0'); if obj then AceBucket:Embed(obj) end
-    return AceBucket
-end
 --- @alias NameSpaceFn fun() : Namespace
 --- @return Namespace
 local function nsfn() return ABP_NS end
@@ -76,10 +59,6 @@ local function NamespaceLoggerMethods(o, ns)
     --- @return BooleanOptional
     function o:IsLoggingDisabled() return true ~= ns().O.GlobalConstants.F.ENABLE_LOGGING end
 
-    function o:CreateDefaultLogger(moduleName)
-        return LoggerMixin():New(moduleName)
-    end
-
     --- @param name string | "'ADDON'" | "'BAG'" | "'BUTTON'" | "'DRAG_AND_DROP'" | "'EVENT'" | "'FRAME'" | "'ITEM'" | "'MESSAGE'" | "'MOUNT'" | "'PET'" | "'PROFILE'" | "'SPELL'"
     --- @param v boolean|number | "1" | "0" | "true" | "false"
     function o:SetLogCategory(name, val)
@@ -93,24 +72,9 @@ local function NamespaceLoggerMethods(o, ns)
         local val = ABP_DEBUG_ENABLED_CATEGORIES[name]
         return val == 1 or val == true
     end
-
     function o.LogCategory() return LoggerMixin().Category end
     function o.LogCategories() return o.LogCategory():GetCategories() end
-
-    local function L() return o.LogCategories() end
-    function o:CreateAddonLogger() return LoggerMixin():New(ns().name, o.LogCategories().ADDON) end
-    function o:CreateBagLogger(moduleName) return L().BAG:NewLogger(moduleName) end
-    function o:CreateButtonLogger(moduleName) return L().BUTTON:NewLogger(moduleName) end
-    function o:CreateDragAndDropLogger(moduleName) return L().DRAG_AND_DROP:NewLogger(moduleName) end
-    function o:CreateEventLogger(moduleName) return L().EVENT:NewLogger(moduleName) end
-    function o:CreateFrameLogger(moduleName) return L().FRAME:NewLogger(moduleName) end
-    function o:CreateItemLogger(moduleName) return L().ITEM:NewLogger(moduleName) end
-    function o:CreateMountLogger(moduleName) return L().MOUNT:NewLogger(moduleName) end
-    function o:CreateMessageLogger(moduleName) return L().MESSAGE:NewLogger(moduleName) end
-    function o:CreatePetLogger(moduleName) return L().PET:NewLogger(moduleName) end
-    function o:CreateProfileLogger(moduleName) return L().PROFILE:NewLogger(moduleName) end
-    function o:CreateSpellLogger(moduleName) return L().SPELL:NewLogger(moduleName) end
-    function o:CreateUnitLogger(moduleName) return L().UNIT:NewLogger(moduleName) end
+    function o:CreateDefaultLogger(moduleName) return LoggerMixin():New(moduleName) end
 
 end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
 
@@ -119,16 +83,7 @@ end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
 local function NewLocalLibStub(ns)
     --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
     local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
-            function(name, newLibInstance)
-                --- @type Logger
-                local loggerLib = LibStub(ns:LibName(ns.M.Logger))
-                if loggerLib then
-                    newLibInstance.logger = loggerLib:NewLogger(name)
-                    newLibInstance.logger:log(30, 'New Lib: %s', newLibInstance.major)
-                    function newLibInstance:GetLogger() return self.logger end
-                end
-                ns:Register(name, newLibInstance)
-            end)
+            function(name, newLibInstance) ns:Register(name, newLibInstance) end)
     return LocalLibStub
 end
 
@@ -143,6 +98,7 @@ local function CreateNamespace(...)
     --- @type string
     local addon
     --- @class __Namespace : LibPackMixin
+    --- @field O GlobalObjects
     local ns
 
     addon, ns = ...
@@ -199,10 +155,17 @@ local function CreateNamespace(...)
         --- @return Kapresoft_Incrementer
         function o:CreateIncrementer(start, increment) return self:K():CreateIncrementer(start, increment) end
 
-        --- @return SequenceMixin
+        --- @return Kapresoft_LibUtil_SequenceMixin
         --- @param startingSequence number|nil
         function o:CreateSequence(startingSequence)
             return self:K().Objects.SequenceMixin:New(startingSequence)
+        end
+
+        --- TODO: Update safecall to handle LoggerMixinV2
+        --- @param libName Name
+        --- @return Kapresoft_LibUtil_Safecall
+        function o:CreateSafecall(libName)
+            local logger = o.O.Logger:NewLogger(libName); return o.O.Safecall:New(logger)
         end
 
         --- @param moduleName string The module name, i.e. Logger

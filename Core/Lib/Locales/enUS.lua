@@ -67,6 +67,7 @@ L['usage']                                               = true
 L['No']                                                  = true
 L['Always']                                              = true
 L['In-Combat']                                           = true
+L['Click and drag to move the action bar']               = true
 L['Right-click to open config UI']                       = true
 L['General']                                             = true
 L['General Configuration']                               = true

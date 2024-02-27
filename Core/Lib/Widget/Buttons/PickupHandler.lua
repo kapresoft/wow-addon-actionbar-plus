@@ -6,12 +6,10 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
-local BaseAPI, LogFactory, Table = O.BaseAPI, O.LogFactory, O.Table
-local IsNotBlank, IsTableEmpty = O.String.IsNotBlank, Table.isEmpty
-local WAttr = GC.WidgetAttributes
-local SPELL, ITEM, MACRO, MOUNT, COMPANION =
-    WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT, WAttr.COMPANION
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local BaseAPI = O.BaseAPI
+local IsNotBlank = O.String.IsNotBlank
 
 
 --[[-----------------------------------------------------------------------------
@@ -19,7 +17,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class PickupHandler
 local L = LibStub:NewLibrary(M.PickupHandler); if not L then return end
-local p = ns:CreateDragAndDropLogger(M.PickupHandler)
+local p = LC.DRAG_AND_DROP:NewLogger(M.PickupHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods

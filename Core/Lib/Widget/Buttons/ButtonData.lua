@@ -10,9 +10,8 @@ local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, _, _, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local String, Assert = O.String, O.Assert
 local W = O.GlobalConstants.WidgetAttributes
@@ -25,7 +24,7 @@ local IsBlank, IsNil = String.IsBlank, Assert.IsNil
 local IsEmptyTable = O.Table.IsEmpty
 
 --[[-----------------------------------------------------------------------------
-New Instance
+New Instance: ** ButtonData is no longer being used **
 -------------------------------------------------------------------------------]]
 --- @class ButtonData : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.ButtonData)

@@ -6,15 +6,13 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub, GC = ns.O, ns.LibStub, ns.O.GlobalConstants
-
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local Assert, String = O.Assert, O.String
 local WAttr, PH = GC.WidgetAttributes, O.PickupHandler
 local AceEvent = O.AceLibrary.AceEvent
 
-local s_replace, IsNil = String.replace, Assert.IsNil
+local IsNil = Assert.IsNil
 local warnColor = WARNING_FONT_COLOR or RED_FONT_COLOR
 local highlightColor =  HIGHLIGHT_LIGHT_BLUE or BLUE_FONT_COLOR
 
@@ -26,8 +24,8 @@ local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)
 New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(ns.M.MacroDragEventHandler)
-local p = L:GetLogger()
+local L = LibStub:NewLibrary(M.MacroDragEventHandler)
+local p = LC.EVENT:NewLogger(M.MacroEventsHandler)
 local LL = GC:GetAceLocale()
 
 --[[-----------------------------------------------------------------------------
@@ -54,10 +52,9 @@ local function eventHandlerMethods(e)
             if isEnabled ~= true then
                 local msg = warnColor:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
                         .. ' ' .. highlightColor:WrapTextInColorCode(LL['ActionbarPlus-M6 URL'])
-                p:log(msg)
+                p:w(msg)
             end
-
-            p:log(10, 'm6 supported: %s', isEnabled)
+            p:i(function() return 'm6 supported: %s', tostring(isEnabled) end)
             return isEnabled
         end
 

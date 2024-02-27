@@ -8,10 +8,10 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return DebuggingConfigGroup, LoggerV2
+--- @return DebuggingSettingsGroup, LoggerV2
 local function CreateLib()
     local libName = M.DebuggingConfigGroup
-    --- @class DebuggingConfigGroup : BaseLibraryObject
+    --- @class DebuggingSettingsGroup : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:CreateDefaultLogger(libName)
     return newLib, logger
@@ -22,7 +22,7 @@ local dbgSeq = ns:CreateSequence()
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o DebuggingConfigGroup
+---@param o DebuggingSettingsGroup
 local function PropsAndMethods(o)
     --- spacer
     local sp = '                                                                   '

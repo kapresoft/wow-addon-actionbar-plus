@@ -6,7 +6,8 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local String = O.String
 local AceEvent = O.AceLibrary.AceEvent
@@ -38,7 +39,7 @@ button: widget.button
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
 local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end; AceEvent:Embed(L)
-local p = L:GetLogger()
+local p = LC.BUTTON:NewLogger(M.ButtonMixin)
 
 --[[-----------------------------------------------------------------------------
 Instance Methods
@@ -1182,12 +1183,6 @@ local function PropsAndMethods(o)
         self:ShowOverlayGlowAsActiveButton()
     end
 
-
-    function o:LogSpellName() p:log('SpellName: %s', tostring(self:GetEffectiveSpellName())) end
-
-    --- @param label string
-    function o:LogSpellNameWithDetails(label) p:log('[%s::%s]: %s [%s]', label or 'SpellDetails',
-            self:GN(), tostring(self:GetEffectiveSpellName()), tostring(self:GetConfig().type)) end
 end
 
 PropsAndMethods(L)

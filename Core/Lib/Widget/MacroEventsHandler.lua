@@ -11,14 +11,16 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+
 local P, Table, String = O.Profile, O.Table, O.String
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
 --- @class MacroEventsHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(M.MacroEventsHandler)
-local p = ns:CreateEventLogger(M.MacroEventsHandler)
+local p = LC.EVENT:NewLogger(M.MacroEventsHandler)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -128,7 +130,10 @@ end
 ---1. Macro UI Updates
 ---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
-    p:t(function() return 'Event Received: %s', event end)
+    local inCombat = InCombatLockdown()
+    p:t(function() return 'Event Received: %s combat=%s', event, tostring(inCombat) end)
+    if inCombat then return end
+
     OnMacroUpdate()
 end
 
@@ -136,7 +141,7 @@ end
 Event Hook
 -------------------------------------------------------------------------------]]
 ns:AceEvent():RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
-    local pm = ns:CreateMessageLogger(M.MacroEventsHandler)
+    local pm = LC.MESSAGE:NewLogger(M.MacroEventsHandler)
     pm:d(function() return "MSG:R: %s", evt end)
     local frame = CreateFrame("Frame", M.MacroEventsHandler .. "Frame", UIParent)
     frame:SetScript(E.OnEvent, OnAddonLoaded)

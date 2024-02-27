@@ -17,11 +17,10 @@ local IsUsableSpell = IsUsableSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local pformat = ns.pformat
+
 local UnitId = GC.UnitId
 local W = GC.WidgetAttributes
 
@@ -30,8 +29,8 @@ local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, 
 local sformat = String.format
 
 --- @class BaseAPI : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.BaseAPI)
-local p = L:GetLogger()
+local L = LibStub:NewLibrary(M.BaseAPI); if not L then return end
+local p = ns:CreateDefaultLogger(M.BaseAPI)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -158,7 +157,7 @@ function L:GetCompanionInfo(petType, index)
         assert(index, "Companion index is required")
         creatureID, creatureName, creatureSpellID, icon, isSummoned, mountType = GetCompanionInfo(petType, index)
     end)
-    if not status then return p:log('Error calling GetCompanionInfo(): %s', err) end
+    if not status then return p:e(function() return 'Error calling GetCompanionInfo(): %s', err end) end
 
     return {
         ['petType'] = petType,
@@ -329,7 +328,7 @@ function L:GetMountInfoLegacy(companionIndex)
     if not IsUsableSpell(spellName) then
         local spellInfoName = GetSpellInfo(creatureSpellID)
         if spellInfoName then spellName = spellInfoName end
-        p:log(30, 'Mount creature-name=[%s] spell=[%s]', creatureName, spellName)
+        p:d(function() return 'Mount creature-name=[%s] spell=[%s]', creatureName, spellName end)
     end
 
     local isActive = false

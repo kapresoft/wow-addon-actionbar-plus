@@ -1,25 +1,22 @@
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local sformat, slower, tinsert = string.format, string.lower, table.insert
+local tinsert = table.insert
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show =
-    GameTooltip, C_Timer, ReloadUI, IsShiftKeyDown, StaticPopup_Show
 local TooltipDataProcessor = TooltipDataProcessor
 local Enum, EmbeddedItemTooltip, ItemRefTooltip = Enum, EmbeddedItemTooltip, ItemRefTooltip
 
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
-local AceEvent = O.AceLibrary.AceEvent
-local String, Table, A, P, MSG = O.String, O.Table, O.Assert, O.Profile, GC.M
-local IsBlankString, IsEmptyTable = String.IsBlank, Table.isEmpty
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local Table, P, MSG = O.Table, O.Profile, GC.M
+local IsEmptyTable = Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
-local AssertNotNil = A.AssertNotNil
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
             WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
@@ -31,9 +28,8 @@ local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
 
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
-local p = L:GetLogger()
-local safecall = O.Safecall:New(p)
+local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; ns:AceEvent(L)
+local p = LC.BUTTON:NewLogger(M.ButtonFactory)
 
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
@@ -218,17 +214,6 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     return btnWidget
 end
 
-function L:IsValidDragSource(cursorInfo)
-    if String.IsBlank(cursorInfo.type) then
-        -- This can happen if a chat tab or others is dragged into
-        -- the action bar.
-        self:log(5, 'Received drag event with invalid cursor info. Skipping...')
-        return false
-    end
-
-    return true
-end
-
 --[[-----------------------------------------------------------------------------
 Event Handlers
 -------------------------------------------------------------------------------]]
@@ -248,7 +233,7 @@ Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
-    local pm = ns:CreateMessageLogger(M.ButtonFactory)
+    local pm = LC.MESSAGE:NewLogger(M.ButtonFactory)
     L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
         pm:d(function() return 'MSG::R: %s', msg end)
         L:Init()
