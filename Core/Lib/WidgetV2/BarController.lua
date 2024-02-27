@@ -12,13 +12,13 @@ New Instance
 local libName = M.BarController or 'BarController'
 --- @class BarController : BaseLibraryObject
 local L = LibStub:NewLibrary(libName); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateDefaultLogger(libName)
 
 -- Add to Modules.lua
---BarController = 'BarController',
+-- BarController = 'BarController',
 --
------ @type BarController
---BarController = {},
+-- @type BarController
+-- BarController = {},
 
 --[[-----------------------------------------------------------------------------
 Methods

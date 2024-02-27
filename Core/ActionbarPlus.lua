@@ -31,8 +31,7 @@ local MX, WMX, BF = O.Mixin, O.WidgetMixin, O.ButtonFactory
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
-local p = LogFactory()
-local ap = ns:CreateAddonLogger()
+local p, pd = ns:CreateAddonLogger(), ns:CreateDefaultLogger(ns.name)
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -45,7 +44,9 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     if UnitOnTaxi(GC.UnitId.player) == true then
         local isShown = WMX:IsHideWhenTaxi() ~= true
         WMX:ShowActionbarsDelayed(isShown, 3)
+        p:d(function() return "OnPlayerEnteringWorld(): Calling ShowActionbarsDelayed..." end)
     end
+    p:d(function() return "OnPlayerEnteringWorld(): Sending message [%s]", M.OnAddOnReady end)
     frame.ctx.addon:SendMessage(M.OnAddOnReady)
 
     --@debug@
@@ -55,7 +56,7 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     if not isLogin then return end
     local versionText = GC:GetAddonInfo()
     local C = GC:GetAceLocale()
-    p:log(sformat(C['Addon Initialized Text Format'], versionText, GCC.ABP_COMMAND))
+    pd:vv(function() return C['Addon Initialized Text Format'], versionText, GCC.ABP_COMMAND end)
 end
 
 --- @return ActionbarPlus_Frame
@@ -83,8 +84,6 @@ Methods
 --- @class ActionbarPlus_Methods : ActionbarPlusProperties
 --- @type string
 local methods = {
-    --- @param self ActionbarPlus
-    ['GetLogger'] = function(self) return p end,
     --- @param self ActionbarPlus
     --- @param isShown boolean
     ['ShowActionbars'] = function(self, isShown)
@@ -115,19 +114,18 @@ local methods = {
     --- @param self ActionbarPlus
     ['SlashCommand_Help_Handler'] = function(self)
         local C = GC:GetAceLocale()
-        p:log('')
-        p:log(GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'])
-        p:log('%s:  /abp [%s]', C['usage'], C['options'])
-        p:log('%s:', C['options'])
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'])
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'])
-        --p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'macros', 'Enable macro edit mode')
-        p:log(GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'])
+        pd:vv('')
+        pd:vv(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
+        pd:vv(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
+        pd:vv(function() return '%s:', C['options'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
     end,
     --- @param self ActionbarPlus
     --- @param spaceSeparatedArgs string
     ['SlashCommand_Info_Handler'] = function(self, spaceSeparatedArgs)
-        p:log(GC:GetAddonInfoFormatted())
+        pd:vv(GC:GetAddonInfoFormatted())
     end,
     --- @param self ActionbarPlus
     ['ConfirmReloadUI'] = function(self)
@@ -164,13 +162,9 @@ local methods = {
     --- @param self ActionbarPlus
     ['OnHide_Config'] = function(self, enableSound)
         enableSound = enableSound or false
-        ap:d(function() return 'OnHide_Config called with enableSound=%s', tostring(enableSound) end)
+        p:d(function() return 'OnHide_Config called with enableSound=%s', tostring(enableSound) end)
         if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
     end,
-    --- @param self ActionbarPlus
-    ['OnUpdate'] = function(self) p:log('OnUpdate called...') end,
-    --- @param self ActionbarPlus
-    ['OnProfileChanged'] = function(self) self:ConfirmReloadUI() end,
     --- @param self ActionbarPlus
     ['InitializeDb'] = function(self)
         -- Set up our database
@@ -205,34 +199,49 @@ local methods = {
         self.barBindings = WMX:GetBarBindingsMap()
         if self.barBindings then BF:UpdateKeybindText() end
     end,
+
+}
+---@param o ActionbarPlus
+local function AdditionalMethods(o)
+
     --- This is called automatically by Ace
-    --- @param self ActionbarPlus
-    ['OnInitialize'] = function(self)
+    function o:OnInitialize()
         self:InitializeDb()
         self:RegisterSlashCommands()
         self:SendMessage(M.OnAddOnInitialized, self)
 
         if ns.features.enableV2 ~= true then return end
-        p:log('IsV2Enabled: %s', ns.features.enableV2)
+        p:d(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
         self:SendMessage(M.OnAddOnInitializedV2)
-        p:log('MSG::OnAddOnInitializedV2 Sent')
-    end,
+        p:d(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
+    end
 
+    --- This is called automatically by Ace
     --- Called during the PLAYER_LOGIN
     --- #### See Also: [Ace-addon-3-0](https://www.wowace.com/projects/ace3/pages/api/ace-addon-3-0)
-    --- @param self ActionbarPlus
-    ['OnEnable'] = function(self)
-        -- Do more initialization here, that really enables the use of your addon.
-        -- Register Events, Hook functions, Create Frames, Get information from
-        -- the game that wasn't available in OnInitialize
-        self:RegisterHooks()
-        self:SendMessage(M.OnAddOnEnabled, self)
-        if ns.features.enableV2 ~= true then return end
+    function o:OnEnable()
+    -- Do more initialization here, that really enables the use of your addon.
+    -- Register Events, Hook functions, Create Frames, Get information from
+    -- the game that wasn't available in OnInitialize
+    self:RegisterHooks()
+    self:SendMessage(M.OnAddOnEnabled, self)
+    if ns.features.enableV2 ~= true then return end
 
-        self:SendMessage(M.OnAddOnEnabledV2)
-        p:log('MSG::OnAddOnEnabledV2 Sent')
+    self:SendMessage(M.OnAddOnEnabledV2)
+    p:d('OnEnable():MSG:OnAddOnEnabledV2 Sent')
     end
-}
+
+    function o:OnProfileChanged() self:ConfirmReloadUI() end
+
+    --- @param ... any
+    function o:SmartMount(...)
+        local flying,ground = ...
+        p:d(function() return "flying=%s ground=%s", flying, ground end)
+        if 'string' == type(flying) and 'string' == type(ground) then
+            O.API:SummonMountSimple(flying, ground)
+        end
+    end
+end
 
 --[[-----------------------------------------------------------------------------
 New Addon Instance
@@ -246,6 +255,7 @@ local function NewInstance()
     A.mountID = nil
     A.companionID = nil
     MX:Mixin(A, methods)
+    AdditionalMethods(A)
     A.ActionbarEmptyGridShowing = false
 
     RegisterEvents(A)

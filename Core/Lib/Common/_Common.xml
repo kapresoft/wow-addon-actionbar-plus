@@ -5,9 +5,9 @@
     <Include file='_ParentFrame.xml'/>
     <Include file='_TooltipFrame.xml'/>
 
-    <Script file="DebuggingConfigGroup.lua"/>
-    <Script file="ConfigEventHandlerMixin.lua"/>
-    <Script file="Config.lua"/>
+    <Script file="DebuggingSettingsGroup.lua"/>
+    <Script file="SettingsEventHandlerMixin.lua"/>
+    <Script file="Settings.lua"/>
     <Script file="ProfileInitializer.lua"/>
     <Script file="Profile.lua"/>
 

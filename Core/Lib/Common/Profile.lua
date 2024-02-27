@@ -6,11 +6,10 @@ local type, pairs, tostring = type, pairs, tostring
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
-local GC, Ace, PI = O.GlobalConstants, O.AceLibrary, O.ProfileInitializer
+local Ace, PI = O.AceLibrary, O.ProfileInitializer
 local Table, Assert, String = O.Table, O.Assert, O.String
 local AceEvent, W = Ace.AceEvent, GC.WidgetAttributes
 local IsEmptyTable, isNotTable, tsize, tinsert, tsort
@@ -22,9 +21,9 @@ local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class Profile : BaseLibraryObject_WithAceEvent
-local P = LibStub:NewLibrary(ns.M.Profile); if not P then return end
+local P = LibStub:NewLibrary(M.Profile); if not P then return end
 AceEvent:Embed(P)
-local p = P:GetLogger()
+local p = ns:CreateProfileLogger(M.Profile)
 
 local ConfigNames = GC.Profile_Config_Names
 local C = GC:GetAceLocale()

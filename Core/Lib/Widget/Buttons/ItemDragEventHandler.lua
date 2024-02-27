@@ -6,29 +6,27 @@ local GetItemInfo = GetItemInfo
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
 local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local API = O.API
 
-
 --[[-----------------------------------------------------------------------------
 New Instance: ItemDragEventHandler
 -------------------------------------------------------------------------------]]
 ---@class ItemDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(ns.M.ItemDragEventHandler); if not L then return end
+local L = LibStub:NewLibrary(M.ItemDragEventHandler); if not L then return end
 
 --[[-----------------------------------------------------------------------------
 New Instance: ItemAttributeSetter
 -------------------------------------------------------------------------------]]
 ---@class ItemAttributeSetter : BaseAttributeSetter
-local S = LibStub:NewLibrary(ns.M.ItemAttributeSetter); if not S then return end
+local S = LibStub:NewLibrary(M.ItemAttributeSetter); if not S then return end
 ---@type BaseAttributeSetter
-local BaseAttributeSetter = LibStub(ns.M.BaseAttributeSetter)
+local BaseAttributeSetter = LibStub(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Methods: ItemDragEventHandler

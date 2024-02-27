@@ -39,16 +39,6 @@ function _L:WidgetBuilder() return _B end
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
---- @param cursorInfo CursorInfo
-local function IsValidDragSource(cursorInfo)
-    if not cursorInfo or IsBlank(cursorInfo.type) then
-        -- This can happen if a chat tab or others is dragged into
-        -- the action bar.
-        return false
-    end
-    return O.ReceiveDragEventHandler:IsSupportedCursorType(cursorInfo)
-end
-
 ---TODO: See the following implementation to mimic keydown
 --- - https://wowpedia.fandom.com/wiki/CVar_ActionButtonUseKeyDown
 --- - https://www.wowinterface.com/forums/showthread.php?t=58768
@@ -214,8 +204,9 @@ local function OnLeave(btn)
     btn.widget:Fire(E.ON_LEAVE)
 end
 
+--- @param btn ButtonUI
 local function OnClick_SecureHookScript(btn, mouseButton, down)
-    --p:log(20, 'SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()))
+    p:d(function() return 'OnClick:SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()) end)
     btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
@@ -257,8 +248,7 @@ end
 
 ---@param widget ButtonUIWidget
 local function OnPlayerStoppedMoving(widget, event)
-    --if widget:IsNotUpdatable() then return end
-    --p:log('moving-stopped[%s]: %s', widget:GN(), GetTime())
+    p:f1(function() return 'moving-stopped[%s]: %s', widget:GN(), GetTime() end)
     OnPlayerTargetChangedDelayed(widget, event)
 end
 --[[-----------------------------------------------------------------------------
@@ -367,10 +357,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     --- @type ButtonUI
     local btn = button
-    ---@param self ButtonUI
-    --btn:SetScript("OnUpdate", function(self)
-    --    p:log('OnUpdate: %s', self:GetName())
-    --end)
 
     --local button = CreateFrame("Button", btnName, UIParent, "SecureActionButtonTemplate,SecureHandlerBaseTemplate")
     button.text = WMX:CreateFontString(button)
@@ -385,8 +371,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     -- /run SetCVar("ActionButtonUseKeyDown", 0)
     -- /dump GetCVarBool("ActionButtonUseKeyDown")
 
-    button:RegisterForDrag("LeftButton", "RightButton");
-    button:RegisterForClicks("AnyDown", "AnyUp");
+    btn:RegisterForDrag("LeftButton", "RightButton");
+    btn:RegisterForClicks("AnyDown", "AnyUp");
 
     --- see: Interface/AddOns/Blizzard_APIDocumentationGenerated/CooldownFrameAPIDocumentation.lua
     --- @class CooldownFrame : _CooldownFrame
@@ -432,8 +418,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     button.widget, cooldown.widget = widget, widget
 
-    AceEvent:Embed(widget)
-    ns:AceBucketEmbed(widget)
+    ns:AceEvent(widget)
+    ns:AceBucket(widget)
 
     ButtonMX:Mixin(widget)
 

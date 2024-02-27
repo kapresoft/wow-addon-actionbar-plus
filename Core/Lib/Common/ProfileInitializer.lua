@@ -24,7 +24,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class ProfileInitializer : BaseLibraryObject_Initialized
 local L = LibStub:NewLibrary(M.ProfileInitializer); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateProfileLogger(M.ProfileInitializer)
 
 --[[-----------------------------------------------------------------------------
 Instance Properties

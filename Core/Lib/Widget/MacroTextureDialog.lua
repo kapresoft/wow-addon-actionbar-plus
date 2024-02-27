@@ -13,12 +13,10 @@ local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
 
 local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:A().AceGUI, O.WidgetMixin
-local GC = O.GlobalConstants
 local ICON_PREFIX = 'Interface/Icons/'
 local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 
@@ -58,7 +56,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroTextureDialog
 local _L = LibStub:NewLibrary('MacroTextureDialog')
-
+local p = ns:CreateFrameLogger('MacroTextureDialog')
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -105,7 +103,7 @@ function _L:LoadChunkIcons(iconSupplier)
     local iconChunks = Table.chunkedArray(icons, options.chunkSize)
     local chunkCount = #iconChunks
     local chunkIndex = 1
-    _L:log(1, 'Loading[%s] %s Icons with Chunk Size [%s]', #icons, options.name, options.chunkSize)
+    p:v(function() return 'Loading[%s] %s Icons with Chunk Size [%s]', #icons, options.name, options.chunkSize end)
     local dlg = _L:GetDialog()
     iconLoadTimer = C_Timer.NewTicker(options.incrementInSeconds, function()
         local chunk = table.remove(iconChunks, 1)
@@ -116,7 +114,7 @@ function _L:LoadChunkIcons(iconSupplier)
         if #iconChunks <= 0 then
             iconLoadTimer:Cancel()
             options.loaded = true
-            _L:log(1, 'Done loading %s icons.', options.name)
+            p:v(function() return 'Done loading %s icons.', options.name end)
             self:LoadChunkIcons(ItemIconsSupplier)
         end
     end)
@@ -133,7 +131,7 @@ Methods
 ---@return MacroTextureDialogFrame
 function _L:GetDialog()
     if thisDialog == nil then
-        self:log(10, 'New MacroTextureDialog instance created.')
+        p:v(function() return 'New MacroTextureDialog instance created.' end)
         thisDialog = self:CreateTexturePopupDialog()
     end
     return thisDialog
@@ -217,7 +215,7 @@ function _L:CreateTexturePopupDialog()
         self:SetIconId(iconId)
         iconPreview:SetImage(iconId)
         if _L.optionalCallbackFn then
-            _L:log(10, 'optionalCallbackFn: %s', _L.optionalCallbackFn)
+            p:v(function() return 'optionalCallbackFn: %s', _L.optionalCallbackFn end)
             _L.optionalCallbackFn(iconId)
         end
         if _L.closeOnSelect then self:Hide() end
@@ -254,7 +252,7 @@ function _L:FetchMacroIcons()
     end
     --macroIcons = GetMacroIcons()
     macroIcons = GetMacroItemIcons()
-    self:log(10, 'MacroIcons fetched')
+    p:v(function() return 'MacroIcons fetched' end)
 end
 
 --[[-----------------------------------------------------------------------------

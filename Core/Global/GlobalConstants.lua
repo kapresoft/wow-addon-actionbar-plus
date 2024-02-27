@@ -256,6 +256,7 @@ local function GlobalConstantProperties(o)
         UNIT_EXITED_VEHICLE = 'UNIT_EXITED_VEHICLE',
 
         UPDATE_MACROS = 'UPDATE_MACROS',
+        ZONE_CHANGED = 'ZONE_CHANGED',
         ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
@@ -623,9 +624,6 @@ local function GlobalConstantMethods(o)
     function o:GetLogLevel() return ABP_LOG_LEVEL end
     --- @param level number The log level between 1 and 100
     function o:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
-    --- @param level number
-    function o:ShouldLog(level) return self:GetLogLevel() >= level end
-    function o:IsVerboseLogging() return self:ShouldLog(20) end
 
     --- @param frameIndex number
     --- @param btnIndex number

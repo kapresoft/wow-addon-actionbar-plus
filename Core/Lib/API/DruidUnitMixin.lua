@@ -1,8 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
+local FLIGHT_FORM_SPELLID = 40120
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -32,6 +34,20 @@ local function PropsAndMethods(o)
         local icon, active, castable, spellID = GetShapeshiftFormInfo(shapeShiftFormIndex)
         return spellID == formSpellId and active
     end
+
+    --- @param spellID SpellID
+    --- @return Boolean
+    function o:IsFlightForm(spellID) return spellID == FLIGHT_FORM_SPELLID end
+
+    --- @return Boolean
+    function o:IsFlightFormUsable() return true == IsUsableSpell(FLIGHT_FORM_SPELLID) end
+
+    --- @param spellID SpellID
+    --- @return Boolean
+    function o:IsFlightFormAndUsable(spellID)
+        return self:IsFlightForm(spellID) and self:IsFlightFormUsable()
+    end
+
 end; PropsAndMethods(L)
 
 

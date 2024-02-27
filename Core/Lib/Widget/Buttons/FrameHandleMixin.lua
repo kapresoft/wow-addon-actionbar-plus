@@ -12,17 +12,13 @@ local format, strlower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, LibStub = ns:LibPack()
-local GC = O.GlobalConstants
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 local LSM = O.AceLibFactory:A().AceLibSharedMedia
-local E = GC.E
-local GCC = GC.C
-local C = GC:GetAceLocale()
+local E, GCC, C = GC.E, GC.C, GC:GetAceLocale()
 
 local FrameHandleBackdrop = {
-    ---@see LibSharedMedia
+    --- @see LibSharedMedia
     bgFile = LSM:Fetch(LSM.MediaType.BACKGROUND, "Solid"),
     --bgFile = BACKDROP_TUTORIAL_16_16.bgFile,
     tile = false, tileSize = 26, edgeSize = 0,
@@ -32,9 +28,9 @@ local FrameHandleBackdrop = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
----@class FrameHandleMixin : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.FrameHandleMixin); if not L then return end
-local p = L:GetLogger()
+--- @class FrameHandleMixin : BaseLibraryObject
+local L = LibStub:NewLibrary(M.FrameHandleMixin); if not L then return end
+local p = ns:CreateFrameLogger(M.FrameHandleMixin)
 
 --Events
 L.E = {
@@ -44,20 +40,20 @@ L.E = {
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
----@class MouseButtonMixin
+--- @class MouseButtonMixin
 local MouseButtonUtil = {}
----@param mouseButton string
----@return boolean
+--- @param mouseButton string
+--- @return boolean
 function MouseButtonUtil:IsLeftButton(mouseButton) return GCC.LeftButton == mouseButton end
----@param mouseButton string
----@return boolean
+--- @param mouseButton string
+--- @return boolean
 function MouseButtonUtil:IsRightButton(mouseButton) return GCC.RightButton == mouseButton end
----@param mouseButton string
----@return boolean
+--- @param mouseButton string
+--- @return boolean
 function MouseButtonUtil:IsButton5(mouseButton) return GCC.Button5 == mouseButton end
 local MBU = MouseButtonUtil
 
----@param frame FrameHandle
+--- @param frame FrameHandle
 local function ShowConfigTooltip(frame)
     GameTooltip:SetOwner(frame, GCC.ANCHOR_TOPLEFT)
     --  Shift + Left-Click to ReloadUI (on debug only)
@@ -65,7 +61,7 @@ local function ShowConfigTooltip(frame)
     GameTooltip:Show()
 end
 
----@param frame FrameHandle
+--- @param frame FrameHandle
 local function OnLeave(frame)
     GameTooltip:Hide()
 
@@ -73,7 +69,7 @@ local function OnLeave(frame)
     frame:HideBackdrop()
 end
 
----@param frame FrameHandle
+--- @param frame FrameHandle
 local function OnEnter(frame)
     ShowConfigTooltip(frame)
     C_Timer.After(3, function() GameTooltip:Hide() end)
@@ -94,12 +90,12 @@ local function OnMouseDown(frameHandle, mouseButton)
     end
 end
 
----@param f FrameHandle
+--- @param f FrameHandle
 local function OnDragStart(f)
     f.widget.frame:StartMoving()
 end
 
----@param f FrameHandle
+--- @param f FrameHandle
 local function OnDragStop(f)
     f.widget.frame:StopMovingOrSizing()
     f.widget:Fire(L.E.OnDragStop_FrameHandle)
@@ -108,7 +104,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param widget FrameWidget
+--- @param widget FrameWidget
 function L:Init(widget)
     self.widget = widget
     self.frame = widget.frame
@@ -117,8 +113,8 @@ end
 --- @param f __FrameHandle
 local function PropertiesAndMethods(f)
 
-    f.OnMouseOverTooltipText = format('%s #%s: %s', ABP_ACTIONBAR_BASE_NAME,
-            f.widget.index, C['Right-click to open config UI'])
+    f.OnMouseOverTooltipText = format('%s #%s:\n%s.\n%s', ABP_ACTIONBAR_BASE_NAME,
+            f.widget.index, C['Click and drag to move the action bar'], C['Right-click to open config UI'])
 
     function f:UpdateBackdropState()
         if self:IsMouseOverEnabled() then
@@ -145,7 +141,7 @@ local function PropertiesAndMethods(f)
 end
 
 
----@return FrameHandle
+--- @return FrameHandle
 function L:Constructor()
     --- @class __FrameHandle
     local fhf = CreateFrame("Frame", nil, self.widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
@@ -181,7 +177,7 @@ function L:Constructor()
 end
 
 
----@param fh FrameHandle
+--- @param fh FrameHandle
 function L:RegisterScripts(fh)
     fh:SetScript(E.OnMouseDown, OnMouseDown)
     fh:SetScript(E.OnDragStart, OnDragStart)
@@ -190,12 +186,11 @@ function L:RegisterScripts(fh)
     fh:SetScript(E.OnLeave, OnLeave)
 end
 
----@return FrameHandle
----@param widget FrameWidget
+--- @return FrameHandle
+--- @param widget FrameWidget
 function ABP_CreateFrameHandle(widget)
     assert(widget, "FrameWidget is required.")
-    ---@class FrameHandleMixinInstance : FrameHandleMixin
+    --- @class FrameHandleMixinInstance : FrameHandleMixin
     local mixin = ns:K():CreateAndInitFromMixin(L, widget)
     return mixin:Constructor()
 end
-

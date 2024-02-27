@@ -32,8 +32,7 @@ local WMX = O.WidgetMixin
 
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; AceEvent:Embed(L)
-local p = L:GetLogger()
-local safecall = O.Safecall:New(p)
+local p = ns:CreateButtonLogger(M.ButtonFactory)
 
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
@@ -216,17 +215,6 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     btnWidget:UpdateStateDelayed(0.05)
     btnWidget:CleanupActionTypeData()
     return btnWidget
-end
-
-function L:IsValidDragSource(cursorInfo)
-    if String.IsBlank(cursorInfo.type) then
-        -- This can happen if a chat tab or others is dragged into
-        -- the action bar.
-        self:log(5, 'Received drag event with invalid cursor info. Skipping...')
-        return false
-    end
-
-    return true
 end
 
 --[[-----------------------------------------------------------------------------

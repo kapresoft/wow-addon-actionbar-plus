@@ -32,7 +32,7 @@ local Assert, Table, P = O.Assert, O.Table, O.Profile
 local AO = O.AceLibFactory:A()
 local AceEvent, AceGUI, LSM = AO.AceEvent, AO.AceGUI, AO.AceLibSharedMedia
 local E, M = GC.E, GC.M
-local configHandler = O.Config
+local configHandler = O.Settings
 
 --- @see _ParentFrame.xml
 local frameTemplate = 'ActionbarPlusFrameTemplate'
@@ -560,7 +560,7 @@ local function WidgetMethods(widget)
 
     function widget:HideUnusedButtons()
         local start = self:GetButtonCount() + 1
-        local max =  O.Config.maxButtons
+        local max =  O.Settings.maxButtons
         for i=start, max do
             --- @type ButtonUI
             local existingBtn = self:GetButtonUI(i)

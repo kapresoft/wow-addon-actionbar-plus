@@ -25,7 +25,7 @@ ns.features.enableV2 = ABP_enableV2
     ABP_DEBUG_ENABLED_CATEGORIES = {
         ADDON=1, FRAME=1, BUTTON=1,
         DRAG_AND_DROP=1,
-        SPELL=1,
+        SPELL=0,
         EVENT=1, MESSAGE=1,
         BAG=1,
         ITEM=1, PET=1, MOUNT=1,
@@ -39,7 +39,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class Developer : BaseLibraryObject_WithAceEvent
 local L = {}; AceEvent:Embed(L); D = L
-local p = O.LogFactory('Developer')
+local p = O.LoggerMixinV2:New('Developer')
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -51,9 +51,10 @@ end
 --- down or up
 function L:KDT()
     local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
-    p:log('ActionButtonUseKeyDown[before]: %s', useKeyDown)
+    p:v(function() return 'ActionButtonUseKeyDown[before]: %s', tostring(useKeyDown) end)
     useKeyDown = not useKeyDown
     SetCVar("ActionButtonUseKeyDown", useKeyDown)
+    p:v(function() return 'ActionButtonUseKeyDown[current]: %s', tostring(useKeyDown) end)
     return useKeyDown
 end
 
@@ -91,18 +92,23 @@ function L:AnchorReset(frameIndex)
     print('Anchor Reset Done')
 end
 
---- @param frameIndex number
 --- @return FrameWidget
+--- @param frameIndex Index
+--- @param buttonIndex Index
 function L:F(frameIndex, buttonIndex)
     if not buttonIndex then return _G['ActionbarPlusF' .. tostring(frameIndex)].widget end
     return self:B(frameIndex, buttonIndex)
 end
 
+--- @param frameIndex Index
 --- @return Profile_Bar
 function L:C(frameIndex) return self:F(frameIndex):GetConfig() end
 
 function L:M() return GetMouseFocus() end
 
+--- @param frameIndex Index
+--- @param buttonIndex Index
+--- @return ButtonUIWidget
 function L:B(frameIndex, buttonIndex)
     local bn = string.format('ActionbarPlusF%sButton%s', frameIndex, buttonIndex)
     return _G[bn].widget
@@ -114,17 +120,41 @@ function L:O() return ns.O end
 
 function L:SM(msg) self:SendMessage(msg) end
 
+
+--- Get the button attributes. Used only for debugging
+--- @return table<string, string>
+--- @param frameIndex Index
+--- @param buttonIndex Index
+function L:BA(frameIndex, buttonIndex)
+    local ret = {}
+    local attributes = {
+        "type", "spell", "item", "unit", "macro", "toy",
+        "harmbutton1", "harmbutton2", "helpbutton1", "helpbutton2",
+        "spell-nuke1", "spell-nuke2", "alt-spell-nuke1", "alt-spell-nuke2",
+        "target", "action", "actionbar", "flyout", "glyph", "stop",
+        "focus", "assist", "click", "attribute", "togglemenu",
+        "destroymenu",
+    }
+    local bw = self:B(frameIndex, buttonIndex)
+    for _, attr in ipairs(attributes) do
+        local value = bw.button():GetAttribute(attr)
+        if value then ret[attr] = value; end
+    end
+
+    return ret
+end
+
 --[[-----------------------------------------------------------------------------
 Frame
 -------------------------------------------------------------------------------]]
+--[[
 local function OnEvent(frame, event, ...)
-    p:log(10, '%s', event)
-    --if event == 'PLAYER_LEAVING_WORLD' then
-    --end
+    p:v(function() return "OnEvent(): Received event=%s", event end)
 end
 
 --- @class DeveloperFrame
-local frame = CreateFrame("Frame", 'DeveloperFrame', UIParent)
+local frame = CreateFrame("Frame", 'DeveloperFrame')
 frame:SetScript('OnEvent', OnEvent)
 frame:RegisterEvent('PLAYER_ENTERING_WORLD')
 frame:RegisterEvent('PLAYER_LEAVING_WORLD')
+]]

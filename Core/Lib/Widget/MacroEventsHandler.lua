@@ -128,7 +128,10 @@ end
 ---1. Macro UI Updates
 ---2. On Reload or Login
 local function OnAddonLoaded(frame, event, ...)
-    p:t(function() return 'Event Received: %s', event end)
+    local inCombat = InCombatLockdown()
+    p:t(function() return 'Event Received: %s combat=%s', event, tostring(inCombat) end)
+    if inCombat then return end
+
     OnMacroUpdate()
 end
 

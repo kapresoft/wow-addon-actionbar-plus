@@ -28,7 +28,7 @@ local BaseAPI = O.BaseAPI
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = O.LogFactory(M.CompanionDragEventHandler)
+local p = ns:CreateDragAndDropLogger(M.CompanionDragEventHandler)
 
 --- @class BattlePetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.BattlePetDragEventHandler)
@@ -65,7 +65,7 @@ end
 --- @param w ButtonUIWidget
 local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
-    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    p:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
     C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
 end
 

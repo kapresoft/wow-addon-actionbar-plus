@@ -14,7 +14,7 @@ local IsBlank = String.IsBlank
 
 --- @class ActionbarPlusAPI : BaseLibraryObject
 local L = LibStub:NewLibrary(ns.M.ActionbarPlusAPI); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateApiLogger(ns.M.ActionbarPlusAPI)
 
 --- @param o ActionbarPlusAPI
 local function PropertiesAndMethods(o)

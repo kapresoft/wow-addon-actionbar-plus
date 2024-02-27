@@ -59,8 +59,8 @@ local M = {
     ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
     CompanionDragEventHandler = 'CompanionDragEventHandler',
     CompanionAttributeSetter = 'CompanionAttributeSetter',
-    Config = 'Config',
-    ConfigEventHandlerMixin = 'ConfigEventHandlerMixin',
+    Settings = 'Settings',
+    SettingsEventHandlerMixin = 'SettingsEventHandlerMixin',
     EquipmentSetDragEventHandler = 'EquipmentSetDragEventHandler',
     EquipmentSetAttributeSetter = 'EquipmentSetAttributeSetter',
     FrameHandleMixin = 'FrameHandleMixin',
@@ -124,11 +124,11 @@ local GlobalObjectsTemplate = {
     ButtonUI = {},
     --- @type ButtonUIWidgetBuilder
     ButtonUIWidgetBuilder = {},
-    --- @type Config
-    Config = {},
-    --- @type ConfigEventHandlerMixin
-    ConfigEventHandlerMixin = {},
-    --- @type DebuggingConfigGroup
+    --- @type Settings
+    Settings = {},
+    --- @type SettingsEventHandlerMixin
+    SettingsEventHandlerMixin = {},
+    --- @type DebuggingSettingsGroup
     DebuggingConfigGroup = {},
     --- @type DruidUnitMixin
     DruidUnitMixin = { },

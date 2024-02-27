@@ -9,10 +9,8 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
-
+local ns = abp_ns(...)
+local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 local BaseAPI, API = O.BaseAPI, O.API
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B, PR, WMX = O.BaseAPI, O.Profile, O.WidgetMixin
@@ -45,10 +43,13 @@ local _EventContext = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+local libName = M.ActionbarPlusEventMixin
 --- @class ActionbarPlusEventMixin : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(ns.M.ActionbarPlusEventMixin)
+local L = LibStub:NewLibrary(libName); if not L then return end
 AceEvent:Embed(L)
-local p = L:GetLogger()
+local p = ns:CreateDefaultLogger(libName)
+local pe = ns:CreateEventLogger(libName)
+local pu = ns:CreateUnitLogger(libName)
 
 --- @param msg string The message name
 --- @param abp ActionbarPlus
@@ -62,7 +63,7 @@ Support Functions
 --- @param f EventFrameInterface
 --- @param event string
 local function OnPlayerCombatEvent(f, event, ...)
-    -- p:log(40, 'Event[%s] received...', event)
+    pu:d(function() return 'Event[%s] received...', event end)
     if E.PLAYER_REGEN_ENABLED == event then
         f.ctx.buttonFactory:Fire(E.OnPlayerLeaveCombat)
     end
@@ -86,6 +87,7 @@ end
 --- @param event string
 local function OnVehicleEvent(f, event, ...)
     local unitTarget = ...
+    pe:d(function() return 'Event[%s]:: unitTarget=%s', event, unitTarget end)
     if UnitId.player ~= unitTarget then return end
     if E.UNIT_ENTERED_VEHICLE == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarHideGroup)
@@ -97,8 +99,9 @@ end
 --- @param f EventFrameInterface
 --- @param event string
 local function OnActionbarGrid(f, event, ...)
-    p:log(30, 'Event received: %s', event)
-    if InCombatLockdown() then return end
+    local inCombat = InCombatLockdown()
+    pe:d(function() return 'Event[%s]:: inCombat=%s', event, tostring(inCombat) end)
+    if inCombat == true then return end
     if E.ACTIONBAR_SHOWGRID == event then
         f.ctx.buttonFactory:Fire(E.OnActionbarShowGrid)
         return
@@ -219,7 +222,7 @@ function L:RegisterEventToMessageTransmitter()
 end
 
 function L:RegisterEvents()
-    p:log(30, 'RegisterEvents called..')
+    p:d('RegisterEvents called..')
 
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()

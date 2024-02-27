@@ -10,10 +10,8 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
+local ns = abp_ns(...)
 local O = ns.O
-local pformat = ns.pformat
 
 local String = O.String
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
@@ -30,7 +28,41 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class API
 local S = {}; ns:Register(ns.M.API, S)
-local p = O.LogFactory(ns.M.API)
+local p = ns:CreateDefaultLogger(ns.M.API)
+--[[-----------------------------------------------------------------------------
+Mixins
+-------------------------------------------------------------------------------]]
+--- @alias Mount MountMixin | C_MountJournal_MountInfo
+--- @class MountMixin
+local MountMixin = {}
+---@param o MountMixin
+local function MountMixinMethods(o)
+    ---@param mount C_MountJournal_MountInfo
+    function o:Init(mount)
+        assert(mount, "MountMixin::Mount is missing.")
+        self.data = mount
+        self.mt = {
+            __tostring = function() return "MountMixin:: " .. self.mount.name end,
+            __index = mount
+        }
+        setmetatable(self, self.mt)
+    end
+    --- @param mount C_MountJournal_MountInfo
+    --- @return Mount
+    function o:New(mount)
+        return ns:K():CreateAndInitFromMixin(o, mount)
+    end
+
+    function o:IsFlyingMountMountUsable()
+        if true ~= IsFlyableArea() then return false end
+        return true == self.isUsable
+    end
+
+    function o:IsGroundMountMountUsable()
+        if true == IsIndoors() then return false end
+        return true == self.isUsable
+    end
+end; MountMixinMethods(MountMixin)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -39,7 +71,6 @@ Methods
 --CursorHasItem() - True if the cursor currently holds an item.
 --CursorHasMacro() - Returns 1 if the cursor is currently dragging a macro.
 --CursorHasMoney() -
--- p:log('cursor-has-spell: %s', CursorHasSpell())
 --- @return CursorInfo
 function S:GetCursorInfo()
     -- actionType string spell, item, macro, mount, etc..
@@ -104,7 +135,7 @@ end
 function S:UpdateAndGetItemData(item)
     if not item.classID then
         local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
-        --p:log(10, 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID)
+        p:d(function() return 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID end)
         item.classID = classID
         item.subclassID = subclassID
     end
@@ -145,7 +176,7 @@ function S:IsItemConsumable(item, retrieveUpdate)
     local doUpdate = retrieveUpdate or true
     if itemData.classID == nil and doUpdate == true then
         itemData = self:UpdateAndGetItemData(item)
-        p:log('Retrieved updated item data: %s', item.name)
+        p:v(function() return 'Retrieved updated item data: %s', item.name end)
     end
     return itemData.classID == Enum.ItemClass.Consumable
 end
@@ -477,6 +508,76 @@ function S:GetItemCooldown(itemIDOrName)
     }
 
     return cd
+end
+
+--- @param spellID SpellName
+--- @return Mount
+function S:GetMountBySpellID(spellID)
+    local mountID = C_MountJournal.GetMountFromSpell(spellID)
+    if not mountID then return nil end
+    local mountName, spellID, Icon, isActive, isUsable, SourceType,
+        isFavorite, isFactionSpecific, Faction, ShouldHideOnChar,
+        isCollected, mountID, isForDragonriding = C_MountJournal.GetMountInfoByID(mountID)
+
+    --- @type C_MountJournal_MountInfo
+    local m = {
+        mountID = mountID, name = mountName, spellID=spellID, isUsable=isUsable, isActive=isActive
+    }
+    return MountMixin:New(m)
+end
+
+--- ABP:SummonMount().Ground('gmount1', 'gmount2').Flying('fmount1', 'fmount2').WithOptions(..,..)
+--- ABP:SummonMount(ground={}, flying={}, opts={})
+--- @param flyingMountName string
+--- @param groundMountName string
+function S:SummonMountSimple(flyingMountName, groundMountName)
+    local flyingMountSpell = self:GetSpellInfo(flyingMountName)
+    if not flyingMountSpell then
+        p:e(function() return "ERROR: Unknown flying mount: %s", flyingMountName end)
+        return
+    end
+    local groundMountSpell = self:GetSpellInfo(groundMountName)
+    if not groundMountSpell then
+        p:e(function() return "ERROR: Unknown ground mount: %s", groundMountName end)
+        return
+    end
+
+    local mountID, mountName
+    local flyingMount = self:GetMountBySpellID(flyingMountSpell.id)
+    if true == flyingMount.isActive then
+        mountID = flyingMount.mountID
+        mountName = flyingMount.name
+    end
+    if mountID then return C_MountJournal.SummonByID(mountID) end
+
+    local groundMount = self:GetMountBySpellID(groundMountSpell.id)
+    if true == groundMount.isActive then
+        mountID = groundMount.mountID
+        mountName = groundMount.name
+    end
+
+    if mountID then
+        if flyingMount:IsFlyingMountMountUsable() then
+            -- while mounted in a ground mount and is-flyable-area
+            p:d(function() return 'Ground mount active is [%s], but the area is flyable. Mount resolved is [%s]',
+                        mountName, flyingMount.name end)
+            return C_MountJournal.SummonByID(flyingMount.mountID)
+        end
+        p:v(function() return 'Ground mount is active: %s', mountName end)
+        return C_MountJournal.SummonByID(mountID)
+    end
+
+    if flyingMount:IsFlyingMountMountUsable() then
+        mountID = C_MountJournal.SummonByID(flyingMount.mountID)
+        mountName = flyingMount.name
+    elseif groundMount:IsGroundMountMountUsable() then
+        mountID = groundMount.mountID
+        mountName = groundMount.name
+    end
+    if mountID then
+        p:v(function() return 'Selected mount: %s', mountName end)
+        C_MountJournal.SummonByID(mountID)
+    end
 end
 
 --- #### Alias for #GetSpellCooldownDetails(spellID)

@@ -1,10 +1,14 @@
+--- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
+
 local ns = abp_ns(...)
 local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
+local H = O.ActionBarHandlerMixin
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local PR, WMX, B = O.Profile, O.WidgetMixin, O.BaseAPI
 local Un = O.UnitMixin:New()
 
+local libName = M.ActionBarController
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
@@ -13,22 +17,20 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return ActionBarController, Logger, Kapresoft_Safecall
+--- @return ActionBarController, LoggerV2, Kapresoft_LibUtil_Safecall
 local function CreateLib()
-    local libName = M.ActionBarController
     --- @class __ActionBarController : BaseLibraryObject_WithAceEvent
-    local lib = LibStub:NewLibrary(libName); if not lib then return end;
-    ns:AceEventEmbed(lib)
-    ns:K():Mixin(lib, O.ActionBarHandlerMixin)
-    local logger = O.Logger:NewLogger(libName)
-    return lib, logger, O.Safecall:New(logger)
+    local lib = LibStub:NewLibrary(libName); if not lib then return end
+    ns:AceEvent(lib); H:Embed(lib)
+    return lib, ns:CreateDefaultLogger(libName), ns:CreateSafecall(libName)
 end; local L, p, safecall = CreateLib()
-local sp = ns:CreateSpellLogger(M.ActionBarController)
-local bagL = ns:CreateBagLogger(M.ActionBarController)
-local df = ns:CreateDefaultLogger(M.ActionBarController)
-local ua = ns:CreateUnitLogger(M.ActionBarController)
 
---- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
+local sp = ns:CreateSpellLogger(libName)
+local bagL = ns:CreateBagLogger(libName)
+local df = ns:CreateDefaultLogger(libName)
+local ua = ns:CreateUnitLogger(libName)
+local pe = ns:CreateEventLogger(libName)
+
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -98,7 +100,7 @@ local function OnPlayerSpellCastStart(event, ...)
     end)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastStartExt, ns.M.ActionBarController, CallbackFn)
+    L:SendMessage(MSG.OnSpellCastStartExt, libName, CallbackFn)
 end
 
 --- Triggered for non channeled spells, both instant and non-instant
@@ -222,7 +224,7 @@ local function OnAddOnReady(frame)
         E.UNIT_SPELLCAST_FAILED_QUIET,
     }, 'player')
 
-    RegisterFrameForUnitEvents(frame, { E.UNIT_SPELLCAST_SENT, })
+    RegisterFrameForUnitEvents(frame, { E.UNIT_SPELLCAST_SENT })
 end
 
 --[[-----------------------------------------------------------------------------

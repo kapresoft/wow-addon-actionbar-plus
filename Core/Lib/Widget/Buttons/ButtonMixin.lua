@@ -38,7 +38,7 @@ button: widget.button
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
 local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end; AceEvent:Embed(L)
-local p = L:GetLogger()
+local p = ns:CreateButtonLogger(M.ButtonMixin)
 
 --[[-----------------------------------------------------------------------------
 Instance Methods
@@ -1182,12 +1182,6 @@ local function PropsAndMethods(o)
         self:ShowOverlayGlowAsActiveButton()
     end
 
-
-    function o:LogSpellName() p:log('SpellName: %s', tostring(self:GetEffectiveSpellName())) end
-
-    --- @param label string
-    function o:LogSpellNameWithDetails(label) p:log('[%s::%s]: %s [%s]', label or 'SpellDetails',
-            self:GN(), tostring(self:GetEffectiveSpellName()), tostring(self:GetConfig().type)) end
 end
 
 PropsAndMethods(L)

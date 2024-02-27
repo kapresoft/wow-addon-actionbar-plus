@@ -11,20 +11,15 @@ local IsNotBlank = String.IsNotBlank
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class ConfigEventHandlerMixin : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(M.ConfigEventHandlerMixin); if not L then return end
+--- @class SettingsEventHandlerMixin : BaseLibraryObject_WithAceEvent
+local L = LibStub:NewLibrary(M.SettingsEventHandlerMixin); if not L then return end
 AceEvent:Embed(L)
-local p = L:GetLogger()
-
---[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-
+local p = ns:CreateEventLogger(M.SettingsEventHandlerMixin)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o ConfigEventHandlerMixin
+--- @param o SettingsEventHandlerMixin
 local function MethodsAndProperties(o)
     function o:Init()
         self.profile = ns.db.profile

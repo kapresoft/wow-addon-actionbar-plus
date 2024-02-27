@@ -1,26 +1,34 @@
--- Addon Interface Types for EmmyLua
--- This file does not need to be included in _Common.xml
+--[[-----------------------------------------------------------------------------
+Note:
+Addon Interface Types for EmmyLua.
+This file does not need to be included in _Common.xml
+-------------------------------------------------------------------------------]]
+--
+--
+--
 --[[-----------------------------------------------------------------------------
 Global Vars
 -------------------------------------------------------------------------------]]
 --- @type fun(fmt:string, ...)|fun(val:string)
 pformat = {}
+--[[-----------------------------------------------------------------------------
+Aliases
+-------------------------------------------------------------------------------]]
+--- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
+
 
 --[[-----------------------------------------------------------------------------
-ActionbarPlus_AceDB
+Type: ActionbarPlus_AceDB
 -------------------------------------------------------------------------------]]
---- @class ActionbarPlus_AceDB
-local _db = {
-    --- @type Profile_Global_Config
-    global = {},
-    --- @type Profile_Config
-    profile = {},
-}
+--- @class ActionbarPlus_AceDB Represents an AceDB instance for ActionbarPlus.
+--- @field global Profile_Global_Config The global configuration profile.
+--- @field profile Profile_Config The configuration profile.
+--- @type ActionbarPlus_AceDB
 
 --[[-----------------------------------------------------------------------------
 Namespace
 -------------------------------------------------------------------------------]]
---- @class LibPackMixin
+--- @class LibPackMixinx
 local LibPackMixin = {
     --- @type GlobalObjects
     O = {}
@@ -224,125 +232,73 @@ local SpellcastSent_Data = {
 }
 
 --[[-----------------------------------------------------------------------------
-Config
+Type: Settings
 -------------------------------------------------------------------------------]]
---- @class Config : BaseLibraryObject_Initialized_WithAceEvent
-local Config = {
-    --- @type ActionbarPlus
-    addon = {},
-    --- @type Profile
-    profile = {},
-    --- @type ConfigEventHandlerMixin
-    eventHandler = {},
-    maxRows = 20,
-    maxCols = 40,
-}
-
---- @class ActionbarInitialSettings
-local ActionbarInitialSettings = {
-    ['rowSize'] = 1,
-    ['colSize'] = 1,
-    ['enable'] = false,
-    ['frame_handle_mouseover'] = true
-}
-
---- @class LayoutStrategyContext
-local LayoutStrategyContext = {
-    --- @type Kapresoft_Incrementer
-    xIncr = {},
-    --- @type Kapresoft_Incrementer
-    yIncr = {},
-}
-
---- @class EquipmentSetInfo
-local EquipmentSetInfo = {
-    name = 'name',
-    id = 1,
-    --- The button index order
-    index = 1,
-    setID = 1,
-    icon = 12345,
-    isEquipped = true,
-    numItems = 1,
-    numEquipped = 1,
-    numInInventory = 1,
-    numLost = 0,
-    numIgnored = 0,
-}
-
---- @class CooldownInfo
-local CooldownInfo = {
-    type='spell',
-    start=nil,
-    duration=nil,
-    enabled=0,
-    --- @type SpellCooldown | ItemCooldown
-    details = {}
-}
-
---- @class SpellCooldown_Spell
-local SpellCooldown_Spell = {
-    name = 'spell-name',
-    id = 1,
-    icon = 1234567
-}
-
---- @class SpellCooldown : Cooldown
-local SpellCooldown = {
-    --- @type SpellCooldown_Spell
-    spell = {
-        name = 'spell-name',
-        id = 1,
-        --- @type number
-        icon = 1234567
-    }
-}
-
---- @class ItemCooldown : Cooldown
-local ItemCooldown = {
-    item = {
-        id = 1,
-        name='Water',
-        icon=1234567
-    },
-    --- @type ItemInfo
-    details = {}
-}
+--- @class Settings : BaseLibraryObject_Initialized_WithAceEvent A settings class for addon configuration and event handling.
+--- @field addon ActionbarPlus The associated addon instance.
+--- @field profile Profile The user profile for settings and preferences.
+--- @field eventHandler SettingsEventHandlerMixin Handles addon events.
+--- @field maxRows Index Maximum number of rows for UI elements.
+--- @field maxCols Index Maximum number of columns for UI elements.
 
 --[[-----------------------------------------------------------------------------
-Supported Extensions
+Type: ActionbarInitialSettings
 -------------------------------------------------------------------------------]]
---- @class M6SupportDBProfile
-local M6Support_DB_Profile = {
-    ["slots"] = {
-        ["s01"] = 1,
-        ["s02"] = 2,
-    }
-}
-
---- @class M6Support_DB
-local M6SupportDB = {
-    --- @type M6SupportDBProfile
-    profiles = {},
-    --- @type table<number, table>
-    actions = {},
-}
---- @class M6Support_MacroHint
-local M6Support_MacroHint = {
-    name = 'm6-name',
-    isActive = true,
-    icon = 123456,
-    spell = 'spell-or-item',
-    itemCount = 1,
-    unknown1 = 0,
-    unknown2 = 0,
-    fn = function()  end,
-    unknown3 = 0,
-}
+--- @class ActionbarInitialSettings Initial configuration settings for action bar layouts and behaviors.
+--- @field rowSize Index Initial row size setting.
+--- @field colSize Index Initial column size setting.
+--- @field enable boolean Whether the action bar is enabled by default.
+--- @field frame_handle_mouseover boolean Determines if the frame handles mouseover events.
 
 --[[-----------------------------------------------------------------------------
-Aliases
+Type: LayoutStrategyContext
 -------------------------------------------------------------------------------]]
+--- @class LayoutStrategyContext Represents a context for layout strategies.
+--- @field xIncr Kapresoft_Incrementer The incrementer for the x-axis.
+--- @field yIncr Kapresoft_Incrementer The incrementer for the y-axis.
 
---- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
---- @alias ActionTypeName string | "'spell'" | "'item'" | "'macro'" | "'macrotext'" | "'companion'" | "'petaction'" | "'equipmentset'"
+--[[-----------------------------------------------------------------------------
+Type: EquipmentSetInfo
+-------------------------------------------------------------------------------]]
+--- @class EquipmentSetInfo Represents information about an equipment set.
+--- @field name string The name of the equipment set.
+--- @field id number The ID of the equipment set.
+--- @field index number The button index order.
+--- @field setID number The ID of the equipment set.
+--- @field icon number The icon ID of the equipment set.
+--- @field isEquipped boolean Whether the equipment set is currently equipped.
+--- @field numItems number The total number of items in the equipment set.
+--- @field numEquipped number The number of items currently equipped from the equipment set.
+--- @field numInInventory number The number of items from the equipment set currently in the player's inventory.
+--- @field numLost number The number of items from the equipment set that are lost.
+--- @field numIgnored number The number of items from the equipment set that are ignored.
+
+--[[-----------------------------------------------------------------------------
+Type: CooldownInfo
+-------------------------------------------------------------------------------]]
+--- @class CooldownInfo Represents information about a cooldown.
+--- @field type CooldownType "The type of the cooldown (e.g., 'spell', 'item')."
+--- @field start StartTime|nil The start time of the cooldown (in seconds since epoch), or nil if not started.
+--- @field duration Duration|nil | "1.0" | "The duration of the cooldown (in seconds), or nil if not applicable."
+--- @field enabled EnabledInt "Indicates whether the cooldown is enabled (0 for disabled, 1 for enabled)."
+--- @field details SpellCooldown|ItemCooldown The details of the cooldown, which can be of type SpellCooldown or ItemCooldown.
+
+--[[-----------------------------------------------------------------------------
+Type: SpellCooldown_Spell
+-------------------------------------------------------------------------------]]
+--- @class SpellCooldown_Spell Represents information about a spell cooldown.
+--- @field name SpellName The name of the spell.
+--- @field id SpellID The ID of the spell.
+--- @field icon Icon The icon ID of the spell.
+
+--[[-----------------------------------------------------------------------------
+Type: SpellCooldown
+-------------------------------------------------------------------------------]]
+--- @class SpellCooldown : Cooldown Represents information about a spell cooldown extending Cooldown.
+--- @field spell SpellCooldown_Spell The details of the spell cooldown.
+
+--[[-----------------------------------------------------------------------------
+Type: ItemCooldown
+-------------------------------------------------------------------------------]]
+--- @class ItemCooldown : Cooldown Represents information about an item cooldown extending Cooldown.
+--- @field item ItemInfo The details of the item.

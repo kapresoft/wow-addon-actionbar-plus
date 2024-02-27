@@ -11,10 +11,10 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @return ActionBarHandlerMixin, Logger
 local function CreateLib()
-    local libName = M.ActionBarHandlerMixin or 'ActionBarHandlerMixin'
+    local libName = M.ActionBarHandlerMixin
     --- @class ActionBarHandlerMixin : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = newLib:GetLogger()
+    local logger = ns:CreateDefaultLogger(libName)
     return newLib, logger
 end; local L, p = CreateLib(); if not L then return end
 
@@ -27,6 +27,10 @@ local function PropsAndMethods(o)
     local isShapeShiftFn = function(bw) return bw:IsShapeshiftSpell() end
     local isStealthSpellFn = function(bw) return bw:IsStealthSpell() end
     local isItemOrMacroFn = function(bw) return bw:IsItemOrMacro() end
+
+    --- @return any The embedded object (same as what was passed)
+    --- @param obj any The object to embed
+    function o:Embed(obj) assert(obj, "The target embed object is missing."); return ns:K():Mixin(obj, o) end
 
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
     function o:ForEachVisibleFrames(applyFn)

@@ -7,19 +7,17 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local pformat = ns.pformat
-local O, LibStub = ns:LibPack()
+local ns = abp_ns(...)
+local O, LibStub = ns.O, ns.O.LibStub
 
 local Mixin, WMX = O.Mixin, O.WidgetMixin
 local AO = O.AceLibFactory:A()
 local AceGUI = AO.AceGUI
 local LuaEvaluator = O.LuaEvaluator
 
-local L = LibStub:NewLibrary('PopupDebugDialog')
----@type LoggerTemplate
-local p = L:GetLogger()
+local libName = 'PopupDebugDialog'
+local L = LibStub:NewLibrary(libName)
+local p = ns:CreateDefaultLogger(libName)
 local FRAME_NAME = 'ABP_DebugDialog'
 local FRAME_TITLE = 'Popup Debug Dialog'
 

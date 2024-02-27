@@ -28,11 +28,11 @@ local BaseAPI = O.BaseAPI
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-
 --- @class EquipmentSetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
 
-local p = L.logger
+local p = ns:CreateDragAndDropLogger(M.EquipmentSetDragEventHandler)
+local pe = ns:CreateEventLogger(M.EquipmentSetDragEventHandler)
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
@@ -104,7 +104,7 @@ end
 --- @param w ButtonUIWidget
 local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
-    p:log(30, 'Message[%s]: %s', evt, w:GetName())
+    pe:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
     if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
     if w:IsMissingEquipmentSet() then return end
 
@@ -149,7 +149,7 @@ local function eventHandlerMethods(e)
 
         local config = btnUI.widget:conf()
         local equipmentSet = ToProfileEquipmentSet(equipmentSetInfo)
-        p:log(30, 'equipmentSet: %s', equipmentSet)
+        p:d(30, function() return 'equipmentSet: %s', pformat(equipmentSet) end)
 
         PH:PickupExisting(btnUI.widget)
         config[WAttr.TYPE] = equipmentSet.type

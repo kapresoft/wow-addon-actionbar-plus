@@ -6,13 +6,14 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, Mod, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, Mod, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
 
 local Ace, BaseAPI = O.AceLibrary, O.BaseAPI
 local E, M = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
 local debugGroup = O.DebuggingConfigGroup
-local p = ns:CreateDefaultLogger(Mod.Config);
+local p = ns:CreateDefaultLogger(Mod.Settings);
 
 ---These are loaded in #fetchLibs()
 --- @type Profile
@@ -216,7 +217,7 @@ local function PropsAndMethods(o)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
-        self.eventHandler = ns:K():CreateAndInitFromMixin(O.ConfigEventHandlerMixin)
+        self.eventHandler = ns:K():CreateAndInitFromMixin(O.SettingsEventHandlerMixin)
         self:Initialize()
         self:SendMessage(GC.M.OnConfigInitialized)
     end
@@ -551,7 +552,7 @@ local function PropsAndMethods(o)
     --- @param fallbackVal any The fallback value
     --- @param message string The message to send
     --- @return fun(_, v:any) : void The function parameter "v" is the option value selected by the user
-    --- @see ConfigEventHandlerMixin#SetConfigWithMessage
+    --- @see SettingsEventHandlerMixin#SetConfigWithMessage
     function o:CM(key, fallbackVal, message) return self.eventHandler:SetConfigWithMessage(key, fallbackVal, message) end
 
 end
@@ -560,10 +561,10 @@ end
 New Instance
 -------------------------------------------------------------------------------]]
 --- properties "addon" and "profile" is injected OnAfterInitialize()
---- @return Config
+--- @return Settings
 local function NewInstance()
-    --- @type Config
-    local newConfig = LibStub:NewLibrary(ns.M.Config); if not newConfig then return end
+    --- @type Settings
+    local newConfig = LibStub:NewLibrary(ns.M.Settings); if not newConfig then return end
     newConfig.maxRows = 20
     newConfig.maxCols = 40
     newConfig.maxButtons = newConfig.maxRows * newConfig.maxCols

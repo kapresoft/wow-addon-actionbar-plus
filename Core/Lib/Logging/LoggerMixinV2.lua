@@ -34,6 +34,8 @@ local LC = {
     --- @type LogCategory
     ADDON = "AD",
     --- @type LogCategory
+    API = "AP",
+    --- @type LogCategory
     BAG = "BG",
     --- @type LogCategory
     BUTTON = "BN",
@@ -281,15 +283,24 @@ local function PropsAndMethods(o)
         self.logfn(self.logPrefix, val, self.categorySuffix, 'V')
     end
 
+    --- Verbose, Always Log
+    --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"
+    function o:vv(strOrCallbackFn)
+        local val
+        if type(strOrCallbackFn) == 'function' then val = safeFormat(strOrCallbackFn())
+        else val = tostring(strOrCallbackFn) end
+        self.logfn(self.logPrefix, val, self.categorySuffix)
+    end
+
     --- ERROR_LEVEL = 5
     --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"
     function o:e(strOrCallbackFn)
-        self:log(ERROR_LEVEL, strOrCallbackFn, ch:FormatColor('FF0000','E'))
+        self:log(ERROR_LEVEL, strOrCallbackFn, ch:FormatColor('FF0000','ERROR'))
     end
     --- WARN_LEVEL = 10
     --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"
     function o:w(strOrCallbackFn)
-        self:log(WARN_LEVEL, strOrCallbackFn, ch:FormatColor('FFA500','W'))
+        self:log(WARN_LEVEL, strOrCallbackFn, ch:FormatColor('FFA500','WARN'))
     end
     --- INFO_LEVEL = 15
     --- @param strOrCallbackFn string|LM_LogCallbackFn | "'Hello thar'" | "function() return 'hello' end"| "function() return 'hello: %s', 'thar' end"

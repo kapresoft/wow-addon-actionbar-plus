@@ -38,7 +38,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class BaseAttributeSetter : AttributeSetter
 local L = LibStub:NewLibrary(M.BaseAttributeSetter); if not L then return end
-local p = L:GetLogger()
+local p = ns:CreateButtonLogger(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
