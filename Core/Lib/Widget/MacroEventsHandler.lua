@@ -11,14 +11,16 @@ local GetNumMacros, GetMacroInfo, GetMacroIndexByName = GetNumMacros, GetMacroIn
 --[[-----------------------------------------------------------------------------
 Local Variables
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+
 local P, Table, String = O.Profile, O.Table, O.String
 local E = O.GlobalConstants.E
 local toStringSorted = Table.toStringSorted
 
 --- @class MacroEventsHandler : BaseLibraryObject
 local L = LibStub:NewLibrary(M.MacroEventsHandler)
-local p = ns:CreateEventLogger(M.MacroEventsHandler)
+local p = LC.EVENT:NewLogger(M.MacroEventsHandler)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -139,7 +141,7 @@ end
 Event Hook
 -------------------------------------------------------------------------------]]
 ns:AceEvent():RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
-    local pm = ns:CreateMessageLogger(M.MacroEventsHandler)
+    local pm = LC.MESSAGE:NewLogger(M.MacroEventsHandler)
     pm:d(function() return "MSG:R: %s", evt end)
     local frame = CreateFrame("Frame", M.MacroEventsHandler .. "Frame", UIParent)
     frame:SetScript(E.OnEvent, OnAddonLoaded)

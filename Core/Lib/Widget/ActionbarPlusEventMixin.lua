@@ -10,7 +10,7 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local BaseAPI, API = O.BaseAPI, O.API
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B, PR, WMX = O.BaseAPI, O.Profile, O.WidgetMixin
@@ -48,8 +48,8 @@ local libName = M.ActionbarPlusEventMixin
 local L = LibStub:NewLibrary(libName); if not L then return end
 AceEvent:Embed(L)
 local p = ns:CreateDefaultLogger(libName)
-local pe = ns:CreateEventLogger(libName)
-local pu = ns:CreateUnitLogger(libName)
+local pe = LC.EVENT:NewLogger(libName)
+local pu = LC.UNIT:NewLogger(libName)
 
 --- @param msg string The message name
 --- @param abp ActionbarPlus

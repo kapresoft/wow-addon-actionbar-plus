@@ -1,29 +1,24 @@
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
-local type, pairs, tostring = type, pairs, tostring
-
+local pairs = pairs
+local tinsert, tsort = table.insert, table.sort
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
-local Ace, PI = O.AceLibrary, O.ProfileInitializer
-local Table, Assert, String = O.Table, O.Assert, O.String
-local AceEvent, W = Ace.AceEvent, GC.WidgetAttributes
-local IsEmptyTable, isNotTable, tsize, tinsert, tsort
-    = Table.IsEmpty, Table.isNotTable, Table.size, table.insert, table.sort
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local PI = O.ProfileInitializer
+local Table, String = O.Table, O.String
 local IsBlankStr = String.IsBlank
-local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
+local IsEmptyTable, IsNotTable, TableSize = Table.IsEmpty, Table.isNotTable, Table.size
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class Profile : BaseLibraryObject_WithAceEvent
-local P = LibStub:NewLibrary(M.Profile); if not P then return end
-AceEvent:Embed(P)
-local p = ns:CreateProfileLogger(M.Profile)
+local P = LibStub:NewLibrary(M.Profile); if not P then return end; ns:AceEvent(P)
+local p = LC.PROFILE:NewLogger(M.Profile)
 
 local ConfigNames = GC.Profile_Config_Names
 local C = GC:GetAceLocale()
@@ -188,7 +183,7 @@ function P:P() return ns.db.profile  end
 --- @return Profile_Global_Config
 function P:G()
     local g = ns.db.global
-    if Table.isNotTable(g.bars) then PI:InitGlobalSettings(g) end
+    if IsNotTable(g.bars) then PI:InitGlobalSettings(g) end
     return g
 end
 
@@ -217,8 +212,8 @@ end
 
 function P:GetBarSize()
     local bars = P:GetBars()
-    if isNotTable(bars) then return 0 end
-    return tsize(bars)
+    if IsNotTable(bars) then return 0 end
+    return TableSize(bars)
 end
 
 --- @param frameIndex number The frame index number
@@ -273,7 +268,7 @@ function P:GetGlobalAnchor(frameIndex)
     --- @type Profile_Global_Config
     local buttonConf = g.bars[fn]
     if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, fn) end
-    if Table.isEmpty(buttonConf.anchor) then
+    if IsEmptyTable(buttonConf.anchor) then
         buttonConf.anchor = PI:InitGlobalButtonConfigAnchor(g, fn)
     end
     return buttonConf.anchor
@@ -325,7 +320,7 @@ function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(GC:GetFram
 function P:IsBarNameEnabled(frameName)
     if not self.profile.bars then return false end
     local bar = self.profile.bars[frameName]
-    if isNotTable(bar) then return false end
+    if IsNotTable(bar) then return false end
     return bar.enabled
 end
 

@@ -2,7 +2,7 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 
 local FLIGHT_FORM_SPELLID = 40120
 --[[-----------------------------------------------------------------------------
@@ -13,7 +13,7 @@ local function CreateLib()
     local libName = M.DruidUnitMixin
     --- @class __DruidUnitMixin : UnitMixin
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = ns:CreateUnitLogger(libName)
+    local logger = LC.UNIT:NewLogger(libName)
     --- @alias DruidUnitMixin __DruidUnitMixin | BaseLibraryObject
     O.UnitMixin:Embed(newLib)
     return newLib, logger

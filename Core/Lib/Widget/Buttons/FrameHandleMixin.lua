@@ -13,8 +13,8 @@ local format, strlower = string.format, string.lower
 Local Vars
 -------------------------------------------------------------------------------]]
 local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-local LSM = O.AceLibFactory:A().AceLibSharedMedia
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local LSM = O.AceLibrary.AceLibSharedMedia
 local E, GCC, C = GC.E, GC.C, GC:GetAceLocale()
 
 local FrameHandleBackdrop = {
@@ -30,7 +30,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class FrameHandleMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.FrameHandleMixin); if not L then return end
-local p = ns:CreateFrameLogger(M.FrameHandleMixin)
+local p = LC.FRAME:NewLogger(M.FrameHandleMixin)
 
 --Events
 L.E = {

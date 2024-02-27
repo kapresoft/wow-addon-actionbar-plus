@@ -72,26 +72,9 @@ local function NamespaceLoggerMethods(o, ns)
         local val = ABP_DEBUG_ENABLED_CATEGORIES[name]
         return val == 1 or val == true
     end
-
     function o.LogCategory() return LoggerMixin().Category end
     function o.LogCategories() return o.LogCategory():GetCategories() end
-
-    local function L() return o.LogCategories() end
     function o:CreateDefaultLogger(moduleName) return LoggerMixin():New(moduleName) end
-    function o:CreateAddonLogger() return LoggerMixin():New(ns().name, o.LogCategories().ADDON) end
-    function o:CreateBagLogger(moduleName) return L().BAG:NewLogger(moduleName) end
-    function o:CreateButtonLogger(moduleName) return L().BUTTON:NewLogger(moduleName) end
-    function o:CreateDragAndDropLogger(moduleName) return L().DRAG_AND_DROP:NewLogger(moduleName) end
-    function o:CreateEventLogger(moduleName) return L().EVENT:NewLogger(moduleName) end
-    function o:CreateFrameLogger(moduleName) return L().FRAME:NewLogger(moduleName) end
-    function o:CreateItemLogger(moduleName) return L().ITEM:NewLogger(moduleName) end
-    function o:CreateMountLogger(moduleName) return L().MOUNT:NewLogger(moduleName) end
-    function o:CreateMessageLogger(moduleName) return L().MESSAGE:NewLogger(moduleName) end
-    function o:CreatePetLogger(moduleName) return L().PET:NewLogger(moduleName) end
-    function o:CreateProfileLogger(moduleName) return L().PROFILE:NewLogger(moduleName) end
-    function o:CreateSpellLogger(moduleName) return L().SPELL:NewLogger(moduleName) end
-    function o:CreateUnitLogger(moduleName) return L().UNIT:NewLogger(moduleName) end
-    function o:CreateApiLogger(moduleName) return L().API:NewLogger(moduleName) end
 
 end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
 
@@ -115,6 +98,7 @@ local function CreateNamespace(...)
     --- @type string
     local addon
     --- @class __Namespace : LibPackMixin
+    --- @field O GlobalObjects
     local ns
 
     addon, ns = ...

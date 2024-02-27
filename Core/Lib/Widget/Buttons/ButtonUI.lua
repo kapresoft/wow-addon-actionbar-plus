@@ -8,18 +8,12 @@ local C_Timer, C_PetJournal = C_Timer, C_PetJournal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
-
-local AO = O.AceLibFactory:A()
-local AceEvent, AceGUI, AceHook = AO.AceEvent, AO.AceGUI, AO.AceHook
-
-local String = O.String
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local E, Ace = GC.E, O.AceLibrary
+local AceGUI, AceHook = Ace.AceGUI, Ace.AceHook
 local A, P, PH, BaseAPI = O.Assert, O.Profile, O.PickupHandler, O.BaseAPI
-
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
-local E, WAttr = GC.E, GC.WidgetAttributes
-
-local IsBlank = String.IsBlank
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 
 --[[-----------------------------------------------------------------------------
@@ -30,8 +24,8 @@ local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
 
 --- @class ButtonUILib
 local _L = LibStub:NewLibrary(M.ButtonUI, 1)
-local p = ns:CreateButtonLogger(M.ButtonUI)
-local pd = ns:CreateDragAndDropLogger(M.ButtonUI)
+local p = LC.BUTTON:NewLogger(M.ButtonUI)
+local pd = LC.DRAG_AND_DROP:NewLogger(M.ButtonUI)
 
 --- @return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end

@@ -1,12 +1,12 @@
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
-local MSG, AceEvent = GC.M, O.AceLibrary.AceEvent
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local MSG = GC.M
 
 --[[-----------------------------------------------------------------------------
 New Library: APIHooks
 -------------------------------------------------------------------------------]]
 --- @class APIHooks
-local L = LibStub:NewLibrary(M.APIHooks); if not L then return end
-AceEvent:Embed(L)
+local L = LibStub:NewLibrary(M.APIHooks); if not L then return end; ns:AceEvent(L)
 local p = ns:CreateDefaultLogger(M.APIHooks)
 
 --[[-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ Message Handler
 --- @see C_MountJournal.Pickup()
 --- @see C_PetJournal.PickupPet()
 L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
-    local pm = ns:CreateMessageLogger(M.APIHooks)
+    local pm = LC.MESSAGE:NewLogger(M.APIHooks)
     pm:d( function() return 'MSG::R: %s', msg end)
 
     if C_MountJournal then

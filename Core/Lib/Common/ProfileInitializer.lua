@@ -13,18 +13,18 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local ConfigNames = GC.Profile_Config_Names
 
 local ATTR, Table = GC.WidgetAttributes, O.Table
-local isNotTable, shallow_copy, tinsert = Table.isNotTable, Table.shallow_copy, table.insert
+local shallow_copy = Table.shallow_copy
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class ProfileInitializer : BaseLibraryObject_Initialized
 local L = LibStub:NewLibrary(M.ProfileInitializer); if not L then return end
-local p = ns:CreateProfileLogger(M.ProfileInitializer)
+local p = LC.PROFILE:NewLogger(M.ProfileInitializer)
 
 --[[-----------------------------------------------------------------------------
 Instance Properties
@@ -223,7 +223,7 @@ local function Methods(o)
         local defaultBars = DEFAULT_PROFILE_DATA.bars
         --- @type Global_Profile_Bar
         local btnConf = g.bars[frameName]
-        btnConf.anchor = Table.shallow_copy(defaultBars[frameName].anchor)
+        btnConf.anchor = shallow_copy(defaultBars[frameName].anchor)
         return btnConf.anchor
     end
 

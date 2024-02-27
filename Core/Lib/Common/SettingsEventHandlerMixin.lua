@@ -1,29 +1,23 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
-local AceEvent, String = O.AceLibrary.AceEvent, O.String
-local IsNotBlank = String.IsNotBlank
+local ns = abp_ns(...)
+local O, M, LibStub, LC = ns.O, ns.M, ns.O.LibStub, ns.LogCategories()
+local IsNotBlank = O.String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class SettingsEventHandlerMixin : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(M.SettingsEventHandlerMixin); if not L then return end
-AceEvent:Embed(L)
-local p = ns:CreateEventLogger(M.SettingsEventHandlerMixin)
+local L = LibStub:NewLibrary(M.SettingsEventHandlerMixin); if not L then return end; ns:AceEvent(L)
+local p = LC.EVENT:NewLogger(M.SettingsEventHandlerMixin)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 --- @param o SettingsEventHandlerMixin
 local function MethodsAndProperties(o)
-    function o:Init()
-        self.profile = ns.db.profile
-    end
+    function o:Init() self.profile = ns.db.profile end
 
     --- Creates a callback function that sends a message after
     --- @param key string The profile key to update
@@ -37,7 +31,5 @@ local function MethodsAndProperties(o)
             if IsNotBlank(message) then self:SendMessage(message, key, self.profile[key]) end
         end
     end
-end
-
-MethodsAndProperties(L)
+end; MethodsAndProperties(L)
 

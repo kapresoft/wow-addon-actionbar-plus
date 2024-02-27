@@ -8,10 +8,8 @@ local InCombatLockdown = InCombatLockdown
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local WMX, String, Profile = O.WidgetMixin, O.String, O.Profile
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
@@ -38,7 +36,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class BaseAttributeSetter : AttributeSetter
 local L = LibStub:NewLibrary(M.BaseAttributeSetter); if not L then return end
-local p = ns:CreateButtonLogger(M.BaseAttributeSetter)
+local p = LC.BUTTON:NewLogger(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Support Functions

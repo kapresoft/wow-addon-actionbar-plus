@@ -16,10 +16,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 -- Bump this version for every release tag
 --
-
---- @type Namespace
-local _, ns = ...
-local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
+local ns = abp_ns(...)
+local O, GC, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.O.LibStub, ns.LogCategories()
 
 local AO = O.AceLibFactory:A()
 local GCC, M = GC.C, GC.M
@@ -31,7 +29,7 @@ local MX, WMX, BF = O.Mixin, O.WidgetMixin, O.ButtonFactory
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
-local p, pd = ns:CreateAddonLogger(), ns:CreateDefaultLogger(ns.name)
+local p, pd = LC.ADDON:NewLogger(ns.name), ns:CreateDefaultLogger(ns.name)
 
 --[[-----------------------------------------------------------------------------
 Support functions

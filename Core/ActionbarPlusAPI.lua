@@ -6,15 +6,14 @@ local tinsert = table.insert
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local ns = select(2, ...)
-local O, GC, LibStub, String = ns.O, ns.O.GlobalConstants, ns.O.LibStub, ns.O.String
-local API = O.API
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local API, String = O.API, O.String
 local IsBlank = String.IsBlank
 
 --- @class ActionbarPlusAPI : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.ActionbarPlusAPI); if not L then return end
-local p = ns:CreateApiLogger(ns.M.ActionbarPlusAPI)
+local L = LibStub:NewLibrary(M.ActionbarPlusAPI); if not L then return end
+local p = LC.API:NewLogger(M.ActionbarPlusAPI)
 
 --- @param o ActionbarPlusAPI
 local function PropertiesAndMethods(o)

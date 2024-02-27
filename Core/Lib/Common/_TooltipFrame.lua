@@ -1,36 +1,39 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
-local _, ns = ...
-local O, GC = ns.O, ns.O.GlobalConstants
+local ns = abp_ns(...)
+local O, GC, LC = ns.O, ns.O.GlobalConstants, ns.LogCategories()
 
-local AceEvent, M, TA =  O.AceLibrary.AceEvent, GC.M, GC.TooltipAnchor
+local M, TA =  GC.M, GC.TooltipAnchor
+
+--[[-----------------------------------------------------------------------------
+Type: ActionbarPlusTooltipAnchorFrame
+-------------------------------------------------------------------------------]]
+--- @alias ActionbarPlusTooltipAnchorFrame _Frame
+
+--[[-----------------------------------------------------------------------------
+Type: TooltipFrameHandlerWidget
+-------------------------------------------------------------------------------]]
+--- @class TooltipFrameHandlerWidget
+--- @field frame ActionbarPlusTooltipAnchorFrame | _Frame
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class ActionbarPlusTooltipAnchorFrame : _Frame
-local _ActionbarPlusTooltipAnchorFrame = {}
-
---- @class TooltipFrameHandlerWidget
-local _TooltipFrameHandlerWidget = {
-    --- @type ActionbarPlusTooltipAnchorFrame
-    frame = {}
-}
-
 --- @class TooltipFrameHandler : BaseLibraryObject_WithAceEvent
+--- @field widget TooltipFrameHandlerWidget
 local L = ns:AceEvent()
 local libName = 'TooltipFrameHandler'
 local p = ns:CreateDefaultLogger(libName)
-local pm = ns:CreateMessageLogger(libName)
+local pm = LC.MESSAGE:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 --- @param evt string The event name
 --- @param handler TooltipFrameHandler
-local OnTooltipFrameUpdate = function(evt, handler, ...)
+--- @vararg any
+local function OnTooltipFrameUpdate(evt, handler, ...)
     local position, val = ...
     pm:d(function() return 'MSG::R: %s %s=%s', evt, tostring(position), tostring(val) end)
     if not val then return end
@@ -48,7 +51,6 @@ local function MethodsAndProperties(o)
         OnTooltipFrameUpdate(msg, o, ...)
     end)
 
-    --- @type TooltipFrameHandlerWidget
     o.widget = {}
 
     function o:OnShow(frame)
@@ -65,6 +67,7 @@ local function MethodsAndProperties(o)
 
     end
 
+    --- @param anchorType string
     function o:IsCursorAnchorType(anchorType) return O.String.StartsWithIgnoreCase(anchorType, 'cursor_') end
 
     --- @see TooltipAnchor
@@ -91,10 +94,10 @@ local function MethodsAndProperties(o)
             f:SetPoint('BOTTOMLEFT', nil, 'BOTTOMLEFT', padX, padY)
         end
     end
-end
+end; MethodsAndProperties(L)
 
-MethodsAndProperties(L)
 --- @see _TooltipFrame.xml
-function ABP_NS.xml:TooltipFrame_OnShow(frame)
+--- @param frame _Frame
+function ns.xml:TooltipFrame_OnShow(frame)
     L:OnShow(frame)
 end

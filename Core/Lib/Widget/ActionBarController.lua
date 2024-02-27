@@ -1,7 +1,7 @@
 --- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
 
 local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 
 local H = O.ActionBarHandlerMixin
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
@@ -25,11 +25,11 @@ local function CreateLib()
     return lib, ns:CreateDefaultLogger(libName), ns:CreateSafecall(libName)
 end; local L, p, safecall = CreateLib()
 
-local sp = ns:CreateSpellLogger(libName)
-local bagL = ns:CreateBagLogger(libName)
+local sp = LC.SPELL:NewLogger(libName)
+local bagL = LC.BAG:NewLogger(libName)
 local df = ns:CreateDefaultLogger(libName)
-local ua = ns:CreateUnitLogger(libName)
-local pe = ns:CreateEventLogger(libName)
+local ua = LC.UNIT:NewLogger(libName)
+local pe = LC.EVENT:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions

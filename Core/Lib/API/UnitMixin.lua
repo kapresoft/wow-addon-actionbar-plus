@@ -1,10 +1,11 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns, O, GC, M, LibStub = ABP_NS:namespace(...)
+local ns = abp_ns(...)
+local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
 local Table = O.Table
 local IsAnyOf = O.String.IsAnyOf
-local TableIsEmpty = O.Table.IsEmpty
+local TableIsEmpty, TableUnpack = Table.IsEmpty, Table.unpack
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -14,7 +15,7 @@ local function CreateLib()
     local libName = M.UnitMixin
     --- @class UnitMixin : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    return newLib, ns:CreateUnitLogger(libName)
+    return newLib, LC.UNIT:NewLogger(libName)
 end; local L, p = CreateLib(); if not L then return end
 
 --- Checks if the first argument matches any of the subsequent arguments.
@@ -133,8 +134,8 @@ local function PropsAndMethods(o)
     ---@param spellID SpellID
     function o:IsBuffActive(spellID)
         if TableIsEmpty(ns.playerBuffs) then return false end
-        -- p:v(function() return 'playerBuffs: %s', pformat(ns.playerBuffs) end)
-        return IsAnyOfBuff(spellID, Table.unpack(ns.playerBuffs))
+        p:d(function() return 'IsBuffActive(): Player-Buffs: %s', pformat(ns.playerBuffs) end)
+        return IsAnyOfBuff(spellID, TableUnpack(ns.playerBuffs))
     end
 
 end; PropsAndMethods(L)

@@ -28,12 +28,6 @@ Type: ActionbarPlus_AceDB
 --[[-----------------------------------------------------------------------------
 Namespace
 -------------------------------------------------------------------------------]]
---- @class LibPackMixinx
-local LibPackMixin = {
-    --- @type GlobalObjects
-    O = {}
-}
-
 --- @class SpellInfoShort
 --- @field id SpellID The unique identifier for the class.
 --- @field name SpellName The name of the class.

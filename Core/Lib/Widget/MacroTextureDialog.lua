@@ -14,7 +14,7 @@ local GetMacroIcons, GetMacroItemIcons = GetMacroIcons, GetMacroItemIcons
 Local vars
 -------------------------------------------------------------------------------]]
 local ns = abp_ns(...)
-local O, GC, LibStub = ns.O, ns.O.GlobalConstants, ns.O.LibStub
+local O, GC, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.O.LibStub, ns.LogCategories()
 
 local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:A().AceGUI, O.WidgetMixin
 local ICON_PREFIX = 'Interface/Icons/'
@@ -54,9 +54,10 @@ local iconOptions = {
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+local libName = 'MacroTextureDialog'
 ---@class MacroTextureDialog
-local _L = LibStub:NewLibrary('MacroTextureDialog')
-local p = ns:CreateFrameLogger('MacroTextureDialog')
+local _L = LibStub:NewLibrary(libName)
+local p = LC.FRAME:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
