@@ -27,7 +27,15 @@ ActionbarPlus is a versatile floating action bar add-on that enables you to crea
 - Customizable button size and number of buttons (rows and columns) with a maximum of 800 buttons arranged in a grid of 20 x 40
 - The ability to bind keys to action buttons using the World of Warcraft Keybinding options is supported.
 - [WowAce](https://www.wowace.com/projects/ace3) profile support includes the ability to switch between profiles, copy a profile, and reset a profile.
-- `ABP:SmarMount(..)` dynamic function that can be utilized in macros for dynamic mounting based on the current area
+- `ABP:SmarMount(..)` A dynamic function that can be utilized in macros for dynamic mounting based on the current area. (More details below)
+
+#### Additional Configuration Options
+
+- **Toggle Button Mouseover Glow Feature:** Activate a visual glow effect on action buttons upon mouseover, making it easier to identify active buttons during gameplay.
+- **Tooltip Visibility, Anchor, and Combat Override Key Options:** Gain full control over tooltips with customizable visibility, anchoring positions, and the ability to set keys for overriding tooltip behavior in combat, providing crucial information exactly when and where you need it.
+- **Equipment Set Options:** Quickly switch between equipment sets directly from your action bars, offering streamlined access to gear changes for different gameplay scenarios.
+- **Actionbar Frame Specific Options:** Fine-tune individual actionbar frames with specific options, including but not limited to positioning, scaling, and more, for ultimate control over your interface layout.
+- **Profile Management:** Enhanced profile management features allow for more efficient setup and switching between different UI configurations, saving you time and effort in customizing your experience.
 
 #### ABP:SmartMount(...) Dynamic Function
 
