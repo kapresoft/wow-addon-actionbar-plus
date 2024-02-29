@@ -22,10 +22,28 @@ ActionbarPlus is a versatile floating action bar add-on that enables you to crea
 
 ### Features
 
-- action buttons triggers on KeyDown (not KeyUp)
+- Action buttons triggers on KeyDown (not KeyUp)
+- Action bars can be dynamically positioned anywhere on the screen, offering unparalleled flexibility and customization to fit your unique gameplay style and UI preferences.
 - Customizable button size and number of buttons (rows and columns) with a maximum of 800 buttons arranged in a grid of 20 x 40
 - The ability to bind keys to action buttons using the World of Warcraft Keybinding options is supported.
 - [WowAce](https://www.wowace.com/projects/ace3) profile support includes the ability to switch between profiles, copy a profile, and reset a profile.
+- `ABP:SmarMount(..)` dynamic function that can be utilized in macros for dynamic mounting based on the current area
+
+#### ABP:SmartMount(...) Dynamic Function
+
+Enhance your World of Warcraft experience with our addon's latest feature. A dynamic function that intelligently selects between your specified flying and ground mounts based on the current area's flyability, ensuring seamless mount selection even in special zones like the city of Dalaran (WOTLK). 
+
+Easily integrate it into your gameplay through macros for an optimized and hassle-free mounting experience.
+
+Syntax: 
+```
+ABP:SmartMount('<flying-mount-name>', '<ground-mount-name>')
+```
+
+Example Macro: 
+```
+/run ABP:SmartMount('Swift Yellow Wind Rider','Black War Raptor')
+```
 
 ## Docs
 - [Wiki](../../wiki)
