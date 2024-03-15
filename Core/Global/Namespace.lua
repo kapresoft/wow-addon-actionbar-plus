@@ -20,9 +20,9 @@ local KO = K.Objects
 --[[-----------------------------------------------------------------------------
 Global Variables: Replace with Addon-specific global vars
 -------------------------------------------------------------------------------]]
----@param val EnabledInt|boolean|nil
----@param key string|nil Category name
----@return table<string, string>
+--- @param val EnabledInt|boolean|nil
+--- @param key string|nil Category name
+--- @return table<string, string>
 local function __categories(key, val)
     if key then ABP_DEBUG_ENABLED_CATEGORIES[key] = val end
     return ABP_DEBUG_ENABLED_CATEGORIES or {}
@@ -83,7 +83,7 @@ Type: LibPackMixin
 --- @field name Name The addon name
 local LibPackMixin = { };
 
----@param o LibPackMixin
+--- @param o LibPackMixin
 local function LibPackMixinMethods(o)
 
     --- Create a new instance of AceEvent or embed to an obj if passed
@@ -103,8 +103,7 @@ end; LibPackMixinMethods(LibPackMixin)
 --- @class __GameVersionMixin
 local GameVersionMixin = {}
 
----@param o __GameVersionMixin | Namespace
----@param ns NameSpaceFn
+--- @param o __GameVersionMixin | Namespace
 local function GameVersionMethods(o)
     -- todo: get rid of ns()
     --- @return GameVersion
@@ -119,8 +118,7 @@ end; GameVersionMethods(GameVersionMixin)
 
 --- @class __NamespaceLoggerMixin
 local NamespaceLoggerMixin = {}
----@param o __NamespaceLoggerMixin
----@param ns NameSpaceFn
+--- @param o __NamespaceLoggerMixin
 local function NamespaceLoggerMethods(o)
 
     local CategoryLogger = KO.CategoryMixin
@@ -148,7 +146,7 @@ local function NamespaceLoggerMethods(o)
     --- @param v boolean|number | "1" | "0" | "true" | "false"
     function o:SetLogCategory(name, val)
         assert(name, 'Debug category name is missing.')
-        ---@param v boolean|nil
+        --- @param v boolean|nil
         local function normalizeVal(v) if v == 1 or v == true then return 1 end; return 0 end
         __categories(name, normalizeVal(val))
     end
@@ -236,7 +234,7 @@ local function CreateNamespace(...)
         --function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
 
         --- @return CursorUtil
-        ---@param cursorInfo CursorInfo Optional cursorInfo instance
+        --- @param cursorInfo CursorInfo Optional cursorInfo instance
         function o:CreateCursorUtil(cursorInfo)
             local _cursorInfo = cursorInfo or o.O.API:GetCursorInfo()
             return self:K():CreateAndInitFromMixin(o.O.CursorMixin, _cursorInfo)
@@ -265,10 +263,10 @@ local function CreateNamespace(...)
         function o:LibName(moduleName) return self.name .. '-' .. moduleName .. '-1.0' end
 
         --- @param name string The module name
-        --- @param o any The object to register
-        function o:Register(name, o)
-            if not (name or o) then return end
-            ns.O[name] = o
+        --- @param obj any The object to register
+        function o:Register(name, obj)
+            if not (name or obj) then return end
+            ns.O[name] = obj
         end
 
     end; Methods(ns)
