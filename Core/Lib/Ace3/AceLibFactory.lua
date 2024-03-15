@@ -9,7 +9,7 @@
 
 --- @type Namespace
 local _, ns = ...
-local M, LibStub = ns.M, ns.O.LibStub
+local M, LibStub = ns.M, ns.LibStub
 
 local AceModule = {
     AceAddon = "AceAddon-3.0",

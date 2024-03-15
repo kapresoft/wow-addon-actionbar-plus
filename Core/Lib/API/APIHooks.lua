@@ -1,6 +1,6 @@
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local MSG = GC.M
+--- @type Namespace
+local ns = select(2, ...)
+local O, M, MSG, LibStub = ns.O, ns.M, ns.GC.M, ns.LibStub
 
 --[[-----------------------------------------------------------------------------
 New Library: APIHooks
@@ -32,7 +32,7 @@ Message Handler
 --- @see C_MountJournal.Pickup()
 --- @see C_PetJournal.PickupPet()
 L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
-    local pm = LC.MESSAGE:NewLogger(M.APIHooks)
+    local pm = ns:LC().MESSAGE:NewLogger(M.APIHooks)
     pm:d( function() return 'MSG::R: %s', msg end)
 
     if C_MountJournal then

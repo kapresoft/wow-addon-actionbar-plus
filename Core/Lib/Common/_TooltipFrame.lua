@@ -1,10 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, LC = ns.O, ns.O.GlobalConstants, ns.LogCategories()
-
-local M, TA =  GC.M, GC.TooltipAnchor
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, MSG = ns.O, ns.GC, ns.GC.M
+local TA =  GC.TooltipAnchor
 
 --[[-----------------------------------------------------------------------------
 Type: ActionbarPlusTooltipAnchorFrame
@@ -25,7 +25,7 @@ New Instance
 local L = ns:AceEvent()
 local libName = 'TooltipFrameHandler'
 local p = ns:CreateDefaultLogger(libName)
-local pm = LC.MESSAGE:NewLogger(libName)
+local pm = ns:LC().MESSAGE:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -47,7 +47,7 @@ Methods
 local function MethodsAndProperties(o)
 
     --- @see Config
-    o:RegisterMessage(M.OnTooltipFrameUpdate, function(msg, ...)
+    o:RegisterMessage(MSG.OnTooltipFrameUpdate, function(msg, ...)
         OnTooltipFrameUpdate(msg, o, ...)
     end)
 
@@ -58,7 +58,7 @@ local function MethodsAndProperties(o)
         if not self.widget.frame then return end
         self.widget.frame:SetSize(1, 1)
 
-        self:RegisterMessage(GC.M.OnAddOnEnabled, function(msg, ...)
+        self:RegisterMessage(MSG.OnAddOnEnabled, function(msg, ...)
             pm:d(function() return 'MSG::R: %s', msg end)
             local names = GC.Profile_Config_Names
             local anchorType = ns.db.profile[names.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPLEFT

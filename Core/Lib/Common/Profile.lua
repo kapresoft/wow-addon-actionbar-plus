@@ -6,8 +6,10 @@ local tinsert, tsort = table.insert, table.sort
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local PI = O.ProfileInitializer
 local Table, String = O.Table, O.String
 local IsBlankStr = String.IsBlank
@@ -18,7 +20,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class Profile : BaseLibraryObject_WithAceEvent
 local P = LibStub:NewLibrary(M.Profile); if not P then return end; ns:AceEvent(P)
-local p = LC.PROFILE:NewLogger(M.Profile)
+local p = ns:LC().PROFILE:NewLogger(M.Profile)
 
 local ConfigNames = GC.Profile_Config_Names
 local C = GC:GetAceLocale()

@@ -7,8 +7,9 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, LibStub = ns.O, ns.O.LibStub
+--- @type Namespace
+local ns = select(2, ...)
+local O, LibStub = ns.O, ns.LibStub
 
 local Mixin, WMX = O.Mixin, O.WidgetMixin
 local AO = O.AceLibFactory:A()

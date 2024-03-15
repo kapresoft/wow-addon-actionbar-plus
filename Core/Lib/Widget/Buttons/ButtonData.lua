@@ -10,8 +10,9 @@ local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, _, _, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local String, Assert = O.String, O.Assert
 local W = O.GlobalConstants.WidgetAttributes

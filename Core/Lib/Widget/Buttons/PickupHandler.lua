@@ -6,8 +6,10 @@ local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, M, LibStub = ns.O, ns.M, ns.LibStub
+
 local BaseAPI = O.BaseAPI
 local IsNotBlank = O.String.IsNotBlank
 
@@ -17,7 +19,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class PickupHandler
 local L = LibStub:NewLibrary(M.PickupHandler); if not L then return end
-local p = LC.DRAG_AND_DROP:NewLogger(M.PickupHandler)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(M.PickupHandler)
 
 --[[-----------------------------------------------------------------------------
 Methods

@@ -1,3 +1,3 @@
 --- @type Namespace
-local _, ns = ...
+local ns = select(2, ...)
 ns.gameVersion = 'wotlk_classic'

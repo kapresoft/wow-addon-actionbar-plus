@@ -15,8 +15,9 @@ local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 
@@ -26,8 +27,8 @@ New Instance
 --- @class EquipmentSetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
 
-local p = LC.DRAG_AND_DROP:NewLogger(M.EquipmentSetDragEventHandler)
-local pe = LC.EVENT:NewLogger(M.EquipmentSetDragEventHandler)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(M.EquipmentSetDragEventHandler)
+local pe = ns:LC().EVENT:NewLogger(M.EquipmentSetDragEventHandler)
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)

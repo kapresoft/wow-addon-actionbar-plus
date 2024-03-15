@@ -13,8 +13,9 @@ local setglobal = setglobal
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local MX, String, P = O.Mixin, O.String, O.Profile
 local BaseAPI = O.BaseAPI

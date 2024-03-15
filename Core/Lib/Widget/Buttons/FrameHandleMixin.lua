@@ -12,8 +12,10 @@ local format, strlower = string.format, string.lower
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local LSM = O.AceLibrary.AceLibSharedMedia
 local E, GCC, C = GC.E, GC.C, GC:GetAceLocale()
 
@@ -30,7 +32,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class FrameHandleMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.FrameHandleMixin); if not L then return end
-local p = LC.FRAME:NewLogger(M.FrameHandleMixin)
+local p = ns:LC().FRAME:NewLogger(M.FrameHandleMixin)
 
 --Events
 L.E = {

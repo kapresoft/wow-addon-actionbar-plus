@@ -1,7 +1,8 @@
 --- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
 
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub, LC = ns.O, ns.GC, ns.M, ns.LibStub, ns:LC()
 
 local H = O.ActionBarHandlerMixin
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
@@ -82,7 +83,7 @@ local function OnUpdateBindings() addon():UpdateKeyBindings() end
 
 --- @param event string The event name
 local function OnPlayerUnitAura(event, unit)
-    ua:t('OnPlayerUnitAura(): called...')
+    ua:t(function() return 'OnPlayerUnitAura(): unit=%s called...', unit end)
     Un:UpdateShapeshiftBuffs()
 end
 

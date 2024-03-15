@@ -1,7 +1,8 @@
 --[[-----------------------------------------------------------------------------
 Modules
 -------------------------------------------------------------------------------]]
-local addon, ns = ...
+--- @type Kapresoft_Base_Namespace
+local kns = select(2, ...)
 
 --- @class Modules
 local L = {
@@ -13,200 +14,138 @@ setmetatable(L, L.mt)
 
 --- @class Module
 local M = {
-    LibStub = 'LibStub',
+    LibStub = '',
 
     -- Libraries
-    ActionbarPlusAPI = 'ActionbarPlusAPI',
-    BaseAPI = 'BaseAPI',
-    API = 'API',
-    Logger = 'Logger',
-    LogFactory = 'LogFactory',
-    PrettyPrint = 'PrettyPrint',
-    Table = 'Table',
-    String = 'String',
-    Safecall = 'Safecall',
-    LuaEvaluator = 'LuaEvaluator',
-    ActionbarPlusEventMixin = 'ActionbarPlusEventMixin',
-    ActionBarController = 'ActionBarController',
-    ActionType = 'ActionType',
-    Assert = 'Assert',
+    ActionBarController = '',
+    ActionbarPlusAPI = '',
+    ActionbarPlusEventMixin = '',
+    ActionType = '',
+    API = '',
+    Assert = '',
+    BaseAPI = '',
+    LogFactory = '',
+    Logger = '',
+    LuaEvaluator = '',
+    PrettyPrint = '',
+    Safecall = '',
+    String = '',
+    Table = '',
+
     --- @deprecated Use AceLibrary
-    AceLibFactory = 'AceLibFactory',
-    AceLibrary = 'AceLibrary',
-    APIHooks = 'APIHooks',
+    AceLibFactory = '',
+    AceLibrary = '',
+    APIHooks = '',
 
     -- Mixins
-    Mixin = 'Mixin',
-    ActionBarHandlerMixin = 'ActionBarHandlerMixin',
-    ButtonMixin = 'ButtonMixin',
-    ButtonProfileMixin = 'ButtonProfileMixin',
-    CursorMixin = 'CursorMixin',
-    DebuggingConfigGroup = 'DebuggingConfigGroup',
-    LoggerMixinV2 = 'LoggerMixinV2',
+    Mixin = '',
 
-    UnitMixin = 'UnitMixin',
-    DruidUnitMixin = 'DruidUnitMixin',
-    PriestUnitMixin = 'PriestUnitMixin',
-    ShamanUnitMixin = 'ShamanUnitMixin',
+    ActionBarHandlerMixin = '',
+    ButtonMixin = '',
+    ButtonProfileMixin = '',
+    CursorMixin = '',
+    DebuggingSettingsGroup = '',
+    DruidUnitMixin = '',
+    LoggerMixinV2 = '',
+    PriestUnitMixin = '',
+    ShamanUnitMixin = '',
+    UnitMixin = '',
 
-    -- Addons
-    BaseAttributeSetter = 'BaseAttributeSetter',
-    BattlePetDragEventHandler = 'BattlePetDragEventHandler',
-    BattlePetAttributeSetter = 'BattlePetAttributeSetter',
-    ButtonFactory = 'ButtonFactory',
-    ButtonFrameFactory = 'ButtonFrameFactory',
-    ButtonUI = 'ButtonUI',
-    ButtonUIWidgetBuilder = 'ButtonUIWidgetBuilder',
-    CompanionDragEventHandler = 'CompanionDragEventHandler',
-    CompanionAttributeSetter = 'CompanionAttributeSetter',
-    Settings = 'Settings',
-    SettingsEventHandlerMixin = 'SettingsEventHandlerMixin',
-    EquipmentSetDragEventHandler = 'EquipmentSetDragEventHandler',
-    EquipmentSetAttributeSetter = 'EquipmentSetAttributeSetter',
-    FrameHandleMixin = 'FrameHandleMixin',
-    GlobalConstants = 'GlobalConstants',
-    ItemAttributeSetter = 'ItemAttributeSetter',
-    ItemDragEventHandler = 'ItemDragEventHandler',
-    LocalizationUtil = 'LocalizationUtil',
-    MacroAttributeSetter = 'MacroAttributeSetter',
-    MacroDragEventHandler = 'MacroDragEventHandler',
-    MacroEventsHandler = 'MacroEventsHandler',
-    MacrotextAttributeSetter = 'MacrotextAttributeSetter',
-    Modules = 'Modules',
-    MountDragEventHandler = 'MountDragEventHandler',
-    MountAttributeSetter = 'MountAttributeSetter',
-    PickupHandler = 'PickupHandler',
-    Profile = 'Profile',
-    ProfileInitializer = 'ProfileInitializer',
-    ReceiveDragEventHandler = 'ReceiveDragEventHandler',
-    SpellAttributeSetter = 'SpellAttributeSetter',
-    SpellDragEventHandler = 'SpellDragEventHandler',
-    WidgetMixin = 'WidgetMixin',
+    BaseAttributeSetter = '',
+    BattlePetAttributeSetter = '',
+    BattlePetDragEventHandler = '',
+    ButtonFactory = '',
+    ButtonFrameFactory = '',
+    ButtonUI = '',
+    ButtonUIWidgetBuilder = '',
+    CompanionAttributeSetter = '',
+    CompanionDragEventHandler = '',
+    EquipmentSetAttributeSetter = '',
+    EquipmentSetDragEventHandler = '',
+    FrameHandleMixin = '',
+    GlobalConstants = '',
+    ItemAttributeSetter = '',
+    ItemDragEventHandler = '',
+    LocalizationUtil = '',
+    MacroAttributeSetter = '',
+    MacroDragEventHandler = '',
+    MacroEventsHandler = '',
+    MacrotextAttributeSetter = '',
+    Modules = '',
+    MountAttributeSetter = '',
+    MountDragEventHandler = '',
+    PickupHandler = '',
+    Profile = '',
+    ProfileInitializer = '',
+    ReceiveDragEventHandler = '',
+    Settings = '',
+    SettingsEventHandlerMixin = '',
+    SpellAttributeSetter = '',
+    SpellDragEventHandler = '',
+    WidgetMixin = '',
     -- Support Classes
-    M6Support = 'M6Support'
-}
+    M6Support = ''
+}; for moduleName in pairs(M) do M[moduleName] = moduleName end
 
 --- @class GlobalObjects
-local GlobalObjectsTemplate = {
-    --- @type LocalLibStub
-    LibStub = {},
+--- @field AceLibFactory AceLibFactory Deprecated, Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
+--- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
+--- @field ActionBarHandlerMixin ActionBarHandlerMixin
+--- @field ActionbarPlusAPI ActionbarPlusAPI
+--- @field ActionbarPlusEventMixin ActionbarPlusEventMixin
+--- @field ActionType ActionType
+--- @field API API
+--- @field Assert Kapresoft_LibUtil_Assert
+--- @field BaseAPI BaseAPI
+--- @field BaseAttributeSetter BaseAttributeSetter
+--- @field BattlePetAttributeSetter BattlePetAttributeSetter
+--- @field BattlePetDragEventHandler BattlePetDragEventHandler
+--- @field ButtonFactory ButtonFactory
+--- @field ButtonFrameFactory ButtonFrameFactory
+--- @field ButtonMixin ButtonMixin
+--- @field ButtonProfileMixin ButtonProfileMixin
+--- @field ButtonUI ButtonUI
+--- @field ButtonUIWidgetBuilder ButtonUIWidgetBuilder
+--- @field CompanionAttributeSetter CompanionAttributeSetter
+--- @field CompanionDragEventHandler CompanionDragEventHandler
+--- @field DebuggingSettingsGroup DebuggingSettingsGroup
+--- @field DruidUnitMixin DruidUnitMixin
+--- @field EquipmentSetAttributeSetter EquipmentSetAttributeSetter
+--- @field EquipmentSetDragEventHandler EquipmentSetDragEventHandler
+--- @field FrameHandleMixin FrameHandleMixin
+--- @field ItemAttributeSetter ItemAttributeSetter
+--- @field ItemDragEventHandler ItemDragEventHandler
+--- @field LocalizationUtil LocalizationUtil
+--- @field LogFactory LogFactory
+--- @field Logger Logger
+--- @field LoggerMixinV2 LoggerMixinV2
+--- @field LuaEvaluator Kapresoft_LibUtil_LuaEvaluator
+--- @field MacroAttributeSetter MacroAttributeSetter
+--- @field MacroDragEventHandler MacroDragEventHandler
+--- @field MacroEventsHandler MacroEventsHandler
+--- @field MacrotextAttributeSetter MacrotextAttributeSetter
+--- @field Mixin Kapresoft_LibUtil_Mixin
+--- @field Modules Modules
+--- @field MountAttributeSetter MountAttributeSetter
+--- @field MountDragEventHandler MountDragEventHandler
+--- @field PickupHandler PickupHandler
+--- @field PriestUnitMixin PriestUnitMixin
+--- @field Profile Profile
+--- @field ProfileInitializer ProfileInitializer
+--- @field ReceiveDragEventHandler ReceiveDragEventHandler
+--- @field Safecall Kapresoft_LibUtil_Safecall
+--- @field Settings Settings
+--- @field SettingsEventHandlerMixin SettingsEventHandlerMixin
+--- @field ShamanUnitMixin ShamanUnitMixin
+--- @field SpellAttributeSetter SpellAttributeSetter
+--- @field SpellDragEventHandler SpellDragEventHandler
+--- @field String Kapresoft_LibUtil_String
+--- @field Table Kapresoft_LibUtil_Table
+--- @field UnitMixin UnitMixin
+--- @field WidgetMixin WidgetMixin
 
-    --- @type ActionbarPlusAPI
-    ActionbarPlusAPI = {},
-    --- @type BaseAPI
-    BaseAPI = {},
-    --- @type API
-    API = {},
-    --- @deprecated Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
-    --- @type AceLibFactory
-    AceLibFactory = {},
-    --- @type Kapresoft_LibUtil_AceLibraryObjects
-    AceLibrary = {},
-    --- @type ActionBarHandlerMixin
-    ActionBarHandlerMixin = {},
-    --- @type ActionbarPlusEventMixin
-    ActionbarPlusEventMixin = {},
-    --- @type ActionType
-    ActionType = {},
-    --- @type Kapresoft_LibUtil_Assert
-    Assert = {},
-    --- @type BaseAttributeSetter
-    BaseAttributeSetter = {},
-    --- @type ButtonFactory
-    ButtonFactory = {},
-    --- @type ButtonFrameFactory
-    ButtonFrameFactory = {},
-    --- @type ButtonMixin
-    ButtonMixin = {},
-    --- @type ButtonProfileMixin
-    ButtonProfileMixin = {},
-    --- @type ButtonUI
-    ButtonUI = {},
-    --- @type ButtonUIWidgetBuilder
-    ButtonUIWidgetBuilder = {},
-    --- @type Settings
-    Settings = {},
-    --- @type SettingsEventHandlerMixin
-    SettingsEventHandlerMixin = {},
-    --- @type DebuggingSettingsGroup
-    DebuggingConfigGroup = {},
-    --- @type DruidUnitMixin
-    DruidUnitMixin = { },
-    --- @type EquipmentSetDragEventHandler
-    EquipmentSetDragEventHandler = {},
-    --- @type EquipmentSetAttributeSetter
-    EquipmentSetAttributeSetter = {},
-    --- @type FrameHandleMixin
-    FrameHandleMixin = {},
-    --- @type GlobalConstants
-    GlobalConstants = {},
-    --- @type ItemAttributeSetter
-    ItemAttributeSetter = {},
-    --- @type ItemDragEventHandler
-    ItemDragEventHandler = {},
-    --- @type LocalizationUtil
-    LocalizationUtil = {},
-    --- @type LogFactory
-    LogFactory = {},
-    --- @type Logger
-    Logger = {},
-    --- @type LoggerMixinV2
-    LoggerMixinV2 = {},
-    --- @type Kapresoft_LibUtil_LuaEvaluator,
-    LuaEvaluator = {},
-    --- @type MacroAttributeSetter
-    MacroAttributeSetter = {},
-    --- @type MacroDragEventHandler
-    MacroDragEventHandler = {},
-    --- @type MacroEventsHandler
-    MacroEventsHandler = {},
-    --- @type MacrotextAttributeSetter
-    MacrotextAttributeSetter = {},
-    --- @type Modules
-    Modules = {},
-    --- @type MountDragEventHandler
-    MountDragEventHandler = {},
-    --- @type BattlePetDragEventHandler
-    BattlePetDragEventHandler = {},
-    --- @type BattlePetAttributeSetter
-    BattlePetAttributeSetter = {},
-    --- @type CompanionDragEventHandler
-    CompanionDragEventHandler = {},
-    --- @type CompanionAttributeSetter
-    CompanionAttributeSetter = {},
-    --- @type MountAttributeSetter
-    MountAttributeSetter = {},
-    --- @type Kapresoft_LibUtil_Mixin
-    Mixin = {},
-    --- @type PickupHandler
-    PickupHandler = {},
-    --- @type PriestUnitMixin
-    PriestUnitMixin = {},
-    --- @type Profile
-    Profile = {},
-    --- @type ProfileInitializer
-    ProfileInitializer = {},
-    --- @type ReceiveDragEventHandler
-    ReceiveDragEventHandler = {},
-    --- @type Kapresoft_LibUtil_Safecall
-    Safecall = {},
-    --- @type SpellAttributeSetter
-    SpellAttributeSetter = {},
-    --- @type SpellDragEventHandler
-    SpellDragEventHandler = {},
-    --- @type Kapresoft_LibUtil_String
-    String = {},
-    --- @type Kapresoft_LibUtil_Table
-    Table = {},
-    --- @type WidgetMixin
-    WidgetMixin = {},
-    --- @type ShamanUnitMixin
-    ShamanUnitMixin = {},
-    --- @type UnitMixin
-    UnitMixin = {},
-}
 L.M = M
-ns.M = M
+kns.M = M
 
-ns.O = ns.O or {}
-ns.O.Modules = L
+kns.O = kns.O or {}
+kns.O.Modules = L

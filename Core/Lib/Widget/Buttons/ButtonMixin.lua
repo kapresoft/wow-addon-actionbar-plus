@@ -6,8 +6,10 @@ local tostring, format, strlower, tinsert = tostring, string.format, string.lowe
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local String = O.String
 local AceEvent = O.AceLibrary.AceEvent
@@ -39,7 +41,7 @@ button: widget.button
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
 local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end; AceEvent:Embed(L)
-local p = LC.BUTTON:NewLogger(M.ButtonMixin)
+local p = ns:LC().BUTTON:NewLogger(M.ButtonMixin)
 
 --[[-----------------------------------------------------------------------------
 Instance Methods

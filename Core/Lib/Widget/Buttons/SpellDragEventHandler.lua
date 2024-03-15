@@ -1,8 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local API, Assert, String, PH = O.API, O.Assert, O.String, O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank = String.IsNotBlank
@@ -13,7 +15,7 @@ New Instance: SpellDragEventHandler
 -------------------------------------------------------------------------------]]
 --- @class SpellDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.SpellDragEventHandler); if not L then return end
-local p = LC.DRAG_AND_DROP:NewLogger(M.SpellDragEventHandler)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(M.SpellDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 New Instance: SpellAttributeSetter

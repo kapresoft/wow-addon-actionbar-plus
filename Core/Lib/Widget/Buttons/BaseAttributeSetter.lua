@@ -8,9 +8,10 @@ local InCombatLockdown = InCombatLockdown
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local WMX, String, Profile = O.WidgetMixin, O.String, O.Profile
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local WMX, String = O.WidgetMixin, O.String
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
 
@@ -18,25 +19,16 @@ local PCN = GC.Profile_Config_Names
 Interface
 -------------------------------------------------------------------------------]]
 --- @class AttributeSetter : BaseLibraryObject
-local AttributeSetter = {
-    --- @param self AttributeSetter
-    --- @param btnUI ButtonUI
-    --- @param btnData Profile_Button
-    ['SetAttributes'] = function(self, btnUI) end,
-    --- @param self AttributeSetter
-    --- @param btnUI ButtonUI
-    ['OnAfterSetAttributes'] = function(self, btnUI) end,
-    --- @param self AttributeSetter
-    --- @param btnUI ButtonUI
-    ['ShowTooltip'] = function(self, btnUI) end
-}
+--- @field SetAttributes fun(self:AttributeSetter, btnUI:ButtonUI, btnData:Profile_Button)
+--- @field OnAfterSetAttributes fun(self:AttributeSetter, btnUI:ButtonUI)
+--- @field ShowTooltip fun(self:AttributeSetter, btnUI:ButtonUI)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class BaseAttributeSetter : AttributeSetter
 local L = LibStub:NewLibrary(M.BaseAttributeSetter); if not L then return end
-local p = LC.BUTTON:NewLogger(M.BaseAttributeSetter)
+local p = ns:LC().BUTTON:NewLogger(M.BaseAttributeSetter)
 
 --[[-----------------------------------------------------------------------------
 Support Functions

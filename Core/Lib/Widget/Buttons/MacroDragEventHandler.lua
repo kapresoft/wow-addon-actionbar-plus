@@ -6,8 +6,10 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local Assert, String = O.Assert, O.String
 local WAttr, PH = GC.WidgetAttributes, O.PickupHandler
 local AceEvent = O.AceLibrary.AceEvent
@@ -25,7 +27,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.MacroDragEventHandler)
-local p = LC.EVENT:NewLogger(M.MacroEventsHandler)
+local p = ns:LC().EVENT:NewLogger(M.MacroEventsHandler)
 local LL = GC:GetAceLocale()
 
 --[[-----------------------------------------------------------------------------

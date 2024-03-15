@@ -9,11 +9,12 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local BaseAPI, API = O.BaseAPI, O.API
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
-local B, PR, WMX = O.BaseAPI, O.Profile, O.WidgetMixin
+local B = O.BaseAPI
 local AceEvent = O.AceLibrary.AceEvent
 local CURSOR_ITEM_TYPE = 1
 
@@ -48,8 +49,8 @@ local libName = M.ActionbarPlusEventMixin
 local L = LibStub:NewLibrary(libName); if not L then return end
 AceEvent:Embed(L)
 local p = ns:CreateDefaultLogger(libName)
-local pe = LC.EVENT:NewLogger(libName)
-local pu = LC.UNIT:NewLogger(libName)
+local pe = ns:LC().EVENT:NewLogger(libName)
+local pu = ns:LC().UNIT:NewLogger(libName)
 
 --- @param msg string The message name
 --- @param abp ActionbarPlus
@@ -187,7 +188,7 @@ function L:RegisterActionbarGridEventFrame()
 end
 
 function L:RegisterCursorChangesInBagEvents()
-    if BaseAPI:IsClassicEra() then return end
+    if B:IsClassicEra() then return end
     local f = self:CreateEventFrame()
     f:SetScript(E.OnEvent, OnCursorChangeInBags)
     -- Note that this event does not fire in WoW Classic (i.e. 1.14.x)

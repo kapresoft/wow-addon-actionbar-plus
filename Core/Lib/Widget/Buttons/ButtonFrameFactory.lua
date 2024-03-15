@@ -25,9 +25,9 @@ local AnchorUtil = AnchorUtil
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.O.LibStub, ns.LogCategories()
-
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, LibStub, LC = ns.O, ns.GC, ns.LibStub, ns:LC()
 local Assert, P = O.Assert, O.Profile
 local AceGUI = O.AceLibrary.AceGUI
 local E, M = GC.E, GC.M

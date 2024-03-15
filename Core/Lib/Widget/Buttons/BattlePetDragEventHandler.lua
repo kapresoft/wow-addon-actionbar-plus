@@ -14,16 +14,17 @@ local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local PH, IsNil = O.PickupHandler, O.Assert.IsNil
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
+local BaseAPI, PH, IsNil = O.BaseAPI, O.PickupHandler, O.Assert.IsNil
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
-local BaseAPI = O.BaseAPI
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = LC.DRAG_AND_DROP:NewLogger(M.CompanionDragEventHandler)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(M.CompanionDragEventHandler)
 
 --- @class BattlePetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.BattlePetDragEventHandler)

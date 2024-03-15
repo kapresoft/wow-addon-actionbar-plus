@@ -6,14 +6,15 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, Mod, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
 
 local Ace, BaseAPI = O.AceLibrary, O.BaseAPI
-local E, M = GC.E, GC.M
+local E, MSG = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
-local debugGroup = O.DebuggingConfigGroup
-local p = ns:CreateDefaultLogger(Mod.Settings);
+local debugGroup = O.DebuggingSettingsGroup
+local p = ns:CreateDefaultLogger(ns.M.Settings);
 
 ---These are loaded in #fetchLibs()
 --- @type Profile
@@ -228,7 +229,7 @@ local function PropsAndMethods(o)
         local options = self:GetOptions()
         -- Get the option table for profiles
         -- options.args.profiles = AceDBOptions:GetOptionsTable(self.db)
-        AceConfig:RegisterOptionsTable(ns.name, options, { GC.C.SLASH_COMMAND_OPTIONS })
+        AceConfig:RegisterOptionsTable(ns.name, options, { GC.C.CONSOLE_COMMAND_OPTIONS })
         AceConfigDialog:AddToBlizOptions(ns.name, ns.name)
         options.args.profiles = AceDBOptions:GetOptionsTable(db)
     end
@@ -571,7 +572,7 @@ local function NewInstance()
 
     AceEvent:Embed(newConfig)
     PropsAndMethods(newConfig)
-    newConfig:RegisterMessage(M.OnAddOnEnabled, function(evt, ...) newConfig:InitConfig(evt, ...) end)
+    newConfig:RegisterMessage(MSG.OnAddOnEnabled, function(evt, ...) newConfig:InitConfig(evt, ...) end)
     return newConfig
 end
 

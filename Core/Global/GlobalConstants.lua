@@ -21,8 +21,14 @@ local date = date
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
--- Use the bare namespace here since this is the very first file to be loaded
-local addon, ns = ...
+--- @type string
+local addon
+--- @type Kapresoft_Base_Namespace
+local ns
+addon, ns = ...
+local kch = ns.Kapresoft_LibUtil.CH
+--- @type LibStub
+local LibStub = LibStub
 
 --- @type fun(o:any, ...) : void
 local pformat = ns.pformat
@@ -34,6 +40,26 @@ local IsBlank, IsNotBlank, EqualsIgnoreCase = String.IsBlank, String.IsNotBlank,
 
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
 local ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
+
+local consoleCommand = "actionbarplus"
+local consoleCommandShort = "abp"
+local consoleCommandOptions = consoleCommandShort .. '-options'
+local globalVarName = "ABP"
+local globalVarPrefix = globalVarName .. "_"
+local dbName = globalVarPrefix .. 'PLUS_DB'
+
+
+--[[-----------------------------------------------------------------------------
+Console Colors
+-------------------------------------------------------------------------------]]
+--- @type Kapresoft_LibUtil_ColorDefinition
+local consoleColors = {
+    primary   = '2db9fb',
+    secondary = 'fbeb2d',
+    tertiary  = 'ffffff',
+}
+local command = kch:FormatColor(consoleColors.primary, '/' .. consoleCommand)
+local commandShort = kch:FormatColor(consoleColors.primary, '/' .. consoleCommandShort)
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -67,13 +93,17 @@ local function GlobalConstantProperties(o)
     --- @class GlobalAttributes
     local C = {
         ADDON_NAME = addon,
-        DB_NAME = 'ABP_PLUS_DB',
+        VAR_NAME = globalVarName,
+        CONSOLE_COMMAND_NAME = consoleCommand,
+        CONSOLE_COMMAND_SHORT = consoleCommandShort,
+        CONSOLE_COMMAND_OPTIONS = consoleCommandOptions,
+        CONSOLE_COLORS = consoleColors,
+        DB_NAME = dbName,
         BASE_FRAME_NAME = 'ActionbarPlusF',
         BUTTON_NAME_FORMAT = 'ActionbarPlusF%sButton%s',
         BUTTON_NAME_SHORT_FORMAT = 'F%s-B%s',
         --- @see _ParentFrame.xml
         FRAME_TEMPLATE = 'ActionbarPlusFrameTemplate',
-        SLASH_COMMAND_OPTIONS = "abp_options",
         ABP_KEYBIND_FORMAT = '\n|cfd03c2fcKeybind ::|r |cfd5a5a5a%s|r',
         ABP_CHECK_VAR_SYNTAX_FORMAT = '|cfdeab676%s ::|r %s',
         ABP_CONSOLE_HEADER_FORMAT = '|cfdeab676### %s ###|r',
@@ -548,6 +578,7 @@ local function GlobalConstantMethods(o)
     --- @param ... any The list of values to check for a match.
     --- @return boolean True if `toMatch` is found in the varargs, false otherwise.
     function o:IsAnyOfNumber(toMatch, ...)
+        if toMatch == nil then return false end
         for i = 1, select('#', ...) do
             local val = select(i, ...)
             if toMatch == val then return true end
@@ -621,9 +652,13 @@ local function GlobalConstantMethods(o)
         )
     end
 
-    function o:GetLogLevel() return ABP_LOG_LEVEL end
-    --- @param level number The log level between 1 and 100
-    function o:SetLogLevel(level) ABP_LOG_LEVEL = level or 1 end
+    function o:GetMessageLoadedText()
+        local consoleCommandMessageFormat = sformat('Type %s or %s for available commands.',
+                command, commandShort)
+        return sformat("%s version %s by %s is loaded. %s",
+                kch:P(addon) , self:GetAddonInfo(), kch:FormatColor(consoleColors.primary, 'kapresoft'),
+                consoleCommandMessageFormat)
+    end
 
     --- @param frameIndex number
     --- @param btnIndex number
@@ -650,6 +685,7 @@ local function Init()
 
     --- @type GlobalConstants
     ABP_GlobalConstants = L
+    --- @type GlobalObjects
     ns.O = ns.O or {}
     ns.O.GlobalConstants = L
 end

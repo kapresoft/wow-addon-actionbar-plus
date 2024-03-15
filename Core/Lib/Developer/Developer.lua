@@ -10,14 +10,15 @@ local SetCVar, GetCVarBool  = SetCVar, GetCVarBool
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
+--- @type Namespace
+local ns = select(2, ...)
 local O, GC = ns.O, ns.O.GlobalConstants
 
 local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile
 
-ABP_enableV2 = true
+ABP_enableV2 = false
 ns.features.enableV2 = ABP_enableV2
 
 --[[O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
@@ -39,7 +40,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class Developer : BaseLibraryObject_WithAceEvent
 local L = {}; AceEvent:Embed(L); D = L
-local p = O.LoggerMixinV2:New('Developer')
+local p = ns:LC().DEV:NewLogger('Developer')
 
 --[[-----------------------------------------------------------------------------
 Methods

@@ -1,12 +1,31 @@
 --[[-----------------------------------------------------------------------------
-Local Vars
+Type Definitions
+-------------------------------------------------------------------------------]]
+--- @alias LoggerV2 LoggerMixinV2
+--- @alias LM_LogCallbackFn fun() : string, any, any, any, any | "function() end"
+--- @alias LogLevel number A number 0 or greater
+
+--- @class LogCategory
+--- @field name string Category name
+--- @field short string Category Short name
+--- @field labelFn fun() : string The label string
+--- @field NewLogger fun(self:LogCategory, logName:string) : LoggerV2
+
+--[[-----------------------------------------------------------------------------
+Lua Vars
 -------------------------------------------------------------------------------]]
 local sformat, stru, strl = string.format, string.upper, string.len
 
-local ns = abp_ns(...)
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+
+--- @type Namespace
+local ns = select(2, ...)
+
+local M = ns.M
 local K, KO = ns:K(), ns:K().Objects
-local KC, M, LibStub = KO.Constants, ns.M, ns.O.LibStub
---local KC, String, Table = KO.Constants, KO.String, KO.Table
+local KC = KO.Constants
 
 local addon = ns.name
 local libName = M.LoggerMixinV2
@@ -20,15 +39,12 @@ local FINER_LEVEL = 30
 local FINEST_LEVEL = 35
 local TRACE_LEVEL = 50
 
---- @alias LoggerV2 LoggerMixinV2
---- @alias LM_LogCallbackFn fun() : string, any, any, any, any | "function() end"
---- @alias LogLevel number A number 0 or greater
-
---- @class LogCategory
---- @field name string Category name
---- @field short string Category Short name
---- @field labelFn fun() : string The label string
---- @field NewLogger fun(self:LogCategory, logName:string) : LoggerV2
+--- @type Kapresoft_LibUtil_ColorDefinition
+local consoleColors = {
+    primary   = '2db9fb',
+    secondary = 'fbeb2d',
+    tertiary  = 'ffffff',
+}
 
 local LC = {
     --- @type LogCategory
@@ -95,12 +111,6 @@ function HasStringLength(str)
     return false
 end
 
---- @type Kapresoft_LibUtil_ColorDefinition
-local consoleColors = {
-    primary   = '2db9fb',
-    secondary = 'fbeb2d',
-    tertiary  = 'ffffff',
-}
 local ch = KC:NewConsoleHelper(consoleColors)
 
 local function GetLogPrefix(name)
@@ -192,9 +202,6 @@ Methods: CategoryMixin
 ---@param o CategoryMixin
 local function CategoryMixinMethods(o)
     InitCategories();
-
-    ---@param cat LogCategory
-    function o:NewLogger(cat) return L:NewByCat(cat) end
 
     function o:GetCategories() return LC end
 

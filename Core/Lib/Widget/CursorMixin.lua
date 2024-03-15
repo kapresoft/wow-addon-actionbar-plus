@@ -1,8 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local W = GC.WidgetAttributes
 local IsBlank = O.String.IsBlank
 
@@ -11,7 +13,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class CursorMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.CursorMixin); if not L then return end
-local p = LC.DRAG_AND_DROP:NewLogger(M.CursorMixin)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(M.CursorMixin)
 
 -- Add to Modules.lua
 --CursorMixin = 'CursorMixin',

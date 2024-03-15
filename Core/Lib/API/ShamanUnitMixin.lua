@@ -1,8 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local GHOST_WOLF_SPELL_ID = 2645
 
 --[[-----------------------------------------------------------------------------
@@ -14,7 +16,7 @@ local function CreateLib()
     local libName = M.ShamanUnitMixin
     --- @class __ShamanUnitMixin : UnitMixin
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = LC.UNIT:NewLogger(libName)
+    local logger = ns:LC().UNIT:NewLogger(libName)
     --- @alias ShamanUnitMixin __ShamanUnitMixin | BaseLibraryObject
     O.UnitMixin:Embed(newLib)
     return newLib, logger
