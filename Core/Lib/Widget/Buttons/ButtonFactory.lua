@@ -12,24 +12,28 @@ local Enum, EmbeddedItemTooltip, ItemRefTooltip = Enum, EmbeddedItemTooltip, Ite
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, E, LibStub = ns.O, ns.GC, ns.M, ns.GC.E, ns.LibStub
+
 local Table, P, MSG = O.Table, O.Profile, GC.M
 local IsEmptyTable = Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
 local WAttr = O.GlobalConstants.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
-            WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
-            WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
-            WAttr.EQUIPMENT_SET
-local E = GC.E
+WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
+WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
+WAttr.EQUIPMENT_SET
 --- @type ButtonUILib
 local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
 
+--[[-----------------------------------------------------------------------------
+New Library
+-------------------------------------------------------------------------------]]
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; ns:AceEvent(L)
-local p = LC.BUTTON:NewLogger(M.ButtonFactory)
+local p = ns:LC().BUTTON:NewLogger(M.ButtonFactory)
 
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
@@ -233,7 +237,7 @@ Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
-    local pm = LC.MESSAGE:NewLogger(M.ButtonFactory)
+    local pm = ns:LC().MESSAGE:NewLogger(M.ButtonFactory)
     L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
         pm:d(function() return 'MSG::R: %s', msg end)
         L:Init()

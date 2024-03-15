@@ -7,14 +7,15 @@ local GetMacroSpell, IsPassiveSpell = GetMacroSpell, IsPassiveSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
 local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
 local CN = GC.Profile_Config_Names
 local String, Table, W = O.String, O.Table, GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
 local IsBlankStr = String.IsBlank
-local p = LC.PROFILE:NewLogger(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -22,6 +23,7 @@ New Instance
 
 --- @class ButtonProfileMixin : BaseLibraryObject
 local L = LibStub:NewLibrary(M.ButtonProfileMixin)
+local p = ns:LC().PROFILE:NewLogger(M.ButtonProfileMixin)
 
 --[[-----------------------------------------------------------------------------
 Support Functions

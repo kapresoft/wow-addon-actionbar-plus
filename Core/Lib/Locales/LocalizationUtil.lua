@@ -6,8 +6,8 @@ local sformat = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local LibStub = ns.O.LibStub
+--- @type Namespace
+local ns = select(2, ...)
 
 local bindingGlobalVarFormat = 'BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s'
 local MAX_BARS = 8
@@ -17,7 +17,7 @@ local MAX_BUTTONS = 50
 New Library
 -------------------------------------------------------------------------------]]
 ---@class LocalizationUtil : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.LocalizationUtil); if not L then return end
+local L = ns.LibStub:NewLibrary(ns.M.LocalizationUtil); if not L then return end
 local p = ns:CreateDefaultLogger(ns.M.LocalizationUtil)
 
 L.MAX_BARS = MAX_BARS

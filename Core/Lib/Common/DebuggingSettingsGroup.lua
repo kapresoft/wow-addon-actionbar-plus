@@ -1,16 +1,21 @@
 --[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local sformat = string.format
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local GC, M, LibStub = ns.O.GlobalConstants, ns.M, ns.O.LibStub
-local sformat = string.format
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @return DebuggingSettingsGroup, LoggerV2
 local function CreateLib()
-    local libName = M.DebuggingConfigGroup
+    local libName = M.DebuggingSettingsGroup
     --- @class DebuggingSettingsGroup : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:CreateDefaultLogger(libName)
@@ -26,8 +31,7 @@ Methods
 local function PropsAndMethods(o)
     --- spacer
     local sp = '                                                                   '
-    local L = GC:GetAceLocale()
-
+    local L = ns:AceLocale()
 
     --- @return AceConfigOption
     function o:CreateDebuggingGroup()
@@ -53,8 +57,8 @@ local function PropsAndMethods(o)
                     width = 1.5,
                     name = L['Log Level'],
                     desc = L['Log Level::Description'],
-                    get = function(_) return GC:GetLogLevel() end,
-                    set = function(_, v) GC:SetLogLevel(v) end,
+                    get = function(_) return ns:GetLogLevel() end,
+                    set = function(_, v) ns:SetLogLevel(v) end,
                 },
                 spacer1b = { type="description", name=sp, width="full", order = dbgSeq:next() },
                 desc_cat = { name = "Categories", type = "header", order = dbgSeq:next() },
@@ -87,7 +91,7 @@ local function PropsAndMethods(o)
             end }
         conf.args.spacer2 = { type="description", name=sp, width="full", order = dbgSeq:next() },
 
-        ns.LogCategory():ForEachCategory(function(cat)
+        ns.LogCategory:ForEachCategory(function(cat)
             local elem = {
                 type = 'toggle', name=cat.labelFn(), order=dbgSeq:next(), width=1.2,
                 get = function() return ns:IsLogCategoryEnabled(cat.name) end,

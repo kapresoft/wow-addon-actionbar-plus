@@ -12,10 +12,10 @@ local CreateFromMixins = CreateFromMixins
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local ConfigNames = GC.Profile_Config_Names
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
+local ConfigNames = GC.Profile_Config_Names
 local ATTR, Table = GC.WidgetAttributes, O.Table
 local shallow_copy = Table.shallow_copy
 
@@ -24,7 +24,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class ProfileInitializer : BaseLibraryObject_Initialized
 local L = LibStub:NewLibrary(M.ProfileInitializer); if not L then return end
-local p = LC.PROFILE:NewLogger(M.ProfileInitializer)
+local p = ns:LC().PROFILE:NewLogger(M.ProfileInitializer)
 
 --[[-----------------------------------------------------------------------------
 Instance Properties

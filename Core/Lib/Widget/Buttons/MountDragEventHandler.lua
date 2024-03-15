@@ -7,8 +7,8 @@ local GameTooltip, C_MountJournal = GameTooltip, C_MountJournal
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local IsNil = O.Assert.IsNil

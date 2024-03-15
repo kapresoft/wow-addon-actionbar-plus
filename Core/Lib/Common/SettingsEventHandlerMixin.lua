@@ -1,8 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, M, LibStub, LC = ns.O, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, M, LibStub = ns.O, ns.M, ns.LibStub
 local IsNotBlank = O.String.IsNotBlank
 
 --[[-----------------------------------------------------------------------------
@@ -10,7 +11,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @class SettingsEventHandlerMixin : BaseLibraryObject_WithAceEvent
 local L = LibStub:NewLibrary(M.SettingsEventHandlerMixin); if not L then return end; ns:AceEvent(L)
-local p = LC.EVENT:NewLogger(M.SettingsEventHandlerMixin)
+local p = ns:LC().EVENT:NewLogger(M.SettingsEventHandlerMixin)
 
 --[[-----------------------------------------------------------------------------
 Methods

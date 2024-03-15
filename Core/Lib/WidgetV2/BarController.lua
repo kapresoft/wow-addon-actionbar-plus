@@ -2,9 +2,8 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local _, ns = ...
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-local E = GC.E
+local ns = select(2, ...)
+local O, GC, M, E, LibStub = ns.O, ns.GC, ns.M, ns.GC.E, ns.LibStub
 
 --[[-----------------------------------------------------------------------------
 New Instance

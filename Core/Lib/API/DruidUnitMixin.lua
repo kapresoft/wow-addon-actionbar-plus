@@ -1,10 +1,10 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local FLIGHT_FORM_SPELLID = 40120
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -13,7 +13,7 @@ local function CreateLib()
     local libName = M.DruidUnitMixin
     --- @class __DruidUnitMixin : UnitMixin
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = LC.UNIT:NewLogger(libName)
+    local logger = ns:LC().UNIT:NewLogger(libName)
     --- @alias DruidUnitMixin __DruidUnitMixin | BaseLibraryObject
     O.UnitMixin:Embed(newLib)
     return newLib, logger
@@ -21,6 +21,9 @@ end; local L, p = CreateLib(); if not L then return end
 
 --- @param o __DruidUnitMixin
 local function PropsAndMethods(o)
+
+    o.FLIGHT_FORM_SPELLID = 40120
+    o.PROWL_SPELL_ID = 5215
 
     function o:IsDruidClass()
         local _, id = self:GetPlayerUnitClass(); return GC.UnitClasses.DRUID.id == id
@@ -37,10 +40,10 @@ local function PropsAndMethods(o)
 
     --- @param spellID SpellID
     --- @return Boolean
-    function o:IsFlightForm(spellID) return spellID == FLIGHT_FORM_SPELLID end
+    function o:IsFlightForm(spellID) return spellID == self.FLIGHT_FORM_SPELLID end
 
     --- @return Boolean
-    function o:IsFlightFormUsable() return true == IsUsableSpell(FLIGHT_FORM_SPELLID) end
+    function o:IsFlightFormUsable() return true == IsUsableSpell(self.FLIGHT_FORM_SPELLID) end
 
     --- @param spellID SpellID
     --- @return Boolean

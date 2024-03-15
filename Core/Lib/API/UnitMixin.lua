@@ -1,9 +1,11 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub, LC = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub, ns.LogCategories()
-local Table = O.Table
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+
+local API, Table = O.API, O.Table
 local IsAnyOf = O.String.IsAnyOf
 local TableIsEmpty, TableUnpack = Table.IsEmpty, Table.unpack
 
@@ -15,7 +17,7 @@ local function CreateLib()
     local libName = M.UnitMixin
     --- @class UnitMixin : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    return newLib, LC.UNIT:NewLogger(libName)
+    return newLib, ns:LC().UNIT:NewLogger(libName)
 end; local L, p = CreateLib(); if not L then return end
 
 --- Checks if the first argument matches any of the subsequent arguments.
@@ -102,7 +104,8 @@ local function PropsAndMethods(o)
 
     function o:GetShapeshiftSpells()
         return O.ShamanUnitMixin.GHOST_WOLF_SPELL_ID,
-               O.PriestUnitMixin.SHADOW_FORM_SPELL_ID
+               O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
+               O.DruidUnitMixin.PROWL_SPELL_ID
     end
 
     function o:UpdateShapeshiftBuffs()
@@ -111,14 +114,27 @@ local function PropsAndMethods(o)
         end)
     end
 
+    --- TODO: Move to API
+    ---@param spellName SpellName
+    function o:IsOwnSpell(spellName)
+        if spellName == nil then return false end
+        local name, spellID = O.API:GetSpellName(spellName)
+        local isUsable = spellID ~= nil
+        --p:t(function() return 'IsUsable Spell: id=%s name=%s: %s',
+        --        tostring(spellID), tostring(spellName), tostring(isUsable) end)
+        return isUsable
+    end
+
     --- @param filterFn UnitBuffFilterFunction | "function(spellID)  end"
     function o:UpdateBuffs(filterFn)
         self:ClearBuffs()
         for i = 1, 40 do
             local spellID = GetBuffSpellID(i)
             if spellID then
-                local name, rank, icon, castTime, minRange, maxRange, spellID, originalIcon = GetSpellInfo(spellID)
-                if filterFn(spellID) then
+                local spellName = O.API:GetSpellName(spellID)
+                if filterFn(spellID) and self:IsOwnSpell(spellName) then
+                    local name = O.API:GetSpellName(spellID)
+                    p:t(function() return "Own spell: id=%s name=%s", spellID, tostring(name) end)
                     --- @type SpellInfoShort
                     local spellInfo = { id = spellID, name = name }
                     table.insert(ns.playerBuffs, spellInfo)

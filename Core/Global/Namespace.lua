@@ -1,19 +1,91 @@
 --[[-----------------------------------------------------------------------------
-Namespace Initialization
+Lua Vars
 -------------------------------------------------------------------------------]]
---- treat this as a base generic namespace (not the Namespace type)
-local _ns = select(2, ...)
 --- @type LibStub
 local LibStub = LibStub
+
+--[[-----------------------------------------------------------------------------
+Namespace Initialization
+-------------------------------------------------------------------------------]]
+--- @type string
+local addonName
+--- @type Kapresoft_Base_Namespace
+local kns
+addonName, kns = ...
+
+local GC = kns.O.GlobalConstants; kns.GC = GC
+local K = kns.Kapresoft_LibUtil
+local KO = K.Objects
+
+--[[-----------------------------------------------------------------------------
+Global Variables: Replace with Addon-specific global vars
+-------------------------------------------------------------------------------]]
+---@param val EnabledInt|boolean|nil
+---@param key string|nil Category name
+---@return table<string, string>
+local function __categories(key, val)
+    if key then ABP_DEBUG_ENABLED_CATEGORIES[key] = val end
+    return ABP_DEBUG_ENABLED_CATEGORIES or {}
+end
+local function __category(key)
+    ABP_DEBUG_ENABLED_CATEGORIES = ABP_DEBUG_ENABLED_CATEGORIES or {}
+    return ABP_DEBUG_ENABLED_CATEGORIES[key]
+end
+--- @param val number|nil Optional log level to set
+--- @return number The new log level passed back
+local function __logLevel(val)
+    if val then ABP_LOG_LEVEL = val end
+    return ABP_LOG_LEVEL or 0
+end
+--[[-----------------------------------------------------------------------------
+Log Categories
+-------------------------------------------------------------------------------]]
+local LogCategories = {
+    --- @type Kapresoft_LogCategory
+    DEFAULT = 'DEFAULT',
+    --- @type LogCategory
+    ADDON = "AD",
+    --- @type LogCategory
+    API = "AP",
+    --- @type LogCategory
+    BAG = "BG",
+    --- @type LogCategory
+    BUTTON = "BN",
+    --- @type LogCategory
+    DEV = "DV",
+    --- @type LogCategory
+    DRAG_AND_DROP = "DD",
+    --- @type LogCategory
+    EVENT = "EV",
+    --- @type LogCategory
+    FRAME = "FR",
+    --- @type LogCategory
+    ITEM = "IT",
+    --- @type LogCategory
+    MESSAGE = "MS",
+    --- @type LogCategory
+    MOUNT = "MT",
+    --- @type LogCategory
+    PET = "PT",
+    --- @type LogCategory
+    PROFILE = "PR",
+    --- @type LogCategory
+    SPELL = "SP",
+    --- @type LogCategory
+    UNIT = "UN",
+}
+
 --[[-----------------------------------------------------------------------------
 Type: LibPackMixin
 -------------------------------------------------------------------------------]]
 --- @class LibPackMixin
 --- @field O GlobalObjects
+--- @field name Name The addon name
 local LibPackMixin = { };
 
 ---@param o LibPackMixin
 local function LibPackMixinMethods(o)
+
     --- Create a new instance of AceEvent or embed to an obj if passed
     --- @return AceEvent
     --- @param obj|nil The object to embed or nil
@@ -23,6 +95,9 @@ local function LibPackMixinMethods(o)
     --- @return AceBucket
     --- @param obj|nil The object to embed or nil
     function o:AceBucket(obj) return self.LibStubAce('AceBucket-3.0'):Embed(obj or {}) end
+
+    function o:AceLocale() return LibStub("AceLocale-3.0"):GetLocale(self.name, true) end
+
 end; LibPackMixinMethods(LibPackMixin)
 
 --- @alias NameSpaceFn fun() : Namespace
@@ -35,6 +110,7 @@ local GameVersionMixin = {}
 ---@param o __GameVersionMixin
 ---@param ns NameSpaceFn
 local function GameVersionMethods(o, ns)
+    -- todo: get rid of ns()
     --- @return GameVersion
     function o:IsVanilla() return ns().gameVersion == 'classic' end
     --- @return GameVersion
@@ -50,14 +126,25 @@ local NamespaceLoggerMixin = {}
 ---@param o __NamespaceLoggerMixin
 ---@param ns NameSpaceFn
 local function NamespaceLoggerMethods(o, ns)
-    ABP_DEBUG_ENABLED_CATEGORIES = ABP_DEBUG_ENABLED_CATEGORIES or {}
 
-    local function LoggerMixin() return ns().O.LoggerMixinV2 end
+    local CategoryLogger = KO.CategoryMixin
+    CategoryLogger:Configure(addonName, LogCategories, {
+        consoleColors = GC.C.CONSOLE_COLORS,
+        levelSupplierFn = function() return __logLevel() end,
+        enabledCategoriesSupplierFn = function() return __categories() end,
+    })
+    --- @private
+    o.LogCategory = CategoryLogger
 
     --- @return BooleanOptional
     function o:IsLoggingEnabled() return true == ns().O.GlobalConstants.F.ENABLE_LOGGING end
     --- @return BooleanOptional
     function o:IsLoggingDisabled() return true ~= ns().O.GlobalConstants.F.ENABLE_LOGGING end
+
+    --- @return number
+    function o:GetLogLevel() return __logLevel() end
+    --- @param level number
+    function o:SetLogLevel(level) __logLevel(level) end
 
     --- @param name string | "'ADDON'" | "'BAG'" | "'BUTTON'" | "'DRAG_AND_DROP'" | "'EVENT'" | "'FRAME'" | "'ITEM'" | "'MESSAGE'" | "'MOUNT'" | "'PET'" | "'PROFILE'" | "'SPELL'"
     --- @param v boolean|number | "1" | "0" | "true" | "false"
@@ -65,16 +152,18 @@ local function NamespaceLoggerMethods(o, ns)
         assert(name, 'Debug category name is missing.')
         ---@param v boolean|nil
         local function normalizeVal(v) if v == 1 or v == true then return 1 end; return 0 end
-        ABP_DEBUG_ENABLED_CATEGORIES[name] = normalizeVal(val)
+        __categories(name, normalizeVal(val))
     end
+    --- @return boolean
     function o:IsLogCategoryEnabled(name)
         assert(name, 'Debug category name is missing.')
-        local val = ABP_DEBUG_ENABLED_CATEGORIES[name]
+        local val = __category(name)
         return val == 1 or val == true
     end
-    function o.LogCategory() return LoggerMixin().Category end
+
     function o.LogCategories() return o.LogCategory():GetCategories() end
-    function o:CreateDefaultLogger(moduleName) return LoggerMixin():New(moduleName) end
+    function o:LC() return LogCategories end
+    function o:CreateDefaultLogger(moduleName) return LogCategories.DEFAULT:NewLogger(moduleName) end
 
 end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
 
@@ -98,6 +187,9 @@ local function CreateNamespace(...)
     --- @type string
     local addon
     --- @class __Namespace : LibPackMixin
+    --- @field GC GlobalConstants
+    --- @field LibStub LocalLibStub
+    --- @field LibStubAce LibStub
     --- @field O GlobalObjects
     local ns
 
@@ -107,7 +199,7 @@ local function CreateNamespace(...)
     function ns:K() return ns.Kapresoft_LibUtil end
 
     --- this is in case we are testing outside of World of Warcraft
-    addon = addon or ABP_GlobalConstants.C.ADDON_NAME
+    addon = addon or GC.C.ADDON_NAME
 
     --- @type GlobalObjects
     ns.O = ns.O or {}
@@ -120,9 +212,8 @@ local function CreateNamespace(...)
     --- @type Module
     ns.M = ns.M or {}
 
+    --- @type fun(fmt:string, ...)|fun(val:string)
     ns.pformat = ns:K().pformat:B()
-
-    ns:K():Mixin(ns, LibPackMixin, GameVersionMixin, NamespaceLoggerMixin)
 
     ns.features = {
         enableV2 = false,
@@ -131,6 +222,8 @@ local function CreateNamespace(...)
 
     --- script handlers
     ns.xml = {}
+
+    ns:K():Mixin(ns, LibPackMixin, GameVersionMixin, NamespaceLoggerMixin)
 
     --- @param o __Namespace | Namespace
     local function Methods(o)
@@ -179,32 +272,23 @@ local function CreateNamespace(...)
             ns.O[name] = o
         end
 
-        --- ### Namespace Helper Function
-        --- ```
-        --- local ns, O, GC, M, LibStub = ABP_NS:ns(...)
-        --- ```
-        --- @return Namespace, GlobalObjects, GlobalConstants, Module, LocalLibStub
-        function o:namespace(...)
-            --- @type Namespace
-            local _, n = ...; return n, n.O, n.O.GlobalConstants, n.M, n.O.LibStub
-        end
-
     end; Methods(ns)
 
     ns.LibStubAce = LibStub
     ns.LibStub = NewLocalLibStub(ns)
-    ns.O.LibStub = ns.LibStub
 
     ns.mt = { __tostring = function() return addon .. '::Namespace'  end }
     setmetatable(ns, ns.mt)
 
+    --- print(ns.name .. '::Namespace:: pformat:', pformat)
+    --- Global Function
+    pformat = pformat or ns.pformat
+
     return ns
 end
 
-if _ns.name then return end
+if kns.name then return end
 
 --- @type Namespace
 ABP_NS = CreateNamespace(...)
 
---- @return Namespace
-function abp_ns(...) local _, namespace = ...; return namespace end

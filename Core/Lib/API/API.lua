@@ -10,7 +10,8 @@ local format = string.format
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
+--- @type Namespace
+local ns = select(2, ...)
 local O = ns.O
 
 local String = O.String
@@ -195,6 +196,13 @@ local function IsRuneSpell(id, name, icon)
     end
     return _icon == icon, _name, _id;
 end
+
+--- @param spellNameOrId SpellName|SpellID
+--- @return SpellID, SpellName
+function S:GetSpellName(spellNameOrId)
+    local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
+    return name, id
+ end
 
 --- @see https://warcraft.wiki.gg/wiki/Category:API_namespaces/C_Engraving
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
@@ -531,6 +539,7 @@ end
 --- @param flyingMountName string
 --- @param groundMountName string
 function S:SummonMountSimple(flyingMountName, groundMountName)
+    if true == IsFlying() then return end
     local flyingMountSpell = self:GetSpellInfo(flyingMountName)
     if not flyingMountSpell then
         p:e(function() return "ERROR: Unknown flying mount: %s", flyingMountName end)

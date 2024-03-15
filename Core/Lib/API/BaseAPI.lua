@@ -17,9 +17,9 @@ local IsUsableSpell = IsUsableSpell
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local ns = abp_ns(...)
-local O, GC, M, LibStub = ns.O, ns.O.GlobalConstants, ns.M, ns.O.LibStub
-
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local UnitId = GC.UnitId
 local W = GC.WidgetAttributes
@@ -43,7 +43,9 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+--- @return boolean
 function L:IsDragonflight() return select(4, GetBuildInfo()) >= 100000 end
+--- @return boolean
 function L:IsClassicEra() return select(4, GetBuildInfo()) <= 11500 end
 
 --- @see Blizzard_UnitId
