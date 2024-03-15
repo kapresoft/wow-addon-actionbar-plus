@@ -32,4 +32,8 @@
 # /dump select(4, GetBuildInfo())
 
 Core\_Core.xml
+#@do-not-package@
+Core\Lib\Developer\_Developer.xml
+Core\Lib\WidgetV2\_Widget.xml
+#@end-do-not-package@
 TBC\_ActionbarPlus.xml
