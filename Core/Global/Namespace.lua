@@ -100,32 +100,28 @@ local function LibPackMixinMethods(o)
 
 end; LibPackMixinMethods(LibPackMixin)
 
---- @alias NameSpaceFn fun() : Namespace
---- @return Namespace
-local function nsfn() return ABP_NS end
-
 --- @class __GameVersionMixin
 local GameVersionMixin = {}
 
----@param o __GameVersionMixin
+---@param o __GameVersionMixin | Namespace
 ---@param ns NameSpaceFn
-local function GameVersionMethods(o, ns)
+local function GameVersionMethods(o)
     -- todo: get rid of ns()
     --- @return GameVersion
-    function o:IsVanilla() return ns().gameVersion == 'classic' end
+    function o:IsVanilla() return self.gameVersion == 'classic' end
     --- @return GameVersion
-    function o:IsTBC() return ns().gameVersion == 'tbc_classic' end
+    function o:IsTBC() return self.gameVersion == 'tbc_classic' end
     --- @return GameVersion
-    function o:IsWOTLK() return ns() == 'wotlk_classic' end
+    function o:IsWOTLK() return self == 'wotlk_classic' end
     --- @return GameVersion
-    function o:IsRetail() return ns().gameVersion == 'retail' end
-end; GameVersionMethods(GameVersionMixin, nsfn)
+    function o:IsRetail() return self.gameVersion == 'retail' end
+end; GameVersionMethods(GameVersionMixin)
 
 --- @class __NamespaceLoggerMixin
 local NamespaceLoggerMixin = {}
 ---@param o __NamespaceLoggerMixin
 ---@param ns NameSpaceFn
-local function NamespaceLoggerMethods(o, ns)
+local function NamespaceLoggerMethods(o)
 
     local CategoryLogger = KO.CategoryMixin
     CategoryLogger:Configure(addonName, LogCategories, {
@@ -136,10 +132,12 @@ local function NamespaceLoggerMethods(o, ns)
     --- @private
     o.LogCategory = CategoryLogger
 
+    --- @deprecated Don't use
     --- @return BooleanOptional
-    function o:IsLoggingEnabled() return true == ns().O.GlobalConstants.F.ENABLE_LOGGING end
+    function o:IsLoggingEnabled() return true == GC.F.ENABLE_LOGGING end
+    --- @deprecated Don't use
     --- @return BooleanOptional
-    function o:IsLoggingDisabled() return true ~= ns().O.GlobalConstants.F.ENABLE_LOGGING end
+    function o:IsLoggingDisabled() return true ~= GC.F.ENABLE_LOGGING end
 
     --- @return number
     function o:GetLogLevel() return __logLevel() end
@@ -165,7 +163,7 @@ local function NamespaceLoggerMethods(o, ns)
     function o:LC() return LogCategories end
     function o:CreateDefaultLogger(moduleName) return LogCategories.DEFAULT:NewLogger(moduleName) end
 
-end; NamespaceLoggerMethods(NamespaceLoggerMixin, nsfn)
+end; NamespaceLoggerMethods(NamespaceLoggerMixin)
 
 --- @param ns Namespace
 --- @return LocalLibStub
@@ -187,6 +185,7 @@ local function CreateNamespace(...)
     --- @type string
     local addon
     --- @class __Namespace : LibPackMixin
+    --- @field gameVersion GameVersion
     --- @field GC GlobalConstants
     --- @field LibStub LocalLibStub
     --- @field LibStubAce LibStub
