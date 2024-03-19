@@ -296,9 +296,11 @@ local function PropsAndMethods(o)
         self:ResetWidgetAttributes()
     end
 
+    --- Note: Don't call self:EnableMouse(..) here
     function o:SetButtonAsEmpty()
         self:ResetConfig()
         self:SetTextureAsEmpty()
+        self:SetChecked(false)
     end
 
     function o:Reset()
@@ -645,23 +647,6 @@ local function PropsAndMethods(o)
         self:SetCooldown(cd.start, cd.duration)
     end
     function o:UpdateCooldownDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateCooldown() end) end
-
-    --- Note: Equipment Set Name cannot be updated.
-    --- The Equipment Manager always creates a new unique name.
-    function o:UpdateEquipmentSet()
-        -- if index changed (similar to how macros are updated)
-        -- if equipment set was deleted
-        -- icon update
-        if self:IsMissingEquipmentSet() then self:SetButtonAsEmpty(); return end
-
-        local equipmentSet = self.w:FindEquipmentSet()
-        if not equipmentSet then self:SetButtonAsEmpty(); return end
-
-        local btnData = self.w:GetEquipmentSetData()
-        btnData.name = equipmentSet.name
-        btnData.icon = equipmentSet.icon
-        self:SetIcon(btnData.icon)
-    end
 
     --- IsSpellOverlayed() is available in Retail Version
     function o:UpdateGlow()
@@ -1183,6 +1168,18 @@ local function PropsAndMethods(o)
             return
         end
         self:ShowOverlayGlowAsActiveButton()
+    end
+
+    --- @return EquipmentSetMixin
+    function o:EquipmentSet() return O.EquipmentSetMixin:New(self.w) end
+
+    function o:IsChecked() return self.button().CheckedTexture:IsShown() end
+    ---@param checked boolean
+    function o:SetChecked(checked)
+        if checked then
+            self.button().CheckedTexture:Show(); return
+        end
+        return self.button().CheckedTexture:Hide()
     end
 
 end

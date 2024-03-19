@@ -24,10 +24,16 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param o ActionBarHandlerMixin
 local function PropsAndMethods(o)
+    ---@param bw ButtonUIWidget
     local isCompanionFn = function(bw) return bw:IsCompanionWOTLK() end
+    ---@param bw ButtonUIWidget
     local isShapeShiftFn = function(bw) return bw:IsShapeshiftSpell() end
+    ---@param bw ButtonUIWidget
     local isStealthSpellFn = function(bw) return bw:IsStealthSpell() end
+    ---@param bw ButtonUIWidget
     local isItemOrMacroFn = function(bw) return bw:IsItemOrMacro() end
+    ---@param bw ButtonUIWidget
+    local isEquipmentSetFn = function(bw) return bw:IsEquipmentSet() end
 
     --- @return any The embedded object (same as what was passed)
     --- @param obj any The object to embed
@@ -48,7 +54,7 @@ local function PropsAndMethods(o)
     function o:ForEachButton(applyFn, predicateFn)
         self:ForEachVisibleFrames(function(fw)
             for _, btn in ipairs(fw.buttonFrames) do
-                local shouldApply = predicateFn and predicateFn(btn.widget)
+                local shouldApply = btn.widget and predicateFn and predicateFn(btn.widget)
                 if true == shouldApply then applyFn(btn.widget) end
             end
         end)
@@ -84,6 +90,12 @@ local function PropsAndMethods(o)
     function o:ForEachMatchingSpellButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
         self:ForEachButton(applyFn, function(bw) return bw:IsMatchingMacroOrSpell(matchSpellId) end)
+    end
+
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachEquipmentSetButton(applyFn)
+        assert(applyFn, "ForEachEquipmentSetButton(fn):: Function handler missing")
+        self:ForEachButton(applyFn, isEquipmentSetFn)
     end
 
 end;

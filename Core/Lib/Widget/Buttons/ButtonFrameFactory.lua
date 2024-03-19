@@ -75,21 +75,6 @@ local function EnableMouseAllButtons(frameWidget, state)
         bw:EnableMouse(state)
     end)
 end
---- @param frameWidget FrameWidget
---- @param event string
-local function OnEquipmentSetsChanged(frameWidget, event)
-    frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
-            function(btnWidget) btnWidget:UpdateEquipmentSet() end)
-end
-
---- @param frameWidget FrameWidget
---- @param event string
-local function OnEquipmentSwapFinished(frameWidget, event)
-    frameWidget:ApplyForEachButtonCondition(function(btnWidget) return btnWidget:IsEquipmentSet() end,
-            function(btnWidget)
-                O.EquipmentSetAttributeSetter:RefreshTooltipAtMouse(btnWidget.button())
-            end)
-end
 
 --- @param frameWidget FrameWidget
 --- @param event string
@@ -243,8 +228,6 @@ local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
     local AceEventIC = ns:AceEvent()
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-    AceEventIC:RegisterMessage(M.EQUIPMENT_SETS_CHANGED, function(evt) OnEquipmentSetsChanged(widget, evt) end)
-    AceEventIC:RegisterMessage(M.EQUIPMENT_SWAP_FINISHED, function(evt) OnEquipmentSwapFinished(widget, evt) end)
     AceEventIC:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)

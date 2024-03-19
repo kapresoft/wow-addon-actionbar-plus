@@ -1,6 +1,8 @@
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
+local sformat, stru, strl = string.format, string.upper, string.len
+
 --- @type LibStub
 local LibStub = LibStub
 
@@ -72,6 +74,8 @@ local LogCategories = {
     --- @type LogCategory
     SPELL = "SP",
     --- @type LogCategory
+    TRACE = "TR",
+    --- @type LogCategory
     UNIT = "UN",
 }
 
@@ -121,12 +125,13 @@ local NamespaceLoggerMixin = {}
 --- @param o __NamespaceLoggerMixin
 local function NamespaceLoggerMethods(o)
 
-    local CategoryLogger = KO.CategoryMixin
+    local CategoryLogger = KO.CategoryMixin:New()
     CategoryLogger:Configure(addonName, LogCategories, {
         consoleColors = GC.C.CONSOLE_COLORS,
         levelSupplierFn = function() return __logLevel() end,
         enabledCategoriesSupplierFn = function() return __categories() end,
     })
+
     --- @private
     o.LogCategory = CategoryLogger
 
@@ -188,6 +193,7 @@ local function CreateNamespace(...)
     --- @field LibStub LocalLibStub
     --- @field LibStubAce LibStub
     --- @field O GlobalObjects
+    --- @field ConfigDialogControllerEventFrame ConfigDialogControllerEventFrame
     local ns
 
     addon, ns = ...
@@ -224,6 +230,12 @@ local function CreateNamespace(...)
 
     --- @param o __Namespace | Namespace
     local function Methods(o)
+
+        o.sformat = string.format
+
+        --- Used in XML files to hook frame events: OnLoad and OnEvent
+        --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
+        o.H = {}
 
         --- @return Profile_Config
         function o.p() return ns.db.profile end
@@ -269,6 +281,55 @@ local function CreateNamespace(...)
             ns.O[name] = obj
         end
 
+        --- Simple Library
+        --- @generic T
+        --- @param clazz T The casted/generic type. This is only used to infer the return type
+        --- @return T
+        function o:NewLibX(clazz, libName, ...) return self:NewLib(libName, ...) end
+
+        --- Simple Library with AceEvent
+        --- @generic T : BaseLibraryObject_WithAceEvent
+        --- @param clazz T The casted/generic type. This is only used to infer the return type.
+        --- @return T
+        function o:NewLibXEvent(clazz, libName, ...) return self:NewLibWithEvent(libName, ...) end
+
+        --- Simple Library
+        --- @return any The newly created library
+        function o:NewLib(libName, ...)
+            assert(libName, "LibName is required")
+            local newLib = {}
+            local len = select("#", ...)
+            if len > 0 then newLib = self:K():Mixin({}, ...) end
+            newLib.mt = { __tostring = function() return libName  end }
+            setmetatable(newLib, newLib.mt)
+            self.O[libName] = newLib
+            return newLib
+        end
+        --- @return any The newly created library with AceEvent
+        function o:NewLibWithEvent(libName, ...)
+            assert(libName, "LibName is required")
+            --- @class GenericObject : BaseLibraryObject_WithAceEventAndMessage
+            local newLib = self.O.AceLibrary.AceEvent:Embed({})
+            local len = select("#", ...)
+            if len > 0 then newLib = self:K():Mixin(newLib, ...) end
+
+            --- @param fromEvent string Use the GlobalConstant.E event names
+            --- @param callback MessageCallbackFn | "function() print('Called...') end"
+            function newLib:RegisterAddonMessage(fromEvent, callback)
+                self:RegisterMessage(GC.toMsg(fromEvent), callback)
+            end
+
+            newLib.mt = { __tostring = function() return libName  end }
+            setmetatable(newLib, newLib.mt)
+            self.O[libName] = newLib
+            return newLib
+        end
+
+        --- @return BaseActionBarController
+        function o:NewActionBarHandler(libName, ...)
+            return self:NewLibWithEvent(libName, self.O.ActionBarHandlerMixin, ...)
+        end
+
     end; Methods(ns)
 
     ns.LibStubAce = LibStub
@@ -280,6 +341,8 @@ local function CreateNamespace(...)
     --- print(ns.name .. '::Namespace:: pformat:', pformat)
     --- Global Function
     pformat = pformat or ns.pformat
+
+    ABP_H = ns.H
 
     return ns
 end

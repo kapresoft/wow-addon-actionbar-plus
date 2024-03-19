@@ -241,7 +241,10 @@ local function GlobalConstantProperties(o)
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
         COMPANION_UPDATE = 'COMPANION_UPDATE',
         CVAR_UPDATE = 'CVAR_UPDATE',
+        --- This event fires whenever there's a change to the player's equipment sets. This includes creating, modifying, or deleting an equipment set.
         EQUIPMENT_SETS_CHANGED = 'EQUIPMENT_SETS_CHANGED',
+        --- Triggered after an equipment set swap has been completed. This event helps addons and scripts determine when the gear change process has ended, allowing them to update or react accordingly.
+        --- Event Parameters: result, setID
         EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
 
@@ -252,6 +255,7 @@ local function GlobalConstantProperties(o)
         PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST',
         PLAYER_MOUNT_DISPLAY_CHANGED = 'PLAYER_MOUNT_DISPLAY_CHANGED',
         PLAYER_ENTERING_WORLD = 'PLAYER_ENTERING_WORLD',
+        --- This event fires when the player's currently equipped items change. It provides specifics about which slot had an item change, making it useful for tracking equipped items in real-time.
         PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED',
         PLAYER_REGEN_ENABLED = 'PLAYER_REGEN_ENABLED',
         PLAYER_STARTED_MOVING = 'PLAYER_STARTED_MOVING',
@@ -290,7 +294,10 @@ local function GlobalConstantProperties(o)
         ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
+    ---@param msg string Message name
     local function newMsg(msg) return sformat("%s::%s", addon, msg) end
+    ---@param event string Event name
+    local function toMsg(event) return newMsg(event) end
 
     --- @class MessageNames
     local Messages = {
@@ -568,6 +575,7 @@ local function GlobalConstantProperties(o)
     o.UnitClasses = UnitClasses
 
     o.newMsg = newMsg
+    o.toMsg = toMsg
 end
 
 --- @param o GlobalConstants

@@ -53,7 +53,7 @@ end
 
 --- @param w ButtonUIWidget
 local function ClickEquipmentSetButton(w)
-    if w:IsMissingEquipmentSet() then return end
+    if w:EquipmentSet():IsMissingEquipmentSet() then return end
 
     local equipmentSet = w:GetEquipmentSetData()
     local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
@@ -88,12 +88,11 @@ local function OpenEquipmentMgrConditionally(w, profile)
 end
 
 --- @param w ButtonUIWidget
----@param profile Profile_Config
-local function GlowButtonConditionally(w, profile)
+local function GlowButtonConditionally(w)
+    local profile = w:GetProfileConfig()
     if profile.equipmentset_show_glow_when_active ~= true then return end
-    local btn = w.button()
-    ActionButton_ShowOverlayGlow(btn)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(btn) end)
+    w:ShowOverlayGlow()
+    C_Timer.After(0.8, function() w:HideOverlayGlow() end)
 end
 
 --- @param evt string
@@ -102,13 +101,10 @@ local function OnClick(evt, w, ...)
     assert(w, "ButtonUIWidget is missing")
     pe:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
     if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
-    if w:IsMissingEquipmentSet() then return end
 
     --- @type _Frame
     local PDF = PaperDollFrame
     C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
-    -- PUT_DOWN_SMALL_CHAIN
-    -- GUILD_BANK_OPEN_BAG
     PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
 
     local profile = w:GetProfileConfig()
@@ -164,10 +160,10 @@ local function attributeSetterMethods(a)
 
     --- @param btnUI ButtonUI
     function a:SetAttributes(btnUI)
-        local w = btnUI.widget
+        local w = btnUI.widget; if not w then return end
         w:ResetWidgetAttributes()
         local equipmentSet = w:GetEquipmentSetData()
-        if w:IsInvalidEquipmentSet(equipmentSet) then return end
+        if w:EquipmentSet():IsInvalidEquipmentSet(equipmentSet) then return end
 
         local icon = EMPTY_ICON
         if equipmentSet.icon then icon = equipmentSet.icon end
@@ -186,20 +182,21 @@ local function attributeSetterMethods(a)
         self:RefreshTooltip(f)
         local w = btnUI.widget
         local profile = w:GetProfileConfig()
-        GlowButtonConditionally(w, profile)
+        --GlowButtonConditionally(w, profile)
     end
 
     --- @param btnUI ButtonUI
-    function a:RefreshTooltip(btnUI)
+    function a:RefreshTooltip(btnUI, setID)
         C_Timer.After(0.2, function() S:ShowTooltip(btnUI) end)
     end
 
     --- @param btnUI ButtonUI
-    function a:ShowTooltip(btnUI)
+    function a:ShowTooltip(btnUI, setID)
         if not btnUI then return end
-        local w = btnUI.widget
-        if w:IsEmpty() or w:IsMissingEquipmentSet() then return end
-        local equipmentSet = w:FindEquipmentSet()
+        local w = btnUI.widget; if w:IsEmpty() then return end
+        local es = w:EquipmentSet()
+        if es:IsMissingEquipmentSet() then return end
+        local equipmentSet = es:FindEquipmentSet()
         -- retail GameTooltip uses setID
         GameTooltip:SetEquipmentSet(equipmentSet.id)
         if equipmentSet.isEquipped then

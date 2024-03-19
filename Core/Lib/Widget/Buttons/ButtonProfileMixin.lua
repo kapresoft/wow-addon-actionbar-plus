@@ -332,44 +332,12 @@ local function PropsAndMethods(o)
     function o:IsInvalidCompanion(c)
         return IsNil(c) or (IsNil(c.name) and IsNil(c.spell) and IsNil(c.spell.id))
     end
-    --- @param e Profile_EquipmentSet
-    function o:IsInvalidEquipmentSet(e)
-        e = e or self:GetEquipmentSetData()
-        if not e then return true end
-        return IsNil(e) or (IsNil(e.name) and IsNil(e.index)) end
 
     --- @param pet Profile_BattlePet
     function o:IsInvalidBattlePet(pet) return IsNil(pet) or (IsNil(pet.guid) and IsNil(pet.name)) end
     function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
-
-    --- @return EquipmentSetInfo
-    function o:FindEquipmentSet()
-        local btnData = self:GetEquipmentSetData()
-        if not btnData then return nil end
-
-        local id, name = btnData.id, btnData.name
-        local index = BaseAPI:GetEquipmentSetIndex(id)
-        if not index then return nil end
-
-        local equipmentSet = BaseAPI:GetEquipmentSetInfoByName(name)
-        if not equipmentSet then
-            equipmentSet = BaseAPI:GetEquipmentSetInfoBySetID(id)
-        end
-        return equipmentSet
-    end
-
-    function o:IsMissingEquipmentSet()
-        if self:IsInvalidEquipmentSet() then return true end
-        local equipmentSet = self:FindEquipmentSet()
-        if not equipmentSet then return true end
-
-        local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
-        if not index then return true end
-
-        return equipmentSet.id ~= self:GetEquipmentSetData().id
-    end
 
     function o:ResetButtonData()
         local conf = self:conf()

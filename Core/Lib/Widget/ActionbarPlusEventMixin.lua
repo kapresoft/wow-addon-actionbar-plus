@@ -215,7 +215,6 @@ function L:RegisterEventToMessageTransmitter()
     --- @see GlobalConstants#M (Messages)
     RegisterFrameForEvents(f, {
         E.PLAYER_ENTERING_WORLD,
-        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
         E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
         E.MODIFIER_STATE_CHANGED,
         E.CVAR_UPDATE,

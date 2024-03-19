@@ -348,6 +348,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local btnName = GC:ButtonName(dragFrameWidget.index, btnIndex)
 
     --- @class __ButtonUI
+    --- @field CheckedTexture _Texture
+    --- @field Cooldown _CooldownFrame
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
     --- @alias ButtonUI __ButtonUI|_Button
 
@@ -373,6 +375,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --- see: Interface/AddOns/Blizzard_APIDocumentationGenerated/CooldownFrameAPIDocumentation.lua
     --- @class CooldownFrame : _CooldownFrame
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
+    cooldown:SetParentKey('Cooldown')
     cooldown:SetAllPoints(button)
     cooldown:SetSwipeColor(1, 1, 1)
     cooldown:SetCountdownFont(GameFontHighlightSmallOutline:GetFont())
@@ -382,8 +385,10 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetUseCircularEdge(false)
     cooldown:SetPoint('CENTER')
 
-    --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent
-    --- @class __ButtonUIWidget : ButtonMixin
+    self:CreateCheckedTexture(button)
+
+    --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin | EquipmentSetMixin
+    --- @class __ButtonUIWidget
     local __widget = {
         --- @type fun() : ActionbarPlus
         addon = function() return ABP end,
@@ -425,4 +430,18 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     widget:InitWidget()
 
     return widget
+end
+
+--- @param button __ButtonUI
+function _B:CreateCheckedTexture(button)
+    local checkedTexture = button:CreateTexture(nil, "OVERLAY")
+    checkedTexture:SetAllPoints() -- Make the texture cover the whole button
+    checkedTexture:SetTexture("Interface\\Buttons\\CheckButtonHilight")
+    checkedTexture:SetBlendMode("ADD") -- This corresponds to alphaMode="ADD" in XML
+    -- set ignore alpha to false so we can control it via settings
+    checkedTexture:SetIgnoreParentAlpha(false)
+    checkedTexture:SetIgnoreParentScale(false)
+    checkedTexture:EnableMouse(false)
+    checkedTexture:SetParentKey("CheckedTexture")
+    checkedTexture:Hide()
 end
