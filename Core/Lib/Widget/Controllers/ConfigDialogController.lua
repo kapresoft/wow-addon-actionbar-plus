@@ -9,8 +9,8 @@ local libName = ns.M.ConfigDialogController
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class ConfigDialogController : BaseLibraryObject_WithAceEvent
-local L = ns:NewLibXEvent(O.ConfigDialogController, libName)
+--- @class ConfigDialogController : BaseActionBarController
+local L = ns:NewActionBarController(libName, O.DruidUnitMixin)
 local p = ns:CreateDefaultLogger(libName)
 local pt = ns:LC().TRACE:NewLogger(libName)
 

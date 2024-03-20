@@ -28,14 +28,14 @@ WAttr.EQUIPMENT_SET
 --- @type ButtonUILib
 local ButtonUI = O.ButtonUI
 local WMX = O.WidgetMixin
-
+local libName = M.ButtonFactory
 --[[-----------------------------------------------------------------------------
 New Library
 -------------------------------------------------------------------------------]]
 --- @class ButtonFactory : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(M.ButtonFactory); if not L then return end; ns:AceEvent(L)
-local p = ns:LC().BUTTON:NewLogger(M.ButtonFactory)
-
+local L = LibStub:NewLibrary(libName); if not L then return end; ns:AceEvent(L)
+local p = ns:LC().BUTTON:NewLogger(libName)
+local pm = ns:LC().MESSAGE:NewLogger(libName)
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
     [SPELL]       = O.SpellAttributeSetter,
@@ -225,7 +225,7 @@ Event Handlers
 --- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
 --- entering the portal and get dismounted upon zoning in to the new area
 local function OnPlayerMount()
-    p:vv('OnPlayerMount called...')
+    pm:f3('OnPlayerMount called...')
     L:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:IsMount() end,
@@ -239,9 +239,8 @@ Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
-    local pm = ns:LC().MESSAGE:NewLogger(M.ButtonFactory)
     L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
-        pm:d(function() return 'MSG::R: %s', msg end)
+        pm:f3(function() return 'MSG::R: %s', msg end)
         L:Init()
     end)
 

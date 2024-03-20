@@ -12,7 +12,7 @@ local safecall = ns:CreateSafecall(libName)
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class __BagController : BaseActionBarController
-local L = ns:NewActionBarHandler(libName, O.ActionBarHandlerMixin)
+local L = ns:NewActionBarController(libName)
 local p = ns:CreateDefaultLogger(libName)
 local pb = ns:LC().BAG:NewLogger(libName)
 
@@ -26,7 +26,7 @@ local function PropsAndMethods(o)
 
     --- @private
     function o:RegisterMessageCallbacks()
-        self:RegisterAddonMessage(E.BAG_UPDATE, function(evt, source) self:OnBagUpdate(evt, source) end)
+        self:RegisterAddOnMessage(E.BAG_UPDATE, function(evt, source) self:OnBagUpdate(evt, source) end)
     end
 
     -- Update Items and Macros referencing items
