@@ -128,10 +128,6 @@ end
 
 --- @param f EventFrameInterface
 --- @param event string
-local function OnMessageTransmitter(f, event, ...) L:SendMessage(GC.newMsg(event), ns.name, ...) end
-
---- @param f EventFrameInterface
---- @param event string
 local function OnSetCVarEvents(f, event, ...)
     local varName, val = ...
     if varName ~= 'lockActionBars' then return end
@@ -209,17 +205,6 @@ function L:RegisterCombatFrame()
     f:SetScript(E.OnEvent, OnPlayerCombatEvent)
     RegisterFrameForEvents(f, { E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED })
 end
-function L:RegisterEventToMessageTransmitter()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnMessageTransmitter)
-    --- @see GlobalConstants#M (Messages)
-    RegisterFrameForEvents(f, {
-        E.PLAYER_ENTERING_WORLD,
-        E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
-        E.MODIFIER_STATE_CHANGED,
-        E.CVAR_UPDATE,
-    })
-end
 
 function L:RegisterEvents()
     p:d('RegisterEvents called..')
@@ -227,7 +212,6 @@ function L:RegisterEvents()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterCombatFrame()
-    self:RegisterEventToMessageTransmitter()
     self:RegisterSetCVarEvents()
 
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
