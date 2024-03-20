@@ -16,6 +16,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, E, LibStub = ns.O, ns.GC, ns.M, ns.GC.E, ns.LibStub
 
+local toMsg = GC.toMsg
 local Table, P, MSG = O.Table, O.Profile, GC.M
 local IsEmptyTable = Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
@@ -224,6 +225,7 @@ Event Handlers
 --- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
 --- entering the portal and get dismounted upon zoning in to the new area
 local function OnPlayerMount()
+    p:vv('OnPlayerMount called...')
     L:ApplyForEachVisibleFrames(function(fw)
         fw:ApplyForEachButtonCondition(
                 function(bw) return bw:IsMount() end,
@@ -243,8 +245,8 @@ local function InitButtonFactory()
         L:Init()
     end)
 
-    L:RegisterMessage(MSG.PLAYER_MOUNT_DISPLAY_CHANGED, OnPlayerMount)
-    L:RegisterMessage(MSG.ZONE_CHANGED_NEW_AREA, OnPlayerMount)
+    L:RegisterMessage(toMsg(E.PLAYER_MOUNT_DISPLAY_CHANGED), OnPlayerMount)
+    L:RegisterMessage(toMsg(E.ZONE_CHANGED_NEW_AREA), OnPlayerMount)
 end
 
 InitButtonFactory()
