@@ -12,7 +12,7 @@ local libName = ns.M.EquipmentSetController
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class __EquipmentSetController : BaseActionBarController
-local L = ns:NewActionBarHandler(libName);
+local L = ns:NewActionBarController(libName);
 local p = ns:LC().EQUIPMENT:NewLogger(libName)
 local pd = ns:CreateDefaultLogger(libName)
 
@@ -29,12 +29,12 @@ local function PropsAndMethods(o)
                 function(evt, source, ...) self:OnClick(...)  end)
         self:RegisterMessage(GC.M.OnEquipmentSetDragComplete,
                 function(evt, source, ...) self:OnEquipmentSetDragComplete(...)  end)
-        self:RegisterAddonMessage(E.PLAYER_EQUIPMENT_CHANGED,
-                function(evt, source, ...) self:OnPlayerEquipmentChanged(...) end)
-        self:RegisterAddonMessage(E.EQUIPMENT_SETS_CHANGED,
-                function(evt) self:OnEquipmentSetsChanged() end)
-        self:RegisterAddonMessage(E.EQUIPMENT_SWAP_FINISHED,
-                function(evt, source, success, setID) self:OnEquipmentSwapFinished(success, setID) end)
+        self:RegisterAddOnMessage(E.PLAYER_EQUIPMENT_CHANGED,
+                function(msg, source, ...) self:OnPlayerEquipmentChanged(...) end)
+        self:RegisterAddOnMessage(E.EQUIPMENT_SETS_CHANGED,
+                function(msg) self:OnEquipmentSetsChanged() end)
+        self:RegisterAddOnMessage(E.EQUIPMENT_SWAP_FINISHED,
+                function(msg, source, success, setID) self:OnEquipmentSwapFinished(success, setID) end)
     end
 
     --- @private

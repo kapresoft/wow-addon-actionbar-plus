@@ -23,17 +23,6 @@ BaseLibraryObject_WithAceEvent
 --- @field name string Retrieves the module's name. This is an instance method that should be implemented to return the name of the module.
 --- @field major string Retrieves the major version of the module. i.e., <LibName>-1.0
 --- @field minor string Retrieves the minor version of the module. i.e., <LibName>-1.0
---[[-----------------------------------------------------------------------------
-BaseLibraryObject_WithAceEventAndMessage
--------------------------------------------------------------------------------]]
---- @class BaseLibraryObject_WithAceEventAndMessage : BaseLibraryObject_WithAceEvent A base library object that includes AceEvent functionality.
---- @field RegisterAddonMessage fun(self:BaseLibraryObject_WithAceEventAndMessage, fromEvent:string, callback:MessageCallbackFn)
-
---[[-----------------------------------------------------------------------------
-BaseActionBarController
--------------------------------------------------------------------------------]]
---- @class BaseActionBarController : BaseLibraryObject_WithAceEvent A base library object that includes AceEvent functionality.
---- @field RegisterAddonMessage fun(self:BaseActionBarController, fromEvent:string, callback:MessageCallbackFn)
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject_Initialized

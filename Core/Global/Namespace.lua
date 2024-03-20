@@ -39,6 +39,15 @@ local function __logLevel(val)
     if val then ABP_LOG_LEVEL = val end
     return ABP_LOG_LEVEL or 0
 end
+
+---@param obj any The object to merge with "tbl" arg
+---@param tbl table The table to merge with "obj" arg
+local function mergeArgs(libName, obj, tbl)
+    assert(obj, "Object to merge is nil for lib=" .. libName)
+    local a = { obj };
+    for _, val in ipairs(tbl) do if val then table.insert(a, val) end end
+    return a
+end
 --[[-----------------------------------------------------------------------------
 Log Categories
 -------------------------------------------------------------------------------]]
@@ -284,18 +293,6 @@ local function CreateNamespace(...)
         end
 
         --- Simple Library
-        --- @generic T
-        --- @param clazz T The casted/generic type. This is only used to infer the return type
-        --- @return T
-        function o:NewLibX(clazz, libName, ...) return self:NewLib(libName, ...) end
-
-        --- Simple Library with AceEvent
-        --- @generic T : BaseLibraryObject_WithAceEvent
-        --- @param clazz T The casted/generic type. This is only used to infer the return type.
-        --- @return T
-        function o:NewLibXEvent(clazz, libName, ...) return self:NewLibWithEvent(libName, ...) end
-
-        --- Simple Library
         --- @return any The newly created library
         function o:NewLib(libName, ...)
             assert(libName, "LibName is required")
@@ -307,19 +304,14 @@ local function CreateNamespace(...)
             self.O[libName] = newLib
             return newLib
         end
+
         --- @return any The newly created library with AceEvent
         function o:NewLibWithEvent(libName, ...)
             assert(libName, "LibName is required")
-            --- @class GenericObject : BaseLibraryObject_WithAceEventAndMessage
             local newLib = self.O.AceLibrary.AceEvent:Embed({})
+
             local len = select("#", ...)
             if len > 0 then newLib = self:K():Mixin(newLib, ...) end
-
-            --- @param fromEvent string Use the GlobalConstant.E event names
-            --- @param callback MessageCallbackFn | "function() print('Called...') end"
-            function newLib:RegisterAddonMessage(fromEvent, callback)
-                self:RegisterMessage(GC.toMsg(fromEvent), callback)
-            end
 
             newLib.mt = { __tostring = function() return libName  end }
             setmetatable(newLib, newLib.mt)
@@ -327,9 +319,21 @@ local function CreateNamespace(...)
             return newLib
         end
 
-        --- @return BaseActionBarController
-        function o:NewActionBarHandler(libName, ...)
-            return self:NewLibWithEvent(libName, self.O.ActionBarHandlerMixin, ...)
+        --- @return BaseActionBarController The newly created library with AceEvent
+        function o:NewActionBarController(libName, ...)
+            local unpack = KO.Table.unpack
+            local args = mergeArgs(libName, self.O.ActionBarHandlerMixin, {...})
+            --- @class BaseActionBarController : AceEvent
+            local newLib = self:NewLibWithEvent(libName, unpack(args))
+
+            --- @param fromEvent Name Use the GlobalConstant.E event names
+            --- @param callback MessageCallbackFn | "function() print('Called...') end"
+            function newLib:RegisterAddOnMessage(fromEvent, callback) self:RegisterMessage(GC.toMsg(fromEvent), callback) end
+
+            --- @param event Name Use the GlobalConstant.E event names
+            function newLib:SendAddOnMessage(event, ...) self:SendMessage(GC.toMsg(event), ...) end
+
+            return newLib;
         end
 
     end; Methods(ns)

@@ -21,8 +21,7 @@ New Instance
 --- @return ActionBarController, LoggerV2, Kapresoft_LibUtil_Safecall
 local function CreateLib()
     --- @class __ActionBarController : BaseLibraryObject_WithAceEvent
-    local lib = LibStub:NewLibrary(libName); if not lib then return end
-    ns:AceEvent(lib); H:Embed(lib)
+    local lib = ns:NewActionBarController(libName)
     return lib, ns:CreateDefaultLogger(libName), ns:CreateSafecall(libName)
 end; local L, p, safecall = CreateLib()
 

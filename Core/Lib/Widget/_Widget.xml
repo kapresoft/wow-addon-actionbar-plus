@@ -6,9 +6,8 @@
     <Script file="WidgetMixin.lua"/>
 
     <Script file="MacroEventsHandler.lua"/>
-    <Script file="ActionbarPlusEventMixin.lua"/>
 
-    <Include file="ConfigDialogController.lua"/>
-    <Include file="ActionBarController.xml"/>
+    <Include file="Buttons\_Buttons.xml"/>
+    <Include file="Controllers\_ActionBarController.xml"/>
 
 </Ui>

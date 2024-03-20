@@ -111,6 +111,7 @@ local function PropsAndMethods(o)
 
     ---@param setID Identifier Equipment Set ID
     function o:RefreshTooltip(setID)
+        assert(setID, 'RefreshTooltip:: setID is required.')
         local equipmentSet = O.BaseAPI:GetEquipmentSetInfoBySetID(setID)
         if not equipmentSet then return end
         -- retail GameTooltip uses setID

@@ -8,11 +8,10 @@ local libName = ns.M.EventToMessageRelayController
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class EventToMessageRelayController : BaseLibraryObject_WithAceEvent
-local L = ns:NewLibXEvent(O.EventToMessageRelayController, libName)
+--- @class EventToMessageRelayController : BaseActionBarController
+local L = ns:NewActionBarController(libName)
 local p = ns:CreateDefaultLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
-p:v(function() return "Loaded: %s", libName end)
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -25,18 +24,26 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param o EventToMessageRelayController
 local function PropsAndMethods(o)
-    local toMsg = GC.toMsg
+
     function o:OnLoad(frame, event, ...)
-        p:vv('OnLoad called...')
-    end
-    function o:OnEvent(frame, event, ...)
-        p:vv('OnEvent called...')
+        p:f3('OnLoad called...')
+        frame:SetScript(E.OnEvent, function(self, evt, ...) L:OnMessageTransmitter(evt, ...) end)
+
+        --- @see GlobalConstants#M (Messages)
+        RegisterFrameForEvents(frame, {
+            E.PLAYER_ENTERING_WORLD,
+            E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
+            E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
+            E.BAG_UPDATE, E.BAG_UPDATE_DELAYED,
+            E.MODIFIER_STATE_CHANGED,
+            E.CVAR_UPDATE,
+        })
     end
 
     --- @param event string
     function o:OnMessageTransmitter(event, ...)
-        p:f1(function() return "Relaying event[%s] to [%s]", event, GC.toMsg(event) end)
-        self:SendMessage(toMsg(event), ns.name, ...)
+        pm:f3(function() return "Relaying event[%s] to message[%s]", event, GC.toMsg(event) end)
+        self:SendAddOnMessage(event, ns.name, ...)
     end
 
 end; PropsAndMethods(L)
@@ -45,21 +52,5 @@ end; PropsAndMethods(L)
 Frame Event Handlers: ABP_EventToMessageRelayControllerFrame
 -------------------------------------------------------------------------------]]
 ---@param frame _Frame
-function ns.H.EventToMessageRelayController_OnLoad(frame)
-    frame:SetScript(E.OnEvent, function(self, evt, ...) L:OnMessageTransmitter(evt, ...) end)
+function ns.H.EventToMessageRelayController_OnLoad(frame) L:OnLoad(frame) end
 
-    --- @see GlobalConstants#M (Messages)
-    RegisterFrameForEvents(frame, {
-        E.PLAYER_ENTERING_WORLD,
-        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
-        E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
-        E.BAG_UPDATE, E.BAG_UPDATE_DELAYED,
-        E.MODIFIER_STATE_CHANGED,
-        E.CVAR_UPDATE,
-    })
-end
-
----@param frame _Frame
-function ns.H.EventToMessageRelayController_OnEvent(frame)
-
-end
