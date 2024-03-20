@@ -4,7 +4,7 @@ Alias Functions
 --- @alias FrameHandlerFunction fun(fw:FrameWidget) : void | "function(fw) print(fw:GetName()) end"
 --- @alias ButtonPredicateFunction fun(bw:ButtonUIWidget) : boolean | "function(bw) print(bw:GetName()) end"
 --- @alias ButtonHandlerFunction fun(bw:ButtonUIWidget) : void | "function(bw) print(bw:GetName()) end"
---- @alias MessageCallbackFn fun(...:any) | "function() print('Called...') end"
+--- @alias MessageCallbackFn fun(evt:string, source:string, ...:any) | "function(evt, source, ...) print('Called...') end"
 
 --[[-----------------------------------------------------------------------------
 BaseLibraryObject

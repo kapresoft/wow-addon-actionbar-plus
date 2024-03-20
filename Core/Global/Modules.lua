@@ -66,7 +66,7 @@ local M = {
     EquipmentSetAttributeSetter = '',
     EquipmentSetController = '',
     EquipmentSetDragEventHandler = '',
-    EquipmentSetMixin = '',
+    EquipmentSetButtonMixin = '',
     FrameHandleMixin = '',
     GlobalConstants = '',
     ItemAttributeSetter = '',
@@ -121,7 +121,7 @@ local M = {
 --- @field EquipmentSetAttributeSetter EquipmentSetAttributeSetter
 --- @field EquipmentSetController EquipmentSetController
 --- @field EquipmentSetDragEventHandler EquipmentSetDragEventHandler
---- @field EquipmentSetMixin EquipmentSetMixin
+--- @field EquipmentSetButtonMixin EquipmentSetButtonMixin
 --- @field FrameHandleMixin FrameHandleMixin
 --- @field ItemAttributeSetter ItemAttributeSetter
 --- @field ItemDragEventHandler ItemDragEventHandler

@@ -51,7 +51,7 @@ function ns.H.EventToMessageRelayController_OnLoad(frame)
     --- @see GlobalConstants#M (Messages)
     RegisterFrameForEvents(frame, {
         E.PLAYER_ENTERING_WORLD,
-        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED,
+        E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
         E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
         E.BAG_UPDATE, E.BAG_UPDATE_DELAYED,
         E.MODIFIER_STATE_CHANGED,

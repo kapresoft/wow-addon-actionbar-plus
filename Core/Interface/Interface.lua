@@ -16,6 +16,8 @@ Aliases
 -------------------------------------------------------------------------------]]
 --- @alias LayoutStrategyFn fun(index:number, barConf:Profile_Bar, context:LayoutStrategyContext)
 
+--- @alias PLAYER_EQUIPMENT_CHANGED_CallbackFn fun(InventorySlotId:Identifier, hasCurrent:boolean) | "function(invSlotID, hasCurrent) end"
+-------------------------------------------------------------------------------]]
 
 --[[-----------------------------------------------------------------------------
 Type: ActionbarPlus_AceDB

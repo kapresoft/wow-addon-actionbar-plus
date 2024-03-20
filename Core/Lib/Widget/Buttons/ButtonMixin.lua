@@ -1170,8 +1170,8 @@ local function PropsAndMethods(o)
         self:ShowOverlayGlowAsActiveButton()
     end
 
-    --- @return EquipmentSetMixin
-    function o:EquipmentSet() return O.EquipmentSetMixin:New(self.w) end
+    --- @return EquipmentSetButtonMixin
+    function o:EquipmentSetMixin() return O.EquipmentSetButtonMixin:New(self.w) end
 
     function o:IsChecked() return self.button().CheckedTexture:IsShown() end
     ---@param checked boolean

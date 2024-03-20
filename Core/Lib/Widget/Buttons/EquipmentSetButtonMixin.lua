@@ -8,10 +8,10 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return EquipmentSetMixin, LoggerV2
+--- @return EquipmentSetButtonMixin, LoggerV2
 local function CreateLib()
-    local libName = M.EquipmentSetMixin
-    --- @class EquipmentSetMixin : BaseLibraryObject
+    local libName = M.EquipmentSetButtonMixin
+    --- @class EquipmentSetButtonMixin : BaseLibraryObject
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:CreateDefaultLogger(libName)
     return newLib, logger
@@ -20,7 +20,7 @@ end; local L, p = CreateLib(); if not L then return end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o EquipmentSetMixin
+--- @param o EquipmentSetButtonMixin
 local function PropsAndMethods(o)
 
     --- @param widget ButtonUIWidget
@@ -35,7 +35,7 @@ local function PropsAndMethods(o)
     function o:Mixin(widget) ns:K():Mixin(widget, self:New(widget)) end
 
     --- @param widget ButtonUIWidget
-    --- @return EquipmentSetMixin
+    --- @return EquipmentSetButtonMixin
     function o:New(widget)
         return ns:K():CreateAndInitFromMixin(o, widget)
     end
@@ -97,10 +97,9 @@ local function PropsAndMethods(o)
             return
         end
 
-        local equipmentSet = self.w:FindEquipmentSet()
+        local equipmentSet = self:FindEquipmentSet()
         if not equipmentSet then
             self.w:SetButtonAsEmpty()
-            --self.w:SetTextureAsEmpty()
             return
         end
 

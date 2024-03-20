@@ -208,7 +208,8 @@ end
 --- @param frameWidget FrameWidget
 local function OnPlayerLeaveCombat(frameWidget, e, ...)
     OnActionbarShowGroup(frameWidget, e, ...)
-    L:PostCombatUpdateComplete()
+    -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
+    -- L:PostCombatUpdateComplete()
 end
 
 --- @param frameWidget FrameWidget
@@ -703,9 +704,11 @@ function L:IsFrameShownByIndex(frameIndex)
     return self:GetFrameByIndex(frameIndex):IsShown()
 end
 
+-- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
 --- @param btnWidget ButtonUIWidget
 function L:AddPostCombatUpdate(btnWidget) table.insert(PostCombatButtonUpdates, btnWidget) end
 
+-- todo: delete this. This was for dragging buttons during combat. That is no longer allowed.
 function L:PostCombatUpdateComplete()
     local count = #PostCombatButtonUpdates
     if count <= 0 then return end

@@ -33,7 +33,8 @@ local p = ns:LC().BUTTON:NewLogger(M.BaseAttributeSetter)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
---- @param btnUI ButtonUI
+-- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
+--- @param btn ButtonUI
 local function AddPostCombat(btn)
     if not InCombatLockdown() then return end
     O.ButtonFrameFactory:AddPostCombatUpdate(btn.widget)
@@ -62,7 +63,8 @@ Methods
 -------------------------------------------------------------------------------]]
 --- @param btn ButtonUI
 function L:OnAfterSetAttributes(btn)
-    AddPostCombat(btn)
+    -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
+    -- AddPostCombat(btn)
     self:HandleGameTooltipCallbacks(btn)
 end
 
@@ -77,9 +79,9 @@ function L:HandleGameTooltipCallbacks(btn)
         else
             if not w:IsTooltipModifierKeyDown() then return end
         end
-        local btn = w.button()
-        self:SetToolTipOwner(btn)
-        self:ShowTooltip(btn)
+        local btnF = w.button()
+        self:SetToolTipOwner(btnF)
+        self:ShowTooltip(btnF)
 
         if not GetCursorInfo() then return end
         w:SetHighlightEmptyButtonEnabled(true)

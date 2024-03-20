@@ -24,10 +24,11 @@ New Instance
 --- @class ButtonUIWidgetBuilder : WidgetMixin
 local _B = LibStub:NewLibrary(M.ButtonUIWidgetBuilder)
 
+local libName = M.ButtonUI
 --- @class ButtonUILib
-local _L = LibStub:NewLibrary(M.ButtonUI, 1)
-local p = ns:LC().BUTTON:NewLogger(M.ButtonUI)
-local pd = ns:LC().DRAG_AND_DROP:NewLogger(M.ButtonUI)
+local _L = LibStub:NewLibrary(libName, 1)
+local p = ns:LC().BUTTON:NewLogger(libName)
+local pd = ns:LC().DRAG_AND_DROP:NewLogger(libName)
 
 --- @return ButtonUIWidgetBuilder
 function _L:WidgetBuilder() return _B end
@@ -86,7 +87,7 @@ local function OnPreClick(btn, key, down)
         w:SendMessage(GC.M.OnButtonClickBattlePet, w)
         return
     elseif w:IsEquipmentSet() then
-        w:SendMessage(GC.M.OnButtonClickEquipmentSet, w)
+        w:SendMessage(GC.M.OnButtonClickEquipmentSet, libName, w)
         return
     else
         w:UpdateRangeIndicator()
@@ -387,7 +388,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     self:CreateCheckedTexture(button)
 
-    --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin | EquipmentSetMixin
+    --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin
     --- @class __ButtonUIWidget
     local __widget = {
         --- @type fun() : ActionbarPlus

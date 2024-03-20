@@ -60,6 +60,8 @@ local LogCategories = {
     --- @type LogCategory
     EVENT = "EV",
     --- @type LogCategory
+    EQUIPMENT = "EQ",
+    --- @type LogCategory
     FRAME = "FR",
     --- @type LogCategory
     ITEM = "IT",
