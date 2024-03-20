@@ -131,7 +131,7 @@ local function PropsAndMethods(o)
         if profile.equipmentset_open_equipment_manager == true then
             --- @type _Frame
             local gmDlg = GearManagerDialog
-            if gmDlg and gmDlg:IsVisible() then ClickEquipmentSetButtonDelayed(w) return end
+            if gmDlg and gmDlg:IsVisible() then self:ClickEquipmentSetButtonDelayed(w) return end
         end
 
         --- Buttons:
