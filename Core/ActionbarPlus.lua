@@ -51,9 +51,6 @@ local function OnPlayerEnteringWorld(frame, event, ...)
     --@end-debug@
 
     if not isLogin then return end
-    local versionText = GC:GetAddonInfo()
-    local C = GC:GetAceLocale()
-    --pd:vv(function() return C['Addon Initialized Text Format'], versionText, GCC.ABP_COMMAND end)
     pd:vv(GC:GetMessageLoadedText())
 end
 
@@ -261,5 +258,4 @@ local function NewInstance()
 
     return A
 end
-
-ABP = NewInstance()
+if ABP then return end; ABP = NewInstance()

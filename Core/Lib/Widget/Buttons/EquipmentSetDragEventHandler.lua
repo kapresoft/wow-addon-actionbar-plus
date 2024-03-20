@@ -8,8 +8,6 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 --- @type __GameTooltip
 local GameTooltip = GameTooltip
----### See: Interface/SharedXML/Constants.lua
-local DESC_FORMAT = HIGHLIGHT_FONT_COLOR_CODE .. '\n%s' .. FONT_COLOR_CODE_CLOSE
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -20,15 +18,14 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
-
+local AceEvent = ns:AceEvent()
+local libName = M.EquipmentSetDragEventHandler
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class EquipmentSetDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(M.EquipmentSetDragEventHandler)
-
-local p = ns:LC().DRAG_AND_DROP:NewLogger(M.EquipmentSetDragEventHandler)
-local pe = ns:LC().EVENT:NewLogger(M.EquipmentSetDragEventHandler)
+local L = LibStub:NewLibrary(libName)
+local p = ns:LC().DRAG_AND_DROP:NewLogger(libName)
 
 --- @class EquipmentSetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.EquipmentSetAttributeSetter)
@@ -49,75 +46,6 @@ local function ToProfileEquipmentSet(equipmentSet)
         id = equipmentSet.id,
         icon = equipmentSet.icon,
     }
-end
-
---- @param w ButtonUIWidget
-local function ClickEquipmentSetButton(w)
-    if w:IsMissingEquipmentSet() then return end
-
-    local equipmentSet = w:GetEquipmentSetData()
-    local index = BaseAPI:GetEquipmentSetIndex(equipmentSet.id)
-
-    local btnName = 'GearSetButton' .. (index)
-    if _G[btnName] then _G[btnName]:Click() end
-end
---- @param w ButtonUIWidget
-local function ClickEquipmentSetButtonDelayed(w)
-    C_Timer.After(0.2, function() ClickEquipmentSetButton(w) end)
-end
-
---- @param w ButtonUIWidget
----@param profile Profile_Config
-local function OpenEquipmentMgrConditionally(w, profile)
-    if profile.equipmentset_open_equipment_manager == true then
-        --- @type _Frame
-        local gmDlg = GearManagerDialog
-        if gmDlg and gmDlg:IsVisible() then ClickEquipmentSetButtonDelayed(w) return end
-    end
-
-    --- Buttons:
-    --- • GearManagerToggleButton (pre-retail)
-    --- • PaperDollSidebarTab3 (retail)
-    --- @type _Button
-    local gmButton = GearManagerToggleButton or PaperDollSidebarTab3
-    if profile.equipmentset_open_equipment_manager ~= true then return end
-    C_Timer.After(0.1, function()
-        gmButton:Click()
-        ClickEquipmentSetButtonDelayed(w)
-    end)
-end
-
---- @param w ButtonUIWidget
----@param profile Profile_Config
-local function GlowButtonConditionally(w, profile)
-    if profile.equipmentset_show_glow_when_active ~= true then return end
-    local btn = w.button()
-    ActionButton_ShowOverlayGlow(btn)
-    C_Timer.After(0.8, function() ActionButton_HideOverlayGlow(btn) end)
-end
-
---- @param evt string
---- @param w ButtonUIWidget
-local function OnClick(evt, w, ...)
-    assert(w, "ButtonUIWidget is missing")
-    pe:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
-    if not w:CanChangeEquipmentSet() or InCombatLockdown() then return end
-    if w:IsMissingEquipmentSet() then return end
-
-    --- @type _Frame
-    local PDF = PaperDollFrame
-    C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
-    -- PUT_DOWN_SMALL_CHAIN
-    -- GUILD_BANK_OPEN_BAG
-    PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
-
-    local profile = w:GetProfileConfig()
-    if profile.equipmentset_open_character_frame then
-        if not PDF:IsVisible() then
-            ToggleCharacter('PaperDollFrame')
-            OpenEquipmentMgrConditionally(w, profile)
-        else OpenEquipmentMgrConditionally(w, profile) end
-    end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -152,6 +80,8 @@ local function eventHandlerMethods(e)
         config[WAttr.EQUIPMENT_SET] = equipmentSet
 
         S(btnUI, config)
+
+        AceEvent:SendMessage(GC.M.OnEquipmentSetDragComplete, libName, btnUI.widget)
     end
 
 end
@@ -164,10 +94,10 @@ local function attributeSetterMethods(a)
 
     --- @param btnUI ButtonUI
     function a:SetAttributes(btnUI)
-        local w = btnUI.widget
+        local w = btnUI.widget; if not w then return end
         w:ResetWidgetAttributes()
         local equipmentSet = w:GetEquipmentSetData()
-        if w:IsInvalidEquipmentSet(equipmentSet) then return end
+        if w:EquipmentSetMixin():IsInvalidEquipmentSet(equipmentSet) then return end
 
         local icon = EMPTY_ICON
         if equipmentSet.icon then icon = equipmentSet.icon end
@@ -184,22 +114,20 @@ local function attributeSetterMethods(a)
         if f:GetName() ~= btnUI:GetName() then return end
 
         self:RefreshTooltip(f)
-        local w = btnUI.widget
-        local profile = w:GetProfileConfig()
-        GlowButtonConditionally(w, profile)
     end
 
     --- @param btnUI ButtonUI
-    function a:RefreshTooltip(btnUI)
+    function a:RefreshTooltip(btnUI, setID)
         C_Timer.After(0.2, function() S:ShowTooltip(btnUI) end)
     end
 
     --- @param btnUI ButtonUI
-    function a:ShowTooltip(btnUI)
+    function a:ShowTooltip(btnUI, setID)
         if not btnUI then return end
-        local w = btnUI.widget
-        if w:IsEmpty() or w:IsMissingEquipmentSet() then return end
-        local equipmentSet = w:FindEquipmentSet()
+        local w = btnUI.widget; if w:IsEmpty() then return end
+        local es = w:EquipmentSetMixin()
+        if es:IsMissingEquipmentSet() then return end
+        local equipmentSet = es:FindEquipmentSet()
         -- retail GameTooltip uses setID
         GameTooltip:SetEquipmentSet(equipmentSet.id)
         if equipmentSet.isEquipped then
@@ -222,8 +150,4 @@ local function Init()
 
     S.mt.__index = BaseAttributeSetter
     S.mt.__call = S.SetAttributes
-
-    ns:AceEvent():RegisterMessage(GC.M.OnButtonClickEquipmentSet, OnClick)
-end
-
-Init()
+end; Init()

@@ -54,7 +54,10 @@ ignore:
   - Core/_Core.lua
   - Core/_Core.xml
   - Core/_ExtLib.xml
-  - Core/_ExtLib_WowAce.xml
+  - Core/_ExtLib_WowAce_Ace3.xml
+  - Core/_ExtLib_WowAce_Misc.xml
+  - Core/ActionbarPlus.lua
+  - Core/ActionbarPlusAPI.lua
   - Core/AddonLib
   - Core/Assets
   - Core/Global

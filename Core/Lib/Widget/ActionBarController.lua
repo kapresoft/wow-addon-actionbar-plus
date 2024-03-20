@@ -52,35 +52,23 @@ Event Handlers
 -------------------------------------------------------------------------------]]
 local function OnStealthIconUpdate() L:ForEachStealthButton(UpdateIcon) end
 
---- Update Items and Macros referencing items
-local function OnBagUpdate()
-    bagL:t( 'OnBagU(): called..')
-    L:ForEachItemButton(function(bw)
-        local success, itemInfo = safecall(function() return bw:GetItemData() end)
-        if not (success and itemInfo) then return end
-        bw:UpdateItemOrMacroState()
-    end)
-
-    --- @param handlerFn ButtonHandlerFunction
-    local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnBagUpdateExt, libName, CallbackFn)
-end
-
 --- Not fired in classic-era
 local function OnCompanionUpdate()
     L:ForEachCompanionButton(function(bw)
         C_Timer.NewTicker(0.5, function() bw:UpdateCompanionActiveState() end, 3)
     end)
 end
-
+-- TODO: Migrate to a new StealthSpellController, ie. controller:OnStealthIconUpdate()
 local function OnUpdateStealth() OnStealthIconUpdate() end
 local function OnShapeShift()
     C_Timer.NewTicker(0.2, function()
         L:ForEachShapeshiftButton(UpdateIcon)
     end, 2)
 end
+-- TODO: Migrate to a new KeyBindingsController, i.e. controller:UpdateKeyBindings()
 local function OnUpdateBindings() addon():UpdateKeyBindings() end
 
+-- TODO: Migrate to a new "PlayerUnitAuraController", i.e. controller:OnPlayerUnitAura()
 --- @param event string The event name
 local function OnPlayerUnitAura(event, unit)
     ua:t(function() return 'OnPlayerUnitAura(): unit=%s called...', unit end)
@@ -169,8 +157,6 @@ local function PropsAndMethods(o)
         df:f1(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
     end
 
-    o[E.BAG_UPDATE] = OnBagUpdate
-    o[E.BAG_UPDATE_DELAYED] = OnBagUpdate
     o[E.COMPANION_UPDATE] = OnCompanionUpdate
 
     o[E.PLAYER_CONTROL_LOST] = function()
@@ -210,8 +196,6 @@ local function OnAddOnReady(frame)
 
     RegisterFrameForEvents(frame, {
         E.PLAYER_TARGET_CHANGED,
-        E.BAG_UPDATE,
-        E.BAG_UPDATE_DELAYED,
         E.COMPANION_UPDATE,
         E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
         E.UPDATE_BINDINGS,

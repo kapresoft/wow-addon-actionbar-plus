@@ -241,17 +241,28 @@ local function GlobalConstantProperties(o)
         COMBAT_LOG_EVENT_UNFILTERED = 'COMBAT_LOG_EVENT_UNFILTERED',
         COMPANION_UPDATE = 'COMPANION_UPDATE',
         CVAR_UPDATE = 'CVAR_UPDATE',
+        --- This event fires whenever there's a change to the player's equipment sets. This includes creating, modifying, or deleting an equipment set.
         EQUIPMENT_SETS_CHANGED = 'EQUIPMENT_SETS_CHANGED',
+        --- Triggered after an equipment set swap has been completed. This event helps addons and scripts determine when the gear change process has ended, allowing them to update or react accordingly.
+        --- Event Params: result, setID
         EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
 
         PET_BATTLE_OPENING_START = 'PET_BATTLE_OPENING_START',
         PET_BATTLE_CLOSE = 'PET_BATTLE_CLOSE',
 
+        --- This event is fired when the players gear changes. Example, a chest is changed to another chest piece.
+        ---
+        --- #### Event Params:<br/>
+        ---  - equipmentSlot number - InventorySlotId
+        ---  - hasCurrent boolean - True when a slot becomes empty, false when filled.
+        PLAYER_EQUIPMENT_CHANGED = 'PLAYER_EQUIPMENT_CHANGED',
+
         PLAYER_CONTROL_GAINED = 'PLAYER_CONTROL_GAINED',
         PLAYER_CONTROL_LOST = 'PLAYER_CONTROL_LOST',
         PLAYER_MOUNT_DISPLAY_CHANGED = 'PLAYER_MOUNT_DISPLAY_CHANGED',
         PLAYER_ENTERING_WORLD = 'PLAYER_ENTERING_WORLD',
+        --- This event fires when the player's currently equipped items change. It provides specifics about which slot had an item change, making it useful for tracking equipped items in real-time.
         PLAYER_REGEN_DISABLED = 'PLAYER_REGEN_DISABLED',
         PLAYER_REGEN_ENABLED = 'PLAYER_REGEN_ENABLED',
         PLAYER_STARTED_MOVING = 'PLAYER_STARTED_MOVING',
@@ -290,7 +301,10 @@ local function GlobalConstantProperties(o)
         ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
+    ---@param msg string Message name
     local function newMsg(msg) return sformat("%s::%s", addon, msg) end
+    ---@param event string Event name
+    local function toMsg(event) return newMsg(event) end
 
     --- @class MessageNames
     local Messages = {
@@ -300,18 +314,19 @@ local function GlobalConstantProperties(o)
         OnAddOnInitializedV2         = newMsg('OnAddOnInitializedV2'),
         OnAddOnReady                 = newMsg('OnAddOnReady'),
         OnBagUpdate                  = newMsg('OnBagUpdate'),
-        OnDBInitialized              = newMsg('OnDBInitialized'),
-        OnConfigInitialized          = newMsg('OnConfigInitialized'),
-        OnTooltipFrameUpdate         = newMsg('OnTooltipFrameUpdate'),
         OnButtonPreClick             = newMsg('OnButtonPreClick'),
         OnButtonPostClick            = newMsg('OnButtonPostClick'),
         OnButtonClickBattlePet       = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet    = newMsg('OnButtonClickEquipmentSet'),
         OnButtonClickCompanion       = newMsg('OnButtonClickCompanion'),
+        OnConfigInitialized          = newMsg('OnConfigInitialized'),
+        OnDBInitialized              = newMsg('OnDBInitialized'),
+        OnEquipmentSetDragComplete   = newMsg('OnEquipmentSetDragComplete'),
         OnMacroAttributesSet         = newMsg('OnMacroAttributesSet'),
         OnUpdateMacroState           = newMsg('OnUpdateMacroState'),
         OnUpdateItemState            = newMsg('OnUpdateItemState'),
         OnSpellCastSucceeded         = newMsg('OnSpellCastSucceeded'),
+        OnTooltipFrameUpdate         = newMsg('OnTooltipFrameUpdate'),
         MacroAttributeSetter_OnSetIcon     = newMsg('MacroAttributeSetter:OnSetIcon'),
         MacroAttributeSetter_OnShowTooltip = newMsg('MacroAttributeSetter:OnShowTooltip'),
         -- External Add-On Integration
@@ -568,6 +583,7 @@ local function GlobalConstantProperties(o)
     o.UnitClasses = UnitClasses
 
     o.newMsg = newMsg
+    o.toMsg = toMsg
 end
 
 --- @param o GlobalConstants

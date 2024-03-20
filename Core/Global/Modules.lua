@@ -54,14 +54,19 @@ local M = {
     BaseAttributeSetter = '',
     BattlePetAttributeSetter = '',
     BattlePetDragEventHandler = '',
+    BagController = '',
     ButtonFactory = '',
     ButtonFrameFactory = '',
     ButtonUI = '',
     ButtonUIWidgetBuilder = '',
     CompanionAttributeSetter = '',
     CompanionDragEventHandler = '',
+    ConfigDialogController = '',
+    EventToMessageRelayController = '',
     EquipmentSetAttributeSetter = '',
+    EquipmentSetController = '',
     EquipmentSetDragEventHandler = '',
+    EquipmentSetButtonMixin = '',
     FrameHandleMixin = '',
     GlobalConstants = '',
     ItemAttributeSetter = '',
@@ -96,6 +101,7 @@ local M = {
 --- @field ActionType ActionType
 --- @field API API
 --- @field Assert Kapresoft_LibUtil_Assert
+--- @field BagController BagController
 --- @field BaseAPI BaseAPI
 --- @field BaseAttributeSetter BaseAttributeSetter
 --- @field BattlePetAttributeSetter BattlePetAttributeSetter
@@ -108,10 +114,14 @@ local M = {
 --- @field ButtonUIWidgetBuilder ButtonUIWidgetBuilder
 --- @field CompanionAttributeSetter CompanionAttributeSetter
 --- @field CompanionDragEventHandler CompanionDragEventHandler
+--- @field ConfigDialogController ConfigDialogController
 --- @field DebuggingSettingsGroup DebuggingSettingsGroup
 --- @field DruidUnitMixin DruidUnitMixin
+--- @field EventToMessageRelayController EventToMessageRelayController
 --- @field EquipmentSetAttributeSetter EquipmentSetAttributeSetter
+--- @field EquipmentSetController EquipmentSetController
 --- @field EquipmentSetDragEventHandler EquipmentSetDragEventHandler
+--- @field EquipmentSetButtonMixin EquipmentSetButtonMixin
 --- @field FrameHandleMixin FrameHandleMixin
 --- @field ItemAttributeSetter ItemAttributeSetter
 --- @field ItemDragEventHandler ItemDragEventHandler
