@@ -665,7 +665,6 @@ local function GlobalConstantMethods(o)
         --lastUpdate = date("%m/%d/%y %H:%M:%S")
         lastUpdate = TimeUtil:TimeToISODate()
         --@end-debug@
-        print('lastUpdate:', lastUpdate)
 
         return lastUpdate
     end
