@@ -12,11 +12,16 @@ Lua Vars
 -------------------------------------------------------------------------------]]
 local sformat = string.format
 
+local GITHUB_LAST_CHANGED_DATE = 'X-Github-Project-Last-Changed-Date'
+local ABP_M6_COMPATIBLE_VERSION_DATE = 'X-ActionbarPlus-M6-Compatible-Version-Date'
+local GITHUB_REPO = 'X-Github-Repo'
+local GITHUB_ISSUES = 'X-Github-Issues'
+local CURSE_FORGE = 'X-CurseForge'
+
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetAddOnMetadata, GetBuildInfo, GetCVarBool = GetAddOnMetadata, GetBuildInfo, GetCVarBool
-local date = date
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -24,18 +29,20 @@ Local Vars
 --- @type string
 local addon
 --- @type Kapresoft_Base_Namespace
-local ns
-addon, ns = ...
-local kch = ns.Kapresoft_LibUtil.CH
+local kns
+addon, kns = ...
+local kch = kns.Kapresoft_LibUtil.CH
 --- @type LibStub
 local LibStub = LibStub
 
 --- @type fun(o:any, ...) : void
-local pformat = ns.pformat
+local pformat = kns.pformat
 
 --- @type Kapresoft_LibUtil
-local K = ns.Kapresoft_LibUtil
-local String = K.Objects.String
+local K = kns.Kapresoft_LibUtil
+local KO = K.Objects
+local TimeUtil = KO.TimeUtil
+local String = KO.String
 local IsBlank, IsNotBlank, EqualsIgnoreCase = String.IsBlank, String.IsNotBlank, String.EqualsIgnoreCase
 
 local LibSharedMedia = LibStub('LibSharedMedia-3.0')
@@ -625,24 +632,63 @@ local function GlobalConstantMethods(o)
     ---```
     --- @return string, string, string, string, string, string, string
     function o:GetAddonInfo()
-        local versionText, lastUpdate
-        --@non-debug@
-        versionText = GetAddOnMetadata(addon, 'Version')
-        lastUpdate = GetAddOnMetadata(addon, 'X-Github-Project-Last-Changed-Date')
-        --@end-non-debug@
-        --@debug@
-        versionText = '1.0.x.dev'
-        lastUpdate = date("%m/%d/%y %H:%M:%S")
-        --@end-debug@
+        local lastUpdate = self:GetLastUpdate()
+        local versionText = self:GetVersion()
 
         local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
         local wowInterfaceVersion = select(4, GetBuildInfo())
 
-        return versionText, GetAddOnMetadata(addon, 'X-CurseForge'), GetAddOnMetadata(addon, 'X-Github-Issues'),
-        GetAddOnMetadata(addon, 'X-Github-Repo'), lastUpdate, useKeyDown, wowInterfaceVersion
+        return versionText, GetAddOnMetadata(addon, CURSE_FORGE), GetAddOnMetadata(addon, GITHUB_ISSUES),
+        GetAddOnMetadata(addon, GITHUB_REPO), lastUpdate, useKeyDown, wowInterfaceVersion
     end
 
-    function o:IsActionbarPlusM6Enabled() return 2 == GetAddOnEnableState(nil, 'ActionbarPlus-M6') end
+    --- @return string The ActionbarPlus version string. Example: 2024.3.1
+    function o:GetVersion()
+        local versionText
+        --@non-debug@
+        versionText = GetAddOnMetadata(addon, 'Version')
+        --@end-non-debug@
+        --@debug@
+        versionText = '1.0.x.dev'
+        --@end-debug@
+        return versionText
+    end
+
+    --- @return string The time in ISO Date Format. Example: 2024-03-22T17:34:00Z
+    function o:GetLastUpdate()
+        local lastUpdate
+        --@non-debug@
+        lastUpdate = GetAddOnMetadata(addon, GITHUB_LAST_CHANGED_DATE)
+        --@end-non-debug@
+
+        --@debug@
+        --lastUpdate = date("%m/%d/%y %H:%M:%S")
+        lastUpdate = TimeUtil:TimeToISODate()
+        --@end-debug@
+        print('lastUpdate:', lastUpdate)
+
+        return lastUpdate
+    end
+
+    --- The date represents compatible version update date.
+    --- between ActionbarPlus-M6 and ActionbarPlus. Any dates lower than this
+    --- will prompt the user of ActionbarPlus-M6 addon to update to the latest
+    --- ActionbarPlus. Example: 2024-03-22T17:34:00Z
+    function o:GetActionbarPlusM6CompatibleVersionDate()
+        local lastCompatibleDate
+        --@non-debug@
+        lastCompatibleDate = GetAddOnMetadata(addon, ABP_M6_COMPATIBLE_VERSION_DATE)
+        --@end-non-debug@
+
+        -- @debug@
+        -- Add time to simulate expired ActionbarPlus-M6 in dev environment. Example: time() + 1000
+        -- if "lastUpdate" is older than "lastCompatibleDate", then ActionbarPlus-M6 will notify user.
+        -- lastCompatibleDate = ns.TimeUtil:TimeToISODate(time() - 10)
+        lastCompatibleDate = lastCompatibleDate or TimeUtil:TimeToISODate(time() - 10)
+        --@end-debug@
+
+        return lastCompatibleDate
+    end
 
     --- @return string
     function o:GetAddonInfoFormatted()
@@ -650,7 +696,7 @@ local function GlobalConstantMethods(o)
         local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
         local fmt = self.C.ADDON_INFO_FMT
         --- @type Namespace
-        local nss = ns
+        local nss = kns
         local ffmt = self.C.ADDON_INFO_FEATURE_FMT
         local features = sformat(ffmt, "v2-enabled", tostring(nss.features.enableV2))
 
@@ -663,7 +709,7 @@ local function GlobalConstantMethods(o)
                 sformat(fmt, C['Last-Update'], lastUpdate),
                 sformat(fmt, C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown)),
                 sformat(fmt, C['Interface-Version'], wowInterfaceVersion),
-                sformat(fmt, C['Game-Version'], ns.gameVersion),
+                sformat(fmt, C['Game-Version'], kns.gameVersion),
                 sformat(fmt, "Features", features)
         )
     end
@@ -702,8 +748,8 @@ local function Init()
     --- @type GlobalConstants
     ABP_GlobalConstants = L
     --- @type GlobalObjects
-    ns.O = ns.O or {}
-    ns.O.GlobalConstants = L
+    kns.O = kns.O or {}
+    kns.O.GlobalConstants = L
 end
 
 Init()

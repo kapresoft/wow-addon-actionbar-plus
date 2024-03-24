@@ -2,6 +2,11 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_ToyBox, C_Container = C_ToyBox, C_Container
+--- Use C_AddOns.GetAddOnEnableStat(addonName, char) if available
+local C_AddOns_GetAddOnEnableState = C_AddOns.GetAddOnEnableState
+--- Else, WOTLK Uses GetAddOnEnableState(index, char)
+local GetAddOnEnableState = GetAddOnEnableState
+local ABP_M6 = 'ActionbarPlus-M6'
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -88,6 +93,31 @@ function S:GetCursorInfo()
     end
 
     return c
+end
+
+function S:GetCurrentPlayer() return UnitName("player") end
+function S:IsActionbarPlusM6Enabled() return self:IsAddOnEnabled(ABP_M6) end
+
+--- @private
+--- @param indexOrName IndexOrName
+--- @return Enabled
+function S:IsAddOnEnabled(indexOrName)
+    local charName = self:GetCurrentPlayer()
+    if not C_AddOns_GetAddOnEnableState then return self:IsAddOnEnabledLegacy(indexOrName, charName) end
+    local intVal = C_AddOns_GetAddOnEnableState(indexOrName, charName)
+    p:d(function() return 'AddOn[%s] is enabled: %s', indexOrName, tostring(intVal == 2) end)
+    return intVal == 2
+end
+
+--- @private
+--- @param indexOrName Name The name of the addon
+--- @return boolean
+function S:IsAddOnEnabledLegacy(indexOrName, charName)
+    --- Note that the parameters are in different order compared
+    --- to the new API C_AddOns.GetAddOnEnableState().
+    --- GetAddOnEnableState is only used in WOTLK. classic era and
+    --- retail uses C_AddOns.GetAddOnEnableState().
+    return GetAddOnEnableState(charName, indexOrName) == 2
 end
 
 --- @see Blizzard_UnitId
@@ -198,11 +228,24 @@ local function IsRuneSpell(id, name, icon)
 end
 
 --- @param spellNameOrId SpellName|SpellID
---- @return SpellID, SpellName
+--- @return SpellName, SpellID
 function S:GetSpellName(spellNameOrId)
     local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
     return name, id
  end
+
+--- @see https://warcraft.wiki.gg/wiki/Category:API_namespaces/C_Engraving
+--- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
+--- @return SpellInfoBasic
+function S:GetSpellInfoBasic(spellNameOrId)
+    if not spellNameOrId then return nil end
+
+    local name, _, icon, _, _, _, id = GetSpellInfo(spellNameOrId)
+    if not name then return nil end
+    --- @type SpellInfo
+    local spellInfo = { id = id, name = name, icon = icon }
+    return spellInfo
+end
 
 --- @see https://warcraft.wiki.gg/wiki/Category:API_namespaces/C_Engraving
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
@@ -347,7 +390,7 @@ end
 --- @param spellInfo Profile_Spell
 function S:IsShapeshiftOrStealthSpell(spellInfo)
     return self:IsShapeshiftSpell(spellInfo)
-            or self:IsStealthSpell(spellInfo.name)
+            or self:IsStealthSpell(spellInfo.id)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
@@ -361,14 +404,13 @@ function S:IsShapeshiftSpell(spellInfo)
     return true == spellInfo.isShapeshift
 end
 
-
---- @param spellName string
-function S:IsStealthSpell(spellName)
-    return IsAnyOf(spellName, WAttr.PROWL, WAttr.STEALTH)
-end
-
----@param spellID SpellID
-function S:IsStealthSpellByID(spellID)
+--- @param spellNameOrID SpellNameOrID
+function S:IsStealthSpell(spellNameOrID)
+    local spellID = spellNameOrID
+    if type(spellNameOrID) == 'string' then
+        local _, id = self:GetSpellName(spellNameOrID); if not id then return false end
+        spellID = id
+    end
     return IsAnyOf(spellID, ROGUE_STEALTH_SPELL_ID, DRUID_PROWL_SPELL_ID, NIGHT_ELF_SHADOWMELD_SPELL_ID)
 end
 
@@ -387,18 +429,16 @@ function S:GetSpellIcon(spellInfo)
                 return GC.Textures.GHOST_WOLF_FORM_ACTIVE_ICON
             end
         end
-    elseif self:IsStealthSpell(spellInfo.name) and IsStealthed() then
-        return GC.Textures.STEALTHED_ICON
-    end
+    elseif self:IsStealthed(spellInfo.id) then return GC.Textures.STEALTHED_ICON end
     return spellInfo.icon
 end
 
---- @param spellInfo Profile_Spell
-function S:GetStealthIcon(spellInfo)
-    if self:IsStealthSpell(spellInfo.name) and IsStealthed() then
-        return GC.Textures.STEALTHED_ICON
-    end
-    return spellInfo.icon
+function S:IsStealthed(spellID) return self:IsStealthSpell(spellID) and IsStealthed() end
+
+--- @param spellID SpellID
+function S:GetStealthIcon(spellID)
+    if self:IsStealthed(spellID) then return GC.Textures.STEALTHED_ICON end
+    return nil
 end
 
 --- @param spellInfo Profile_Spell

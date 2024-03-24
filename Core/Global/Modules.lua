@@ -88,11 +88,13 @@ local M = {
     SpellAttributeSetter = '',
     SpellDragEventHandler = '',
     WidgetMixin = '',
-    -- Support Classes
+
+    -- M6 AddOn Support
     M6Support = ''
 }; for moduleName in pairs(M) do M[moduleName] = moduleName end
 
 --- @class GlobalObjects
+--- @field M6Support M6Support
 --- @field AceLibFactory AceLibFactory Deprecated, Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
 --- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin

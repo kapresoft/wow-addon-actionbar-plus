@@ -50,13 +50,13 @@ local function eventHandlerMethods(e)
     function e:Supports(cursorInfo)
         local c = ns:CreateCursorUtil(cursorInfo)
         if c:IsM6Macro() then
-            local isEnabled  = GC:IsActionbarPlusM6Enabled()
+            local isEnabled  = O.M6Support.enabled
             if isEnabled ~= true then
                 local msg = warnColor:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
                         .. ' ' .. highlightColor:WrapTextInColorCode(LL['ActionbarPlus-M6 URL'])
                 p:w(msg)
             end
-            p:i(function() return 'm6 supported: %s', tostring(isEnabled) end)
+            p:d(function() return 'm6 supported: %s', tostring(isEnabled) end)
             return isEnabled
         end
 
