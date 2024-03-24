@@ -229,7 +229,7 @@ local function AdditionalMethods(o)
 
     function o:OnProfileChanged() self:ConfirmReloadUI() end
 
-    --- @param ... any
+    --- @vararg any
     function o:SmartMount(...)
         local flying,ground = ...
         p:d(function() return "flying=%s ground=%s", flying, ground end)

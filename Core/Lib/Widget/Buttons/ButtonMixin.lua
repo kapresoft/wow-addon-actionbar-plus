@@ -987,6 +987,21 @@ local function PropsAndMethods(o)
 
     end
 
+    --- @param spellNameOrID SpellNameOrID
+    --- @param callbackFn fun(spell:SpellInfoBasic) end | "function(spell) print(spell.id) end
+    function o:IfStealthSpell(spellNameOrID, callbackFn)
+        if not spellNameOrID then return end
+        local isStealthSpell = spellNameOrID and self:IsStealthSpell(spellNameOrID)
+        if not isStealthSpell then return end
+
+        local spell = API:GetSpellInfoBasic(spellNameOrID)
+        local spellId = spell and spell.id; if not spellId then return end
+        if not IsStealthed() then return end
+        local stealthIcon = API:GetStealthIcon(spellId)
+        if stealthIcon then spell.icon = stealthIcon end
+        callbackFn(spell)
+    end
+
     --- @param cd CooldownInfo
     function o:IsUsableSpell(cd)
         local spellID = cd.details.spell.id

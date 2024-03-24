@@ -323,7 +323,8 @@ local function CreateNamespace(...)
         function o:NewActionBarController(libName, ...)
             local unpack = KO.Table.unpack
             local args = mergeArgs(libName, self.O.ActionBarHandlerMixin, {...})
-            --- @class BaseActionBarController : AceEvent
+            --- @alias BaseActionBarController | __BaseActionBarController | AceEvent
+            --- @class __BaseActionBarController : ActionBarHandlerMixin
             local newLib = self:NewLibWithEvent(libName, unpack(args))
 
             --- @param fromEvent Name Use the GlobalConstant.E event names

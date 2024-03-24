@@ -77,7 +77,7 @@ end
 
 --- @param fallback any The fallback value
 --- @param key string The key value
---- @param config Config The config instance
+--- @param config Settings The config instance
 local function SetAndApply(config, key, fallback, foreachButtonFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
@@ -176,7 +176,7 @@ local function GetColSizeSetterHandler(frameIndex)
     end
 end
 
---- @param config Config The config instance
+--- @param config Settings The config instance
 --- @param key string The key value
 --- @param fallback any The fallback value
 local function PSet(config, key, fallback)
@@ -186,7 +186,7 @@ local function PSet(config, key, fallback)
     end
 end
 
---- @param config Config The config instance
+--- @param config Settings The config instance
 --- @param fallback any The fallback value
 --- @param key string The key value
 local function PGet(config, key, fallback)
@@ -208,10 +208,10 @@ end
 --[[-----------------------------------------------------------------------------
 Properties & Methods
 -------------------------------------------------------------------------------]]
---- @param o Config
+--- @param o Settings
 local function PropsAndMethods(o)
 
-    --- Call Order: Config -> Profile -> ButtonFactory
+    --- Call Order: Settings -> Profile -> ButtonFactory
     --- Message triggered by ActionbarPlus#OnInitializeModules
     --- @param msg string The message name
     function o:InitConfig(msg)
@@ -574,6 +574,4 @@ local function NewInstance()
     PropsAndMethods(newConfig)
     newConfig:RegisterMessage(MSG.OnAddOnEnabled, function(evt, ...) newConfig:InitConfig(evt, ...) end)
     return newConfig
-end
-
-NewInstance()
+end; NewInstance()

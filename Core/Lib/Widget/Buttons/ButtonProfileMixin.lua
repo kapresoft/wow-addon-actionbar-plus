@@ -244,13 +244,13 @@ local function PropsAndMethods(o)
 
     function o:IsStealthSpell()
         local spellInfo = self:GetSpellData()
-        if not (spellInfo and spellInfo.name) then return false end
-        return API:IsStealthSpell(spellInfo.name)
+        local spellID = spellInfo and spellInfo.id; if not spellID then return false end
+        return API:IsStealthSpell(spellID)
     end
 
     function o:IsStealthEffectiveSpell()
         local spellID = self:GetEffectiveSpellID()
-        return spellID and API:IsStealthSpellByID(spellID), spellID
+        return spellID and API:IsStealthSpell(spellID), spellID
     end
 
     function o:IsShapeshiftSpell()
