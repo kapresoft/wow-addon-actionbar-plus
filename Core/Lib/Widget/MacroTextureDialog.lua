@@ -16,8 +16,8 @@ Local vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
-
-local Table, String, AceGUI, WMX = O.Table, O.String, O.AceLibFactory:A().AceGUI, O.WidgetMixin
+local Ace = ns:KO().AceLibrary.O
+local Table, String, AceGUI, WMX = O.Table, O.String, Ace.AceGUI, O.WidgetMixin
 local ICON_PREFIX = 'Interface/Icons/'
 local TEXTURE_DIALOG_GLOBAL_FRAME_NAME = 'ABP_TextureDialogFrame'
 

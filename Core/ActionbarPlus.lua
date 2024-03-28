@@ -22,8 +22,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
-
-local AO = O.AceLibFactory:A()
+local AO = ns:KO().AceLibrary.O
 local GCC, M = GC.C, GC.M
 
 local String, Table = O.String, O.Table

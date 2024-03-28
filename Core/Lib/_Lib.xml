@@ -3,7 +3,6 @@
 
     <Include file="Logging\_Logging.xml"/>
     <Include file="Locales\_Locales.xml"/>
-    <Include file="Ace3\_Ace3.xml"/>
     <Include file='API\_API.xml'/>
 
     <Include file='Common\_Common.xml'/>
