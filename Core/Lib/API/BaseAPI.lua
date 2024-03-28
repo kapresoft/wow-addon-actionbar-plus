@@ -26,10 +26,9 @@ local W = GC.WidgetAttributes
 
 local String, Assert = O.String, O.Assert
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
-local sformat = String.format
 
---- @class BaseAPI : BaseLibraryObject
-local L = LibStub:NewLibrary(M.BaseAPI); if not L then return end
+--- @class BaseAPI
+local L = ns:NewLibStd(M.BaseAPI)
 local p = ns:CreateDefaultLogger(M.BaseAPI)
 
 --[[-----------------------------------------------------------------------------
@@ -128,7 +127,7 @@ function L:GetEquipmentSetInfoBySetID(id)
     }
 end
 
----@param petID Identifier The Pet ID (GUID)
+--- @param petID Identifier The Pet ID (GUID)
 function L:GetPetInfo_CJournal(petID)
     local speciesID, customName, level, xp, maxXp, displayID,
     isFavorite, name, icon, petType, creatureID, sourceText,
@@ -290,7 +289,7 @@ function L:GetMountInfo(cursorInfo)
     return mountIDorIndex and self:GetMountInfoGenericFromCursor(mountIDorIndex)
 end
 
----@param mountDisplayIndex Index
+--- @param mountDisplayIndex Index
 function L:GetMountIDFromDisplayIndex(mountDisplayIndex)
     local name, spellID, icon,
     isActive, isUsable, sourceType, isFavorite,

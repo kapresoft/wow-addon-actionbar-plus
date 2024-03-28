@@ -38,15 +38,16 @@ end)]]
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+local libName = 'Developer'
 --- @class Developer : BaseLibraryObject_WithAceEvent
 local L = {}; AceEvent:Embed(L); D = L
-local p = ns:LC().DEV:NewLogger('Developer')
+local p = ns:LC().DEV:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 function L:TT()
-    self:SendMessage(GC.M.OnTooltipFrameUpdate)
+    self:SendMessage(GC.M.OnTooltipFrameUpdate, libName)
 end
 
 --- down or up
@@ -119,7 +120,7 @@ function L:API() return O.BaseAPI, O.API end
 function L:NS() return ns end
 function L:O() return ns.O end
 
-function L:SM(msg) self:SendMessage(msg) end
+function L:SM(msg) self:SendMessage(msg, libName) end
 
 
 --- Get the button attributes. Used only for debugging

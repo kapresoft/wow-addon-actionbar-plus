@@ -208,7 +208,7 @@ end
 --[[-----------------------------------------------------------------------------
 Properties & Methods
 -------------------------------------------------------------------------------]]
---- @param o Settings
+--- @param o Settings | AceEventPlus
 local function PropsAndMethods(o)
 
     --- Call Order: Settings -> Profile -> ButtonFactory
@@ -218,9 +218,9 @@ local function PropsAndMethods(o)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
-        self.eventHandler = ns:K():CreateAndInitFromMixin(O.SettingsEventHandlerMixin)
+        self.eventHandler = O.SettingsEventHandlerMixin:New()
         self:Initialize()
-        self:SendMessage(GC.M.OnConfigInitialized)
+        self:SendMessage(GC.M.OnConfigInitialized, ns.M.Settings)
     end
 
     --- Sets up Ace config dialog
@@ -564,14 +564,19 @@ New Instance
 --- properties "addon" and "profile" is injected OnAfterInitialize()
 --- @return Settings
 local function NewInstance()
-    --- @type Settings
-    local newConfig = LibStub:NewLibrary(ns.M.Settings); if not newConfig then return end
+
+    --- @class Settings A settings class for addon configuration and event handling.
+    --- @field addon ActionbarPlus The associated addon instance.
+    --- @field profile Profile The user profile for settings and preferences.
+    --- @field eventHandler SettingsEventHandlerMixin Handles addon events.
+    --- @field maxRows Index Maximum number of rows for UI elements.
+    --- @field maxCols Index Maximum number of columns for UI elements.
+    local newConfig = ns:NewLib(ns.M.Settings)
     newConfig.maxRows = 20
     newConfig.maxCols = 40
     newConfig.maxButtons = newConfig.maxRows * newConfig.maxCols
 
-    AceEvent:Embed(newConfig)
     PropsAndMethods(newConfig)
-    newConfig:RegisterMessage(MSG.OnAddOnEnabled, function(evt, ...) newConfig:InitConfig(evt, ...) end)
+    newConfig:RegisterMessage(MSG.OnAddOnEnabled, function(evt, msg, ...) newConfig:InitConfig(evt, msg, ...) end)
     return newConfig
 end; NewInstance()

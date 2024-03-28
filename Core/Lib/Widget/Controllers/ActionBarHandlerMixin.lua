@@ -10,14 +10,10 @@ local PR = O.Profile
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return ActionBarHandlerMixin, Logger
-local function CreateLib()
-    local libName = M.ActionBarHandlerMixin
-    --- @class ActionBarHandlerMixin : BaseLibraryObject
-    local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = ns:CreateDefaultLogger(libName)
-    return newLib, logger
-end; local L, p = CreateLib(); if not L then return end
+local libName = M.ActionBarHandlerMixin
+--- @class ActionBarHandlerMixin : BaseLibraryObject
+local L = ns:NewLibStd(libName)
+local p = ns:CreateDefaultLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods

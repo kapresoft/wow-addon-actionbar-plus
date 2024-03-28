@@ -239,8 +239,7 @@ Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
     InitButtonGameTooltipHooks()
-    L:RegisterMessage(MSG.OnAddOnEnabled, function(msg)
-        pm:f3(function() return 'MSG::R: %s', msg end)
+    L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, source, addOn)
         L:Init()
     end)
 

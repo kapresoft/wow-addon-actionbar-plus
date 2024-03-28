@@ -1,4 +1,3 @@
---- @alias EquipmentSetController __EquipmentSetController | ActionBarHandlerMixin
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -11,20 +10,28 @@ local libName = ns.M.EquipmentSetController
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class __EquipmentSetController : BaseActionBarController
-local L = ns:NewActionBarController(libName);
+--- @class EquipmentSetController
+local L = ns:NewController(libName)
+
 local p = ns:LC().EQUIPMENT:NewLogger(libName)
 local pd = ns:CreateDefaultLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o __EquipmentSetController | EquipmentSetController
+--- @param o EquipmentSetController | ControllerV2
 local function PropsAndMethods(o)
+
+    --- Automatically called
+    --- @see ModuleV2Mixin#Init
+    --- @private
+    function o:OnAddOnReady()
+        self:ConditionallyCheckButtons()
+        self:RegisterMessageCallbacks()
+    end
 
     --- @private
     function o:RegisterMessageCallbacks()
-        self:RegisterMessage(MSG.OnAddOnReady, function() self:OnAddOnReady()  end)
         self:RegisterMessage(GC.M.OnButtonClickEquipmentSet,
                 function(evt, source, ...) self:OnClick(...)  end)
         self:RegisterMessage(GC.M.OnEquipmentSetDragComplete,
@@ -52,12 +59,6 @@ local function PropsAndMethods(o)
     function o:OnPlayerEquipmentChanged(invSlotID, hasCurrent)
         p:f3(function()
             return 'OnPlayerEquipmentChanged called: slotID=%s hasCurrent=%s', invSlotID, tostring(hasCurrent) end)
-        self:ConditionallyCheckButtons()
-    end
-
-    --- @private
-    function o:OnAddOnReady()
-        p:f3('OnEquipmentSetsChanged called...')
         self:ConditionallyCheckButtons()
     end
 
@@ -164,6 +165,5 @@ local function PropsAndMethods(o)
         if _G[btnName] then _G[btnName]:Click() end
     end
 
-    o:RegisterMessageCallbacks()
 end; PropsAndMethods(L)
 

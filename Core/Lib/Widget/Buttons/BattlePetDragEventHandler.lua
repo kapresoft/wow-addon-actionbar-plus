@@ -24,10 +24,12 @@ local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local p = ns:LC().DRAG_AND_DROP:NewLogger(M.CompanionDragEventHandler)
-
+local libName = M.BattlePetDragEventHandler
 --- @class BattlePetDragEventHandler : DragEventHandler
-local L = LibStub:NewLibrary(M.BattlePetDragEventHandler)
+local L = LibStub:NewLibrary(libName)
+
+local p = ns:LC().DRAG_AND_DROP:NewLogger(libName)
+local pm = ns:LC().MESSAGE_TRACE:NewLogger(libName)
 
 --- @class BattlePetAttributeSetter : BaseAttributeSetter
 local S = LibStub:NewLibrary(M.BattlePetAttributeSetter)
@@ -59,10 +61,9 @@ end
 
 --- @param evt string
 --- @param w ButtonUIWidget
-local function OnClick(evt, w, ...)
+local function OnClick(evt, source, w, ...)
     assert(w, "ButtonUIWidget is missing")
-    p:d(function() return 'Message[%s]: %s', evt, w:GetName() end)
-    C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
+    return C_PetJournal.SummonPetByGUID(w:GetBattlePetData().guid)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -154,7 +155,7 @@ local function Init()
     S.mt.__index = BaseAttributeSetter
     S.mt.__call = S.SetAttributes
 
-    ns:AceEvent():RegisterMessage(GC.M.OnButtonClickBattlePet, OnClick)
+    ns:AceEventWithTrace(libName):RegisterMessage(GC.M.OnButtonClickBattlePet, OnClick)
 end
 
 Init()

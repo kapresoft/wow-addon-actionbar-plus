@@ -31,7 +31,7 @@ Message Handler
 --- @param abp ActionbarPlus
 --- @see C_MountJournal.Pickup()
 --- @see C_PetJournal.PickupPet()
-L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
+L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, source, abp)
     local pm = ns:LC().MESSAGE:NewLogger(M.APIHooks)
     pm:d( function() return 'MSG::R: %s', msg end)
 

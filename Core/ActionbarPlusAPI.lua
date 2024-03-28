@@ -13,13 +13,13 @@ local TimeUtil = ns:K().Objects.TimeUtil
 local API, String = O.API, O.String
 local IsBlank = String.IsBlank
 
---- @alias ActionbarPlusAPI __ActionbarPlusAPI | __BaseActionBarController
---- @class __ActionbarPlusAPI : BaseLibraryObject
-local L = LibStub:NewLibrary(M.ActionbarPlusAPI); if not L then return end
-O.ActionBarHandlerMixin:Embed(L)
-local p = ns:LC().API:NewLogger(M.ActionbarPlusAPI)
+--- ActionbarPlusAPI is a Library used by other addOns like ActionbarPlus-M6
+local libName = M.ActionbarPlusAPI
+--- @class ActionbarPlusAPI
+local L = ns:NewController(libName)
+local p = ns:LC().API:NewLogger(libName)
 
---- @param o __ActionbarPlusAPI | ActionbarPlusAPI
+--- @param o ActionbarPlusAPI | ModuleV2
 local function PropertiesAndMethods(o)
 
     -- These fields are used for dependent addons like ActionbarPlus-M6
@@ -111,9 +111,12 @@ local function PropertiesAndMethods(o)
         end)
     end
 
+    --- This ABP_API is required by dependent addons like ActionbarPlus-M6
+    function o:OnAddOnReady()
+        local fn = function() return 'ABP_API is: %s', tostring(ABP_API) end
+        if not ABP_API then return p:e(fn) end
+        p:d(fn)
+    end
+
 end
-PropertiesAndMethods(L)
-
-ABP_API = L
-
-
+PropertiesAndMethods(L); ABP_API = L

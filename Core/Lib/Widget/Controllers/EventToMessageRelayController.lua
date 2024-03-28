@@ -8,11 +8,11 @@ local libName = ns.M.EventToMessageRelayController
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class EventToMessageRelayController : BaseActionBarController
-local L = ns:NewActionBarController(libName)
+--- @class EventToMessageRelayController
+local L = ns:NewLib(libName)
 local p = ns:CreateDefaultLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
-
+local pt = ns:LC().MESSAGE_TRACE:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
@@ -22,7 +22,7 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFra
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o EventToMessageRelayController
+--- @param o EventToMessageRelayController | ModuleV2
 local function PropsAndMethods(o)
 
     function o:OnLoad(frame, event, ...)
@@ -42,7 +42,7 @@ local function PropsAndMethods(o)
 
     --- @param event string
     function o:OnMessageTransmitter(event, ...)
-        pm:f3(function() return "Relaying event[%s] to message[%s]", event, GC.toMsg(event) end)
+        pt:t(function() return "Relaying event[%s] to message[%s]", event, GC.toMsg(event) end)
         self:SendAddOnMessage(event, ns.name, ...)
     end
 
@@ -51,6 +51,6 @@ end; PropsAndMethods(L)
 --[[-----------------------------------------------------------------------------
 Frame Event Handlers: ABP_EventToMessageRelayControllerFrame
 -------------------------------------------------------------------------------]]
----@param frame _Frame
+--- @param frame Frame
 function ns.H.EventToMessageRelayController_OnLoad(frame) L:OnLoad(frame) end
 

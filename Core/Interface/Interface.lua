@@ -228,16 +228,6 @@ local SpellcastSent_Data = {
 }
 
 --[[-----------------------------------------------------------------------------
-Type: Settings
--------------------------------------------------------------------------------]]
---- @class Settings : BaseLibraryObject_Initialized_WithAceEvent A settings class for addon configuration and event handling.
---- @field addon ActionbarPlus The associated addon instance.
---- @field profile Profile The user profile for settings and preferences.
---- @field eventHandler SettingsEventHandlerMixin Handles addon events.
---- @field maxRows Index Maximum number of rows for UI elements.
---- @field maxCols Index Maximum number of columns for UI elements.
-
---[[-----------------------------------------------------------------------------
 Type: ActionbarInitialSettings
 -------------------------------------------------------------------------------]]
 --- @class ActionbarInitialSettings Initial configuration settings for action bar layouts and behaviors.

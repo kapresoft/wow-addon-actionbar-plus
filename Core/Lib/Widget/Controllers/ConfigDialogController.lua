@@ -9,18 +9,21 @@ local libName = ns.M.ConfigDialogController
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class ConfigDialogController : BaseActionBarController
-local L = ns:NewActionBarController(libName, O.DruidUnitMixin)
+--- @class ConfigDialogController
+local L = ns:NewLib(libName, O.DruidUnitMixin)
 local p = ns:CreateDefaultLogger(libName)
 local pt = ns:LC().TRACE:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ConfigDialogController
+---@param o ConfigDialogController | ModuleV2
 local function PropsAndMethods(o)
 
-    function o:OnAddonReady()
+    --- @private
+    --- This is called automatically
+    --- @see ModuleV2Mixin#Init
+    function o:OnAddOnReady()
         if ns.ConfigDialogControllerEventFrame then
             pt:f1('ConfigDialogControllerEventFrame already initialized...')
             return;
@@ -28,6 +31,7 @@ local function PropsAndMethods(o)
         self:CreateDialogEventFrame()
     end
 
+    --- @private
     function o:CreateDialogEventFrame()
         pt:f1(function() return 'CreateDialogEventFrame called with ConfigDialogControllerEventFrame: %s', type(ns.ConfigDialogControllerEventFrame) end)
         local frameName = ns.sformat("%s_%sEventFrame", ns.name, libName)
@@ -41,8 +45,6 @@ local function PropsAndMethods(o)
         ns.ConfigDialogControllerEventFrame = f
         RegisterStateDriver(f, "visibility", "[combat]hide;show")
     end
-
-    L:RegisterMessage(MS.OnAddOnReady, function() o:OnAddonReady()  end)
 
 end; PropsAndMethods(L)
 

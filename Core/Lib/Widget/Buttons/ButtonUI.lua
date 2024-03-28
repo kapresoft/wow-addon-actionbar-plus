@@ -40,9 +40,14 @@ Scripts
 --- - https://wowpedia.fandom.com/wiki/CVar_ActionButtonUseKeyDown
 --- - https://www.wowinterface.com/forums/showthread.php?t=58768
 --- @param widget ButtonUIWidget
+--- @param event string | "'AnyUp'" | "'AnyDown'" | "'PreClick'" | "'PostClick'"
 --- @param down boolean true if the press is KeyDown
+--- @param key string Which key was pressed, i.e. "LeftMouseButton"
 --- @see ActionbarPlusEventMixin#OnSetCVarEvents
-local function RegisterForClicks(widget, event, down)
+local function RegisterForClicks(widget, event, down, key)
+    if widget:IsEmpty() then return end
+    p:f3(function()
+        return 'event=%s down=%s key=%s btn=%s :: RegisterForClicks()', event, down, key, widget:GN() end)
     local btn = widget.button()
 
     local isLockActionBars = BaseAPI:IsLockedActionBarsInGameOptions()
@@ -76,18 +81,23 @@ end
 --- @param key string The key clicked
 --- @param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
-    local w = btn.widget
-    w:SendMessage(GC.M.OnButtonPreClick, w)
+    local w = btn.widget; if w:IsEmpty() then return end
+
+    w:SendMessage(GC.M.OnButtonPreClick, libName, w)
+
     if w:IsCompanion() then
         -- WOTLK and below uses 'companion'
-        w:SendMessage(GC.M.OnButtonClickCompanion, w)
+        w:SendMessage(GC.M.OnButtonClickCompanion, libName, w)
         return
     elseif w:IsBattlePet() and C_PetJournal then
         -- Retail uses 'battlepet' for both battlepet and companions
-        w:SendMessage(GC.M.OnButtonClickBattlePet, w)
+        w:SendMessage(GC.M.OnButtonClickBattlePet, libName, w)
         return
     elseif w:IsEquipmentSet() then
         w:SendMessage(GC.M.OnButtonClickEquipmentSet, libName, w)
+        return
+    elseif w:IsNewLeatherWorkingSpell() then
+        w:SendMessage(GC.M.OnButtonClickLeatherworking, libName, w)
         return
     else
         w:UpdateRangeIndicator()
@@ -95,14 +105,15 @@ local function OnPreClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
-    RegisterForClicks(w, 'PreClick', down)
+    RegisterForClicks(w, 'PreClick', down, key)
 end
 
 --- @param btn ButtonUI
 --- @param key string The key clicked
 --- @param down boolean true if the press is KeyDown
 local function OnPostClick(btn, key, down)
-    local w = btn.widget
+    local w = btn.widget; if w:IsEmpty() then return end
+
     w:SendMessage(GC.M.OnButtonPostClick, w)
 
     ---@param handlerFn ButtonHandlerFunction
@@ -111,7 +122,7 @@ local function OnPostClick(btn, key, down)
 
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
-    RegisterForClicks(w, 'PreClick', down)
+    RegisterForClicks(w, 'PostClick', down, key)
 end
 
 --- @param btnUI ButtonUI
@@ -161,10 +172,10 @@ local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
 --- @param widget ButtonUIWidget
 --- @param event string
---- @param mouseButtonPressed string LMOUSECLICK, etc...
+--- @param key string LSHIFT, etc...
 --- @param down boolean 1 or true if the press is KeyDown
-local function OnModifierStateChanged(widget, event, mouseButtonPressed, down)
-    RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down)
+local function OnModifierStateChanged(widget, event, key, down)
+    RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down, key)
     if widget:IsMacro() then if down == 1 then widget:UpdateMacroState() end end
 end
 
