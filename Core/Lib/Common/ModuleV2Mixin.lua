@@ -52,7 +52,7 @@ local function CreateTraceFn(logger, callback, isBucket)
         fn = function(msg, source, ...)
             local a = safeArgs(...)
             if type(source) == 'table' then source = tostring(source) end
-            logger:f3(function() return prefix .. "[%s] src=%s args=%s", msg, source, a end)
+            logger:i(function() return prefix .. "[%s] src=%s args=%s", msg, source, a end)
             callback(msg, source, ...)
         end
     end
@@ -97,6 +97,13 @@ local function PropsAndMethods(o)
     --- @param callback MessageCallbackFn | "function() print('Called...') end"
     function o:RegisterAddOnMessage(fromEvent, callback)
         self:RegisterMessage(GC.toMsg(fromEvent), CreateTraceFn(self.pm, callback))
+    end
+
+    --- @param fromEvent Name The event name from GC.E enum
+    --- @param interval number The Bucket interval (burst interval)
+    --- @param callbackFn HandlerFnNoArg|string The callback function, either as a function reference, or a string pointing to a method of the addon object.
+    function o:RegisterBucketAddOnMessage(fromEvent, interval, callbackFn)
+        self:RegisterBucketMessage(GC.toMsg(fromEvent), interval, callbackFn)
     end
 
     --- @param event Name Use the GlobalConstant.E event names

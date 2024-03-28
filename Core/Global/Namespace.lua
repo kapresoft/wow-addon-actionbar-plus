@@ -129,48 +129,6 @@ local function CreateTraceFn(ns, logger, callback)
     end
     return fn
 end
---[[-----------------------------------------------------------------------------
-Type: LibPackMixin
--------------------------------------------------------------------------------]]
---- @class LibPackMixin
---- @field O GlobalObjects
---- @field name Name The addon name
-local LibPackMixin = { };
-
---- @param o LibPackMixin
-local function LibPackMixinMethods(o)
-
-    --- Create a new instance of AceEvent or embed to an obj if passed
-    --- @return AceEvent
-    --- @param libName Name
-    function o:AceEventWithTrace(libName)
-        assert(libName, "libName is required.")
-        local pm = self:LC().MESSAGE_TRACE:NewLogger(libName)
-        local o2 = self.O.AceLibrary.AceEvent:Embed({})
-        local _RegisterMessage = o2.RegisterMessage
-
-        --- @param msg string The message name
-        --- @param callbackFn fun(self:any, ...)|string The callback function name or function(self,...) in the instance of this object
-        function o2:RegisterMessage(msg, callbackFn)
-            _RegisterMessage(o2, msg, CreateTraceFn(kns, pm, callbackFn))
-        end
-        return o2
-    end
-
-    --- Create a new instance of AceEvent or embed to an obj if passed
-    --- @return AceEvent
-    --- @param obj|nil The object to embed or nil
-    function o:AceEvent(obj) return self.O.AceLibrary.AceEvent:Embed(obj or {}) end
-
-    --- Create a new instance of AceBucket or embed to an obj if passed
-    --- @return AceBucket
-    --- @param obj|nil The object to embed or nil
-    function o:AceBucket(obj) return self.LibStubAce('AceBucket-3.0'):Embed(obj or {}) end
-
-    --- @return AceLocale
-    function o:AceLocale() return LibStub("AceLocale-3.0"):GetLocale(self.name, true) end
-
-end; LibPackMixinMethods(LibPackMixin)
 
 --- @class __GameVersionMixin
 local GameVersionMixin = {}
@@ -243,13 +201,13 @@ Namespace: Create
 --- @field gameVersion GameVersion
 
 --- @alias GameVersion string | "'classic'" | "'tbc_classic'" | "'wotlk_classic'" | "'retail'"
---- @alias Namespace __Namespace | __NamespaceOther | __GameVersionMixin | __NamespaceLoggerMixin
+--- @alias Namespace __Namespace | __NamespaceOther | AceLibraryMixin | __GameVersionMixin | __NamespaceLoggerMixin
 
 --- @return Namespace
 local function CreateNamespace(...)
     --- @type string
     local addon
-    --- @class __Namespace : LibPackMixin
+    --- @class __Namespace : AceLibraryMixin
     --- @field gameVersion GameVersion
     --- @field GC GlobalConstants
     --- @field LibStub LocalLibStub
@@ -290,7 +248,7 @@ local function CreateNamespace(...)
     --- script handlers
     ns.xml = {}
 
-    ns:K():Mixin(ns, LibPackMixin, GameVersionMixin, NamespaceLoggerMixin)
+    ns:K():Mixin(ns, ns.O.AceLibraryMixin, GameVersionMixin, NamespaceLoggerMixin)
 
     --- Enable this flag to trace messages
     ns.enableEventTrace = ns.enableEventTrace or false

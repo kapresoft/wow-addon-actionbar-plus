@@ -98,6 +98,7 @@ local M = {
 --- @field M6Support M6Support
 --- @field AceLibFactory AceLibFactory Deprecated, Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
 --- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
+--- @field AceLibraryMixin AceLibraryMixin
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin
 --- @field ActionbarPlusAPI ActionbarPlusAPI
 --- @field ActionbarPlusEventMixin ActionbarPlusEventMixin

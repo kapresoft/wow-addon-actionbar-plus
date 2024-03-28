@@ -24,11 +24,12 @@ local function PropsAndMethods(o)
     local function extAPI() return O.ActionbarPlusAPI  end
 
     --- @private
-    function o:RegisterMessageCallbacks()
-        self:RegisterAddOnMessage(E.BAG_UPDATE, function(evt, source) self:OnBagUpdate(evt, source) end)
+    function o:OnAddOnReady()
+        self:RegisterBucketAddOnMessage(E.BAG_UPDATE, 0.1,
+                function(evt, source) self:OnBagUpdate(evt, source) end)
     end
 
-    -- Update Items and Macros referencing items
+    --- Update Items and Macros referencing items
     function o:OnBagUpdate(evt)
         pb:f3( function() return 'OnBagU(): called...' end)
         self:ForEachItemButton(function(bw)
@@ -41,8 +42,6 @@ local function PropsAndMethods(o)
         local function CallbackFn(handlerFn) extAPI():UpdateM6Macros(handlerFn) end
         self:SendMessage(MSG.OnBagUpdateExt, libName, CallbackFn)
     end
-
-    o:RegisterMessageCallbacks()
 
 end; PropsAndMethods(L)
 
