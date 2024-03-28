@@ -161,8 +161,6 @@ local methods = {
     --- @param self ActionbarPlus
     ['InitDbDefaults'] = function(self)
         self:InitDefaultProfile()
-        -- TODO next: remove self.profile in favor of ns.p()
-        self.profile = self.db.profile
     end,
     --- @see ActionbarPlusEventMixin
     ['RetrieveKeyBindingsMap'] = function(self)

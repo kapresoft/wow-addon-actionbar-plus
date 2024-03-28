@@ -262,14 +262,6 @@ local function CreateNamespace(...)
         --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
         o.H = {}
 
-        --- @return Profile_Config
-        function o.p() return ns.db.profile end
-
-        ----- @return BooleanOptional
-        --function o:IsLoggingEnabled() return true == ns.O.GlobalConstants.F.ENABLE_LOGGING end
-        ----- @return BooleanOptional
-        --function o:IsLoggingDisabled() return true ~= ns.O.GlobalConstants.F.ENABLE_LOGGING end
-
         --- @return CursorUtil
         --- @param cursorInfo CursorInfo Optional cursorInfo instance
         function o:CreateCursorUtil(cursorInfo)
