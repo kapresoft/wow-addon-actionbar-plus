@@ -201,7 +201,7 @@ function P:ResetButtonConfig(bw) P:GetBar(bw.frameIndex).buttons[bw:GetName()] =
 function P:RetrieveBar(frameIndex)
     assert(frameIndex, "RetrieveBar: frameIndex is required.")
     local frameName = GC:GetFrameName(frameIndex)
-    local profile = ns.p()
+    local profile = ns.db.profile
     local bar = profile.bars[frameName]
     barProfiles[frameIndex] = bar
     return bar
