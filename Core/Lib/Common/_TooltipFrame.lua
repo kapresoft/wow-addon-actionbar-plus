@@ -20,10 +20,10 @@ Type: TooltipFrameHandlerWidget
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class TooltipFrameHandler : BaseLibraryObject_WithAceEvent
---- @field widget TooltipFrameHandlerWidget
-local L = ns:AceEvent()
 local libName = 'TooltipFrameHandler'
+--- @class TooltipFrameHandler
+--- @field widget TooltipFrameHandlerWidget
+local L = ns:NewLib(libName)
 local p = ns:CreateDefaultLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
 
@@ -43,11 +43,11 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o TooltipFrameHandler
+--- @param o TooltipFrameHandler | ModuleV2
 local function MethodsAndProperties(o)
 
     --- @see Config
-    o:RegisterMessage(MSG.OnTooltipFrameUpdate, function(msg, ...)
+    o:RegisterMessage(MSG.OnTooltipFrameUpdate, function(msg, source, ...)
         OnTooltipFrameUpdate(msg, o, ...)
     end)
 
@@ -58,8 +58,7 @@ local function MethodsAndProperties(o)
         if not self.widget.frame then return end
         self.widget.frame:SetSize(1, 1)
 
-        self:RegisterMessage(MSG.OnAddOnEnabled, function(msg, ...)
-            pm:d(function() return 'MSG::R: %s', msg end)
+        self:RegisterMessage(MSG.OnAddOnEnabled, function(msg, source, ...)
             local names = GC.Profile_Config_Names
             local anchorType = ns.db.profile[names.tooltip_anchor_type] or GC.TooltipAnchor.CURSOR_TOPLEFT
             self:UpdateTooltipAnchor(anchorType)

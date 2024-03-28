@@ -80,6 +80,7 @@ local M = {
     MountAttributeSetter = '',
     MountDragEventHandler = '',
     PickupHandler = '',
+    ProfessionController = '',
     Profile = '',
     ProfileInitializer = '',
     ReceiveDragEventHandler = '',
@@ -105,6 +106,7 @@ local M = {
 --- @field Assert Kapresoft_LibUtil_Assert
 --- @field BagController BagController
 --- @field BaseAPI BaseAPI
+--- @field ModuleV2Mixin ModuleV2Mixin
 --- @field BaseAttributeSetter BaseAttributeSetter
 --- @field BattlePetAttributeSetter BattlePetAttributeSetter
 --- @field BattlePetDragEventHandler BattlePetDragEventHandler
@@ -142,6 +144,7 @@ local M = {
 --- @field MountDragEventHandler MountDragEventHandler
 --- @field PickupHandler PickupHandler
 --- @field PriestUnitMixin PriestUnitMixin
+--- @field ProfessionController ProfessionController
 --- @field Profile Profile
 --- @field ProfileInitializer ProfileInitializer
 --- @field ReceiveDragEventHandler ReceiveDragEventHandler

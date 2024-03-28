@@ -1,4 +1,9 @@
 --[[-----------------------------------------------------------------------------
+Alias
+-------------------------------------------------------------------------------]]
+--- @alias AddOnEvents  AceEvent | AceHook | AceConsole
+
+--[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
 local unpack = unpack
@@ -21,7 +26,7 @@ local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
 local AO = O.AceLibFactory:A()
 local GCC, M = GC.C, GC.M
 
-local String, Table, LogFactory = O.String, O.Table, O.LogFactory
+local String, Table = O.String, O.Table
 local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
 local IsBlank, IsAnyOf = String.IsBlank, String.IsAnyOf
 local MX, WMX, BF = O.Mixin, O.WidgetMixin, O.ButtonFactory
@@ -44,7 +49,7 @@ local function OnPlayerEnteringWorld(frame, event, ...)
         p:d(function() return "OnPlayerEnteringWorld(): Calling ShowActionbarsDelayed..." end)
     end
     p:d(function() return "OnPlayerEnteringWorld(): Sending message [%s]", M.OnAddOnReady end)
-    frame.ctx.addon:SendMessage(M.OnAddOnReady)
+    frame.ctx.addon:SendMessage(M.OnAddOnReady, ns.name)
 
     --@debug@
     isLogin = true
@@ -73,6 +78,12 @@ local function RegisterEvents(addon)
     return frame
 end
 
+--- @return boolean
+local function isConfigHidden()
+    local fw = AceConfigDialog.OpenFrames[ns.name]; if not fw then return true end
+    --- @type Frame
+    local f = fw.frame; return f:IsVisible() ~= true
+end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -88,11 +99,6 @@ local methods = {
     ['RegisterSlashCommands'] = function(self)
         self:RegisterChatCommand(GCC.CONSOLE_COMMAND_NAME, "SlashCommands")
         self:RegisterChatCommand(GCC.CONSOLE_COMMAND_SHORT, "SlashCommands")
-    end,
-    --- @param self ActionbarPlus
-    ['RegisterHooks'] = function(self)
-        local f = SettingsPanel or InterfaceOptionsFrame
-        if f then self:HookScript(f, 'OnHide', 'OnHide_Config_WithoutSound') end
     end,
     --- @param self ActionbarPlus
     --- @param spaceSeparatedArgs string
@@ -131,36 +137,7 @@ local methods = {
         end
         WMX:ShowReloadUIConfirmation()
     end,
-    --- @param self ActionbarPlus
-    ['OpenConfig'] = function(self, sourceFrameWidget)
-        --select the frame config tab if possible
-        local optionsConfigPath
-        if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
-            optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
-        end
-        if optionsConfigPath ~= nil then
-            AceConfigDialog:SelectGroup(ns.name, optionsConfigPath)
-        end
-        AceConfigDialog:Open(ns.name, self.configFrame)
-        self.onHideHooked = self.onHideHooked or false
-        self.configDialogWidget = AceConfigDialog.OpenFrames[ns.name]
 
-        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
-        if not self.onHideHooked then
-            self:HookScript(self.configDialogWidget.frame, 'OnHide', 'OnHide_Config_WithSound')
-            self.onHideHooked = true
-        end
-    end,
-    --- @param self ActionbarPlus
-    ['OnHide_Config_WithSound'] = function(self) self:OnHide_Config(true) end,
-    --- @param self ActionbarPlus
-    ['OnHide_Config_WithoutSound'] = function(self) self:OnHide_Config() end,
-    --- @param self ActionbarPlus
-    ['OnHide_Config'] = function(self, enableSound)
-        enableSound = enableSound or false
-        p:d(function() return 'OnHide_Config called with enableSound=%s', tostring(enableSound) end)
-        if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
-    end,
     --- @param self ActionbarPlus
     ['InitializeDb'] = function(self)
         -- Set up our database
@@ -171,7 +148,7 @@ local methods = {
         self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
         self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
         self:InitDbDefaults()
-        self:SendMessage(M.OnDBInitialized, self)
+        self:SendMessage(M.OnDBInitialized, ns.name)
     end,
 
     --- @param self ActionbarPlus
@@ -197,18 +174,18 @@ local methods = {
     end,
 
 }
----@param o ActionbarPlus
+--- @param o ActionbarPlus | AddOnEvents
 local function AdditionalMethods(o)
 
     --- This is called automatically by Ace
     function o:OnInitialize()
         self:InitializeDb()
         self:RegisterSlashCommands()
-        self:SendMessage(M.OnAddOnInitialized, self)
+        self:SendMessage(M.OnAddOnInitialized, ns.name)
 
         if ns.features.enableV2 ~= true then return end
         p:d(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
-        self:SendMessage(M.OnAddOnInitializedV2)
+        self:SendMessage(M.OnAddOnInitializedV2, ns.name)
         p:d(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
     end
 
@@ -216,18 +193,24 @@ local function AdditionalMethods(o)
     --- Called during the PLAYER_LOGIN
     --- #### See Also: [Ace-addon-3-0](https://www.wowace.com/projects/ace3/pages/api/ace-addon-3-0)
     function o:OnEnable()
-    -- Do more initialization here, that really enables the use of your addon.
-    -- Register Events, Hook functions, Create Frames, Get information from
-    -- the game that wasn't available in OnInitialize
-    self:RegisterHooks()
-    self:SendMessage(M.OnAddOnEnabled, self)
-    if ns.features.enableV2 ~= true then return end
+        -- Do more initialization here, that really enables the use of your addon.
+        -- Register Events, Hook functions, Create Frames, Get information from
+        -- the game that wasn't available in OnInitialize
+        self:RegisterHooks()
+        self:SendMessage(M.OnAddOnEnabled, ns.name, self)
+        if ns.features.enableV2 ~= true then return end
 
-    self:SendMessage(M.OnAddOnEnabledV2)
-    p:d('OnEnable():MSG:OnAddOnEnabledV2 Sent')
+        self:SendMessage(M.OnAddOnEnabledV2, ns.name, self)
+        p:d('OnEnable():MSG:OnAddOnEnabledV2 Sent')
     end
 
     function o:OnProfileChanged() self:ConfirmReloadUI() end
+
+    --- This is for AceConfigDialog.BlizOptions[appName]
+    function o:RegisterHooks()
+        local f = SettingsPanel or InterfaceOptionsFrame
+        if f then self:HookScript(f, 'OnHide', 'OnHideBlizzardOptions') end
+    end
 
     --- @vararg any
     function o:SmartMount(...)
@@ -236,6 +219,80 @@ local function AdditionalMethods(o)
         if 'string' == type(flying) and 'string' == type(ground) then
             O.API:SummonMountSimple(flying, ground)
         end
+    end
+
+    --- @param spaceSeparatedArgs string
+    function o:SlashCommand_Info_Handler(spaceSeparatedArgs)
+        pd:vv(GC:GetAddonInfoFormatted())
+    end
+
+    function o:ConfirmReloadUI()
+        if IsShiftKeyDown() then ReloadUI(); return end
+        WMX:ShowReloadUIConfirmation()
+    end
+
+    function o:OpenConfig(sourceFrameWidget)
+        --select the frame config tab if possible
+        local optionsConfigPath
+        if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
+            optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
+        else optionsConfigPath = 'general' end
+
+        AceConfigDialog:SelectGroup(ns.name, optionsConfigPath)
+        local hidden = isConfigHidden()
+        if hidden == true then
+            self:DialogGlitchHack(optionsConfigPath)
+            AceConfigDialog:Open(ns.name, self.configFrame)
+            PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
+        end
+
+        self.onHideHooked = self.onHideHooked == true or false
+
+        self.configDialogWidget = AceConfigDialog.OpenFrames[ns.name]
+        if not self.configDialogWidget then return end
+        if self.onHideHooked == true then return end
+
+        --- @type Frame
+        local frame = self.configDialogWidget and self.configDialogWidget.frame
+        if frame and self.onHideHooked ~= true then
+            local success, msg = pcall(function()
+                self:HookScript(frame, 'OnHide', function()
+                    self:OnHide(frame, self.configDialogWidget:GetUserData('appName'))
+                    self.onHideHooked = true
+                end)
+            end)
+            if success ~= true then p:f3(function() return "onHideHookFailed: %s", msg end) end
+        end
+    end
+
+    --- Since AceConfigDialog caches the frames, we want to make sure the appName is this addOn
+    --- @param name Name The appName
+    --- @param frame Frame
+    function o:OnHide(frame, name)
+        if ns.name ~= name then return end
+        self:OnHideSettings(true)
+    end
+
+    function o:OnHideBlizzardOptions()
+        self:OnHideSettings(false)
+    end
+
+    --- @param enableSound boolean|nil
+    function o:OnHideSettings(enableSound)
+        enableSound = enableSound or false
+        p:d(function() return 'OnHideSettings[%s] sound=%s', ns.name, enableSound end)
+        if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
+    end
+
+    --- This hacks solves the range UI notch not positioning properly
+    function o:DialogGlitchHack(group)
+        local sgroup = group or 'general'
+        AceConfigDialog:SelectGroup(ns.name, "debugging")
+        AceConfigDialog:Open(ns.name)
+        C_Timer.After(0.01, function()
+            AceConfigDialog:ConfigTableChanged('anyEvent', ns.name)
+            AceConfigDialog:SelectGroup(ns.name, sgroup)
+        end)
     end
 end
 

@@ -9,6 +9,8 @@
 ## LoadManagers: AddonLoader
 ## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-64xe.tga
 
+## OptionalDeps: Blizzard_Professions
+
 ## X-Min-Interface: 90200
 ## X-LoadOn-Always: delayed
 ## X-Credits: kapresoft@gmail.com
@@ -39,6 +41,10 @@
 
 # To get the Interface/Build Info.
 # /dump select(4, GetBuildInfo())
+
+#@do-not-package@
+Core\Lib\Developer\_GlobalDeveloper.xml
+#@end-do-not-package@
 
 Core\_Core.xml
 #@do-not-package@

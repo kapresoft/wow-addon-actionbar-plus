@@ -432,6 +432,6 @@ function P:GetTooltipAnchorTypeKey() return TooltipAnchorTypeKey end
 --[[-----------------------------------------------------------------------------
 Listen to Message
 -------------------------------------------------------------------------------]]
-P:RegisterMessage(GC.M.OnDBInitialized, function(msg)
+P:RegisterMessage(GC.M.OnDBInitialized, function(msg, source)
     P.profile = ns.db.profile
 end)

@@ -32,16 +32,18 @@ local pushedTextureInUseAlpha = 0.5
 local nonEmptySlotAlpha = 1.0
 local showEmptyGridAlpha = 0.6
 local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
-
+local PC = function() return O.ProfessionController end
 --[[-----------------------------------------------------------------------------
 New Instance
 self: widget
 button: widget.button
 -------------------------------------------------------------------------------]]
+local libName = M.ButtonMixin
 --- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
 --- @see ButtonUIWidget
-local L = LibStub:NewLibrary(M.ButtonMixin); if not L then return end; AceEvent:Embed(L)
-local p = ns:LC().BUTTON:NewLogger(M.ButtonMixin)
+local L = LibStub:NewLibrary(libName); if not L then return end; AceEvent:Embed(L)
+local p = ns:LC().BUTTON:NewLogger(libName)
+local pi = ns:LC().ITEM:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Instance Methods
@@ -530,6 +532,8 @@ local function PropsAndMethods(o)
         return d and d.runeSpell and (d.runeSpell.id ~= nil)
     end
 
+    function o:IsNewLeatherWorkingSpell() return PC():IsNewLeatherWorkingSpell(self:GetEffectiveSpell()) end
+
     function o:UpdateItemOrMacroState()
         if self:IsItem() then self:UpdateItemState(); return end
         self:UpdateMacroState()
@@ -557,13 +561,14 @@ local function PropsAndMethods(o)
         self:SetText('')
         if not itemInfo then return nil end
 
-        local itemID = itemInfo.id
-        if itemInfo == nil then return end
+        local itemID = itemInfo and itemInfo.name and itemInfo.id
+        if itemID == nil then return end
         if API:IsToyItem(itemID) then self:SetActionUsable(true); return end
 
         local stackCount = itemInfo.stackCount or 1
         local count = itemInfo.count
-        -- health stones, mana gems/emeralds
+        -- chargeCount: health stones, mana gems/emeralds
+        -- stackCount: How many you can stack in bags, i.e. water x 20
         local chargeCount = GetItemCount(itemInfo.name, false, true, false)
         if chargeCount > 1 then
             stackCount = chargeCount
@@ -574,6 +579,8 @@ local function PropsAndMethods(o)
             self:SetText('')
             self:SetActionUsable(false)
         end
+        pi:d(function() return "Item[%s] count=%s chargeCount=%s stackCount=%s details=%s",
+                   itemInfo.name, count, chargeCount, stackCount, itemInfo end)
     end
 
     function o:UpdateUsable()

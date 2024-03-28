@@ -43,7 +43,7 @@ local function PropsAndMethods(o)
     --- @return UnitMixin
     function o:New(obj)
         obj = obj or {}
-        return ns:K():Mixin(obj, self)
+        return ns:K():Mixin(obj, o)
     end
     function o:Embed(obj) return self:New(obj) end
 

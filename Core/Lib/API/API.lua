@@ -33,7 +33,7 @@ local NIGHT_ELF_SHADOWMELD_SPELL_ID = 20580
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class API
-local S = {}; ns:Register(ns.M.API, S)
+local S = ns:NewLibStd(ns.M.API)
 local p = ns:CreateDefaultLogger(ns.M.API)
 --[[-----------------------------------------------------------------------------
 Mixins
@@ -105,7 +105,6 @@ function S:IsAddOnEnabled(indexOrName)
     local charName = self:GetCurrentPlayer()
     if not C_AddOns_GetAddOnEnableState then return self:IsAddOnEnabledLegacy(indexOrName, charName) end
     local intVal = C_AddOns_GetAddOnEnableState(indexOrName, charName)
-    p:d(function() return 'AddOn[%s] is enabled: %s', indexOrName, tostring(intVal == 2) end)
     return intVal == 2
 end
 

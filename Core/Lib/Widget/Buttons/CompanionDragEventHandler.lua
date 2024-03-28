@@ -130,7 +130,7 @@ end
 
 --- @param evt string
 --- @param w ButtonUIWidget
-local function OnClick(evt, w, ...)
+local function OnClick(evt, source, w, ...)
     if InCombatLockdown() then return end
     local conf = w:conf()
     local petID = conf and conf.companion and IsNotBlank(conf.companion.petID) and conf.companion.petID

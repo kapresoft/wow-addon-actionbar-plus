@@ -8,6 +8,7 @@
     <Script file="ConfigDialogController.lua"/>
     <Script file="BagController.lua"/>
     <Script file="EquipmentSetController.lua"/>
+    <Script file="ProfessionController.lua"/>
     <Script file="M6Support.lua"/>
 
     <Script file="ActionBarController.lua"/>

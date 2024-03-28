@@ -138,7 +138,7 @@ local function attributeSetterMethods(a)
         w:SetIcon(icon)
 
         if w:IsM6Macro(macroInfo.name) then
-            self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, ns.name, function() return w, macroInfo.name end)
+            self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, M.MacroAttributeSetter, function() return w, macroInfo.name end)
         end
 
         C_Timer.NewTicker(0.01, function() w:UpdateMacroState() end, 2)
@@ -155,7 +155,7 @@ local function attributeSetterMethods(a)
         if w:IsInvalidMacro(macroInfo) then return end
 
         if w:IsM6Macro(macroInfo.name) then
-            self:SendMessage(GC.M.MacroAttributeSetter_OnShowTooltip, ns.name, function() return w, macroInfo.name end)
+            self:SendMessage(GC.M.MacroAttributeSetter_OnShowTooltip, M.MacroAttributeSetter, function() return w, macroInfo.name end)
             return
         end
 

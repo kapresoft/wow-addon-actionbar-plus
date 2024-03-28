@@ -54,42 +54,81 @@ Log Categories
 local LogCategories = {
     --- @type Kapresoft_LogCategory
     DEFAULT = 'DEFAULT',
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     ADDON = "AD",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     API = "AP",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     BAG = "BG",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     BUTTON = "BN",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     DEV = "DV",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     DRAG_AND_DROP = "DD",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     EVENT = "EV",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     EQUIPMENT = "EQ",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     FRAME = "FR",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     ITEM = "IT",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     MESSAGE = "MS",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
+    MESSAGE_TRACE = "MT",
+    --- @type Kapresoft_LogCategory
     MOUNT = "MT",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     PET = "PT",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     PROFILE = "PR",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     SPELL = "SP",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     TRACE = "TR",
-    --- @type LogCategory
+    --- @type Kapresoft_LogCategory
     UNIT = "UN",
 }
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- @param ns Namespace
+--- @return LocalLibStub
+local function NewLocalLibStub(ns)
+    --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
+    local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
+            function(name, newLibInstance) ns:Register(name, newLibInstance) end)
+    return LocalLibStub
+end
 
+local function safeArgs(...)
+    local a = {...}
+    for i, elem in ipairs(a) do
+        if type(elem) == "table" then
+            a[i] = tostring(elem)
+        end
+    end
+    return a
+end
+
+--- @param ns Namespace
+--- @param logger Kapresoft_CategoryLoggerMixin
+--- @param callback fun(msg:string, source:string, ...:any)
+local function CreateTraceFn(ns, logger, callback)
+    assert(callback, "callback function is required.")
+    local fn = callback
+    if ns.enableEventTrace == true then
+        fn = function(msg, source, ...)
+            local a = safeArgs(...)
+            if type(source) == 'table' then source = tostring(source) end
+            logger:t(function() return "MSG:R[%s] src=%s args=%s", msg, source, a end)
+            callback(msg, source, ...)
+        end
+    end
+    return fn
+end
 --[[-----------------------------------------------------------------------------
 Type: LibPackMixin
 -------------------------------------------------------------------------------]]
@@ -103,6 +142,23 @@ local function LibPackMixinMethods(o)
 
     --- Create a new instance of AceEvent or embed to an obj if passed
     --- @return AceEvent
+    --- @param libName Name
+    function o:AceEventWithTrace(libName)
+        assert(libName, "libName is required.")
+        local pm = self:LC().MESSAGE_TRACE:NewLogger(libName)
+        local o2 = self.O.AceLibrary.AceEvent:Embed({})
+        local _RegisterMessage = o2.RegisterMessage
+
+        --- @param msg string The message name
+        --- @param callbackFn fun(self:any, ...)|string The callback function name or function(self,...) in the instance of this object
+        function o2:RegisterMessage(msg, callbackFn)
+            _RegisterMessage(o2, msg, CreateTraceFn(kns, pm, callbackFn))
+        end
+        return o2
+    end
+
+    --- Create a new instance of AceEvent or embed to an obj if passed
+    --- @return AceEvent
     --- @param obj|nil The object to embed or nil
     function o:AceEvent(obj) return self.O.AceLibrary.AceEvent:Embed(obj or {}) end
 
@@ -111,6 +167,7 @@ local function LibPackMixinMethods(o)
     --- @param obj|nil The object to embed or nil
     function o:AceBucket(obj) return self.LibStubAce('AceBucket-3.0'):Embed(obj or {}) end
 
+    --- @return AceLocale
     function o:AceLocale() return LibStub("AceLocale-3.0"):GetLocale(self.name, true) end
 
 end; LibPackMixinMethods(LibPackMixin)
@@ -179,15 +236,9 @@ local function NamespaceLoggerMethods(o)
 
 end; NamespaceLoggerMethods(NamespaceLoggerMixin)
 
---- @param ns Namespace
---- @return LocalLibStub
-local function NewLocalLibStub(ns)
-    --- @class LocalLibStub : Kapresoft_LibUtil_LibStubMixin
-    local LocalLibStub = ns:K().Objects.LibStubMixin:New(ns.name, 1.0,
-            function(name, newLibInstance) ns:Register(name, newLibInstance) end)
-    return LocalLibStub
-end
-
+--[[-----------------------------------------------------------------------------
+Namespace: Create
+-------------------------------------------------------------------------------]]
 --- @class __NamespaceOther
 --- @field gameVersion GameVersion
 
@@ -211,6 +262,8 @@ local function CreateNamespace(...)
 
     --- @return Kapresoft_LibUtil
     function ns:K() return ns.Kapresoft_LibUtil end
+    --- @return Kapresoft_LibUtil_Objects
+    function ns:KO() return KO end
 
     --- this is in case we are testing outside of World of Warcraft
     addon = addon or GC.C.ADDON_NAME
@@ -238,6 +291,9 @@ local function CreateNamespace(...)
     ns.xml = {}
 
     ns:K():Mixin(ns, LibPackMixin, GameVersionMixin, NamespaceLoggerMixin)
+
+    --- Enable this flag to trace messages
+    ns.enableEventTrace = ns.enableEventTrace or false
 
     --- @param o __Namespace | Namespace
     local function Methods(o)
@@ -288,54 +344,36 @@ local function CreateNamespace(...)
         --- @param name string The module name
         --- @param obj any The object to register
         function o:Register(name, obj)
-            if not (name or obj) then return end
+            local nameAssertMsg = sformat('ns:Register(name, val): Library name is invalid. Expected type to be string but was: %s', type(name))
+            assert(type(name) == 'string' , nameAssertMsg)
+
+            local objAssertMsg = sformat('ns:Register(name, val): The library object value for [%s] is invalid. Expected table type but was [%s].',
+                    tostring(name), type(obj))
+            assert(type(obj) == 'table', objAssertMsg)
+
             ns.O[name] = obj
         end
 
-        --- Simple Library
+        --- Plain old library
         --- @return any The newly created library
-        function o:NewLib(libName, ...)
+        function o:NewLibStd(libName, ...)
             assert(libName, "LibName is required")
             local newLib = {}
             local len = select("#", ...)
             if len > 0 then newLib = self:K():Mixin({}, ...) end
             newLib.mt = { __tostring = function() return libName  end }
             setmetatable(newLib, newLib.mt)
-            self.O[libName] = newLib
+            self:Register(libName, newLib)
             return newLib
         end
 
-        --- @return any The newly created library with AceEvent
-        function o:NewLibWithEvent(libName, ...)
-            assert(libName, "LibName is required")
-            local newLib = self.O.AceLibrary.AceEvent:Embed({})
+        --- @param libName Name The library module name
+        --- @return ModuleV2
+        function o:NewLib(libName, ...) return self.O.ModuleV2Mixin:New(libName, ...) end
 
-            local len = select("#", ...)
-            if len > 0 then newLib = self:K():Mixin(newLib, ...) end
-
-            newLib.mt = { __tostring = function() return libName  end }
-            setmetatable(newLib, newLib.mt)
-            self.O[libName] = newLib
-            return newLib
-        end
-
-        --- @return BaseActionBarController The newly created library with AceEvent
-        function o:NewActionBarController(libName, ...)
-            local unpack = KO.Table.unpack
-            local args = mergeArgs(libName, self.O.ActionBarHandlerMixin, {...})
-            --- @alias BaseActionBarController | __BaseActionBarController | AceEvent
-            --- @class __BaseActionBarController : ActionBarHandlerMixin
-            local newLib = self:NewLibWithEvent(libName, unpack(args))
-
-            --- @param fromEvent Name Use the GlobalConstant.E event names
-            --- @param callback MessageCallbackFn | "function() print('Called...') end"
-            function newLib:RegisterAddOnMessage(fromEvent, callback) self:RegisterMessage(GC.toMsg(fromEvent), callback) end
-
-            --- @param event Name Use the GlobalConstant.E event names
-            function newLib:SendAddOnMessage(event, ...) self:SendMessage(GC.toMsg(event), ...) end
-
-            return newLib;
-        end
+        --- @param libName Name The library module name
+        --- @return ControllerV2
+        function o:NewController(libName, ...) return self.O.ModuleV2Mixin:New(libName, self.O.ActionBarHandlerMixin, ...) end
 
     end; Methods(ns)
 

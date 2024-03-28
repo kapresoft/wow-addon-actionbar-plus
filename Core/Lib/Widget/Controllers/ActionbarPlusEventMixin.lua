@@ -23,7 +23,7 @@ Interface
 -------------------------------------------------------------------------------]]
 local ABPI = function() return O.ActionbarPlusAPI  end
 
---- @class EventFrameInterface : _Frame
+--- @class EventFrameInterface : Frame
 local _EventFrame = {
     --- @type EventContext
     ctx = {}
@@ -54,7 +54,7 @@ local pu = ns:LC().UNIT:NewLogger(libName)
 
 --- @param msg string The message name
 --- @param abp ActionbarPlus
-L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, abp)
+L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, source, abp)
     abp.addonEvents:RegisterEvents()
 end)
 
@@ -153,7 +153,7 @@ function L:CreateEventFrame()
     return f
 end
 
---- @param eventFrame _Frame
+--- @param eventFrame Frame
 --- @return EventContext
 function L:CreateContext(eventFrame)
     local ctx = {

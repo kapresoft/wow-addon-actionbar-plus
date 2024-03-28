@@ -9,22 +9,19 @@ local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local PR, WMX, B = O.Profile, O.WidgetMixin, O.BaseAPI
 local Un = O.UnitMixin:New()
 
-local libName = M.ActionBarController
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local RegisterFrameForEvents, RegisterFrameForUnitEvents
         = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return ActionBarController, LoggerV2, Kapresoft_LibUtil_Safecall
-local function CreateLib()
-    --- @class __ActionBarController : BaseLibraryObject_WithAceEvent
-    local lib = ns:NewActionBarController(libName)
-    return lib, ns:CreateDefaultLogger(libName), ns:CreateSafecall(libName)
-end; local L, p, safecall = CreateLib()
-
+local libName = M.ActionBarController
+--- @class ActionBarController
+local L = ns:NewController(libName)
+local p = ns:CreateDefaultLogger(libName)
 local sp = LC.SPELL:NewLogger(libName)
 local bagL = LC.BAG:NewLogger(libName)
 local df = ns:CreateDefaultLogger(libName)
@@ -35,7 +32,7 @@ local pe = LC.EVENT:NewLogger(libName)
 Support Functions
 -------------------------------------------------------------------------------]]
 local ABPI = function() return O.ActionbarPlusAPI  end
-local addon = function() return ABP  end
+local addon = function() return ABP end
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -80,7 +77,7 @@ end
 local function OnPlayerSpellCastStart(event, ...)
     local spellCastEvent = B:ParseSpellCastEventArgs(...)
     L:ForEachMatchingSpellButton(spellCastEvent.spellID, function(bw)
-        sp:d(function()
+        sp:f1(function()
             local spellName, spellID = bw:GetEffectiveSpellName(), bw:GetEffectiveSpellID()
             return 'cast started: %s,id=%s [%s]', spellName, spellID, bw:GN()
         end)
@@ -95,7 +92,7 @@ end
 --- @param evt _SpellCastSentEventArguments
 local function OnPlayerSpellCastSent(evt)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:d(function() return 'cast sent: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        sp:f1(function() return 'cast sent: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
         bw:SetButtonStateNormal();
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -115,7 +112,7 @@ end
 local function OnSpellCastSucceeded(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:d(function() return 'cast succeeded: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        sp:f1(function() return 'cast succeeded: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
         bw:UpdateItemOrMacroState();
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
@@ -137,7 +134,7 @@ end
 local function OnPlayerSpellCastStop(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:d(function() return 'cast stopped: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        sp:f1(function() return 'cast stopped: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
         bw:ResetHighlight()
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -148,8 +145,9 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o __ActionBarController | ActionBarHandlerMixin
+---@param o ActionBarController | ControllerV2
 local function PropsAndMethods(o)
+
     ---@param evt string
     o[E.PLAYER_TARGET_CHANGED] = function(evt, ...)
         local t = UnitName('target') or 'NONE'

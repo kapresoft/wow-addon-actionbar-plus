@@ -38,6 +38,10 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
+#@do-not-package@
+Core\Lib\Developer\_GlobalDeveloper.xml
+#@end-do-not-package@
+
 Core\_Core.xml
 #@do-not-package@
 Core\Lib\Developer\_Developer.xml

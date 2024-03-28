@@ -326,6 +326,7 @@ local function GlobalConstantProperties(o)
         OnButtonClickBattlePet       = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet    = newMsg('OnButtonClickEquipmentSet'),
         OnButtonClickCompanion       = newMsg('OnButtonClickCompanion'),
+        OnButtonClickLeatherworking  = newMsg('OnButtonClickLeatherworking'),
         OnConfigInitialized          = newMsg('OnConfigInitialized'),
         OnDBInitialized              = newMsg('OnDBInitialized'),
         OnEquipmentSetDragComplete   = newMsg('OnEquipmentSetDragComplete'),
@@ -589,6 +590,7 @@ local function GlobalConstantProperties(o)
     o.UnitClass = UnitClass
     o.UnitClasses = UnitClasses
 
+    o.ch = kch
     o.newMsg = newMsg
     o.toMsg = toMsg
 end

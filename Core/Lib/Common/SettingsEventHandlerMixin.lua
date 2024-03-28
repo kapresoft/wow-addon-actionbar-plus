@@ -9,16 +9,23 @@ local IsNotBlank = O.String.IsNotBlank
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+local libName = M.SettingsEventHandlerMixin
 --- @class SettingsEventHandlerMixin : BaseLibraryObject_WithAceEvent
-local L = LibStub:NewLibrary(M.SettingsEventHandlerMixin); if not L then return end; ns:AceEvent(L)
-local p = ns:LC().EVENT:NewLogger(M.SettingsEventHandlerMixin)
+local L = LibStub:NewLibrary(libName); if not L then return end; ns:AceEvent(L)
+local p = ns:LC().EVENT:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 --- @param o SettingsEventHandlerMixin
 local function MethodsAndProperties(o)
-    function o:Init() self.profile = ns.db.profile end
+
+    function o:New() return ns:K():CreateAndInitFromMixin(o, ns.db.profile) end
+
+    --- @param profileConf Profile_Config
+    function o:Init(profileConf)
+        self.profile = profileConf
+    end
 
     --- Creates a callback function that sends a message after
     --- @param key string The profile key to update
@@ -29,7 +36,7 @@ local function MethodsAndProperties(o)
         return function(_, v)
             assert(type(key) == 'string', 'Profile config key should be a string')
             self.profile[key] = v or fallbackVal
-            if IsNotBlank(message) then self:SendMessage(message, key, self.profile[key]) end
+            if IsNotBlank(message) then self:SendMessage(message, libName, key, self.profile[key]) end
         end
     end
 end; MethodsAndProperties(L)

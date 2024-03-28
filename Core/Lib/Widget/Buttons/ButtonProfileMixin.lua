@@ -20,11 +20,11 @@ local IsBlankStr = String.IsBlank
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-
+local libName = M.ButtonProfileMixin
 --- @class ButtonProfileMixin : BaseLibraryObject
-local L = LibStub:NewLibrary(M.ButtonProfileMixin)
-local p = ns:LC().PROFILE:NewLogger(M.ButtonProfileMixin)
-
+local L = LibStub:NewLibrary(libName)
+local p = ns:LC().PROFILE:NewLogger(libName)
+local ps = ns:LC().SPELL:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -178,6 +178,8 @@ local function PropsAndMethods(o)
         return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
     end
 
+    -- TODO: replace with GetEffectiveSpell()
+    --- @deprecated
     --- @return SpellName|nil
     function o:GetEffectiveSpellName()
         local conf = self:conf()
@@ -214,6 +216,12 @@ local function PropsAndMethods(o)
         end
 
         return spellID
+    end
+
+    --- @return SpellInfoBasic
+    function o:GetEffectiveSpell()
+        local spID = self:GetEffectiveSpellID(); if not spID then return nil end
+        return API:GetSpellInfoBasic(spID)
     end
 
     function o:IsInvalidButtonData(o, key)

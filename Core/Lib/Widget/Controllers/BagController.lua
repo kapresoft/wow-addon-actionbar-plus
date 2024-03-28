@@ -1,4 +1,3 @@
---- @alias BagController __BagController | ActionBarHandlerMixin
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -11,15 +10,15 @@ local safecall = ns:CreateSafecall(libName)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class __BagController : BaseActionBarController
-local L = ns:NewActionBarController(libName)
+--- @class BagController
+local L = ns:NewController(libName)
 local p = ns:CreateDefaultLogger(libName)
 local pb = ns:LC().BAG:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o __BagController | BagController
+--- @param o BagController | ControllerV2
 local function PropsAndMethods(o)
 
     local function extAPI() return O.ActionbarPlusAPI  end
