@@ -25,7 +25,7 @@ local function PropsAndMethods(o)
 
     --- @private
     function o:OnAddOnReady()
-        self:RegisterBucketAddOnMessage(E.BAG_UPDATE, 0.1,
+        self:RegisterBucketAddOnMessage(E.BAG_UPDATE, 0.2,
                 function(evt, source) self:OnBagUpdate(evt, source) end)
     end
 

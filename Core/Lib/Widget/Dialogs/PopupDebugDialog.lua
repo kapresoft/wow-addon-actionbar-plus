@@ -12,8 +12,8 @@ local ns = select(2, ...)
 local O, LibStub = ns.O, ns.LibStub
 
 local Mixin, WMX = O.Mixin, O.WidgetMixin
-local AO = O.AceLibFactory:A()
-local AceGUI = AO.AceGUI
+local Ace = ns:KO().AceLibrary.O
+local AceGUI = Ace.AceGUI
 local LuaEvaluator = O.LuaEvaluator
 
 local libName = 'PopupDebugDialog'
