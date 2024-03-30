@@ -14,7 +14,7 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local E, Ace = GC.E, O.AceLibrary
 local AceGUI, AceHook = Ace.AceGUI, Ace.AceHook
-local A, P, PH, BaseAPI = O.Assert, O.Profile, O.PickupHandler, O.BaseAPI
+local A, PH, API = O.Assert, O.PickupHandler, O.API
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 
@@ -41,39 +41,27 @@ Scripts
 --- - https://www.wowinterface.com/forums/showthread.php?t=58768
 --- @param widget ButtonUIWidget
 --- @param event string | "'AnyUp'" | "'AnyDown'" | "'PreClick'" | "'PostClick'"
---- @param down boolean true if the press is KeyDown
+--- @param down boolean|number boolean, 1 or 0
 --- @param key string Which key was pressed, i.e. "LeftMouseButton"
 --- @see ActionbarPlusEventMixin#OnSetCVarEvents
 local function RegisterForClicks(widget, event, down, key)
     if widget:IsEmpty() then return end
-    p:f3(function()
-        return 'event=%s down=%s key=%s btn=%s :: RegisterForClicks()', event, down, key, widget:GN() end)
-    local btn = widget.button()
+    if down ~= nil then down = down == 1 or down == true end
 
-    local isLockActionBars = BaseAPI:IsLockedActionBarsInGameOptions()
-    if isLockActionBars == false then btn:RegisterForClicks('AnyUp'); return; end
+    API:SyncUseKeyDownActionButtonSettings()
+    widget:UseKeyDownForClicks()
 
-    local useKeyDown = BaseAPI:IsUseKeyDownActionButton()
-    if E.ON_LEAVE == event then
-        if useKeyDown then
-            btn:RegisterForClicks('AnyDown')
-        else
-            btn:RegisterForClicks('AnyUp')
-        end
-    elseif E.ON_ENTER == event then
-        if useKeyDown then
-            --- Note: Macro will not trigger on first click if Drag Key is used in 'mod:<key>' in macros
-            --- Macros should not use mod:<key> on the same drag key
-            btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-        else
-            btn:RegisterForClicks('AnyUp')
-        end
-    elseif E.MODIFIER_STATE_CHANGED == event or 'PreClick' == event or 'PostClick' == event then
-        if useKeyDown then
-            btn:RegisterForClicks(down and WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
-        else
-            btn:RegisterForClicks('AnyUp')
-        end
+    local useKeyDown = API:IsUseKeyDownActionButton()
+    local lockActionBars = API:IsLockActionBars()
+
+    p:f1(function()
+        return 'event=%s down=%s key=%s btn=%s lockAB=%s useKD=%s :: RegisterForClicksRetail()',
+        event, down, key, widget:GN(), lockActionBars, useKeyDown end)
+
+    --- This has to sync with Blizzard's ActionButton behavior
+    --- or else the click won't work
+    if lockActionBars ~= true or (WMX:IsDragKeyDown() == true) then
+        return widget:UseKeyUpForClicks()
     end
 end
 
@@ -105,6 +93,7 @@ local function OnPreClick(btn, key, down)
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
+
     RegisterForClicks(w, 'PreClick', down, key)
 end
 
@@ -120,9 +109,6 @@ local function OnPostClick(btn, key, down)
     local function CallbackFn(handlerFn) O.ActionbarPlusAPI:UpdateM6Macros(handlerFn) end
     w:SendMessage(GC.M.OnButtonPostClickExt, ns.M.ButtonUI, CallbackFn)
 
-    -- This prevents the button from being clicked
-    -- on sequential drag-and-drops (one after another)
-    RegisterForClicks(w, 'PostClick', down, key)
 end
 
 --- @param btnUI ButtonUI

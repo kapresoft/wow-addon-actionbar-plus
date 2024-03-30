@@ -51,9 +51,6 @@ function L:IsClassicEra() return select(4, GetBuildInfo()) <= 11500 end
 function L:IsTargetFriendlyToPlayer() return UnitIsFriend(UnitId.player, UnitId.target) end
 function L:IsTargetEnemyToPlayer() return UnitIsEnemy(UnitId.player, UnitId.target) end
 
-function L:IsLockedActionBarsInGameOptions() return GetCVarBool('lockActionBars') end
-function L:IsUseKeyDownActionButton() return GetCVarBool("ActionButtonUseKeyDown") end
-
 --- @param cursorInfo CursorInfo
 --- @return CompanionCursor
 function L:ToCompanionCursor(cursorInfo)
