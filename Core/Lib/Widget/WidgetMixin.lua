@@ -2,7 +2,6 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
-local GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown = GetModifiedClick, IsShiftKeyDown, IsAltKeyDown, IsControlKeyDown
 local UISpecialFrames, StaticPopup_Visible, StaticPopup_Show = UISpecialFrames, StaticPopup_Visible, StaticPopup_Show
 local StaticPopupDialogs, ReloadUI = StaticPopupDialogs, ReloadUI
 --[[-----------------------------------------------------------------------------
@@ -274,15 +273,9 @@ end
 
 -- 'NONE' if not specified
 function _L:IsDragKeyDown()
-    local isLockedActionBars = BaseAPI:IsLockedActionBarsInGameOptions()
+    local isLockedActionBars = O.API:IsLockActionBars()
     if isLockedActionBars ~= true then return true end
-
-    local pickupAction =  GetModifiedClick(GC.C.PICKUPACTION) or GC.C.SHIFT
-
-    local isDragKeyDown = pickupAction == GC.C.SHIFT and IsShiftKeyDown()
-            or pickupAction == GC.C.ALT and IsAltKeyDown()
-            or pickupAction == GC.C.CTRL and IsControlKeyDown()
-    return isDragKeyDown
+    return IsModifiedClick("PICKUPACTION") == true
 end
 
 function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)

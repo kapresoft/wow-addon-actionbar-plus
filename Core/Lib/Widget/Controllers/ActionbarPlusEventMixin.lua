@@ -130,10 +130,19 @@ end
 --- @param event string
 local function OnSetCVarEvents(f, event, ...)
     local varName, val = ...
-    if varName ~= 'lockActionBars' then return end
+    local lockAB = O.API.LOCK_ACTION_BARS
+    local keyDownVar = O.API.ACTION_BUTTON_USE_KEY_DOWN
+    if varName == keyDownVar or varName == lockAB then
+        pe:f3(function() return "OnSetCVarEvents(): %s=%s", varName, val end)
+    end
+    if varName ~= lockAB then return end
+
     local isLockedActionBarsInGameOptions = val == '1'
-    if isLockedActionBarsInGameOptions == true then SetCVar('ActionButtonUseKeyDown', 1); return end
-    SetCVar('ActionButtonUseKeyDown', 0)
+    if isLockedActionBarsInGameOptions == true then SetCVar(keyDownVar, 1)
+    else SetCVar(keyDownVar, 0) end
+    pe:d(function()
+        return 'The cvar [%s] is set to [%s] because cvar %s=%s',
+                keyDownVar, GetCVarBool(keyDownVar), lockAB, isLockedActionBarsInGameOptions end)
 end
 
 --[[-----------------------------------------------------------------------------

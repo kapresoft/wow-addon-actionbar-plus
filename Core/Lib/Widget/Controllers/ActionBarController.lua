@@ -1,4 +1,4 @@
---- @alias ActionBarController __ActionBarController | ActionBarHandlerMixin
+--- @alias ActionBarController __ActionBarController | ControllerV2
 
 --- @type Namespace
 local ns = select(2, ...)
@@ -19,8 +19,11 @@ local RegisterFrameForEvents, RegisterFrameForUnitEvents
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = M.ActionBarController
---- @class ActionBarController
-local L = ns:NewController(libName)
+--- @class __ActionBarController
+local LIB = ns:NewController(libName)
+--- @type ActionBarController
+local L = LIB
+
 local p = ns:CreateDefaultLogger(libName)
 local sp = LC.SPELL:NewLogger(libName)
 local bagL = LC.BAG:NewLogger(libName)
@@ -92,7 +95,10 @@ end
 --- @param evt _SpellCastSentEventArguments
 local function OnPlayerSpellCastSent(evt)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:f1(function() return 'cast sent: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        sp:f1(function()
+            local r = GetSpellSubtext(evt.spellID)
+            return 'cast sent: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
+        end)
         bw:SetButtonStateNormal();
     end)
     ---@param handlerFn ButtonHandlerFunction
@@ -112,7 +118,10 @@ end
 local function OnSpellCastSucceeded(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:f1(function() return 'cast succeeded: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
+        sp:f1(function()
+            local r = GetSpellSubtext(evt.spellID)
+            return 'cast succeeded: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
+        end)
         bw:UpdateItemOrMacroState();
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
@@ -145,7 +154,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o ActionBarController | ControllerV2
+---@param o __ActionBarController | ActionBarController
 local function PropsAndMethods(o)
 
     ---@param evt string
@@ -180,7 +189,7 @@ local function PropsAndMethods(o)
     o[E.UNIT_SPELLCAST_SUCCEEDED] = OnSpellCastSucceeded
     o[E.UNIT_SPELLCAST_FAILED_QUIET] = OnPlayerSpellCastFailedQuietly
 
-end; PropsAndMethods(L)
+end; PropsAndMethods(LIB)
 
 ---@param frame _Frame
 local function OnAddOnReady(frame)
@@ -215,6 +224,8 @@ OnLoad & OnEvent Hooks
 ---@param frame _Frame
 function ABP_ActionBarController_OnLoad(frame)
     L:RegisterMessage(GC.M.OnAddOnReady, function() OnAddOnReady(frame)  end)
+
+    O.API:SyncUseKeyDownActionButtonSettings()
 
     ABP_ActionBarController_OnLoad = nil
 end

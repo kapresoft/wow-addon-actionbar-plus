@@ -1204,6 +1204,15 @@ local function PropsAndMethods(o)
         return self.button().CheckedTexture:Hide()
     end
 
+    function o:UseKeyUpForClicks()
+        SetCVar("ActionButtonUseKeyDown", 0)
+        self.button():RegisterForClicks('AnyUp')
+    end
+    function o:UseKeyDownForClicks()
+        SetCVar("ActionButtonUseKeyDown", 1)
+        self.button():RegisterForClicks('AnyDown')
+    end
+
 end
 
 PropsAndMethods(L)

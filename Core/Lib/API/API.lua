@@ -35,6 +35,12 @@ New Instance
 --- @class API
 local S = ns:NewLibStd(ns.M.API)
 local p = ns:CreateDefaultLogger(ns.M.API)
+
+local ACTION_BUTTON_USE_KEY_DOWN = 'ActionButtonUseKeyDown'
+local LOCK_ACTION_BARS = 'lockActionBars'
+
+S.ACTION_BUTTON_USE_KEY_DOWN = ACTION_BUTTON_USE_KEY_DOWN
+S.LOCK_ACTION_BARS = LOCK_ACTION_BARS
 --[[-----------------------------------------------------------------------------
 Mixins
 -------------------------------------------------------------------------------]]
@@ -446,13 +452,20 @@ function S:GetShapeshiftIcon(spellInfo)
     return spellInfo.icon
 end
 
+--- This is for WOTLK and Retail
 --- @param spellInfo Profile_Spell
-function S:GetSpellAttributeValue(spellInfo)
-    --[[local spellAttrValue = spellInfo.id
-    if self:IsShapeshiftOrStealthSpell(spellInfo) then
-        spellAttrValue = spellInfo.name
-    end]]
-    return spellInfo.name
+function S:GetSpellAttributeValue(spellInfo) return spellInfo.name end
+
+--  TODO: Rank matters in classic-era. We should use this
+--- @param spellInfo Profile_Spell
+function S:GetSpellAttributeValueClassicEra(spellInfo)
+    local spell = spellInfo.name
+    local spellRank = GetSpellSubtext(spellInfo.id)
+    if String.IsNotBlank(spellRank) then
+        spell = spell .. '(' .. spellRank .. ')'
+    end
+    --print('spell:', spell)
+    return spell
 end
 
 --- @param itemID number
@@ -625,6 +638,21 @@ function S:SummonMountSimple(flyingMountName, groundMountName)
     if mountID then
         p:v(function() return 'Selected mount: %s', mountName end)
         C_MountJournal.SummonByID(mountID)
+    end
+end
+
+function S:IsLockActionBars() return GetCVarBool(LOCK_ACTION_BARS) == true end
+function S:IsUseKeyDownActionButton() return GetCVarBool(ACTION_BUTTON_USE_KEY_DOWN) == true end
+
+function S:SyncUseKeyDownActionButtonSettings()
+    -- make sure lockActionBars is in sync with ""
+    local lockActionBars = self:IsLockActionBars()
+    local useKeyDown = self:IsUseKeyDownActionButton()
+    if useKeyDown ~= lockActionBars then
+        local val = lockActionBars == true and 1 or 0
+        SetCVar(ACTION_BUTTON_USE_KEY_DOWN, val)
+        p:f3(function()
+            return "Syncing %s=%s with lockActionBars settings.", ACTION_BUTTON_USE_KEY_DOWN, val end)
     end
 end
 
