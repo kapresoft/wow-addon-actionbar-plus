@@ -641,7 +641,11 @@ function S:SummonMountSimple(flyingMountName, groundMountName)
     end
 end
 
-function S:IsLockActionBars() return GetCVarBool(LOCK_ACTION_BARS) == true end
+function S:IsDragKeyDown()
+    return O.API:IsLockActionBars() ~= true or IsModifiedClick("PICKUPACTION") == true
+end
+
+function S:IsLockActionBars() return Settings.GetValue(LOCK_ACTION_BARS) == true end
 function S:IsUseKeyDownActionButton() return GetCVarBool(ACTION_BUTTON_USE_KEY_DOWN) == true end
 
 function S:SyncUseKeyDownActionButtonSettings()

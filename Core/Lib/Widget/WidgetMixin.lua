@@ -271,13 +271,6 @@ function _L:AddItemKeybindingInfo(btnWidget)
     GameTooltip:AppendText(String.format(GC.C.ABP_KEYBIND_FORMAT, bindings.key1))
 end
 
--- 'NONE' if not specified
-function _L:IsDragKeyDown()
-    local isLockedActionBars = O.API:IsLockActionBars()
-    if isLockedActionBars ~= true then return true end
-    return IsModifiedClick("PICKUPACTION") == true
-end
-
 function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
     local frame = frameInstance
     if frameInstance.frame then frame = frameInstance.frame end

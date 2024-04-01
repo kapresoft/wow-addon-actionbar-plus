@@ -117,12 +117,13 @@ end
 --- @param event string The event name
 local function OnSpellCastSucceeded(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
-    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
+    L:ForEachButton(function(bw)
         sp:f1(function()
             local r = GetSpellSubtext(evt.spellID)
             return 'cast succeeded: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
         end)
-        bw:UpdateItemOrMacroState();
+        if bw:IsMatchingMacroOrSpell(evt.spellID) then bw:UpdateItemOrMacroState()
+        elseif bw:IsMacro() then bw:SetHighlightDefault() end
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
 end
@@ -224,9 +225,6 @@ OnLoad & OnEvent Hooks
 ---@param frame _Frame
 function ABP_ActionBarController_OnLoad(frame)
     L:RegisterMessage(GC.M.OnAddOnReady, function() OnAddOnReady(frame)  end)
-
-    O.API:SyncUseKeyDownActionButtonSettings()
-
     ABP_ActionBarController_OnLoad = nil
 end
 

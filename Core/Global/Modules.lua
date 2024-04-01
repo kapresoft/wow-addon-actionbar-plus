@@ -96,10 +96,10 @@ local M = {
 
 --- @class GlobalObjects
 --- @field M6Support M6Support
---- @field AceLibFactory AceLibFactory Deprecated, Use #AceLibrary : Kapresoft_LibUtil_AceLibrary
 --- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
 --- @field AceLibraryMixin AceLibraryMixin
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin
+--- @field ActionBarKeyPressController ActionBarKeyPressController
 --- @field ActionbarPlusAPI ActionbarPlusAPI
 --- @field ActionbarPlusEventMixin ActionbarPlusEventMixin
 --- @field ActionType ActionType
