@@ -48,7 +48,6 @@ local function RegisterForClicks(widget, event, down, key)
     if widget:IsEmpty() then return end
     if down ~= nil then down = down == 1 or down == true end
 
-    API:SyncUseKeyDownActionButtonSettings()
     widget:UseKeyDownForClicks()
 
     local useKeyDown = API:IsUseKeyDownActionButton()
@@ -60,7 +59,7 @@ local function RegisterForClicks(widget, event, down, key)
 
     --- This has to sync with Blizzard's ActionButton behavior
     --- or else the click won't work
-    if lockActionBars ~= true or (WMX:IsDragKeyDown() == true) then
+    if lockActionBars ~= true or (O.API:IsDragKeyDown() == true) then
         return widget:UseKeyUpForClicks()
     end
 end
@@ -113,12 +112,12 @@ end
 
 --- @param btnUI ButtonUI
 local function OnDragStart(btnUI)
-    if InCombatLockdown() then return end
+    if InCombatLockdown() or not O.API:IsDragKeyDown() then return end
+
     --- @type ButtonUIWidget
     local w = btnUI.widget
     if w:IsEmpty() then return end
 
-    if InCombatLockdown() or not WMX:IsDragKeyDown() then return end
     w:Reset()
     pd:d(function() return 'OnDragStart():Actionbar-Info: %s', pformat(btnUI.widget:GetActionbarInfo()) end)
 
@@ -201,7 +200,7 @@ end
 --- @param btn ButtonUI
 local function OnClick_SecureHookScript(btn, mouseButton, down)
     p:d(function() return 'OnClick:SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()) end)
-    btn:RegisterForClicks(WMX:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
+    btn:RegisterForClicks(O.API:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)
 end

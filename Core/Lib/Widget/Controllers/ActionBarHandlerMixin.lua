@@ -48,9 +48,10 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     --- @param predicateFn ButtonPredicateFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachButton(applyFn, predicateFn)
+        local pfn = predicateFn or function(bw) return true end
         self:ForEachVisibleFrames(function(fw)
             for _, btn in ipairs(fw.buttonFrames) do
-                local shouldApply = btn.widget and predicateFn and predicateFn(btn.widget)
+                local shouldApply = btn.widget and pfn(btn.widget)
                 if true == shouldApply then applyFn(btn.widget) end
             end
         end)
