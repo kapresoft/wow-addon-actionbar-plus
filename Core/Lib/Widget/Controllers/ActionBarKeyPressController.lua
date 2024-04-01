@@ -32,7 +32,7 @@ local function PropsAndMethods(o)
         if isModKeyDown ~= true then return end
 
         -- This will only occur if Mod key is on keyDown
-        p:vv(function() return "keyPressed=%s downPress=%s modKey=%s", keyPressed, downPress, isModKeyDown end)
+        p:f3(function() return "keyPressed=%s downPress=%s modKey=%s", keyPressed, downPress, isModKeyDown end)
         O.API:SyncUseKeyDownActionButtonSettings()
     end
 
