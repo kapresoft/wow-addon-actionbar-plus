@@ -1205,12 +1205,12 @@ local function PropsAndMethods(o)
     end
 
     function o:UseKeyUpForClicks()
-        SetCVar("ActionButtonUseKeyDown", 0)
         self.button():RegisterForClicks('AnyUp')
+        if ns:IsRetail() then SetCVar("ActionButtonUseKeyDown", 0) end
     end
     function o:UseKeyDownForClicks()
-        SetCVar("ActionButtonUseKeyDown", 1)
         self.button():RegisterForClicks('AnyDown')
+        if ns:IsRetail() then SetCVar("ActionButtonUseKeyDown", 1) end
     end
 
 end
