@@ -126,25 +126,6 @@ local function OnCursorChangeInBags(f, event, ...)
     ABP.ActionbarEmptyGridShowing = true
 end
 
---- @param f EventFrameInterface
---- @param event string
-local function OnSetCVarEvents(f, event, ...)
-    local varName, val = ...
-    local lockAB = O.API.LOCK_ACTION_BARS
-    local keyDownVar = O.API.ACTION_BUTTON_USE_KEY_DOWN
-    if varName == keyDownVar or varName == lockAB then
-        pe:f3(function() return "OnSetCVarEvents(): %s=%s", varName, val end)
-    end
-    if varName ~= lockAB then return end
-
-    local isLockedActionBarsInGameOptions = val == '1'
-    if isLockedActionBarsInGameOptions == true then SetCVar(keyDownVar, 1)
-    else SetCVar(keyDownVar, 0) end
-    pe:d(function()
-        return 'The cvar [%s] is set to [%s] because cvar %s=%s',
-                keyDownVar, GetCVarBool(keyDownVar), lockAB, isLockedActionBarsInGameOptions end)
-end
-
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -172,12 +153,6 @@ function L:CreateContext(eventFrame)
         widgetMixin = self.widgetMixin
     }
     return ctx
-end
-
-function L:RegisterSetCVarEvents()
-    local f = self:CreateEventFrame()
-    f:SetScript(E.OnEvent, OnSetCVarEvents)
-    RegisterFrameForEvents(f, { E.CVAR_UPDATE })
 end
 
 function L:RegisterVehicleFrame()
@@ -221,7 +196,6 @@ function L:RegisterEvents()
     self:RegisterActionbarGridEventFrame()
     self:RegisterCursorChangesInBagEvents()
     self:RegisterCombatFrame()
-    self:RegisterSetCVarEvents()
 
     if B:SupportsPetBattles() then self:RegisterPetBattleFrame() end
     --TODO: Need to investigate Wintergrasp (hides/shows intermittently)
