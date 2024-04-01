@@ -19,12 +19,9 @@ Methods
 local function PropsAndMethods(o)
 
     function o:OnAddOnReady()
-        self.isRetail = ns:IsRetail()
+        if ns:IsRetail() ~= true then return end
 
         O.API:SyncUseKeyDownActionButtonSettings()
-
-        if self.isRetail ~= true then return end
-
         self:RegisterAddOnMessage(E.MODIFIER_STATE_CHANGED,
                 function(evt, source, ...) self:OnModifierStateChanged(...)
         end)
