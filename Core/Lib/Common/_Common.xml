@@ -7,6 +7,13 @@
     <Include file='_ParentFrame.xml'/>
     <Include file='_TooltipFrame.xml'/>
 
+    <Script file="EventToMessageRelay.lua"/>
+    <Frame parentKey="EventToMessageRelay" parent="ActionbarPlusEventFrame">
+        <Scripts>
+            <OnLoad>ABP_H.EventToMessageRelay_OnLoad(self)</OnLoad>
+        </Scripts>
+    </Frame>
+
     <Script file="DebuggingSettingsGroup.lua"/>
     <Script file="SettingsEventHandlerMixin.lua"/>
     <Script file="Settings.lua"/>

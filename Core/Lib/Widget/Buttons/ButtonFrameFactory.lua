@@ -68,26 +68,6 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
----@param state boolean
-local function EnableMouseAllButtons(frameWidget, state)
-    frameWidget:ApplyForEachButton(function(bw)
-        if not bw:IsEmpty() then return end
-        bw:EnableMouse(state)
-    end)
-end
-
---- @param frameWidget FrameWidget
---- @param event string
-local function OnModifierStateChanged(frameWidget, event, sourceName, modifierKey, keyState)
-    frameWidget:ApplyForEachMacro(function(w)
-        C_Timer.NewTicker(0.01, function()
-            w:UpdateMacroState()
-            w:UpdateUsable()
-        end, 3)
-    end)
-end
-
---- @param frameWidget FrameWidget
 local function OnCooldownTextSettingsChanged(frameWidget, event)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:RefreshTexts()  end)
@@ -164,21 +144,8 @@ end
 --- @param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
---- @param frameWidget FrameWidget
-local function OnActionbarShowGrid(frameWidget, e, ...)
-    frameWidget:ApplyForEachButton(function(bw)
-        bw:ShowEmptyGridEvent()
-        C_Timer.After(0.1, function() bw:EnableMouse(true) end)
-    end)
-end
---- @param frameWidget FrameWidget
-local function OnActionbarHideGrid(frameWidget, e, ...)
-    frameWidget:ApplyForEachButton(function(bw) bw:HideEmptyGridEvent() end)
-    C_Timer.After(2, function()
-        EnableMouseAllButtons(frameWidget, GetCursorInfo() ~= nil)
-    end)
-end
-
+--  todo: Convert to use RegisterStateDriver(..)
+--- @see ConfigDialogController#CreateDialogEventFrame
 --- @param frameWidget FrameWidget
 local function OnHideWhenTaxiChanged(frameWidget, e, ...)
     if not UnitOnTaxi(GC.UnitId.player) then return end
@@ -229,7 +196,7 @@ local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
     local AceEventIC = ns:AceEvent()
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-    AceEventIC:RegisterMessage(M.MODIFIER_STATE_CHANGED, function(evt, ...) OnModifierStateChanged(widget, evt, ...) end)
+
     widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
@@ -239,8 +206,6 @@ local function RegisterCallbacks(widget)
 
     widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(E.OnActionbarShowEmptyButtonsUpdated, OnActionbarShowEmptyButtonsUpdated)
-    widget:SetCallback(E.OnActionbarShowGrid, OnActionbarShowGrid)
-    widget:SetCallback(E.OnActionbarHideGrid, OnActionbarHideGrid)
 
     widget:SetCallback(E.OnHideWhenTaxiChanged, OnHideWhenTaxiChanged)
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)

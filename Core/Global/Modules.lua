@@ -19,7 +19,6 @@ local M = {
     -- Libraries
     ActionBarController = '',
     ActionbarPlusAPI = '',
-    ActionbarPlusEventMixin = '',
     ActionType = '',
     API = '',
     Assert = '',
@@ -62,7 +61,6 @@ local M = {
     CompanionAttributeSetter = '',
     CompanionDragEventHandler = '',
     ConfigDialogController = '',
-    EventToMessageRelayController = '',
     EquipmentSetAttributeSetter = '',
     EquipmentSetController = '',
     EquipmentSetDragEventHandler = '',
@@ -99,9 +97,7 @@ local M = {
 --- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
 --- @field AceLibraryMixin AceLibraryMixin
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin
---- @field ActionBarKeyPressController ActionBarKeyPressController
 --- @field ActionbarPlusAPI ActionbarPlusAPI
---- @field ActionbarPlusEventMixin ActionbarPlusEventMixin
 --- @field ActionType ActionType
 --- @field API API
 --- @field Assert Kapresoft_LibUtil_Assert
@@ -122,7 +118,6 @@ local M = {
 --- @field ConfigDialogController ConfigDialogController
 --- @field DebuggingSettingsGroup DebuggingSettingsGroup
 --- @field DruidUnitMixin DruidUnitMixin
---- @field EventToMessageRelayController EventToMessageRelayController
 --- @field EquipmentSetAttributeSetter EquipmentSetAttributeSetter
 --- @field EquipmentSetController EquipmentSetController
 --- @field EquipmentSetDragEventHandler EquipmentSetDragEventHandler

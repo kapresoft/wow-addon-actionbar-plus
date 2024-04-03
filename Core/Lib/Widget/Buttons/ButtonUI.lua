@@ -161,7 +161,6 @@ local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 --- @param down boolean 1 or true if the press is KeyDown
 local function OnModifierStateChanged(widget, event, key, down)
     RegisterForClicks(widget, E.MODIFIER_STATE_CHANGED, down, key)
-    if widget:IsMacro() then if down == 1 then widget:UpdateMacroState() end end
 end
 
 --- @param widget ButtonUIWidget

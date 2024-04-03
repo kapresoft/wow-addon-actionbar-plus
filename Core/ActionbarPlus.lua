@@ -37,46 +37,6 @@ local p, pd = ns:LC().ADDON:NewLogger(ns.name), ns:CreateDefaultLogger(ns.name)
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
---- @param frame ActionbarPlus_Frame
-local function OnPlayerEnteringWorld(frame, event, ...)
-    local isLogin, isReload = ...
-    if event ~= GC.E.PLAYER_ENTERING_WORLD then return end
-
-    if UnitOnTaxi(GC.UnitId.player) == true then
-        local isShown = WMX:IsHideWhenTaxi() ~= true
-        WMX:ShowActionbarsDelayed(isShown, 3)
-        p:d(function() return "OnPlayerEnteringWorld(): Calling ShowActionbarsDelayed..." end)
-    end
-    p:d(function() return "OnPlayerEnteringWorld(): Sending message [%s]", M.OnAddOnReady end)
-    frame.ctx.addon:SendMessage(M.OnAddOnReady, ns.name)
-
-    --@debug@
-    isLogin = true
-    --@end-debug@
-
-    if not isLogin then return end
-    pd:vv(GC:GetMessageLoadedText())
-end
-
---- @return ActionbarPlus_Frame
---- @param addon ActionbarPlus|ActionbarPlusEventMixin
-local function RegisterEvents(addon)
-
-    --- @class ActionbarPlus_Frame : _Frame
-    local frame = CreateFrame("Frame", nil, UIParent)
-    frame.ctx = { addon = addon }
-
-    local E = GC.E
-    frame:SetScript(E.OnEvent, OnPlayerEnteringWorld)
-    frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
-
-    --- @class ActionbarPlusEvent : ActionbarPlusEventMixin
-    local addonEvents = ns:K():CreateAndInitFromMixin(O.ActionbarPlusEventMixin, addon)
-    addon.addonEvents = addonEvents
-
-    return frame
-end
-
 --- @return boolean
 local function isConfigHidden()
     local fw = AceConfigDialog.OpenFrames[ns.name]; if not fw then return true end
@@ -307,8 +267,6 @@ local function NewInstance()
     MX:Mixin(A, methods)
     AdditionalMethods(A)
     A.ActionbarEmptyGridShowing = false
-
-    RegisterEvents(A)
 
     return A
 end

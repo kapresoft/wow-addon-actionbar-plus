@@ -2,14 +2,16 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <Script file="ActionbarPlusEventMixin.lua"/>
     <Script file="ActionBarHandlerMixin.lua"/>
 
+    <Script file="ActionbarPlusEventMixin.lua"/>
+    <Script file="MainController.lua"/>
     <Script file="ConfigDialogController.lua"/>
     <Script file="BagController.lua"/>
     <Script file="EquipmentSetController.lua"/>
     <Script file="ProfessionController.lua"/>
-    <Script file="ActionBarKeyPressController.lua"/>
+    <Script file="GridEventsController.lua"/>
+    <Script file="ModifierStateChangeController.lua"/>
     <Script file="M6Support.lua"/>
 
     <Script file="ActionBarController.lua"/>
@@ -17,13 +19,6 @@
         <Scripts>
             <OnLoad function="ABP_ActionBarController_OnLoad"/>
             <OnEvent function="ABP_ActionBarController_OnEvent"/>
-        </Scripts>
-    </Frame>
-
-    <Script file="EventToMessageRelayController.lua"/>
-    <Frame name="ABP_EventToMessageRelayControllerFrame">
-        <Scripts>
-            <OnLoad>ABP_H.EventToMessageRelayController_OnLoad(self)</OnLoad>
         </Scripts>
     </Frame>
 

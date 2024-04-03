@@ -3,8 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, M, LibStub = ns.O, ns.M, ns.LibStub
-
+local O, M = ns.O, ns.M
 local PR = O.Profile
 
 --[[-----------------------------------------------------------------------------
@@ -87,6 +86,21 @@ local function PropsAndMethods(o)
     function o:ForEachMatchingSpellButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
         self:ForEachButton(applyFn, function(bw) return bw:IsMatchingMacroOrSpell(matchSpellId) end)
+    end
+
+    --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
+    --- @param matchSpellId number
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachMatchingSpellAndAllMacrosButton(matchSpellId, applyFn)
+        assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
+        self:ForEachButton(applyFn, function(bw) return bw:IsMacro() or bw:IsMatchingMacroOrSpell(matchSpellId) end)
+    end
+
+    --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachMacroButton(applyFn)
+        assert(applyFn, "ForEachMacroButton(fn):: Function handler missing")
+        self:ForEachButton(applyFn, function(bw) return bw:IsMacro() end)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
