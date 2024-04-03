@@ -46,6 +46,7 @@
 Core\Lib\Developer\_GlobalDeveloper.xml
 #@end-do-not-package@
 
+Retail\Retail.lua
 Core\_Core.xml
 #@do-not-package@
 Core\Lib\Developer\_Developer.xml

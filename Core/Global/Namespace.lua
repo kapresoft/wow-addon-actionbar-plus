@@ -262,6 +262,8 @@ local function CreateNamespace(...)
         --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
         o.H = {}
 
+        function o:a() return ABP end
+
         --- @return CursorUtil
         --- @param cursorInfo CursorInfo Optional cursorInfo instance
         function o:CreateCursorUtil(cursorInfo)

@@ -296,3 +296,4 @@ Type: SpellInfoBasic
 --- @field public id SpellID The spell ID
 --- @field public name SpellName The spell Name
 --- @field public icon Icon The icon ID
+--- @field public empowered BooleanOptional

@@ -3,6 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
+    <Frame name="ActionbarPlusEventFrame" parentKey="ActionbarPlusEventFrame" parent="UIParent" />
+
     <Frame name="ActionbarPlusFrameTemplate" parent="UIParent" frameStrata="MEDIUM"
            hidden="false" enableMouse="false" movable="true" alpha="0.5" virtual="true"
            inherits="BackdropTemplate" mixin="BackdropTemplateMixin">

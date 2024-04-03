@@ -103,7 +103,7 @@ local function OnPlayerSpellCastSent(evt)
     end)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastSentExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+    L:SendMessage(MSG.OnSpellCastSentExt, libName, CallbackFn)
 end
 
 --- @param event string The event name
@@ -125,7 +125,7 @@ local function OnSpellCastSucceeded(event, ...)
         if bw:IsMatchingMacroOrSpell(evt.spellID) then bw:UpdateItemOrMacroState()
         elseif bw:IsMacro() then bw:SetHighlightDefault() end
     end)
-    L:SendMessage(GC.M.OnSpellCastSucceeded, ns.M.ActionbarPlusEventMixin)
+    L:SendMessage(GC.M.OnSpellCastSucceeded, libName)
 end
 
 --- i.e. Conjure mana gem when there is already a mana gem in bag
@@ -137,19 +137,23 @@ local function OnPlayerSpellCastFailedQuietly(event, ...)
     end)
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastFailedExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+    L:SendMessage(MSG.OnSpellCastFailedExt, libName, CallbackFn)
 end
 
 --- @param event string The event name
 local function OnPlayerSpellCastStop(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
-    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
-        sp:f1(function() return 'cast stopped: %s(%s)', evt.spellID, bw:GetEffectiveSpellName() end)
-        bw:ResetHighlight()
+    L:ForEachMatchingSpellAndAllMacrosButton(evt.spellID, function(bw)
+        local spell = bw:GetEffectiveSpellName()
+        if spell then
+            sp:f1(function() return 'cast stopped: %s(%s :: %s)', evt.spellID, spell, bw:conf().type end)
+            bw:ResetHighlight()
+        end
     end)
+
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
-    L:SendMessage(MSG.OnSpellCastStopExt, ns.M.ActionbarPlusEventMixin, CallbackFn)
+    L:SendMessage(MSG.OnSpellCastStopExt, libName, CallbackFn)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -190,6 +194,11 @@ local function PropsAndMethods(o)
     o[E.UNIT_SPELLCAST_SUCCEEDED] = OnSpellCastSucceeded
     o[E.UNIT_SPELLCAST_FAILED_QUIET] = OnPlayerSpellCastFailedQuietly
 
+    if not ns:IsRetail() then return end
+
+    o[E.UNIT_SPELLCAST_EMPOWER_START] = OnPlayerSpellCastStart
+    o[E.UNIT_SPELLCAST_EMPOWER_STOP] = OnPlayerSpellCastStop
+
 end; PropsAndMethods(LIB)
 
 ---@param frame _Frame
@@ -216,7 +225,15 @@ local function OnAddOnReady(frame)
         E.UNIT_SPELLCAST_FAILED_QUIET,
     }, 'player')
 
+    --- This applies to all units
     RegisterFrameForUnitEvents(frame, { E.UNIT_SPELLCAST_SENT })
+
+    if not ns:IsRetail() then return end
+
+    RegisterFrameForUnitEvents(frame, {
+        E.UNIT_SPELLCAST_EMPOWER_START, E.UNIT_SPELLCAST_EMPOWER_STOP
+    }, 'player')
+
 end
 
 --[[-----------------------------------------------------------------------------

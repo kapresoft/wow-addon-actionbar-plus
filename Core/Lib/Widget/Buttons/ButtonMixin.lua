@@ -984,7 +984,7 @@ local function PropsAndMethods(o)
         end
 
         -- energy based spells do not use 'notEnoughMana'
-        if  isStealthedOrShapeshifted == true then
+        if isStealthedOrShapeshifted == true then
             normalTexture:SetVertexColor(0.6, 0.6, 0.6)
         elseif not isUsable then
             normalTexture:SetVertexColor(0.3, 0.3, 0.3)

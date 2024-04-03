@@ -252,6 +252,36 @@ function S:GetSpellInfoBasic(spellNameOrId)
     return spellInfo
 end
 
+--- @param unit UnitID|nil Defaults to 'player'
+--- @return SpellInfoBasic
+function S:GetCurrentSpellCasting(unit)
+    return self:GetUnitCastingInfoBasic(unit) or self:GetUnitChannelInfoBasic(unit)
+end
+
+--- @param unit UnitID|nil Defaults to 'player'
+--- @return SpellInfoBasic
+function S:GetUnitCastingInfoBasic(unit)
+    unit = unit or UnitId.player
+    local spn, _, icon, _, _, _, _, _, spID = UnitCastingInfo(unit)
+    if not spn then return nil end
+
+    --- @type SpellInfoBasic
+    local ret = { id = spID, name = spn, icon = icon, empowered = false }
+    return ret
+end
+
+--- @param unit UnitID|nil Defaults to 'player'
+--- @return SpellInfoBasic
+function S:GetUnitChannelInfoBasic(unit)
+    unit = unit or UnitId.player
+    local spn, _, icon, _, _, _, _, spID, isEmpowered = UnitChannelInfo(unit)
+    if not spn then return nil end
+
+    --- @type SpellInfoBasic
+    local ret = { id = spID, name = spn, icon = icon, empowered = isEmpowered }
+    return ret
+end
+
 --- @see https://warcraft.wiki.gg/wiki/Category:API_namespaces/C_Engraving
 --- @param spellNameOrId SpellID_Name_Or_Index Spell ID or Name
 --- @return SpellInfo
