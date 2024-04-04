@@ -113,9 +113,12 @@ local function attributeSetterMethods(a)
         if w:IsInvalidItem(itemInfo) then
             return
         end
+        local itemId = itemInfo and itemInfo.id; if not itemId then return end
 
-        if itemInfo and itemInfo.id then
-            GameTooltip:SetItemByID(itemInfo.id)
+        if API:IsToyItem(itemId) then
+            GameTooltip:SetToyByItemID(itemId)
+        else
+            GameTooltip:SetItemByID(itemId)
         end
     end
 end
