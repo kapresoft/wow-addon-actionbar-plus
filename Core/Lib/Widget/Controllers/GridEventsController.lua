@@ -26,7 +26,6 @@ local function PropsAndMethods(o)
         o:RegisterAddOnMessage(E.ACTIONBAR_HIDEGRID, o.OnActionbarHideGrid)
 
         if ns:IsVanilla() then return end
-        print('xxx Not Vanilla')
         o:RegisterAddOnMessage(E.CURSOR_CHANGED, o.OnCursorChangeInBags)
     end
 
