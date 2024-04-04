@@ -54,7 +54,7 @@ local function RegisterForClicks(widget, event, down, key)
     local lockActionBars = API:IsLockActionBars()
 
     p:f1(function()
-        return 'event=%s down=%s key=%s btn=%s lockAB=%s useKD=%s :: RegisterForClicksRetail()',
+        return 'event=%s down=%s key=%s btn=%s lockAB=%s useKD=%s :: RegisterForClicks()',
         event, down, key, widget:GN(), lockActionBars, useKeyDown end)
 
     --- This has to sync with Blizzard's ActionButton behavior
