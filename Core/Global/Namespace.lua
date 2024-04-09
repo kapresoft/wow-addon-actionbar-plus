@@ -208,6 +208,7 @@ local function CreateNamespace(...)
     --- @type string
     local addon
     --- @class __Namespace : AceLibraryMixin
+    --- @field debug DebugSettings
     --- @field gameVersion GameVersion
     --- @field GC GlobalConstants
     --- @field LibStub LocalLibStub
@@ -249,9 +250,6 @@ local function CreateNamespace(...)
     ns.xml = {}
 
     ns:K():Mixin(ns, ns.O.AceLibraryMixin, GameVersionMixin, NamespaceLoggerMixin)
-
-    --- Enable this flag to trace messages
-    ns.enableEventTrace = ns.enableEventTrace or false
 
     --- @param o __Namespace | Namespace
     local function Methods(o)

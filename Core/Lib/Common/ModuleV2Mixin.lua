@@ -9,6 +9,7 @@ Aliases
 --- Use ControllerV2 for Controllers (has the ActionbarHandlerMixin trait)
 --- @alias ControllerV2 ModuleV2Mixin | ActionBarHandlerMixin | AceEventPlus
 
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -19,6 +20,7 @@ local K = ns.Kapresoft_LibUtil
 local Ace = K.Objects.AceLibrary.O
 local AceEvent = Ace.AceEvent
 local AceBucket = Ace.AceBucket
+local eventTraceEnabled = ns.debug.flag.eventTrace
 
 --[[-----------------------------------------------------------------------------
 New Instance: ModuleV2Mixin
@@ -46,15 +48,14 @@ end
 --- @param isBucket boolean Is AceBucket message
 local function CreateTraceFn(logger, callback, isBucket)
     local fn = callback
-    if ns.enableEventTrace == true then
-        local prefix = "MSG:R"
-        if isBucket == true then prefix = "MSGB:R" end
-        fn = function(msg, source, ...)
-            local a = safeArgs(...)
-            if type(source) == 'table' then source = tostring(source) end
-            logger:i(function() return prefix .. "[%s] src=%s args=%s", msg, source, a end)
-            callback(msg, source, ...)
-        end
+    if eventTraceEnabled ~= true then return fn end
+    local prefix = "MSG:R"
+    if isBucket == true then prefix = "MSGB:R" end
+    fn = function(msg, source, ...)
+        local a = safeArgs(...)
+        if type(source) == 'table' then source = tostring(source) end
+        logger:i(function() return prefix .. "[%s] src=%s args=%s", msg, source, a end)
+        callback(msg, source, ...)
     end
     return fn
 end

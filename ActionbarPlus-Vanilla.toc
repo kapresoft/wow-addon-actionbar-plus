@@ -38,10 +38,10 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
+Core\Base\_Base.xml
 #@do-not-package@
 Core\Lib\Developer\_GlobalDeveloper.xml
 #@end-do-not-package@
-
 Vanilla\Vanilla.lua
 Core\_Core.xml
 #@do-not-package@

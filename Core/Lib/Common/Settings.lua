@@ -243,7 +243,7 @@ local function PropsAndMethods(o)
     function o:CreateConfig()
         local configArgs = {}
 
-        configArgs['general'] = self:CreateGeneralGroup()
+        configArgs.general = self:CreateGeneralGroup()
         local hiddenGeneralConfigs = {
             'equipmentset_header',
             PC.equipmentset_open_character_frame,
@@ -254,7 +254,12 @@ local function PropsAndMethods(o)
             local gen = configArgs['general'].args
             for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
         end
-        configArgs['debugging'] = debugGroup:CreateDebuggingGroup()
+
+        if ns.debug.flag.debugging == true then
+            configArgs.debugging = debugGroup:CreateDebuggingGroup()
+        else
+            ABP_LOG_LEVEL = 0
+        end
 
         local barConfigs = self:CreateActionBarConfigs()
         for bName, bConf in pairs(barConfigs) do
