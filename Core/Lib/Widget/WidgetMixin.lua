@@ -149,6 +149,8 @@ function _L:CreateKeybindTextFontString(b)
     return fs
 end
 
+--- @see ActionBarHandlerMixin
+--- @deprecated
 function _L:ShowActionbarsDelayed(isShown, delayInSec)
     local actualDelayInSec = delayInSec
     local showActionBars = isShown == true

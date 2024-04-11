@@ -169,20 +169,6 @@ local function PropsAndMethods(o)
     end
 
     o[E.COMPANION_UPDATE] = OnCompanionUpdate
-
-    o[E.PLAYER_CONTROL_LOST] = function()
-        if not PR:IsHideWhenTaxi() then return end
-        C_Timer.After(1, function()
-            local playerOnTaxi = UnitOnTaxi(GC.UnitId.player)
-            if playerOnTaxi ~= true then return end
-            WMX:ShowActionbarsDelayed(false, 1)
-        end)
-    end
-
-    o[E.PLAYER_CONTROL_GAINED] = function()
-        if not PR:IsHideWhenTaxi() then return end
-        WMX:ShowActionbarsDelayed(true, 2)
-    end
     o[E.UPDATE_BINDINGS]        = OnUpdateBindings
     o[E.UPDATE_STEALTH]         = OnUpdateStealth
     o[E.UPDATE_SHAPESHIFT_FORM] = OnShapeShift
@@ -213,7 +199,6 @@ local function OnAddOnReady(frame)
     RegisterFrameForEvents(frame, {
         E.PLAYER_TARGET_CHANGED,
         E.COMPANION_UPDATE,
-        E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
         E.UPDATE_BINDINGS,
         E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM,
     })

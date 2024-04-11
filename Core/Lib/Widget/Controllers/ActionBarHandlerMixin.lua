@@ -19,6 +19,7 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param o ActionBarHandlerMixin
 local function PropsAndMethods(o)
+
     ---@param bw ButtonUIWidget
     local isCompanionFn = function(bw) return bw:IsCompanionWOTLK() end
     ---@param bw ButtonUIWidget
@@ -34,13 +35,37 @@ local function PropsAndMethods(o)
     --- @param obj any The object to embed
     function o:Embed(obj) assert(obj, "The target embed object is missing."); return ns:K():Mixin(obj, o) end
 
+    --- @return API
+    function o:a() return O.API end
+    --- @return ActionBarOperations
+    function o:o() return O.ActionBarOperations end
+
+    --- Includes Non-Visible in Settings
+    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
+    function o:ForEachFrames(applyFn)
+        local frames = PR:GetAllBarFrames()
+        if #frames <= 0 then return end
+        for _, f in ipairs(frames) do applyFn(f.widget) end
+    end
+
+    --- Visible in Settings
+    --- @see ActionBarHandlerMixin#ForEachSettingsVisibleFrames
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
     function o:ForEachVisibleFrames(applyFn)
+        return self:ForEachSettingsVisibleFrames(applyFn)
+    end
+
+    --- Visible in Settings
+    --- @see ActionBarHandlerMixin#ForEachSettingsVisibleFrames
+    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
+    function o:fevf(applyFn) return self:ForEachSettingsVisibleFrames(applyFn) end
+
+    --- Visible in Settings
+    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
+    function o:ForEachSettingsVisibleFrames(applyFn)
         local frames = PR:GetUsableBarFrames()
         if #frames <= 0 then return end
-        for _, f in ipairs(frames) do
-            applyFn(f.widget)
-        end
+        for _, f in ipairs(frames) do applyFn(f.widget) end
     end
 
     --- Apply for each button with a predicateFn
@@ -48,7 +73,7 @@ local function PropsAndMethods(o)
     --- @param predicateFn ButtonPredicateFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachButton(applyFn, predicateFn)
         local pfn = predicateFn or function(bw) return true end
-        self:ForEachVisibleFrames(function(fw)
+        self:fevf(function(fw)
             for _, btn in ipairs(fw.buttonFrames) do
                 local shouldApply = btn.widget and pfn(btn.widget)
                 if true == shouldApply then applyFn(btn.widget) end

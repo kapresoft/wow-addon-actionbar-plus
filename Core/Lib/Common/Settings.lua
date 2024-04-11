@@ -14,6 +14,8 @@ local Ace, BaseAPI = O.AceLibrary, O.BaseAPI
 local E, MSG = GC.E, GC.M
 local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
 local debugGroup = O.DebuggingSettingsGroup
+
+local libName = 'Settings'
 local p = ns:CreateDefaultLogger(ns.M.Settings);
 
 ---These are loaded in #fetchLibs()
@@ -64,6 +66,14 @@ local function PSetWithEvent(config, key, fallbackVal, eventName)
         assert(type(key) == 'string', 'Profile key should be a string')
         config.profile[key] = v or fallbackVal
         if eventName then BF:Fire(eventName) end
+    end
+end
+
+local function PSetWithMsg(config, key, fallbackVal, msg)
+    return function(_, v)
+        assert(type(key) == 'string', 'Profile key should be a string')
+        config.profile[key] = v or fallbackVal
+        if msg then AceEvent:SendMessage(msg, libName, config.profile[key]) end
     end
 end
 
@@ -299,7 +309,7 @@ local function PropsAndMethods(o)
                     desc = L['Hide during taxi::Description'],
                     get = PGet(self, PC.hide_when_taxi, false),
                     set = PSet(self, PC.hide_when_taxi, false),
-                    set = PSetWithEvent(self, PC.hide_when_taxi, false, E.OnHideWhenTaxiChanged)
+                    set = PSetWithMsg(self, PC.hide_when_taxi, false, MSG.OnHideWhenTaxiSettingsChanged)
                 },
                 action_button_mouseover_glow = {
                     width = 'normal',

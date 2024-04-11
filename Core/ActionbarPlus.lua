@@ -7,13 +7,11 @@ Alias
 Lua Vars
 -------------------------------------------------------------------------------]]
 local unpack = unpack
-local sformat, loadstring, format = string.format, loadstring, format
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local ReloadUI, IsShiftKeyDown, UnitOnTaxi = ReloadUI, IsShiftKeyDown, UnitOnTaxi
-local UIParent, CreateFrame = UIParent, CreateFrame
+local ReloadUI, IsShiftKeyDown = ReloadUI, IsShiftKeyDown
 local InterfaceOptionsFrame, PlaySound, SOUNDKIT = InterfaceOptionsFrame, PlaySound, SOUNDKIT
 
 --[[-----------------------------------------------------------------------------
@@ -46,93 +44,15 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @class ActionbarPlus_Methods : ActionbarPlusProperties
---- @type string
-local methods = {
-    --- @param self ActionbarPlus
-    --- @param isShown boolean
-    ['ShowActionbars'] = function(self, isShown)
-        WMX:ShowActionbarsDelayed(isShown, 1)
-    end,
-    --- @param self ActionbarPlus
-    ['RegisterSlashCommands'] = function(self)
-        self:RegisterChatCommand(GCC.CONSOLE_COMMAND_NAME, "SlashCommands")
-        self:RegisterChatCommand(GCC.CONSOLE_COMMAND_SHORT, "SlashCommands")
-    end,
-    --- @param self ActionbarPlus
-    --- @param spaceSeparatedArgs string
-    ['SlashCommands'] = function(self, spaceSeparatedArgs)
-        local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
-        if IsEmptyTable(args) then self:SlashCommand_Help_Handler(); return end
-        if IsAnyOf('config', unpack(args))
-                or IsAnyOf('conf', unpack(args)) then
-            self:OpenConfig();
-            return
-        end
-        if IsAnyOf('info', unpack(args)) then self:SlashCommand_Info_Handler(spaceSeparatedArgs); return end
-        self:SlashCommand_Help_Handler()
-    end,
-    --- @param self ActionbarPlus
-    ['SlashCommand_Help_Handler'] = function(self)
-        local C = GC:GetAceLocale()
-        pd:vv('')
-        pd:vv(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
-        pd:vv(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
-        pd:vv(function() return '%s:', C['options'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
-    end,
-    --- @param self ActionbarPlus
-    --- @param spaceSeparatedArgs string
-    ['SlashCommand_Info_Handler'] = function(self, spaceSeparatedArgs)
-        pd:vv(GC:GetAddonInfoFormatted())
-    end,
-    --- @param self ActionbarPlus
-    ['ConfirmReloadUI'] = function(self)
-        if IsShiftKeyDown() then
-            ReloadUI()
-            return
-        end
-        WMX:ShowReloadUIConfirmation()
-    end,
-
-    --- @param self ActionbarPlus
-    ['InitializeDb'] = function(self)
-        -- Set up our database
-        --- @type ActionbarPlus_AceDB
-        self.db = AceDB:New(GC.C.DB_NAME)
-        ns.db = self.db
-        self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
-        self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
-        self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
-        self:InitDbDefaults()
-        self:SendMessage(M.OnDBInitialized, ns.name)
-    end,
-
-    --- @param self ActionbarPlus
-    ['InitDefaultProfile'] = function(self)
-        local defaultProfile = P:CreateDefaultProfile()
-        self.defaultDB = { profile =  defaultProfile }
-        self.db:RegisterDefaults(self.defaultDB)
-    end,
-
-    --- @param self ActionbarPlus
-    ['InitDbDefaults'] = function(self)
-        self:InitDefaultProfile()
-    end,
-    --- @see ActionbarPlusEventMixin
-    ['RetrieveKeyBindingsMap'] = function(self)
-        self.barBindings = WMX:GetBarBindingsMap()
-    end,
-    ['UpdateKeyBindings'] = function(self)
-        self.barBindings = WMX:GetBarBindingsMap()
-        if self.barBindings then BF:UpdateKeybindText() end
-    end,
-
-}
 --- @param o ActionbarPlus | AddOnEvents
-local function AdditionalMethods(o)
+local function PropertiesAndMethods(o)
+
+    --- The mountID for C_MountJournal Pickup Support
+    --- @see APIHooks
+    o.mountID = nil
+    o.companionID = nil
+    o.ActionbarEmptyGridShowing = false
+
 
     --- This is called automatically by Ace
     function o:OnInitialize()
@@ -144,6 +64,72 @@ local function AdditionalMethods(o)
         p:d(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
         self:SendMessage(M.OnAddOnInitializedV2, ns.name)
         p:d(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
+    end
+
+    function o:InitializeDb()
+        -- Set up our database
+        --- @type ActionbarPlus_AceDB
+        self.db = AceDB:New(GC.C.DB_NAME)
+        ns.db = self.db
+        self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+        self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+        self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+        self:InitDbDefaults()
+        self:SendMessage(M.OnDBInitialized, ns.name)
+    end
+
+    function o:InitDefaultProfile()
+        local defaultProfile = P:CreateDefaultProfile()
+        self.defaultDB = { profile =  defaultProfile }
+        self.db:RegisterDefaults(self.defaultDB)
+    end
+
+    function o:InitDbDefaults() self:InitDefaultProfile() end
+    function o:RetrieveKeyBindingsMap() self.barBindings = WMX:GetBarBindingsMap() end
+
+    function o:RegisterSlashCommands()
+        self:RegisterChatCommand(GCC.CONSOLE_COMMAND_NAME, "SlashCommands")
+        self:RegisterChatCommand(GCC.CONSOLE_COMMAND_SHORT, "SlashCommands")
+    end
+
+    --- @param spaceSeparatedArgs string
+    function o:SlashCommands(spaceSeparatedArgs)
+        local args = parseSpaceSeparatedVar(spaceSeparatedArgs)
+        if IsEmptyTable(args) then self:SlashCommand_Help_Handler(); return end
+        if IsAnyOf('config', unpack(args))
+            or IsAnyOf('conf', unpack(args)) then
+            self:OpenConfig();
+            return
+        end
+        if IsAnyOf('info', unpack(args)) then self:SlashCommand_Info_Handler(); return end
+        self:SlashCommand_Help_Handler()
+    end
+
+    function o:SlashCommand_Help_Handler()
+        local C = GC:GetAceLocale()
+        pd:vv('')
+        pd:vv(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
+        pd:vv(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
+        pd:vv(function() return '%s:', C['options'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
+        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
+    end
+
+    function o:SlashCommand_Info_Handler() pd:vv(GC:GetAddonInfoFormatted()) end
+
+    function o:ConfirmReloadUI()
+        if IsShiftKeyDown() then
+            ReloadUI()
+            return
+        end
+        WMX:ShowReloadUIConfirmation()
+    end
+
+    -- TODO: Migrate to a new KeyBindingsController
+    function o:UpdateKeyBindings()
+        self.barBindings = WMX:GetBarBindingsMap()
+        if self.barBindings then BF:UpdateKeybindText() end
     end
 
     --- This is called automatically by Ace
@@ -252,22 +238,13 @@ local function AdditionalMethods(o)
         end)
     end
 end
-
 --[[-----------------------------------------------------------------------------
 New Addon Instance
 -------------------------------------------------------------------------------]]
 --- @return ActionbarPlus
 local function NewInstance()
-    --- @class ActionbarPlus : ActionbarPlus_Methods
-    local A = LibStub:NewAddon(ns.name)
-    --- The mountID for C_MountJournal Pickup Support
-    --- @see APIHooks
-    A.mountID = nil
-    A.companionID = nil
-    MX:Mixin(A, methods)
-    AdditionalMethods(A)
-    A.ActionbarEmptyGridShowing = false
-
+    --- @class ActionbarPlus
+    local A = LibStub:NewAddon(ns.name); PropertiesAndMethods(A)
     return A
 end
 if ABP then return end; ABP = NewInstance()
