@@ -15,8 +15,7 @@ local p = ns:CreateDefaultLogger(libName)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-local function _l1() return "OnPlayerEnteringWorld(): Calling ShowActionbarsDelayed..." end
-local function _l2() return "OnPlayerEnteringWorld(): Sending message [%s]", MSG.OnAddOnReady end
+local function _l1() return "OnPlayerEnteringWorld(): Sending message [%s]", MSG.OnAddOnReady end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -27,12 +26,7 @@ local function PropsAndMethods(o)
     function o.OnPlayerEnteringWorld(event, src, ...)
         local isLogin, isReload = ...
 
-        if UnitOnTaxi(GC.UnitId.player) == true then
-            local isShown = WMX:IsHideWhenTaxi() ~= true
-            WMX:ShowActionbarsDelayed(isShown, 3)
-            p:d(_l1)
-        end
-        p:f1(_l2)
+        p:f1(_l1)
         o:SendMessage(MSG.OnAddOnReady, ns.name)
 
         --@debug@

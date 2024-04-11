@@ -252,7 +252,7 @@ local function CreateNamespace(...)
     ns:K():Mixin(ns, ns.O.AceLibraryMixin, GameVersionMixin, NamespaceLoggerMixin)
 
     --- @param o __Namespace | Namespace
-    local function Methods(o)
+    local function PropsAndMethods(o)
 
         o.sformat = string.format
 
@@ -260,7 +260,10 @@ local function CreateNamespace(...)
         --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
         o.H = {}
 
+        --- @return ActionbarPlus
         function o:a() return ABP end
+        --- @return Profile_Config
+        function o:p() return self.db.profile end
 
         --- @return CursorUtil
         --- @param cursorInfo CursorInfo Optional cursorInfo instance
@@ -325,7 +328,7 @@ local function CreateNamespace(...)
         --- @return ControllerV2
         function o:NewController(libName, ...) return self.O.ModuleV2Mixin:New(libName, self.O.ActionBarHandlerMixin, ...) end
 
-    end; Methods(ns)
+    end; PropsAndMethods(ns)
 
     ns.LibStubAce = LibStub
     ns.LibStub = NewLocalLibStub(ns)

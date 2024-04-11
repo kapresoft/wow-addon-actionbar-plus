@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local GC, E = ns.GC, ns.GC.E
+local GC, E, M = ns.GC, ns.GC.E, ns.GC.M
 local libName = 'EventToMessageRelay'
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -39,15 +39,25 @@ local function PropsAndMethods(o)
             E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID,
             E.CURSOR_CHANGED,
             E.MODIFIER_STATE_CHANGED,
+
+            E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
+            E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
         })
+
     end
+
+    local transformations = {
+        [E.PLAYER_REGEN_DISABLED] = M.OnPlayerEnterCombat,
+        [E.PLAYER_REGEN_ENABLED] = M.OnPlayerLeaveCombat,
+    }
 
     --- @param frame Frame
     --- @param event string
     function o.OnMessageTransmitter(frame, event, ...)
         local a = {...}
-        pt:t(function() return "Relaying event[%s] to message[%s] args=[%s]", event, GC.toMsg(event), a end)
-        o:SendAddOnMessage(event, libName, ...)
+        local msg = transformations[event] or GC.toMsg(event)
+        pt:i(function() return "Relaying event[%s] to message[%s] args=[%s]", event, msg, a end)
+        o:SendMessage(msg, libName, ...)
     end
 
     ns.H.EventToMessageRelay_OnLoad = o.OnLoad

@@ -2,10 +2,13 @@
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_ToyBox, C_Container = C_ToyBox, C_Container
+local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
 --- Use C_AddOns.GetAddOnEnableStat(addonName, char) if available
 local C_AddOns_GetAddOnEnableState = C_AddOns.GetAddOnEnableState
 --- Else, WOTLK Uses GetAddOnEnableState(index, char)
 local GetAddOnEnableState = GetAddOnEnableState
+local UnitInVehicle, UnitOnTaxi = UnitInVehicle, UnitOnTaxi
+
 local ABP_M6 = 'ActionbarPlus-M6'
 
 --[[-----------------------------------------------------------------------------
@@ -690,7 +693,16 @@ function S:SyncUseKeyDownActionButtonSettings()
     end
 end
 
---- #### Alias for #GetSpellCooldownDetails(spellID)
+function S:SupportsPetBattles() return C_PetBattles ~= nil end
+function S:SupportsVehicles() return UnitInVehicle ~= nil end
+function S:IsPlayerInVehicle() return UnitInVehicle('player') end
+function S:IsPlayerOnTaxi() return UnitOnTaxi('player') end
+function S:IsPlayerInPetBattle()
+    if not self:SupportsPetBattles() then return false end
+    return C_PetBattles.IsInBattle() == true
+end
+
+    --- #### Alias for #GetSpellCooldownDetails(spellID)
 --- @return SpellCooldownDetails
 function S:GSCD(spellID, optionalSpell) return S:GetSpellCooldownDetails(spellID, optionalSpell) end
 --- #### Alias for #GetSpellCooldown(spellID)

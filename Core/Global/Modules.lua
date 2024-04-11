@@ -97,6 +97,7 @@ local M = {
 --- @field AceLibrary Kapresoft_LibUtil_AceLibraryObjects
 --- @field AceLibraryMixin AceLibraryMixin
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin
+--- @field ActionBarOperations ActionBarOperations
 --- @field ActionbarPlusAPI ActionbarPlusAPI
 --- @field ActionType ActionType
 --- @field API API
@@ -153,6 +154,7 @@ local M = {
 --- @field String Kapresoft_LibUtil_String
 --- @field Table Kapresoft_LibUtil_Table
 --- @field UnitMixin UnitMixin
+--- @field VehicleAndPetBattleEventsStateDriver VehicleAndPetBattleEventsStateDriver
 --- @field WidgetMixin WidgetMixin
 
 L.M = M

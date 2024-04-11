@@ -43,7 +43,6 @@ Scripts
 --- @param event string | "'AnyUp'" | "'AnyDown'" | "'PreClick'" | "'PostClick'"
 --- @param down boolean|number boolean, 1 or 0
 --- @param key string Which key was pressed, i.e. "LeftMouseButton"
---- @see ActionbarPlusEventMixin#OnSetCVarEvents
 local function RegisterForClicks(widget, event, down, key)
     if widget:IsEmpty() then return end
     if down ~= nil then down = down == 1 or down == true end

@@ -207,18 +207,14 @@ local function GlobalConstantProperties(o)
         --- Custom Events
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
-        OnActionbarHideGroup = 'OnActionbarHideGroup',
         OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
-        OnActionbarShowGroup = 'OnActionbarShowGroup',
         OnButtonCountChanged = 'OnButtonCountChanged',
         OnButtonSizeChanged = 'OnButtonSizeChanged',
         OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
-        OnHideWhenTaxiChanged = 'OnHideWhenTaxiChanged',
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
-        OnPlayerLeaveCombat = 'OnPlayerLeaveCombat',
         OnTextSettingsChanged = 'OnTextSettingsChanged',
         OnUpdateItemStates = 'OnUpdateItemStates',
 
@@ -254,9 +250,6 @@ local function GlobalConstantProperties(o)
         --- Event Params: result, setID
         EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
-
-        PET_BATTLE_OPENING_START = 'PET_BATTLE_OPENING_START',
-        PET_BATTLE_CLOSE = 'PET_BATTLE_CLOSE',
 
         --- This event is fired when the players gear changes. Example, a chest is changed to another chest piece.
         ---
@@ -333,6 +326,7 @@ local function GlobalConstantProperties(o)
         OnConfigInitialized          = newMsg('OnConfigInitialized'),
         OnDBInitialized              = newMsg('OnDBInitialized'),
         OnEquipmentSetDragComplete   = newMsg('OnEquipmentSetDragComplete'),
+        OnHideWhenTaxiSettingsChanged = newMsg('OnHideWhenTaxiSettingsChanged'),
         OnMacroAttributesSet         = newMsg('OnMacroAttributesSet'),
         OnUpdateMacroState           = newMsg('OnUpdateMacroState'),
         OnUpdateItemState            = newMsg('OnUpdateItemState'),
@@ -343,6 +337,9 @@ local function GlobalConstantProperties(o)
         -- External Add-On Integration
         OnBagUpdateExt               = newMsg('OnBagUpdateExt'),
         OnButtonPostClickExt         = newMsg('OnButtonPostClickExt'),
+        OnPlayerEnterCombat          = newMsg('OnPlayerEnterCombat'),
+        OnPlayerLeaveCombat          = newMsg('OnPlayerLeaveCombat'),
+
         OnSpellCastStartExt          = newMsg('OnSpellCastStartExt'),
         OnSpellCastSentExt           = newMsg('OnSpellCastSentExt'),
         OnSpellCastStopExt           = newMsg('OnSpellCastStopExt'),

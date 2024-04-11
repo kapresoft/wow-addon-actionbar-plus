@@ -144,16 +144,6 @@ end
 --- @param event string
 local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
 
---  todo: Convert to use RegisterStateDriver(..)
---- @see ConfigDialogController#CreateDialogEventFrame
---- @param frameWidget FrameWidget
-local function OnHideWhenTaxiChanged(frameWidget, e, ...)
-    if not UnitOnTaxi(GC.UnitId.player) then return end
-    local WMX = O.WidgetMixin
-    local isShown = WMX:IsHideWhenTaxi() ~= true
-    WMX:ShowActionbars(isShown)
-end
-
 --- @param frameWidget FrameWidget
 local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
 
@@ -161,28 +151,6 @@ local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWid
 local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
     local barConf = frameWidget:GetConfig()
     frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
-end
-
----Sometimes there's a delay. Fire immediately, then after a few seconds
---- @param frameWidget FrameWidget
-local function OnActionbarShowGroup(frameWidget, e, ...)
-    if  true ~= P:IsBarEnabled(frameWidget.index) then return end
-    frameWidget:ShowGroup()
-    C_Timer.After(5, function() frameWidget:ShowGroup() end)
-end
-
----Sometimes there's a delay. Fire immediately, then after a few seconds
---- @param frameWidget FrameWidget
-local function OnPlayerLeaveCombat(frameWidget, e, ...)
-    OnActionbarShowGroup(frameWidget, e, ...)
-    -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
-    -- L:PostCombatUpdateComplete()
-end
-
---- @param frameWidget FrameWidget
-local function OnActionbarHideGroup(frameWidget, e, ...)
-    frameWidget:HideGroup()
-    C_Timer.After(5, function() frameWidget:HideGroup() end)
 end
 
 --- @param frameWidget FrameWidget
@@ -207,31 +175,12 @@ local function RegisterCallbacks(widget)
     widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
     widget:SetCallback(E.OnActionbarShowEmptyButtonsUpdated, OnActionbarShowEmptyButtonsUpdated)
 
-    widget:SetCallback(E.OnHideWhenTaxiChanged, OnHideWhenTaxiChanged)
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
-    widget:SetCallback(E.OnActionbarHideGroup, OnActionbarHideGroup)
-    widget:SetCallback(E.OnActionbarShowGroup, OnActionbarShowGroup)
+    -- TODO: Migrate OnUpdateItemStates
     widget:SetCallback(E.OnUpdateItemStates, OnUpdateItemStates)
-    widget:SetCallback(E.OnPlayerLeaveCombat, OnPlayerLeaveCombat)
 
-    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
-    --widget:SetCallback("OnUnitSpellcastSent", OnUnitSpellcastSent)
-    --widget:SetCallback("OnCurrentSpellcastChanged", OnCurrentSpellcastChanged)
 end
-
---- @param widget FrameWidget
-local function RegisterEvents(widget)
-    --- @param w FrameWidget
-    local function OnPlayerEnterCombatFrameWidget(w) w:SetCombatLockState() end
-    --- @param w FrameWidget
-    local function OnPlayerLeaveCombatFrameWidget(w) w:SetCombatUnlockState() end
-
-    widget:RegisterEvent(E.PLAYER_REGEN_DISABLED, OnPlayerEnterCombatFrameWidget, widget)
-    widget:RegisterEvent(E.PLAYER_REGEN_ENABLED, OnPlayerLeaveCombatFrameWidget, widget)
-    --todo next: move events from ButtonUI to here 'coz it's more performant/efficient
-end
-
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -305,16 +254,6 @@ local function WidgetMethods(widget)
         end
         if self.HideGroup then self:HideGroup() end
     end
-
-    -- Not sure what the use case is for this
-    -- Synchronize UI and Profile data
-    --[[function widget:IsShownInConfigSynchronize()
-        local frameIndex = self:GetIndex()
-        AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'IsShownInConfig(frameIndex)')
-        local actualFrameIsShown = frame:IsShown()
-        P:SetBarEnabledState(frameIndex, actualFrameIsShown)
-        return P:IsBarEnabled(frameIndex)
-    end]]
 
     -- Synchronize UI and Profile data
     function widget:IsShownInConfig() return P:IsBarEnabled(self.index) end
@@ -405,7 +344,8 @@ local function WidgetMethods(widget)
     --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
     function widget:fevb(predicateFn, applyFn) self:ApplyForEachButtonCondition(predicateFn, applyFn) end
 
-
+    -- TODO: Migrate
+    --- @see ActionBarOperations#SetActionBarsLockState
     function widget:SetGroupState(isShown)
         if isShown == true then
             if self.ShowGroup then self:ShowGroup() end
@@ -431,11 +371,15 @@ local function WidgetMethods(widget)
     function widget:Hide() if InCombatLockdown() then return end; frame:Hide() end
     function widget:Show() if InCombatLockdown() then return end; frame:Show() end
 
+    -- TODO: Migrate
+    --- @see ActionBarOperations#SetActionBarsLockState
     function widget:HideGroup()
         self:Hide()
         self:HideButtons()
     end
 
+    -- TODO: Migrate
+    --- @see ActionBarOperations#SetActionBarsLockState
     function widget:ShowGroup()
         self:InitAnchor()
         self:Show()
@@ -519,6 +463,7 @@ local function WidgetMethods(widget)
         self:ApplyForEachButton(function(bw)
             bw:ShowKeybindText(isShowKeybindText)
             bw:Show()
+            bw:UpdateUsable()
         end)
     end
 
@@ -752,7 +697,6 @@ function L:Constructor(frameIndex)
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
     RegisterCallbacks(widget)
-    RegisterEvents(widget)
 
     widget:SetFrameDimensions()
 
