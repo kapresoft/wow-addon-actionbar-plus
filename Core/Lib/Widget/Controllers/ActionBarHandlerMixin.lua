@@ -75,7 +75,7 @@ local function PropsAndMethods(o)
         local pfn = predicateFn or function(bw) return true end
         self:fevf(function(fw)
             for _, btn in ipairs(fw.buttonFrames) do
-                local shouldApply = btn.widget and pfn(btn.widget)
+                local shouldApply = btn.widget and not btn.widget:IsEmpty() and pfn(btn.widget)
                 if true == shouldApply then applyFn(btn.widget) end
             end
         end)

@@ -68,11 +68,6 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
-local function OnCooldownTextSettingsChanged(frameWidget, event)
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw) bw:RefreshTexts()  end)
-end
---- @param frameWidget FrameWidget
 local function OnTextSettingsChanged(frameWidget, event)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw) bw:RefreshTexts()  end)
@@ -165,7 +160,6 @@ local function RegisterCallbacks(widget)
     local AceEventIC = ns:AceEvent()
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
 
-    widget:SetCallback(E.OnCooldownTextSettingsChanged, OnCooldownTextSettingsChanged)
     widget:SetCallback(E.OnTextSettingsChanged, OnTextSettingsChanged)
     widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)

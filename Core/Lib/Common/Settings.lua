@@ -336,7 +336,7 @@ local function PropsAndMethods(o)
                     name = L['Hide countdown numbers on cooldowns'],
                     desc = L['Hide countdown numbers on cooldowns::Description'],
                     get = PGet(self, PC.hide_countdown_numbers, false),
-                    set = PSetWithEvent(self, PC.hide_countdown_numbers, false, E.OnCooldownTextSettingsChanged),
+                    set = PSetWithMsg(self, PC.hide_countdown_numbers, false, MSG.OnCooldownTextSettingsChanged),
                 },
 
                 equipmentset_header = { order = mainSeq:next(), type = "header", name = "Equipment Set Options" },

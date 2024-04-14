@@ -31,12 +31,17 @@ local function PropsAndMethods(o)
         o:o():SetActionBarsLockState(false);
     end
 
+    function o.OnCooldownTextSettingsChanged()
+        o:ForEachButton(function(bw) bw:RefreshTexts() end)
+    end
+
     --- Automatically called
     --- @see ModuleV2Mixin#Init
     --- @private
     function o:OnAddOnReady()
         self:RegisterMessage(MSG.OnPlayerEnterCombat, o.OnCombatLockState)
         self:RegisterMessage(MSG.OnPlayerLeaveCombat, o.OnCombatUnlockState)
+        self:RegisterMessage(MSG.OnCooldownTextSettingsChanged, o.OnCooldownTextSettingsChanged)
     end
 
 end; PropsAndMethods(L)
