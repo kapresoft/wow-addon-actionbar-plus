@@ -9,6 +9,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC = ns.O, ns.GC
 local MSG = GC.M
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -56,8 +57,6 @@ local function PropsAndMethods(o)
 
     --- @param frameIndex Index
     function o.OnButtonCountChanged(msg, src, frameIndex)
-        p:vv(function() return 'OnButtonCountChanged() called: frameIndex=%s', frameIndex end)
-
         local fw = o:GetFrameByIndex(frameIndex); if not fw then return end
         if not fw:IsShownInConfig() then return end
 
@@ -80,6 +79,13 @@ local function PropsAndMethods(o)
         fw:SaveAndScrubDeletedButtons(true)
     end
 
+    function o.OnShowEmptyButtons(msg, src, frameIndex)
+        o:FrameForEachEmptyButton(frameIndex, function(bw)
+            bw:SetTextureAsEmpty()
+            bw:UpdateKeybindTextState()
+        end)
+    end
+
     --- Automatically called
     --- @see ModuleV2Mixin#Init
     --- @private
@@ -91,7 +97,9 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnMouseOverGlowSettingsChanged, o.OnMouseOverGlowSettingsChanged)
         self:RegisterMessage(MSG.OnButtonSizeChanged, o.OnButtonSizeChanged)
         self:RegisterMessage(MSG.OnButtonCountChanged, o.OnButtonCountChanged)
+        self:RegisterMessage(MSG.OnShowEmptyButtons, o.OnShowEmptyButtons)
     end
+
 
 end; PropsAndMethods(L)
 

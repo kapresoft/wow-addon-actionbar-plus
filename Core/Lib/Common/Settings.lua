@@ -114,12 +114,12 @@ end
 --- @param frameIndex number
 --- @param key string The key value
 --- @param fallback any The fallback value
---- @param eventNameOrFunction string | function | nil
-local function PSetWidget2(frameIndex, key, fallback, eventNameOrFunction)
+--- @param msgName string | function | nil
+local function PSetWidget2(frameIndex, key, fallback, msgName)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
         GetBarConfig(frameIndex).widget[key] = v or fallback
-        if 'string' == type(eventNameOrFunction) then AceEvent:SendMessage(eventNameOrFunction, libName, frameIndex) end
+        if 'string' == type(msgName) then AceEvent:SendMessage(msgName, libName, frameIndex) end
     end
 end
 
@@ -453,7 +453,7 @@ local function PropsAndMethods(o)
                     desc = L['Show empty buttons::Description'],
                     order = barSeq:next(),
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
-                    set = PSetSpecificWidget(frameIndex, WC.show_empty_buttons, false, E.OnActionbarShowEmptyButtonsUpdated),
+                    set = PSetWidget2(frameIndex, WC.show_empty_buttons, false, MSG.OnShowEmptyButtons),
                 },
                 showIndex = {
                     width = "normal",

@@ -71,10 +71,6 @@ end
 local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
     frameWidget:UpdateButtonAlpha()
 end
---- @param frameWidget FrameWidget
-local function OnActionbarShowEmptyButtonsUpdated(frameWidget, event, sourceFrameIndex)
-    frameWidget:UpdateEmptyButtonsSettings()
-end
 
 --- Show delayed due to anchor not setting until UI is fully loaded
 --- Event is fired from ActionbarPlus#OnAddonLoaded.
@@ -99,12 +95,6 @@ local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
     frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
 end
 
---- @param frameWidget FrameWidget
-local function OnUpdateItemStates(frameWidget, e, ...)
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachItem(function(bw) bw:UpdateItemState() end)
-end
-
 ---@param widget FrameWidget
 local function RegisterCallbacks(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
@@ -112,14 +102,9 @@ local function RegisterCallbacks(widget)
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
 
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
-
     widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
-    widget:SetCallback(E.OnActionbarShowEmptyButtonsUpdated, OnActionbarShowEmptyButtonsUpdated)
-
     widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
     widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
-    -- TODO: Migrate OnUpdateItemStates
-    widget:SetCallback(E.OnUpdateItemStates, OnUpdateItemStates)
 
 end
 

@@ -207,12 +207,10 @@ local function GlobalConstantProperties(o)
         --- Custom Events
         OnActionbarFrameAlphaUpdated = 'OnActionbarFrameAlphaUpdated',
         OnActionbarHideGrid = 'OnActionbarHideGrid',
-        OnActionbarShowEmptyButtonsUpdated = 'OnActionbarShowEmptyButtonsUpdated',
         OnActionbarShowGrid = 'OnActionbarShowGrid',
         OnCooldownTextSettingsChanged = 'OnCooldownTextSettingsChanged',
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
-        OnUpdateItemStates = 'OnUpdateItemStates',
 
         -- ################################
         --- @deprecated DEPRECATED: Use the camel cased version
@@ -332,6 +330,7 @@ local function GlobalConstantProperties(o)
         OnMouseOverGlowSettingsChanged = newMsg('OnMouseOverGlowSettingsChanged'),
         OnUpdateMacroState             = newMsg('OnUpdateMacroState'),
         OnUpdateItemState              = newMsg('OnUpdateItemState'),
+        OnShowEmptyButtons             = newMsg('OnShowEmptyButtons'),
         OnSpellCastSucceeded           = newMsg('OnSpellCastSucceeded'),
         OnTextSettingsChanged          = newMsg('OnTextSettingsChanged'),
         OnTooltipFrameUpdate           = newMsg('OnTooltipFrameUpdate'),

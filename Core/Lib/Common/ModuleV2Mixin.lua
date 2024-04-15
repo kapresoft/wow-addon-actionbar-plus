@@ -18,8 +18,9 @@ local ns = select(2, ...)
 local O, GC, M = ns.O, ns.GC, ns.M
 local K = ns.Kapresoft_LibUtil
 local Ace = K.Objects.AceLibrary.O
-local AceEvent = Ace.AceEvent
-local AceBucket = Ace.AceBucket
+local AceEvent, AceBucket = Ace.AceEvent, Ace.AceBucket
+local StringReplace = O.String.Replace
+
 local eventTraceEnabled = ns.debug.flag.eventTrace
 
 --[[-----------------------------------------------------------------------------
@@ -114,9 +115,8 @@ local function PropsAndMethods(o)
     local _RegisterBucketMessage = o.RegisterBucketMessage
 
     --- @param msg string The message name
-    --- @param callbackFn fun(self:any, ...)|string The callback function name or function(self,...) in the instance of this object
+    --- @param callbackFn fun(msg:string, source:string, ...:any) The callback function name or function(msg, src,...) in the instance of this object
     function o:RegisterMessage(msg, callbackFn)
-        --ns:AceEvent():RegisterMessage(msg, CreateTraceFn(ns, self.pm, callbackFn))
         _RegisterMessage(self, msg, CreateTraceFn(self.pm, callbackFn))
     end
 
@@ -130,13 +130,18 @@ local function PropsAndMethods(o)
     end
 
     --- @param msg string The message name
-    ---@param callbackFn fun(...:any)
-    function o:RegisterMessageHandler(msg, callbackFn)
-        if type(callbackFn) == 'string' then
-            self:RegisterMessage(msg, self[callbackFn])
-        elseif type(callbackFn) == 'function' then
-            self:RegisterMessage(msg, function(...) callbackFn(self, ...) end)
-        end
+    --- @param self PlayerSettingsController
+    local function ResolveHandlerFunction(self, msg)
+        assert(type(msg) == 'string', 'Expected message to be a string but was: ' .. type(msg))
+        local handlerName = StringReplace(msg, ns.name .. '::', '')
+        local handlerFn = self[handlerName]
+        assert(type(handlerFn) == 'function', 'Expected handler to be a function: ' .. handlerName)
+        return handlerFn
+    end
+
+    --- @param msg string The message name
+    function o:RegisterMessageHandler(msg)
+        self:RegisterMessage(msg, ResolveHandlerFunction(self, msg))
     end
 
 end; PropsAndMethods(L)
