@@ -13,7 +13,7 @@ local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local E, Ace = GC.E, O.AceLibrary
-local AceGUI, AceHook = Ace.AceGUI, Ace.AceHook
+local AceGUI, AceHook, AceEvent = Ace.AceGUI, Ace.AceHook, ns:AceEvent()
 local A, PH, API = O.Assert, O.PickupHandler, O.API
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
@@ -186,13 +186,19 @@ end
 local function OnEnter(btn)
     OnBeforeEnter(btn.widget)
     ---Receiver will get a func(widget, event) {}
-    btn.widget:Fire(E.ON_ENTER)
+    btn.widget:Fire(E.OnEnter)
+
+    -- TODO: Will be used in the future in place of widget:Fire(..)
+    -- AceEvent:SendMessage(GC.M.OnEnter, libName, btn)
 end
 --- @param btn ButtonUI
 local function OnLeave(btn)
     OnBeforeLeave(btn.widget)
     ---Receiver will get a func(widget, event) {}
-    btn.widget:Fire(E.ON_LEAVE)
+    btn.widget:Fire(E.OnLeave)
+
+    -- TODO: Will be used in the future in place of widget:Fire(..)
+    -- AceEvent:SendMessage(GC.M.OnLeave, libName, btn)
 end
 
 --- @param btn ButtonUI
@@ -270,8 +276,8 @@ local function RegisterScripts(button)
 
     button:SetScript('OnDragStart', OnDragStart)
     button:SetScript('OnReceiveDrag', OnReceiveDrag)
-    button:SetScript(E.ON_ENTER, OnEnter)
-    button:SetScript(E.ON_LEAVE, OnLeave)
+    button:SetScript(E.OnEnter, OnEnter)
+    button:SetScript(E.OnLeave, OnLeave)
 end
 
 --- @param widget ButtonUIWidget

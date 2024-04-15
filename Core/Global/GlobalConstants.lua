@@ -311,6 +311,8 @@ local function GlobalConstantProperties(o)
 
     --- @class MessageNames
     local Messages = {
+        OnEnter                       = newMsg('OnEnter'),
+        OnLeave                       = newMsg('OnLeave'),
         OnAddOnInitialized            = newMsg('OnAddOnInitialized'),
         OnAddOnEnabled                = newMsg('OnAddOnEnabled'),
         OnAddOnEnabledV2              = newMsg('OnAddOnEnabledV2'),

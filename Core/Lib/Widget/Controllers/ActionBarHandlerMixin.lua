@@ -75,6 +75,19 @@ local function PropsAndMethods(o)
         local pfn = predicateFn or function(bw) return true end
         self:fevf(function(fw)
             for _, btn in ipairs(fw.buttonFrames) do
+                local shouldApply = btn.widget and pfn(btn.widget)
+                if true == shouldApply then applyFn(btn.widget) end
+            end
+        end)
+    end
+
+    --- Apply for each non-empty button with a predicateFn
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachNonEmptyButton(applyFn, predicateFn)
+        local pfn = predicateFn or function(bw) return true end
+        self:fevf(function(fw)
+            for _, btn in ipairs(fw.buttonFrames) do
                 local shouldApply = btn.widget and not btn.widget:IsEmpty() and pfn(btn.widget)
                 if true == shouldApply then applyFn(btn.widget) end
             end
@@ -84,25 +97,25 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachCompanionButton(applyFn)
         assert(applyFn, "ForEachCompanionButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn,isCompanionFn)
+        self:ForEachNonEmptyButton(applyFn,isCompanionFn)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachStealthButton(applyFn)
         assert(applyFn, "ForEachStealthButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, isStealthSpellFn)
+        self:ForEachNonEmptyButton(applyFn, isStealthSpellFn)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachShapeshiftButton(applyFn)
         assert(applyFn, "ForEachShapeshiftButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, isShapeShiftFn)
+        self:ForEachNonEmptyButton(applyFn, isShapeShiftFn)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachItemButton(applyFn)
         assert(applyFn, "ForEachItemButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, isItemOrMacroFn)
+        self:ForEachNonEmptyButton(applyFn, isItemOrMacroFn)
     end
 
     --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
@@ -110,7 +123,7 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachMatchingSpellButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, function(bw) return bw:IsMatchingMacroOrSpell(matchSpellId) end)
+        self:ForEachNonEmptyButton(applyFn, function(bw) return bw:IsMatchingMacroOrSpell(matchSpellId) end)
     end
 
     --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
@@ -118,20 +131,20 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachMatchingSpellAndAllMacrosButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, function(bw) return bw:IsMacro() or bw:IsMatchingMacroOrSpell(matchSpellId) end)
+        self:ForEachNonEmptyButton(applyFn, function(bw) return bw:IsMacro() or bw:IsMatchingMacroOrSpell(matchSpellId) end)
     end
 
     --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachMacroButton(applyFn)
         assert(applyFn, "ForEachMacroButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, function(bw) return bw:IsMacro() end)
+        self:ForEachNonEmptyButton(applyFn, function(bw) return bw:IsMacro() end)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachEquipmentSetButton(applyFn)
         assert(applyFn, "ForEachEquipmentSetButton(fn):: Function handler missing")
-        self:ForEachButton(applyFn, isEquipmentSetFn)
+        self:ForEachNonEmptyButton(applyFn, isEquipmentSetFn)
     end
 
 end;
