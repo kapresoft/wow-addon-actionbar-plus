@@ -485,7 +485,7 @@ local function PropsAndMethods(o)
                     name = L['Alpha'],
                     desc = L['Alpha::Description'],
                     get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
-                    set = PSetSpecificWidget(frameIndex, WC.buttonAlpha, 1.0, E.OnActionbarFrameAlphaUpdated),
+                    set = PSetWidget2(frameIndex, WC.buttonAlpha, 1.0, MSG.OnActionbarFrameAlphaUpdated),
                 },
                 button_width = {
                     width = "normal",
@@ -547,7 +547,7 @@ local function PropsAndMethods(o)
                     name = L['Mouseover'],
                     desc = L['Mouseover::Description'],
                     get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
-                    set = PSetSpecificWidget(frameIndex, WC.frame_handle_mouseover, false, E.OnFrameHandleMouseOverConfigChanged),
+                    set = PSetWidget2(frameIndex, WC.frame_handle_mouseover, false, MSG.OnMouseOverFrameHandleConfigChanged),
                 },
                 frame_handle_alpha = {
                     width = "normal",
@@ -560,7 +560,7 @@ local function PropsAndMethods(o)
                     min = 0,
                     max = 1,
                     get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
-                    set = PSetSpecificWidget(frameIndex, WC.frame_handle_alpha, 1.0, E.OnFrameHandleAlphaConfigChanged),
+                    set = PSetWidget2(frameIndex, WC.frame_handle_alpha, 1.0, MSG.OnFrameHandleAlphaConfigChanged),
                 },
                 reset_anchor = {
                     width = "normal",

@@ -79,12 +79,29 @@ local function PropsAndMethods(o)
         fw:SaveAndScrubDeletedButtons(true)
     end
 
+    --- @param frameIndex Index
     function o.OnShowEmptyButtons(msg, src, frameIndex)
         o:FrameForEachEmptyButton(frameIndex, function(bw)
             bw:SetTextureAsEmpty()
             bw:UpdateKeybindTextState()
         end)
     end
+
+    --- @param frameIndex Index
+    function o.OnActionbarFrameAlphaUpdated(msg, src, frameIndex)
+        o:GetFrameByIndex(frameIndex):UpdateButtonAlpha()
+    end
+
+    --- @param frameIndex Index
+    function o.OnMouseOverFrameHandleConfigChanged(msg, src, frameIndex)
+        o:GetFrameByIndex(frameIndex).frameHandle:UpdateBackdropState()
+    end
+
+    --- @param frameIndex Index
+    function o.OnFrameHandleAlphaConfigChanged(msg, src, frameIndex)
+        o:GetFrameByIndex(frameIndex):UpdateFrameHandleAlpha()
+    end
+
 
     --- Automatically called
     --- @see ModuleV2Mixin#Init
@@ -98,6 +115,14 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnButtonSizeChanged, o.OnButtonSizeChanged)
         self:RegisterMessage(MSG.OnButtonCountChanged, o.OnButtonCountChanged)
         self:RegisterMessage(MSG.OnShowEmptyButtons, o.OnShowEmptyButtons)
+        self:RegisterMessage(MSG.OnActionbarFrameAlphaUpdated, o.OnActionbarFrameAlphaUpdated)
+        self:RegisterMessage(MSG.OnMouseOverFrameHandleConfigChanged, o.OnMouseOverFrameHandleConfigChanged)
+        self:RegisterMessage(MSG.OnFrameHandleAlphaConfigChanged, o.OnFrameHandleAlphaConfigChanged)
+
+
+        self:ForEachVisibleFrames(function(fw)
+            fw:UpdateFrameHandleAlpha()
+        end)
     end
 
 

@@ -6,6 +6,7 @@
     <Script file="ActionBarOperations.lua"/>
 
     <Script file="MainController.lua"/>
+    <Script file="FrameGroupController.lua"/>
     <Script file="ConfigDialogController.lua"/>
     <Script file="BagController.lua"/>
     <Script file="EquipmentSetController.lua"/>
