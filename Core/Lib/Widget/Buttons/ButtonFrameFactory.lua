@@ -49,6 +49,8 @@ local p = LC.FRAME:NewLogger(ns.M.ButtonFrameFactory)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+local function fh() return O.FrameHandleBuilderMixin end
+
 --- @param widget FrameWidget
 --- @param name string The widget name.
 local function RegisterWidget(widget, name)
@@ -67,45 +69,20 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
---- @param frameWidget FrameWidget
-local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
-    frameWidget:UpdateButtonAlpha()
-end
-
 --- Show delayed due to anchor not setting until UI is fully loaded
 --- Event is fired from ActionbarPlus#OnAddonLoaded.
 --- Avoid taint() and return if in combat
---- @param w FrameWidget
-local function OnAddOnReady(w, msg)
+--- @param self FrameWidget
+local function OnAddOnReady(self)
     if InCombatLockdown() then return end
-    C_Timer.After(0.1, function() w:InitAnchor() end)
-end
-
----Fired by FrameHandle when dragging stopped
---- @param frameWidget FrameWidget
---- @param event string
-local function OnDragStop_FrameHandle(frameWidget, event) frameWidget:UpdateAnchor() end
-
---- @param frameWidget FrameWidget
-local function OnMouseOverFrameHandleConfigChanged(frameWidget, e, ...) frameWidget.frameHandle:UpdateBackdropState() end
-
---- @param frameWidget FrameWidget
-local function OnFrameHandleAlphaConfigChanged(frameWidget, e, ...)
-    local barConf = frameWidget:GetConfig()
-    frameWidget.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
+    C_Timer.After(0.1, function() self:InitAnchor() end)
 end
 
 ---@param widget FrameWidget
-local function RegisterCallbacks(widget)
+local function RegisterMessages(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    local AceEventIC = ns:AceEvent()
-    AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
-
-    widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
-    widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)
-    widget:SetCallback(E.OnFrameHandleMouseOverConfigChanged, OnMouseOverFrameHandleConfigChanged)
-    widget:SetCallback(E.OnFrameHandleAlphaConfigChanged, OnFrameHandleAlphaConfigChanged)
-
+    local evt = ns:AceEvent()
+    evt:RegisterMessage(M.OnAddOnReady, function() OnAddOnReady(widget) end)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -153,6 +130,7 @@ local function WidgetMethods(widget)
 
         --- @type _RegionAnchor
         local frameAnchor = AnchorUtil.CreateAnchorFromPoint(frame, 1)
+        p:f3(function() return "New Frame Anchor: %s", frameAnchor end)
         P:SaveAnchor(frameAnchor, self.index)
     end
 
@@ -451,6 +429,11 @@ local function WidgetMethods(widget)
         end)
     end
 
+    function widget:UpdateFrameHandleAlpha()
+        local barConf = self:GetConfig()
+        self.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
+    end
+
     function widget:UpdateEmptyButtonsSettings()
         --- @param bw ButtonUIWidget
         self:ApplyForEachButton(function(bw)
@@ -617,12 +600,12 @@ function L:Constructor(frameIndex)
     widget.frame = f
     f.widget = widget
 
-    widget.frameHandle = ABP_CreateFrameHandle(widget)
+    widget.frameHandle = fh():New(widget)
     widget.frameHandle:Show()
 
     RegisterWidget(widget, f:GetName() .. '::Widget')
     WidgetMethods(widget)
-    RegisterCallbacks(widget)
+    RegisterMessages(widget)
 
     widget:SetFrameDimensions()
 

@@ -6,7 +6,7 @@
     <Script file="ButtonProfileMixin.lua"/>
     <Script file="ButtonMixin.lua"/>
     <Script file="ButtonUI.lua"/>
-    <Script file="FrameHandleMixin.lua"/>
+    <Script file="FrameHandleBuilderMixin.lua"/>
     <Script file="ButtonFrameFactory.lua"/>
     <Script file="BaseAttributeSetter.lua"/>
     <Script file="MacrotextAttributeSetter.lua"/>

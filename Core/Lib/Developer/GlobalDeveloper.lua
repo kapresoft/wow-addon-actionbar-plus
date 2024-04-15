@@ -1,3 +1,5 @@
+--- @class GlobalDeveloper
+
 --- @type string
 local addon
 --- @type Namespace | Kapresoft_Base_Namespace
@@ -15,8 +17,10 @@ local function log(...) print(prefix, ...) end
 Main Code
 -------------------------------------------------------------------------------]]
 local flag = kns.debug.flag
+flag.developer = true
 flag.debugging = true
 flag.eventTrace = true
 
+log('debug.flag.developer:', flag.developer)
 log('debug.flag.debugging:', flag.debugging)
 log('debug.flag.eventTrace:', flag.eventTrace)
