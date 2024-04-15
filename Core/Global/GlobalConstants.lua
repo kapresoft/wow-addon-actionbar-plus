@@ -215,7 +215,6 @@ local function GlobalConstantProperties(o)
         OnFrameHandleAlphaConfigChanged = 'OnFrameHandleAlphaConfigChanged',
         OnFrameHandleMouseOverConfigChanged = 'OnFrameHandleMouseOverConfigChanged',
         OnMouseOverGlowSettingsChanged = 'OnMouseOverGlowSettingsChanged',
-        OnTextSettingsChanged = 'OnTextSettingsChanged',
         OnUpdateItemStates = 'OnUpdateItemStates',
 
         -- ################################
@@ -334,6 +333,7 @@ local function GlobalConstantProperties(o)
         OnUpdateMacroState            = newMsg('OnUpdateMacroState'),
         OnUpdateItemState             = newMsg('OnUpdateItemState'),
         OnSpellCastSucceeded          = newMsg('OnSpellCastSucceeded'),
+        OnTextSettingsChanged         = newMsg('OnTextSettingsChanged'),
         OnTooltipFrameUpdate          = newMsg('OnTooltipFrameUpdate'),
         MacroAttributeSetter_OnSetIcon     = newMsg('MacroAttributeSetter:OnSetIcon'),
         MacroAttributeSetter_OnShowTooltip = newMsg('MacroAttributeSetter:OnShowTooltip'),
