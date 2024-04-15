@@ -54,15 +54,35 @@ local function PropsAndMethods(o)
     end
 
     --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction|nil | "function(bw) return true end"
+    --- @return FrameWidget
+    function o:FrameForEachButtonCondition(frameIndex, applyFn, predicateFn)
+        local pfn = predicateFn or function() return true end
+        assertFrameIndex(frameIndex)
+        local fw = self:GetFrameByIndex(frameIndex); if not fw then return nil end
+        for _, btn in ipairs(fw.buttonFrames) do
+            if pfn(btn.widget) == true then applyFn(btn.widget) end
+        end
+        return fw
+    end
+
+    --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @return FrameWidget
+    function o:FrameForEachEmptyButton(frameIndex, applyFn)
+        return self:FrameForEachButtonCondition(frameIndex, applyFn,
+                function(bw) return bw:IsEmpty() end)
+    end
+
+    --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     --- @return FrameWidget
     function o:FrameForAllButton(frameIndex, applyFn)
-        assertFrameIndex(frameIndex)
-        local fw = PR:GetFrameWidgetByIndex(frameIndex); if not fw then return nil end
-        for _, btn in ipairs(fw.buttonFrames) do
-            applyFn(btn.widget)
-        end
-        return fw
+        return self:FrameForEachButtonCondition(frameIndex, applyFn)
     end
 
     --- Includes Non-Visible in Settings
