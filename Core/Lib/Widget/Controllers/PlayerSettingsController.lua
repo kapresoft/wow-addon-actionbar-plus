@@ -43,6 +43,43 @@ local function PropsAndMethods(o)
         o:ForEachNonEmptyButton(function(bw) bw:RefreshHighlightEnabled() end)
     end
 
+    --- @param frameIndex Index
+    function o.OnButtonSizeChanged(msg, src, frameIndex)
+        local fw = o:FrameForAllButton(frameIndex, function(bw)
+            bw:SetButtonProperties()
+            bw:RefreshTexts()
+            bw:UpdateKeybindTextState()
+        end); if not fw then return end
+        fw:SetFrameDimensions()
+        fw:LayoutButtonGrid()
+    end
+
+    --- @param frameIndex Index
+    function o.OnButtonCountChanged(msg, src, frameIndex)
+        p:vv(function() return 'OnButtonCountChanged() called: frameIndex=%s', frameIndex end)
+
+        local fw = o:GetFrameByIndex(frameIndex); if not fw then return end
+        if not fw:IsShownInConfig() then return end
+
+        local barConfig = fw:GetConfig()
+        local widget = barConfig.widget
+        local bf = O.ButtonFactory
+        fw:SetFrameDimensions()
+
+        bf:CreateButtons(fw, widget.rowSize, widget.colSize)
+        fw:HideUnusedButtons()
+
+        fw:SetInitialState()
+        fw:ShowGroupIfEnabled()
+
+        fw = o:FrameForAllButton(frameIndex, function(bw)
+            bw:SetButtonProperties()
+            bw:RefreshTexts()
+            bw:UpdateKeybindTextState()
+        end)
+        fw:SaveAndScrubDeletedButtons(true)
+    end
+
     --- Automatically called
     --- @see ModuleV2Mixin#Init
     --- @private
@@ -52,6 +89,8 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnCooldownTextSettingsChanged, o.OnCooldownTextSettingsChanged)
         self:RegisterMessage(MSG.OnTextSettingsChanged, o.OnTextSettingsChanged)
         self:RegisterMessage(MSG.OnMouseOverGlowSettingsChanged, o.OnMouseOverGlowSettingsChanged)
+        self:RegisterMessage(MSG.OnButtonSizeChanged, o.OnButtonSizeChanged)
+        self:RegisterMessage(MSG.OnButtonCountChanged, o.OnButtonCountChanged)
     end
 
 end; PropsAndMethods(L)
