@@ -68,12 +68,6 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
-local function OnMouseOverGlowSettingsChanged(frameWidget, event)
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw) bw:RefreshHighlightEnabled() end)
-end
-
---- @param frameWidget FrameWidget
 local function OnButtonSizeChanged(frameWidget, event)
     --- @param bw ButtonUIWidget
     frameWidget:ApplyForEachButton(function(bw)
@@ -155,7 +149,7 @@ local function RegisterCallbacks(widget)
     local AceEventIC = ns:AceEvent()
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
 
-    widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
+    -- widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
     widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
     widget:SetCallback(E.OnButtonCountChanged, OnButtonCountChanged)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
