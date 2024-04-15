@@ -318,7 +318,7 @@ local function PropsAndMethods(o)
                     name = L['Mouseover Glow'],
                     desc = L['Mouseover Glow::Description'],
                     get = PGet(self, PC.action_button_mouseover_glow, false),
-                    set = PSetWithEvent(self, PC.action_button_mouseover_glow, false, E.OnMouseOverGlowSettingsChanged)
+                    set = PSetWithMsg(self, PC.action_button_mouseover_glow, false, MSG.OnMouseOverGlowSettingsChanged)
                 },
                 hide_text_on_small_buttons = {
                     width = 'full',

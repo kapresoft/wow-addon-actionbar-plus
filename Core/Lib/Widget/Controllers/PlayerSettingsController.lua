@@ -39,6 +39,10 @@ local function PropsAndMethods(o)
         o:ForEachNonEmptyButton(function(bw) bw:RefreshTexts() end)
     end
 
+    function o.OnMouseOverGlowSettingsChanged()
+        o:ForEachNonEmptyButton(function(bw) bw:RefreshHighlightEnabled() end)
+    end
+
     --- Automatically called
     --- @see ModuleV2Mixin#Init
     --- @private
@@ -47,6 +51,7 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnPlayerLeaveCombat, o.OnCombatUnlockState)
         self:RegisterMessage(MSG.OnCooldownTextSettingsChanged, o.OnCooldownTextSettingsChanged)
         self:RegisterMessage(MSG.OnTextSettingsChanged, o.OnTextSettingsChanged)
+        self:RegisterMessage(MSG.OnMouseOverGlowSettingsChanged, o.OnMouseOverGlowSettingsChanged)
     end
 
 end; PropsAndMethods(L)
