@@ -115,6 +115,18 @@ end
 --- @param key string The key value
 --- @param fallback any The fallback value
 --- @param eventNameOrFunction string | function | nil
+local function PSetWidget2(frameIndex, key, fallback, eventNameOrFunction)
+    return function(_, v)
+        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
+        GetBarConfig(frameIndex).widget[key] = v or fallback
+        if 'string' == type(eventNameOrFunction) then AceEvent:SendMessage(eventNameOrFunction, libName, frameIndex) end
+    end
+end
+
+--- @param frameIndex number
+--- @param key string The key value
+--- @param fallback any The fallback value
+--- @param eventNameOrFunction string | function | nil
 local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
@@ -173,7 +185,7 @@ end
 local function GetRowSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.rowSize = v
-        BF:Fire(E.OnButtonCountChanged, frameIndex)
+        AceEvent:SendMessage(MSG.OnButtonCountChanged, libName, frameIndex)
     end
 end
 local function GetColSizeGetterHandler(frameIndex)
@@ -182,7 +194,7 @@ end
 local function GetColSizeSetterHandler(frameIndex)
     return function(_, v)
         GetBarConfig(frameIndex).widget.colSize = v
-        BF:Fire(E.OnButtonCountChanged, frameIndex)
+        AceEvent:SendMessage(MSG.OnButtonCountChanged, libName, frameIndex)
     end
 end
 
@@ -485,7 +497,7 @@ local function PropsAndMethods(o)
                     name = L['Size (Width & Height)'],
                     desc = L['Size (Width & Height)::Description'],
                     get = PGetWidget(frameIndex, WC.buttonSize, 36),
-                    set = PSetWidget(frameIndex, WC.buttonSize, 36, E.OnButtonSizeChanged),
+                    set = PSetWidget2(frameIndex, WC.buttonSize, 36, MSG.OnButtonSizeChanged),
                 },
                 rows = {
                     width = "normal",

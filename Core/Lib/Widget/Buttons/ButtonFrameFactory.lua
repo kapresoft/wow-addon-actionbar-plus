@@ -68,44 +68,6 @@ local function RegisterWidget(widget, name)
 end
 
 --- @param frameWidget FrameWidget
-local function OnButtonSizeChanged(frameWidget, event)
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw)
-        bw:SetButtonProperties()
-        bw:RefreshTexts()
-        bw:UpdateKeybindTextState()
-    end)
-    frameWidget:SetFrameDimensions()
-    frameWidget:LayoutButtonGrid()
-end
-
---- @param frameWidget FrameWidget
-local function OnButtonCountChanged(frameWidget, event, sourceFrameIndex)
-    if sourceFrameIndex ~= frameWidget:GetFrameIndex() then return end
-    if not frameWidget:IsShownInConfig() then return end
-
-    local barConfig = frameWidget:GetConfig()
-    local widget = barConfig.widget
-    local bf = O.ButtonFactory
-    frameWidget:SetFrameDimensions()
-
-    bf:CreateButtons(frameWidget, widget.rowSize, widget.colSize)
-    frameWidget:HideUnusedButtons()
-
-    frameWidget:SetInitialState()
-    frameWidget:ShowGroupIfEnabled()
-
-    --- @param bw ButtonUIWidget
-    frameWidget:ApplyForEachButton(function(bw)
-        bw:SetButtonProperties()
-        bw:RefreshTexts()
-        bw:UpdateKeybindTextState()
-    end)
-
-    frameWidget:SaveAndScrubDeletedButtons(true)
-end
-
---- @param frameWidget FrameWidget
 local function OnActionbarFrameAlphaUpdated(frameWidget, event, sourceFrameIndex)
     frameWidget:UpdateButtonAlpha()
 end
@@ -149,9 +111,6 @@ local function RegisterCallbacks(widget)
     local AceEventIC = ns:AceEvent()
     AceEventIC:RegisterMessage(M.OnAddOnReady, function(msg) OnAddOnReady(widget, msg) end)
 
-    -- widget:SetCallback(E.OnMouseOverGlowSettingsChanged, OnMouseOverGlowSettingsChanged)
-    widget:SetCallback(E.OnButtonSizeChanged, OnButtonSizeChanged)
-    widget:SetCallback(E.OnButtonCountChanged, OnButtonCountChanged)
     widget:SetCallback(O.FrameHandleMixin.E.OnDragStop_FrameHandle, OnDragStop_FrameHandle)
 
     widget:SetCallback(E.OnActionbarFrameAlphaUpdated, OnActionbarFrameAlphaUpdated)

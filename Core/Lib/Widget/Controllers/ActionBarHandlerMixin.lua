@@ -13,6 +13,13 @@ local libName = M.ActionBarHandlerMixin
 --- @class ActionBarHandlerMixin : BaseLibraryObject
 local L = ns:NewLibStd(libName)
 local p = ns:CreateDefaultLogger(libName)
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+---@param frameIndex Index
+local function assertFrameIndex(frameIndex)
+    assert(type(frameIndex) == 'number', 'Expected frameIndex to be a number but got ' .. type(frameIndex))
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -39,6 +46,24 @@ local function PropsAndMethods(o)
     function o:a() return O.API end
     --- @return ActionBarOperations
     function o:o() return O.ActionBarOperations end
+
+    --- @return FrameWidget
+    function o:GetFrameByIndex(frameIndex)
+        assertFrameIndex(frameIndex)
+        return PR:GetFrameWidgetByIndex(frameIndex)
+    end
+
+    --- Includes Non-Visible in Settings
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @return FrameWidget
+    function o:FrameForAllButton(frameIndex, applyFn)
+        assertFrameIndex(frameIndex)
+        local fw = PR:GetFrameWidgetByIndex(frameIndex); if not fw then return nil end
+        for _, btn in ipairs(fw.buttonFrames) do
+            applyFn(btn.widget)
+        end
+        return fw
+    end
 
     --- Includes Non-Visible in Settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
