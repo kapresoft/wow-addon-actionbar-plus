@@ -33,7 +33,7 @@ local function PropsAndMethods(o)
         if delay then assert(type(delay) == 'number',
                 m .. ": Delay must be a number in milliseconds. Got-> " .. type(delay)) end
         local timeDelay = delay or 0.2
-        p:vv(function() return '%s: called: delay=%s', m, timeDelay end)
+        p:f3(function() return '%s: called: delay=%s', m, timeDelay end)
         C_Timer.After(timeDelay, function()
             o:fevf(function(fw) fw:ShowGroupIfEnabled() end)
         end)
