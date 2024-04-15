@@ -327,7 +327,7 @@ local function PropsAndMethods(o)
                     name = L['Hide text for smaller buttons'],
                     desc = L['Hide text for smaller buttons::Description'],
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
-                    set = PSetWithEvent(self, PC.hide_text_on_small_buttons, false, E.OnTextSettingsChanged),
+                    set = PSetWithMsg(self, PC.hide_text_on_small_buttons, false, MSG.OnTextSettingsChanged),
                 },
                 hide_countdown_numbers = {
                     width = 'full',

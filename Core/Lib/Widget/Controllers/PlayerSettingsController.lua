@@ -32,7 +32,11 @@ local function PropsAndMethods(o)
     end
 
     function o.OnCooldownTextSettingsChanged()
-        o:ForEachButton(function(bw) bw:RefreshTexts() end)
+        o:ForEachNonEmptyButton(function(bw) bw:RefreshTexts() end)
+    end
+
+    function o.OnTextSettingsChanged()
+        o:ForEachNonEmptyButton(function(bw) bw:RefreshTexts() end)
     end
 
     --- Automatically called
@@ -42,6 +46,7 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnPlayerEnterCombat, o.OnCombatLockState)
         self:RegisterMessage(MSG.OnPlayerLeaveCombat, o.OnCombatUnlockState)
         self:RegisterMessage(MSG.OnCooldownTextSettingsChanged, o.OnCooldownTextSettingsChanged)
+        self:RegisterMessage(MSG.OnTextSettingsChanged, o.OnTextSettingsChanged)
     end
 
 end; PropsAndMethods(L)
