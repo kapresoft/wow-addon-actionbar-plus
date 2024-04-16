@@ -1,6 +1,6 @@
 --- @type string
 local addon
---- @type Namespace | Kapresoft_Base_Namespace
+--- @type BaseNamespace
 local kns
 addon, kns = ...
 
@@ -29,5 +29,7 @@ Type: DebugSettings
 --- @field flag DebugSettingsFlag
 --- @see GlobalDeveloper
 kns.debug = {
-    flag = flag
+    flag = flag,
+    --- The name is case-insensitive
+    chatFrameName = '<name of the chat-frame-tab>',
 }

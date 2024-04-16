@@ -7,7 +7,7 @@ local addon
 local ns
 addon, ns = ...
 
-local sformat = string.format
+local sformat, strlower = string.format, string.lower
 local c1 = CreateColor(0.9, 0.2, 0.2, 1.0)
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -21,13 +21,14 @@ Support Functions
 -------------------------------------------------------------------------------]]
 ---@param name Name
 function GetFrameByName(name)
+    assert(type(name) == 'string', "ChatFrame string name is required")
     for i = 1, NUM_CHAT_WINDOWS do
         --- @type Frame
         local frame = _G["ChatFrame" .. i]
         if frame then
             --- @type Name
             local n = FCF_GetChatWindowInfo(i)
-            if name == n then return frame end
+            if n and strlower(name) == strlower(n) then return frame end
         end
     end
 end
@@ -75,9 +76,9 @@ local function PropsAndMethods(o)
         if ns.printerFn then return ns.printerFn end
 
         --- @type ChatLogFrame
-        local chatFrame = GetFrameByName('Debug')
+        local chatFrame = GetFrameByName(ns.debug.chatFrameName)
         if not chatFrame then
-            print(o.prefix, addon, 'Could not find a chat frame named [Debug].')
+            print(o.prefix, addon, sformat('Could not find a chat frame named [%s].', ns.debug.chatFrameName))
             return nil
         end
 
@@ -92,7 +93,7 @@ local function PropsAndMethods(o)
             ns.printerFn = function(...) ns.chatFrame:log(...) end
             FCF_SelectDockFrame(chatFrame)
         end
-        chatFrame:log(o.prefix, 'ChatFrame initialized. Log console enabled:', flag.logConsole)
+        chatFrame:log(o.prefix, 'Debug ChatFrame initialized. Log console enabled:', flag.logConsole)
 
         return ns.printerFn
     end

@@ -2,7 +2,7 @@
 
 --- @type string
 local addon
---- @type Namespace | Kapresoft_Base_Namespace
+--- @type BaseNamespace
 local kns
 addon, kns = ...
 local sformat = string.format
@@ -17,12 +17,16 @@ local function log(...) print(prefix, ...) end
 Main Code
 -------------------------------------------------------------------------------]]
 local flag = kns.debug.flag
+
 flag.developer = true
 flag.debugging = true
 flag.logConsole = true
 flag.eventTrace = true
 
+kns.debug.chatFrameName = 'debug'
+
 log('developer:', flag.developer)
 log('debugging:', flag.debugging)
 log('logConsole:', flag.logConsole)
 log('eventTrace:', flag.eventTrace)
+log('chatFrameName:', kns.debug.chatFrameName)
