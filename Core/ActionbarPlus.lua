@@ -101,22 +101,24 @@ local function PropertiesAndMethods(o)
             self:OpenConfig();
             return
         end
-        if IsAnyOf('info', unpack(args)) then self:SlashCommand_Info_Handler(); return end
+        if IsAnyOf('clear', unpack(args)) then return self:SlashCommand_ClearConsole_Handler() end
+        if IsAnyOf('info', unpack(args)) then return self:SlashCommand_Info_Handler() end
         self:SlashCommand_Help_Handler()
     end
 
     function o:SlashCommand_Help_Handler()
         local C = GC:GetAceLocale()
-        pd:vv('')
-        pd:vv(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
-        pd:vv(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
-        pd:vv(function() return '%s:', C['options'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
-        pd:vv(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
+        pd:a('')
+        pd:a(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
+        pd:a(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
+        pd:a(function() return '%s:', C['options'] end)
+        pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
+        pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
+        pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
     end
 
     function o:SlashCommand_Info_Handler() pd:vv(GC:GetAddonInfoFormatted()) end
+    function o:SlashCommand_ClearConsole_Handler() return ns.chatFrame and ns.chatFrame:Clear() end
 
     function o:ConfirmReloadUI()
         if IsShiftKeyDown() then
@@ -166,7 +168,7 @@ local function PropertiesAndMethods(o)
 
     --- @param spaceSeparatedArgs string
     function o:SlashCommand_Info_Handler(spaceSeparatedArgs)
-        pd:vv(GC:GetAddonInfoFormatted())
+        pd:a(GC:GetAddonInfoFormatted())
     end
 
     function o:ConfirmReloadUI()

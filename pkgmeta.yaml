@@ -71,6 +71,7 @@ ignore:
   - Core/ExtLib/WowAce/Ace3/Ace3_Wrath.toc
   - Core/ExtLib/WowAce/Ace3/Bindings.xml
   - Core/ExtLib/WowAce/Ace3/Bindings.xml
+  - Core/Lib/Developer
   - Dev.toc
 
 ## Potentially helpful libraries

@@ -13,7 +13,11 @@ Type: DebugSettingsFlag
 --- @see GlobalDeveloper
 local flag = {
     developer = false,
+    --- Enables debugging
     debugging = false,
+    --- Enables the log console
+    logConsole = false,
+    --- Enable Event Tracing on the log console
     eventTrace = false,
 }
 

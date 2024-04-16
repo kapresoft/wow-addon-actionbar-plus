@@ -11,7 +11,7 @@ Namespace Initialization
 -------------------------------------------------------------------------------]]
 --- @type string
 local addonName
---- @type Kapresoft_Base_Namespace
+--- @type BaseNamespace
 local kns
 addonName, kns = ...
 
@@ -146,7 +146,7 @@ local function GameVersionMethods(o)
     function o:IsRetail() return self.gameVersion == 'retail' end
 end; GameVersionMethods(GameVersionMixin)
 
---- @class __NamespaceLoggerMixin
+--- @class __NamespaceLoggerMixin : BaseNamespace
 local NamespaceLoggerMixin = {}
 --- @param o __NamespaceLoggerMixin
 local function NamespaceLoggerMethods(o)
@@ -155,6 +155,8 @@ local function NamespaceLoggerMethods(o)
     CategoryLogger:Configure(addonName, LogCategories, {
         consoleColors = GC.C.CONSOLE_COLORS,
         levelSupplierFn = function() return __logLevel() end,
+        printerFn = kns.printerFn,
+        enabled = kns.debug.flag.debugging == true,
         enabledCategoriesSupplierFn = function() return __categories() end,
     })
 

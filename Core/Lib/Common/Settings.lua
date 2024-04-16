@@ -279,6 +279,9 @@ local function PropsAndMethods(o)
 
         if ns.debug.flag.debugging == true then
             configArgs.debugging = debugGroup:CreateDebuggingGroup()
+            p:a(function()
+                return 'Debugging tab in Settings UI is enabled with log-level: %s', ABP_LOG_LEVEL
+            end)
         else
             ABP_LOG_LEVEL = 0
         end

@@ -36,7 +36,7 @@ local function PropsAndMethods(o)
         if not isLogin then return end
 
         local pa = ns:CreateDefaultLogger(ns.name)
-        pa:vv(GC:GetMessageLoadedText())
+        pa:a(GC:GetMessageLoadedText())
     end
 
     function o.OnAddOnInitialized(event, src, ...)

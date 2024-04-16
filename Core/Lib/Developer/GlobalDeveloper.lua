@@ -19,8 +19,10 @@ Main Code
 local flag = kns.debug.flag
 flag.developer = true
 flag.debugging = true
+flag.logConsole = true
 flag.eventTrace = true
 
-log('debug.flag.developer:', flag.developer)
-log('debug.flag.debugging:', flag.debugging)
-log('debug.flag.eventTrace:', flag.eventTrace)
+log('developer:', flag.developer)
+log('debugging:', flag.debugging)
+log('logConsole:', flag.logConsole)
+log('eventTrace:', flag.eventTrace)

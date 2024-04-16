@@ -13,7 +13,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC = ns.O, ns.O.GlobalConstants
-
+local IsNotEmpty = ns:KO().String.IsNotEmpty
 local AceEvent = O.AceLibrary.AceEvent
 local BF = O.ButtonFactory
 local P = O.Profile
@@ -40,7 +40,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'Developer'
 --- @class Developer : BaseLibraryObject_WithAceEvent
-local L = {}; AceEvent:Embed(L); D = L
+local L = {}; AceEvent:Embed(L); A = L
 local p = ns:LC().DEV:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -146,17 +146,6 @@ function L:BA(frameIndex, buttonIndex)
     return ret
 end
 
---[[-----------------------------------------------------------------------------
-Frame
--------------------------------------------------------------------------------]]
---[[
-local function OnEvent(frame, event, ...)
-    p:v(function() return "OnEvent(): Received event=%s", event end)
-end
+function L:C()
 
---- @class DeveloperFrame
-local frame = CreateFrame("Frame", 'DeveloperFrame')
-frame:SetScript('OnEvent', OnEvent)
-frame:RegisterEvent('PLAYER_ENTERING_WORLD')
-frame:RegisterEvent('PLAYER_LEAVING_WORLD')
-]]
+end
