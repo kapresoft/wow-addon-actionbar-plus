@@ -137,10 +137,10 @@ local function OnReceiveDrag(btnUI)
     AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'OnReceiveDrag(btnUI)')
     local cursorUtil = ns:CreateCursorUtil()
     if not cursorUtil:IsValid() then
-        pd:d(function() return 'OnReceiveDrag():CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()) end)
+        pd:f1(function() return 'OnReceiveDrag():CursorInfo: %s isValid: false', pformat:B()(cursorUtil:GetCursor()) end)
         return false
     else
-        pd:d(function() return 'OnReceiveDrag():CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()) end)
+        pd:f1(function() return 'OnReceiveDrag():CursorInfo: %s', pformat:B()(cursorUtil:GetCursor()) end)
     end
     ClearCursor()
 

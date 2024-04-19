@@ -12,6 +12,14 @@ New Instance
 --- @class GridEventsController
 local L = ns:NewController(libName)
 local p = ns:CreateDefaultLogger(libName)
+local pd = ns:LC().DRAG_AND_DROP:NewLogger(libName)
+
+--- @return boolean
+local function IsSupportedCursor()
+    local cursorUtil = ns:CreateCursorUtil()
+    local supported = O.ReceiveDragEventHandler:IsSupportedCursorType(cursorUtil)
+    return supported == true
+end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -22,15 +30,17 @@ local function PropsAndMethods(o)
     --- @see ModuleV2Mixin#Init
     --- @private
     function o:OnAddOnReady()
-        o:RegisterAddOnMessage(E.ACTIONBAR_SHOWGRID, o.OnActionbarShowGrid)
-        o:RegisterAddOnMessage(E.ACTIONBAR_HIDEGRID, o.OnActionbarHideGrid)
+        o:RegisterAddOnMessage(E.ACTIONBAR_SHOWGRID, o.OnActionBarShowGrid)
+        o:RegisterAddOnMessage(E.PET_BAR_SHOWGRID, o.OnPetBarShowGrid)
+        o:RegisterAddOnMessage(E.ACTIONBAR_HIDEGRID, o.OnActionBarHideGrid)
+        o:RegisterAddOnMessage(E.PET_BAR_HIDEGRID, o.OnPetBarHideGrid)
 
         if ns:IsVanilla() then return end
         o:RegisterAddOnMessage(E.CURSOR_CHANGED, o.OnCursorChangeInBags)
     end
 
-    function o.OnActionbarShowGrid()
-        p:f1('OnActionbarShowGrid() called...')
+    function o.OnActionBarShowGrid()
+        if IsSupportedCursor() ~= true then return end
         if InCombatLockdown() then return end
 
         o:ForEachButton(function(bw)
@@ -40,14 +50,22 @@ local function PropsAndMethods(o)
 
     end
 
-    function o.OnActionbarHideGrid()
-        p:f1('OnActionbarShowGrid() called...')
+    function o.OnPetBarShowGrid()
+        if IsSupportedCursor() ~= true then return end
+        o.OnActionBarShowGrid()
+    end
+
+    function o.OnActionBarHideGrid()
         if InCombatLockdown() then return end
 
         o:ForEachButton(function(bw) bw:HideEmptyGridEvent() end)
         C_Timer.After(1, function()
             o:EnableMouseAllButtons(GetCursorInfo() ~= nil)
         end)
+    end
+
+    function o.OnPetBarHideGrid()
+        o.OnActionBarHideGrid()
     end
 
     --- See Also: [https://wowpedia.fandom.com/wiki/CURSOR_CHANGED](https://wowpedia.fandom.com/wiki/CURSOR_CHANGED)
@@ -57,14 +75,14 @@ local function PropsAndMethods(o)
         if InCombatLockdown() then return end
 
         local isDefault, newCursorType, oldCursorType = ...
-        p:f3(function() return "OnCursorChangeInBags: isDefault=%s newCursorType=%s", isDefault, newCursorType end)
+        pd:f3(function() return "OnCursorChangeInBags: isDefault=%s newCursorType=%s", isDefault, newCursorType end)
         if true == isDefault and oldCursorType == CURSOR_ITEM_TYPE then
-            o.OnActionbarHideGrid()
+            o.OnActionBarHideGrid()
             ns:a().ActionbarEmptyGridShowing = false
             return
         end
         if newCursorType ~= CURSOR_ITEM_TYPE then return end
-        o.OnActionbarShowGrid()
+        o.OnActionBarShowGrid()
         ns:a().ActionbarEmptyGridShowing = true
     end
     --- @param state boolean

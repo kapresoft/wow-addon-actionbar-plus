@@ -642,7 +642,9 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds or 1, function() self:UpdateState() end) end
-    ---@param optionalCooldownInfo CooldownInfo
+
+    --  TODO: Revisit UpdateCooldown() and make sure it's not being called multiple times
+    --- @param optionalCooldownInfo CooldownInfo
     function o:UpdateCooldown(optionalCooldownInfo)
         local cd = optionalCooldownInfo or self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end

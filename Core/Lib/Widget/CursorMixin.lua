@@ -51,7 +51,7 @@ function L:IsValid()
         -- is dragged into the action bar.
         return false
     end
-    p:d(function() return 'Cursor is valid: %s', pformat(self.cursorInfo) end)
+    p:f1(function() return 'Cursor is valid: %s', pformat(self.cursorInfo) end)
     return true
 end
 --- @return string

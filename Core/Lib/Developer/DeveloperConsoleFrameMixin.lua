@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type string
 local addon
---- @class BaseNamespace : Kapresoft_Base_Namespace
+--- @type BaseNamespace
 local ns
 addon, ns = ...
 
@@ -84,7 +84,7 @@ local function PropsAndMethods(o)
 
         Mixin(chatFrame, ChatLogFrameMixin)
 
-        local font, size, flags = ABP_Console_Mono:GetFont()
+        local font, size, flags = ns.DEV_CONSOLE_FONT:GetFont()
         chatFrame:SetFont(font, size, flags)
         ns.chatFrame = chatFrame
 

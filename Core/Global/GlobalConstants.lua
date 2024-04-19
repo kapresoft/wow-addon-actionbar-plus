@@ -226,6 +226,8 @@ local function GlobalConstantProperties(o)
 
         ACTIONBAR_SHOWGRID = 'ACTIONBAR_SHOWGRID',
         ACTIONBAR_HIDEGRID = 'ACTIONBAR_HIDEGRID',
+        PET_BAR_SHOWGRID   = 'PET_BAR_SHOWGRID',
+        PET_BAR_HIDEGRID   = 'PET_BAR_HIDEGRID',
 
         --- wow classic
         BAG_UPDATE = 'BAG_UPDATE',

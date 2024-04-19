@@ -1,12 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-	<!-- Interface\AddOns\ActionbarPlus\Core\Lib\Developer\Fonts\Inconsolata-VariableFont_wdth_wght.ttf -->
-
-	<FontFamily name="ABP_Console_Mono" virtual="true">
+	<FontFamily name="ConsoleMonoCondensedSemiBold" virtual="true">
 		<Member alphabet="roman">
-			<Font font="Interface\AddOns\ActionbarPlus\Core\Lib\Developer\Fonts\Inconsolata_Condensed-Black.ttf"
-				  height="12" outline="NORMAL" />
+			<Font font="Interface\AddOns\ActionbarPlus\Core\Lib\Developer\Fonts\Inconsolata_Condensed-SemiBold.ttf"
+				  height="12">
+			</Font>
 		</Member>
 		<Member alphabet="korean">
 			<Font font="Fonts\2002.TTF" height="11" outline="THICK" monochrome="true"/>
@@ -22,7 +21,65 @@
 		</Member>
 	</FontFamily>
 
-	<FontFamily name="ABP_Console_Medium" virtual="true">
+	<FontFamily name="ConsoleMonoCondensedSemiBoldOutline" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Interface\AddOns\ActionbarPlus\Core\Lib\Developer\Fonts\Inconsolata_Condensed-SemiBold.ttf"
+				  height="12" outline="Normal">
+			</Font>
+		</Member>
+		<Member alphabet="korean">
+			<Font font="Fonts\2002.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\FRIZQT__.TTF" height="11" outline="NORMAL" monochrome="true"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\bHEI01B.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\ARIALN.TTF" height="12" outline="THICK" monochrome="true"/>
+		</Member>
+	</FontFamily>
+
+	<FontFamily name="ConsoleMonoSemiCondensedBlack" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Interface\AddOns\ActionbarPlus\Core\Lib\Developer\Fonts\Inconsolata_SemiCondensed-Black.ttf"
+				  height="12">
+			</Font>
+		</Member>
+		<Member alphabet="korean">
+			<Font font="Fonts\2002.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\FRIZQT__.TTF" height="11" outline="NORMAL" monochrome="true"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\bHEI01B.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\ARIALN.TTF" height="12" outline="THICK" monochrome="true"/>
+		</Member>
+	</FontFamily>
+
+	<FontFamily name="ConsoleMedium" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Fonts\ARIALN.TTF" height="12"/>
+		</Member>
+		<Member alphabet="korean">
+			<Font font="Fonts\2002.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\FRIZQT__.TTF" height="11" outline="NORMAL" monochrome="true"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\bHEI01B.TTF" height="11" outline="THICK" monochrome="true"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\ARIALN.TTF" height="12" outline="THICK" monochrome="true"/>
+		</Member>
+	</FontFamily>
+
+	<FontFamily name="ConsoleMediumOutline" virtual="true">
 		<Member alphabet="roman">
 			<Font font="Fonts\ARIALN.TTF" height="12" outline="NORMAL"/>
 		</Member>

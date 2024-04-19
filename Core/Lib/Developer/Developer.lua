@@ -40,7 +40,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'Developer'
 --- @class Developer : BaseLibraryObject_WithAceEvent
-local L = {}; AceEvent:Embed(L); A = L
+local L = {}; AceEvent:Embed(L); dd = L
 local p = ns:LC().DEV:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -146,6 +146,16 @@ function L:BA(frameIndex, buttonIndex)
     return ret
 end
 
-function L:C()
-
+function L:c()
+    local c = ns.chatFrame
+    for i=1, NUM_PET_ACTION_SLOTS, 1 do
+        local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID, checksRange, inRange = GetPetActionInfo(i);
+        if name then
+            local x = { name=name, texture=texture, isToken=isToken,
+                     isActive=isActive, autoCastAllowed=autoCastAllowed,
+                     autoCastEnabled=autoCastEnabled, spellID=spellID,
+                     checksRange=checksRange, inRange=inRange }
+            c:log('pet-action:', pformat(x))
+        end
+    end
 end

@@ -209,7 +209,7 @@ Namespace: Create
 local function CreateNamespace(...)
     --- @type string
     local addon
-    --- @class __Namespace : AceLibraryMixin
+    --- @class __Namespace : BaseNamespace
     --- @field debug DebugSettings
     --- @field gameVersion GameVersion
     --- @field GC GlobalConstants
