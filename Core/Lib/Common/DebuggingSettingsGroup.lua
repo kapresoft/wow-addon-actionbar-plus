@@ -48,31 +48,102 @@ local function PropsAndMethods(o)
             args = {
                 desc = { name = sformat(" %s ", L['Debugging Configuration']), type = "header", order = dbgSeq:next() },
                 spacer1a = { type="description", name=sp, width="full", order = dbgSeq:next() },
-                log_level = {
-                    type = 'range',
-                    order = dbgSeq:next(),
-                    step = 5,
-                    min = 0,
-                    max = 50,
-                    width = 1.5,
-                    name = L['Log Level'],
-                    desc = L['Log Level::Description'],
-                    get = function(_) return ns:GetLogLevel() end,
-                    set = function(_, v) ns:SetLogLevel(v) end,
-                },
-                spacer1b = { type="description", name=sp, width="full", order = dbgSeq:next() },
-                desc_cat = { name = "Categories", type = "header", order = dbgSeq:next() },
-                spacer1c = { type="description", name=sp, width="full", order = dbgSeq:next() },
             },
         }
-
+        self:AddLevelButtons(debugConf)
+        self:AddLogLevelSlider(debugConf)
         self:AddCategories(debugConf)
 
         return debugConf;
     end
 
+    ---@param debugConf AceConfigOption
+    function o:AddLogLevelSlider(debugConf)
+        local a = debugConf.args
+        a.log_level = {
+            type = 'range',
+            order = dbgSeq:next(),
+            step = 5,
+            min = 0,
+            max = 50,
+            width = 1.5,
+            name = L['Log Level'],
+            desc = L['Log Level::Description'],
+            get = function(_) return ns:GetLogLevel() end,
+            set = function(_, v) ns:SetLogLevel(v) end,
+        }
+        a.spacer1b = { type="description", name=sp, width="full", order = dbgSeq:next() }
+    end
+
+    ---@param debugConf AceConfigOption
+    function o:AddLevelButtons(debugConf)
+        local a = debugConf.args
+        a.off = {
+            name = 'Off',
+            type = "execute", order = dbgSeq:next(), width = 0.4,
+            desc = "Turn Off Logging",
+            func = function()
+                a.log_level.set({}, 0)
+            end,
+        }
+        a.info = {
+            name = 'Info',
+            type = "execute", order = dbgSeq:next(), width = 0.4,
+            desc = "Info Log Level (15)",
+            func = function()
+                a.log_level.set({}, 15)
+            end,
+        }
+        a.debugBtn = {
+            name = 'Debug',
+            type = "execute", order = dbgSeq:next(), width = 0.5,
+            desc = "Debug Log Level (20)",
+            func = function()
+                a.log_level.set({}, 20)
+            end,
+        }
+
+        a.fineBtn = {
+            name = 'F1',
+            type = "execute", order = dbgSeq:next(), width = 0.3,
+            desc = "Fine Log Level (25)",
+            func = function()
+                a.log_level.set({}, 25)
+            end,
+        }
+        a.finerBtn = {
+            name = 'F2',
+            type = "execute", order = dbgSeq:next(), width = 0.3,
+            desc = "Finer Log Level (30)",
+            func = function()
+                a.log_level.set({}, 30)
+            end,
+        }
+        a.finestBtn = {
+            name = 'F3',
+            type = "execute", order = dbgSeq:next(), width = 0.3,
+            desc = "Finest Log Level (35)",
+            func = function()
+                a.log_level.set({}, 35)
+            end,
+        }
+        a.traceBtn = {
+            name = 'Trace',
+            type = "execute", order = dbgSeq:next(), width = 0.4,
+            desc = "Trace Log Level (50)",
+            func = function()
+                a.log_level.set({}, 50)
+            end,
+        }
+
+        a.spacerlb1 = { type="description", name=sp, width="full", order = dbgSeq:next() }
+    end
+
     ---@param conf AceConfigOption
     function o:AddCategories(conf)
+        conf.args.desc_cat = { name = ' ' .. L['Categories'] .. ' ', type = "header", order = dbgSeq:next() }
+        conf.args.spacer1d = { type="description", name=sp, width="full", order = dbgSeq:next() }
+
         conf.args.enable_all = {
             name = L['Debugging::Category::Enable All::Button'], desc = L['Debugging::Category::Enable All::Button::Desc'],
             type = "execute", order = dbgSeq:next(), width = 'normal',
