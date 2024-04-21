@@ -17,9 +17,9 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M = ns.O, ns.GC, ns.M
 local K = ns.Kapresoft_LibUtil
-local Ace = K.Objects.AceLibrary.O
+local Ace = ns:AceLibrary()
 local AceEvent, AceBucket = Ace.AceEvent, Ace.AceBucket
-local StringReplace = O.String.Replace
+local StringReplace = ns:String().Replace
 
 local eventTraceEnabled = ns.debug.flag.eventTrace
 

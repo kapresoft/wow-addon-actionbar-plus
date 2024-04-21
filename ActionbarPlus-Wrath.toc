@@ -38,14 +38,5 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
-Core\Base\_Base.xml
-#@do-not-package@
-Core\Lib\Developer\_GlobalDeveloper.xml
-#@end-do-not-package@
-Wrath\Wrath.lua
+Core\Wrath.lua
 Core\_Core.xml
-#@do-not-package@
-Core\Lib\Developer\_Developer.xml
-Core\Lib\WidgetV2\_Widget.xml
-#@end-do-not-package@
-Wrath\_ActionbarPlus.xml

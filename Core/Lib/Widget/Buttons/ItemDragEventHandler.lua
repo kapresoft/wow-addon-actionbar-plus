@@ -10,8 +10,8 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, Assert, Table, PH = O.Profile, O.Assert, O.Table, O.PickupHandler
-local ItemAttributeSetter, WAttr = O.ItemAttributeSetter, O.GlobalConstants.WidgetAttributes
+local P, Assert, Table, PH = O.Profile, ns:Assert(), ns:Table(), O.PickupHandler
+local WAttr = ns.GC.WidgetAttributes
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local API = O.API
 

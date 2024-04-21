@@ -11,10 +11,10 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
+local P, API = O.Profile, O.API
 local CN = GC.Profile_Config_Names
-local String, Table, W = O.String, O.Table, GC.WidgetAttributes
-local IsEmptyTable, IsNil = Table.IsEmpty, O.Assert.IsNil
+local String, Table, W = ns:String(), ns:Table(), GC.WidgetAttributes
+local IsEmptyTable, IsNil = Table.IsEmpty, ns:Assert().IsNil
 local IsBlankStr = String.IsBlank
 
 --[[-----------------------------------------------------------------------------

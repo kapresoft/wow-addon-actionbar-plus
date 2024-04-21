@@ -1,11 +1,9 @@
 --- @type string
 local addon
---- @type Namespace | Kapresoft_Base_Namespace
-local kns
-addon, kns = ...
+--- @type CoreNamespace
+local ns
+addon, ns = ...
 
---- @type Namespace
-local ns = select(2, ...)
 ns.gameVersion = 'retail'
 
 --- The colors selected here should be available for all versions

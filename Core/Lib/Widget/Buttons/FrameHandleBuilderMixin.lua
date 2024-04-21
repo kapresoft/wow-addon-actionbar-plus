@@ -12,7 +12,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, MSG, LibStub = ns.O, ns.GC, ns.M, ns.GC.M, ns.LibStub
 
-local LSM = O.AceLibrary.AceLibSharedMedia
+local LSM = ns:AceLibrary().AceLibSharedMedia
 local E, GCC, C = GC.E, GC.C, GC:GetAceLocale()
 local AceEvent = ns:AceEvent()
 

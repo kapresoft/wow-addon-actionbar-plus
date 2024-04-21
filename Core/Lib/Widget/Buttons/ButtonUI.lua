@@ -12,9 +12,9 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local E, Ace = GC.E, O.AceLibrary
-local AceGUI, AceHook, AceEvent = Ace.AceGUI, Ace.AceHook, ns:AceEvent()
-local A, PH, API = O.Assert, O.PickupHandler, O.API
+local E, Ace = GC.E, ns:AceLibrary()
+local AceGUI, AceHook = Ace.AceGUI, Ace.AceHook
+local A, PH, API = ns:Assert(), O.PickupHandler, O.API
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 

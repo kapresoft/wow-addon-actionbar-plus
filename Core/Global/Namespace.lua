@@ -11,13 +11,12 @@ Namespace Initialization
 -------------------------------------------------------------------------------]]
 --- @type string
 local addonName
---- @type BaseNamespace
+--- @type CoreNamespace
 local kns
 addonName, kns = ...
 
-local GC = kns.O.GlobalConstants; kns.GC = GC
-local K = kns.Kapresoft_LibUtil
-local KO = K.Objects
+local GC = kns.GC
+local KO = kns:KO()
 
 --[[-----------------------------------------------------------------------------
 Global Variables: Replace with Addon-specific global vars
@@ -146,7 +145,7 @@ local function GameVersionMethods(o)
     function o:IsRetail() return self.gameVersion == 'retail' end
 end; GameVersionMethods(GameVersionMixin)
 
---- @class __NamespaceLoggerMixin : BaseNamespace
+--- @class __NamespaceLoggerMixin : CoreNamespace
 local NamespaceLoggerMixin = {}
 --- @param o __NamespaceLoggerMixin
 local function NamespaceLoggerMethods(o)
@@ -156,7 +155,7 @@ local function NamespaceLoggerMethods(o)
         consoleColors = GC.C.CONSOLE_COLORS,
         levelSupplierFn = function() return __logLevel() end,
         printerFn = kns.printerFn,
-        enabled = kns.debug.flag.debugging == true,
+        enabled = kns.debug:IsDeveloper(),
         enabledCategoriesSupplierFn = function() return __categories() end,
     })
 
@@ -209,10 +208,8 @@ Namespace: Create
 local function CreateNamespace(...)
     --- @type string
     local addon
-    --- @class __Namespace : BaseNamespace
+    --- @class __Namespace : CoreNamespace
     --- @field debug DebugSettings
-    --- @field gameVersion GameVersion
-    --- @field GC GlobalConstants
     --- @field LibStub LocalLibStub
     --- @field LibStubAce LibStub
     --- @field O GlobalObjects
@@ -220,11 +217,6 @@ local function CreateNamespace(...)
     local ns
 
     addon, ns = ...
-
-    --- @return Kapresoft_LibUtil
-    function ns:K() return ns.Kapresoft_LibUtil end
-    --- @return Kapresoft_LibUtil_Objects
-    function ns:KO() return KO end
 
     --- this is in case we are testing outside of World of Warcraft
     addon = addon or GC.C.ADDON_NAME
@@ -289,7 +281,7 @@ local function CreateNamespace(...)
         --- @param libName Name
         --- @return Kapresoft_LibUtil_Safecall
         function o:CreateSafecall(libName)
-            local logger = o.O.Logger:NewLogger(libName); return o.O.Safecall:New(logger)
+            local logger = o.O.Logger:NewLogger(libName); return ns:Safecall():New(logger)
         end
 
         --- @param moduleName string The module name, i.e. Logger

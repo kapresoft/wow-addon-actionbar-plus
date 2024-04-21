@@ -5,7 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local API, Assert, String, PH = O.API, O.Assert, O.String, O.PickupHandler
+local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank = String.IsNotBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes

@@ -18,7 +18,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local BaseAPI, PH, IsNil = O.BaseAPI, O.PickupHandler, O.Assert.IsNil
+local BaseAPI, PH, IsNil = O.BaseAPI, O.PickupHandler, ns:Assert().IsNil
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 
 --[[-----------------------------------------------------------------------------

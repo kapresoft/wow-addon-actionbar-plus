@@ -6,7 +6,7 @@ local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local W = GC.WidgetAttributes
-local IsBlank = O.String.IsBlank
+local IsBlank = ns:String().IsBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance

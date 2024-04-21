@@ -11,7 +11,7 @@ local ns = select(2, ...)
 local O, M, LibStub = ns.O, ns.M, ns.LibStub
 
 local BaseAPI = O.BaseAPI
-local IsNotBlank = O.String.IsNotBlank
+local IsNotBlank = ns:String().IsNotBlank
 
 
 --[[-----------------------------------------------------------------------------

@@ -1,14 +1,23 @@
+--local kch = LibStub('Kapresoft-ColorUtil-1.0')
+--print('kch:', kch)
+
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type string
 local addon
---- @type BaseNamespace
+--- @type CoreNamespace
 local ns
 addon, ns = ...
 
+local KO = ns.Kapresoft_LibUtil.Objects
+local ch = KO.ColorUtil
+
 local sformat, strlower = string.format, string.lower
-local c1 = CreateColor(0.9, 0.2, 0.2, 1.0)
+local c1 = ch:NewFormatterFromRGB(0.9, 0.2, 0.2, 1.0)
+local c2 = ch:NewFormatterFromColor(BLUE_FONT_COLOR)
+local c3 = ch:NewFormatterFromColor(YELLOW_FONT_COLOR)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -68,8 +77,8 @@ end; ChatLogFrameMixin_PropsAndMethods(ChatLogFrameMixin)
 --- @param o DeveloperConsoleFrameMixin
 local function PropsAndMethods(o)
 
-    local nameColor = c1:WrapTextInColorCode(addon)
-    local libNameColor = YELLOW_FONT_COLOR:WrapTextInColorCode(libShortName)
+    local nameColor = c1(addon)
+    local libNameColor = c3(libShortName)
     o.prefix = sformat('{{%s::%s}}:', nameColor, libNameColor)
 
     function o:GetChatFrameFn()
@@ -89,11 +98,17 @@ local function PropsAndMethods(o)
         ns.chatFrame = chatFrame
 
         local flag = ns.debug.flag
-        if flag.logConsole == true and flag.debugging == true then
+        if flag.logConsole == true and ns.debug:IsDeveloper() then
             ns.printerFn = function(...) ns.chatFrame:log(...) end
             FCF_SelectDockFrame(chatFrame)
         end
-        chatFrame:log(o.prefix, 'Debug ChatFrame initialized. Log console enabled:', flag.logConsole)
+        c(o.prefix, 'Debug ChatFrame initialized.')
+        c(o.prefix, 'Log Console Enabled:', c2(flag.logConsole))
+        c(o.prefix, 'Chat Frame Name:', c2(ns.debug.chatFrameName))
+        c(o.prefix, 'Font, Size, Flags:', c2(font), c2(size), c2(flags))
+        c(o.prefix, 'xLog to this dev console by running: /run c("hello", "there")', '\n\n')
+
+        --c('xx trunc:', ns:String().Truncate('hello thar', 4, ',,'))
 
         return ns.printerFn
     end

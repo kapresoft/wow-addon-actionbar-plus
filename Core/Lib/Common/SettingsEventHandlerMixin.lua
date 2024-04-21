@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, M, LibStub = ns.O, ns.M, ns.LibStub
-local IsNotBlank = O.String.IsNotBlank
+local IsNotBlank = ns:String().IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance

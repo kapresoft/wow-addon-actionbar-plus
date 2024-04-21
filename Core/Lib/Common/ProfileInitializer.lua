@@ -16,7 +16,7 @@ local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local ConfigNames = GC.Profile_Config_Names
-local ATTR, Table = GC.WidgetAttributes, O.Table
+local ATTR, Table = GC.WidgetAttributes, ns:Table()
 local shallow_copy = Table.shallow_copy
 
 --[[-----------------------------------------------------------------------------

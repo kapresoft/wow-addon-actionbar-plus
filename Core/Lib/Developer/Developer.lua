@@ -12,10 +12,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, GC = ns.O, ns.O.GlobalConstants
-local IsNotEmpty = ns:KO().String.IsNotEmpty
-local AceEvent = O.AceLibrary.AceEvent
-local BF = O.ButtonFactory
+local O = ns.O
+local AceEvent = ns:AceLibrary().AceEvent
 local P = O.Profile
 
 ABP_enableV2 = false
@@ -47,7 +45,7 @@ local p = ns:LC().DEV:NewLogger(libName)
 Methods
 -------------------------------------------------------------------------------]]
 function L:TT()
-    self:SendMessage(GC.M.OnTooltipFrameUpdate, libName)
+    self:SendMessage(ns.GC.M.OnTooltipFrameUpdate, libName)
 end
 
 --- down or up

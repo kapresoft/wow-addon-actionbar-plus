@@ -15,8 +15,8 @@ Local Variables
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, Table, String = O.Profile, O.Table, O.String
-local E = O.GlobalConstants.E
+local P, Table, String = O.Profile, ns:Table(), ns:String()
+local E = ns.GC.E
 local toStringSorted = Table.toStringSorted
 
 --- @class MacroEventsHandler : BaseLibraryObject

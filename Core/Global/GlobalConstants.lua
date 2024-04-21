@@ -28,7 +28,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type string
 local addon
---- @type Kapresoft_Base_Namespace
+--- @type CoreNamespace
 local kns
 addon, kns = ...
 local kch = kns.Kapresoft_LibUtil.CH
@@ -651,28 +651,23 @@ local function GlobalConstantMethods(o)
 
     --- @return string The ActionbarPlus version string. Example: 2024.3.1
     function o:GetVersion()
-        local versionText
-        --@non-debug@
-        versionText = GetAddOnMetadata(addon, 'Version')
-        --@end-non-debug@
-        --@debug@
-        versionText = '1.0.x.dev'
-        --@end-debug@
+        local versionText = GetAddOnMetadata(addon, 'Version')
+        --@do-not-package@
+        if kns.debug:IsDeveloper() then
+            versionText = '1.0.0.dev'
+        end
+        --@end-do-not-package@
         return versionText
     end
 
     --- @return string The time in ISO Date Format. Example: 2024-03-22T17:34:00Z
     function o:GetLastUpdate()
-        local lastUpdate
-        --@non-debug@
-        lastUpdate = GetAddOnMetadata(addon, GITHUB_LAST_CHANGED_DATE)
-        --@end-non-debug@
-
-        --@debug@
-        --lastUpdate = date("%m/%d/%y %H:%M:%S")
-        lastUpdate = TimeUtil:TimeToISODate()
-        --@end-debug@
-
+        local lastUpdate = GetAddOnMetadata(addon, GITHUB_LAST_CHANGED_DATE)
+        --@do-not-package@
+        if kns.debug:IsDeveloper() then
+            lastUpdate = TimeUtil:TimeToISODate()
+        end
+        --@end-do-not-package@
         return lastUpdate
     end
 
@@ -682,16 +677,16 @@ local function GlobalConstantMethods(o)
     --- ActionbarPlus. Example: 2024-03-22T17:34:00Z
     function o:GetActionbarPlusM6CompatibleVersionDate()
         local lastCompatibleDate
-        --@non-debug@
         lastCompatibleDate = GetAddOnMetadata(addon, ABP_M6_COMPATIBLE_VERSION_DATE)
-        --@end-non-debug@
 
-        -- @debug@
-        -- Add time to simulate expired ActionbarPlus-M6 in dev environment. Example: time() + 1000
-        -- if "lastUpdate" is older than "lastCompatibleDate", then ActionbarPlus-M6 will notify user.
-        -- lastCompatibleDate = ns.TimeUtil:TimeToISODate(time() - 10)
-        lastCompatibleDate = lastCompatibleDate or TimeUtil:TimeToISODate(time() - 10)
-        --@end-debug@
+        --@do-not-package@
+        if kns.debug:IsDeveloper() then
+            -- Add time to simulate expired ActionbarPlus-M6 in dev environment. Example: time() + 1000
+            -- if "lastUpdate" is older than "lastCompatibleDate", then ActionbarPlus-M6 will notify user.
+            -- lastCompatibleDate = ns.TimeUtil:TimeToISODate(time() - 10)
+            lastCompatibleDate = lastCompatibleDate or TimeUtil:TimeToISODate(time() - 10)
+        end
+        --@end-do-not-package@
 
         return lastCompatibleDate
     end
@@ -750,12 +745,7 @@ Initializer
 local function Init()
     GlobalConstantProperties(L)
     GlobalConstantMethods(L)
-
-    --- @type GlobalConstants
-    ABP_GlobalConstants = L
-    --- @type GlobalObjects
-    kns.O = kns.O or {}
-    kns.O.GlobalConstants = L
+    kns.GC = L
 end
 
 Init()

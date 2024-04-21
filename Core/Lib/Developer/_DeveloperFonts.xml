@@ -97,7 +97,4 @@
 		</Member>
 	</FontFamily>
 
-	<Script file="GlobalDeveloper.lua" />
-	<Script file="DeveloperConsoleFrameMixin.lua"/>
-
 </Ui>

@@ -10,7 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local TimeUtil = ns:K().Objects.TimeUtil
-local API, String = O.API, O.String
+local API, String = O.API, ns:String()
 local IsBlank = String.IsBlank
 
 --- ActionbarPlusAPI is a Library used by other addOns like ActionbarPlus-M6
