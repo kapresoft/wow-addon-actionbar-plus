@@ -11,11 +11,11 @@ local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
-local String = O.String
-local AceEvent = O.AceLibrary.AceEvent
-local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
+local String = ns:String()
+local AceEvent = ns:AceLibrary().AceEvent
+local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
 
-local WAttr = O.GlobalConstants.WidgetAttributes
+local WAttr = ns.GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
 local C, T = GC.C, GC.Textures

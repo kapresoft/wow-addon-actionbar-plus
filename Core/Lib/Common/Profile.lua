@@ -11,7 +11,7 @@ local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local PI = O.ProfileInitializer
-local Table, String = O.Table, O.String
+local Table, String = ns:Table(), ns:String()
 local IsBlankStr = String.IsBlank
 local IsEmptyTable, IsNotTable, TableSize = Table.IsEmpty, Table.isNotTable, Table.size
 

@@ -11,10 +11,10 @@ Local Vars
 local ns = select(2, ...)
 local O, LibStub = ns.O, ns.LibStub
 
-local Mixin, WMX = O.Mixin, O.WidgetMixin
+local WMX = O.WidgetMixin
 local Ace = ns:KO().AceLibrary.O
 local AceGUI = Ace.AceGUI
-local LuaEvaluator = O.LuaEvaluator
+local LuaEvaluator = ns:KO().LuaEvaluator
 
 local libName = 'PopupDebugDialog'
 local L = LibStub:NewLibrary(libName)
@@ -82,7 +82,7 @@ function L:Constructor()
     local dialog = { }
     ---@see "AceGUIContainer-Frame.lua"
     local frameWidget = CreateDialog()
-    Mixin:Mixin(dialog, L, frameWidget)
+    ns:K():Mixin(dialog, L, frameWidget)
 
     return dialog
 end

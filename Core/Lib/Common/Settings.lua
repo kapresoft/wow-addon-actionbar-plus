@@ -8,12 +8,14 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
+local O, GC = ns.O, ns.GC
 
-local Ace, BaseAPI = O.AceLibrary, O.BaseAPI
+local Ace, BaseAPI = ns:AceLibrary(), O.BaseAPI
 local E, MSG = GC.E, GC.M
-local AceEvent, AceConfig, AceConfigDialog, AceDBOptions = Ace.AceEvent, Ace.AceConfig, Ace.AceConfigDialog, Ace.AceDBOptions
+local AceEvent, AceConfig = Ace.AceEvent, Ace.AceConfig
+local AceConfigDialog, AceDBOptions = Ace.AceConfigDialog, Ace.AceDBOptions
 local debugGroup = O.DebuggingSettingsGroup
+local c1 = ns:ColorUtil():NewFormatterFromColor(BLUE_FONT_COLOR)
 
 local libName = 'Settings'
 local p = ns:CreateDefaultLogger(ns.M.Settings);
@@ -227,6 +229,21 @@ local function lazyInitLibs()
     L = GC:GetAceLocale()
 end
 
+--- @param optArgs AceConfigOption
+local function ConfigureDebugging(optArgs)
+    --@do-not-package@
+    if ns.debug:IsDeveloper() then
+        optArgs.debugging = debugGroup:CreateDebuggingGroup()
+        p:a(function()
+            return 'Debugging tab in Settings UI is enabled with LogLevel=%s', c1(ABP_LOG_LEVEL)
+        end)
+        return
+    end
+    --@end-do-not-package@
+
+    ABP_LOG_LEVEL = 0
+end
+
 --[[-----------------------------------------------------------------------------
 Properties & Methods
 -------------------------------------------------------------------------------]]
@@ -275,22 +292,12 @@ local function PropsAndMethods(o)
         if BaseAPI:IsClassicEra() then
             local gen = configArgs['general'].args
             for _, v in ipairs(hiddenGeneralConfigs) do gen[v] = nil end
-        end
-
-        if ns.debug.flag.debugging == true then
-            configArgs.debugging = debugGroup:CreateDebuggingGroup()
-            p:a(function()
-                return 'Debugging tab in Settings UI is enabled with log-level: %s', ABP_LOG_LEVEL
-            end)
-        else
-            ABP_LOG_LEVEL = 0
-        end
+        end; ConfigureDebugging(configArgs)
 
         local barConfigs = self:CreateActionBarConfigs()
         for bName, bConf in pairs(barConfigs) do
             configArgs[bName] = bConf
         end
-
 
         return configArgs
     end

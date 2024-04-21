@@ -9,8 +9,8 @@ Local Vars
 --- @type Namespace
 local _, ns = ...
 
-local W = ns.O.GlobalConstants.WidgetAttributes
-local String = ns.O.String
+local W = ns.GC.WidgetAttributes
+local String = ns:String()
 local EqualsIgnoreCase = String.EqualsIgnoreCase
 
 --[[-----------------------------------------------------------------------------

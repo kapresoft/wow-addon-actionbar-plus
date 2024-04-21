@@ -4,7 +4,8 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, MSG, E = ns.O, ns.GC, ns.GC.M, ns.GC.E
-local WMX = O.WidgetMixin
+local c1 = ns:ColorUtil():NewFormatterFromColor(BLUE_FONT_COLOR)
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -29,9 +30,13 @@ local function PropsAndMethods(o)
         p:f1(_l1)
         o:SendMessage(MSG.OnAddOnReady, ns.name)
 
-        --@debug@
-        isLogin = true
-        --@end-debug@
+        --@do-not-package@
+        if ns.debug:IsDeveloper() then
+            isLogin = true
+            p:vv(function()
+                return "IsLogin=%s IsReload=%s", c1(isLogin), c1(isReload) end)
+        end
+        --@end-do-not-package@
 
         if not isLogin then return end
 

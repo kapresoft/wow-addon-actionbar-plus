@@ -16,8 +16,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local MX, String, P = O.Mixin, O.String, O.Profile
-local BaseAPI = O.BaseAPI
+local String, P = ns:String(), O.Profile
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
 
@@ -142,7 +141,7 @@ function _L:CreateKeybindTextFontString(b)
     fs:SetJustifyH("RIGHT")
     fs:SetJustifyV("TOP")
     --- @type FontStringWidget
-    local widget = MX:Mixin({ }, FontStringWidget)
+    local widget = ns:K():Mixin({ }, FontStringWidget)
     widget.fontString = fs
     fs.widget = widget;
 

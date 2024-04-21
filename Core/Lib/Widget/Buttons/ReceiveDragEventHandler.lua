@@ -5,7 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local A, W = O.Assert, GC.WidgetAttributes
+local A, W = ns:Assert(), GC.WidgetAttributes
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
 
 --[[-----------------------------------------------------------------------------

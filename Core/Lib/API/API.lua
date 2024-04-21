@@ -22,9 +22,9 @@ Local Vars
 local ns = select(2, ...)
 local O = ns.O
 
-local String = O.String
+local String = ns:String()
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
-local DruidAPI, ShamanAPI, PriestAPI, GC = O.DruidUnitMixin, O.ShamanUnitMixin, O.PriestUnitMixin, O.GlobalConstants
+local DruidAPI, ShamanAPI, PriestAPI, GC = O.DruidUnitMixin, O.ShamanUnitMixin, O.PriestUnitMixin, ns.GC
 local WAttr, UnitId = GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 

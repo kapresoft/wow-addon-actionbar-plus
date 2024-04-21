@@ -28,8 +28,8 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, LibStub, LC = ns.O, ns.GC, ns.LibStub, ns:LC()
-local Assert, P = O.Assert, O.Profile
-local AceGUI = O.AceLibrary.AceGUI
+local Assert, P = ns:Assert(), O.Profile
+local AceGUI = ns:AceLibrary().AceGUI
 local E, M = GC.E, GC.M
 local configHandler = O.Settings
 

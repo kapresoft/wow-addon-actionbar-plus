@@ -24,7 +24,7 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local UnitId = GC.UnitId
 local W = GC.WidgetAttributes
 
-local String, Assert = O.String, O.Assert
+local String, Assert = ns:String(), ns:Assert()
 local IsBlank, IsNotBlank, IsNil, IsNotNil = String.IsBlank, String.IsNotBlank, Assert.IsNil, Assert.IsNotNil
 
 --- @class BaseAPI

@@ -11,7 +11,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
-local WMX, String = O.WidgetMixin, O.String
+local WMX, String = O.WidgetMixin, ns:String()
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
 

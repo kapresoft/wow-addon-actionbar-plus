@@ -10,7 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local WAttr, Assert = GC.WidgetAttributes, O.Assert
+local WAttr, Assert = GC.WidgetAttributes, ns:Assert()
 local AssertNotNil = Assert.AssertNotNil
 
 --[[-----------------------------------------------------------------------------

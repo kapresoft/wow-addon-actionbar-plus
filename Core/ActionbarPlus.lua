@@ -23,10 +23,10 @@ local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
 local AO = ns:KO().AceLibrary.O
 local GCC, M = GC.C, GC.M
 
-local String, Table = O.String, O.Table
+local String, Table = ns:String(), ns:Table()
 local IsEmptyTable, parseSpaceSeparatedVar = Table.isEmpty, Table.parseSpaceSeparatedVar
 local IsBlank, IsAnyOf = String.IsBlank, String.IsAnyOf
-local MX, WMX, BF = O.Mixin, O.WidgetMixin, O.ButtonFactory
+local WMX, BF = O.WidgetMixin, O.ButtonFactory
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
@@ -182,6 +182,9 @@ local function PropertiesAndMethods(o)
         if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
             optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
         else optionsConfigPath = 'general' end
+
+        -- TODO: For Development
+        -- optionsConfigPath = 'debugging'
 
         AceConfigDialog:SelectGroup(ns.name, optionsConfigPath)
         local hidden = isConfigHidden()

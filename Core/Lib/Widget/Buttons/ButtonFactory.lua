@@ -17,10 +17,10 @@ local ns = select(2, ...)
 local O, GC, M, E, LibStub = ns.O, ns.GC, ns.M, ns.GC.E, ns.LibStub
 
 local toMsg = GC.toMsg
-local Table, P, MSG = O.Table, O.Profile, GC.M
+local Table, P, MSG = ns:Table(), O.Profile, GC.M
 local IsEmptyTable = Table.isEmpty
 local ButtonFrameFactory = O.ButtonFrameFactory
-local WAttr = O.GlobalConstants.WidgetAttributes
+local WAttr = ns.GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
 WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
 WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,

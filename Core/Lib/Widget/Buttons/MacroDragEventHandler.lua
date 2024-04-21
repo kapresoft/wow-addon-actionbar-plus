@@ -10,9 +10,9 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local Assert, String = O.Assert, O.String
+local Assert, String = ns:Assert(), ns:String()
 local WAttr, PH = GC.WidgetAttributes, O.PickupHandler
-local AceEvent = O.AceLibrary.AceEvent
+local AceEvent = ns:AceLibrary().AceEvent
 
 local IsNil = Assert.IsNil
 local warnColor = WARNING_FONT_COLOR or RED_FONT_COLOR

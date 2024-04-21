@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, MS = ns.O, ns.GC.M
-local AceConfigDialog = O.AceLibrary.AceConfigDialog
+local AceConfigDialog = ns:AceLibrary().AceConfigDialog
 local libName = ns.M.ConfigDialogController
 --[[-----------------------------------------------------------------------------
 New Instance

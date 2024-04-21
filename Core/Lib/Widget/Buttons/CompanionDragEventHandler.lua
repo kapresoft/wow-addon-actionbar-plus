@@ -13,7 +13,7 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local PH = O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local BaseAPI = O.BaseAPI
-local IsNil, IsNotBlank = O.Assert.IsNil, O.String.IsNotBlank
+local IsNil, IsNotBlank = ns:Assert().IsNil, ns:String().IsNotBlank
 
 --[[-----------------------------------------------------------------------------
 New Instance

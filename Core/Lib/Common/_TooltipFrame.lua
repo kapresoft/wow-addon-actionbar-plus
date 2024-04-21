@@ -67,7 +67,7 @@ local function MethodsAndProperties(o)
     end
 
     --- @param anchorType string
-    function o:IsCursorAnchorType(anchorType) return O.String.StartsWithIgnoreCase(anchorType, 'cursor_') end
+    function o:IsCursorAnchorType(anchorType) return ns:String().StartsWithIgnoreCase(anchorType, 'cursor_') end
 
     --- @see TooltipAnchor
     --- @param anchorType string

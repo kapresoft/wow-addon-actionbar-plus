@@ -5,8 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local API, Table = O.API, O.Table
-local IsAnyOf = O.String.IsAnyOf
+local Table, IsAnyOf = ns:Table(), ns:String().IsAnyOf
 local TableIsEmpty, TableUnpack = Table.IsEmpty, Table.unpack
 
 --[[-----------------------------------------------------------------------------

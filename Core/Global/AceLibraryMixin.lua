@@ -1,14 +1,14 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Kapresoft_Base_Namespace
+--- @type CoreNamespace
 local kns = select(2, ...)
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'AceLibraryMixin'
---- @class AceLibraryMixin
+--- @class AceLibraryMixin : Kapresoft_LibUtil_NamespaceAceLibraryMixin
 local L = {}; kns.O[libName] = L
 
 --[[-----------------------------------------------------------------------------
@@ -43,7 +43,8 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o AceLibraryMixin | Namespace
+--- @see Base.lua
+--- @param o AceLibraryMixin | Namespace
 local function PropsAndMethods(o)
 
     -- todo: AceEventWithTrace will eventually replace AceEvent(..)
@@ -52,7 +53,7 @@ local function PropsAndMethods(o)
     --- @param moduleName Name
     function o:AceEventWithTrace(moduleName)
         assert(moduleName, "moduleName is required.")
-        local o2 = self.O.AceLibrary.AceEvent:Embed({})
+        local o2 = kns:AceEvent()
         o2.pm = self:LC().MESSAGE_TRACE:NewLogger(moduleName)
         local _RegisterMessage = o2.RegisterMessage
 
@@ -64,16 +65,7 @@ local function PropsAndMethods(o)
         return o2
     end
 
-    --- Create a new instance of AceEvent or embed to an obj if passed
-    --- @return AceEvent
-    --- @param obj|nil The object to embed or nil
-    function o:AceEvent(obj) return self.O.AceLibrary.AceEvent:Embed(obj or {}) end
-
-    --- Create a new instance of AceBucket or embed to an obj if passed
-    --- @return AceBucket
-    --- @param obj|nil The object to embed or nil
-    function o:AceBucket(obj) return self.LibStubAce('AceBucket-3.0'):Embed(obj or {}) end
-
+    --- AceLocale needs to be called after the _Locales.xml has been loaded
     --- @return AceLocale
     function o:AceLocale() return LibStub("AceLocale-3.0"):GetLocale(self.name, true) end
 
