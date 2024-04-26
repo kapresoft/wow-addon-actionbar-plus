@@ -55,6 +55,7 @@ ignore:
   - Core/Retail.lua
   - Core/Vanilla.lua
   - Core/Wrath.lua
+  - Core/Cata.lua
   - Core/_Core.lua
   - Core/_Core.xml
   - Core/_ExtLib.xml
