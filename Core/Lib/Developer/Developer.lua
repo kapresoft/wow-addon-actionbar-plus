@@ -19,26 +19,12 @@ local P = O.Profile
 ABP_enableV2 = false
 ns.features.enableV2 = ABP_enableV2
 
---[[O.AceLibrary.AceEvent:RegisterMessage(GC.M.OnAddOnReady, function(evt, source, ...)
-    --- @type table<string, boolean|number>
-    ABP_DEBUG_ENABLED_CATEGORIES = {
-        ADDON=1, FRAME=1, BUTTON=1,
-        DRAG_AND_DROP=1,
-        SPELL=0,
-        EVENT=1, MESSAGE=1,
-        BAG=1,
-        ITEM=1, PET=1, MOUNT=1,
-        UNIT=1,
-        PROFILE=1,
-    }
-end)]]
-
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'Developer'
 --- @class Developer : BaseLibraryObject_WithAceEvent
-local L = {}; AceEvent:Embed(L); dd = L
+local L = {}; AceEvent:Embed(L); a = L
 local p = ns:LC().DEV:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -144,6 +130,44 @@ function L:BA(frameIndex, buttonIndex)
     return ret
 end
 
+-- Prints the number of talent points spent in each talent tree for the current specialization.
+function L:t1()
+    local totalPoints = 0
+    for i = 1, GetNumTalentTabs() do
+        local name, _, pointsSpent = GetTalentTabInfo(i)
+        print(name .. " tree: " .. pointsSpent .. " points")
+        totalPoints = totalPoints + pointsSpent
+    end
+    print("Total points spent: " .. totalPoints)
+end
+-- Prints the number of talent points spent in each talent tree for the current specialization.
+function L:t()
+    local info = O.UnitMixin:GetTalentInfo()
+    c('Talent:', info)
+end
+
+-- Prints the currently selected talents for each tier in the player's current specialization.
+function L:tr()
+    local specIndex = GetSpecialization()
+    if not specIndex then
+        c("You need to be in a specialization to use this function.")
+        return
+    end
+
+    local _, specName = GetSpecializationInfo(specIndex)
+    c("Current Specialization: " .. specName)
+
+    for tier = 1, 7 do -- Talent tiers generally range from 1 to 7
+        for column = 1, 3 do -- There are typically three talents per tier
+            local talentID, name, texture, selected = GetTalentInfoBySpecialization(specIndex, tier, column)
+            if selected then
+                c("Tier " .. tier .. ": " .. name)
+            end
+        end
+    end
+end
+
+
 function L:c()
     local c = ns.chatFrame
     for i=1, NUM_PET_ACTION_SLOTS, 1 do
@@ -156,4 +180,14 @@ function L:c()
             c:log('pet-action:', pformat(x))
         end
     end
+end
+
+function L:c1()
+    c('chatFrame:', ns.chatFrame:IsSelected())
+
+    for i = 1, NUM_CHAT_WINDOWS do
+        local name, fontSize, r, g, b, alpha, isSelected = GetChatWindowInfo(i)
+        c('tab:', name, 'selected:', isSelected)
+    end
+
 end

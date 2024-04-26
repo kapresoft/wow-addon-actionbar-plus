@@ -91,6 +91,11 @@ local function PropertiesAndMethods(o)
         self:RegisterChatCommand(GCC.CONSOLE_COMMAND_NAME, "SlashCommands")
         self:RegisterChatCommand(GCC.CONSOLE_COMMAND_SHORT, "SlashCommands")
     end
+    --@do-not-package@
+    if ns.debug:IsDeveloper() then
+        o:RegisterChatCommand('c', function(spaceSeparatedArgs) ns.print(spaceSeparatedArgs) end)
+    end
+    --@end-do-not-package@
 
     --- @param spaceSeparatedArgs string
     function o:SlashCommands(spaceSeparatedArgs)

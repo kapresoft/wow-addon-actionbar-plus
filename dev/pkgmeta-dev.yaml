@@ -51,6 +51,10 @@ ignore:
   - dev
   - doc
   - scripts
+  - Core/Core.lua
+  - Core/Retail.lua
+  - Core/Vanilla.lua
+  - Core/Wrath.lua
   - Core/_Core.lua
   - Core/_Core.xml
   - Core/_ExtLib.xml

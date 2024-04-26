@@ -1,18 +1,20 @@
 ## Interface: 30403
 ## Version: @project-version@
-## Title: Actionbar|cff1784d1Plus|r WOTLK
-## Notes: Actionbar Addon for World of Warcraft
+## Title: Actionbar|cff1784d1Plus|r Classic
+## Notes: Actionbars Everywhere, Make you click happy.
 ## Author: kapresoft@gmail.com
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
+
 ## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-LoadOn-AddonLoaded: Blizzard_Professions
 
 ## X-Min-Interface: 20501
-## X-LoadOn-Always: delayed
 ## X-Credits: kapresoft@gmail.com
 ## X-Category: ActionBars
-## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
+## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 
 ## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus
 ## X-Github-Issues: https://github.com/kapresoft/wowaddon-actionbar-plus/issues

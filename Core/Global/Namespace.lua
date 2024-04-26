@@ -140,7 +140,9 @@ local function GameVersionMethods(o)
     --- @return GameVersion
     function o:IsTBC() return self.gameVersion == 'tbc_classic' end
     --- @return GameVersion
-    function o:IsWOTLK() return self == 'wotlk_classic' end
+    function o:IsWOTLK() return self.gameVersion == 'wotlk_classic' end
+    --- @return GameVersion
+    function o:IsCataclysm() return self.gameVersion == 'cataclysm_classic' end
     --- @return GameVersion
     function o:IsRetail() return self.gameVersion == 'retail' end
 end; GameVersionMethods(GameVersionMixin)
@@ -154,7 +156,7 @@ local function NamespaceLoggerMethods(o)
     CategoryLogger:Configure(addonName, LogCategories, {
         consoleColors = GC.C.CONSOLE_COLORS,
         levelSupplierFn = function() return __logLevel() end,
-        printerFn = kns.printerFn,
+        printerFn = kns.print,
         enabled = kns.debug:IsDeveloper(),
         enabledCategoriesSupplierFn = function() return __categories() end,
     })

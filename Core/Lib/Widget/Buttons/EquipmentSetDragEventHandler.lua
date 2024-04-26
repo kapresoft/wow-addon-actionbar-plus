@@ -8,6 +8,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 --- @type __GameTooltip
 local GameTooltip = GameTooltip
+local LOOT_SPECIALIZATION_DEFAULT = LOOT_SPECIALIZATION_DEFAULT
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -19,10 +20,13 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local AceEvent = ns:AceEvent()
-local libName = M.EquipmentSetDragEventHandler
+local c1 = ns:ColorUtil():NewFormatterFromColor(HIGHLIGHT_LIGHT_BLUE)
+local c2 = ns:ColorUtil():NewFormatterFromColor(VERY_LIGHT_GRAY_COLOR)
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
+local libName = M.EquipmentSetDragEventHandler
 --- @class EquipmentSetDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(libName)
 local p = ns:LC().DRAG_AND_DROP:NewLogger(libName)
@@ -122,19 +126,38 @@ local function attributeSetterMethods(a)
     end
 
     --- @param btnUI ButtonUI
-    function a:ShowTooltip(btnUI, setID)
+    function a:ShowTooltip(btnUI)
         if not btnUI then return end
         local w = btnUI.widget; if w:IsEmpty() then return end
         local es = w:EquipmentSetMixin()
         if es:IsMissingEquipmentSet() then return end
+
         local equipmentSet = es:FindEquipmentSet()
-        -- retail GameTooltip uses setID
+        -- Use setID for all game versions
         GameTooltip:SetEquipmentSet(equipmentSet.id)
+
         if equipmentSet.isEquipped then
             -- todo next: localize
-            local equippedLabel = ns:K().CH:FormatColor('0073FF', ' (Equipped)')
+            local equippedLabel = c1(' (Equipped)')
             GameTooltip:AppendText(equippedLabel)
+            GameTooltip:AddLine('Equipment set is ' .. c1('ACTIVE'))
+
+            local talent = O.UnitMixin:GetTalentInfo()
+            if talent then
+                GameTooltip:AddLine(' ')
+                local specText = sformat(LOOT_SPECIALIZATION_DEFAULT, c1(talent.spec)) .. ' ' .. (talent.icon or '')
+                GameTooltip:AddDoubleLine(specText)
+                if not ns:IsRetail() then
+                    GameTooltip:AddLine('Talent Points:')
+                    talent:ForEachTalent(function(name, points)
+                        GameTooltip:AddDoubleLine(c2(name) .. ':', points)
+                    end)
+                end
+            end
+        else
+            GameTooltip:AddLine(sformat('Click to %s equipment set', c1('activate')))
         end
+        GameTooltip:Show()
     end
 end
 

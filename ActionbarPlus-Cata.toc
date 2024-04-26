@@ -1,18 +1,17 @@
-## Interface: 100206
+## Interface: 40400
 ## Version: @project-version@
-## Title: Actionbar|cff1784d1Plus|r
+## Title: Actionbar|cff1784d1Plus|r Classic
 ## Notes: Actionbars Everywhere, Make you click happy.
 ## Author: kapresoft@gmail.com
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-64xe.tga
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
 ## X-LoadOn-AddonLoaded: Blizzard_Professions
 
-## X-Min-Interface: 90200
+## X-Min-Interface: 20501
 ## X-Credits: kapresoft@gmail.com
 ## X-Category: ActionBars
 ## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
@@ -38,8 +37,8 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-# To get the Interface/Build Info.
+# To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
-Core\Retail.lua
+Core\Cata.lua
 Core\_Core.xml
