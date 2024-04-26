@@ -220,6 +220,7 @@ local function GlobalConstantProperties(o)
         ON_RECEIVE_DRAG = 'OnReceiveDrag',
         -- ################################
 
+        ADDON_LOADED = 'ADDON_LOADED',
         ACTIONBAR_UPDATE_COOLDOWN = 'ACTIONBAR_UPDATE_COOLDOWN',
         ACTIONBAR_UPDATE_STATE = 'ACTIONBAR_UPDATE_STATE',
         ACTIONBAR_UPDATE_USABLE = 'ACTIONBAR_UPDATE_USABLE',

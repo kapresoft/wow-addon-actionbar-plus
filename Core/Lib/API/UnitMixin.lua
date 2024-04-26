@@ -11,17 +11,14 @@ local TableIsEmpty, TableUnpack = Table.IsEmpty, Table.unpack
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return UnitMixin, LoggerV2
-local function CreateLib()
-    local libName = M.UnitMixin
-    --- @class UnitMixin : BaseLibraryObject
-    local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    return newLib, ns:LC().UNIT:NewLogger(libName)
-end; local L, p = CreateLib(); if not L then return end
+local libName = M.UnitMixin
+--- @class UnitMixin : BaseLibraryObject
+local L = ns:NewLibStd(libName)
+local p = ns:LC().UNIT:NewLogger(libName)
 
 --- Checks if the first argument matches any of the subsequent arguments.
 --- @param toMatch number The value to match against the varargs.
---- @param ... SpellInfoShort The list of values to check for a match.
+--- @vararg string SpellInfoShort The list of values to check for a match.
 --- @return boolean True if `toMatch` is found in the varargs, false otherwise.
 local function IsAnyOfBuff(toMatch, ...)
     for i = 1, select('#', ...) do
@@ -151,6 +148,116 @@ local function PropsAndMethods(o)
         if TableIsEmpty(ns.playerBuffs) then return false end
         p:d(function() return 'IsBuffActive(): Player-Buffs: %s', pformat(ns.playerBuffs) end)
         return IsAnyOfBuff(spellID, TableUnpack(ns.playerBuffs))
+    end
+
+    local function NewTalentInfo()
+        --- @class TalentInfo
+        local info = {
+            --- @type table<number, Name>
+            names = {},
+            --- @type table<Name, number>
+            points = {},
+            --- @type string
+            spec = nil,
+            talentIndex = -1,
+            --- @type string
+            icon = nil,
+        }
+        return info
+    end
+
+    --- @class TalentTabInfoMixin
+    local TalentTabInfoMixin = {}
+    --- @param name Name
+    --- @param icon TextureIDOrPath
+    --- @param pointsSpent Number
+    --- @return TalentTabInfo
+    function TalentTabInfoMixin:New(name, icon, pointsSpent)
+        --- @class TalentTabInfo
+        local info = { name = name, icon = icon, pointsSpent = pointsSpent }
+        return info
+    end
+
+    --- @return TalentInfo
+    function o:GetTalentInfo()
+        if ns:IsRetail() then return self:GetTalentInfoRetail() end
+        if not GetNumTalentTabs then return nil end
+        return self:GetTalentInfoPreRetail()
+    end
+
+    --- @param tabIndex Index
+    local function GetTalentTabInfoPreCataclysm(tabIndex)
+        local name, icon, pointsSpent = GetTalentTabInfo(tabIndex)
+        return TalentTabInfoMixin:New(name, icon, pointsSpent)
+    end
+
+    --- @param tabIndex Index
+    local function GetTalentTabInfo_Cataclysm(tabIndex)
+        local id, name, talentDesc, icon, pointsSpent = GetTalentTabInfo(tabIndex)
+        return TalentTabInfoMixin:New(name, icon, pointsSpent)
+    end
+
+    --- @private
+    --- @return TalentInfo
+    function o:GetTalentInfoPreRetail()
+        local totalPoints = 0
+
+        --- @type TalentInfo
+        local info = NewTalentInfo()
+        function info:summary()
+            local s = {}
+            for name, points in pairs(self.points) do
+                points = points or 0
+                table.insert(s, name .. ': ' .. tostring(points))
+            end
+            return table.concat(s, ', ')
+        end
+        --- @param callbackFn fun(name:string, points:number) | "function(name, points) end"
+        function info:ForEachTalent(callbackFn)
+            for name, points in pairs(self.points) do
+                points = points or 0
+                callbackFn(name, points)
+            end
+        end
+
+        local max = 0
+        -- /dump GetTalentTabInfo(1)
+        for i = 1, GetNumTalentTabs() do
+            --- @type TalentTabInfo
+            local tabInfo
+            if ns:IsCataclysm() then tabInfo = GetTalentTabInfo_Cataclysm(i)
+            else tabInfo = GetTalentTabInfoPreCataclysm(i) end
+
+            if tabInfo then
+                table.insert(info.names, tabInfo.name)
+                info.points[tabInfo.name] = tabInfo.pointsSpent
+                --p:vv(function() return 'i-%s: PointsSpent=%s,%s Max=%s', i, type(pointsSpent), pointsSpent, type(max) end)
+                if tabInfo.pointsSpent > max then
+                    info.spec = tabInfo.name
+                    info.talentIndex = i
+                    info.icon = ns.sformat('|T%s:18:18:0:0|t', tabInfo.icon)
+                    max = tabInfo.pointsSpent
+                end
+                totalPoints = totalPoints + tabInfo.pointsSpent
+            end
+        end
+        return info
+    end
+
+    --- @private
+    --- @return TalentInfo
+    function o:GetTalentInfoRetail()
+        --- @type TalentInfo
+        local info = NewTalentInfo()
+        function info:summary() return nil end
+
+        --- @param callbackFn fun(name:string, points:number) | "function(name, points) end"
+        function info:ForEachTalent(callbackFn) end
+
+        local specIndex = GetSpecialization(); if not specIndex then return nil end
+        local _, spec = GetSpecializationInfo(specIndex); info.spec = spec
+        p:d(function() return 'TalentInfo(): Spec=%s', spec end)
+        return info
     end
 
 end; PropsAndMethods(L)

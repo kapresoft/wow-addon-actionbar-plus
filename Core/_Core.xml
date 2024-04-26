@@ -4,19 +4,15 @@
     <Include file='_ExtLib.xml'/>
 
     <Script file='Core.lua'/>
-
     <!--@do-not-package@-->
     <Include file='Lib\Developer\_DeveloperComponents.xml'/>
     <!--@end-do-not-package@-->
-
     <Include file='Global\_Global.xml'/>
     <Include file='Lib\_Lib.xml'/>
-
     <!--@do-not-package@-->
     <Include file='Lib\Developer\_Developer.xml'/>
     <Include file='Lib\WidgetV2\_Widget.xml'/>
     <!--@end-do-not-package@-->
-
     <Script file="ActionbarPlus.lua"/>
     <Script file="ActionbarPlusAPI.lua"/>
 </Ui>

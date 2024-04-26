@@ -14,11 +14,16 @@ addon, ns = ...; ns.addon = addon
 local O = ns.O or {}; ns.O = O
 
 -- global print/logger ('c')
-c = function(...)
+function ns.print(...)
     if ns.chatFrame then return ns.chatFrame:log(...) end
     print(...)
-end
+end; c = ns.print
 
+---@param module Name
+function ns.logp(module, ...)
+    if ns.chatFrame then return ns.chatFrame:logp(module,...) end
+    print(module, ...)
+end;
 
 --- @see AceLibraryMixin.lua
 --- @param o CoreNamespace
@@ -63,7 +68,7 @@ end; CoreNamespaceMixin(ns)
 Type: DebugSettingsFlag
 -------------------------------------------------------------------------------]]
 --- @class DebugSettingsFlag
---- @see GlobalDeveloper
+--- @see DeveloperSetup
 local flag = {
     developer = false,
     --- Enables debugging
@@ -83,7 +88,7 @@ local function debug()
     local o = {
         flag = flag,
         --- The name is case-insensitive
-        chatFrameName = '<name of the chat-frame-tab>',
+        chatFrameName = '<name of the chat-frame-tab>'
     }
     function o:IsDeveloper() return self.flag.developer == true  end
     return o;

@@ -4,8 +4,8 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, MSG, E = ns.O, ns.GC, ns.GC.M, ns.GC.E
+local BaseAPI, After300ms = O.BaseAPI, ns:K().After300ms
 
-local BaseAPI = O.BaseAPI
 local libName = ns.M.EquipmentSetController
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -99,6 +99,7 @@ local function PropsAndMethods(o)
         local PDF = PaperDollFrame
         C_EquipmentSet.UseEquipmentSet(w:GetEquipmentSetData().id)
         PlaySound(SOUNDKIT.GUILD_BANK_OPEN_BAG)
+        After300ms(function() O.EquipmentSetAttributeSetter:ShowTooltip(w.button()) end)
 
         local profile = w:GetProfileConfig()
         if profile.equipmentset_open_character_frame then
