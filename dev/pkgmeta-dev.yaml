@@ -51,7 +51,8 @@ ignore:
   - dev
   - doc
   - scripts
-  - Core/Core.lua
+  - Core/ActionbarPlus.lua
+  - Core/ActionbarPlusAPI.lua
   - Core/Retail.lua
   - Core/Vanilla.lua
   - Core/Wrath.lua
@@ -61,8 +62,6 @@ ignore:
   - Core/_ExtLib.xml
   - Core/_ExtLib_WowAce_Ace3.xml
   - Core/_ExtLib_WowAce_Misc.xml
-  - Core/ActionbarPlus.lua
-  - Core/ActionbarPlusAPI.lua
   - Core/AddonLib
   - Core/Assets
   - Core/Global

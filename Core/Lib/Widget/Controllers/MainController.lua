@@ -29,13 +29,8 @@ local function PropsAndMethods(o)
 
         p:f1(_l1)
         o:SendMessage(MSG.OnAddOnReady, ns.name)
-
         --@do-not-package@
-        if ns.debug:IsDeveloper() then
-            isLogin = true
-            p:vv(function()
-                return "IsLogin=%s IsReload=%s", c1(isLogin), c1(isReload) end)
-        end
+        isLogin = true
         --@end-do-not-package@
 
         if not isLogin then return end

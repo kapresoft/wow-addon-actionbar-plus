@@ -60,11 +60,7 @@ local dbName = globalVarPrefix .. 'PLUS_DB'
 Console Colors
 -------------------------------------------------------------------------------]]
 --- @type Kapresoft_LibUtil_ColorDefinition
-local consoleColors = {
-    primary   = '2db9fb',
-    secondary = 'fbeb2d',
-    tertiary  = 'ffffff',
-}
+local consoleColors = kns.consoleColors
 local command = kch:FormatColor(consoleColors.primary, '/' .. consoleCommand)
 local commandShort = kch:FormatColor(consoleColors.primary, '/' .. consoleCommandShort)
 
@@ -654,9 +650,7 @@ local function GlobalConstantMethods(o)
     function o:GetVersion()
         local versionText = GetAddOnMetadata(addon, 'Version')
         --@do-not-package@
-        if kns.debug:IsDeveloper() then
-            versionText = '1.0.0.dev'
-        end
+        versionText = '1.0.0.dev'
         --@end-do-not-package@
         return versionText
     end
@@ -665,9 +659,7 @@ local function GlobalConstantMethods(o)
     function o:GetLastUpdate()
         local lastUpdate = GetAddOnMetadata(addon, GITHUB_LAST_CHANGED_DATE)
         --@do-not-package@
-        if kns.debug:IsDeveloper() then
-            lastUpdate = TimeUtil:TimeToISODate()
-        end
+        lastUpdate = TimeUtil:TimeToISODate()
         --@end-do-not-package@
         return lastUpdate
     end

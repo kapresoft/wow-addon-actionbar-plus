@@ -145,7 +145,7 @@ local function attributeSetterMethods(a)
             local talent = O.UnitMixin:GetTalentInfo()
             if talent then
                 GameTooltip:AddLine(' ')
-                local specText = sformat(LOOT_SPECIALIZATION_DEFAULT, c1(talent.spec)) .. ' ' .. (talent.icon or '')
+                local specText = sformat(LOOT_SPECIALIZATION_DEFAULT, c1(talent.spec or 'NONE')) .. ' ' .. (talent.icon or '')
                 GameTooltip:AddDoubleLine(specText)
                 if not ns:IsRetail() then
                     GameTooltip:AddLine('Talent Points:')
