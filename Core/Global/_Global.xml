@@ -3,7 +3,8 @@
 
     <Script file="GlobalConstants.lua"/>
     <Script file="Modules.lua"/>
-    <Script file="AceLibraryMixin.lua"/>
+    <Script file="AceEventWithTraceMixin.lua"/>
+    <Script file="CategoryLoggerMixin.lua"/>
     <Script file="Namespace.lua"/>
 
 </Ui>

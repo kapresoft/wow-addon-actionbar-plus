@@ -8,6 +8,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
+local c1 = ns:K():cf(LIGHTBLUE_FONT_COLOR)
 
 local bindingGlobalVarFormat = 'BINDING_NAME_ABP_ACTIONBAR%s_BUTTON%s'
 local MAX_BARS = 8
@@ -56,7 +57,7 @@ local function Methods(o)
     function o:SetupKeybindNames(aceLocale, localizedActionBarText, localizedButtonBarText)
         assert(aceLocale, "AceLocale is required")
         -- Example: L["BINDING_NAME_ABP_ACTIONBAR1_BUTTON1"]  = 'Bar #1 Action Button 1'
-        local bindingNameFormat = localizedActionBarText ..' #%s %s %s'
+        local bindingNameFormat = localizedActionBarText ..' %s %s %s ' .. c1('(ABP)')
         for bar = 1, MAX_BARS, 1
         do
             for button = 1, MAX_BUTTONS, 1

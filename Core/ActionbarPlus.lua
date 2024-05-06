@@ -18,7 +18,7 @@ local InterfaceOptionsFrame, PlaySound, SOUNDKIT = InterfaceOptionsFrame, PlaySo
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local ns = select(2, ...)
+local ns = select(2, ...); local addon = ns.addon
 local O, GC, LibStub = ns.O, ns.GC, ns.LibStub
 local AO = ns:KO().AceLibrary.O
 local GCC, M = GC.C, GC.M
@@ -30,14 +30,14 @@ local WMX, BF = O.WidgetMixin, O.ButtonFactory
 
 local AceDB, AceConfigDialog = AO.AceDB, AO.AceConfigDialog
 local P = O.Profile
-local p, pd = ns:LC().ADDON:NewLogger(ns.name), ns:CreateDefaultLogger(ns.name)
+local p, pd = ns:LC().ADDON:NewLogger(addon), ns:CreateDefaultLogger(addon)
 
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
 --- @return boolean
 local function isConfigHidden()
-    local fw = AceConfigDialog.OpenFrames[ns.name]; if not fw then return true end
+    local fw = AceConfigDialog.OpenFrames[addon]; if not fw then return true end
     --- @type Frame
     local f = fw.frame; return f:IsVisible() ~= true
 end
@@ -58,11 +58,11 @@ local function PropertiesAndMethods(o)
     function o:OnInitialize()
         self:InitializeDb()
         self:RegisterSlashCommands()
-        self:SendMessage(M.OnAddOnInitialized, ns.name)
+        self:SendMessage(M.OnAddOnInitialized, addon)
 
         if ns.features.enableV2 ~= true then return end
         p:d(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
-        self:SendMessage(M.OnAddOnInitializedV2, ns.name)
+        self:SendMessage(M.OnAddOnInitializedV2, addon)
         p:d(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
     end
 
@@ -75,7 +75,7 @@ local function PropertiesAndMethods(o)
         self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
         self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
         self:InitDbDefaults()
-        self:SendMessage(M.OnDBInitialized, ns.name)
+        self:SendMessage(M.OnDBInitialized, addon)
     end
 
     function o:InitDefaultProfile()
@@ -147,10 +147,10 @@ local function PropertiesAndMethods(o)
         -- Register Events, Hook functions, Create Frames, Get information from
         -- the game that wasn't available in OnInitialize
         self:RegisterHooks()
-        self:SendMessage(M.OnAddOnEnabled, ns.name, self)
+        self:SendMessage(M.OnAddOnEnabled, addon, self)
         if ns.features.enableV2 ~= true then return end
 
-        self:SendMessage(M.OnAddOnEnabledV2, ns.name, self)
+        self:SendMessage(M.OnAddOnEnabledV2, addon, self)
         p:d('OnEnable():MSG:OnAddOnEnabledV2 Sent')
     end
 
@@ -191,17 +191,17 @@ local function PropertiesAndMethods(o)
         -- TODO: For Development
         -- optionsConfigPath = 'debugging'
 
-        AceConfigDialog:SelectGroup(ns.name, optionsConfigPath)
+        AceConfigDialog:SelectGroup(addon, optionsConfigPath)
         local hidden = isConfigHidden()
         if hidden == true then
             self:DialogGlitchHack(optionsConfigPath)
-            AceConfigDialog:Open(ns.name, self.configFrame)
+            AceConfigDialog:Open(addon, self.configFrame)
             PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)
         end
 
         self.onHideHooked = self.onHideHooked == true or false
 
-        self.configDialogWidget = AceConfigDialog.OpenFrames[ns.name]
+        self.configDialogWidget = AceConfigDialog.OpenFrames[addon]
         if not self.configDialogWidget then return end
         if self.onHideHooked == true then return end
 
@@ -222,7 +222,7 @@ local function PropertiesAndMethods(o)
     --- @param name Name The appName
     --- @param frame Frame
     function o:OnHide(frame, name)
-        if ns.name ~= name then return end
+        if addon ~= name then return end
         self:OnHideSettings(true)
     end
 
@@ -233,18 +233,18 @@ local function PropertiesAndMethods(o)
     --- @param enableSound boolean|nil
     function o:OnHideSettings(enableSound)
         enableSound = enableSound or false
-        p:d(function() return 'OnHideSettings[%s] sound=%s', ns.name, enableSound end)
+        p:d(function() return 'OnHideSettings[%s] sound=%s', addon, enableSound end)
         if true == enableSound then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
     end
 
     --- This hacks solves the range UI notch not positioning properly
     function o:DialogGlitchHack(group)
         local sgroup = group or 'general'
-        AceConfigDialog:SelectGroup(ns.name, "debugging")
-        AceConfigDialog:Open(ns.name)
+        AceConfigDialog:SelectGroup(addon, "debugging")
+        AceConfigDialog:Open(addon)
         C_Timer.After(0.01, function()
-            AceConfigDialog:ConfigTableChanged('anyEvent', ns.name)
-            AceConfigDialog:SelectGroup(ns.name, sgroup)
+            AceConfigDialog:ConfigTableChanged('anyEvent', addon)
+            AceConfigDialog:SelectGroup(addon, sgroup)
         end)
     end
 end
@@ -254,7 +254,8 @@ New Addon Instance
 --- @return ActionbarPlus
 local function NewInstance()
     --- @class ActionbarPlus
-    local A = LibStub:NewAddon(ns.name); PropertiesAndMethods(A)
+    local A = LibStub:NewAddon(addon); PropertiesAndMethods(A)
+    function A.ns() return ns end
     return A
 end
 if ABP then return end; ABP = NewInstance()

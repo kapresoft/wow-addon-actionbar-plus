@@ -50,6 +50,7 @@ end
 --[[-----------------------------------------------------------------------------
 Log Categories
 -------------------------------------------------------------------------------]]
+--- @class LogCategories
 local LogCategories = {
     --- @type Kapresoft_LogCategory
     DEFAULT = 'DEFAULT',
@@ -129,105 +130,26 @@ local function CreateTraceFn(ns, logger, callback)
     return fn
 end
 
---- @class __GameVersionMixin
-local GameVersionMixin = {}
-
---- @param o __GameVersionMixin | Namespace
-local function GameVersionMethods(o)
-    -- todo: get rid of ns()
-    --- @return GameVersion
-    function o:IsVanilla() return self.gameVersion == 'classic' end
-    --- @return GameVersion
-    function o:IsTBC() return self.gameVersion == 'tbc_classic' end
-    --- @return GameVersion
-    function o:IsWOTLK() return self.gameVersion == 'wotlk_classic' end
-    --- @return GameVersion
-    function o:IsCataclysm() return self.gameVersion == 'cataclysm_classic' end
-    --- @return GameVersion
-    function o:IsRetail() return self.gameVersion == 'retail' end
-end; GameVersionMethods(GameVersionMixin)
-
---- @class __NamespaceLoggerMixin : CoreNamespace
-local NamespaceLoggerMixin = {}
---- @param o __NamespaceLoggerMixin
-local function NamespaceLoggerMethods(o)
-
-    local CategoryLogger = KO.CategoryMixin:New()
-    CategoryLogger:Configure(addonName, LogCategories, {
-        consoleColors = GC.C.CONSOLE_COLORS,
-        levelSupplierFn = function() return __logLevel() end,
-        printerFn = kns.print,
-        enabled = kns.debug:IsDeveloper(),
-        enabledCategoriesSupplierFn = function() return __categories() end,
-    })
-
-    --- @private
-    o.LogCategory = CategoryLogger
-
-    --- @deprecated Don't use
-    --- @return BooleanOptional
-    function o:IsLoggingEnabled() return true == GC.F.ENABLE_LOGGING end
-    --- @deprecated Don't use
-    --- @return BooleanOptional
-    function o:IsLoggingDisabled() return true ~= GC.F.ENABLE_LOGGING end
-
-    --- @return number
-    function o:GetLogLevel() return __logLevel() end
-    --- @param level number
-    function o:SetLogLevel(level) __logLevel(level) end
-
-    --- @param name string | "'ADDON'" | "'BAG'" | "'BUTTON'" | "'DRAG_AND_DROP'" | "'EVENT'" | "'FRAME'" | "'ITEM'" | "'MESSAGE'" | "'MOUNT'" | "'PET'" | "'PROFILE'" | "'SPELL'"
-    --- @param v boolean|number | "1" | "0" | "true" | "false"
-    function o:SetLogCategory(name, val)
-        assert(name, 'Debug category name is missing.')
-        --- @param v boolean|nil
-        local function normalizeVal(v) if v == 1 or v == true then return 1 end; return 0 end
-        __categories(name, normalizeVal(val))
-    end
-    --- @return boolean
-    function o:IsLogCategoryEnabled(name)
-        assert(name, 'Debug category name is missing.')
-        local val = __category(name)
-        return val == 1 or val == true
-    end
-
-    function o.LogCategories() return o.LogCategory():GetCategories() end
-    function o:LC() return LogCategories end
-    function o:CreateDefaultLogger(moduleName) return LogCategories.DEFAULT:NewLogger(moduleName) end
-
-end; NamespaceLoggerMethods(NamespaceLoggerMixin)
-
 --[[-----------------------------------------------------------------------------
 Namespace: Create
 -------------------------------------------------------------------------------]]
---- @class __NamespaceOther
---- @field gameVersion GameVersion
 
---- @alias GameVersion string | "'classic'" | "'tbc_classic'" | "'wotlk_classic'" | "'retail'"
---- @alias Namespace __Namespace | __NamespaceOther | AceLibraryMixin | __GameVersionMixin | __NamespaceLoggerMixin
+--- @alias Namespace __Namespace | AceEventWithTraceMixin | CategoryLoggerMixin | Kapresoft_LibUtil_NamespaceAceLibraryMixin
 
 --- @return Namespace
 local function CreateNamespace(...)
     --- @type string
     local addon
+
     --- @class __Namespace : CoreNamespace
     --- @field debug DebugSettings
     --- @field LibStub LocalLibStub
     --- @field LibStubAce LibStub
     --- @field O GlobalObjects
+    --- @field CategoryLoggerMixin CategoryLoggerMixin
     --- @field ConfigDialogControllerEventFrame ConfigDialogControllerEventFrame
-    local ns
+    local ns = select(2, ...)
 
-    addon, ns = ...
-
-    --- this is in case we are testing outside of World of Warcraft
-    addon = addon or GC.C.ADDON_NAME
-
-    --- @type GlobalObjects
-    ns.O = ns.O or {}
-    --- The AddOn Name, i.e. "ActionbarPlus"
-    --- @type string
-    ns.name = addon
     --- @type ActionbarPlus_AceDB
     ns.db = ns.db or {}
 
@@ -245,7 +167,8 @@ local function CreateNamespace(...)
     --- script handlers
     ns.xml = {}
 
-    ns:K():Mixin(ns, ns.O.AceLibraryMixin, GameVersionMixin, NamespaceLoggerMixin)
+    ns:K():MixinWithDefExc(ns, ns.O.AceEventWithTraceMixin)
+    ns.CategoryLoggerMixin:Configure(ns, LogCategories)
 
     --- @param o __Namespace | Namespace
     local function PropsAndMethods(o)
@@ -340,9 +263,5 @@ local function CreateNamespace(...)
 
     return ns
 end
-
-if kns.name then return end
-
 --- @type Namespace
 ABP_NS = CreateNamespace(...)
-

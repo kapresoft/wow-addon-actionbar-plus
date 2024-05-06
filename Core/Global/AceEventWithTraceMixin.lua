@@ -7,8 +7,8 @@ local kns = select(2, ...)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local libName = 'AceLibraryMixin'
---- @class AceLibraryMixin : Kapresoft_LibUtil_NamespaceAceLibraryMixin
+local libName = 'AceEventWithTraceMixin'
+--- @class AceEventWithTraceMixin
 local L = {}; kns.O[libName] = L
 
 --[[-----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 --- @see Base.lua
---- @param o AceLibraryMixin | Namespace
+--- @param o AceEventWithTraceMixin | Namespace
 local function PropsAndMethods(o)
 
     -- todo: AceEventWithTrace will eventually replace AceEvent(..)

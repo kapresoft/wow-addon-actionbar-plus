@@ -94,7 +94,7 @@ local M = {
 
 --- @class GlobalObjects
 --- @field M6Support M6Support
---- @field AceLibraryMixin AceLibraryMixin
+--- @field AceEventWithTraceMixin AceEventWithTraceMixin
 --- @field ActionBarHandlerMixin ActionBarHandlerMixin
 --- @field ActionBarOperations ActionBarOperations
 --- @field ActionbarPlusAPI ActionbarPlusAPI

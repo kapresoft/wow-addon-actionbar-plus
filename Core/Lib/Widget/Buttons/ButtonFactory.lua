@@ -120,6 +120,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+-- todo refactor:
 function L:Init()
     local frameNames = ButtonFrameFactory:CreateActionbarFrames()
     for i in ipairs(frameNames) do

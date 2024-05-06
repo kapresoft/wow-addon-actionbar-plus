@@ -3,7 +3,7 @@
 
     <Include file='_ExtLib.xml'/>
 
-    <Script file='Core.lua'/>
+    <Script file='_Core.lua'/>
     <!--@do-not-package@-->
     <Include file='Lib\Developer\_DeveloperComponents.xml'/>
     <!--@end-do-not-package@-->

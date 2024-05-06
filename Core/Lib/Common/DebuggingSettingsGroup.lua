@@ -27,7 +27,7 @@ local dbgSeq = ns:CreateSequence()
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
----@param o DebuggingSettingsGroup
+--- @param o DebuggingSettingsGroup
 local function PropsAndMethods(o)
     --- spacer
     local sp = '                                                                   '
@@ -50,22 +50,20 @@ local function PropsAndMethods(o)
                 spacer1a = { type="description", name=sp, width="full", order = dbgSeq:next() },
             },
         }
-        self:AddLevelButtons(debugConf)
+        self:QuickLogLevelButtons(debugConf, dbgSeq)
         self:AddLogLevelSlider(debugConf)
         self:AddCategories(debugConf)
 
         return debugConf;
     end
 
-    ---@param debugConf AceConfigOption
+    --- @param debugConf AceConfigOption
     function o:AddLogLevelSlider(debugConf)
         local a = debugConf.args
         a.log_level = {
             type = 'range',
             order = dbgSeq:next(),
-            step = 5,
-            min = 0,
-            max = 50,
+            step = 5, min = 0, max = 50,
             width = 1.5,
             name = L['Log Level'],
             desc = L['Log Level::Description'],
@@ -75,71 +73,43 @@ local function PropsAndMethods(o)
         a.spacer1b = { type="description", name=sp, width="full", order = dbgSeq:next() }
     end
 
-    ---@param debugConf AceConfigOption
-    function o:AddLevelButtons(debugConf)
+    --- @param debugConf AceConfigOption
+    --- @param seq Kapresoft_SequenceMixin
+    function o:QuickLogLevelButtons(debugConf, seq)
         local a = debugConf.args
         a.off = {
-            name = 'Off',
-            type = "execute", order = dbgSeq:next(), width = 0.4,
-            desc = "Turn Off Logging",
-            func = function()
-                a.log_level.set({}, 0)
-            end,
+            name = 'Off', type = "execute", order = seq:next(), width = 0.4, desc = "Turn Off Logging",
+            func = function() a.log_level.set({}, 0) end,
         }
         a.info = {
-            name = 'Info',
-            type = "execute", order = dbgSeq:next(), width = 0.4,
-            desc = "Info Log Level (15)",
-            func = function()
-                a.log_level.set({}, 15)
-            end,
+            name = 'Info', type = "execute", order = seq:next(), width = 0.4, desc = "Info Log Level (15)",
+            func = function() a.log_level.set({}, 15) end,
         }
         a.debugBtn = {
-            name = 'Debug',
-            type = "execute", order = dbgSeq:next(), width = 0.5,
-            desc = "Debug Log Level (20)",
-            func = function()
-                a.log_level.set({}, 20)
-            end,
+            name = 'Debug', type = "execute", order = seq:next(), width = 0.5, desc = "Debug Log Level (20)",
+            func = function() a.log_level.set({}, 20) end,
         }
-
         a.fineBtn = {
-            name = 'F1',
-            type = "execute", order = dbgSeq:next(), width = 0.3,
-            desc = "Fine Log Level (25)",
-            func = function()
-                a.log_level.set({}, 25)
-            end,
+            name = 'F1', type = "execute", order = seq:next(), width = 0.3, desc = "Fine Log Level (25)",
+            func = function() a.log_level.set({}, 25) end,
         }
         a.finerBtn = {
-            name = 'F2',
-            type = "execute", order = dbgSeq:next(), width = 0.3,
-            desc = "Finer Log Level (30)",
-            func = function()
-                a.log_level.set({}, 30)
-            end,
+            name = 'F2', type = "execute", order = seq:next(), width = 0.3, desc = "Finer Log Level (30)",
+            func = function() a.log_level.set({}, 30) end,
         }
         a.finestBtn = {
-            name = 'F3',
-            type = "execute", order = dbgSeq:next(), width = 0.3,
-            desc = "Finest Log Level (35)",
-            func = function()
-                a.log_level.set({}, 35)
-            end,
+            name = 'F3', type = "execute", order = seq:next(), width = 0.3, desc = "Finest Log Level (35)",
+            func = function() a.log_level.set({}, 35) end,
         }
         a.traceBtn = {
-            name = 'Trace',
-            type = "execute", order = dbgSeq:next(), width = 0.4,
-            desc = "Trace Log Level (50)",
-            func = function()
-                a.log_level.set({}, 50)
-            end,
+            name = 'Trace', type = "execute", order = seq:next(), width = 0.4, desc = "Trace Log Level (50)",
+            func = function() a.log_level.set({}, 50) end,
         }
 
-        a.spacerlb1 = { type="description", name=sp, width="full", order = dbgSeq:next() }
+        a.qlb_spacer = { type="description", name=sp, width="full", order = seq:next() }
     end
 
-    ---@param conf AceConfigOption
+    --- @param conf AceConfigOption
     function o:AddCategories(conf)
         conf.args.desc_cat = { name = ' ' .. L['Categories'] .. ' ', type = "header", order = dbgSeq:next() }
         conf.args.spacer1d = { type="description", name=sp, width="full", order = dbgSeq:next() }
@@ -162,7 +132,7 @@ local function PropsAndMethods(o)
             end }
         conf.args.spacer2 = { type="description", name=sp, width="full", order = dbgSeq:next() },
 
-        ns.LogCategory:ForEachCategory(function(cat)
+        ns.CategoryLogger():ForEachCategory(function(cat)
             local elem = {
                 type = 'toggle', name=cat.labelFn(), order=dbgSeq:next(), width=1.2,
                 get = function() return ns:IsLogCategoryEnabled(cat.name) end,
