@@ -16,11 +16,16 @@ ns.addonLogName   = 'ABP'
 local O = ns.O or {}; ns.O = O
 
 --- @type Kapresoft_LibUtil_ColorDefinition
-local consoleColors = {
+ns.consoleColors = {
     primary   = '2db9fb',
     secondary = 'fbeb2d',
     tertiary  = 'ffffff',
-}; ns.consoleColors = consoleColors
+}
+ns.ch = ns:NewConsoleHelper(ns.consoleColors)
+
+--- @class AddOnFeatures
+local features = { enableV2 = false, }
+ns.features = features
 
 --[[-----------------------------------------------------------------------------
 Type: DebugSettingsFlag
@@ -42,23 +47,13 @@ local flag = {
 Type: DebugSettings
 --- Make sure to match this structure in GlobalDeveloper (which is not packaged in releases)
 -------------------------------------------------------------------------------]]
+--- @class DebugSettings
+local debug = {
+    flag = flag
+}; ns.debug = debug
 
---- @return DebugSettings
-local function debug()
-    --- @class DebugSettings
-    local o = {
-        flag = flag,
-    }
-    --- @return boolean
-    function o:IsDeveloper() return self.flag.developer == true  end
-    --- @return boolean
-    function o:IsEnableLogConsole()
-        return self:IsDeveloper() and self.flag.enableLogConsole == true
-    end
-    function o:IsSelectLogConsoleTab()
-        return self:IsEnableLogConsole() and self.flag.selectLogConsoleTab
-    end
-    return o;
-end
-
-ns.debug = debug()
+--[[-----------------------------------------------------------------------------
+Namespace Methods
+-------------------------------------------------------------------------------]]
+--- @return boolean
+function ns:IsDev() return ns.debug.flag.developer == true end

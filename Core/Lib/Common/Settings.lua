@@ -232,7 +232,7 @@ end
 --- @param optArgs AceConfigOption
 local function ConfigureDebugging(optArgs)
     --@do-not-package@
-    if ns.debug:IsDeveloper() then
+    if ns:IsDev() then
         optArgs.debugging = debugGroup:CreateDebuggingGroup()
         p:a(function()
             return 'Debugging tab in Settings UI is enabled with LogLevel=%s', c1(ABP_LOG_LEVEL)

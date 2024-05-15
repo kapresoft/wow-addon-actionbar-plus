@@ -23,21 +23,24 @@ local buttonBarText = 'Button'
 
 L['ABP_ACTIONBAR_BASE_NAME']                             = actionBarText
 L['ABP_BUTTON_BASE_NAME']                                = buttonBarText
+L['%s version %s by %s is loaded.'] = true
+L['Type %s or %s for available commands.'] = true
 
 LocUtil:SetupKeybindNames(L, actionBarText, buttonBarText)
 
 --[[-----------------------------------------------------------------------------
 No Translations
 -------------------------------------------------------------------------------]]
-L['Version']                                    = true
-L['Curse-Forge']                                = true
-L['Bugs']                                       = true
-L['Repo']                                       = true
-L['Last-Update']                                = true
-L['Interface-Version']                          = true
-L['Game-Version']                               = true
-L['Locale']                                     = true
-L['Use-KeyDown(cvar ActionButtonUseKeyDown)']   = true
+L['Version']                                  = true
+L['Curse-Forge']                              = true
+L['Bugs']                                     = true
+L['Repo']                                     = true
+L['Last-Update']                              = true
+L['Interface-Version']                        = true
+L['Game-Version']                             = true
+L['Locale']                                   = true
+L['Use-KeyDown(cvar ActionButtonUseKeyDown)'] = true
+L['Features']                                 = true
 
 --[[-----------------------------------------------------------------------------
 Localized Texts

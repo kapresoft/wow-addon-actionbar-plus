@@ -8,6 +8,17 @@ manual-changelog:
   filename: CHANGELOG.txt
   markup-type: markdown
 
+embedded-libraries:
+  - LibStub
+  - Ace3
+
+tools-used:
+  - DevSuite
+  - DebugChatFrame
+  - Addon-Usage
+  - Bugsack
+  - Bug-Grabber
+
 # Declaring the following dependencies will make curse forge app install these 3rd-party
 # libraries. Need to figure out which is best (embedded or external).
 # in code, check for each of library global var before using

@@ -54,7 +54,7 @@ local o = L; do
             levelSupplierFn = function() return __GetLogLevel() end,
             enabledCategoriesSupplierFn = function() return __GetCategories() end,
             printerFn = ns.print,
-            enabled = namesp.debug:IsDeveloper(),
+            enabled = namesp:IsDev(),
         })
         namesp.CategoryLogger = function() return CategoryLogger end
         namesp:K():Mixin(namesp, o)
@@ -80,7 +80,9 @@ local o = L; do
         local val = __IsEnabledCategory(name)
         return val == 1 or val == true
     end
+    --- @return LogCategories
     function o:LC() return self.LogCategories() end
+    --- @return Kapresoft_CategoryLoggerMixin
     function o:CreateDefaultLogger(moduleName) return self:LC().DEFAULT:NewLogger(moduleName) end
 
     ns.CategoryLoggerMixin = o
