@@ -1,19 +1,16 @@
-## Interface: 100206
+## Interface: 100207
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
 ## Notes: Actionbars Everywhere, Make you click happy.
-## Author: kapresoft@gmail.com
+## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-64xe.tga
+## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-v2-18x
 
-## LoadManagers: AddonLoader
-## X-LoadOn-Always: delayed
-## X-LoadOn-AddonLoaded: Blizzard_Professions
+## OptionalDeps: Blizzard_Professions
 
-## X-Min-Interface: 90200
-## X-Credits: kapresoft@gmail.com
+## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: ActionBars
 ## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 

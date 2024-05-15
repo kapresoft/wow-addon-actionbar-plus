@@ -11,12 +11,8 @@ if type(ABP_DEBUG_MODE) ~= "boolean" then ABP_DEBUG_MODE = false end
 Lua Vars
 -------------------------------------------------------------------------------]]
 local sformat = string.format
-
-local GITHUB_LAST_CHANGED_DATE = 'X-Github-Project-Last-Changed-Date'
+local ActionButtonUseKeyDown_Cvar = 'ActionButtonUseKeyDown'
 local ABP_M6_COMPATIBLE_VERSION_DATE = 'X-ActionbarPlus-M6-Compatible-Version-Date'
-local GITHUB_REPO = 'X-Github-Repo'
-local GITHUB_ISSUES = 'X-Github-Issues'
-local CURSE_FORGE = 'X-CurseForge'
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -26,21 +22,21 @@ local GetAddOnMetadata, GetBuildInfo, GetCVarBool = GetAddOnMetadata, GetBuildIn
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type string
-local addon
---- @type CoreNamespace
-local kns
-addon, kns = ...
-local kch = kns.Kapresoft_LibUtil.CH
 --- @type LibStub
 local LibStub = LibStub
 
---- @type fun(o:any, ...) : void
-local pformat = kns.pformat
+--- @type CoreNamespace
+local kns = select(2, ...)
+local addon = kns.addon
 
+--- @type Kapresoft_LibUtil_ConsoleHelper
+local kch = kns.Kapresoft_LibUtil.CH
 --- @type Kapresoft_LibUtil
 local K = kns.Kapresoft_LibUtil
+--- @type Kapresoft_LibUtil_Modules
 local KO = K.Objects
+--- @type Kapresoft_LibUtil_TimeUtil
+
 local TimeUtil = KO.TimeUtil
 local String = KO.String
 local IsBlank, IsNotBlank, EqualsIgnoreCase = String.IsBlank, String.IsNotBlank, String.EqualsIgnoreCase
@@ -600,6 +596,15 @@ end
 --- @param o GlobalConstants
 local function GlobalConstantMethods(o)
 
+    --- @return boolean
+    local function IsDev()
+        local _isDev = kns:IsDev()
+        --@do-not-package@
+        _isDev = true
+        --@end-do-not-package@
+        return _isDev
+    end
+
     --- Checks if the first argument matches any of the subsequent arguments.
     --- @param toMatch number The value to match against the varargs.
     --- @param ... any The list of values to check for a match.
@@ -615,7 +620,16 @@ local function GlobalConstantMethods(o)
 
     --- @return string
     function o:AddonName() return o.C.ADDON_NAME end
-    function o:GetAceLocale() return LibStub("AceLocale-3.0"):GetLocale(addon, true) end
+    function o:GetAceLocale()
+        --return LibStub("AceLocale-3.0"):GetLocale(addon, true)
+        return KO.AceLocaleUtil:GetLocale(addon, not IsDev())
+    end
+
+    function o:AIU()
+        if o.AddonUtil then return o.AddonUtil end
+        o.AddonUtil = kns:AddonInfoUtil():New(addon, kns.consoleColors, IsDev())
+        return o.AddonUtil
+    end
 
     ---@param frameIndex Index
     function o:GetFrameName(frameIndex)
@@ -628,41 +642,11 @@ local function GlobalConstantMethods(o)
         return sformat('%sButton%s', self:GetFrameName(frameIndex), tostring(buttonIndex))
     end
 
-    function o:Constants() return o.C end
-    function o:Events() return o.E end
-    ---#### Example
-    ---```
-    ---local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = GC:GetAddonInfo()
-    ---```
-    --- @return string, string, string, string, string, string, string
-    function o:GetAddonInfo()
-        local lastUpdate = self:GetLastUpdate()
-        local versionText = self:GetVersion()
-
-        local useKeyDown = GetCVarBool("ActionButtonUseKeyDown")
-        local wowInterfaceVersion = select(4, GetBuildInfo())
-
-        return versionText, GetAddOnMetadata(addon, CURSE_FORGE), GetAddOnMetadata(addon, GITHUB_ISSUES),
-        GetAddOnMetadata(addon, GITHUB_REPO), lastUpdate, useKeyDown, wowInterfaceVersion
-    end
-
     --- @return string The ActionbarPlus version string. Example: 2024.3.1
-    function o:GetVersion()
-        local versionText = GetAddOnMetadata(addon, 'Version')
-        --@do-not-package@
-        versionText = '1.0.0.dev'
-        --@end-do-not-package@
-        return versionText
-    end
+    function o:GetVersion() return self:AIU():GetVersion() end
 
     --- @return string The time in ISO Date Format. Example: 2024-03-22T17:34:00Z
-    function o:GetLastUpdate()
-        local lastUpdate = GetAddOnMetadata(addon, GITHUB_LAST_CHANGED_DATE)
-        --@do-not-package@
-        lastUpdate = TimeUtil:TimeToISODate()
-        --@end-do-not-package@
-        return lastUpdate
-    end
+    function o:GetLastUpdate() return self:AIU():GetLastUpdate() end
 
     --- The date represents compatible version update date.
     --- between ActionbarPlus-M6 and ActionbarPlus. Any dates lower than this
@@ -673,7 +657,7 @@ local function GlobalConstantMethods(o)
         lastCompatibleDate = GetAddOnMetadata(addon, ABP_M6_COMPATIBLE_VERSION_DATE)
 
         --@do-not-package@
-        if kns.debug:IsDeveloper() then
+        if kns:IsDev() then
             -- Add time to simulate expired ActionbarPlus-M6 in dev environment. Example: time() + 1000
             -- if "lastUpdate" is older than "lastCompatibleDate", then ActionbarPlus-M6 will notify user.
             -- lastCompatibleDate = ns.TimeUtil:TimeToISODate(time() - 10)
@@ -686,34 +670,27 @@ local function GlobalConstantMethods(o)
 
     --- @return string
     function o:GetAddonInfoFormatted()
-        local C = self:GetAceLocale()
-        local version, curseForge, issues, repo, lastUpdate, useKeyDown, wowInterfaceVersion = self:GetAddonInfo()
-        local fmt = self.C.ADDON_INFO_FMT
-        --- @type Namespace
-        local nss = kns
-        local ffmt = self.C.ADDON_INFO_FEATURE_FMT
-        local features = sformat(ffmt, "v2-enabled", tostring(nss.features.enableV2))
+        local a = self:AIU()
 
-        return sformat("%s:\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
-                C['Addon Info'],
-                sformat(fmt, C['Version'], version),
-                sformat(fmt, C['Curse-Forge'], curseForge),
-                sformat(fmt, C['Bugs'], issues),
-                sformat(fmt, C['Repo'], repo),
-                sformat(fmt, C['Last-Update'], lastUpdate),
-                sformat(fmt, C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown)),
-                sformat(fmt, C['Interface-Version'], wowInterfaceVersion),
-                sformat(fmt, C['Game-Version'], kns.gameVersion),
-                sformat(fmt, "Features", features)
-        )
+        local kvFormat = a:infoKvFn()
+        local kvSubFormat = a:infoKvSubFn()
+
+        local function AdditionalInfo()
+            local C = self:GetAceLocale()
+            local s = ''
+            local useKeyDown = GetCVarBool(ActionButtonUseKeyDown_Cvar)
+
+            s = s .. kvFormat(C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown))
+            s = s .. kvFormat(C['Features'], ' ')
+            s = s .. kvSubFormat('v2-enabled', tostring(kns.features.enableV2))
+            return s
+        end
+
+        return self:AIU():GetInfoSlashCommandText() .. AdditionalInfo()
     end
 
     function o:GetMessageLoadedText()
-        local consoleCommandMessageFormat = sformat('Type %s or %s for available commands.',
-                command, commandShort)
-        return sformat("%s version %s by %s is loaded. %s",
-                kch:P(addon) , self:GetAddonInfo(), kch:FormatColor(consoleColors.primary, 'kapresoft'),
-                consoleCommandMessageFormat)
+        return self:AIU():GetMessageLoadedText(command, commandShort)
     end
 
     --- @param frameIndex number

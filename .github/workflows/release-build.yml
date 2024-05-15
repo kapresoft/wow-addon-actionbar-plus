@@ -110,7 +110,7 @@ jobs:
           echo "$(env|sort)"
       ## ------------------------------------------------ ##
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         id: build_changelog
@@ -134,13 +134,13 @@ jobs:
           args: -r ${releaseDir} ${bigWigsUploads} ${packagerOptions}
       ## ------------------------------------------------ ##
       - name: "Verify Build Artifact Exists: ${{ env.buildArtifact }}"
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "${{ env.buildArtifact }}"
           fail: true
       ## ------------------------------------------------ ##
       - name: "Verify: Supporting Scripts Exists"
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "./dev/md5sum.sh"
           fail: true
@@ -177,7 +177,7 @@ jobs:
       - name: Create a draft release
         id: create_draft_release
         if: ${{ env.createDraftRelease != 'false' }}
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -195,7 +195,7 @@ jobs:
       ## https://github.com/actions/upload-artifact
       - name: Upload Build Artifact File
         if: ${{ env.uploadBuildArtifacts == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.buildArtifactFilename }}
           path: ${{ env.buildArtifact }}
@@ -203,7 +203,7 @@ jobs:
       ## ------------------------------------------------ ##
       - name: Upload Build Artifact Checksum File
         if: ${{ env.uploadBuildArtifacts == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env. buildArtifactChecksumFilename }}
           path: ${{ env.buildArtifactChecksumFile }}
