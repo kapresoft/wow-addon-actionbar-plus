@@ -131,21 +131,28 @@ local function PropsAndMethods(o)
     --- @param profile Profile_Config
     function o:OpenEquipmentMgrConditionally(w, profile)
         if profile.equipmentset_open_equipment_manager == true then
-            --- @type _Frame
+            --- @type Frame
             local gmDlg = GearManagerDialog
             if gmDlg and gmDlg:IsVisible() then self:ClickEquipmentSetButtonDelayed(w) return end
         end
 
+        if profile.equipmentset_open_equipment_manager ~= true then return end
+
         --- Buttons:
         --- • GearManagerToggleButton (pre-retail)
         --- • PaperDollSidebarTab3 (retail)
-        --- @type _Button
+        --- @type Button
         local gmButton = GearManagerToggleButton or PaperDollSidebarTab3
-        if profile.equipmentset_open_equipment_manager ~= true then return end
         C_Timer.After(0.1, function()
             gmButton:Click()
             self:ClickEquipmentSetButtonDelayed(w)
         end)
+        self:ExpandCharacterFrame()
+    end
+
+    function o:ExpandCharacterFrame()
+        if not (ns:IsCataclysm() and CharacterFrameExpandButton) then return end
+        CharacterFrameExpandButton:Click()
     end
 
     --- @private
