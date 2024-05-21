@@ -152,6 +152,7 @@ local function PropsAndMethods(o)
 
     function o:ExpandCharacterFrame()
         if not (ns:IsCataclysm() and CharacterFrameExpandButton) then return end
+        if CharacterFrame.Expanded == true then return end
         CharacterFrameExpandButton:Click()
     end
 
