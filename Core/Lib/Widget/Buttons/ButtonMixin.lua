@@ -10,7 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, API, BaseAPI = O.Profile, O.API, O.BaseAPI
+local P, Compat, API, BaseAPI = O.Profile, O.Compat, O.API, O.BaseAPI
 local String = ns:String()
 local AceEvent = ns:AceLibrary().AceEvent
 local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
@@ -661,7 +661,7 @@ local function PropsAndMethods(o)
     function o:UpdateGlow()
         if not IsSpellOverlayed then return end
         local spell = self:GetEffectiveSpellName(); if not spell then return end
-        local spellID = select(7, GetSpellInfo(spell)); if not spellID then return end
+        local spellID = select(7, Compat:GetSpellInfo(spell)); if not spellID then return end
         local isGlowing = IsSpellOverlayed(spellID)
         if isGlowing then self:ShowOverlayGlow(); return else end
         self:HideOverlayGlow()
@@ -1016,13 +1016,13 @@ local function PropsAndMethods(o)
         local spellID = cd.details.spell.id
         -- why true by default?
         if IsBlank(spellID) then return true end
-        return IsUsableSpell(spellID)
+        return Compat:IsUsableSpell(spellID)
     end
 
     function o:IsUsableToy(itemID)
         local _, spellID = API:GetItemSpellInfo(itemID)
         if not spellID then return false end
-        return IsUsableSpell(spellID)
+        return Compat:IsUsableSpell(spellID)
     end
 
     --- @param itemID ItemID
@@ -1046,7 +1046,7 @@ local function PropsAndMethods(o)
         if cd.details.spell then
             local spellID = cd.details.spell.id
             if IsBlank(spellID) then return true end
-            return IsUsableSpell(spellID)
+            return Compat:IsUsableSpell(spellID)
         elseif cd.details.item then
             return IsUsableItem(cd.details.item.id)
         end
@@ -1133,9 +1133,9 @@ local function PropsAndMethods(o)
         if not spell then return false end
 
         if 'string' == type(spell) then
-            return SpellHasRange(spell) == true
+            return Compat:SpellHasRange(spell) == true
         elseif 'number' == type(spell) then
-            return SpellHasRange(GetSpellInfo(spell)) == true
+            return Compat:SpellHasRange(Compat:GetSpellInfo(spell)) == true
         end
         return false
     end

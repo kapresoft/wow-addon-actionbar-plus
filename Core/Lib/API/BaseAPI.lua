@@ -19,7 +19,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local O, GC, M, Compat = ns.O, ns.GC, ns.M, ns.O.Compat
 
 local UnitId = GC.UnitId
 local W = GC.WidgetAttributes
@@ -172,7 +172,7 @@ end
 --- @param spell Profile_Spell
 function L:PickupSpell(spell)
     if not (spell and spell.id) then return end
-    PickupSpell(spell.id)
+    Compat:PickupSpell(spell.id)
 end
 --- @param macro Profile_Macro
 function L:PickupMacro(macro)
@@ -189,7 +189,7 @@ end
 --- @param mount Profile_Mount
 function L:PickupMount(mount)
     local spellID = C_MountJournal and mount.spell and mount.spell.id
-    if spellID then return PickupSpell(spellID) end
+    if spellID then return Compat:PickupSpell(spellID) end
 
     PickupCompanion(W.MOUNT, mount.index)
 end

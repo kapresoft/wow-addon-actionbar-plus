@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local O, GC, M, Compat = ns.O, ns.GC, ns.M, ns.O.Compat
 
 local Table, IsAnyOf = ns:Table(), ns:String().IsAnyOf
 local TableIsEmpty, TableUnpack = Table.IsEmpty, Table.unpack
@@ -81,17 +81,10 @@ local function PropsAndMethods(o)
         return unitClassID and GC:IsAnyOfNumber(unitClassID, ...)
     end
 
-    --- @param index Index
-    --- @return SpellID
-    local function GetBuffSpellID(index)
-        local _, _, _, _, _, _, _, _, _, unitBuffSpellId = UnitBuff("player", index)
-        return unitBuffSpellId
-    end
-
     --- Inefficient. Use #IsBuffActive
     function o:HasBuff(spellID)
         for i = 1, 40 do
-            if spellID == GetBuffSpellID(i) then return true end
+            if spellID == Compat:GetBuffSpellID(i) then return true end
         end
         return false
     end
@@ -125,7 +118,7 @@ local function PropsAndMethods(o)
     function o:UpdateBuffs(filterFn)
         self:ClearBuffs()
         for i = 1, 40 do
-            local spellID = GetBuffSpellID(i)
+            local spellID = Compat:GetBuffSpellID(i)
             if spellID then
                 local spellName = O.API:GetSpellName(spellID)
                 if filterFn(spellID) and self:IsOwnSpell(spellName) then

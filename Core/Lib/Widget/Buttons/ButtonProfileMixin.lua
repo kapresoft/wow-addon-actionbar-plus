@@ -11,7 +11,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, API = O.Profile, O.API
+local P, Compat, API = O.Profile, O.Compat, O.API
 local CN = GC.Profile_Config_Names
 local String, Table, W = ns:String(), ns:Table(), GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, ns:Assert().IsNil
@@ -276,7 +276,7 @@ local function PropsAndMethods(o)
         end
         -- assume passive by default if we can't find any spell info
         if not spellNameOrId then return true end
-        return IsPassiveSpell(spellNameOrId)
+        return Compat:IsPassiveSpell(spellNameOrId)
     end
 
     --- @deprecated Use #IsActionType(type, optionalConfig)
