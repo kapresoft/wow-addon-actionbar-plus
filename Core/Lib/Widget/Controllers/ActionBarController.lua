@@ -2,11 +2,11 @@
 
 --- @type Namespace
 local ns = select(2, ...)
-local O, GC, M, LibStub, LC = ns.O, ns.GC, ns.M, ns.LibStub, ns:LC()
+local O, GC, M, Compat, LC = ns.O, ns.GC, ns.M, ns.O.Compat, ns:LC()
 
 local H = O.ActionBarHandlerMixin
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
-local PR, WMX, B = O.Profile, O.WidgetMixin, O.BaseAPI
+local PR, WMX, B, API = O.Profile, O.WidgetMixin, O.BaseAPI, O.API
 local Un = O.UnitMixin:New()
 
 --[[-----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ end
 local function OnPlayerSpellCastSent(evt)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
         sp:f1(function()
-            local r = GetSpellSubtext(evt.spellID)
+            local r = Compat:GetSpellSubtext(evt.spellID)
             return 'cast sent: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
         end)
         bw:SetButtonStateNormal();
@@ -119,7 +119,7 @@ local function OnSpellCastSucceeded(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
     L:ForEachButton(function(bw)
         sp:f1(function()
-            local r = GetSpellSubtext(evt.spellID)
+            local r = Compat:GetSpellSubtext(evt.spellID)
             return 'cast succeeded: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
         end)
         if bw:IsMatchingMacroOrSpell(evt.spellID) then bw:UpdateItemOrMacroState()

@@ -23,6 +23,7 @@ local M = {
     API = '',
     Assert = '',
     BaseAPI = '',
+    Compat = '',
     LogFactory = '',
     Logger = '',
     LuaEvaluator = '',
@@ -102,6 +103,7 @@ local M = {
 --- @field API API
 --- @field BagController BagController
 --- @field BaseAPI BaseAPI
+--- @field Compat Compat
 --- @field ModuleV2Mixin ModuleV2Mixin
 --- @field BaseAttributeSetter BaseAttributeSetter
 --- @field BattlePetAttributeSetter BattlePetAttributeSetter

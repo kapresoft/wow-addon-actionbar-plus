@@ -1,7 +1,6 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local PickupSpell, PickupMacro, PickupItem, PickupCompanion = PickupSpell, PickupMacro, PickupItem, PickupCompanion
 local GetCursorInfo = GetCursorInfo
 --[[-----------------------------------------------------------------------------
 Local vars

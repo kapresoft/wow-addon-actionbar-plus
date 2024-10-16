@@ -20,7 +20,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O = ns.O
+local O, Compat = ns.O, ns.O.Compat
 
 local String = ns:String()
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
@@ -50,7 +50,7 @@ Mixins
 --- @alias Mount MountMixin | C_MountJournal_MountInfo
 --- @class MountMixin
 local MountMixin = {}
----@param o MountMixin
+--- @param o MountMixin
 local function MountMixinMethods(o)
     ---@param mount C_MountJournal_MountInfo
     function o:Init(mount)
@@ -136,7 +136,7 @@ function S:HasTarget() return GetUnitName(UnitId.target) ~= nil end
 --- @param target UnitID
 --- @return boolean
 function S:IsSpellInRange(spell, target)
-    local inRange = IsSpellInRange(spell, target);
+    local inRange = Compat:IsSpellInRange(spell, target);
     if inRange == nil then return nil end
     return inRange == true or inRange == 1
 end
@@ -220,7 +220,7 @@ function S:IsItemConsumable(item, retrieveUpdate)
     return itemData.classID == Enum.ItemClass.Consumable
 end
 
-function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, UnitId.target) ~= nil end
+function S:CanApplySpellOnTarget(spellName) return Compat:IsSpellInRange(spellName, UnitId.target) ~= nil end
 
 
 ---@return boolean, SpellName, SpellID
@@ -228,7 +228,7 @@ function S:CanApplySpellOnTarget(spellName) return IsSpellInRange(spellName, Uni
 ---@param name SpellName The source spell name
 ---@param icon Number The source spell Icon
 local function IsRuneSpell(id, name, icon)
-    local _name, _, _icon, _, _, _, _id = GetSpellInfo(name)
+    local _name, _, _icon, _, _, _, _id = Compat:GetSpellInfo(name)
     if _name == nil or _icon == nil or id == _id or name == _name then
         return false
     end
@@ -238,7 +238,7 @@ end
 --- @param spellNameOrId SpellName|SpellID
 --- @return SpellName, SpellID
 function S:GetSpellName(spellNameOrId)
-    local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
+    local name, rank, icon, castTime, minRange, maxRange, id = Compat:GetSpellInfo(spellNameOrId)
     return name, id
  end
 
@@ -248,7 +248,7 @@ function S:GetSpellName(spellNameOrId)
 function S:GetSpellInfoBasic(spellNameOrId)
     if not spellNameOrId then return nil end
 
-    local name, _, icon, _, _, _, id = GetSpellInfo(spellNameOrId)
+    local name, _, icon, _, _, _, id = Compat:GetSpellInfo(spellNameOrId)
     if not name then return nil end
     --- @type SpellInfo
     local spellInfo = { id = id, name = name, icon = icon }
@@ -291,11 +291,11 @@ end
 function S:GetSpellInfo(spellNameOrId)
     if not spellNameOrId then return nil end
 
-    local name, rank, icon, castTime, minRange, maxRange, id = GetSpellInfo(spellNameOrId)
+    local name, rank, icon, castTime, minRange, maxRange, id = Compat:GetSpellInfo(spellNameOrId)
     if not name then return end
 
-    local subTextOrRank = GetSpellSubtext(name)
-    local spellLink = GetSpellLink(name)
+    local subTextOrRank = Compat:GetSpellSubtext(name)
+    local spellLink = Compat:GetSpellLink(name)
     --- @type SpellInfo
     local spellInfo = {
         id = id, name = name, icon = icon,
@@ -344,7 +344,7 @@ function S:GetMacroSpellID(macroIndex) return macroIndex and GetMacroSpell(macro
 --- @return SpellName, SpellID
 function S:GetMacroSpell(macroIndex)
     local spellID = self:GetMacroSpellID(macroIndex)
-    return spellID and GetSpellInfo(spellID), spellID
+    return spellID and Compat:GetSpellInfo(spellID), spellID
 end
 
 --- @param macroIndex number
@@ -353,14 +353,12 @@ function S:GetMacroSpellInfo(macroIndex)
     local spellId = self:GetMacroSpellID(macroIndex)
     return spellId and self:GetSpellInfo(spellId)
 end
---- @param spellNameOrId string|number
-function S:IsPassiveSpell(spellNameOrId) return IsPassiveSpell(spellNameOrId) end
 
 --- @return SpellCooldownDetails
 function S:GetSpellCooldownDetails(spellID, optionalSpell)
     local spell = optionalSpell or self:GetSpellInfo(spellID)
     if spell == nil then error("Spell not found: " .. spellID) end
-    local start, duration, enabled, modRate = GetSpellCooldown(spellID);
+    local start, duration, enabled, modRate = Compat:GetSpellCooldown(spellID);
     local cooldown = { start = start, duration = duration, enabled = enabled, modRate = modRate }
     --- @class SpellCooldownDetails
     local details = { spell = spell, cooldown = cooldown }
@@ -375,7 +373,7 @@ function S:GetSpellCooldown(spellNameOrID)
     local spell = self:GetSpellInfo(spellNameOrID)
     if not spell then return nil end
 
-    local start, duration, enabled, modRate = GetSpellCooldown(spellNameOrID);
+    local start, duration, enabled, modRate = Compat:GetSpellCooldown(spellNameOrID);
 
     --- @type SpellCooldown
     local cd = {
@@ -493,7 +491,7 @@ function S:GetSpellAttributeValue(spellInfo) return spellInfo.name end
 --- @param spellInfo Profile_Spell
 function S:GetSpellAttributeValueClassicEra(spellInfo)
     local spell = spellInfo.name
-    local spellRank = GetSpellSubtext(spellInfo.id)
+    local spellRank = Compat:GetSpellSubtext(spellInfo.id)
     if String.IsNotBlank(spellRank) then
         spell = spell .. '(' .. spellRank .. ')'
     end
