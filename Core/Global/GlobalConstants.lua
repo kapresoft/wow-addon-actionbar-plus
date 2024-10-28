@@ -17,7 +17,8 @@ local ABP_M6_COMPATIBLE_VERSION_DATE = 'X-ActionbarPlus-M6-Compatible-Version-Da
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GetAddOnMetadata, GetBuildInfo, GetCVarBool = GetAddOnMetadata, GetBuildInfo, GetCVarBool
+local GetBuildInfo, GetCVarBool = GetBuildInfo, GetCVarBool
+local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
 --[[-----------------------------------------------------------------------------
 Local Vars
