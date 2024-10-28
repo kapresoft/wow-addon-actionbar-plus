@@ -10,7 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local TimeUtil = ns:K().Objects.TimeUtil
-local API, String = O.API, ns:String()
+local Compat, API, String = O.Compat, O.API, ns:String()
 local IsBlank = String.IsBlank
 
 --- ActionbarPlusAPI is a Library used by other addOns like ActionbarPlus-M6
@@ -57,6 +57,11 @@ local function PropertiesAndMethods(o)
     function o:GetSpell(spellNameOrID)
         local name, id = API:GetSpellName(spellNameOrID); return name, id
     end
+
+    --- Retrieves spell information, compatible with both Retail and Classic WoW.
+    --- @param spellIDOrName SpellID_Name_Or_Index
+    --- @return SpellName, nil, Icon, CastTime, MinRange, MaxRange, SpellID, OriginalIcon
+    function o:GetSpellInfo(spellIDOrName) return Compat:GetSpellInfo(spellIDOrName) end
 
     --- @param spellNameOrID SpellID|SpellName
     --- @return boolean, SpellID, SpellName
