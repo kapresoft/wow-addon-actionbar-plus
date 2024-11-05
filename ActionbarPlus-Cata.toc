@@ -7,6 +7,8 @@
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 
+## OptionalDeps: Blizzard_Professions, Ace3
+
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: ActionBars
 ## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r

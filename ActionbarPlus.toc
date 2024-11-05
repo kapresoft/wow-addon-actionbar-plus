@@ -8,7 +8,7 @@
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
 ## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-v2-18x
 
-## OptionalDeps: Blizzard_Professions
+## OptionalDeps: Blizzard_Professions, Ace3
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: ActionBars
