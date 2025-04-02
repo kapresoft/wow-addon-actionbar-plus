@@ -2,9 +2,6 @@
 |--------|----------|
 |[![Branch Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml)| [![Release Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml)|
 
-# Test
-- We are going to revert this afterwards.
-
 # ActionbarPlus
 > A [World of Warcraft](https://worldofwarcraft.com/) AddOn
 
