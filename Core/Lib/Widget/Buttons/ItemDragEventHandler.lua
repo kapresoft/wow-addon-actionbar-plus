@@ -9,11 +9,13 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local E, MSG = GC.E, GC.M
 
 local P, Assert, Table, PH = O.Profile, ns:Assert(), ns:Table(), O.PickupHandler
 local WAttr = ns.GC.WidgetAttributes
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local API = O.API
+local AceEvent = ns:AceLibrary().AceEvent
 
 --[[-----------------------------------------------------------------------------
 New Instance: ItemDragEventHandler
@@ -56,6 +58,9 @@ local function eventHandlerMethods(e)
 
         S(btnUI, btnData)
         btnUI.widget:UpdateItemState()
+
+        AceEvent:SendMessage(MSG.OnUpdateItemState,
+                             M.ItemDragEventHandler, btnUI.widget)
     end
 
     function e:GetItemDetails(itemId)
