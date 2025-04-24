@@ -30,7 +30,6 @@ local function PropsAndMethods(o)
 
     --- @param bw ButtonUIWidget
     function o:OnUpdateSingleItem(bw)
-        p:vv(function() return 'updated: %s', tostring(bw:GetItemName()) end)
         self:ConditionallyCheckSingleItemButton(bw)
     end
 
