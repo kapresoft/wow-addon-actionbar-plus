@@ -40,7 +40,6 @@ local function PropsAndMethods(o)
             E.PET_BAR_SHOWGRID, E.PET_BAR_HIDEGRID,
             E.CURSOR_CHANGED,
             E.MODIFIER_STATE_CHANGED,
-
             E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
         })
