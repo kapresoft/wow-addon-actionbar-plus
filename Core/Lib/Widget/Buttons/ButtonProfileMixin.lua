@@ -47,7 +47,7 @@ local function PropsAndMethods(o)
     end
 
     --- @return Profile_Button
-    function o:conf() return self:GetConfig() end
+    function o:conf() return PR():GetButtonConfig(self.w.frameIndex, self.w.buttonName) end
 
     function o:SetButtonAttributes()
         local conf = self:conf()
@@ -107,10 +107,6 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Bar
     function o:GetBarConfig() return self.dragFrame():GetConfig() end
-
-    ---#### Get Profile Button Config Data
-    --- @return Profile_Button
-    function o:GetConfig() return PR():GetButtonConfig(self.w.frameIndex, self.w.buttonName) end
 
     --- @return Profile_Config
     function o:GetProfileConfig() return PR():P() end

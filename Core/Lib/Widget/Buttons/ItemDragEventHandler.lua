@@ -51,7 +51,7 @@ local function eventHandlerMethods(e)
         local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
                            link = itemInfo.link, count = itemInfo.count, stackCount = itemInfo.stackCount }
 
-        local btnData = btnUI.widget:GetConfig()
+        local btnData = btnUI.widget:conf()
         PH:PickupExisting(btnUI.widget)
         btnData.type = WAttr.ITEM
         btnData[WAttr.ITEM] = itemData
