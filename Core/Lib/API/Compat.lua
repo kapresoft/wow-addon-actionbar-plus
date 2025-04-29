@@ -9,7 +9,14 @@ local O, GC, M = ns.O, ns.GC, ns.M
 local L = ns:NewLibStd(M.Compat)
 local p = ns:CreateDefaultLogger(M.Compat)
 
---- Checks if a spell is passive, compatible with both Retail and Classic WoW.
+function L:IsDualSpecEnabled()
+    if GetNumTalentGroups == nil or GC.F.ENABLE_MULTI_SPEC ~= true then return false end
+    return GetNumTalentGroups and (GetNumTalentGroups() > 1)
+end
+function L:IsPrimarySpec() return 1 == GetActiveTalentGroup() end
+function L:IsNotPrimarySpec() return 1 < GetActiveTalentGroup() end
+
+    --- Checks if a spell is passive, compatible with both Retail and Classic WoW.
 --- @param spellIDOrName SpellID_Name_Or_Index
 --- @return boolean|nil isPassive True if the spell is passive, or nil if not found.
 function L:IsPassiveSpell(spellIDOrName)

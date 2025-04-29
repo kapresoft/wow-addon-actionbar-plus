@@ -254,13 +254,18 @@ local function Methods(o)
         end
     end
 
+    --- This helps cleanup unused buttons if applied properly.
+    --- If there are no changes in the button conf, it will not be
+    --- saved in the ActionbarPlus.lua profile file.
     --- @param profile Profile_Config
     --- @param barName string
     --- @param barConf Profile_Bar
     --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
+        local btnNameSecondarySpec = btnName .. '_2'
         barConf.buttons[btnName] = self:CreateSingleButtonTemplate()
+        barConf.buttons[btnNameSecondarySpec] = self:CreateSingleButtonTemplate()
     end
 
     --- @return Profile_Button

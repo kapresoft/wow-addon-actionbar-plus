@@ -87,7 +87,8 @@ local function GlobalConstantProperties(o)
     --- @Class AddonFeatures
     local FEATURES = {
         ENABLE_LOGGING = true,
-        ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST = true
+        ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST = true,
+        ENABLE_MULTI_SPEC = true,
     }
 
     --- @class GlobalAttributes
@@ -220,6 +221,7 @@ local function GlobalConstantProperties(o)
 
         ACTIONBAR_SHOWGRID = 'ACTIONBAR_SHOWGRID',
         ACTIONBAR_HIDEGRID = 'ACTIONBAR_HIDEGRID',
+        ACTIVE_TALENT_GROUP_CHANGED = 'ACTIVE_TALENT_GROUP_CHANGED',
         PET_BAR_SHOWGRID   = 'PET_BAR_SHOWGRID',
         PET_BAR_HIDEGRID   = 'PET_BAR_HIDEGRID',
 

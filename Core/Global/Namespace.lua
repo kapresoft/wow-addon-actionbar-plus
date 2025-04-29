@@ -87,6 +87,8 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     SPELL = "SP",
     --- @type Kapresoft_LogCategory
+    TALENT = "TA",
+    --- @type Kapresoft_LogCategory
     TRACE = "TR",
     --- @type Kapresoft_LogCategory
     UNIT = "UN",

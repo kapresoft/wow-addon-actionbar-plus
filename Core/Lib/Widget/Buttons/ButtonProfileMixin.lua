@@ -349,7 +349,9 @@ local function PropsAndMethods(o)
         conf[W.TYPE] = ''
     end
 
-    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self.w) end
+    function o:CleanupActionTypeData()
+        PR():CleanupActionTypeData(self.w.frameIndex, self.w:GetName())
+    end
 
 end
 
