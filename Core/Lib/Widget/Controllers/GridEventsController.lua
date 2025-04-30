@@ -34,8 +34,6 @@ local function PropsAndMethods(o)
         o:RegisterAddOnMessage(E.PET_BAR_SHOWGRID, o.OnPetBarShowGrid)
         o:RegisterAddOnMessage(E.ACTIONBAR_HIDEGRID, o.OnActionBarHideGrid)
         o:RegisterAddOnMessage(E.PET_BAR_HIDEGRID, o.OnPetBarHideGrid)
-
-        if ns:IsVanilla() then return end
         o:RegisterAddOnMessage(E.CURSOR_CHANGED, o.OnCursorChangeInBags)
     end
 

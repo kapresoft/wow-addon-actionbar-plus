@@ -40,8 +40,12 @@ local handlers = {
 
 ---@param cursor CursorUtil
 function L:IsSupportedCursorType(cursor)
+    if not (cursor and cursor:IsValid()) then return false end
     local handler = handlers[cursor:GetType()]
-    if not (handler and handler.Handle) then return false end
+    if not (handler and handler.Handle) then
+        p:d(function() return 'Unsupported cursor type: %s', tostring(cursor:GetType()) end)
+        return false
+    end
 
     -- Optional method Supports():boolean
     if handler.Supports then return handler:Supports(cursor:GetCursor()) end
@@ -52,10 +56,10 @@ end
 ---@param cursor CursorUtil
 ---@param btnUI ButtonUI
 function L:Handle(btnUI, cursor)
+    if not (btnUI and cursor) then return end
     local cursorInfo = cursor:GetCursor()
-    AssertThatMethodArgIsNotNil(btnUI, 'btnUI', 'Handle(btnUI, actionType)')
-    AssertThatMethodArgIsNotNil(cursorInfo, 'cursorInfo', 'Handle(btnUI, cursorInfo)')
     p:d(function() return 'Handle():CursorInfo: %s', pformat:B()(cursorInfo) end)
+
     local actionType = cursorInfo.type
 
     if not self:IsSupportedCursorType(cursor) then return end
