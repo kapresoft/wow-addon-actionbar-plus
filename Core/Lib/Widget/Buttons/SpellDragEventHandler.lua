@@ -7,7 +7,7 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
 local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
-local IsNotBlank = String.IsNotBlank
+local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 
 --[[-----------------------------------------------------------------------------
@@ -31,6 +31,7 @@ Methods: SpellDragEventHandler
 -------------------------------------------------------------------------------]]
 ---@param e SpellDragEventHandler
 local function eventHandlerMethods(e)
+
     ---spellCursorInfo `{ type = actionType, name='TODO', bookIndex = info1, bookType = info2, id = info3 }`
     ---@param btnUI ButtonUI
     ---@param cursorInfo table Data structure`{ type = actionType, info1 = info1, info2 = info2, info3 = info3 }`
@@ -50,7 +51,7 @@ local function eventHandlerMethods(e)
         local btnData = w:conf()
         PH:PickupExisting(w)
         btnData[WAttr.TYPE] = WAttr.SPELL
-        btnData[WAttr.SPELL] = spellInfo
+        btnData[WAttr.SPELL] = self:ToSpellData(spellInfo)
 
         S(btnUI, btnData)
     end
@@ -58,13 +59,25 @@ local function eventHandlerMethods(e)
     function e:IsValid(btnUI, cursorInfo)
         return cursorInfo.type == nil or cursorInfo == nil or cursorInfo.id == nil
     end
+
+    --- @private
+    --- @param sp SpellInfo
+    --- @return Profile_Spell
+    function e:ToSpellData(sp)
+        if not sp then return nil end
+        return {
+            id = sp.id, name = sp.name, icon = sp.icon,
+            runeSpell = sp.runeSpell,
+        }
+    end
+
 end
 
 
 --[[-----------------------------------------------------------------------------
 Methods: SpellAttributeSetter
 -------------------------------------------------------------------------------]]
----@param a SpellAttributeSetter
+--- @param a SpellAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI The UIFrame
     ---@param btnData Profile_Button The button data
@@ -87,6 +100,7 @@ local function attributeSetterMethods(a)
         local spellAttrValue = API:GetSpellAttributeValue(spellInfo)
         btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
 
+        w:UpdateSpellCheckedStateDelayed()
         self:OnAfterSetAttributes(btnUI)
     end
 
@@ -101,11 +115,25 @@ local function attributeSetterMethods(a)
         GameTooltip:SetSpellByID(spellInfo.id)
 
         -- Replace 'Spell' with 'Spell (Rank #Rank)'
-        if (IsNotBlank(spellInfo.rank)) then
-            GameTooltip:AppendText(format(' |cff565656(%s)|r', spellInfo.rank))
-        end
-
+        if not GetSpellBookItemName then return end
+        local rank = self:GetHighestSpellRank(spellInfo.name)
+        if IsBlank(rank) then return end
+        GameTooltip:AppendText(format(' |cff565656(%s)|r', rank))
     end
+
+    function a:GetHighestSpellRank(spellName)
+        if not GetSpellBookItemName then return nil end
+        local i = 1
+        local lastRank
+        while true do
+            local name, rank = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+            if not name then break end
+            if rank and name == spellName then lastRank = rank end
+            i = i + 1
+        end
+        return lastRank
+    end
+
 end
 
 --[[-----------------------------------------------------------------------------

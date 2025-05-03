@@ -75,11 +75,14 @@ local function PropsAndMethods(o)
     end
 
     --- @param ... any list of Unit Class IDs
-    --- @return boolean
+    --- @return Boolean
     function o:IsPlayerClassAnyOfID(...)
         local _, _, unitClassID = UnitClass('player')
         return unitClassID and GC:IsAnyOfNumber(unitClassID, ...)
     end
+
+    --- @return Boolean
+    function o:IsStealthActive() return IsStealthed and IsStealthed() end
 
     --- Inefficient. Use #IsBuffActive
     function o:HasBuff(spellID)
@@ -91,15 +94,15 @@ local function PropsAndMethods(o)
 
     --- @alias UnitBuffFilterFunction fun(spellID:SpellID) : void
 
-    function o:GetShapeshiftSpells()
+    function o:GeTrackedShapeshiftSpells()
         return O.ShamanUnitMixin.GHOST_WOLF_SPELL_ID,
-               O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
-               O.DruidUnitMixin.PROWL_SPELL_ID
+                O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
+                O.PriestUnitMixin.SHADOW_FORM_SPELL_ID_RETAIL
     end
 
     function o:UpdateShapeshiftBuffs()
         self:UpdateBuffs(function(spellID)
-            return GC:IsAnyOfNumber(spellID, self:GetShapeshiftSpells());
+            return GC:IsAnyOfNumber(spellID, self:GeTrackedShapeshiftSpells());
         end)
     end
 

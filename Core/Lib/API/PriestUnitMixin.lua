@@ -5,8 +5,6 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local SHADOW_FORM_SPELL_ID = 15473
-
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -26,7 +24,8 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param o __PriestUnitMixin
 local function PropsAndMethods(o)
-    o.SHADOW_FORM_SPELL_ID = SHADOW_FORM_SPELL_ID
+    o.SHADOW_FORM_SPELL_ID = 15473
+    o.SHADOW_FORM_SPELL_ID_RETAIL = 232698
 
     function o:IsPriestClass()
         local _, id = self:GetPlayerUnitClass(); return GC.UnitClasses.PRIEST.id == id;
@@ -36,10 +35,14 @@ local function PropsAndMethods(o)
     function o:IsShapeShifted() return GetShapeshiftForm() > 0 end
 
     ---@param spellID SpellID
-    function o:IsInShadowFormSpell(spellID) return spellID == SHADOW_FORM_SPELL_ID end
+    function o:IsInShadowFormSpell(spellID)
+        return spellID == self.SHADOW_FORM_SPELL_ID
+                or spellID == self.SHADOW_FORM_SPELL_ID_RETAIL end
 
     --- @return boolean
-    function o:IsInShadowForm() return self:IsBuffActive(SHADOW_FORM_SPELL_ID) end
+    function o:IsInShadowForm()
+        return self:IsBuffActive(self.SHADOW_FORM_SPELL_ID)
+                or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL) end
 
 end; PropsAndMethods(L)
 

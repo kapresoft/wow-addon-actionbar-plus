@@ -7,6 +7,7 @@
     <Script file="DruidUnitMixin.lua"/>
     <Script file="PriestUnitMixin.lua"/>
     <Script file="ShamanUnitMixin.lua"/>
+    <Script file="RogueUnitMixin.lua"/>
 
     <Script file="APIHooks.lua"/>
     <Script file="BaseAPI.lua"/>

@@ -112,6 +112,7 @@ end
 --- @return string|nil subText The subtext or rank of the spell, or nil if not found.
 function L:GetSpellSubtext(spellIDOrName)
     if C_Spell and C_Spell.GetSpellDescription then
+        --- @type SpellInfo
         local spellInfo = C_Spell.GetSpellInfo(spellIDOrName)
         if spellInfo then
             return spellInfo.name -- For some spells, detailed descriptions can be fetched this way
