@@ -20,11 +20,13 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-local O, Compat = ns.O, ns.O.Compat
+local O, GC, Compat = ns.O, ns.GC, ns.O.Compat
 
 local String = ns:String()
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
-local DruidAPI, ShamanAPI, PriestAPI, GC = O.DruidUnitMixin, O.ShamanUnitMixin, O.PriestUnitMixin, ns.GC
+local DruidAPI, ShamanAPI = O.DruidUnitMixin, O.ShamanUnitMixin
+local PriestAPI, RogueAPI = O.PriestUnitMixin, O.RogueUnitMixin
+
 local WAttr, UnitId = GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
@@ -317,23 +319,18 @@ function S:GetSpellInfo(spellNameOrId)
     return spellInfo
 end
 
+--- @param spellInfo SpellInfo
 function S:ApplySpellInfoAttributes(spellInfo)
     if not spellInfo then return end
-    spellInfo.label = spellInfo.name
-    if IsNotBlank(spellInfo.rank) then
-        -- color codes format: |cAARRGGBB
-        local labelFormat = '%s |c00747474(%s)|r'
-        spellInfo.label = format(labelFormat, spellInfo.name, spellInfo.rank)
-    end
-    local rankLc = strlower(spellInfo.rank or '')
-    local nameLc = strlower(spellInfo.name or '')
 
-    -- Manual correction since [Moonkin Form] doesn't have rank as 'Shapeshift'
-    if WAttr.MOONKIN_FORM == nameLc then spellInfo.rank = 'Shapeshift' end
-    if WAttr.SHAPESHIFT == rankLc or WAttr.SHADOWFORM == nameLc then
-        spellInfo.isShapeshift = true
-    elseif WAttr.STEALTH == nameLc then spellInfo.isStealth = true
-    elseif WAttr.PROWL == nameLc then spellInfo.isProwl = true end
+    local spId = spellInfo.id
+    if DruidAPI:IsDruidClass() then
+        spellInfo.isProwl = DruidAPI:IsProwl(spId)
+    elseif RogueAPI:IsRogueClass() then
+        spellInfo.isStealth = RogueAPI:IsStealth(spId)
+    elseif PriestAPI:IsPriestClass() then
+        spellInfo.isShapeshift = PriestAPI:IsInShadowFormSpell(spId)
+    end
 end
 
 --- @param macroIndex number
@@ -423,21 +420,22 @@ function S:IsShapeShiftActiveBySpellID(spellID)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
---- @param spellInfo Profile_Spell
+--- @param spellInfo Profile_Spell|SpellInfo
 function S:IsShapeshiftOrStealthSpell(spellInfo)
     return self:IsShapeshiftSpell(spellInfo)
             or self:IsStealthSpell(spellInfo.id)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
---- @param spellInfo Profile_Spell
-function S:IsShapeshiftSpell(spellInfo)
+--- @param spell Profile_Spell|SpellInfo
+function S:IsShapeshiftSpell(spell)
+    local spellId = spell and spell.id; if not spellId then return end
     if ShamanAPI:IsShamanClass() then
-        return ShamanAPI:IsGhostWolfSpell(spellInfo.id)
+        return ShamanAPI:IsGhostWolfSpell(spellId)
     elseif PriestAPI:IsPriestClass() then
-        return PriestAPI:IsInShadowFormSpell(spellInfo.id)
+        return PriestAPI:IsInShadowFormSpell(spellId)
     end
-    return true == spellInfo.isShapeshift
+    return DruidAPI:IsDruidForm(spellId)
 end
 
 --- @param spellNameOrID SpellNameOrID
@@ -450,23 +448,24 @@ function S:IsStealthSpell(spellNameOrID)
     return IsAnyOf(spellID, ROGUE_STEALTH_SPELL_ID, DRUID_PROWL_SPELL_ID, NIGHT_ELF_SHADOWMELD_SPELL_ID)
 end
 
---- @param spellInfo Profile_Spell
-function S:GetSpellIcon(spellInfo)
-    if not spellInfo then return nil end
+--- @param spell Profile_Spell
+function S:GetSpellIcon(spell)
+    if not spell then return nil end
 
-    if self:IsShapeshiftSpell(spellInfo) then
+    if self:IsShapeshiftSpell(spell) then
         local unitClass = self:GetUnitClass(UnitId.player)
-        if self:IsShapeShiftActive(spellInfo) then
+        if self:IsShapeShiftActive(spell) then
             if unitClass == GC.UnitClass.DRUID then
                 return GC.Textures.DRUID_FORM_ACTIVE_ICON
             elseif unitClass == GC.UnitClass.PRIEST then
+                if ns:IsRetail() then return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON_RETAIL end
                 return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON
             elseif unitClass == GC.UnitClass.SHAMAN then
                 return GC.Textures.GHOST_WOLF_FORM_ACTIVE_ICON
             end
         end
-    elseif self:IsStealthed(spellInfo.id) then return GC.Textures.STEALTHED_ICON end
-    return spellInfo.icon
+    elseif self:IsStealthed(spell.id) then return GC.Textures.STEALTHED_ICON end
+    return spell.icon
 end
 
 function S:IsStealthed(spellID) return self:IsStealthSpell(spellID) and IsStealthed() end

@@ -39,18 +39,14 @@ local CursorUtil = {}
 --[[-----------------------------------------------------------------------------
 Profile
 -------------------------------------------------------------------------------]]
---- @class Profile_Spell : SpellInfo
-local Profile_Spell = {
-    ["minRange"] = 0,
-    ["id"] = 8232,
-    ["label"] = "Windfury Weapon |c00747474(Rank 1)|r",
-    ["name"] = "Windfury Weapon",
-    ["castTime"] = 0,
-    ["link"] = "|cff71d5ff|Hspell:8232:0|h[Windfury Weapon]|h|r",
-    ["maxRange"] = 0,
-    ["icon"] = 136018,
-    ["rank"] = "Rank 1"
-}
+--- @class Profile_Spell
+--- @field public id SpellID The spell ID
+--- @field public name SpellName The spell Name
+--- @field public icon Icon The icon ID
+--- @field public rank string The rank label number, i.e. "Rank 1"
+--- @field public runeSpell RuneSpellInfo The actual spell that the run is casting
+local Profile_Spell = { }
+
 --- @class Profile_Item
 local Profile_Item = {
     ["name"] = "Arcane Powder",

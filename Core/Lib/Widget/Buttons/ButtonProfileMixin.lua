@@ -178,12 +178,12 @@ local function PropsAndMethods(o)
     --- @deprecated
     --- @return SpellName|nil
     function o:GetEffectiveSpellName()
-        local conf = self:conf()
+        local conf = self:conf(); if not conf then return end
         local actionType = conf and conf.type
         if IsBlankStr(actionType) then return nil end
 
         local spellName
-        if actionType == 'spell' and not IsBlankStr(conf.spell.name) then
+        if actionType == 'spell' and not IsBlankStr(conf.spell and conf.spell.name) then
             spellName = conf.spell.name
         elseif actionType == 'macro' then
             spellName = API:GetMacroSpell(self:GetMacroIndex())
@@ -198,12 +198,13 @@ local function PropsAndMethods(o)
 
     --- @return SpellID|nil
     function o:GetEffectiveSpellID()
-        local conf = self:conf()
-        local actionType = conf and conf.type
+        local conf = self:conf(); if not conf then return nil end
+        local actionType = conf.type
         if IsBlankStr(actionType) then return nil end
 
         local spellID
-        if actionType == 'spell' and not IsBlankStr(conf.spell.name) then
+        local spellName = conf.spell and conf.spell.name
+        if actionType == 'spell' and not IsBlankStr(spellName) then
             spellID = conf.spell.id
         elseif actionType == 'macro' then
             _, spellID = API:GetMacroSpell(self:GetMacroIndex())
@@ -258,9 +259,9 @@ local function PropsAndMethods(o)
     end
 
     function o:IsShapeshiftSpell()
-        local spellInfo = self:GetSpellData()
-        if not (spellInfo and spellInfo.name) then return false end
-        return API:IsShapeshiftSpell(spellInfo)
+        local spell = self:GetSpellData()
+        if not (spell and spell.name) then return false end
+        return API:IsShapeshiftSpell(spell)
     end
 
     --- @param optionalSpellNameOrId number|string

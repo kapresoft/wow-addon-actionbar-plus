@@ -153,6 +153,8 @@ local function GlobalConstantProperties(o)
         --- @type number|string
         STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
         --- @type number|string
+        PRIEST_SHADOWFORM_ACTIVE_ICON_RETAIL = 136116,
+        --- @type number|string
         PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
         --- @type string
         TEXTURE_EMPTY = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty'),

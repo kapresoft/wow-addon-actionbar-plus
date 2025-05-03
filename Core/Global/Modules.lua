@@ -138,6 +138,7 @@ local M = {
 --- @field MountDragEventHandler MountDragEventHandler
 --- @field PickupHandler PickupHandler
 --- @field PriestUnitMixin PriestUnitMixin
+--- @field RogueUnitMixin RogueUnitMixin
 --- @field ProfessionController ProfessionController
 --- @field Profile Profile
 --- @field ProfileInitializer ProfileInitializer

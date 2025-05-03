@@ -4,9 +4,8 @@
 local ns = select(2, ...)
 local O, GC, M, Compat, LC = ns.O, ns.GC, ns.M, ns.O.Compat, ns:LC()
 
-local H = O.ActionBarHandlerMixin
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
-local PR, WMX, B, API = O.Profile, O.WidgetMixin, O.BaseAPI, O.API
+local B, API = O.BaseAPI, O.API
 local Un = O.UnitMixin:New()
 
 --[[-----------------------------------------------------------------------------
@@ -42,8 +41,9 @@ Support Functions
 -------------------------------------------------------------------------------]]
 ---@param bw ButtonUIWidget
 local function UpdateIcon(bw)
-    local icon = O.API:GetSpellIcon(bw:GetSpellData())
+    local icon = API:GetSpellIcon(bw:GetSpellData())
     if icon then bw:SetIcon(icon) end
+    bw:UpdateSpellCheckedStateDelayed()
 end
 
 --[[-----------------------------------------------------------------------------

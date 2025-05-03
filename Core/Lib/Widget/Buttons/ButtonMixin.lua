@@ -18,6 +18,8 @@ local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
 local WAttr = ns.GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
+local Pru, Dru, Rog = O.PriestUnitMixin, O.DruidUnitMixin, O.RogueUnitMixin
+
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
 
@@ -643,6 +645,20 @@ local function PropsAndMethods(o)
 
     function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds or 1, function() self:UpdateState() end) end
 
+    function o:UpdateSpellCheckedStateDelayed()
+        if not self:IsSpell() then return end
+        local spId = self:GetSpellID()
+        local checked = false
+        if Pru:IsPriestClass() and Pru:IsInShadowFormSpell(spId) then
+            checked = Pru:IsInShadowForm()
+        elseif Dru:IsDruidClass() and Dru:IsProwl(spId)  then
+            checked = Dru:IsStealthActive()
+        elseif Rog:IsRogueClass() and Rog:IsStealth(spId) then
+            checked = Rog:IsStealthActive()
+        end
+        C_Timer.After(0.001, function() self:SetChecked(checked) end)
+    end
+
     --  TODO: Revisit UpdateCooldown() and make sure it's not being called multiple times
     --- @param optionalCooldownInfo CooldownInfo
     function o:UpdateCooldown(optionalCooldownInfo)
@@ -885,12 +901,12 @@ local function PropsAndMethods(o)
         local conf = self:conf()
         if not conf and (conf.spell or conf.macro) then return false end
         if self:IsConfigOfType(conf, SPELL) then
-            return spellID == conf.spell.id
+            return spellID == conf.spell and conf.spell.id
         elseif self:IsConfigOfType(conf, MACRO) and conf.macro.index then
-            local macroSpellId =  GetMacroSpell(conf.macro.index)
+            local macroSpellId =  GetMacroSpell(conf.macro and conf.macro.index)
             return spellID == macroSpellId
         elseif self:IsConfigOfType(conf, ITEM) and IsNotBlank(conf.item.link) then
-            local _, itemSpellID = API:GetItemSpellInfo(conf.item.link)
+            local _, itemSpellID = API:GetItemSpellInfo(conf.item and conf.item.link)
             return spellID == itemSpellID
         end
 
@@ -1013,10 +1029,10 @@ local function PropsAndMethods(o)
 
     --- @param cd CooldownInfo
     function o:IsUsableSpell(cd)
-        local spellID = cd.details.spell.id
-        -- why true by default?
-        if IsBlank(spellID) then return true end
-        return Compat:IsUsableSpell(spellID)
+        -- only use spell names here for 'usable' state
+        local spellName = cd.details.spell.name
+        if IsBlank(spellName) then return true end
+        return Compat:IsUsableSpell(spellName)
     end
 
     function o:IsUsableToy(itemID)
