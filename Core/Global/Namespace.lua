@@ -87,6 +87,8 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     SPELL = "SP",
     --- @type Kapresoft_LogCategory
+    SPELL_AUTO_REPEAT = "SPA",
+    --- @type Kapresoft_LogCategory
     TRACE = "TR",
     --- @type Kapresoft_LogCategory
     UNIT = "UN",
@@ -148,6 +150,7 @@ local function CreateNamespace(...)
     --- @field O GlobalObjects
     --- @field CategoryLoggerMixin CategoryLoggerMixin
     --- @field ConfigDialogControllerEventFrame ConfigDialogControllerEventFrame
+    --- @field uie fun(self:__Namespace) : UIError
     local ns = select(2, ...)
 
     --- @type ActionbarPlus_AceDB
@@ -227,7 +230,7 @@ local function CreateNamespace(...)
         end
 
         --- Plain old library
-        --- @return any The newly created library
+        --- @return any The newly created library object
         function o:NewLibStd(libName, ...)
             assert(libName, "LibName is required")
             local newLib = {}
@@ -239,6 +242,12 @@ local function CreateNamespace(...)
             return newLib
         end
 
+        --- Use this for plain old mixins
+        --- @param libName Name The library module name
+        --- @return any The newly created mixin library object
+        function o:NewMixin(libName, ...) return self:NewLibStd(libName, ...) end
+
+        --- Use this for library modules that require addon event hooks
         --- @param libName Name The library module name
         --- @return ModuleV2
         function o:NewLib(libName, ...) return self.O.ModuleV2Mixin:New(libName, ...) end

@@ -284,3 +284,12 @@ Type: SpellInfoBasic
 --- @field public name SpellName The spell Name
 --- @field public icon Icon The icon ID
 --- @field public empowered BooleanOptional
+
+--[[-----------------------------------------------------------------------------
+Type: AutoRepeatSpellData
+-------------------------------------------------------------------------------]]
+--- @class AutoRepeatSpellData
+--- @field public flashing BooleanInt
+--- @field public flashTime TimeInMilli
+--- @field public wasAuto boolean
+--- @field _checkAutoRepeatTime TimeInMilli

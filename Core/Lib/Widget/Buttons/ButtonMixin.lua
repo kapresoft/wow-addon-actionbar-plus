@@ -610,7 +610,6 @@ local function PropsAndMethods(o)
         self:SetActionUsable(isUsable)
     end
 
-
     function o:UpdateState()
         self:UpdateCooldown()
         if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end

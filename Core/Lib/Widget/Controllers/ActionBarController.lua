@@ -165,7 +165,7 @@ local function PropsAndMethods(o)
     ---@param evt string
     o[E.PLAYER_TARGET_CHANGED] = function(evt, ...)
         local t = UnitName('target') or 'NONE'
-        df:f1(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
+        ua:f1(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
     end
 
     o[E.COMPANION_UPDATE] = OnCompanionUpdate

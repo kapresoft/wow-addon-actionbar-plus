@@ -78,6 +78,7 @@ local M = {
     Modules = '',
     MountAttributeSetter = '',
     MountDragEventHandler = '',
+    MultiOnUpdateFrameMixin   = '',
     PickupHandler = '',
     ProfessionController = '',
     Profile = '',
@@ -136,6 +137,7 @@ local M = {
 --- @field Modules Modules
 --- @field MountAttributeSetter MountAttributeSetter
 --- @field MountDragEventHandler MountDragEventHandler
+--- @field MultiOnUpdateFrameMixin MultiOnUpdateFrameMixin
 --- @field PickupHandler PickupHandler
 --- @field PriestUnitMixin PriestUnitMixin
 --- @field RogueUnitMixin RogueUnitMixin

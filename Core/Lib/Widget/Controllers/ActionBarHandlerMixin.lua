@@ -115,7 +115,7 @@ local function PropsAndMethods(o)
 
     --- Apply for each button with a predicateFn
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    --- @param predicateFn ButtonPredicateFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
     function o:ForEachButton(applyFn, predicateFn)
         local pfn = predicateFn or function(bw) return true end
         self:fevf(function(fw)
@@ -128,7 +128,7 @@ local function PropsAndMethods(o)
 
     --- Apply for each non-empty button with a predicateFn
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    --- @param predicateFn ButtonPredicateFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
     function o:ForEachNonEmptyButton(applyFn, predicateFn)
         local pfn = predicateFn or function(bw) return true end
         self:fevf(function(fw)

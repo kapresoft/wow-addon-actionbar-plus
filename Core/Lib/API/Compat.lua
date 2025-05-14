@@ -1,4 +1,9 @@
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local IsAutoRepeatSpell = IsAutoRepeatSpell or C_Spell.IsAutoRepeatSpell
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
@@ -45,6 +50,10 @@ function L:IsUsableSpell(spellIDOrName)
     end
     return nil, nil
 end
+
+--- @param spellIDorName SpellNameOrID
+--- @return boolean
+function L:IsAutoRepeatSpell(spellIDorName) return IsAutoRepeatSpell(spellIDorName) end
 
 --- Retrieves the spell ID of a buff on the player by index.
 --- Automatically adjusts for Retail and Classic versions of WoW.
