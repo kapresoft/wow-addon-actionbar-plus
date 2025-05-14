@@ -67,9 +67,9 @@ end
 --- @param key string The key clicked
 --- @param down boolean true if the press is KeyDown
 local function OnPreClick(btn, key, down)
-    local w = btn.widget; if w:IsEmpty() then return end
-
-    w:SendMessage(GC.M.OnButtonPreClick, libName, w)
+    local w = btn.widget
+    w:SendMessage(GC.M.OnButtonBeforePreClick, libName, w)
+    if w:IsEmpty() then return end
 
     if w:IsCompanion() then
         -- WOTLK and below uses 'companion'
@@ -93,20 +93,21 @@ local function OnPreClick(btn, key, down)
     if PH:IsPickingUpSomething(btn) then btn:SetAttribute("type", "empty") end
 
     RegisterForClicks(w, 'PreClick', down, key)
+
+    w:SendMessage(GC.M.OnButtonAfterPreClick, libName, w)
 end
 
 --- @param btn ButtonUI
 --- @param key string The key clicked
 --- @param down boolean true if the press is KeyDown
 local function OnPostClick(btn, key, down)
-    local w = btn.widget; if w:IsEmpty() then return end
-
-    w:SendMessage(GC.M.OnButtonPostClick, w)
+    local w = btn.widget;
+    if w:IsEmpty() then return end
+    w:SendMessage(GC.M.OnButtonAfterPostClick, ns.M.ButtonUI, w)
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) O.ActionbarPlusAPI:UpdateM6Macros(handlerFn) end
     w:SendMessage(GC.M.OnButtonPostClickExt, ns.M.ButtonUI, CallbackFn)
-
 end
 
 --- @param btnUI ButtonUI
@@ -127,7 +128,8 @@ local function OnDragStart(btnUI)
     w:SetButtonAsEmpty()
     w:ShowEmptyGrid()
     w:ShowKeybindText(true)
-    w:Fire('OnDragStart')
+
+    btnUI.widget:SendMessage(GC.M.OnAfterDragStart, libName, w)
 end
 
 --- Used with `button:RegisterForDrag('LeftButton')`
@@ -146,13 +148,10 @@ local function OnReceiveDrag(btnUI)
 
     --- @type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
+    btnUI.widget:UpdateStateDelayed(0.01)
 
-    btnUI.widget:Fire('OnReceiveDrag')
+    btnUI.widget:SendMessage(GC.M.OnAfterReceiveDrag, libName, btnUI.widget)
 end
-
----Triggered by SetCallback('event', fn)
---- @param widget ButtonUIWidget
-local function OnReceiveDragCallback(widget) widget:UpdateStateDelayed(0.01) end
 
 --- @param widget ButtonUIWidget
 --- @param event string
@@ -219,13 +218,16 @@ local function OnUpdateButtonCooldown(widget, event)
     widget:SetCooldownTextures(cd.icon)
 end
 
---- @param widget ButtonUIWidget
+--- @param w ButtonUIWidget
 --- @param event string Event string
-local function OnSpellUpdateUsable(widget, event)
-    if widget:IsNotUpdatable() then return end
-    widget:UpdateRangeIndicator()
-    widget:UpdateUsable()
-    widget:UpdateGlow()
+local function OnSpellUpdateUsable(w, event)
+    if w:IsNotUpdatable() then return end
+    w:UpdateRangeIndicator()
+    w:UpdateUsable()
+    w:UpdateGlow()
+
+    if w:IsEmpty() then return end
+    w:SendMessage(GC.M.OnPostUpdateSpellUsable, libName, w)
 end
 
 --- @see "UnitDocumentation.lua"
@@ -318,9 +320,8 @@ local function RegisterCallbacks(widget)
     RegisterSpellUpdateUsable(widget)
     RegisterUpdateRangeIndicatorOnSpellCast(widget)
 
+    -- TODO: Refactor to use messages (see #OnReceiveDrag())
     -- Callbacks (fired via Ace Events)
-    widget:SetCallback(E.ON_RECEIVE_DRAG, OnReceiveDragCallback)
-
     --- @param w ButtonUIWidget
     widget:SetCallback("OnEnter", function(w)
         if InCombatLockdown() then return end
@@ -352,7 +353,9 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --- @field CheckedTexture _Texture
     --- @field Cooldown _CooldownFrame
     local button = CreateFrame("Button", btnName, UIParent, GC.C.SECURE_ACTION_BUTTON_TEMPLATE)
-    --- @alias ButtonUI __ButtonUI|_Button
+    ns:K():Mixin(button, O.MultiOnUpdateFrameMixin)
+
+    --- @alias ButtonUI __ButtonUI | Button | MultiOnUpdateFrameMixin
 
     --- @type ButtonUI
     local btn = button
@@ -390,6 +393,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin
     --- @class __ButtonUIWidget
+    --- @field AutoRepeatSpell AutoRepeatSpellData
     local __widget = {
         --- @type fun() : ActionbarPlus
         addon = function() return ABP end,

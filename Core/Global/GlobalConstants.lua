@@ -196,7 +196,6 @@ local function GlobalConstantProperties(o)
         OnDragStop = 'OnDragStop',
         OnMouseUp = 'OnMouseUp',
         OnMouseDown = 'OnMouseDown',
-        OnReceiveDrag = 'OnReceiveDrag',
 
         ---################################
         --- Custom Events
@@ -211,8 +210,6 @@ local function GlobalConstantProperties(o)
         ON_EVENT = 'OnEvent',
         --- @deprecated DEPRECATED: Use the camel cased version
         ON_LEAVE = 'OnLeave',
-        --- @deprecated DEPRECATED: Use the camel cased version
-        ON_RECEIVE_DRAG = 'OnReceiveDrag',
         -- ################################
 
         ADDON_LOADED = 'ADDON_LOADED',
@@ -261,6 +258,7 @@ local function GlobalConstantProperties(o)
         SPELL_UPDATE_COOLDOWN = 'SPELL_UPDATE_COOLDOWN',
         SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
 
+        UI_ERROR_MESSAGE = 'UI_ERROR_MESSAGE',
         UNIT_AURA = 'UNIT_AURA',
         UNIT_HEALTH = 'UNIT_HEALTH',
         UNIT_POWER_FREQUENT = 'UNIT_POWER_FREQUENT',
@@ -271,6 +269,7 @@ local function GlobalConstantProperties(o)
         UNIT_SPELLCAST_FAILED_QUIET = 'UNIT_SPELLCAST_FAILED_QUIET',
         UNIT_SPELLCAST_FAILED = 'UNIT_SPELLCAST_FAILED',
         --- This applies to all players
+        --- In classic, this is not a real event, but shows up on etrace
         UNIT_SPELLCAST_SENT = 'UNIT_SPELLCAST_SENT',
         -- Fired for Start of Non-Instant Spell Cast
         UNIT_SPELLCAST_START = 'UNIT_SPELLCAST_START',
@@ -302,15 +301,19 @@ local function GlobalConstantProperties(o)
     local Messages = {
         OnEnter                             = newMsg('OnEnter'),
         OnLeave                             = newMsg('OnLeave'),
+        OnActionbarFrameAlphaUpdated        = newMsg('OnActionbarFrameAlphaUpdated'),
         OnAddOnInitialized                  = newMsg('OnAddOnInitialized'),
         OnAddOnEnabled                      = newMsg('OnAddOnEnabled'),
         OnAddOnEnabledV2                    = newMsg('OnAddOnEnabledV2'),
         OnAddOnInitializedV2                = newMsg('OnAddOnInitializedV2'),
         OnAddOnReady                        = newMsg('OnAddOnReady'),
-        OnActionbarFrameAlphaUpdated        = newMsg('OnActionbarFrameAlphaUpdated'),
+        OnAfterReceiveDrag                  = newMsg('OnAfterReceiveDrag'),
+        OnAfterDragStart                    = newMsg('OnAfterDragStart'),
         OnBagUpdate                         = newMsg('OnBagUpdate'),
-        OnButtonPreClick                    = newMsg('OnButtonPreClick'),
-        OnButtonPostClick                   = newMsg('OnButtonPostClick'),
+        OnButtonBeforePreClick              = newMsg('OnButtonBeforePreClick'),
+        OnButtonAfterPreClick               = newMsg('OnButtonAfterPreClick'),
+        OnButtonBeforePostClick             = newMsg('OnButtonBeforePostClick'),
+        OnButtonAfterPostClick              = newMsg('OnButtonAfterPostClick'),
         OnButtonClickBattlePet              = newMsg('OnButtonClickBattlePet'),
         OnButtonClickEquipmentSet           = newMsg('OnButtonClickEquipmentSet'),
         OnButtonClickCompanion              = newMsg('OnButtonClickCompanion'),
@@ -329,6 +332,7 @@ local function GlobalConstantProperties(o)
         OnMouseOverFrameHandleConfigChanged = newMsg('OnMouseOverFrameHandleConfigChanged'),
         OnUpdateMacroState                  = newMsg('OnUpdateMacroState'),
         OnUpdateItemState                   = newMsg('OnUpdateItemState'),
+        OnPostUpdateSpellUsable             = newMsg('OnPostUpdateSpellUsable'),
         OnShowEmptyButtons                  = newMsg('OnShowEmptyButtons'),
         OnSpellCastSucceeded                = newMsg('OnSpellCastSucceeded'),
         OnTextSettingsChanged               = newMsg('OnTextSettingsChanged'),
@@ -341,10 +345,18 @@ local function GlobalConstantProperties(o)
         OnPlayerEnterCombat                 = newMsg('OnPlayerEnterCombat'),
         OnPlayerLeaveCombat                 = newMsg('OnPlayerLeaveCombat'),
 
+        -- Relayed from UNIT_SPELLCAST_[SENT|FAILED|SUCCEEDED]
+        OnPlayerSpellCastStart              = newMsg('OnPlayerSpellCastStart'),
+        OnPlayerSpellCastStop               = newMsg('OnPlayerSpellCastStop'),
+        OnPlayerSpellCastSucceeded          = newMsg('OnPlayerSpellCastSucceeded'),
+        OnPlayerSpellCastFailed             = newMsg('OnPlayerSpellCastFailed'),
+        OnPlayerSpellCastFailedQuiet        = newMsg('OnPlayerSpellCastFailedQuiet'),
+
         OnSpellCastStartExt                 = newMsg('OnSpellCastStartExt'),
         OnSpellCastSentExt                  = newMsg('OnSpellCastSentExt'),
         OnSpellCastStopExt                  = newMsg('OnSpellCastStopExt'),
         OnSpellCastFailedExt                = newMsg('OnSpellCastFailedExt'),
+
         --- Relayed Events
         PLAYER_ENTERING_WORLD               = newMsg(Events.PLAYER_ENTERING_WORLD),
         EQUIPMENT_SETS_CHANGED              = newMsg(Events.EQUIPMENT_SETS_CHANGED),
