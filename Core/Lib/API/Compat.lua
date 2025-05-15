@@ -1,7 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local IsAutoRepeatSpell = IsAutoRepeatSpell or C_Spell.IsAutoRepeatSpell
+local CSpell_IsAutoRepeatSpell = (C_Spell and C_Spell.IsAutoRepeatSpell) or IsAutoRepeatSpell
+local CSpell_IsCurrentSpell    = (C_Spell and C_Spell.IsCurrentSpell) or IsCurrentSpell
+local AUTO_ATTACK_SPELL_ID = 6603
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -13,6 +15,27 @@ local O, GC, M = ns.O, ns.GC, ns.M
 --- @class Compat
 local L = ns:NewLibStd(M.Compat)
 local p = ns:CreateDefaultLogger(M.Compat)
+
+--- @param spellIDorName SpellIdentifier | "'Auto Attack'" | "6603"
+--- @return boolean
+function L:IsAutoAttackSpell(spellIDorName)
+    return spellIDorName == AUTO_ATTACK_SPELL_ID
+            and CSpell_IsCurrentSpell(spellIDorName)
+end
+
+--- This returns true for Water elemental (3167) and Auto Attack (6603)
+--- Returns false for an UIError
+--- @param spellIDorName SpellIdentifier | "'Smite'" | "585"
+--- @return boolean
+function L:IsCurrentSpell(spellIDorName)
+    return spellIDorName and CSpell_IsCurrentSpell(spellIDorName)
+end
+
+--- @param spellIDorName SpellIdentifier | "'Smite'" | "585"
+--- @return boolean
+function L:IsAutoRepeatSpell(spellIDorName)
+    return spellIDorName and CSpell_IsAutoRepeatSpell(spellIDorName)
+end
 
 --- Checks if a spell is passive, compatible with both Retail and Classic WoW.
 --- @param spellIDOrName SpellID_Name_Or_Index
@@ -50,10 +73,6 @@ function L:IsUsableSpell(spellIDOrName)
     end
     return nil, nil
 end
-
---- @param spellIDorName SpellNameOrID
---- @return boolean
-function L:IsAutoRepeatSpell(spellIDorName) return IsAutoRepeatSpell(spellIDorName) end
 
 --- Retrieves the spell ID of a buff on the player by index.
 --- Automatically adjusts for Retail and Classic versions of WoW.
