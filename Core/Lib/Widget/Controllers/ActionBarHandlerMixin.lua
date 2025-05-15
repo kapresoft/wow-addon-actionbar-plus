@@ -168,15 +168,7 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachMatchingSpellButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
-        self:ForEachNonEmptyButton(applyFn, function(bw) return bw:IsMatchingMacroOrSpell(matchSpellId) end)
-    end
-
-    --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
-    --- @param matchSpellId number
-    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    function o:ForEachMatchingSpellAndAllMacrosButton(matchSpellId, applyFn)
-        assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
-        self:ForEachNonEmptyButton(applyFn, function(bw) return bw:IsMacro() or bw:IsMatchingMacroOrSpell(matchSpellId) end)
+        self:ForEachNonEmptyButton(applyFn, function(bw) return matchSpellId == bw:GetEffectiveSpellID() end)
     end
 
     --- Any buttons that has an effective SpellID (includes macros, items, mounts?)

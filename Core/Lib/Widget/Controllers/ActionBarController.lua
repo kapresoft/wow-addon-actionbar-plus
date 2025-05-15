@@ -143,7 +143,7 @@ end
 --- @param event string The event name
 local function OnPlayerSpellCastStop(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
-    L:ForEachMatchingSpellAndAllMacrosButton(evt.spellID, function(bw)
+    L:ForEachMatchingSpellButton(evt.spellID, function(bw)
         local spell = bw:GetEffectiveSpellName()
         if spell then
             sp:f1(function() return 'cast stopped: %s(%s :: %s)', evt.spellID, spell, bw:conf().type end)

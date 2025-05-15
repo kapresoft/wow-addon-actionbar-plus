@@ -893,6 +893,8 @@ local function PropsAndMethods(o)
         return false
     end
 
+    -- TODO Next: Delete Me
+    --- @deprecated Use #GetEffectiveSpell<IDorName>()
     --- @param spellID string The spellID to match
     --- @return boolean
     function o:IsMatchingMacroOrSpell(spellID)
