@@ -102,7 +102,7 @@ local function attributeSetterMethods(a)
 
         btnUI.widget:SetIcon(itemData.icon)
         btnUI:SetAttribute(WAttr.TYPE, WAttr.ITEM)
-        btnUI:SetAttribute(WAttr.ITEM, itemData.name)
+        btnUI:SetAttribute(WAttr.ITEM, 'item:' .. itemData.id)
 
         self:OnAfterSetAttributes(btnUI)
     end
