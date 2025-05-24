@@ -87,6 +87,8 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     SPELL = "SP",
     --- @type Kapresoft_LogCategory
+    TALENT = "TA",
+    --- @type Kapresoft_LogCategory
     SPELL_AUTO_REPEAT = "SPA",
     --- @type Kapresoft_LogCategory
     TRACE = "TR",
@@ -255,6 +257,22 @@ local function CreateNamespace(...)
         --- @param libName Name The library module name
         --- @return ControllerV2
         function o:NewController(libName, ...) return self.O.ModuleV2Mixin:New(libName, self.O.ActionBarHandlerMixin, ...) end
+
+        --- @param btnName Name
+        --- @param btnIndex Index
+        --- @return string
+        function o:ButtonConfigName(btnName, btnIndex)
+            local c     = ns.O.Compat
+            local bName = btnName
+            if not c:IsDualSpecEnabled() or c:IsPrimarySpec() then return bName end
+            assert(btnIndex, 'Namespace:: Unexpected error retrieving button index number.')
+
+            local activeSpec = GetActiveTalentGroup()
+            -- b12 for button1 spec 2
+            bName = 'b' .. btnIndex .. activeSpec
+            -- print(sformat('Namespace:: %s conf name: %s', btnName, bName))
+            return bName
+        end
 
     end; PropsAndMethods(ns)
 

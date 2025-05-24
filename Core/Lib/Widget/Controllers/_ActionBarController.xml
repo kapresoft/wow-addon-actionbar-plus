@@ -19,6 +19,7 @@
     <Script file="VehicleAndPetBattleEventsStateDriver.lua"/>
     <Script file="PlayerLostControlHandler.lua"/>
     <Script file="PlayerSettingsController.lua"/>
+    <Script file="DualSpecController.lua"/>
     <Script file="M6Support.lua"/>
 
     <Script file="ActionBarController.lua"/>

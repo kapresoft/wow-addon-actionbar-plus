@@ -80,8 +80,7 @@ Methods: SpellAttributeSetter
 --- @param a SpellAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI The UIFrame
-    ---@param btnData Profile_Button The button data
-    function a:SetAttributes(btnUI, btnData)
+    function a:SetAttributes(btnUI)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
 
@@ -89,6 +88,12 @@ local function attributeSetterMethods(a)
         if type(spellInfo) ~= 'table' then return end
         if not spellInfo.id then return end
         AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
+
+        --local PR = O.Profile
+        --local conf = PR:GetButtonConfig(w.frameIndex, w:GetName())
+        --local configName = PR:GetButtonConfigName(btnUI:GetName())
+        --p:i(function() return 'configName: %s spell: %s',
+        --        configName, conf.spell.name end)
 
         local spellIcon = GC.Textures.TEXTURE_EMPTY
         if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end

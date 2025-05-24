@@ -80,6 +80,7 @@ local function PropertiesAndMethods(o)
 
     function o:InitDefaultProfile()
         local defaultProfile = P:CreateDefaultProfile()
+        A = defaultProfile
         self.defaultDB = { profile =  defaultProfile }
         self.db:RegisterDefaults(self.defaultDB)
     end
@@ -205,6 +206,9 @@ local function PropertiesAndMethods(o)
         --- @type Frame
         local frame = self.configDialogWidget and self.configDialogWidget.frame
         if frame and self.onHideHooked ~= true then
+            -- Set the frame strata above "LOW" or equal to "DIALOG"
+            -- because we want it to show behind the confirm dialog.
+            frame:SetFrameStrata("DIALOG")
             local success, msg = pcall(function()
                 self:HookScript(frame, 'OnHide', function()
                     self:OnHide(frame, self.configDialogWidget:GetUserData('appName'))

@@ -586,7 +586,7 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateUsable()
-        local c = self.w:conf()
+        local c = self.w:conf(); if not c then return end
         local isUsable = true
         local cd = self:GetCooldownInfo()
         local inCombat = InCombatLockdown()
@@ -1028,6 +1028,8 @@ local function PropsAndMethods(o)
         callbackFn(spell)
     end
 
+    function o:IsSpellKnown() return Compat:IsSpellKnown(self:GetSpellName()) end
+
     --- @param cd CooldownInfo
     function o:IsUsableSpell(cd)
         -- only use spell names here for 'usable' state
@@ -1059,7 +1061,7 @@ local function PropsAndMethods(o)
 
     --- @param cd CooldownInfo
     function o:IsUsableMacro(cd)
-        if not (cd or cd.details) then return false end
+        if not (cd or cd.details or not self:IsSpellKnown()) then return false end
         if cd.details.spell then
             local spellID = cd.details.spell.id
             if IsBlank(spellID) then return true end

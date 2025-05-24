@@ -11,11 +11,12 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, Compat, API = O.Profile, O.Compat, O.API
-local CN = GC.Profile_Config_Names
+local P, PI, Compat, API  = O.Profile, O.ProfileInitializer, O.Compat, O.API
+local ATTR, CN = GC.ButtonAttributes, GC.Profile_Config_Names
 local String, Table, W = ns:String(), ns:Table(), GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, ns:Assert().IsNil
 local IsBlankStr = String.IsBlank
+local SPELL = ATTR.SPELL
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -46,12 +47,54 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
+    function o:GetPrimarySpecButtonConfigName() return self.w.buttonName end
+
     --- @return Profile_Button
-    function o:conf() return PR():GetButtonConfig(self.w.frameIndex, self.w.buttonName) end
+    function o:confXX() return PR():GetButtonConfig(self.w.frameIndex, self.w.buttonName) end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    function o:conf()
+        local barData = PR():GetBar(self.w.frameIndex)
+
+        local btnConfName = ns:ButtonConfigName(self.w.buttonName, self.w.index)
+        local btnConf = barData.buttons[btnConfName]
+        if not btnConf then
+            --ps:vv(function() return 'xx nil btnConf: %s', btnConfName end)
+            local btnConfNamePrimary = self:GetPrimarySpecButtonConfigName()
+            local prim = barData.buttons[btnConfNamePrimary]
+            local newConf = PI:CreateSingleButtonTemplate()
+            if not P:IsEmptyButtonConfig(prim)
+                    and P:ShouldCopyPrimarySpecButtons() then
+                newConf = barData.buttons[btnConfNamePrimary]
+                ps:vv(function() return 'xx should copy: %s', newConf end)
+            end
+            barData.buttons[btnConfName] = newConf
+        end
+        return barData.buttons[btnConfName], btnConfName
+    end
+
+    --- @param btnIndex Index
+    function o:configName(btnIndex)
+        return self:configName(btnIndex)
+    end
+
+    --- @protected
+    --- @param btnIndex Index
+    --- @return string
+    function o:configNameInternal(btnIndex)
+        local bName    = self:GetName()
+        if not Compat:IsDualSpecEnabled()
+                or Compat:IsPrimarySpec() then return bName end
+        assert(btnIndex, libName .. ':: Unexpected error retrieving button index number.')
+        local activeSpec = GetActiveTalentGroup()
+        bName = btnIndex .. '_' .. activeSpec
+        p:vv(function() return '%s conf name: %s', self:GetName(), bName end)
+        return bName
+    end
 
     function o:SetButtonAttributes()
-        local conf = self:conf()
-        if not conf then return end
+        local conf = self:conf();
+        if not conf or P:IsEmptyButtonConfig(conf) then return end
         if IsBlankStr(conf.type) then
             conf.type = self:GuessButtonType(conf)
             if IsBlankStr(conf.type) then return end
@@ -112,7 +155,7 @@ local function PropsAndMethods(o)
     function o:GetProfileConfig() return PR():P() end
 
     --- @param type ActionTypeName One of: spell, item, or macro
-    function o:GetButtonTypeData(type) return self:conf()[type] end
+    function o:GetButtonTypeData(type) local c = self:conf(); return c and c[type] end
 
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
@@ -287,6 +330,7 @@ local function PropsAndMethods(o)
     --- @param optionalConfig Profile_Button|nil
     function o:IsActionType(type, optionalConfig)
         local config = optionalConfig or self:conf()
+        if not config then return false end
         return config.type and type == config.type
     end
 
@@ -345,12 +389,14 @@ local function PropsAndMethods(o)
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
 
     function o:ResetButtonData()
-        local conf = self:conf()
+        local conf = self:conf(); if not conf then return end
         for _, a in ipairs(O.ActionType:GetNames()) do conf[a] = nil end
         conf[W.TYPE] = ''
     end
 
-    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self.w) end
+    function o:CleanupActionTypeData()
+        PR():CleanupActionTypeData(self.w.frameIndex, self.w:GetName())
+    end
 
 end
 
