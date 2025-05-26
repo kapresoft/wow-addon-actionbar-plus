@@ -97,8 +97,9 @@ local function WidgetMethods(widget)
 
     function widget:GetName() return widget.frame:GetName() end
 
-    ---@param btnIndex Index
-    function widget:GetButtonName(btnIndex) return self:GetName() .. 'Button' .. btnIndex end
+    --- This is the button UI name. No longer the config name.
+    --- @param btnIndex Index
+    function widget:GetButtonUIName(btnIndex) return self:GetName() .. 'Button' .. btnIndex end
 
     --- @deprecated Use self#GetIndex()
     function widget:GetFrameIndex() return self:GetIndex() end
@@ -298,7 +299,11 @@ local function WidgetMethods(widget)
         end
     end
 
-    ---@param btnName string
+    --- This is for resizing the rows and cols.
+    --- If the button gets deleted due to rows and cols getting smaller,
+    --- then try and find and empty button to save to.
+    --- @see ButtonFactory#Init() Currently Disabled
+    --- @param btnName string
     function widget:SaveButton(btnName)
         --- @type ButtonUI
         local sourceBtn = _G[btnName]; if not sourceBtn then return end
@@ -322,9 +327,8 @@ local function WidgetMethods(widget)
     end
 
     function widget:ScrubEmptyButtons()
-        local barConf = self:conf()
         self:ApplyForEachButtonNoCond(function(bw)
-            P:CleanupActionTypeData(bw)
+            P:CleanupActionTypeData(bw.frameIndex, bw:GetName())
         end)
         self:SaveAndScrubDeletedButtons()
     end
@@ -337,9 +341,10 @@ local function WidgetMethods(widget)
         local start = (barConf.widget.rowSize * barConf.widget.colSize) + 1
 
         for i = start, configHandler.maxButtons do
-            local btnName = self:GetButtonName(i)
-            if save == true then self:SaveButton(btnName) end
-            if barConf.buttons[btnName] then barConf.buttons[btnName] = nil end
+            local uiName     = self:GetButtonUIName(i)
+            local configName = P:GetButtonConfigName(uiName)
+            if save == true then self:SaveButton(uiName) end
+            if barConf.buttons[configName] then barConf.buttons[configName] = nil end
         end
     end
 
@@ -412,8 +417,9 @@ local function WidgetMethods(widget)
         self:UpdateButtonAlpha()
         C_Timer.After(0.1, function()
             self:ApplyForEachButton(function(bw)
-                if not bw:IsEmpty() then return end
-                bw:EnableMouse(false)
+                -- solved the problem of buttons being disabled
+                -- after a primary talent switch
+                bw:EnableMouse(not bw:IsEmpty())
             end)
         end)
     end
@@ -488,7 +494,7 @@ local function WidgetMethods(widget)
     end
 
     --- @return ButtonUI
-    function widget:GetButtonUI(buttonIndex) return _G[self:GetButtonName(buttonIndex)] end
+    function widget:GetButtonUI(buttonIndex) return _G[self:GetButtonUIName(buttonIndex)] end
 
     function widget:LayoutButtonGrid()
         local barConfig = self:GetConfig()

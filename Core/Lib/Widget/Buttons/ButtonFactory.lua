@@ -127,7 +127,9 @@ function L:Init()
         local f = self:CreateActionbarGroup(i)
         tinsert(self.FRAMES, f)
         f:ShowGroupIfEnabled()
-        f:ScrubEmptyButtons()
+        -- TODO next: revisit whether scrubbing is needed since default profile ace config
+        --            takes care of that
+        --f:ScrubEmptyButtons()
     end
 end
 
@@ -198,9 +200,8 @@ function L:CreateButtons(fw, rowSize, colSize)
     for row=1, rowSize do
         for col=1, colSize do
             index = index + 1
-            local btnUI = fw:GetButtonUI(index)
-            if not btnUI then btnUI = self:CreateSingleButton(fw, row, col, index).button() end
-            fw:AddButtonFrame(btnUI)
+            local bw = self:CreateSingleButton(fw, row, col, index)
+            fw:AddButtonFrame(bw.button())
         end
     end
     fw:LayoutButtonGrid()
@@ -212,11 +213,17 @@ end
 --- @param btnIndex number The button index number
 --- @return ButtonUIWidget
 function L:CreateSingleButton(frameWidget, row, col, btnIndex)
-    local btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
+    local btnUI = frameWidget:GetButtonUI(btnIndex)
+    local btnWidget = btnUI and btnUI.widget
+    if not btnWidget then
+        btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
+    end
     btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)
     btnWidget:CleanupActionTypeData()
+    -- after a switch in spec, the buttons need to be cleared as needed
+    if btnWidget:IsEmpty() then btnWidget:SetButtonAsEmpty() end
     return btnWidget
 end
 

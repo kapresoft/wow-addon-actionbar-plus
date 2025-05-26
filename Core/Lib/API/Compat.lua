@@ -4,6 +4,8 @@ Blizzard Vars
 local CSpell_IsAutoRepeatSpell = (C_Spell and C_Spell.IsAutoRepeatSpell) or IsAutoRepeatSpell
 local CSpell_IsCurrentSpell    = (C_Spell and C_Spell.IsCurrentSpell) or IsCurrentSpell
 local AUTO_ATTACK_SPELL_ID = 6603
+local PRIMARY_SPEC_INDEX = 1
+local SECONDARY_SPEC_INDEX = 2
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -37,8 +39,19 @@ function L:IsAutoRepeatSpell(spellIDorName)
     return spellIDorName and CSpell_IsAutoRepeatSpell(spellIDorName)
 end
 
+--- @return boolean Returns true if the environment supports dual spec and the feature flag is enabled.
+function L:IsDualSpecEnabled()
+    if GetNumTalentGroups == nil or GC.F.ENABLE_MULTI_SPEC ~= true then return false end
+    return GetNumTalentGroups and (GetNumTalentGroups() > 1)
+end
+
+--- @return boolean
+function L:IsPrimarySpec() return PRIMARY_SPEC_INDEX == GetActiveTalentGroup() end
+--- @return boolean
+function L:IsSecondarySpec() return SECONDARY_SPEC_INDEX == GetActiveTalentGroup() end
+
 --- Checks if a spell is passive, compatible with both Retail and Classic WoW.
---- @param spellIDOrName SpellID_Name_Or_Index
+--- @param spellIDOrName SpellIdentifier
 --- @return boolean|nil isPassive True if the spell is passive, or nil if not found.
 function L:IsPassiveSpell(spellIDOrName)
     if C_Spell and C_Spell.IsSpellPassive then
@@ -60,6 +73,12 @@ function L:IsSpellInRange(spell, target)
         return IsSpellInRange(spell, target)
     end
     return nil
+end
+
+--- @param spellName SpellName
+--- @return boolean The spell is known to the character
+function L:IsSpellKnown(spellName)
+    return type(spellName) == "string" and self:GetSpellInfo(spellName) ~= nil
 end
 
 --- Checks if a spell is usable, compatible with both Retail and Classic WoW.

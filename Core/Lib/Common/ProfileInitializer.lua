@@ -54,6 +54,7 @@ local ActionbarInitialSettings = {
 --- @type ActionbarInitialSettings
 local ActionbarInitialSettingsDefault = {
     ['enable'] = false,
+    ["spec2Init"] = 0,
     ['rowSize'] = 2, ['colSize'] = 5,
     ['frame_handle_mouseover'] = true
 }
@@ -88,6 +89,7 @@ local DEFAULT_PROFILE_DATA = {
     [ConfigNames.equipmentset_open_character_frame] = true,
     [ConfigNames.equipmentset_open_equipment_manager] = true,
     [ConfigNames.equipmentset_show_glow_when_active] = true,
+    [ConfigNames.spec2_init] = nil,
     [ConfigNames.bars] = {},
 }
 
@@ -254,13 +256,20 @@ local function Methods(o)
         end
     end
 
+    --- This helps cleanup unused buttons if applied properly.
+    --- If there are no changes in the button conf, it will not be
+    --- saved in the ActionbarPlus.lua profile file.
     --- @param profile Profile_Config
     --- @param barName string
     --- @param barConf Profile_Bar
     --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
+        -- local btnNameNew = ns:GetPrimarySpecButtonConfigNameNew(btnIndex)
+        local btnNameSecondarySpec = ns:GetSecondarySpecConfigName(btnIndex)
         barConf.buttons[btnName] = self:CreateSingleButtonTemplate()
+        -- barConf.buttons[btnNameNew] = self:CreateSingleButtonTemplate()
+        barConf.buttons[btnNameSecondarySpec] = self:CreateSingleButtonTemplate()
     end
 
     --- @return Profile_Button

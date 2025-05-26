@@ -9,6 +9,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local Compat = O.Compat
 
 local PI = O.ProfileInitializer
 local Table, String = ns:Table(), ns:String()
@@ -100,14 +101,21 @@ end
 --    for i, v in ipairs(tbl) do if v == value then tbl[i] = nil end end
 --end
 
+--- @param btnConf Profile_Button
+--- @return boolean
+function P:IsEmptyButtonConfig(btnConf)
+    return IsEmptyTable(btnConf) or IsBlankStr(btnConf.type)
+end
+
 --- Removes a particular actionType data from Profile_Button
---- @param bw ButtonUIWidget
-function P:CleanupActionTypeData(bw)
-    local btnConf = P:GetButtonConfigForScrubbing(bw.frameIndex, bw:GetName())
+--- @param frameIndex Index
+--- @param btnUIName Name
+function P:CleanupActionTypeData(frameIndex, btnUIName)
+    local btnConf, btnConfName = self:GetButtonConfig(frameIndex, btnUIName)
     if not btnConf then return end
 
     if IsEmptyTable(btnConf) or IsBlankStr(btnConf.type) then
-        self:ResetButtonConfig(bw)
+        self:ResetButtonConfig(frameIndex, btnConfName)
         return
     end
 
@@ -121,48 +129,51 @@ local barProfiles = {}
 --- @type table<string, Profile_Button>
 local buttonProfiles = {}
 
+--- FORMAT: Spec1: buttonName, spec2: buttonName_2, specN: buttonName_N
+--- @param buttonName Name
+function P:GetButtonConfigName(buttonName)
+    -- TODO next: shorten primary button config name, ie b1, f1b1_2
+    local bName    = buttonName
+    if not Compat:IsDualSpecEnabled() then return bName end
+
+    -- p:vv(function() return 'Has dual spec: %s', dualSpec end)
+    local activeSpec = GetActiveTalentGroup()
+    if activeSpec == 1 then return bName end
+
+    bName = bName .. '_' .. activeSpec
+    return bName
+end
+
+--- @return table<number, Profile_Button> This is the top leve ["buttons"] = {} config
+function P:GetButtonsConfig(frameIndex)
+    local bar = self:GetBar(frameIndex)
+    local buttons = bar.buttons or {}
+    bar.buttons = buttons
+    return buttons
+end
+
+--- @return boolean
+function P:ShouldCopyPrimarySpecButtons()
+    if Compat:IsPrimarySpec() then return false end
+
+    -- value of 1 means that the non-primary specs was
+    -- not yet initialized for the first time.
+    return ns.db.profile.spec2_init ~= 1
+end
+
 --- @param frameIndex Index
 --- @param buttonName string
---- @return Profile_Button
+--- @return Profile_Button, Name The button config and the button config name
 function P:GetButtonConfig(frameIndex, buttonName)
     local bar = self:GetBar(frameIndex)
     local buttons = bar.buttons or {}
     bar.buttons = buttons
-    if not buttons[buttonName] then
-        local btn = O.ProfileInitializer:CreateSingleButtonTemplate()
-        buttons[buttonName] = btn
+    -- TODO next: shorten name, ie b1, f1b1_2
+    local btnConfName = self:GetButtonConfigName(buttonName)
+    if not buttons[btnConfName] then
+        buttons[btnConfName] = PI:CreateSingleButtonTemplate()
     end
-    return buttons[buttonName]
-end
-
---- @param frameIndex Index
---- @param buttonName string
---- @return Profile_Button
-function P:GetButtonConfigForScrubbing(frameIndex, buttonName)
-    local bar = self:GetBar(frameIndex)
-    local buttons = bar.buttons or {}
-    bar.buttons = buttons
-    if not buttons then return nil end
-    return self:GetBar(frameIndex).buttons[buttonName]
-end
-
---- @deprecated To be deleted
---- @param frameIndex Index
---- @param buttonName string
-function P:RetrieveButtonConfig(frameIndex, buttonName)
-    local profileButton = self:GetButtonData(frameIndex, buttonName)
-    buttonProfiles[buttonName] = profileButton
-    return profileButton
-end
-
---- @deprecated To be deleted
---- Object buttons[buttonName] is guaranteed to exist by the default profile (see #CreateDefaultProfile())
---- @return Profile_Button
-function P:GetButtonData(frameIndex, buttonName)
-    local barData = self:GetBar(frameIndex)
-    if not barData then return end
-    local buttons = barData.buttons
-    return buttons[buttonName]
+    return buttons[btnConfName], btnConfName
 end
 
 function P:CreateDefaultProfile() return PI:InitNewProfile() end
@@ -190,14 +201,24 @@ function P:G()
 end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
+--- @param frameIndex Index
 --- @return Profile_Bar
-function P:GetBar(frameIndex) return barProfiles[frameIndex] or self:RetrieveBar(frameIndex) end
+function P:GetBar(frameIndex)
+    local bar = barProfiles[frameIndex] or self:RetrieveBar(frameIndex)
+    bar.buttons = bar.buttons or {}
+    return bar
+end
 
----@param bw ButtonUIWidget
-function P:ResetButtonConfig(bw) P:GetBar(bw.frameIndex).buttons[bw:GetName()] = nil end
+--- @param frameIndex Index
+--- @param btnConfName Name The profile button dual-spec name, not the UI button name
+function P:ResetButtonConfig(frameIndex, btnConfName)
+    local barConf = self:GetBar(frameIndex);
+    if barConf.buttons[btnConfName] then barConf.buttons[btnConfName] = nil end
+end
+
 
 --- @return Profile_Bar
----@param frameIndex number
+--- @param frameIndex number
 function P:RetrieveBar(frameIndex)
     assert(frameIndex, "RetrieveBar: frameIndex is required.")
     local frameName = GC:GetFrameName(frameIndex)
@@ -207,13 +228,12 @@ function P:RetrieveBar(frameIndex)
     return bar
 end
 
+--- @return table<string, Profile_Bar>
+function P:GetBars() return ns.db.profile.bars end
 
-function P:GetBars()
-    return ns.db.profile.bars
-end
-
+--- @return number
 function P:GetBarSize()
-    local bars = P:GetBars()
+    local bars = self:GetBars()
     if IsNotTable(bars) then return 0 end
     return TableSize(bars)
 end

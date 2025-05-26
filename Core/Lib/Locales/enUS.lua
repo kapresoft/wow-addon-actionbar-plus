@@ -138,3 +138,7 @@ Needs Translations
 -------------------------------------------------------------------------------]]
 L['Requires ActionbarPlus-M6::Message']                  = "This feature requires ActionbarPlus-M6."
 L['ActionbarPlus-M6 URL']                                = "See https://www.curseforge.com/wow/addons/actionbarplus-m6"
+
+L['Primary']                               = true
+L['Secondary']                             = true
+L['Talents Switch Success Message Format'] = '%s spec action bars activated.'

@@ -139,17 +139,16 @@ local Profile_Bar_Widget = {
     ["show_empty_buttons"] = true
 }
 
-
 --- @class Profile_Bar
 local Profile_Bar = {
-    -- show/hide the actionbar frame
+    --- show/hide the actionbar frame
     ["enabled"] = false,
-    -- allowed values: {"", "always", "in-combat"}
+    --- allowed values: {"", "always", "in-combat"}
     ["locked"] = "",
-    -- shows the button index
+    --- shows the button index
     ["show_button_index"] = true,
-    -- shows the keybind text TOP
     --TODO next: show_keybind_text should be in Profile_Bar_Widget properties
+    --- shows the keybind text TOP
     ["show_keybind_text"] = true,
     ["widget"] = Profile_Bar_Widget,
     --- @see _RegionAnchor
@@ -182,6 +181,8 @@ local Profile_Global_Config = {
 
 --- @class Profile_Config
 local Profile_Config = {
+    --- Spec 2 Initialized Flag, 1=initialized, otherwise, not initialized
+    ["spec2_init"] = 1,
     ["hide_when_taxi"] = true,
     --- Toggle action button mouseover glow
     ["action_button_mouseover_glow"] = true,
@@ -218,10 +219,11 @@ local SpellcastSent_Data = {
 Type: ActionbarInitialSettings
 -------------------------------------------------------------------------------]]
 --- @class ActionbarInitialSettings Initial configuration settings for action bar layouts and behaviors.
---- @field rowSize Index Initial row size setting.
---- @field colSize Index Initial column size setting.
---- @field enable boolean Whether the action bar is enabled by default.
---- @field frame_handle_mouseover boolean Determines if the frame handles mouseover events.
+--- @field public rowSize Index Initial row size setting.
+--- @field public colSize Index Initial column size setting.
+--- @field public enable boolean Whether the action bar is enabled by default.
+--- @field public frame_handle_mouseover boolean Determines if the frame handles mouseover events.
+--- @field public spec2Init BooleanInt Spec 2 Initialized Flag. Default is 0
 
 --[[-----------------------------------------------------------------------------
 Type: LayoutStrategyContext
