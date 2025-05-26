@@ -218,6 +218,7 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     if not btnWidget then
         btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
     end
+    btnWidget:ClearAllText()
     btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
     btnWidget:UpdateStateDelayed(0.05)
