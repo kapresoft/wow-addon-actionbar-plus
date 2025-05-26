@@ -43,6 +43,7 @@ local function PropsAndMethods(o)
             E.MODIFIER_STATE_CHANGED,
             E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
+            E.ACTIVE_TALENT_GROUP_CHANGED,
             E.PLAYER_TARGET_SET_ATTACKING,
             E.UI_ERROR_MESSAGE
         })

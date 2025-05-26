@@ -11,8 +11,8 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
-local P, Compat, API = O.Profile, O.Compat, O.API
-local CN = GC.Profile_Config_Names
+local P, PI, Compat, API  = O.Profile, O.ProfileInitializer, O.Compat, O.API
+local ATTR, CN = GC.ButtonAttributes, GC.Profile_Config_Names
 local String, Table, W = ns:String(), ns:Table(), GC.WidgetAttributes
 local IsEmptyTable, IsNil = Table.IsEmpty, ns:Assert().IsNil
 local IsBlankStr = String.IsBlank
@@ -46,8 +46,62 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
-    --- @return Profile_Button
-    function o:conf() return PR():GetButtonConfig(self.w.frameIndex, self.w.buttonName) end
+    function o:GetPrimarySpecButtonConfigName()
+        return ns:GetPrimarySpecButtonConfigName(self.w.buttonName)
+    end
+
+    function o:GetPrimarySpecButtonConfigNameNew()
+        return ns:GetPrimarySpecButtonConfigNameNew(self.w.index)
+    end
+
+    function o:GetSecondarySpecConfigName()
+        return ns:GetSecondarySpecConfigName(self.w.index)
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    function o:conf()
+        if not Compat:IsDualSpecEnabled() or Compat:IsPrimarySpec() then
+            return self:_confPrimary()
+        end
+        return self:_confSecondary()
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    function o:_confPrimary()
+        local barData = PR():GetBar(self.w.frameIndex)
+        local btnConfName = self:GetPrimarySpecButtonConfigName()
+        local btnConfPrim = barData.buttons[btnConfName]
+        if not btnConfPrim then
+            barData.buttons[btnConfName] = PI:CreateSingleButtonTemplate()
+        end
+        return barData.buttons[btnConfName], btnConfName
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    function o:_confSecondary()
+        local barData = PR():GetBar(self.w.frameIndex)
+        local btnConfName = self:GetSecondarySpecConfigName()
+
+        local btnConf = barData.buttons[btnConfName] or PI:CreateSingleButtonTemplate()
+        local btnConfNamePrimary = self:GetPrimarySpecButtonConfigName()
+        local prim = barData.buttons[btnConfNamePrimary]
+        if not P:IsEmptyButtonConfig(prim) and P:ShouldCopyPrimarySpecButtons() then
+            btnConf = Table.deep_copy(barData.buttons[btnConfNamePrimary])
+            ps:f1(function() return 'Should copy: %s', btnConf end)
+        end
+        barData.buttons[btnConfName] = btnConf
+        return barData.buttons[btnConfName], btnConfName
+    end
+
+    --- Used only for debugging
+    --- @return SpellName, SpellName, string  The spell names for primary talent 1 and 2 and conf name
+    function o:_confButtonNames()
+        local c1, c1n = self:_confPrimary()
+        local c2, c2n = self:_confSecondary()
+        local sp1 = c1 and c1.spell and c1.spell.name
+        local sp2 = c2 and c2.spell and c2.spell.name
+        return sp1, sp2, c1n, c2n
+    end
 
     function o:SetButtonAttributes()
         local conf = self:conf()
@@ -264,18 +318,6 @@ local function PropsAndMethods(o)
         return API:IsShapeshiftSpell(spell)
     end
 
-    --- @param optionalSpellNameOrId number|string
-    function o:IsPassiveSpell(optionalSpellNameOrId)
-        local spellNameOrId = optionalSpellNameOrId
-        if not spellNameOrId then
-            local spellInfo = self:GetSpellData()
-            if spellInfo then spellNameOrId = spellInfo.name end
-        end
-        -- assume passive by default if we can't find any spell info
-        if not spellNameOrId then return true end
-        return Compat:IsPassiveSpell(spellNameOrId)
-    end
-
     --- @deprecated Use #IsActionType(type, optionalConfig)
     --- @param config Profile_Button
     --- @param type string spell, item, macro, mount, etc
@@ -350,7 +392,9 @@ local function PropsAndMethods(o)
         conf[W.TYPE] = ''
     end
 
-    function o:CleanupActionTypeData() PR():CleanupActionTypeData(self.w) end
+    function o:CleanupActionTypeData()
+        PR():CleanupActionTypeData(self.w.frameIndex, self.w:GetName())
+    end
 
 end
 

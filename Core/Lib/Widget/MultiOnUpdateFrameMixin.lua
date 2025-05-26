@@ -12,8 +12,8 @@ New Instance
 local function CreateLib()
     local libName = M.MultiOnUpdateFrameMixin or 'MultiOnUpdateMixin'
     --- @class __MultiOnUpdateFrameMixin : BaseLibraryObject
-    --- @field _onUpdateHandlers table<Name, fun(frame: Frame, elapsed: number)> | nil  # Map of handler names to update functions
-    --- @field _onUpdateInstalled boolean | nil                                         # True if OnUpdate is currently hooked
+    --- @private @field _onUpdateHandlers table<Name, fun(frame: Frame, elapsed: number)> | nil  # Map of handler names to update functions
+    --- @private @field _onUpdateInstalled boolean | nil                                         # True if OnUpdate is currently hooked
     local newLib = ns:NewMixin(libName); if not newLib then return nil end
 
     --- @alias MultiOnUpdateFrameMixin __MultiOnUpdateFrameMixin | Frame

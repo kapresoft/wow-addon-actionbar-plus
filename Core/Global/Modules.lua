@@ -79,6 +79,7 @@ local M = {
     MountAttributeSetter = '',
     MountDragEventHandler = '',
     MultiOnUpdateFrameMixin   = '',
+    MultiSpellUpdateUsableFrameMixin = '',
     PickupHandler = '',
     ProfessionController = '',
     Profile = '',

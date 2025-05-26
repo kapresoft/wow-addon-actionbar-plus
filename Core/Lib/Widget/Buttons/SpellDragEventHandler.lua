@@ -9,6 +9,7 @@ local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
+local Compat = O.Compat
 
 --[[-----------------------------------------------------------------------------
 New Instance: SpellDragEventHandler
@@ -46,14 +47,19 @@ local function eventHandlerMethods(e)
         if IsNil(spellInfo) then return end
 
         local w = btnUI.widget
-        if w:IsPassiveSpell(spellInfo.name) then return end
+        if Compat:IsPassiveSpell(spellInfo.name) then return end
 
         local btnData = w:conf()
         PH:PickupExisting(w)
         btnData[WAttr.TYPE] = WAttr.SPELL
         btnData[WAttr.SPELL] = self:ToSpellData(spellInfo)
 
-        S(btnUI, btnData)
+        p:f3(function()
+            local sp1, sp2, btn1, btn2 = w:_confButtonNames()
+            return 'button data: primary[%s->%s], secondary[%s->%s]', sp1, btn1, sp2, btn2
+        end)
+
+        S(btnUI)
     end
 
     function e:IsValid(btnUI, cursorInfo)
@@ -80,8 +86,7 @@ Methods: SpellAttributeSetter
 --- @param a SpellAttributeSetter
 local function attributeSetterMethods(a)
     ---@param btnUI ButtonUI The UIFrame
-    ---@param btnData Profile_Button The button data
-    function a:SetAttributes(btnUI, btnData)
+    function a:SetAttributes(btnUI)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
 

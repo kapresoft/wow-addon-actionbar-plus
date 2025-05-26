@@ -205,6 +205,10 @@ local function PropertiesAndMethods(o)
         --- @type Frame
         local frame = self.configDialogWidget and self.configDialogWidget.frame
         if frame and self.onHideHooked ~= true then
+            -- Set the frame strata above "LOW" or equal to "DIALOG"
+            -- because we want it to show behind the confirm dialog.
+            frame:SetFrameStrata('MEDIUM')
+            frame:SetFrameLevel(0)
             local success, msg = pcall(function()
                 self:HookScript(frame, 'OnHide', function()
                     self:OnHide(frame, self.configDialogWidget:GetUserData('appName'))

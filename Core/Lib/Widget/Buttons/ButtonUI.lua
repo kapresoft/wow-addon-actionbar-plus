@@ -397,6 +397,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local __widget = {
         --- @type fun() : ActionbarPlus
         addon = function() return ABP end,
+        --- The button index number
         --- @type number
         index = btnIndex,
         --- @type number

@@ -87,7 +87,11 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     SPELL = "SP",
     --- @type Kapresoft_LogCategory
+    TALENT = "TA",
+    --- @type Kapresoft_LogCategory
     SPELL_AUTO_REPEAT = "SPA",
+    --- @type Kapresoft_LogCategory
+    SPELL_USABLE = "SPU",
     --- @type Kapresoft_LogCategory
     TRACE = "TR",
     --- @type Kapresoft_LogCategory
@@ -255,6 +259,43 @@ local function CreateNamespace(...)
         --- @param libName Name The library module name
         --- @return ControllerV2
         function o:NewController(libName, ...) return self.O.ModuleV2Mixin:New(libName, self.O.ActionBarHandlerMixin, ...) end
+
+        --- @param btnIndex Index
+        --- @param activeSpec number Example values: 1=primary, 2=secondary
+        --- @return string The secondary spec button name (i.e. b1_2 for button 1)
+        function o:GetSpecConfigName(btnIndex, activeSpec)
+            return sformat('b%s_%s', btnIndex, activeSpec or 1)
+        end
+
+        --- @param btnName Name
+        --- @return string
+        function o:GetPrimarySpecButtonConfigName(btnName) return btnName end
+
+        --- @param btnIndex Index
+        --- @return string The secondary spec button name (i.e. b1_2 for button 1)
+        function o:GetPrimarySpecButtonConfigNameNew(btnIndex)
+            return self:GetSpecConfigName(btnIndex, 1)
+        end
+
+        --- @param btnIndex Index
+        --- @return string The secondary spec button name (i.e. b1_2 for button 1)
+        function o:GetSecondarySpecConfigName(btnIndex)
+            return self:GetSpecConfigName(btnIndex, 2)
+        end
+
+        --- @param btnName Name
+        --- @param btnIndex Index
+        --- @return string
+        function o:ButtonConfigName(btnName, btnIndex)
+            local c     = ns.O.Compat
+            local bName = btnName
+            if not c:IsDualSpecEnabled() or c:IsPrimarySpec() then return bName end
+            assert(btnIndex, 'Namespace:: Unexpected error retrieving button index number.')
+
+            local activeSpec = GetActiveTalentGroup()
+            bName = self:GetSpecConfigName(btnIndex, activeSpec)
+            return bName
+        end
 
     end; PropsAndMethods(ns)
 

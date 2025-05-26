@@ -30,6 +30,12 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+-- /run a:cs2()
+function L:cs2()
+    ns.db.profile.spec2_init = nil
+    p:vv('profile.spec2_init cleared')
+end
+
 function L:TT()
     self:SendMessage(ns.GC.M.OnTooltipFrameUpdate, libName)
 end
