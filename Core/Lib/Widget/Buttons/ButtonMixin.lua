@@ -305,6 +305,7 @@ local function PropsAndMethods(o)
         self:ResetConfig()
         self:SetTextureAsEmpty()
         self:SetChecked(false)
+        self:ClearAllText()
     end
 
     function o:Reset()
