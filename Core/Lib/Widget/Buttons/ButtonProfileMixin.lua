@@ -60,10 +60,26 @@ local function PropsAndMethods(o)
 
     --- @return Profile_Button, Name The button config and the button config name
     function o:conf()
+        if Compat:SupportsDualSpec() then return self:_confDualSpec() end
+        return self:_confMultiSpec()
+    end
+
+    function o:_confDualSpec()
         if not Compat:IsDualSpecEnabled() or Compat:IsPrimarySpec() then
             return self:_confPrimary()
         end
         return self:_confSecondary()
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    function o:_confMultiSpec()
+        local barData = PR():GetBar(self.w.frameIndex)
+        local btnConfName = ns:ButtonConfigName(self.w:GetName(), self.w.index)
+
+        if not barData.buttons[btnConfName] then
+            barData.buttons[btnConfName] = PI:CreateSingleButtonTemplate()
+        end
+        return barData.buttons[btnConfName], btnConfName
     end
 
     --- @return Profile_Button, Name The button config and the button config name

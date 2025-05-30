@@ -169,10 +169,28 @@ function L:GetCompanionInfo(petType, index)
     }
 end
 
+--- @return SpellBookItemInfo
+---@param spellID SpellID
+function L:GetSpellBookItemInfo(spellID)
+    if not C_SpellBook or not C_SpellBook.GetSpellBookItemInfo then return nil end
+
+    for i = 1, 100 do
+        local info = C_SpellBook.GetSpellBookItemInfo(i, Enum.SpellBookSpellBank.Player)
+        if info.spellID == spellID then return info end
+    end
+
+end
+
 --- @param spell Profile_Spell
 function L:PickupSpell(spell)
     if not (spell and spell.id) then return end
-    Compat:PickupSpell(spell.id)
+    if IsSpellKnown(spell.id) then return Compat:PickupSpell(spell.id) end
+
+    -- in retail, some of the spells (like druid bear/cat requires actionID to pickup *shrug*
+    local spInfo = self:GetSpellBookItemInfo(spell.id)
+    p:f1(function() return 'Pickup requires SpellBookItem info: %s', spInfo end)
+    if not spInfo or not spInfo.actionID then return end
+    Compat:PickupSpell(spInfo.actionID)
 end
 --- @param macro Profile_Macro
 function L:PickupMacro(macro)

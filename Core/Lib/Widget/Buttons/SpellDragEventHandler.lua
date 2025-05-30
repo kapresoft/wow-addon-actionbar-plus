@@ -9,7 +9,7 @@ local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
-local Compat = O.Compat
+local Compat, Dru = O.Compat, O.DruidUnitMixin
 
 --[[-----------------------------------------------------------------------------
 New Instance: SpellDragEventHandler
@@ -90,26 +90,39 @@ local function attributeSetterMethods(a)
         local w = btnUI.widget
         w:ResetWidgetAttributes()
 
-        local spellInfo = w:GetSpellData()
-        if type(spellInfo) ~= 'table' then return end
-        if not spellInfo.id then return end
-        AssertNotNil(spellInfo.id, 'btnData[spell].spellInfo.id')
+        local spell = w:GetSpellData()
+        if type(spell) ~= 'table' then return end
+        if not spell.id then return end
+        AssertNotNil(spell.id, 'btnData[spell].spellInfo.id')
 
         local spellIcon = GC.Textures.TEXTURE_EMPTY
-        if spellInfo.icon then spellIcon = API:GetSpellIcon(spellInfo) end
+        if spell.icon then spellIcon = API:GetSpellIcon(spell) end
         w:SetIcon(spellIcon)
 
         btnUI:SetAttribute(BAttr.UNIT2, UAttr.FOCUS)
 
         btnUI:SetAttribute(WAttr.TYPE, WAttr.SPELL)
-        local spellAttrValue = API:GetSpellAttributeValue(spellInfo)
+        local spellAttrValue = API:GetSpellAttributeValue(spell)
         btnUI:SetAttribute(WAttr.SPELL, spellAttrValue)
+
+        self:SetAttributesCataclysmDruid(btnUI, spell)
+
+        p:f1(function() return 'SpellID[%s]: %s', spell.name, spell.id end)
 
         w:UpdateSpellCheckedStateDelayed()
         self:OnAfterSetAttributes(btnUI)
     end
 
-    ---@param btnUI ButtonUI
+    --- @param spell SpellInfo
+    --- @param btnUI ButtonUI
+    function a:SetAttributesCataclysmDruid(btnUI, spell)
+        if not Dru:IsCataclysmDruidSpecializedSpell(spell.id) then return end
+
+        p:f1(function() return 'Druid special attribute spell[%s]: %s', spell.name, spell.id end)
+        btnUI:SetAttribute(WAttr.SPELL, spell.id)
+    end
+
+    --- @param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
         local w = btnUI.widget
         if not w:ConfigContainsValidActionType() then return end

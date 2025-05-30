@@ -14,6 +14,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local Compat = O.Compat
 
 local ConfigNames = GC.Profile_Config_Names
 local ATTR, Table = GC.WidgetAttributes, ns:Table()
@@ -202,6 +203,8 @@ Methods
 --- @param o ProfileInitializer
 local function Methods(o)
 
+    local specCount = ns:IsRetail() and 4 or 2
+
     --- @param g Profile_Global_Config
     function o:InitGlobalSettings(g)
         g.bars = {}
@@ -256,6 +259,8 @@ local function Methods(o)
         end
     end
 
+    --- Note that Talent functions are not yet available in this method.
+    ---
     --- This helps cleanup unused buttons if applied properly.
     --- If there are no changes in the button conf, it will not be
     --- saved in the ActionbarPlus.lua profile file.
@@ -265,11 +270,11 @@ local function Methods(o)
     --- @param btnIndex Index
     function o:InitializeButtons(profile, barName, barConf, btnIndex)
         local btnName = format('%sButton%s', barName, btnIndex)
-        -- local btnNameNew = ns:GetPrimarySpecButtonConfigNameNew(btnIndex)
-        local btnNameSecondarySpec = ns:GetSecondarySpecConfigName(btnIndex)
         barConf.buttons[btnName] = self:CreateSingleButtonTemplate()
-        -- barConf.buttons[btnNameNew] = self:CreateSingleButtonTemplate()
-        barConf.buttons[btnNameSecondarySpec] = self:CreateSingleButtonTemplate()
+        for specId = 2, specCount do
+            local btnConfName = ns:GetSpecConfigName(btnIndex, specId)
+            barConf.buttons[btnConfName] = self:CreateSingleButtonTemplate()
+        end
     end
 
     --- @return Profile_Button

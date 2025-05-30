@@ -6,6 +6,8 @@ local ns = select(2, ...)
 local GC, E, M, KO = ns.GC, ns.GC.E, ns.GC.M, ns:KO()
 local StartsWith = KO.String.StartsWith
 local libName = 'EventToMessageRelay'
+
+local tinsert = table.insert
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -31,8 +33,7 @@ local function PropsAndMethods(o)
         p:f3(function() return 'OnLoad called... frame=%s', frame:GetParentKey() end)
         frame:SetScript(E.OnEvent, o.OnMessageTransmitter)
 
-        --- @see GlobalConstants#M (Messages)
-        RegisterFrameForEvents(frame, {
+        local events = {
             E.PLAYER_ENTERING_WORLD,
             E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
             E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
@@ -43,18 +44,26 @@ local function PropsAndMethods(o)
             E.MODIFIER_STATE_CHANGED,
             E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
-            E.ACTIVE_TALENT_GROUP_CHANGED,
-            E.PLAYER_TARGET_SET_ATTACKING,
             E.UI_ERROR_MESSAGE
-        })
+        }
+        if not ns:IsRetail() then
+            tinsert(events, E.ACTIVE_TALENT_GROUP_CHANGED)
+            tinsert(events, E.PLAYER_TARGET_SET_ATTACKING)
+        else
+            tinsert(events, E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED)
+        end
 
-        RegisterFrameForUnitEvents(frame, {
+        local playerEvents = {
             E.UNIT_SPELLCAST_START,
             E.UNIT_SPELLCAST_STOP,
             E.UNIT_SPELLCAST_SUCCEEDED,
             E.UNIT_SPELLCAST_FAILED,
             E.UNIT_SPELLCAST_FAILED_QUIET,
-        }, 'player')
+        }
+
+        --- @see GlobalConstants#M (Messages)
+        RegisterFrameForEvents(frame, events)
+        RegisterFrameForUnitEvents(frame, playerEvents, 'player')
 
     end
 

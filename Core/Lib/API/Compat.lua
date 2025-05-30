@@ -4,8 +4,10 @@ Blizzard Vars
 local CSpell_IsAutoRepeatSpell = (C_Spell and C_Spell.IsAutoRepeatSpell) or IsAutoRepeatSpell
 local CSpell_IsCurrentSpell    = (C_Spell and C_Spell.IsCurrentSpell) or IsCurrentSpell
 local AUTO_ATTACK_SPELL_ID = 6603
-local PRIMARY_SPEC_INDEX = 1
-local SECONDARY_SPEC_INDEX = 2
+local FIRST_SPEC_INDEX     = 1
+local SECOND_SPEC_INDEX    = 2
+local THIRD_SPEC_INDEX   = 2
+local FOURTH_SPEC_INDEX = 2
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -39,16 +41,49 @@ function L:IsAutoRepeatSpell(spellIDorName)
     return spellIDorName and CSpell_IsAutoRepeatSpell(spellIDorName)
 end
 
+--- 1, 2, 3 retail ; 1, 2 classic
+function L:GetSpecializationID()
+    if GetSpecialization then return GetSpecialization() end
+    return GetActiveTalentGroup()
+end
+
+--- @return boolean Returns true if the wow env supports dual spec
+function L:SupportsDualSpec()
+    return (GetNumTalentGroups and GetNumTalentGroups() > 1) or false
+end
+
+--- @return boolean Returns true if the wow env supports more than dual spec (up to 4)
+function L:SupportsMultiSpec()
+    return (GetNumSpecializations and GetNumSpecializations() > 1) or false
+end
+
+--- @return number The number of available specs
+function L:GetAvailableSpecCount()
+    if GetNumTalentGroups then return GetNumTalentGroups() end
+    if GetNumSpecializations then return GetNumSpecializations() end
+    return 1
+end
+
 --- @return boolean Returns true if the environment supports dual spec and the feature flag is enabled.
 function L:IsDualSpecEnabled()
-    if GetNumTalentGroups == nil or GC.F.ENABLE_MULTI_SPEC ~= true then return false end
-    return GetNumTalentGroups and (GetNumTalentGroups() > 1)
+    if GC.F.ENABLE_MULTI_SPEC ~= true then return false end
+    return self:SupportsDualSpec()
+end
+
+--- @return boolean Returns true if the environment supports dual spec and the feature flag is enabled.
+function L:IsMultiSpecEnabled()
+    if GC.F.ENABLE_MULTI_SPEC ~= true then return false end
+    return self:SupportsDualSpec() or self:SupportsMultiSpec()
 end
 
 --- @return boolean
-function L:IsPrimarySpec() return PRIMARY_SPEC_INDEX == GetActiveTalentGroup() end
+function L:IsPrimarySpec() return FIRST_SPEC_INDEX == self:GetSpecializationID() end
 --- @return boolean
-function L:IsSecondarySpec() return SECONDARY_SPEC_INDEX == GetActiveTalentGroup() end
+function L:IsSecondarySpec() return SECOND_SPEC_INDEX == self:GetSpecializationID() end
+--- @return boolean
+function L:IsTertiarySpec() return THIRD_SPEC_INDEX == self:GetSpecializationID() end
+--- @return boolean
+function L:IsQuaternarySpec() return FOURTH_SPEC_INDEX == self:GetSpecializationID() end
 
 --- Checks if a spell is passive, compatible with both Retail and Classic WoW.
 --- @param spellIDOrName SpellIdentifier

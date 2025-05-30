@@ -44,6 +44,8 @@ Scripts
 --- @param down boolean|number boolean, 1 or 0
 --- @param key string Which key was pressed, i.e. "LeftMouseButton"
 local function RegisterForClicks(widget, event, down, key)
+    if InCombatLockdown() then return end
+
     if widget:IsEmpty() then return end
     if down ~= nil then down = down == 1 or down == true end
 

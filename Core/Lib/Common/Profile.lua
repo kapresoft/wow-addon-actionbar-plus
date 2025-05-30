@@ -134,10 +134,10 @@ local buttonProfiles = {}
 function P:GetButtonConfigName(buttonName)
     -- TODO next: shorten primary button config name, ie b1, f1b1_2
     local bName    = buttonName
-    if not Compat:IsDualSpecEnabled() then return bName end
+    if not Compat:IsMultiSpecEnabled() then return bName end
 
     -- p:vv(function() return 'Has dual spec: %s', dualSpec end)
-    local activeSpec = GetActiveTalentGroup()
+    local activeSpec = Compat:GetSpecializationID()
     if activeSpec == 1 then return bName end
 
     bName = bName .. '_' .. activeSpec
