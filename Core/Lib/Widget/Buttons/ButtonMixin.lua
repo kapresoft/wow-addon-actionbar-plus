@@ -1033,8 +1033,9 @@ local function PropsAndMethods(o)
     function o:IsUsableSpell(cd)
         -- only use spell names here for 'usable' state
         local spellName = cd.details.spell.name
+        local spellID = cd.details.spell.id
         if IsBlank(spellName) then return true end
-        return Compat:IsUsableSpell(spellName)
+        return spellID and Compat:IsUsableSpell(spellID)
     end
 
     function o:IsUsableToy(itemID)

@@ -289,10 +289,10 @@ local function CreateNamespace(...)
         function o:ButtonConfigName(btnName, btnIndex)
             local c     = ns.O.Compat
             local bName = btnName
-            if not c:IsDualSpecEnabled() or c:IsPrimarySpec() then return bName end
+            if not c:IsMultiSpecEnabled() or c:IsPrimarySpec() then return bName end
             assert(btnIndex, 'Namespace:: Unexpected error retrieving button index number.')
 
-            local activeSpec = GetActiveTalentGroup()
+            local activeSpec = c:GetSpecializationID()
             bName = self:GetSpecConfigName(btnIndex, activeSpec)
             return bName
         end

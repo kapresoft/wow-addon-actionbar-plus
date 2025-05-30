@@ -30,10 +30,43 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+--- /dump IsSpellKnown(106785)
+--- /dump IsSpellKnown(C_Spell.GetSpellIDForSpellIdentifier('Swipe'))
+--- /dump C_Spell.GetSpellIDForSpellIdentifier('Swipe')
+--- /dump C_Spell.DoesSpellExist('Swipe')
+function L:sp1()
+
+    local spellids = { [348] = 1, [116858] = 1, [29722] = 1 }
+    for i = 1, 100 do
+        local info = C_SpellBook.GetSpellBookItemInfo(i, Enum.SpellBookSpellBank.Player)
+        if info.name == 'Swipe' then
+        p:vv(function() return 'info=%s', info end) end
+        --if info and spellids[info.spellID] then print("Slot:", i, "ID:", info.spellID, info.name) end
+    end
+
+end
+
+function L:sp1b()
+
+    local spellids = { [348] = 1, [116858] = 1, [29722] = 1 }
+    for i = 1, 100 do
+        local info = GetSpellBookItemInfo(i, Enum.SpellBookSpellBank.Player)
+        if info.name == 'Swipe' then
+            p:vv(function() return 'info=%s', info end) end
+        --if info and spellids[info.spellID] then print("Slot:", i, "ID:", info.spellID, info.name) end
+    end
+
+end
+
 -- /run a:cs2()
 function L:cs2()
     ns.db.profile.spec2_init = nil
     p:vv('profile.spec2_init cleared')
+end
+
+-- /dump a:spc()
+function L:spc()
+    p:vv(function() return 'Spec Available: %s', O.Compat:GetAvailableSpecCount() end)
 end
 
 function L:TT()

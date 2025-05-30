@@ -86,6 +86,9 @@ local function PropsAndMethods(o)
         self:RegisterMessage(GC.M.OnButtonAfterPostClick, o.OnButtonAfterPostClick)
         self:RegisterMessage(GC.M.OnPostUpdateSpellUsable, o.OnPostUpdateSpellUsable)
         self:RegisterMessage(GC.M.OnAfterDragStart, o.OnAfterDragStart)
+
+        -- Non-Retail Only
+        if ns:IsRetail() then return end
         self:RegisterAddOnMessage(GC.E.PLAYER_TARGET_SET_ATTACKING, o.OnPlayerStartAttacking)
     end
 

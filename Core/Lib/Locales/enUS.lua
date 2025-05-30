@@ -141,4 +141,4 @@ L['ActionbarPlus-M6 URL']                                = "See https://www.curs
 
 L['Primary']                               = true
 L['Secondary']                             = true
-L['Talents Switch Success Message Format'] = '%s spec action bars activated.'
+L['Talents Switch Success Message Format'] = '[%s] spec action bars activated.'

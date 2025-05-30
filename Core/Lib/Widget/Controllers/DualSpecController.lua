@@ -53,14 +53,31 @@ local function PropsAndMethods(o)
     --- @private
     function o:RegisterMessageCallbacks()
         self:RegisterAddOnMessage(E.ACTIVE_TALENT_GROUP_CHANGED, o.OnActiveTalentGroupChanged)
+
+        -- retail only
+        if not ns:IsRetail() then return end
+        self:RegisterAddOnMessage(E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED, o.OnActivePlayerSpecChanged)
     end
 
+    -- pre-retail: ACTIVE_TALENT_GROUP_CHANGED
+    -- retail: ACTIVE_PLAYER_SPECIALIZATION_CHANGED
     function o.OnActiveTalentGroupChanged(msg, source, newGroup, previousGroup)
         ps:vv(function()
             local specName = AL['Primary']
             if Compat:IsSecondarySpec() then specName = AL['Secondary'] end
             return talentsSwitchMsgFmt, specName
         end)
+        initButtonsSafe()
+    end
+
+    function o.OnActivePlayerSpecChanged(msg, source)
+        local specIndex = GetSpecialization()
+        if specIndex then
+            local specID, specName = GetSpecializationInfo(specIndex)
+            ps:vv(function()
+                return talentsSwitchMsgFmt, specName
+            end)
+        end
         initButtonsSafe()
     end
 

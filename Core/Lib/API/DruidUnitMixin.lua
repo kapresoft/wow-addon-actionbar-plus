@@ -5,6 +5,29 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
+local BEAR_SHAPESHIFT_FORM_INDEX = 1
+local CAT_SHAPESHIFT_FORM_INDEX = 3
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- Converts a list of spellIDs into a set-style lookup table for fast boolean checks.
+--- @param list number[] @An array of numeric spellIDs.
+--- @return table<number, boolean> @A lookup table where each spellID is a key with value true.
+local function LT(list)
+    local t = {}
+    for _, id in ipairs(list) do t[id] = true end
+    return t
+end
+
+--- Merges the contents of a lookup table into another.
+--- @param target table<number, boolean>
+--- @param source table<number, boolean>
+local function MergeLT(target, source)
+    for spellID in pairs(source) do
+        target[spellID] = true
+    end
+end
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -32,9 +55,45 @@ local function PropsAndMethods(o)
     o.FLIGHT_FORM_SPELLID = 40120
     o.SWIFT_FLIGHT_FORM_SPELL_ID = 40120
 
-    function o:IsDruidClass()
-        local _, id = self:GetPlayerUnitClass(); return GC.UnitClasses.DRUID.id == id
-    end
+    o.CATACLYSM_SWIPE_BEAR_SPELL_ID = 779
+    o.CATACLYSM_SWIPE_CAT_SPELL_ID  = 62078
+
+    o.CATACLYSM_MANGLE_BEAR_SPELL_ID  = 33878
+    o.CATACLYSM_MANGLE_CAT_SPELL_ID  = 33876
+
+    o.CATACLYSM_SKULL_BASH_BEAR_SPELL_ID  = 80964
+    o.CATACLYSM_SKULL_BASH_CAT_SPELL_ID  = 80965
+
+    o.CATACLYSM_FERAL_CHARGE_BEAR_SPELL_ID  = 16979
+    o.CATACLYSM_FERAL_CHARGE_CAT_SPELL_ID  = 49376
+
+    --- @type table<number, boolean>
+    local CATACLYSM_CAT_SPELLS = LT({
+                                        o.CATACLYSM_SWIPE_CAT_SPELL_ID,
+                                        o.CATACLYSM_MANGLE_CAT_SPELL_ID,
+                                        o.CATACLYSM_SKULL_BASH_CAT_SPELL_ID,
+                                        o.CATACLYSM_FERAL_CHARGE_CAT_SPELL_ID,
+                                    })
+    --- @type table<number, boolean>
+    local CATACLYSM_BEAR_SPELLS = LT({
+                                         o.CATACLYSM_SWIPE_BEAR_SPELL_ID,
+                                         o.CATACLYSM_MANGLE_BEAR_SPELL_ID,
+                                         o.CATACLYSM_SKULL_BASH_BEAR_SPELL_ID,
+                                         o.CATACLYSM_FERAL_CHARGE_BEAR_SPELL_ID,
+                                     })
+
+    -- TODO next: Retail Behavior
+    -- Thrash works with SettAttribute('spell', 'Thrash')
+    -- Need to handle tooltip correctly
+    -- If bear, shows Thrash Bear (spID 7758)
+    -- If cat, shows Thrash Cat (spID 106830)
+    -- TBD: Thrash Bear returns nil if char is in cat form and vice versa
+    -- IDEA: On Spec Change, go through all the dual Bear/Cat spells and reset attribute?
+
+    --- @type table<number, boolean>
+    local CATACLYSM_SPECIALIZED_SPELLS = (function()
+        local sp = {}; MergeLT(sp, CATACLYSM_CAT_SPELLS); MergeLT(sp, CATACLYSM_BEAR_SPELLS); return sp
+    end)();
 
     --- @param formSpellId number
     function o:IsActiveForm(formSpellId)
@@ -71,6 +130,54 @@ local function PropsAndMethods(o)
                 or spellId == o.MOONKIN_FORM_SPELL_ID
                 or spellId == o.SWIFT_FLIGHT_FORM_SPELL_ID
     end
+
+    function o:IsCataclysmDruid() return ns:IsCataclysm() and self:IsDruidClass() end
+
+    --- Checks if the given spellID is part of the known Druid action spellIDs.
+    --- @param spellID SpellID
+    --- @return boolean
+    function o:IsCataclysmDruidSpecializedSpell(spellID)
+        if not self:IsCataclysmDruid() then return end
+        return CATACLYSM_SPECIALIZED_SPELLS[spellID] == true
+    end
+
+    --- Checks if the given spellID is a known Cat Form spell in Cataclysm Classic.
+    --- @param spellID SpellID
+    --- @return boolean
+    function o:IsCatSpell(spellID) return CATACLYSM_CAT_SPELLS[spellID] == true end
+
+    --- Checks if the given spellID is a known Cat Form spell in Cataclysm Classic.
+    --- @param spellID SpellID
+    --- @return boolean
+    function o:IsBearSpell(spellID) return CATACLYSM_BEAR_SPELLS[spellID] == true end
+
+    function o:IsDruidClass()
+        local _, id = self:GetPlayerUnitClass(); return GC.UnitClasses.DRUID.id == id
+    end
+
+    --- @param spellID SpellID
+    --- @return boolean
+    function o:IsCataclysmDruidSwipe(spellID)
+        if not ns:IsCataclysm() and not self:IsDruidClass() then return false end
+        return o.CATACLYSM_SWIPE_BEAR_SPELL_ID == spellID
+                or o.CATACLYSM_SWIPE_CAT_SPELL_ID == spellID
+    end
+
+    function o:GetCurrentFormName()
+        local index = GetShapeshiftForm()
+        local _, _, _, spellID = GetShapeshiftFormInfo(index)
+        return spellID and GetSpellInfo(spellID)
+    end
+
+    function o:GetBearFormName()
+        local _, _, _, spellID = GetShapeshiftFormInfo(BEAR_SHAPESHIFT_FORM_INDEX)
+        return spellID and GetSpellInfo(spellID)
+    end
+    function o:GetCatFormName()
+        local _, _, _, spellID = GetShapeshiftFormInfo(CAT_SHAPESHIFT_FORM_INDEX)
+        return spellID and GetSpellInfo(spellID)
+    end
+
 
 end; PropsAndMethods(L)
 
