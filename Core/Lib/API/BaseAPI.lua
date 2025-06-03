@@ -194,13 +194,13 @@ function L:PickupSpell(spell)
 end
 --- @param macro Profile_Macro
 function L:PickupMacro(macro)
-    if not (macro or macro.index) then return end
+    if not (macro and macro.index) then return end
     PickupMacro(macro.index)
 end
 
 --- @param item Profile_Item
 function L:PickupItem(item)
-    if not (item or item.id) then return end
+    if not (item and item.id) then return end
     PickupItem(item.id)
 end
 
