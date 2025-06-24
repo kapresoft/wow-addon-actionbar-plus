@@ -44,13 +44,18 @@ local function PropsAndMethods(o)
             E.MODIFIER_STATE_CHANGED,
             E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
+            E.START_AUTOREPEAT_SPELL, E.STOP_AUTOREPEAT_SPELL,
+            E.PLAYER_ENTER_COMBAT, E.PLAYER_LEAVE_COMBAT,
             E.UI_ERROR_MESSAGE
         }
-        if not ns:IsRetail() then
-            tinsert(events, E.ACTIVE_TALENT_GROUP_CHANGED)
-            tinsert(events, E.PLAYER_TARGET_SET_ATTACKING)
-        else
+
+        --- @see EquipmentSetController
+        if ns:IsRetail() then
             tinsert(events, E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED)
+        elseif ns:IsMoP() then
+            tinsert(events, E.PLAYER_SPECIALIZATION_CHANGED)
+        else
+            tinsert(events, E.ACTIVE_TALENT_GROUP_CHANGED)
         end
 
         local playerEvents = {

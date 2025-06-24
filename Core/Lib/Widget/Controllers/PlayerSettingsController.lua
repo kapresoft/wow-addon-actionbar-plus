@@ -119,8 +119,8 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnMouseOverFrameHandleConfigChanged, o.OnMouseOverFrameHandleConfigChanged)
         self:RegisterMessage(MSG.OnFrameHandleAlphaConfigChanged, o.OnFrameHandleAlphaConfigChanged)
 
-
-        self:ForEachVisibleFrames(function(fw)
+        self:ForEachFrames(function(fw)
+            fw.frameHandle:UpdateBackdropState()
             fw:UpdateFrameHandleAlpha()
         end)
     end

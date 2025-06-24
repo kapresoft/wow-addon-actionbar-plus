@@ -30,6 +30,24 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+function L:f1()
+
+    -- Disc: 256
+    -- Shadow: 258
+    -- /dump GetSpecializationInfoForClassID(5, 1)
+    -- /dump GetSpecializationInfoForSpecID(258)
+
+    local D = O.DruidUnitMixin
+    local Pr = O.PriestUnitMixin
+
+    local playerC  = D:GetPlayerUnitClass()
+    local isDruid  = D:IsUs(playerC)
+    local isPriest = Pr:IsUs(playerC)
+
+    --ActionbarPlusF1.widget.frameHandle:ClearBackdrop()
+    p:vv(function() return 'f1 unit class: %s is-druid: %s is-priest: %s class-id: %s',
+            playerC, isDruid, isPriest, O.PriestUnitMixin:ClassID() end)
+end
 --- /dump IsSpellKnown(106785)
 --- /dump IsSpellKnown(C_Spell.GetSpellIDForSpellIdentifier('Swipe'))
 --- /dump C_Spell.GetSpellIDForSpellIdentifier('Swipe')

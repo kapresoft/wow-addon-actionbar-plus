@@ -276,7 +276,7 @@ Type: SpellCooldown
 Type: ItemCooldown
 -------------------------------------------------------------------------------]]
 --- @class ItemCooldown : Cooldown Represents information about an item cooldown extending Cooldown.
---- @field item ItemInfo The details of the item.
+--- @field item ItemInfoDetails The details of the item.
 
 --[[-----------------------------------------------------------------------------
 Type: SpellInfoBasic

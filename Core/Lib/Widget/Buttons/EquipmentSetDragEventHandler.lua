@@ -20,6 +20,8 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local BaseAPI, PH = O.BaseAPI, O.PickupHandler
 local WAttr, EMPTY_ICON = GC.WidgetAttributes, GC.Textures.TEXTURE_EMPTY
 local AceEvent = ns:AceEvent()
+local LL = ns:AceLocale()
+
 local c1 = ns:ColorUtil():NewFormatterFromColor(HIGHLIGHT_LIGHT_BLUE)
 local c2 = ns:ColorUtil():NewFormatterFromColor(VERY_LIGHT_GRAY_COLOR)
 
@@ -137,18 +139,17 @@ local function attributeSetterMethods(a)
         GameTooltip:SetEquipmentSet(equipmentSet.id)
 
         if equipmentSet.isEquipped then
-            -- todo next: localize
-            local equippedLabel = c1(' (Equipped)')
+            local equippedLabel = c1(' ' .. LL['Equipped'])
             GameTooltip:AppendText(equippedLabel)
-            GameTooltip:AddLine('Equipment set is ' .. c1('ACTIVE'))
+            GameTooltip:AddLine(ns.sformat(LL['Equipment set is %s'], c1('ACTIVE')))
 
             local talent = O.UnitMixin:GetTalentInfo()
             if talent then
                 GameTooltip:AddLine(' ')
                 local specText = sformat(LOOT_SPECIALIZATION_DEFAULT, c1(talent.spec or 'NONE')) .. ' ' .. (talent.icon or '')
                 GameTooltip:AddDoubleLine(specText)
-                if not ns:IsRetail() then
-                    GameTooltip:AddLine('Talent Points:')
+                if not (ns:IsRetail() or ns:IsMoP()) then
+                    GameTooltip:AddLine(ns.sformat('%s:', LL['Talent Points']))
                     talent:ForEachTalent(function(name, points)
                         GameTooltip:AddDoubleLine(c2(name) .. ':', points)
                     end)

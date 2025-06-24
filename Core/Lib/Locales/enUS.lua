@@ -136,9 +136,12 @@ L['Alpha::Description']                                  = 'Set the opacity of t
 --[[-----------------------------------------------------------------------------
 Needs Translations
 -------------------------------------------------------------------------------]]
-L['Requires ActionbarPlus-M6::Message']                  = "This feature requires ActionbarPlus-M6."
-L['ActionbarPlus-M6 URL']                                = "See https://www.curseforge.com/wow/addons/actionbarplus-m6"
-
-L['Primary']                               = true
-L['Secondary']                             = true
+L['Requires ActionbarPlus-M6::Message']    = "This feature requires ActionbarPlus-M6."
+L['ActionbarPlus-M6 URL']                  = "See https://www.curseforge.com/wow/addons/actionbarplus-m6"
 L['Talents Switch Success Message Format'] = '[%s] spec action bars activated.'
+
+L['Primary']             = true
+L['Secondary']           = true
+L['Equipment set is %s'] = true
+L['Equipped']            = true
+L['Talent Points']       = true

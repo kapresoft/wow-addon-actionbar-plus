@@ -4,7 +4,8 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, E = ns.O, ns.GC, ns.GC.E
-local MSG = GC.M
+local MSG, API, Compat = GC.M, O.API, O.Compat
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -49,7 +50,7 @@ local function PropsAndMethods(o)
         for slot = 1, 19 do
             local link = GetInventoryItemLink("player", slot)
             if link then
-                local equippedItemID = GetItemInfoInstant(link)
+                local equippedItemID = Compat:GetItemInfoInstant(link)
                 if equippedItemID == itemID then return true end
             end
         end
@@ -70,12 +71,8 @@ local function PropsAndMethods(o)
     --- @param bw ButtonUIWidget
     function o:ConditionallyCheckSingleItemButton(bw)
         local it = bw:GetItemData()
-        if not it then return end
-        local _, _, _, _, _, classID = GetItemInfoInstant(it.id)
-        if not (Enum.ItemClass.Weapon == classID
-                or Enum.ItemClass.Armor == classID) then return end
-        if self:IsItemEquipped(it.id) then bw:SetChecked(true); return end
-        bw:SetChecked(false)
+        if not it or not it.id or not bw:IsWeaponOrArmor(it.id) then return end
+        bw:SetChecked(self:IsItemEquipped(it.id))
     end
 
 end; PropsAndMethods(L)

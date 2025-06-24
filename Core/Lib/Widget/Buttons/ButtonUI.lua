@@ -204,7 +204,7 @@ end
 
 --- @param btn ButtonUI
 local function OnClick_SecureHookScript(btn, mouseButton, down)
-    p:d(function() return 'OnClick:SecureHookScript| Actionbar: %s', pformat(btn.widget:GetActionbarInfo()) end)
+    if InCombatLockdown() then return end
     btn:RegisterForClicks(O.API:IsDragKeyDown() and 'AnyUp' or 'AnyDown')
     if not PH:IsPickingUpSomething() then return end
     OnReceiveDrag(btn)

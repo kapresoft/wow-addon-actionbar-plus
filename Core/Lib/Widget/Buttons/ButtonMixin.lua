@@ -18,7 +18,8 @@ local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
 local WAttr = ns.GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
 
-local Pru, Dru, Rog = O.PriestUnitMixin, O.DruidUnitMixin, O.RogueUnitMixin
+local Unit, Priest = O.UnitMixin, O.PriestUnitMixin
+local Druid, Rogue = O.DruidUnitMixin, O.RogueUnitMixin
 
 local C, T = GC.C, GC.Textures
 local UNIT = GC.UnitIDAttributes
@@ -559,7 +560,7 @@ local function PropsAndMethods(o)
         self:UpdateItemStateByItemInfo(API:GetItemInfo(itemIDOrName))
     end
 
-    ---@param itemInfo ItemInfo
+    --- @param itemInfo ItemInfoDetails
     function o:UpdateItemStateByItemInfo(itemInfo)
         self:SetText('')
         if not itemInfo then return nil end
@@ -572,7 +573,7 @@ local function PropsAndMethods(o)
         local count = itemInfo.count
         -- chargeCount: health stones, mana gems/emeralds
         -- stackCount: How many you can stack in bags, i.e. water x 20
-        local chargeCount = GetItemCount(itemInfo.name, false, true, false)
+        local chargeCount = Compat:GetItemCount(itemInfo.name, false, true, false)
         if chargeCount > 1 then
             stackCount = chargeCount
             count = chargeCount
@@ -643,18 +644,20 @@ local function PropsAndMethods(o)
         if not self:IsEmpty() then button.keybindText:Show() end
     end
 
-    function o:UpdateStateDelayed(inSeconds) C_Timer.After(inSeconds or 1, function() self:UpdateState() end) end
-
+    function o:UpdateStateDelayed(inSeconds)
+        C_Timer.After(inSeconds or 1, function() self:UpdateState() end)
+    end
     function o:UpdateSpellCheckedStateDelayed()
         if not self:IsSpell() then return end
         local spId = self:GetSpellID()
         local checked = false
-        if Pru:IsPriestClass() and Pru:IsInShadowFormSpell(spId) then
-            checked = Pru:IsInShadowForm()
-        elseif Dru:IsDruidClass() and Dru:IsProwl(spId)  then
-            checked = Dru:IsStealthActive()
-        elseif Rog:IsRogueClass() and Rog:IsStealth(spId) then
-            checked = Rog:IsStealthActive()
+        local unitClass = Unit:GetPlayerUnitClass()
+        if Priest:IsUs(unitClass) and Priest:IsShadowFormSpell(spId) then
+            checked = Priest:IsInShadowForm()
+        elseif Druid:IsUs(unitClass) and Druid:IsProwl(spId)  then
+            checked = Druid:IsStealthActive()
+        elseif Rogue:IsUs(unitClass) and Rogue:IsStealth(spId) then
+            checked = Rogue:IsStealthActive()
         end
         C_Timer.After(0.001, function() self:SetChecked(checked) end)
     end
@@ -1046,17 +1049,24 @@ local function PropsAndMethods(o)
 
     --- @param itemID ItemID
     function o:IsUsableItemID(itemID)
-        if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
-        return IsUsableItem(itemID)
+        if IsBlank(itemID) then return true
+        elseif self:IsWeaponOrArmor(itemID) then return true
+        elseif API:IsToyItem(itemID) then return self:IsUsableToy(itemID)
+        end
+        return Compat:IsUsableItem(itemID)
+    end
+
+    --- @return boolean
+    function o:IsWeaponOrArmor(itemID)
+        local classID = API:GetItemClass(itemID)
+        return Enum.ItemClass.Weapon == classID or Enum.ItemClass.Armor == classID
     end
 
     --- @param cdOrItemID CooldownInfo|number
     function o:IsUsableItem(cdOrItemID)
         if 'number' == type(cdOrItemID) then return self:IsUsableItemID(cdOrItemID) end
         local itemID = cdOrItemID.details.item.id
-        if IsBlank(itemID) then return true end
-        if API:IsToyItem(itemID) then return self:IsUsableToy(itemID) end
-        return IsUsableItem(itemID)
+        return itemID and self:IsUsableItemID(itemID)
     end
 
     --- @param cd CooldownInfo
@@ -1067,7 +1077,7 @@ local function PropsAndMethods(o)
             if IsBlank(spellID) then return true end
             return Compat:IsUsableSpell(spellID)
         elseif cd.details.item then
-            return IsUsableItem(cd.details.item.id)
+            return Compat:IsUsableItemID(cd.details.item.id)
         end
         return false
     end

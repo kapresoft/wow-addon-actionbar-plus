@@ -13,6 +13,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 local libName = M.UnitMixin
 --- @class UnitMixin : BaseLibraryObject
+--- @field protected CLASS_ID UnitClass This is an interface field and must be defined by the specific unit
 local L = ns:NewLibStd(libName)
 local p = ns:LC().UNIT:NewLogger(libName)
 
@@ -36,29 +37,34 @@ Methods
 ---@param o UnitMixin
 local function PropsAndMethods(o)
 
+    o.ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
+    o.stealthedIcon = ns.sformat(o.ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active')
+
     --- @return UnitMixin
-    function o:New(obj)
+    --- @param unitClass UnitClass
+    function o:New(obj, unitClass)
+        assert(type(unitClass) == 'string', 'Param UnitClass must be one of @UnitClass')
         obj = obj or {}
-        return ns:K():Mixin(obj, o)
+        ns:K():Mixin(obj, o)
+        obj.CLASS_ID = unitClass
+        return obj
     end
+    --- Use New() instead if a unit class is extending this mixin instead
     function o:Embed(obj) return self:New(obj) end
+    --- @return UnitClass
+    function o:ClassID() return self.CLASS_ID end
 
     --- Class names are not locale-specific (The second return value of UnitClass())
     ---Example:
     --- @param optionalUnit string
     --- @see GlobalConstants#UnitId
     --- @see Blizzard_UnitId
-    --- @return string, number One of DRUID, ROGUE, PRIEST, etc...
-    function o:GetUnitClass(optionalUnit)
-        optionalUnit = optionalUnit or 'player'
-        return select(2, UnitClass(optionalUnit))
-    end
+    --- @return UnitClass, UnitClassID One of DRUID, ROGUE, PRIEST, etc... returned with the ID
+    function o:GetUnitClass(optionalUnit) return UnitClassBase(optionalUnit or 'player') end
 
     --- @see GC#UnitClasses
     --- @return string, number One of DRUID, ROGUE, PRIEST, etc...
-    function o:GetPlayerUnitClass()
-        return self:GetUnitClass(GC.UnitId.player)
-    end
+    function o:GetPlayerUnitClass() return self:GetUnitClass() end
 
     --- /dump select(2, UnitClass('player'))
     ---Example:
@@ -74,15 +80,33 @@ local function PropsAndMethods(o)
         return unitClass and IsAnyOf(unitClass, ...)
     end
 
-    --- @param ... any list of Unit Class IDs
+    --- @vararg any list of Unit Class IDs
     --- @return Boolean
     function o:IsPlayerClassAnyOfID(...)
         local _, _, unitClassID = UnitClass('player')
         return unitClassID and GC:IsAnyOfNumber(unitClassID, ...)
     end
 
+    --- Notes:
+    --- - `PriestUnitMixin:IsUs()` returns true if player is a priest, otherwise false
+    --- - `PriestUnitMixin:IsUs('PRIEST')` returns true if player is a priest, otherwise false
+    --- - `DruidUnitMixin:IsUs()`, then returns true if player is a druid, otherwise false
+    --- - `DruidUnitMixin:IsUs('DRUID')`, then returns true if player is a druid, otherwise false
+    --- Don't call `UnitMixin:IsUs()` directly.
+    ---
+    --- Uses Interface field: CLASS_ID
+    --- @see UnitClass
+    --- @param unitClass UnitClass|nil Optional unit class. If passed, unitClass is checked against the player class.
+    function o:IsUs(unitClass)
+        assert(self.CLASS_ID, 'CLASS_ID is missing')
+        local pClass = unitClass or self:GetPlayerUnitClass()
+        return self.CLASS_ID == pClass
+    end
+
     --- @return Boolean
     function o:IsStealthActive() return IsStealthed and IsStealthed() end
+    --- @return boolean
+    function o:IsShapeShifted() return GetShapeshiftForm() > 0 end
 
     --- Inefficient. Use #IsBuffActive
     function o:HasBuff(spellID)
@@ -217,6 +241,17 @@ local function PropsAndMethods(o)
         end
 
         local max = 0
+
+        -- skip MoP for now (uses GetNumSpecGroups)
+        if GetNumSpecGroups then
+            local specIndex = Compat:GetSpecializationID()
+            if specIndex then
+                local specId, specName = Compat:GetSpecializationInfo(specIndex)
+                info.spec = specName
+            end
+            return info
+        end
+
         -- /dump GetTalentTabInfo(1)
         for i = 1, GetNumTalentTabs() do
             --- @type TalentTabInfo
@@ -227,7 +262,6 @@ local function PropsAndMethods(o)
             if tabInfo then
                 table.insert(info.names, tabInfo.name)
                 info.points[tabInfo.name] = tabInfo.pointsSpent
-                --p:vv(function() return 'i-%s: PointsSpent=%s,%s Max=%s', i, type(pointsSpent), pointsSpent, type(max) end)
                 if tabInfo.pointsSpent > max then
                     info.spec = tabInfo.name
                     info.talentIndex = i

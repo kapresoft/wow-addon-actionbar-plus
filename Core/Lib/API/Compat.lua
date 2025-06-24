@@ -1,9 +1,19 @@
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local CSpell_IsAutoRepeatSpell = (C_Spell and C_Spell.IsAutoRepeatSpell) or IsAutoRepeatSpell
-local CSpell_IsCurrentSpell    = (C_Spell and C_Spell.IsCurrentSpell) or IsCurrentSpell
-local AUTO_ATTACK_SPELL_ID = 6603
+local CSpell_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
+local CSpell_IsCurrentSpell    = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
+local C_GetSpecializationInfo  = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo or C_GetSpecializationInfo
+local C_GetActiveSpecGroup     = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
+local C_GetItemCount           = C_Item and C_Item.GetItemCount or GetItemCount
+local C_GetItemInfo            = C_Item and C_Item.GetItemInfo or GetItemInfo
+local C_GetItemInfoInstant     = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
+local C_GetItemSpell           = C_Item and C_Item.GetItemSpell or GetItemSpell
+local C_IsUsableItem           = C_Item and C_Item.IsUsableItem or IsUsableItem
+local C_PickupItem             = C_Item and C_Item.PickupItem or PickupItem
+local GetSpecialization        = GetSpecialization
+local GetActiveTalentGroup     = GetActiveTalentGroup
+
 local FIRST_SPEC_INDEX     = 1
 local SECOND_SPEC_INDEX    = 2
 local THIRD_SPEC_INDEX   = 2
@@ -20,12 +30,19 @@ local O, GC, M = ns.O, ns.GC, ns.M
 local L = ns:NewLibStd(M.Compat)
 local p = ns:CreateDefaultLogger(M.Compat)
 
---- @param spellIDorName SpellIdentifier | "'Auto Attack'" | "6603"
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
 --- @return boolean
-function L:IsAutoAttackSpell(spellIDorName)
-    return spellIDorName == AUTO_ATTACK_SPELL_ID
-            and CSpell_IsCurrentSpell(spellIDorName)
-end
+--- @param o any An object to evaluate
+local function IsFn(o) return 'function' == type(o) end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+--- @param spell SpellIdentifier | "'Auto Attack'" | "6603"
+--- @return boolean
+function L:IsCurrentSpell(spell) return CSpell_IsCurrentSpell(spell) end
 
 --- This returns true for Water elemental (3167) and Auto Attack (6603)
 --- Returns false for an UIError
@@ -41,15 +58,46 @@ function L:IsAutoRepeatSpell(spellIDorName)
     return spellIDorName and CSpell_IsAutoRepeatSpell(spellIDorName)
 end
 
+--- @param specIndex number
+--- @return Identifier, Name
+function L:GetSpecializationInfo(specIndex) return C_GetSpecializationInfo(specIndex, false, false) end
+
+--- C_SpecializationInfo.GetSpecialization
 --- 1, 2, 3 retail ; 1, 2 classic
+--- @return number
 function L:GetSpecializationID()
-    if GetSpecialization then return GetSpecialization() end
-    return GetActiveTalentGroup()
+    if IsFn(GetSpecialization) then return GetSpecialization()
+    elseif IsFn(GetActiveTalentGroup) then return GetActiveTalentGroup()
+    -- C_GetActiveSpecGroup: MoP Classic (the active specIndex tab)
+    elseif IsFn(C_GetActiveSpecGroup) then return C_GetActiveSpecGroup()
+    end
+    return 1
+end
+
+--- @return boolean Returns true if the wow env supports dual or multi spec
+function L:SupportsDualOrMultiSpec()
+    return self:SupportsDualSpec() or self:SupportsDualSpecMoP() or self:SupportsMultiSpec()
 end
 
 --- @return boolean Returns true if the wow env supports dual spec
 function L:SupportsDualSpec()
-    return (GetNumTalentGroups and GetNumTalentGroups() > 1) or false
+    return self:SupportsDualSpecCata() or self:SupportsDualSpecMoP()
+end
+
+--- @return boolean Returns true if the wow env supports dual spec
+function L:SupportsDualSpecCata()
+    local ok, result = pcall(function()
+        return (GetNumTalentGroups and GetNumTalentGroups() > 1) or false
+    end)
+    return ok and (result == true)
+end
+
+--- @return boolean Returns true if the wow env supports dual spec
+function L:SupportsDualSpecMoP()
+    local ok, result = pcall(function()
+        return type(GetNumSpecGroups) == 'function' and GetNumSpecGroups() > 1
+    end)
+    return ok and (result == true)
 end
 
 --- @return boolean Returns true if the wow env supports more than dual spec (up to 4)
@@ -226,3 +274,34 @@ function L:SpellHasRange(spell)
     end
     return nil
 end
+
+--- @param item ItemInfo
+--- @param includeBank OptionalFlag If true, includes the bank
+--- @param includeUses OptionalFlag If true, includes each charge of an item similar to GetActionCount()
+--- @param includeReagentBank OptionalFlag If true, includes the reagent bank
+function L:GetItemCount(item, includeBank, includeUses, includeReagentBank) return C_GetItemCount(item, includeBank, includeUses, includeReagentBank) end
+
+--- @param item ItemInfo
+--- @return ItemID, ItemType, ItemSubType, ItemEquipLoc, Icon, ItemClassID, SubclassID
+function L:GetItemInfoInstant(item) return C_GetItemInfoInstant(item) end
+
+--- @param item ItemInfo
+--- @return ItemName, ItemLink, ItemQuality, ItemLevel, ItemLevel, ItemType, ItemSubType, ItemStackCount, ItemEquipLoc, ItemTexture, SellPrice, ItemClassID, SubclassID, BindType, ExpacID, SetID, IsCraftingReagent
+function L:GetItemInfo(item) return C_GetItemInfo(item) end
+
+--- Returns the spell effect for an item.
+--- #### See: [API_GetItemSpell](https://warcraft.wiki.gg/wiki/API_GetItemSpell)
+--- @param item ItemInfo
+--- @return SpellName, SpellID
+function L:GetItemSpell(item) return C_GetItemSpell(item) end
+
+--- ### Usages:
+--- ```
+--- usable, noMana = IsUsableItem('Cookie')
+--- ```
+--- @param item ItemInfo
+--- @return Usable, CannotBeCastedDueToLowMana
+function L:IsUsableItem(item) return C_IsUsableItem(item) end
+
+--- @param item ItemInfo
+function L:PickupItem(item) return C_PickupItem(item) end

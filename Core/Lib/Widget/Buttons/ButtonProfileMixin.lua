@@ -187,11 +187,15 @@ local function PropsAndMethods(o)
     --- @return Profile_Spell
     function o:GetSpellData() return self:GetButtonTypeData(W.SPELL) end
     function o:GetSpellID() local d = self:GetSpellData(); return d and d.id end
+    function o:GetSpellIDx() return self:GetEffectiveSpellID() end
     function o:GetSpellName() local d = self:GetSpellData(); return d and d.name end
 
     --- @return Profile_Item
     function o:GetItemData() return self:GetButtonTypeData(W.ITEM) end
+    --- @return ItemName
     function o:GetItemName() local item = self:GetItemData(); return (item and item.name) or '' end
+    --- @return ItemID
+    function o:GetItemID() local item = self:GetItemData(); return item and item.id end
     --- @return Profile_Macro
     function o:GetMacroData() return self:GetButtonTypeData(W.MACRO) end
 

@@ -52,11 +52,13 @@ local function PropsAndMethods(o)
 
     --- @private
     function o:RegisterMessageCallbacks()
-        self:RegisterAddOnMessage(E.ACTIVE_TALENT_GROUP_CHANGED, o.OnActiveTalentGroupChanged)
+        if ns:IsRetail() then
+            return self:RegisterAddOnMessage(E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED, o.OnActivePlayerSpecChanged)
+        end
 
-        -- retail only
-        if not ns:IsRetail() then return end
-        self:RegisterAddOnMessage(E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED, o.OnActivePlayerSpecChanged)
+        local msg = E.ACTIVE_TALENT_GROUP_CHANGED
+        if ns:IsMoP() then msg = E.PLAYER_SPECIALIZATION_CHANGED end
+        self:RegisterAddOnMessage(msg, o.OnActiveTalentGroupChanged)
     end
 
     -- pre-retail: ACTIVE_TALENT_GROUP_CHANGED
@@ -71,9 +73,9 @@ local function PropsAndMethods(o)
     end
 
     function o.OnActivePlayerSpecChanged(msg, source)
-        local specIndex = GetSpecialization()
+        local specIndex = Compat:GetSpecializationID()
         if specIndex then
-            local specID, specName = GetSpecializationInfo(specIndex)
+            local specID, specName = Compat:GetSpecializationInfo(specIndex)
             ps:vv(function()
                 return talentsSwitchMsgFmt, specName
             end)
