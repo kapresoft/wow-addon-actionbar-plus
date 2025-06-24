@@ -15,7 +15,7 @@ local function CreateLib()
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:LC().UNIT:NewLogger(libName)
     --- @alias RogueUnitMixin __RogueUnitMixin | BaseLibraryObject
-    O.UnitMixin:Embed(newLib)
+    O.UnitMixin:New(newLib, 'ROGUE')
     return newLib, logger
 end; local L, p = CreateLib(); if not L then return end
 

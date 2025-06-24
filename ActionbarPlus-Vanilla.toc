@@ -6,11 +6,11 @@
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-
 ## OptionalDeps: Ace3
+## Category-enUS: Action Bars
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
-## X-Category: ActionBars
+## X-Category: Action Bars
 ## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 
 ## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus

@@ -38,15 +38,16 @@ local function CreateLib()
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:LC().UNIT:NewLogger(libName)
     --- @alias DruidUnitMixin __DruidUnitMixin | BaseLibraryObject
-    O.UnitMixin:Embed(newLib)
+    O.UnitMixin:New(newLib, 'DRUID')
     return newLib, logger
 end; local L, p = CreateLib(); if not L then return end
 
 --- @param o __DruidUnitMixin
 local function PropsAndMethods(o)
 
-    o.PROWL_SPELL_ID = 5215
+    o.DRUID_FORM_ACTIVE_ICON = 136116
 
+    o.PROWL_SPELL_ID = 5215
     o.CAT_FORM_SPELL_ID = 768
     o.TRAVEL_FORM_SPELL_ID = 783
     o.AQUATIC_FORM_SPELL_ID = 1066
@@ -131,7 +132,7 @@ local function PropsAndMethods(o)
                 or spellId == o.SWIFT_FLIGHT_FORM_SPELL_ID
     end
 
-    function o:IsCataclysmDruid() return ns:IsCataclysm() and self:IsDruidClass() end
+    function o:IsCataclysmDruid() return ns:IsCataclysm() and self:IsUs() end
 
     --- Checks if the given spellID is part of the known Druid action spellIDs.
     --- @param spellID SpellID
@@ -158,7 +159,7 @@ local function PropsAndMethods(o)
     --- @param spellID SpellID
     --- @return boolean
     function o:IsCataclysmDruidSwipe(spellID)
-        if not ns:IsCataclysm() and not self:IsDruidClass() then return false end
+        if not ns:IsCataclysm() and not self:IsUs() then return false end
         return o.CATACLYSM_SWIPE_BEAR_SPELL_ID == spellID
                 or o.CATACLYSM_SWIPE_CAT_SPELL_ID == spellID
     end
@@ -178,7 +179,15 @@ local function PropsAndMethods(o)
         return spellID and GetSpellInfo(spellID)
     end
 
+    function o:GetFormActiveIcon() return o.DRUID_FORM_ACTIVE_ICON end
 
+    --- @param spellInfo Profile_Spell
+    --- @return Icon The shapeshift icon
+    function o:GetShapeshiftIcon(spellInfo)
+        if not spellInfo then return nil end
+        if self:IsShapeShiftActive(spellInfo) then return self:GetFormActiveIcon() end
+        return spellInfo.icon
+    end
 end; PropsAndMethods(L)
 
 

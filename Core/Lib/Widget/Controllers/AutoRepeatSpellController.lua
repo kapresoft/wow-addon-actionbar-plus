@@ -9,10 +9,8 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC = ns.O, ns.GC
-local Compat, MSG = O.Compat, GC.M
-local T_Unpack = ns:KO().Table.unpack
-local AUTO_REPEAT_SPELL_FLASH_TIME = 0.4
-local ABH                          = O.ActionBarHandlerMixin
+local Compat, API, E, M = O.Compat, O.API, GC.E, GC.M
+local ABH = O.ActionBarHandlerMixin
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -26,18 +24,19 @@ local ps = ns:LC().SPELL:NewLogger(libName)
 Aliases
 -------------------------------------------------------------------------------]]
 --- @alias IsChecked boolean
---- @alias IsAuto boolean
+--- @alias IsAutoRepeat boolean
 --- @alias IsAutoAttack boolean
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 --- @param spellID SpellID
---- @return IsChecked, IsAuto, IsAutoAttack
-local function IsChecked(spellID)
-    local isAuto       = Compat:IsAutoRepeatSpell(spellID)
-    local isAutoAttack = Compat:IsAutoAttackSpell(spellID)
-    return isAuto == true or isAutoAttack == true, isAuto, isAutoAttack
+--- @return IsChecked, IsAutoRepeat, IsAutoAttack
+local function ShouldCheck(spellID)
+    local isAutoRepeat = Compat:IsAutoRepeatSpell(spellID)
+    local isAutoAttack = API:IsCurrentlyAutoAttacking(spellID)
+    local isShootSpell = API:IsShootSpell(spellID)
+    return isAutoRepeat == true or isAutoAttack == true, isAutoRepeat, isAutoAttack, isShootSpell
 end
 
 --- @param w ButtonUIWidget
@@ -50,10 +49,10 @@ local function OnUpdateFlashingHandler(btn, elapsed)
     local spellID = w:GetEffectiveSpellID(); if not spellID then return end
     local tex = btn:GetNormalTexture(); if not tex then return end
 
-    local checked, isAuto, isAutoAttack = IsChecked(spellID)
-    w:SetChecked(checked)
+    local shouldCheck, isAutoRepeat, isAutoAttack = ShouldCheck(spellID)
+    w:SetChecked(shouldCheck)
 
-    if isAuto or isAutoAttack then
+    if isAutoRepeat or isAutoAttack then
         local t = floor(GetTime() * 10) % 8  -- cycle every 0.8s
 
         if t < 4 then
@@ -83,13 +82,12 @@ local function PropsAndMethods(o)
     end
 
     function o:RegisterMessageCallbacks()
-        self:RegisterMessage(GC.M.OnButtonAfterPostClick, o.OnButtonAfterPostClick)
-        self:RegisterMessage(GC.M.OnPostUpdateSpellUsable, o.OnPostUpdateSpellUsable)
-        self:RegisterMessage(GC.M.OnAfterDragStart, o.OnAfterDragStart)
-
-        -- Non-Retail Only
-        if ns:IsRetail() then return end
-        self:RegisterAddOnMessage(GC.E.PLAYER_TARGET_SET_ATTACKING, o.OnPlayerStartAttacking)
+        self:RegisterAddOnMessage(E.PLAYER_ENTER_COMBAT, o.OnPlayerEnterCombat)
+        self:RegisterAddOnMessage(E.PLAYER_LEAVE_COMBAT, o.OnPlayerLeaveCombat)
+        self:RegisterAddOnMessage(E.START_AUTOREPEAT_SPELL, o.OnStartAutoRepeatSpell)
+        self:RegisterAddOnMessage(E.STOP_AUTOREPEAT_SPELL, o.OnStopAutoRepeatSpell)
+        self:RegisterMessage(M.OnPostUpdateSpellUsable, o.OnPostUpdateSpellUsable)
+        self:RegisterMessage(M.OnAfterDragStart, o.OnAfterDragStart)
     end
 
     --- When the action is dragged out, the button is EMPTY.
@@ -101,13 +99,32 @@ local function PropsAndMethods(o)
         w.button():RemoveOnUpdateCallback(GetUniqueName(w))
     end
 
-    --- When the action is dragged out, the button is EMPTY.
-    --- @see ButtonUI#OnReceiveDrag
     --- @param msg Name The message name
     --- @param src Name Should be from 'ButtonUI'
-    --- @param w ButtonUIWidget Only fires on a non-empty action slot
-    function o.OnPlayerStartAttacking(msg, src, w)
-        o:ForEachMatchingSpellButton(6603, function(bw)
+    function o.OnPlayerEnterCombat(msg, src)
+        if Compat:IsCurrentSpell(API.AUTO_ATTACK_SPELL_ID) then
+            o:ForEachMatchingSpellButton(API.AUTO_ATTACK_SPELL_ID, function(bw)
+                bw:SetChecked(true)
+            end)
+        end
+    end
+
+    --- @param msg Name The message name
+    --- @param src Name Should be from 'ButtonUI'
+    function o.OnPlayerLeaveCombat(msg, src)
+        o:ForEachNonEmptyButton(function(bw)
+            bw:SetChecked(false)
+        end, function(bw)
+            local spID = bw:GetEffectiveSpellID();
+            return spID == API.AUTO_ATTACK_SPELL_ID
+        end)
+    end
+
+
+    --- @param msg Name The message name
+    --- @param src Name Should be from 'ButtonUI'
+    function o.OnStartAutoRepeatSpell(msg, src)
+        ABH:ForEachAutoRepeatSpellButton(function(bw)
             bw:SetChecked(true)
             bw.button():AddOnUpdateCallback(GetUniqueName(bw), OnUpdateFlashingHandler)
         end)
@@ -115,22 +132,8 @@ local function PropsAndMethods(o)
 
     --- @param msg Name The message name
     --- @param src Name Should be from 'ButtonUI'
-    --- @param w ButtonUIWidget Only fires on a non-empty action slot
-    function o.OnButtonAfterPostClick(msg, src, w)
-        if not w:IsSpell() then return end
-        local spellID     = w:GetEffectiveSpellID()
-        local checked, isAuto, isAutoAttack = IsChecked(spellID)
-        local matchErrors = { LE_GAME_ERR_GENERIC_NO_TARGET, LE_GAME_ERR_SPELL_OUT_OF_RANGE }
-
-        if isAuto then
-            if ns:uie():HasErrorCodes(T_Unpack(matchErrors)) then checked = false end
-            w:SetChecked(checked)
-        elseif isAutoAttack then
-            -- always check regardless
-            checked = true
-            w:SetChecked(checked)
-        end
-        ABH:ForEachMatchingSpellButton(spellID, function(bw) bw:SetChecked(checked) end)
+    function o.OnStopAutoRepeatSpell(msg, src)
+        -- nothing to do here for now
     end
 
     -- PLAYER_TARGET_SET_ATTACKING
@@ -140,21 +143,21 @@ local function PropsAndMethods(o)
     function o.OnPostUpdateSpellUsable(msg, src, w)
         local spellID = w and w:GetEffectiveSpellID();
         if not spellID then return end
-        local isChecked, isAuto, isAutoAttack = IsChecked(spellID)
 
-        if isChecked == true then
-            w:SetChecked(isChecked)
-        else
+        local shouldCheck, isAutoRepeat, isAutoAttack, isShootSpell = ShouldCheck(spellID)
+        -- The 'Shoot' spell returns isAuto=false if not actively shooting
+        if not (isAutoRepeat or isAutoAttack or isShootSpell) then
+            return
+        end
+
+        if not shouldCheck then
             w.button():RemoveOnUpdateCallback(GetUniqueName(w))
             return w:SetChecked(false)
         end
 
+        w:SetChecked(true)
         w.AutoRepeatSpell = { flashing = 0, flashTime = 0 }
-        if isAuto == true then
-            -- The autoAttack is handled in #OnPlayerStartAttacking()
-            w.button():AddOnUpdateCallback(GetUniqueName(w), OnUpdateFlashingHandler)
-        end
-
+        w.button():AddOnUpdateCallback(GetUniqueName(w), OnUpdateFlashingHandler)
     end
 
 end; PropsAndMethods(L)

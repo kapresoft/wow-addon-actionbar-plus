@@ -148,15 +148,9 @@ local function GlobalConstantProperties(o)
     --- @class Textures
     local Textures = {
         --- @type number|string
-        DRUID_FORM_ACTIVE_ICON = 136116,
-        --- @type number|string
         GHOST_WOLF_FORM_ACTIVE_ICON = 136116,
         --- @type number|string
         STEALTHED_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_nature_invisibilty_active'),
-        --- @type number|string
-        PRIEST_SHADOWFORM_ACTIVE_ICON_RETAIL = 136116,
-        --- @type number|string
-        PRIEST_SHADOWFORM_ACTIVE_ICON = sformat(ADDON_TEXTURES_DIR_FORMAT, 'spell_shadowform_active'),
         --- @type string
         TEXTURE_EMPTY = sformat(ADDON_TEXTURES_DIR_FORMAT, 'ui-button-empty'),
         --- @type string
@@ -221,8 +215,12 @@ local function GlobalConstantProperties(o)
         ACTIONBAR_SHOWGRID = 'ACTIONBAR_SHOWGRID',
         ACTIONBAR_HIDEGRID = 'ACTIONBAR_HIDEGRID',
 
+        -- Classic
         ACTIVE_TALENT_GROUP_CHANGED          = 'ACTIVE_TALENT_GROUP_CHANGED',
+        -- Retail
         ACTIVE_PLAYER_SPECIALIZATION_CHANGED = 'ACTIVE_PLAYER_SPECIALIZATION_CHANGED',
+        -- MoP
+        PLAYER_SPECIALIZATION_CHANGED        = 'PLAYER_SPECIALIZATION_CHANGED',
 
         PET_BAR_SHOWGRID   = 'PET_BAR_SHOWGRID',
         PET_BAR_HIDEGRID   = 'PET_BAR_HIDEGRID',
@@ -261,8 +259,12 @@ local function GlobalConstantProperties(o)
         PLAYER_TARGET_CHANGED = 'PLAYER_TARGET_CHANGED',
         PLAYER_TARGET_SET_ATTACKING = 'PLAYER_TARGET_SET_ATTACKING',
 
-        SPELL_UPDATE_COOLDOWN = 'SPELL_UPDATE_COOLDOWN',
-        SPELL_UPDATE_USABLE = 'SPELL_UPDATE_USABLE',
+        SPELL_UPDATE_COOLDOWN  = 'SPELL_UPDATE_COOLDOWN',
+        SPELL_UPDATE_USABLE    = 'SPELL_UPDATE_USABLE',
+        START_AUTOREPEAT_SPELL = 'START_AUTOREPEAT_SPELL',
+        STOP_AUTOREPEAT_SPELL  = 'STOP_AUTOREPEAT_SPELL',
+        PLAYER_ENTER_COMBAT    = 'PLAYER_ENTER_COMBAT',
+        PLAYER_LEAVE_COMBAT    = 'PLAYER_LEAVE_COMBAT',
 
         UI_ERROR_MESSAGE = 'UI_ERROR_MESSAGE',
         UNIT_AURA = 'UNIT_AURA',

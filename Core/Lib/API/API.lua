@@ -24,8 +24,8 @@ local O, GC, Compat = ns.O, ns.GC, ns.O.Compat
 
 local String = ns:String()
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
-local DruidAPI, ShamanAPI = O.DruidUnitMixin, O.ShamanUnitMixin
-local PriestAPI, RogueAPI = O.PriestUnitMixin, O.RogueUnitMixin
+local Unit, Druid, Shaman = O.UnitMixin, O.DruidUnitMixin, O.ShamanUnitMixin
+local Priest, Rogue = O.PriestUnitMixin, O.RogueUnitMixin
 
 local WAttr, UnitId = GC.WidgetAttributes, GC.UnitId
 local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
@@ -33,6 +33,8 @@ local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MO
 local ROGUE_STEALTH_SPELL_ID = 1784
 local DRUID_PROWL_SPELL_ID = 5215
 local NIGHT_ELF_SHADOWMELD_SPELL_ID = 20580
+local SHOOT_SPELL_ID = 5019
+local AUTO_ATTACK_SPELL_ID = 6603
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -45,7 +47,9 @@ local ACTION_BUTTON_USE_KEY_DOWN = 'ActionButtonUseKeyDown'
 local LOCK_ACTION_BARS = 'lockActionBars'
 
 S.ACTION_BUTTON_USE_KEY_DOWN = ACTION_BUTTON_USE_KEY_DOWN
-S.LOCK_ACTION_BARS = LOCK_ACTION_BARS
+S.LOCK_ACTION_BARS           = LOCK_ACTION_BARS
+S.AUTO_ATTACK_SPELL_ID       = AUTO_ATTACK_SPELL_ID
+
 --[[-----------------------------------------------------------------------------
 Mixins
 -------------------------------------------------------------------------------]]
@@ -175,7 +179,7 @@ end
 --- @return Profile_Item
 function S:UpdateAndGetItemData(item)
     if not item.classID then
-        local itemID, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(item.id)
+        local classID, subclassID = self:GetItemClass(item.id)
         p:d(function() return 'Item[%s]: retrieved classID=%s subclassID=%s', item.name, classID, subclassID end)
         item.classID = classID
         item.subclassID = subclassID
@@ -324,12 +328,13 @@ function S:ApplySpellInfoAttributes(spellInfo)
     if not spellInfo then return end
 
     local spId = spellInfo.id
-    if DruidAPI:IsDruidClass() then
-        spellInfo.isProwl = DruidAPI:IsProwl(spId)
-    elseif RogueAPI:IsRogueClass() then
-        spellInfo.isStealth = RogueAPI:IsStealth(spId)
-    elseif PriestAPI:IsPriestClass() then
-        spellInfo.isShapeshift = PriestAPI:IsInShadowFormSpell(spId)
+    local unitClass = Unit:GetPlayerUnitClass()
+    if Druid:IsUs(unitClass) then
+        spellInfo.isProwl = Druid:IsProwl(spId)
+    elseif Rogue:IsUs(unitClass) then
+        spellInfo.isStealth = Rogue:IsStealth(spId)
+    elseif Priest:IsUs(unitClass) then
+        spellInfo.isShapeshift = Priest:IsShadowFormSpell(spId)
     end
 end
 
@@ -413,10 +418,10 @@ end
 function S:IsShapeShiftActiveBySpellID(spellID)
     if self:IsPlayerClassAnyOf(GC.UnitClass.PRIEST, GC.UnitClass.ROGUE) then
         return GetShapeshiftForm() > 0
-    elseif ShamanAPI:IsShamanClass() then
-        return ShamanAPI:IsGhostWolfSpell(spellID) and ShamanAPI:IsInGhostWolfForm()
+    elseif Shaman:IsUs() then
+        return Shaman:IsGhostWolfSpell(spellID) and Shaman:IsInGhostWolfForm()
     end
-    return spellID and DruidAPI:IsActiveForm(spellID)
+    return spellID and Druid:IsActiveForm(spellID)
 end
 
 --- Generalizes shapeshift and stealth and shapeshift form
@@ -430,12 +435,13 @@ end
 --- @param spell Profile_Spell|SpellInfo
 function S:IsShapeshiftSpell(spell)
     local spellId = spell and spell.id; if not spellId then return end
-    if ShamanAPI:IsShamanClass() then
-        return ShamanAPI:IsGhostWolfSpell(spellId)
-    elseif PriestAPI:IsPriestClass() then
-        return PriestAPI:IsInShadowFormSpell(spellId)
+    local unitClass = Unit:GetPlayerUnitClass()
+    if Shaman:IsUs(unitClass) then
+        return Shaman:IsGhostWolfSpell(spellId)
+    elseif Priest:IsUs(unitClass) then
+        return Priest:IsShadowFormSpell(spellId)
     end
-    return DruidAPI:IsDruidForm(spellId)
+    return Druid:IsUs(unitClass) and Druid:IsDruidForm(spellId)
 end
 
 --- @param spellNameOrID SpellNameOrID
@@ -453,15 +459,15 @@ function S:GetSpellIcon(spell)
     if not spell then return nil end
 
     if self:IsShapeshiftSpell(spell) then
-        local unitClass = self:GetUnitClass(UnitId.player)
+        local unitClass = Unit:GetPlayerUnitClass()
         if self:IsShapeShiftActive(spell) then
-            if unitClass == GC.UnitClass.DRUID then
-                return GC.Textures.DRUID_FORM_ACTIVE_ICON
-            elseif unitClass == GC.UnitClass.PRIEST then
-                if ns:IsRetail() then return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON_RETAIL end
-                return GC.Textures.PRIEST_SHADOWFORM_ACTIVE_ICON
-            elseif unitClass == GC.UnitClass.SHAMAN then
-                return GC.Textures.GHOST_WOLF_FORM_ACTIVE_ICON
+            if Druid:IsUs(unitClass) then
+                return Druid:GetFormActiveIcon()
+            elseif Priest:IsUs(unitClass) then
+                local icon = Priest:GetShadowFormActiveIcon()
+                return icon
+            elseif Shaman:IsUs(unitClass) then
+                return Shaman:GetFormActiveIcon()
             end
         end
     elseif self:IsStealthed(spell.id) then return GC.Textures.STEALTHED_ICON end
@@ -474,12 +480,6 @@ function S:IsStealthed(spellID) return self:IsStealthSpell(spellID) and IsStealt
 function S:GetStealthIcon(spellID)
     if self:IsStealthed(spellID) then return GC.Textures.STEALTHED_ICON end
     return nil
-end
-
---- @param spellInfo Profile_Spell
-function S:GetShapeshiftIcon(spellInfo)
-    if self:IsShapeShiftActive(spellInfo) then return GC.Textures.DRUID_FORM_ACTIVE_ICON end
-    return spellInfo.icon
 end
 
 --- This is for WOTLK and Retail
@@ -506,7 +506,7 @@ function S:IsToyItem(itemID)
 end
 
 --- @param macroName string
---- @return ItemInfo
+--- @return ItemInfoDetails
 function S:GetMacroItem(macroName)
     local name = GetMacroItem(macroName); if not name then return nil end
     return self:GetItemInfo(name)
@@ -534,22 +534,20 @@ end
 --- @param spellName string
 function S:IsItemSpell(spellName) return spellName and GetItemInfo(spellName) ~= nil end
 
---- See: [GetItemInfo](https://wowpedia.fandom.com/wiki/API_GetItemInfo)
---- See: [GetItemInfoInstant](https://wowpedia.fandom.com/wiki/API_GetItemInfoInstant)
---- @param item ItemID_Link_Or_Name
---- @return ItemInfo
+--- @param item ItemInfo
+--- @return ItemInfoDetails
 function S:GetItemInfo(item)
     local itemID = self:ResolveItemID(item); if not itemID then return nil end
 
     local itemName, itemLink,
         itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
         itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-        expacID, setID, isCraftingReagent = GetItemInfo(itemID)
+        expacID, setID, isCraftingReagent = Compat:GetItemInfo(itemID)
 
     --- count includes charges
-    local count = GetItemCount(itemID, false, true, true) or 0
+    local count = Compat:GetItemCount(itemID, false, true, true) or 0
 
-    --- @type ItemInfo
+    --- @type ItemInfoDetails
     local itemInfo = { id = itemID, name = itemName, link = itemLink, icon = itemTexture,
                        quality = itemQuality, level = itemLevel, minLevel = itemMinLevel,
                        type = itemType, subType = itemSubType, stackCount = itemStackCount,
@@ -565,18 +563,25 @@ function S:GetItemSpellInfo(itemIdNameOrLink)
     if type(itemIdNameOrLink) == 'table' then
         return self:GetItemSpellInfoFromItemData(itemIdNameOrLink)
     end
-    local spellName, spellID = GetItemSpell(itemIdNameOrLink)
+    local spellName, spellID = Compat:GetItemSpell(itemIdNameOrLink)
     return spellName, spellID
 end
 
 --- @param itemInfo Profile_Item
 --- @return string, number
 function S:GetItemSpellInfoFromItemData(itemInfo)
-    local spellName, spellID = GetItemSpell(itemInfo.name)
+    local spellName, spellID = Compat:GetItemSpell(itemInfo.name)
     if not (spellName and spellID) then
-        spellName, spellID = GetItemSpell(itemInfo.link)
+        spellName, spellID = Compat:GetItemSpell(itemInfo.link)
     end
     return spellName, spellID
+end
+
+--- @param itemID ItemID
+--- @return ItemClassID, SubclassID
+function S:GetItemClass(itemID)
+    local _, _, _, _, _, classID, subclassID = Compat:GetItemInfoInstant(itemID)
+    return classID, subclassID
 end
 
 --- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
@@ -671,6 +676,16 @@ function S:SummonMountSimple(flyingMountName, groundMountName)
     end
 end
 
+--- @param spell SpellIdentifier | "'Auto Attack'" | "6603"
+--- @return boolean
+function S:IsAutoAttackSpell(spell) return spell == AUTO_ATTACK_SPELL_ID end
+--- @param spellID SpellID
+function S:IsShootSpell(spellID) return SHOOT_SPELL_ID == spellID end
+--- @param spell SpellIdentifier | "'Auto Attack'" | "6603"
+--- @return boolean
+function S:IsCurrentlyAutoAttacking(spell)
+    return spell == AUTO_ATTACK_SPELL_ID and Compat:IsCurrentSpell(spell)
+end
 function S:IsDragKeyDown()
     return O.API:IsLockActionBars() ~= true or IsModifiedClick("PICKUPACTION") == true
 end

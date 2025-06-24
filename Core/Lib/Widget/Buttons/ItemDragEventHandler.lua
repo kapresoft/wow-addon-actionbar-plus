@@ -46,7 +46,7 @@ local function eventHandlerMethods(e)
         end
 
         local itemID = cursorInfo.info1
-        ---@type ItemInfo
+        --- @type ItemInfoDetails
         local itemInfo = API:GetItemInfo(itemID)
         local itemData = { id = itemID, name = itemInfo.name, icon = itemInfo.icon,
                            link = itemInfo.link, count = itemInfo.count, stackCount = itemInfo.stackCount }

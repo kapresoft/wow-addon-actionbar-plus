@@ -201,7 +201,7 @@ end
 --- @param item Profile_Item
 function L:PickupItem(item)
     if not (item and item.id) then return end
-    PickupItem(item.id)
+    Compat:PickupItem(item.id)
 end
 
 --- @param mount Profile_Mount

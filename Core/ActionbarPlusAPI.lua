@@ -41,7 +41,7 @@ local function PropertiesAndMethods(o)
     end
 
     --- @param itemIDOrName number|string The itemID or itemName
-    --- @return ItemInfo
+    --- @return ItemInfoDetails
     function o:GetItemInfo(itemIDOrName) return API:GetItemInfo(itemIDOrName) end
 
     --- @param itemIDOrName number|string The itemID or itemName

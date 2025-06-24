@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, M = ns.O, ns.M
-local PR = O.Profile
+local Compat, PR = O.Compat, O.Profile
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -168,7 +168,16 @@ local function PropsAndMethods(o)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachMatchingSpellButton(matchSpellId, applyFn)
         assert(applyFn, "ForEachMatchingSpellButton(fn):: Function handler missing")
-        self:ForEachNonEmptyButton(applyFn, function(bw) return matchSpellId == bw:GetEffectiveSpellID() end)
+        self:ForEachNonEmptyButton(applyFn, function(bw) return matchSpellId == bw:GetSpellIDx() end)
+    end
+
+    --- Iterate spell buttons that has an effective SpellID (includes macros, items, mounts?)
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachAutoRepeatSpellButton(applyFn)
+        assert(applyFn, "ForEachAutoRepeatSpellButton(fn):: Function handler missing")
+        self:ForEachNonEmptyButton(applyFn, function(bw)
+            local spID = bw:GetSpellIDx(); return spID and Compat:IsAutoRepeatSpell(spID)
+        end)
     end
 
     --- Any buttons that has an effective SpellID (includes macros, items, mounts?)

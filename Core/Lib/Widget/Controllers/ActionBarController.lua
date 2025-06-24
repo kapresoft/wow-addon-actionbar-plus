@@ -6,7 +6,7 @@ local O, GC, M, Compat, LC = ns.O, ns.GC, ns.M, ns.O.Compat, ns:LC()
 
 local E, MSG, UnitId = GC.E, GC.M,  GC.UnitId
 local B, API = O.BaseAPI, O.API
-local Un = O.UnitMixin:New()
+local Un = O.UnitMixin
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars

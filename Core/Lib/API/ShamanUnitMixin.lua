@@ -18,7 +18,7 @@ local function CreateLib()
     local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
     local logger = ns:LC().UNIT:NewLogger(libName)
     --- @alias ShamanUnitMixin __ShamanUnitMixin | BaseLibraryObject
-    O.UnitMixin:Embed(newLib)
+    O.UnitMixin:New(newLib, 'SHAMAN')
     return newLib, logger
 end; local L, p = CreateLib(); if not L then return end
 
@@ -28,16 +28,16 @@ Methods
 ---@param o __ShamanUnitMixin
 local function PropsAndMethods(o)
     o.GHOST_WOLF_SPELL_ID = GHOST_WOLF_SPELL_ID
-
-    function o:IsShamanClass()
-        return GC.UnitClasses.SHAMAN.name == self:GetUnitClass('player')
-    end
+    o.GHOST_WOLF_FORM_ACTIVE_ICON = 136116
 
     ---@param spellID SpellID
     function o:IsGhostWolfSpell(spellID) return spellID == GHOST_WOLF_SPELL_ID end
 
     --- @return boolean True if in Ghost Wolf form, false otherwise.
     function o:IsInGhostWolfForm() return self:IsBuffActive(GHOST_WOLF_SPELL_ID) end
+
+    --- @return Icon The icon if form is active
+    function o:GetFormActiveIcon() return o.GHOST_WOLF_FORM_ACTIVE_ICON end
 
 end; PropsAndMethods(L)
 

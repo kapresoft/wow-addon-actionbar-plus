@@ -1,16 +1,16 @@
-## Interface: 40402
+## Interface: 50500
 ## Version: @project-version@
-## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r Classic
+## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r MoP
 ## Notes: Actionbars Everywhere, Make you click happy.
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## OptionalDeps: Blizzard_Professions, Ace3
+## OptionalDeps: Ace3
 ## Category-enUS: Action Bars
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
-## X-Category: ActionBars
+## X-Category: Action Bars
 ## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 
 ## X-Github-Repo: https://github.com/kapresoft/wowaddon-actionbar-plus
@@ -37,5 +37,5 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
-Core\Cata.lua
+Core\Mists.lua
 Core\_Core.xml
