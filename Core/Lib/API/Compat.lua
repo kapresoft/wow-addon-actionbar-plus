@@ -3,7 +3,7 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CSpell_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
 local CSpell_IsCurrentSpell    = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
-local C_GetSpecializationInfo  = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo or C_GetSpecializationInfo
+local C_GetSpecializationInfo  = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo or GetSpecializationInfo
 local C_GetActiveSpecGroup     = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
 local C_GetItemCount           = C_Item and C_Item.GetItemCount or GetItemCount
 local C_GetItemInfo            = C_Item and C_Item.GetItemInfo or GetItemInfo
