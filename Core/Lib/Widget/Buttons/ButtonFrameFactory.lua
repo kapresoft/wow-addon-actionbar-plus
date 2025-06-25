@@ -454,15 +454,6 @@ local function WidgetMethods(widget)
         self.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
     end
 
-    function widget:UpdateEmptyButtonsSettings()
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachVisibleButton(function(bw)
-            if not bw:IsEmpty() then return end
-            bw:SetTextureAsEmpty()
-            bw:UpdateKeybindTextState()
-        end)
-    end
-
     function widget:SetLockedState()
         local frameIndex = self:GetIndex()
         if P:IsBarLockedAlways(frameIndex) then
