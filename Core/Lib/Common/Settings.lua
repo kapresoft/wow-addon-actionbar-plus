@@ -611,6 +611,7 @@ local function NewInstance()
     local newConfig = ns:NewLib(ns.M.Settings)
     newConfig.maxRows = 20
     newConfig.maxCols = 40
+    -- With the default of 20 x 40, a frame may have up to 800 buttons
     newConfig.maxButtons = newConfig.maxRows * newConfig.maxCols
 
     PropsAndMethods(newConfig)
