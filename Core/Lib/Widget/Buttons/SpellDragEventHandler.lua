@@ -11,6 +11,9 @@ local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 local Compat, Dru = O.Compat, O.DruidUnitMixin
 
+-- Cache table for spell ranks
+local highestSpellRankCache = {}
+
 --[[-----------------------------------------------------------------------------
 New Instance: SpellDragEventHandler
 -------------------------------------------------------------------------------]]
@@ -141,15 +144,27 @@ local function attributeSetterMethods(a)
 
     function a:GetHighestSpellRank(spellName)
         if not GetSpellBookItemName then return nil end
+        if IsBlank(spellName) then return nil end
+
+        -- Check cache first
+        local rank = highestSpellRankCache[spellName]
+        if rank ~= nil then return rank end
+
         local i = 1
         local lastRank
         while true do
-            local name, rank = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+            local name, r = GetSpellBookItemName(i, BOOKTYPE_SPELL)
             if not name then break end
-            if rank and name == spellName then lastRank = rank end
+            if r and name == spellName then lastRank = r end
             i = i + 1
         end
+
+        highestSpellRankCache[spellName] = lastRank
         return lastRank
+    end
+
+    function a:ClearSpellRankCache()
+        highestSpellRankCache = {}
     end
 
 end
