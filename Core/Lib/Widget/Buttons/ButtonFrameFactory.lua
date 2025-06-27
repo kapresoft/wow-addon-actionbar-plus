@@ -171,14 +171,14 @@ local function WidgetMethods(widget)
         local theState = (state == true)
         self:GetConfig().show_button_index = theState
         --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw) bw:ShowIndex(theState) end)
+        self:ApplyForEachVisibleButton(function(bw) bw:ShowIndex(theState) end)
     end
     --- @param state boolean true will show button indices
     function widget:ShowKeybindText(state)
         local theState = (state == true)
         self:GetConfig().show_keybind_text = theState
         --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw)
+        self:ApplyForEachVisibleButton(function(bw)
             bw:ShowKeybindText(theState)
             bw:UpdateKeybindTextState()
         end)
@@ -379,7 +379,7 @@ local function WidgetMethods(widget)
     --- @param state boolean
     function widget:UpdateActionButtonMouseoverState(state)
         --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw)
+        self:ApplyForEachVisibleButton(function(bw)
             bw:SetHighlightEnabled(state)
         end)
     end
@@ -404,6 +404,20 @@ local function WidgetMethods(widget)
     function widget:GetButtons() return self.buttonFrames end
 
     function widget:GetButtonFrames() return self.buttonFrames end
+    --- Return a list of button frames that are currently visible
+    function widget:GetVisibleButtonFrames()
+        local visible = {}
+        for _, btn in ipairs(self.buttonFrames) do
+            if not btn.widget:IsHidden() then tinsert(visible, btn) end
+        end
+        return visible
+    end
+    --- Iterate over visible buttons only
+    function widget:ApplyForEachVisibleButton(applyFunction)
+        local buttons = self:GetVisibleButtonFrames()
+        if #buttons <= 0 then return end
+        for _, btn in ipairs(buttons) do applyFunction(btn.widget) end
+    end
     function widget:IsRendered() return self.rendered end
     function widget:IsNotRendered() return not self:IsRendered() end
     function widget:MarkRendered() self.rendered = true end
@@ -430,7 +444,7 @@ local function WidgetMethods(widget)
         local barConf = self:GetConfig()
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
-        self:ApplyForEachButton(function(bw)
+        self:ApplyForEachVisibleButton(function(bw)
             bw.button():SetAlpha(buttonAlpha)
         end)
     end
@@ -438,15 +452,6 @@ local function WidgetMethods(widget)
     function widget:UpdateFrameHandleAlpha()
         local barConf = self:GetConfig()
         self.frameHandle:SetAlpha(barConf.widget.frame_handle_alpha or 1.0)
-    end
-
-    function widget:UpdateEmptyButtonsSettings()
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw)
-            if not bw:IsEmpty() then return end
-            bw:SetTextureAsEmpty()
-            bw:UpdateKeybindTextState()
-        end)
     end
 
     function widget:SetLockedState()
@@ -461,7 +466,7 @@ local function WidgetMethods(widget)
     function widget:RefreshActionbarFrame()
         self:SetFrameDimensions()
         --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw) bw:SetButtonProperties() end)
+        self:ApplyForEachVisibleButton(function(bw) bw:SetButtonProperties() end)
     end
 
     function widget:SetFrameDimensions()
