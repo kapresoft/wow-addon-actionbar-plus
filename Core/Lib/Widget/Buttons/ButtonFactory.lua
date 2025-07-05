@@ -186,8 +186,7 @@ end
 function L:CreateActionbarGroup(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
-    --- @type FrameWidget
-    local f = ButtonFrameFactory(frameIndex)
+    local f = ButtonFrameFactory:New(frameIndex)
     self:CreateButtons(f, widget.rowSize, widget.colSize)
     f:SetInitialState()
     return f
