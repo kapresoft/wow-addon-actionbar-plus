@@ -566,7 +566,14 @@ function L:CreateFrame(frameIndex)
     return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
 end
 
----@param frameIndex number
+--- @public
+--- @param frameIndex number
+--- @return FrameWidget
+function L:New(frameIndex) return self:Constructor(frameIndex) end
+
+--- @private
+--- @param frameIndex number
+--- @return FrameWidget
 function L:Constructor(frameIndex)
 
     --- @class __ActionbarFrame
