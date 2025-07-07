@@ -5,6 +5,8 @@ Local Vars
 local ns = select(2, ...)
 local O, M = ns.O, ns.M
 local Compat, PR = O.Compat, O.Profile
+local PI = O.ProfileInitializer
+local tinsert = table.insert
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -27,15 +29,17 @@ Methods
 ---@param o ActionBarHandlerMixin
 local function PropsAndMethods(o)
 
-    ---@param bw ButtonUIWidget
+    --- @param bw ButtonUIWidget
     local isCompanionFn = function(bw) return bw:IsCompanionWOTLK() end
-    ---@param bw ButtonUIWidget
+    --- @param bw ButtonUIWidget
+    local isMountFn = function(bw) return bw:IsMount() end
+    --- @param bw ButtonUIWidget
     local isShapeShiftFn = function(bw) return bw:IsShapeshiftSpell() end
-    ---@param bw ButtonUIWidget
+    --- @param bw ButtonUIWidget
     local isStealthSpellFn = function(bw) return bw:IsStealthSpell() end
-    ---@param bw ButtonUIWidget
+    --- @param bw ButtonUIWidget
     local isItemOrMacroFn = function(bw) return bw:IsItemOrMacro() end
-    ---@param bw ButtonUIWidget
+    --- @param bw ButtonUIWidget
     local isEquipmentSetFn = function(bw) return bw:IsEquipmentSet() end
 
     --- @return any The embedded object (same as what was passed)
@@ -47,12 +51,6 @@ local function PropsAndMethods(o)
     --- @return ActionBarOperations
     function o:o() return O.ActionBarOperations end
 
-    --- @return FrameWidget
-    function o:GetFrameByIndex(frameIndex)
-        assertFrameIndex(frameIndex)
-        return PR:GetFrameWidgetByIndex(frameIndex)
-    end
-
     --- Includes Non-Visible in Settings
     --- @param frameIndex Index
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
@@ -61,7 +59,7 @@ local function PropsAndMethods(o)
     function o:FrameForEachButtonCondition(frameIndex, applyFn, predicateFn)
         local pfn = predicateFn or function() return true end
         assertFrameIndex(frameIndex)
-        local fw = self:GetFrameByIndex(frameIndex); if not fw then return nil end
+        local fw = self:o():GetFrameWidgetByIndex(frameIndex); if not fw then return nil end
         for _, btn in ipairs(fw.buttonFrames) do
             if pfn(btn.widget) == true then applyFn(btn.widget) end
         end
@@ -88,7 +86,7 @@ local function PropsAndMethods(o)
     --- Includes Non-Visible in Settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
     function o:ForEachFrames(applyFn)
-        local frames = PR:GetAllBarFrames()
+        local frames = self:o():GetAllBarFrames()
         if #frames <= 0 then return end
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
@@ -108,7 +106,7 @@ local function PropsAndMethods(o)
     --- Visible in Settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
     function o:ForEachSettingsVisibleFrames(applyFn)
-        local frames = PR:GetUsableBarFrames()
+        local frames = self:o():GetVisibleBarFrames()
         if #frames <= 0 then return end
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
@@ -140,9 +138,15 @@ local function PropsAndMethods(o)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachMountButton(applyFn)
+        assert(applyFn, "ForEachCompanionButton(fn):: Function handler missing")
+        self:ForEachNonEmptyButton(applyFn, isMountFn)
+    end
+
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachCompanionButton(applyFn)
         assert(applyFn, "ForEachCompanionButton(fn):: Function handler missing")
-        self:ForEachNonEmptyButton(applyFn,isCompanionFn)
+        self:ForEachNonEmptyButton(applyFn, isCompanionFn)
     end
 
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"

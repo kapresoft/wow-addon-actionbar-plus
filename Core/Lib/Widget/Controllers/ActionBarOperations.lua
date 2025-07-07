@@ -3,12 +3,19 @@ ActionBarOperations: The role of this utility is to provide ActionBar operations
 -------------------------------------------------------------------------------]]
 
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local CreateFrame = CreateFrame
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC = ns.O, ns.GC
-local MSG = GC.M
+local PI, MSG = O.ProfileInitializer, GC.M
+
+local tinsert = table.insert
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -23,8 +30,80 @@ Methods
 --- @param o ActionBarOperations | ControllerV2
 local function PropsAndMethods(o)
 
+    o.BASE_FRAME_NAME = 'ActionbarPlusF'
+
     --- @return API
     function o:a() return O.API end
+
+    --- @return number
+    function o:GetActionbarFrameCount() return PI.ActionbarCount end
+
+    --- @param frameIndex Index
+    function o:GetFrameName(frameIndex)
+        assert(frameIndex and frameIndex > 0, "frameIndex should be > 0 on GC:GetFrameName(frameIndex)")
+        return o.BASE_FRAME_NAME .. frameIndex
+    end
+
+    --- @param frameIndex Index
+    --- @return ActionbarFrame
+    function o:GetFrameByIndex(frameIndex)
+        assert(type(frameIndex) == 'number', 'Expected frameIndex to be a number but got ' .. type(frameIndex))
+        --- @type ActionbarFrame
+        local f = _G[self:GetFrameName(frameIndex)]
+        return f and f.GetName and f
+    end
+
+    --- @param frameIndex Index
+    --- @return FrameWidget
+    function o:GetFrameWidgetByIndex(frameIndex)
+        local f = self:GetFrameByIndex(frameIndex)
+        return f and f.widget
+    end
+
+    --- The parent ActionbarPlus Frame which will eventually
+    --- be the type `ActionbarPlusFrame`
+    --- @param frameIndex number
+    --- @return Frame
+    function o:CreateBarFrame(frameIndex)
+        local frameName = self:GetFrameName(frameIndex)
+        return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
+    end
+
+    --- @return table<number, ActionbarFrame>
+    function o:GetAllBarFrames()
+        local barFrames = {}
+        for i=1, self:GetActionbarFrameCount() do
+            local f = self:GetFrameByIndex(i)
+            if f and f.widget then tinsert(barFrames, f) end
+        end
+        return barFrames
+    end
+
+    --- @return table<number, ActionbarFrame>
+    function o:GetVisibleBarFrames()
+        local barFrames = {}
+        for i=1, self:GetActionbarFrameCount() do
+            local f = self:GetFrameByIndex(i)
+            if f and f.widget and f.widget:IsShownInConfig() then
+                tinsert(barFrames, f)
+            end
+        end
+        return barFrames
+    end
+
+    --- @return table<number, ActionbarFrame>
+    function o:GetUsableBarFrames()
+        local barFrames = {}
+        for i=1, self:GetActionbarFrameCount() do
+            local f = self:GetFrameWidgetByIndex(i)
+            if f and f.widget
+                    and f.widget:IsShownInConfig()
+                    and f.widget:HasEmptyButtons() ~= true then
+                tinsert(barFrames, f)
+            end
+        end
+        return barFrames
+    end
 
     --- @private
     --- @param delay OptionalTimeDelayInMilli

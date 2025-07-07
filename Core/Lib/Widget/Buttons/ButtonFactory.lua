@@ -25,10 +25,13 @@ local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
 WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
 WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
 WAttr.EQUIPMENT_SET
+
 --- @type ButtonUILib
 local ButtonUI = O.ButtonUI
-local WMX = O.WidgetMixin
-local libName = M.ButtonFactory
+local WMX      = O.WidgetMixin
+local libName  = M.ButtonFactory
+local MAS      = O.MountAttributeSetter
+
 --[[-----------------------------------------------------------------------------
 New Library
 -------------------------------------------------------------------------------]]
@@ -36,14 +39,15 @@ New Library
 local L = LibStub:NewLibrary(libName); if not L then return end; ns:AceEvent(L)
 local p = ns:LC().BUTTON:NewLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
+
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
-    [SPELL]       = O.SpellAttributeSetter,
-    [ITEM]        = O.ItemAttributeSetter,
-    [MACRO]       = O.MacroAttributeSetter,
-    [MOUNT]       = O.MountAttributeSetter,
-    [COMPANION]   = O.CompanionAttributeSetter,
-    [BATTLE_PET]   = O.BattlePetAttributeSetter,
+    [SPELL]         = O.SpellAttributeSetter,
+    [ITEM]          = O.ItemAttributeSetter,
+    [MACRO]         = O.MacroAttributeSetter,
+    [MOUNT]         = MAS,
+    [COMPANION]     = O.CompanionAttributeSetter,
+    [BATTLE_PET]    = O.BattlePetAttributeSetter,
     [EQUIPMENT_SET] = O.EquipmentSetAttributeSetter,
 }
 
@@ -52,6 +56,8 @@ L.FRAMES = {}
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+local function abh() return O.ActionBarHandlerMixin end
+
 local function InitButtonGameTooltipHooksLegacy()
     GameTooltip:HookScript(E.OnShow, function(tooltip, ...)
         if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
@@ -103,20 +109,6 @@ local function OnMacroChanged(btnWidget)
     AttributeSetters[MACRO]:SetAttributes(btnWidget.button())
 end
 
---- Autocorrect bad data if we have button data with
---- btnData[type] but no btnData.type
---- @param btnWidget ButtonUIWidget
---- @param btnData Profile_Button
-local function GuessButtonType(btnWidget, btnData)
-    for buttonType in pairs(AttributeSetters) do
-        -- return the first data found
-        if not IsEmptyTable(btnData[buttonType]) then
-            return buttonType
-        end
-    end
-    return nil
-end
-
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -133,54 +125,10 @@ function L:Init()
     end
 end
 
-function L:Fire(event, sourceEvent, ...)
-    local args = ...
-    --- @param frameWidget FrameWidget
-    self:ApplyForEachFrames(function(frameWidget)
-        if frameWidget then frameWidget:Fire(event, sourceEvent, args) end
-    end)
-end
-
-function L:FireOnFrame(frameIndex, event, sourceEvent, ...)
-    local args = ...
-    self.FRAMES[frameIndex]:Fire(event, sourceEvent, args)
-end
-
---- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
-function L:ApplyForEachFrames(applyFunction)
-    local frames = P:GetAllFrameNames()
-    if #frames <= 0 then return end
-    -- `_` is the index
-    for _,f in ipairs(frames) do applyFunction(_G[f].widget) end
-end
-
---- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
-function L:ApplyForEachVisibleFrames(applyFunction)
-    local frames = P:GetAllBarFrames()
-    if #frames <= 0 then return end
-    for _,f in ipairs(frames) do
-        local fw = f.widget
-        if fw and fw:IsShownInConfig() then applyFunction(fw) end
-    end
-end
---- Alias for #ApplyForEachVisibleFrames(applyFunction)
---- @param applyFunction FrameHandlerFunction | "function(frameWidget) print(frameWidget:GetName()) end"
-function L:fevf(applyFunction) self:ApplyForEachVisibleFrames(applyFunction) end
-
 function L:UpdateKeybindText()
-    local frames = P:GetAllFrameNames()
-    for i,name in ipairs(frames) do
-        local f = _G[name]
-        if f and f.widget then
-            --- @type FrameWidget
-            local fw = f.widget
-            if P:IsBarIndexEnabled(i) then fw:UpdateKeybindText() end
-        end
-    end
-end
-
-function L:RefreshActionbar(frameIndex)
-    P:GetFrameWidgetByIndex(frameIndex):RefreshActionbarFrame()
+    abh():fevf(function(fw)
+        if P:IsBarEnabled(fw.index) then fw:UpdateKeybindText() end
+    end)
 end
 
 function L:CreateActionbarGroup(frameIndex)
@@ -235,12 +183,8 @@ Event Handlers
 --- This event includes ZONE_CHANGED_NEW_AREA because the player could be mounted before
 --- entering the portal and get dismounted upon zoning in to the new area
 local function OnPlayerMount()
-    pm:f3('OnPlayerMount called...')
-    L:ApplyForEachVisibleFrames(function(fw)
-        fw:ApplyForEachButtonCondition(
-                function(bw) return bw:IsMount() end,
-                function(bw) O.MountAttributeSetter:SetAttributes(bw.button(), 'event') end
-        )
+    abh():ForEachMountButton(function(bw)
+        MAS:SetAttributes(bw.button(), 'event')
     end)
 end
 

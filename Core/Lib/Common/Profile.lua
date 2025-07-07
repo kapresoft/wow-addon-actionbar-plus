@@ -15,6 +15,10 @@ local PI = O.ProfileInitializer
 local Table, String = ns:Table(), ns:String()
 local IsBlankStr = String.IsBlank
 local IsEmptyTable, IsNotTable, TableSize = Table.IsEmpty, Table.isNotTable, Table.size
+local IsTable = Table.isTable
+
+--- @type table<number, Profile_Bar>
+local barProfiles = {}
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -78,15 +82,42 @@ local TooltipAnchorTypeKey = {
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-
---- @param source _RegionAnchor
 --- @param dest _RegionAnchor
+--- @param source _RegionAnchor
 local function CopyAnchor(source, dest)
     dest.point = source.point
     dest.relativeTo = source.relativeTo
     dest.relativePoint = source.relativePoint
     dest.x = source.x
     dest.y = source.y
+end
+
+--- @param frameIndex number
+--- @return Name
+local function GetBarName(frameIndex)
+    assert(type(frameIndex) == 'number' and frameIndex > 0, "GetBarName: frameIndex should be a number > 0")
+    return 'ActionbarPlusF' .. frameIndex
+end
+
+local function InitGlobalSettings()
+    local g = ns.db.global
+    if IsNotTable(g.bars) then PI:InitGlobalSettings(g, GetBarName) end
+end
+
+--- @param barName Name The profile name of the action bar
+--- @return Profile_Bar
+local function GetBarProfileByName(barName)
+    assert(type(barName) == 'string', 'GetBarProfileByName(): barName should be a string.')
+    return ns.db.profile.bars[barName] end
+
+--- @return Profile_Bar
+--- @param frameIndex number
+local function GetBarProfileByIndex(frameIndex)
+    if barProfiles[frameIndex] then return barProfiles[frameIndex] end
+    local barProfileName    = GetBarName(frameIndex)
+    local barProfile        = GetBarProfileByName(barProfileName)
+    barProfiles[frameIndex] = barProfile
+    return barProfile
 end
 
 --[[-----------------------------------------------------------------------------
@@ -122,12 +153,6 @@ function P:CleanupActionTypeData(frameIndex, btnUIName)
     local actionTypes = O.ActionType:GetOtherNamesExcept(btnConf.type)
     for _, v in ipairs(actionTypes) do if v ~= nil then btnConf[v] = nil end end
 end
-
---- @type table<number, Profile_Bar>
-local barProfiles = {}
-
---- @type table<string, Profile_Button>
-local buttonProfiles = {}
 
 --- FORMAT: Spec1: buttonName, spec2: buttonName_2, specN: buttonName_N
 --- @param buttonName Name
@@ -176,35 +201,19 @@ function P:GetButtonConfig(frameIndex, buttonName)
     return buttons[btnConfName], btnConfName
 end
 
-function P:CreateDefaultProfile() return PI:InitNewProfile() end
-
-function P:CreateBarsTemplate()
-    local bars = {}
-    for i=1, self:GetActionbarFrameCount() do
-        local frameName = GC:GetFrameName(i)
-        bars[frameName] = {
-            enabled = false,
-            buttons = {}
-        }
-    end
-
-    return bars
-end
+--- @return Profile_Config
+function P:CreateDefaultProfile() InitGlobalSettings(); return PI:InitNewProfile(GetBarName) end
 
 --- @return Profile_Config
 function P:P() return ns.db.profile  end
---- @return Profile_Global_Config
-function P:G()
-    local g = ns.db.global
-    if IsNotTable(g.bars) then PI:InitGlobalSettings(g) end
-    return g
-end
+--- @return Global_Profile_Config
+function P:G() return ns.db.global end
 
 -- /run ABP_Table.toString(Profile:GetBar(1))
 --- @param frameIndex Index
 --- @return Profile_Bar
 function P:GetBar(frameIndex)
-    local bar = barProfiles[frameIndex] or self:RetrieveBar(frameIndex)
+    local bar = barProfiles[frameIndex] or GetBarProfileByIndex(frameIndex)
     bar.buttons = bar.buttons or {}
     return bar
 end
@@ -214,18 +223,6 @@ end
 function P:ResetButtonConfig(frameIndex, btnConfName)
     local barConf = self:GetBar(frameIndex);
     if barConf.buttons[btnConfName] then barConf.buttons[btnConfName] = nil end
-end
-
-
---- @return Profile_Bar
---- @param frameIndex number
-function P:RetrieveBar(frameIndex)
-    assert(frameIndex, "RetrieveBar: frameIndex is required.")
-    local frameName = GC:GetFrameName(frameIndex)
-    local profile = ns.db.profile
-    local bar = profile.bars[frameName]
-    barProfiles[frameIndex] = bar
-    return bar
 end
 
 --- @return table<string, Profile_Bar>
@@ -284,14 +281,12 @@ end
 --- @param frameIndex number
 --- @return _RegionAnchor
 function P:GetGlobalAnchor(frameIndex)
-    --- @type Global_Profile_Bar
-    local g = self:G()
-    local fn = GC:GetFrameName(frameIndex)
-    --- @type Profile_Global_Config
-    local buttonConf = g.bars[fn]
-    if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, fn) end
+    local g          = self:G()
+    local barName    = GetBarName(frameIndex)
+    local buttonConf = self:GetGlobalBar(frameIndex)
+    if not buttonConf then buttonConf = PI:InitGlobalButtonConfig(g, barName) end
     if IsEmptyTable(buttonConf.anchor) then
-        buttonConf.anchor = PI:InitGlobalButtonConfigAnchor(g, fn)
+        buttonConf.anchor = PI:InitGlobalButtonConfigAnchor(g, barName)
     end
     return buttonConf.anchor
 end
@@ -314,7 +309,7 @@ end
 --- @param frameIndex number
 --- @return Global_Profile_Bar
 function P:GetGlobalBar(frameIndex)
-    local frameName = GC:GetFrameName(frameIndex)
+    local frameName = GetBarName(frameIndex)
     return frameIndex and self:G().bars[frameName]
 end
 
@@ -337,13 +332,12 @@ function P:IsActionButtonMouseoverGlowEnabled() return self:P().action_button_mo
 function P:IsBarUnlocked(frameIndex) return self:GetBarLockValue(frameIndex) == '' or self:GetBarLockValue(frameIndex) == nil end
 function P:IsBarLockedInCombat(frameIndex) return self:GetBarLockValue(frameIndex) == 'in-combat' end
 function P:IsBarLockedAlways(frameIndex) return self:GetBarLockValue(frameIndex) == 'always' end
-function P:IsBarIndexEnabled(frameIndex) return self:IsBarNameEnabled(GC:GetFrameName(frameIndex)) end
 
-function P:IsBarNameEnabled(frameName)
-    if not self.profile.bars then return false end
-    local bar = self.profile.bars[frameName]
-    if IsNotTable(bar) then return false end
-    return bar.enabled
+--- @param frameIndex number The frame index number
+--- @return boolean
+function P:IsBarEnabled(frameIndex)
+    local bar = self:GetBar(frameIndex)
+    return bar and IsTable(bar) and bar.enabled == true
 end
 
 --- @param frameIndex number The frame index number
@@ -367,49 +361,6 @@ function P:IsShowKeybindText(frameIndex) return self:GetBar(frameIndex).show_key
 
 --- @param frameIndex number The frame index number
 function P:IsShowEmptyButtons(frameIndex) return self:GetBar(frameIndex).widget.show_empty_buttons == true end
-
---- @return FrameWidget
-function P:GetFrameWidgetByIndex(frameIndex) return _G[GC:GetFrameName(frameIndex)].widget end
-
-function P:GetActionbarFrameCount() return PI.ActionbarCount end
-
-function P:GetAllFrameNames()
-    local fnames = {}
-    for i=1, self:GetActionbarFrameCount() do
-        local fn = GC:GetFrameName(i)
-        tinsert(fnames, fn)
-    end
-    tsort(fnames)
-    return fnames
-end
-
---- @return table<number, ActionbarFrame>
-function P:GetAllBarFrames()
-    local barFrames = {}
-    for i=1, self:GetActionbarFrameCount() do
-        local fn = GC:GetFrameName(i)
-        --- @type ActionbarFrame
-        local f = _G[fn]
-        if f and f.widget then tinsert(barFrames, f) end
-    end
-    return barFrames
-end
-
---- @return table<number, ActionbarFrame>
-function P:GetUsableBarFrames()
-    local barFrames = {}
-    for i=1, self:GetActionbarFrameCount() do
-        local fn = GC:GetFrameName(i)
-        --- @type ActionbarFrame
-        local f = _G[fn]
-        if f and f.widget
-                and f.widget:IsShownInConfig()
-                and f.widget:HasEmptyButtons() ~= true then
-            tinsert(barFrames, f)
-        end
-    end
-    return barFrames
-end
 
 --- Only return the bars that do exist. Some old profile button info
 --- may exist even though the size of bar may not include these buttons.

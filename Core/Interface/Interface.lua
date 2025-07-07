@@ -22,7 +22,7 @@ Aliases
 Type: ActionbarPlus_AceDB
 -------------------------------------------------------------------------------]]
 --- @class ActionbarPlus_AceDB Represents an AceDB instance for ActionbarPlus.
---- @field global Profile_Global_Config The global configuration profile.
+--- @field global Global_Profile_Config The global configuration profile.
 --- @field profile Profile_Config The configuration profile.
 --- @type ActionbarPlus_AceDB
 
@@ -165,7 +165,7 @@ local Global_Profile_Bar = {
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
 }
 
---- @class Profile_Global_Config
+--- @class Global_Profile_Config
 local Profile_Global_Config = {
     ["bars"] = {
         ["ActionbarPlusF1"] = Global_Profile_Bar,

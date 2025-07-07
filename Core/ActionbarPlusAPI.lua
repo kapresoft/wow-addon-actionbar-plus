@@ -19,7 +19,7 @@ local libName = M.ActionbarPlusAPI
 local L = ns:NewController(libName)
 local p = ns:LC().API:NewLogger(libName)
 
---- @param o ActionbarPlusAPI | ModuleV2
+--- @param o ActionbarPlusAPI | ControllerV2
 local function PropertiesAndMethods(o)
 
     -- These fields are used for dependent addons like ActionbarPlus-M6
@@ -77,20 +77,14 @@ local function PropertiesAndMethods(o)
     --- @param macroName string
     --- @return boolean
     function o:IsM6Macro(macroName) return GC:IsM6Macro(macroName) end
-    
+
     --- @param btnHandlerFn ButtonHandlerFunction
-    function o:UpdateMacros(btnHandlerFn)
-        O.ButtonFactory:ApplyForEachVisibleFrames(function(fw)
-            fw:ApplyForEachMacro(btnHandlerFn)
-        end)
-    end
+    function o:UpdateMacros(btnHandlerFn) self:ForEachMacroButton(btnHandlerFn) end
+
     --- @param btnHandlerFn ButtonHandlerFunction
     function o:UpdateM6Macros(btnHandlerFn)
-        O.ButtonFactory:ApplyForEachVisibleFrames(function(fw)
-            fw:ApplyForEachMacro(function(bw)
-                if not bw:IsM6Macro() then return end
-                btnHandlerFn(bw)
-            end)
+        self:ForEachMacroButton(function(bw)
+            return bw:IsM6Macro() and btnHandlerFn(bw)
         end)
     end
 
@@ -98,21 +92,8 @@ local function PropertiesAndMethods(o)
     --- @param macroName string
     function o:UpdateMacrosByName(macroName, btnHandlerFn)
         if IsBlank(macroName) then return end
-        O.ButtonFactory:ApplyForEachVisibleFrames(function(fw)
-            fw:ApplyForEachMacro(function(bw)
-                if bw:HasMacroName(macroName) then btnHandlerFn(bw) end
-            end)
-        end)
-    end
-
-    --- @param predicateFn ButtonPredicateFunction
-    --- @return table<number, ButtonUIWidget>
-    function o:FindMacros(predicateFn)
-        local ret = {}
-        O.ButtonFactory:ApplyForEachVisibleFrames(function(fw)
-            fw:ApplyForEachMacro(function(bw)
-                if predicateFn(bw) then tinsert(ret, bw) end
-            end)
+        self:ForEachMacroButton(function(bw)
+            return bw:HasMacroName(macroName) and btnHandlerFn(bw)
         end)
     end
 
