@@ -100,7 +100,6 @@ local function GlobalConstantProperties(o)
         CONSOLE_COMMAND_OPTIONS = consoleCommandOptions,
         CONSOLE_COLORS = consoleColors,
         DB_NAME = dbName,
-        BASE_FRAME_NAME = 'ActionbarPlusF',
         BUTTON_NAME_FORMAT = 'ActionbarPlusF%sButton%s',
         BUTTON_NAME_SHORT_FORMAT = 'F%s-B%s',
         --- @see _ParentFrame.xml
@@ -653,17 +652,6 @@ local function GlobalConstantMethods(o)
         if o.AddonUtil then return o.AddonUtil end
         o.AddonUtil = kns:AddonInfoUtil():New(addon, kns.consoleColors, IsDev())
         return o.AddonUtil
-    end
-
-    ---@param frameIndex Index
-    function o:GetFrameName(frameIndex)
-        assert(frameIndex, "frameIndex is required on GC:GetFrameName(frameIndex)")
-        assert(frameIndex > 0, "frameIndex should be > 0 on GC:GetFrameName(frameIndex)")
-        return self.C.BASE_FRAME_NAME .. frameIndex
-    end
-    --- @param buttonIndex Index
-    function o:GetButtonName(frameIndex, buttonIndex)
-        return sformat('%sButton%s', self:GetFrameName(frameIndex), tostring(buttonIndex))
     end
 
     --- @return string The ActionbarPlus version string. Example: 2024.3.1

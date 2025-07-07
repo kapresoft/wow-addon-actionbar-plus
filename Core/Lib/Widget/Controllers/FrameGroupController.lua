@@ -24,7 +24,7 @@ local function PropsAndMethods(o)
     --- @param frameIndex Index
     function o.OnDragStopFrameHandle(msg, src, frameIndex)
         p:f3(function() return 'OnDragStopFrameHandle() called: frameIndex=%s', frameIndex end)
-        local frameWidget = o:GetFrameByIndex(frameIndex)
+        local frameWidget = o:o():GetFrameWidgetByIndex(frameIndex)
         frameWidget:UpdateAnchor()
     end
 

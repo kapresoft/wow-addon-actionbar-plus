@@ -1,3 +1,4 @@
+--- @alias BarConfNameSupplierFn fun(barIndex:Index) : Name
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -30,9 +31,6 @@ local p = ns:LC().PROFILE:NewLogger(M.ProfileInitializer)
 --[[-----------------------------------------------------------------------------
 Instance Properties
 -------------------------------------------------------------------------------]]
--- todo next deprecate P.baseFrameName
-L.baseFrameName = GC.C.BASE_FRAME_NAME
-
 --- This is the hard limit
 local ACTION_BAR_COUNT = 10
 
@@ -98,6 +96,7 @@ local DEFAULT_PROFILE_DATA = {
 Support Functions
 -------------------------------------------------------------------------------]]
 --- @param index number
+--- @return ActionbarInitialSettings
 local function GetActionbarInitialSettings(index)
     local initS = ActionbarInitialSettings[index]
     if not initS then initS = CreateFromMixins(ActionbarInitialSettingsDefault) end
@@ -164,27 +163,18 @@ local DefaultLayoutStrategy = function(frameIndex, barConfig, context)
     barConfig.anchor = CreateDefaultAnchor(x, y, 'CENTER', 'CENTER')
 end
 
---- @param layoutStrategyFn LayoutStrategyFn
-local function ApplyLayoutStrategy(layoutStrategyFn)
-    local xIncr = ns:CreateIncrementer(-200, 190)
-    local yIncr = ns:CreateIncrementer(100, -80)
-
-    --- @type Profile_Bar
-    local bars = DEFAULT_PROFILE_DATA[ConfigNames.bars]
-    for i = 1, ACTION_BAR_COUNT do
-        local barName = GC:GetFrameName(i)
-        local barConf = bars[barName]
-        layoutStrategyFn(i, barConf, { xIncr = xIncr, yIncr = yIncr })
-    end
-end
-
 --- This function initializes the DEFAULT_PROFILE_DATA var
 --- to populate the default Profile Data
-local function InitDefaultProfileData()
+--- @param barConfNameSupplierFn BarConfNameSupplierFn | "function(barIndex) return 'barName' end"
+local function InitDefaultProfileData(barConfNameSupplierFn)
+    local xIncr = ns:CreateIncrementer(-200, 190)
+    local yIncr = ns:CreateIncrementer(100, -80)
+    local layoutStrategyFn = DefaultLayoutStrategy
+
     for i = 1, ACTION_BAR_COUNT do
         --- @type Profile_Bar
         local bars = DEFAULT_PROFILE_DATA[ConfigNames.bars]
-        local name = GC:GetFrameName(i)
+        local name = barConfNameSupplierFn(i)
         local barConfig = CreateActionBarConfig(name)
         local init = GetActionbarInitialSettings(i)
 
@@ -193,8 +183,10 @@ local function InitDefaultProfileData()
         barConfig.widget[ConfigNames.colSize] = init.colSize
         barConfig.widget[ConfigNames.frame_handle_mouseover] = init.frame_handle_mouseover
         bars[name] = barConfig
+
+        layoutStrategyFn(i, barConfig, { xIncr = xIncr, yIncr = yIncr })
     end
-    ApplyLayoutStrategy(DefaultLayoutStrategy)
+
 end
 
 --[[-----------------------------------------------------------------------------
@@ -205,43 +197,47 @@ local function Methods(o)
 
     local specCount = ns:IsRetail() and 4 or 2
 
-    --- @param g Profile_Global_Config
-    function o:InitGlobalSettings(g)
+    --- @param g Global_Profile_Config
+    --- @param barConfNameSupplierFn BarConfNameSupplierFn | "function(barIndex) return 'barName' end"
+    function o:InitGlobalSettings(g, barConfNameSupplierFn)
         g.bars = {}
         for frameIndex=1, ACTION_BAR_COUNT do
-            local fn = GC:GetFrameName(frameIndex)
-            self:InitGlobalButtonConfig(g, fn)
+            local globalBarConf = barConfNameSupplierFn(frameIndex)
+            self:InitGlobalButtonConfig(g, globalBarConf)
         end
     end
 
-    --- @param g Profile_Global_Config
-    --- @param frameName string
-    function o:InitGlobalButtonConfig(g, frameName)
-        g.bars[frameName] = { }
-        self:InitGlobalButtonConfigAnchor(g, frameName)
-        return g.bars[frameName]
+    --- @param g Global_Profile_Config
+    --- @param barConfName Name
+    function o:InitGlobalButtonConfig(g, barConfName)
+        g.bars[barConfName] = { }
+        self:InitGlobalButtonConfigAnchor(g, barConfName)
+        return g.bars[barConfName]
     end
 
-    --- @param g Profile_Global_Config
-    --- @param frameName string
-    function o:InitGlobalButtonConfigAnchor(g, frameName)
+    --- @param g Global_Profile_Config
+    --- @param barConfName string
+    function o:InitGlobalButtonConfigAnchor(g, barConfName)
         local defaultBars = DEFAULT_PROFILE_DATA.bars
         --- @type Global_Profile_Bar
-        local btnConf = g.bars[frameName]
-        btnConf.anchor = shallow_copy(defaultBars[frameName].anchor)
+        local btnConf = g.bars[barConfName]
+        btnConf.anchor = shallow_copy(defaultBars[barConfName].anchor)
         return btnConf.anchor
     end
 
     --- DEFAULT_PROFILE_DATA is initialized in #InitDefaultProfileData()
+    --- @param barConfNameSupplierFn BarConfNameSupplierFn | "function(barIndex) return 'barName' end"
+    --- @see Profile#CreateDefaultProfile This is called by Profile
     --- @return Profile_Config
-    function o:InitNewProfile()
+    function o:InitNewProfile(barConfNameSupplierFn)
+        InitDefaultProfileData(barConfNameSupplierFn)
+
         --- @type Profile_Config
         local profile = CreateFromMixins(DEFAULT_PROFILE_DATA)
         for i=1, ACTION_BAR_COUNT do
-            local barName = GC:GetFrameName(i)
+            local barName = barConfNameSupplierFn(i)
             local barConf = profile.bars[barName]
             self:InitializeActionbar(profile, barName, barConf)
-
         end
         return profile
     end
@@ -283,7 +279,3 @@ end
 
 Methods(L)
 
---[[-----------------------------------------------------------------------------
-Initializer
--------------------------------------------------------------------------------]]
-InitDefaultProfileData()

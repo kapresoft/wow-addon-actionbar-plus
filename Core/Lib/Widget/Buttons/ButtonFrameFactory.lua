@@ -13,8 +13,6 @@ local tinsert, tsort = table.insert, table.sort
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateAnchor, GridLayoutMixin = CreateAnchor, GridLayoutMixin
-local UnitOnTaxi = UnitOnTaxi
-local CreateFrame = CreateFrame
 
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
@@ -50,6 +48,8 @@ local p = LC.FRAME:NewLogger(ns.M.ButtonFrameFactory)
 Support Functions
 -------------------------------------------------------------------------------]]
 local function fh() return O.FrameHandleBuilderMixin end
+local function abh() return O.ActionBarHandlerMixin end
+local function abo() return O.ActionBarOperations end
 
 --- @param widget FrameWidget
 --- @param name string The widget name.
@@ -57,6 +57,9 @@ local function RegisterWidget(widget, name)
     assert(widget ~= nil)
     assert(name ~= nil)
 
+    --- WidgetBase provides convenience functions
+    --- for self.frame operations
+    --- @see Ace3/WidgetBase
     local WidgetBase = AceGUI.WidgetBase
     widget.userdata = {}
     widget.events = {}
@@ -69,13 +72,28 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
+--- @param fw FrameWidget
+local function InitAnchor(fw)
+    local frame = fw.frame
+    local anchor = P:GetAnchor(fw.index)
+    local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
+    if frame:IsShown() then
+        p:f1(function()
+            return 'InitAnchor| anchor-from-profile[f.%s]: %s', fw.index, anchor
+        end)
+    end
+    if InCombatLockdown() then return end
+    frame:ClearAllPoints()
+    frame:SetPoint(anchor.point, relativeTo , anchor.relativePoint, anchor.x, anchor.y)
+end
+
 --- Show delayed due to anchor not setting until UI is fully loaded
 --- Event is fired from ActionbarPlus#OnAddonLoaded.
 --- Avoid taint() and return if in combat
---- @param self FrameWidget
-local function OnAddOnReady(self)
+--- @param fw FrameWidget
+local function OnAddOnReady(fw)
     if InCombatLockdown() then return end
-    C_Timer.After(0.1, function() self:InitAnchor() end)
+    C_Timer.After(0.1, function() InitAnchor(fw) end)
 end
 
 ---@param widget FrameWidget
@@ -95,14 +113,14 @@ local function WidgetMethods(widget)
     local profile = widget.profile
     local frame = widget.frame
 
-    function widget:GetName() return widget.frame:GetName() end
+    --- @return Name
+    function widget:GetName() return frame:GetName() end
 
     --- This is the button UI name. No longer the config name.
     --- @param btnIndex Index
+    --- @return Name
     function widget:GetButtonUIName(btnIndex) return self:GetName() .. 'Button' .. btnIndex end
-
-    --- @deprecated Use self#GetIndex()
-    function widget:GetFrameIndex() return self:GetIndex() end
+    --- @return Index
     function widget:GetIndex() return self.index end
 
     --- @return Profile_Bar
@@ -111,19 +129,6 @@ local function WidgetMethods(widget)
     --- @deprecated Use #conf
     --- @return Profile_Bar
     function widget:GetConfig() return profile:GetBar(self:GetIndex()) end
-
-    function widget:InitAnchor()
-        local anchor = P:GetAnchor(self.index)
-        local relativeTo = anchor.relativeTo and _G[anchor.relativeTo] or nil
-        if frame:IsShown() then
-            p:f1(function()
-                return 'InitAnchor| anchor-from-profile[f.%s]: %s', self.index, pformat(anchor)
-            end)
-        end
-        if InCombatLockdown() then return end
-        frame:ClearAllPoints()
-        frame:SetPoint(anchor.point, relativeTo , anchor.relativePoint, anchor.x, anchor.y)
-    end
 
     function widget:UpdateAnchor()
         local n = frame:GetNumPoints()
@@ -142,13 +147,15 @@ local function WidgetMethods(widget)
         self:UpdateAnchor()
     end
 
-    function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetFrameIndex()) end
+    --- @return boolean
+    function widget:IsLockedInCombat() return profile:IsBarLockedInCombat(self:GetIndex()) end
     function widget:SetCombatLockState() if self:IsLockedInCombat() then self:LockGroup() end end
     function widget:SetCombatUnlockState() if self:IsLockedInCombat() then self:UnlockGroup() end end
 
     --- @return boolean
-    function widget:IsFrameEnabledInConfig() return P:IsBarNameEnabled(self:GetName()) end
+    function widget:IsFrameEnabledInConfig() return P:IsBarEnabled(self:GetIndex()) end
 
+    ---@param isEnabled boolean
     function widget:SetFrameState(isEnabled)
         local frameIndex = self:GetIndex()
         AssertThatMethodArgIsNotNil(frameIndex, 'frameIndex', 'SetFrameState(frameIndex)')
@@ -160,25 +167,24 @@ local function WidgetMethods(widget)
         if self.HideGroup then self:HideGroup() end
     end
 
-    -- Synchronize UI and Profile data
+    --- @return boolean
     function widget:IsShownInConfig() return P:IsBarEnabled(self.index) end
-
-    function widget:IsShowIndex() return P:IsShowIndex(self:GetFrameIndex()) end
-    function widget:IsShowKeybindText() return P:IsShowKeybindText(self:GetFrameIndex()) end
+    --- @return boolean
+    function widget:IsShowIndex() return P:IsShowIndex(self:GetIndex()) end
+    --- @return boolean
+    function widget:IsShowKeybindText() return P:IsShowKeybindText(self:GetIndex()) end
 
     --- @param state boolean true will show button indices
     function widget:ShowButtonIndices(state)
         local theState = (state == true)
         self:GetConfig().show_button_index = theState
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachVisibleButton(function(bw) bw:ShowIndex(theState) end)
+        abh():ForEachButton(function(bw) bw:ShowIndex(theState) end)
     end
     --- @param state boolean true will show button indices
     function widget:ShowKeybindText(state)
         local theState = (state == true)
         self:GetConfig().show_keybind_text = theState
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachVisibleButton(function(bw)
+        abh():ForEachButton(function(bw)
             bw:ShowKeybindText(theState)
             bw:UpdateKeybindTextState()
         end)
@@ -188,69 +194,7 @@ local function WidgetMethods(widget)
         self:ShowKeybindText(self:IsShowKeybindText())
     end
 
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachButton(applyFunction)
-        if self:HasEmptyButtons() then return end
-        -- `_` is the index
-        --- @param btn ButtonUI
-        for _, btn in ipairs(self.buttonFrames) do applyFunction(btn.widget) end
-    end
-
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachButtonNoCond(applyFunction)
-        --- @param btn ButtonUI
-        for _, btn in ipairs(self.buttonFrames) do
-            applyFunction(btn.widget)
-        end
-    end
-
-    --- @param applyFunction ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachItem(applyFunction)
-        if self:HasEmptyButtons() then return end
-        -- `_` is the index
-        --- @param btn ButtonUI
-        for _, btn in ipairs(self.buttonFrames) do
-            if btn.widget:IsItem() then applyFunction(btn.widget) end
-        end
-    end
-
-    --- @param matchSpellId number
-    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
-        self:fevb(function(btnWidget)
-            return btnWidget:IsMatchingMacroOrSpell(matchSpellId)
-        end, applyFunction)
-    end
-    --- Alias for #ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
-    --- @param matchSpellId number
-    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
-    function widget:fesmb(matchSpellId, applyFunction)
-        self:ApplyForEachSpellOrMacroButtons(matchSpellId, applyFunction)
-    end
-
-    --- @param applyFunction ButtonHandlerFunction | "function(bw) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachMacro(applyFunction)
-        self:fevb(function(btnWidget) return btnWidget:IsMacro() end, applyFunction)
-    end
-
-    --- Apply for each button with a filter
-    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
-    --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
-    function widget:ApplyForEachButtonCondition(predicateFn, applyFn)
-        if self:HasEmptyButtons() then return end
-        -- `_` is the index
-        --- @param btn ButtonUI
-        for _, btn in ipairs(self.buttonFrames) do
-            if true == predicateFn(btn.widget) then applyFn(btn.widget) end
-        end
-    end
-    --- Alias for #ApplyForEachButtonCondition(predicateFn, applyFn)
-    --- @param predicateFn ButtonPredicateFunction | "function(btnWidget) return true end"
-    --- @param applyFn ButtonHandlerFunction | "function(btnWidget) print(btnWidget:GetName()) end"
-    function widget:fevb(predicateFn, applyFn) self:ApplyForEachButtonCondition(predicateFn, applyFn) end
-
-    -- TODO: Migrate
-    --- @see ActionBarOperations#SetActionBarsLockState
+    ---@param isShown boolean
     function widget:SetGroupState(isShown)
         if isShown == true then
             if self.ShowGroup then self:ShowGroup() end
@@ -276,17 +220,13 @@ local function WidgetMethods(widget)
     function widget:Hide() if InCombatLockdown() then return end; frame:Hide() end
     function widget:Show() if InCombatLockdown() then return end; frame:Show() end
 
-    -- TODO: Migrate
-    --- @see ActionBarOperations#SetActionBarsLockState
     function widget:HideGroup()
         self:Hide()
         self:HideButtons()
     end
 
-    -- TODO: Migrate
-    --- @see ActionBarOperations#SetActionBarsLockState
     function widget:ShowGroup()
-        self:InitAnchor()
+        InitAnchor(self)
         self:Show()
         self:ShowButtons()
     end
@@ -327,7 +267,7 @@ local function WidgetMethods(widget)
     end
 
     function widget:ScrubEmptyButtons()
-        self:ApplyForEachButtonNoCond(function(bw)
+        abh():ForEachButton(function(bw)
             P:CleanupActionTypeData(bw.frameIndex, bw:GetName())
         end)
         self:SaveAndScrubDeletedButtons()
@@ -368,8 +308,7 @@ local function WidgetMethods(widget)
 
     function widget:ShowButtons()
         local isShowKeybindText = self:IsShowKeybindText()
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachButton(function(bw)
+        abh():ForEachButton(function(bw)
             bw:ShowKeybindText(isShowKeybindText)
             bw:Show()
             bw:UpdateUsable()
@@ -378,8 +317,7 @@ local function WidgetMethods(widget)
 
     --- @param state boolean
     function widget:UpdateActionButtonMouseoverState(state)
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachVisibleButton(function(bw)
+        abh():ForEachButton(function(bw)
             bw:SetHighlightEnabled(state)
         end)
     end
@@ -397,28 +335,30 @@ local function WidgetMethods(widget)
         tinsert(self.buttonFrames, buttonFrame)
     end
 
+    --- @return Count
     function widget:GetButtonCount() return #self.buttonFrames end
+    --- @return boolean
     function widget:HasEmptyButtons() return self:GetButtonCount() <= 0 end
     --- hard code max button column size for now
+    --- @return number
     function widget:GetMaxButtonColSize() return 40 end
+
+    --- @return table<number, ButtonUI>
     function widget:GetButtons() return self.buttonFrames end
 
-    function widget:GetButtonFrames() return self.buttonFrames end
     --- Return a list of button frames that are currently visible
+    --- @return table<number, ButtonUI>
     function widget:GetVisibleButtonFrames()
+        --- @type table<number, ButtonUI>
         local visible = {}
         for _, btn in ipairs(self.buttonFrames) do
             if not btn.widget:IsHidden() then tinsert(visible, btn) end
         end
         return visible
     end
-    --- Iterate over visible buttons only
-    function widget:ApplyForEachVisibleButton(applyFunction)
-        local buttons = self:GetVisibleButtonFrames()
-        if #buttons <= 0 then return end
-        for _, btn in ipairs(buttons) do applyFunction(btn.widget) end
-    end
+    --- @return boolean
     function widget:IsRendered() return self.rendered end
+    --- @return boolean
     function widget:IsNotRendered() return not self:IsRendered() end
     function widget:MarkRendered() self.rendered = true end
 
@@ -430,7 +370,7 @@ local function WidgetMethods(widget)
         self:SetInitialStateOnFrameHandle()
         self:UpdateButtonAlpha()
         C_Timer.After(0.1, function()
-            self:ApplyForEachButton(function(bw)
+            abh():ForEachButton(function(bw)
                 -- solved the problem of buttons being disabled
                 -- after a primary talent switch
                 bw:EnableMouse(not bw:IsEmpty())
@@ -444,7 +384,7 @@ local function WidgetMethods(widget)
         local barConf = self:GetConfig()
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
-        self:ApplyForEachVisibleButton(function(bw)
+        abh():ForEachButton(function(bw)
             bw.button():SetAlpha(buttonAlpha)
         end)
     end
@@ -461,12 +401,6 @@ local function WidgetMethods(widget)
         else P:IsBarUnlocked(frameIndex)
             self:UnlockGroup()
         end
-    end
-
-    function widget:RefreshActionbarFrame()
-        self:SetFrameDimensions()
-        --- @param bw ButtonUIWidget
-        self:ApplyForEachVisibleButton(function(bw) bw:SetButtonProperties() end)
     end
 
     function widget:SetFrameDimensions()
@@ -492,11 +426,6 @@ local function WidgetMethods(widget)
     end
 
     function widget:ClearButtons() self.buttonFrames = {} end
-
-    --- @param buttonIndex number
-    function widget:GetButtonName(buttonIndex)
-        return format('%sButton%s', self:GetName(), tostring(buttonIndex))
-    end
 
     --- @return ButtonUI
     function widget:GetButtonUI(buttonIndex) return _G[self:GetButtonUIName(buttonIndex)] end
@@ -524,16 +453,6 @@ local function WidgetMethods(widget)
     end
 end
 
---- @return _Frame
-function L:GetFrameByIndex(frameIndex)
-    local frameName = GC:GetFrameName(frameIndex)
-    return _G[frameName]
-end
-
-function L:IsFrameShownByIndex(frameIndex)
-    return self:GetFrameByIndex(frameIndex):IsShown()
-end
-
 -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
 --- @param btnWidget ButtonUIWidget
 function L:AddPostCombatUpdate(btnWidget) table.insert(PostCombatButtonUpdates, btnWidget) end
@@ -551,19 +470,12 @@ end
 
 function L:CreateActionbarFrames()
     local frameNames = {}
-    for i=1, P:GetActionbarFrameCount() do
-        local actionbarFrame = self:CreateFrame(i)
+    for i=1, abh():o():GetActionbarFrameCount() do
+        local actionbarFrame = abo():CreateBarFrame(i)
         tinsert(frameNames, actionbarFrame:GetName())
     end
     tsort(frameNames)
     return frameNames
-end
-
---- @param frameIndex number
---- @return _Frame
-function L:CreateFrame(frameIndex)
-    local frameName = GC:GetFrameName(frameIndex)
-    return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
 end
 
 --- @public
@@ -577,8 +489,8 @@ function L:New(frameIndex) return self:Constructor(frameIndex) end
 function L:Constructor(frameIndex)
 
     --- @class __ActionbarFrame
-    local f = self:GetFrameByIndex(frameIndex) or self:CreateFrame(frameIndex)
-    --- @alias ActionbarFrame __ActionbarFrame|_Frame
+    local f = abo():GetFrameByIndex(frameIndex) or abo():CreateBarFrame(frameIndex)
+    --- @alias ActionbarFrame __ActionbarFrame | Frame
 
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'

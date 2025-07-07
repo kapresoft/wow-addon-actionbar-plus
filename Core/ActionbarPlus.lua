@@ -178,11 +178,12 @@ local function PropertiesAndMethods(o)
         WMX:ShowReloadUIConfirmation()
     end
 
+    --- @param sourceFrameWidget FrameWidget
     function o:OpenConfig(sourceFrameWidget)
         --select the frame config tab if possible
         local optionsConfigPath
-        if sourceFrameWidget and sourceFrameWidget.GetFrameIndex  then
-            optionsConfigPath = 'bar' .. sourceFrameWidget:GetFrameIndex()
+        if sourceFrameWidget and sourceFrameWidget.GetIndex  then
+            optionsConfigPath = 'bar' .. sourceFrameWidget:GetIndex()
         else optionsConfigPath = 'general' end
 
         -- TODO: For Development

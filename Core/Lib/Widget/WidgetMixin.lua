@@ -28,6 +28,10 @@ StaticPopupDialogs[GC.C.CONFIRM_RELOAD_UI] = {
     OnAccept = function() ReloadUI() end,
     preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
 }
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+local function abh() return O.ActionBarHandlerMixin end
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -162,7 +166,7 @@ end
 
 --- @param isShown boolean Set to true to show action bar
 function _L:ShowActionbars(isShown)
-    O.ButtonFactory:ApplyForEachVisibleFrames(function(frameWidget)
+    abh():fevf(function(frameWidget)
         if frameWidget:IsShownInConfig() then
             frameWidget:SetGroupState(isShown)
         end

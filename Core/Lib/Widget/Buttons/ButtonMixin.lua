@@ -695,7 +695,7 @@ local function PropsAndMethods(o)
 
         --- @class ActionBarInfo
         local info = {
-            name = frameName, index = dragFrame:GetFrameIndex(),
+            name = frameName, index = dragFrame:GetIndex(),
             button = { name = btnName, index = index },
         }
         return info

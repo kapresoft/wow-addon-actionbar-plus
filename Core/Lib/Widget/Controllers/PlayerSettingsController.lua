@@ -57,7 +57,7 @@ local function PropsAndMethods(o)
 
     --- @param frameIndex Index
     function o.OnButtonCountChanged(msg, src, frameIndex)
-        local fw = o:GetFrameByIndex(frameIndex); if not fw then return end
+        local fw = o:o():GetFrameWidgetByIndex(frameIndex); if not fw then return end
         if not fw:IsShownInConfig() then return end
 
         local barConfig = fw:GetConfig()
@@ -89,17 +89,17 @@ local function PropsAndMethods(o)
 
     --- @param frameIndex Index
     function o.OnActionbarFrameAlphaUpdated(msg, src, frameIndex)
-        o:GetFrameByIndex(frameIndex):UpdateButtonAlpha()
+        o:o():GetFrameWidgetByIndex(frameIndex):UpdateButtonAlpha()
     end
 
     --- @param frameIndex Index
     function o.OnMouseOverFrameHandleConfigChanged(msg, src, frameIndex)
-        o:GetFrameByIndex(frameIndex).frameHandle:UpdateBackdropState()
+        o:o():GetFrameWidgetByIndex(frameIndex).frameHandle:UpdateBackdropState()
     end
 
     --- @param frameIndex Index
     function o.OnFrameHandleAlphaConfigChanged(msg, src, frameIndex)
-        o:GetFrameByIndex(frameIndex):UpdateFrameHandleAlpha()
+        o:o():GetFrameWidgetByIndex(frameIndex):UpdateFrameHandleAlpha()
     end
 
 
@@ -119,7 +119,7 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnMouseOverFrameHandleConfigChanged, o.OnMouseOverFrameHandleConfigChanged)
         self:RegisterMessage(MSG.OnFrameHandleAlphaConfigChanged, o.OnFrameHandleAlphaConfigChanged)
 
-        self:ForEachFrames(function(fw)
+        self:fevf(function(fw)
             fw.frameHandle:UpdateBackdropState()
             fw:UpdateFrameHandleAlpha()
         end)

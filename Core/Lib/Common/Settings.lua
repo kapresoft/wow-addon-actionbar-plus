@@ -48,93 +48,18 @@ local barSeq = ns:CreateSequence()
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
+local function fo() return O.ActionBarOperations end
 local function ConfirmAndReload() return O.WidgetMixin:ConfirmAndReload() end
---- @return FrameWidget
-local function GetFrameWidget(frameIndex) return FF:GetFrameByIndex(frameIndex).widget end
---- @return Profile_Bar
-local function GetBarConfig(frameIndex) return GetFrameWidget(frameIndex):GetConfig() end
-
---- @param applyFunction ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
---- @param configVal any
-local function ApplyForEachButton(applyFunction, configVal)
-    BF:ApplyForEachFrames(function(frameWidget)
-        --- @param widget ButtonUIWidget
-        frameWidget:ApplyForEachButtons(function(widget) applyFunction(widget, configVal) end)
-    end)
-end
-
-local function PSetWithEvent(config, key, fallbackVal, eventName)
-    return function(_, v)
-        assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallbackVal
-        if eventName then BF:Fire(eventName) end
-    end
-end
-
-local function PSetWithMsg(config, key, fallbackVal, msg)
-    return function(_, v)
-        assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallbackVal
-        if msg then AceEvent:SendMessage(msg, libName, config.profile[key]) end
-    end
-end
-
-local function SetAndApplyGeneric(config, key, fallbackVal, postFunction)
-    return function(_, v)
-        assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallbackVal
-        if 'function' == type(postFunction) then postFunction(config.profile[key]) end
-    end
-end
-
---- @param fallback any The fallback value
---- @param key string The key value
---- @param config Settings The config instance
-local function SetAndApply(config, key, fallback, foreachButtonFunction)
-    return function(_, v)
-        assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallback
-        if 'function' == type(foreachButtonFunction) then
-            ApplyForEachButton(foreachButtonFunction, config.profile[key])
-        end
-    end
-end
-
---- @param frameIndex number
---- @param key string The key value
---- @param fallback any The fallback value
---- @param eventNameOrFunction string | function | nil
-local function PSetWidget(frameIndex, key, fallback, eventNameOrFunction)
-    return function(_, v)
-        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
-        GetBarConfig(frameIndex).widget[key] = v or fallback
-        if 'string' == type(eventNameOrFunction) then BF:Fire(eventNameOrFunction, frameIndex)
-        elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
-    end
-end
 
 --- @param frameIndex number
 --- @param key string The key value
 --- @param fallback any The fallback value
 --- @param msgName string | function | nil
-local function PSetWidget2(frameIndex, key, fallback, msgName)
+local function PSetWidget(frameIndex, key, fallback, msgName)
     return function(_, v)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
-        GetBarConfig(frameIndex).widget[key] = v or fallback
+        P:GetBar(frameIndex).widget[key] = v or fallback
         if 'string' == type(msgName) then AceEvent:SendMessage(msgName, libName, frameIndex) end
-    end
-end
-
---- @param frameIndex number
---- @param key string The key value
---- @param fallback any The fallback value
---- @param eventNameOrFunction string | function | nil
-local function PSetSpecificWidget(frameIndex, key, fallback, eventNameOrFunction)
-    return function(_, v)
-        assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
-        GetBarConfig(frameIndex).widget[key] = v or fallback
-        if 'string' == type(eventNameOrFunction) then BF:FireOnFrame(frameIndex, eventNameOrFunction)
-        elseif 'function' == type(eventNameOrFunction) then eventNameOrFunction(frameIndex, v or fallback) end
     end
 end
 
@@ -144,37 +69,37 @@ end
 local function PGetWidget(frameIndex, key, fallback)
     return function(_)
         assert(type(key) == 'string', 'Widget attribute key should be a string, but was ' .. type(key))
-        return GetBarConfig(frameIndex).widget[key] or fallback
+        return P:GetBar(frameIndex).widget[key] or fallback
     end
 end
 
 --- @param frameIndex number
-local function OnResetAnchor(frameIndex) return function() GetFrameWidget(frameIndex):ResetAnchor() end end
+local function OnResetAnchor(frameIndex) return function() fo():GetFrameWidgetByIndex(frameIndex):ResetAnchor() end end
 
 local function GetFrameStateSetterHandler(frameIndex)
-    return function(_, v) GetFrameWidget(frameIndex):SetFrameState(v) end
+    return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):SetFrameState(v) end
 end
 local function GetFrameStateGetterHandler(frameIndex)
-    return function(_) return GetFrameWidget(frameIndex):IsShownInConfig() end
+    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShownInConfig() end
 end
 local function GetShowButtonIndexStateGetterHandler(frameIndex)
-    return function(_) return GetFrameWidget(frameIndex):IsShowIndex() end
+    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShowIndex() end
 end
 local function GetShowButtonIndexStateSetterHandler(frameIndex)
     --TODO: NEXT: Use events instead
-    return function(_, v) GetFrameWidget(frameIndex):ShowButtonIndices(v) end
+    return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):ShowButtonIndices(v) end
 end
 local function GetShowKeybindTextStateGetterHandler(frameIndex)
-    return function(_) return GetFrameWidget(frameIndex):IsShowKeybindText() end
+    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShowKeybindText() end
 end
 local function GetShowKeybindTextStateSetterHandler(frameIndex)
     --TODO: NEXT: Use events instead
-    return function(_, v) GetFrameWidget(frameIndex):ShowKeybindText(v) end
+    return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):ShowKeybindText(v) end
 end
 local function GetLockStateSetterHandler(frameIndex)
     return function(_, v)
         P:SetBarLockValue(frameIndex, v)
-        GetFrameWidget(frameIndex):SetLockedState()
+        fo():GetFrameWidgetByIndex(frameIndex):SetLockedState()
     end
 end
 local function GetLockStateGetterHandler(frameIndex)
@@ -182,20 +107,20 @@ local function GetLockStateGetterHandler(frameIndex)
 end
 
 local function GetRowSizeGetterHandler(frameIndex)
-    return function(_) return GetBarConfig(frameIndex).widget.rowSize or 2 end
+    return function(_) return P:GetBar(frameIndex).widget.rowSize or 2 end
 end
 local function GetRowSizeSetterHandler(frameIndex)
     return function(_, v)
-        GetBarConfig(frameIndex).widget.rowSize = v
+        P:GetBar(frameIndex).widget.rowSize = v
         AceEvent:SendMessage(MSG.OnButtonCountChanged, libName, frameIndex)
     end
 end
 local function GetColSizeGetterHandler(frameIndex)
-    return function(_) return GetBarConfig(frameIndex).widget.colSize or 6 end
+    return function(_) return P:GetBar(frameIndex).widget.colSize or 6 end
 end
 local function GetColSizeSetterHandler(frameIndex)
     return function(_, v)
-        GetBarConfig(frameIndex).widget.colSize = v
+        P:GetBar(frameIndex).widget.colSize = v
         AceEvent:SendMessage(MSG.OnButtonCountChanged, libName, frameIndex)
     end
 end
@@ -203,10 +128,12 @@ end
 --- @param config Settings The config instance
 --- @param key string The key value
 --- @param fallback any The fallback value
-local function PSet(config, key, fallback)
+--- @param msg string|nil An optional string message to send
+local function PSet(config, key, fallbackVal, msg)
     return function(_, v)
         assert(type(key) == 'string', 'Profile key should be a string')
-        config.profile[key] = v or fallback
+        config.profile[key] = v or fallbackVal
+        if msg then AceEvent:SendMessage(msg, libName, config.profile[key]) end
     end
 end
 
@@ -330,8 +257,7 @@ local function PropsAndMethods(o)
                     name = L['Hide during taxi'],
                     desc = L['Hide during taxi::Description'],
                     get = PGet(self, PC.hide_when_taxi, false),
-                    set = PSet(self, PC.hide_when_taxi, false),
-                    set = PSetWithMsg(self, PC.hide_when_taxi, false, MSG.OnHideWhenTaxiSettingsChanged)
+                    set = PSet(self, PC.hide_when_taxi, false, MSG.OnHideWhenTaxiSettingsChanged)
                 },
                 action_button_mouseover_glow = {
                     width = 'normal',
@@ -340,7 +266,7 @@ local function PropsAndMethods(o)
                     name = L['Mouseover Glow'],
                     desc = L['Mouseover Glow::Description'],
                     get = PGet(self, PC.action_button_mouseover_glow, false),
-                    set = PSetWithMsg(self, PC.action_button_mouseover_glow, false, MSG.OnMouseOverGlowSettingsChanged)
+                    set = PSet(self, PC.action_button_mouseover_glow, false, MSG.OnMouseOverGlowSettingsChanged)
                 },
                 hide_text_on_small_buttons = {
                     width = 'full',
@@ -349,7 +275,7 @@ local function PropsAndMethods(o)
                     name = L['Hide text for smaller buttons'],
                     desc = L['Hide text for smaller buttons::Description'],
                     get = PGet(self, PC.hide_text_on_small_buttons, false),
-                    set = PSetWithMsg(self, PC.hide_text_on_small_buttons, false, MSG.OnTextSettingsChanged),
+                    set = PSet(self, PC.hide_text_on_small_buttons, false, MSG.OnTextSettingsChanged),
                 },
                 hide_countdown_numbers = {
                     width = 'full',
@@ -358,7 +284,7 @@ local function PropsAndMethods(o)
                     name = L['Hide countdown numbers on cooldowns'],
                     desc = L['Hide countdown numbers on cooldowns::Description'],
                     get = PGet(self, PC.hide_countdown_numbers, false),
-                    set = PSetWithMsg(self, PC.hide_countdown_numbers, false, MSG.OnCooldownTextSettingsChanged),
+                    set = PSet(self, PC.hide_countdown_numbers, false, MSG.OnCooldownTextSettingsChanged),
                 },
 
                 equipmentset_header = { order = mainSeq:next(), type = "header", name = "Equipment Set Options" },
@@ -463,7 +389,7 @@ local function PropsAndMethods(o)
                     desc = L['Show empty buttons::Description'],
                     order = barSeq:next(),
                     get = PGetWidget(frameIndex, WC.show_empty_buttons, false),
-                    set = PSetWidget2(frameIndex, WC.show_empty_buttons, false, MSG.OnShowEmptyButtons),
+                    set = PSetWidget(frameIndex, WC.show_empty_buttons, false, MSG.OnShowEmptyButtons),
                 },
                 showIndex = {
                     width = "normal",
@@ -495,7 +421,7 @@ local function PropsAndMethods(o)
                     name = L['Alpha'],
                     desc = L['Alpha::Description'],
                     get = PGetWidget(frameIndex, WC.buttonAlpha, 1.0),
-                    set = PSetWidget2(frameIndex, WC.buttonAlpha, 1.0, MSG.OnActionbarFrameAlphaUpdated),
+                    set = PSetWidget(frameIndex, WC.buttonAlpha, 1.0, MSG.OnActionbarFrameAlphaUpdated),
                 },
                 button_width = {
                     width = "normal",
@@ -507,7 +433,7 @@ local function PropsAndMethods(o)
                     name = L['Size (Width & Height)'],
                     desc = L['Size (Width & Height)::Description'],
                     get = PGetWidget(frameIndex, WC.buttonSize, 36),
-                    set = PSetWidget2(frameIndex, WC.buttonSize, 36, MSG.OnButtonSizeChanged),
+                    set = PSetWidget(frameIndex, WC.buttonSize, 36, MSG.OnButtonSizeChanged),
                 },
                 rows = {
                     width = "normal",
@@ -557,7 +483,7 @@ local function PropsAndMethods(o)
                     name = L['Mouseover'],
                     desc = L['Mouseover::Description'],
                     get = PGetWidget(frameIndex, WC.frame_handle_mouseover, false),
-                    set = PSetWidget2(frameIndex, WC.frame_handle_mouseover, false, MSG.OnMouseOverFrameHandleConfigChanged),
+                    set = PSetWidget(frameIndex, WC.frame_handle_mouseover, false, MSG.OnMouseOverFrameHandleConfigChanged),
                 },
                 frame_handle_alpha = {
                     width = "normal",
@@ -570,7 +496,7 @@ local function PropsAndMethods(o)
                     min = 0,
                     max = 1,
                     get = PGetWidget(frameIndex, WC.frame_handle_alpha, 1.0),
-                    set = PSetWidget2(frameIndex, WC.frame_handle_alpha, 1.0, MSG.OnFrameHandleAlphaConfigChanged),
+                    set = PSetWidget(frameIndex, WC.frame_handle_alpha, 1.0, MSG.OnFrameHandleAlphaConfigChanged),
                 },
                 reset_anchor = {
                     width = "normal",
