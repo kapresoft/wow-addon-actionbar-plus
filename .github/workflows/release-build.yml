@@ -117,6 +117,8 @@ jobs:
       ## ------------------------------------------------ ##
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
       ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         if: ${{ env.createAddOnChangeLog != 'false' }}
