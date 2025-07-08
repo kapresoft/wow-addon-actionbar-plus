@@ -138,6 +138,10 @@ jobs:
           cat <<EOF > "$CHANGELOG_FILE"
           $c_changeLog
           EOF
+          echo "Adding Release Changes"
+          cat <<EOF >> "$CHANGELOG_FILE"
+          ${{ steps.build_changelog.outputs.changelog }}
+          EOF
           echo "Final Changelog Contents ---"
           cat $CHANGELOG_FILE
       ## ------------------------------------------------ ##
