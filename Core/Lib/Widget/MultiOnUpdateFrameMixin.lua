@@ -69,6 +69,15 @@ local function PropsAndMethods(o)
         end
     end
 
+    --- Clears all registered update callbacks
+    function o:ClearOnUpdateCallbacks()
+        self._onUpdateHandlers = nil
+        if self:GetScript("OnUpdate") then
+            self:SetScript("OnUpdate", nil)
+        end
+        self._onUpdateInstalled = nil
+    end
+
 end; PropsAndMethods(L)
 
 

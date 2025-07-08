@@ -307,12 +307,14 @@ local function PropsAndMethods(o)
         self:SetTextureAsEmpty()
         self:SetChecked(false)
         self:ClearAllText()
+        self.button():ClearOnUpdateCallbacks()
     end
 
     function o:Reset()
         self:ResetCooldown()
         self:HideOverlayGlow()
         self:ClearAllText()
+        self.button():ClearOnUpdateCallbacks()
     end
 
     function o:ResetCooldown() self:SetCooldown(0, 0) end
