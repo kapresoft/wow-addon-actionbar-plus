@@ -30,6 +30,13 @@ Aliases
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+-- TODO: Need to add other auto repeat spells
+---@param bw ButtonUIWidget
+local function IsAutoRepeatSpellPredicate(bw)
+    local spellID = bw:GetEffectiveSpellID()
+    return API:IsShootSpell(spellID)
+end
+
 --- @param spellID SpellID
 --- @return IsChecked, IsAutoRepeat, IsAutoAttack
 local function ShouldCheck(spellID)
@@ -133,7 +140,10 @@ local function PropsAndMethods(o)
     --- @param msg Name The message name
     --- @param src Name Should be from 'ButtonUI'
     function o.OnStopAutoRepeatSpell(msg, src)
-        -- nothing to do here for now
+        ABH:ForEachSpellButton(function(bw)
+            bw:SetChecked(false)
+            bw.button():RemoveOnUpdateCallback(GetUniqueName(bw))
+        end, IsAutoRepeatSpellPredicate)
     end
 
     -- PLAYER_TARGET_SET_ATTACKING

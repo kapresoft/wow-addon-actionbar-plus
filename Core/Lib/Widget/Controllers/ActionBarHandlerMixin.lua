@@ -175,6 +175,14 @@ local function PropsAndMethods(o)
         self:ForEachNonEmptyButton(applyFn, function(bw) return matchSpellId == bw:GetSpellIDx() end)
     end
 
+    --- Any buttons that has an effective SpellID (includes macros, items, mounts?)
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction|nil | "function(bw) return true end"
+    function o:ForEachSpellButton(applyFn, predicateFn)
+        assert(applyFn, "ForEachSpellButton():: Function handler missing")
+        self:ForEachNonEmptyButton(applyFn, predicateFn)
+    end
+
     --- Iterate spell buttons that has an effective SpellID (includes macros, items, mounts?)
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     function o:ForEachAutoRepeatSpellButton(applyFn)
