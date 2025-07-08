@@ -34,11 +34,12 @@ env:
   artifact_retentionDays: 7
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
-  createAddOnChangeLog: true
-  createDraftRelease: false
-  uploadCurseForge: false
-  uploadWowInterface: false
   repo: wow-addon-actionbar-plus
+  createAddOnChangeLog: true
+  ## When Debugging Issues, set the vars below to false
+  createDraftRelease: true
+  uploadCurseForge: true
+  uploadWowInterface: true
 
 jobs:
   build:
@@ -134,11 +135,12 @@ jobs:
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           
+          # Creates the initial changelog with env substitution
           cat <<EOF > "$CHANGELOG_FILE"
           ${c_changeLog}
           EOF
           
-          # The single quote does not eval contents
+          # The single quote on EOF does not eval contents
           cat <<'EOF' >> "$CHANGELOG_FILE"
           ${{ steps.build_changelog.outputs.changelog }}
           EOF
