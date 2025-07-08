@@ -49,11 +49,15 @@ local function OnUpdateFlashingHandler(btn, elapsed)
     local spellID = w:GetEffectiveSpellID(); if not spellID then return end
     local tex = btn:GetNormalTexture(); if not tex then return end
 
+    local ars = w.AutoRepeatSpell or { flashTime = 0 }
+    w.AutoRepeatSpell = ars
+
     local shouldCheck, isAutoRepeat, isAutoAttack = ShouldCheck(spellID)
     w:SetChecked(shouldCheck)
 
     if isAutoRepeat or isAutoAttack then
-        local t = floor(GetTime() * 10) % 8  -- cycle every 0.8s
+        ars.flashTime = ars.flashTime + (elapsed or 0)
+        local t = floor(ars.flashTime * 10) % 8  -- cycle every 0.8s
 
         if t < 4 then
             tex:SetVertexColor(1, 0, 0, 1) -- red
@@ -64,6 +68,7 @@ local function OnUpdateFlashingHandler(btn, elapsed)
         tex:SetVertexColor(1, 1, 1, 1)
         w:SetChecked(false)
         btn:RemoveOnUpdateCallback(GetUniqueName(w))
+        ars.flashTime = 0
     end
 end
 
@@ -133,7 +138,11 @@ local function PropsAndMethods(o)
     --- @param msg Name The message name
     --- @param src Name Should be from 'ButtonUI'
     function o.OnStopAutoRepeatSpell(msg, src)
-        -- nothing to do here for now
+        ABH:ForEachAutoRepeatSpellButton(function(bw)
+            bw:SetChecked(false)
+            bw.button():RemoveOnUpdateCallback(GetUniqueName(bw))
+            if bw.AutoRepeatSpell then bw.AutoRepeatSpell.flashTime = 0 end
+        end)
     end
 
     -- PLAYER_TARGET_SET_ATTACKING
