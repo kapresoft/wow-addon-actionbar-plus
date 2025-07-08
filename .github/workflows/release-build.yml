@@ -133,9 +133,13 @@ jobs:
           export c_RESOLVED_VERSION="${{ env.refName }}"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
+          #echo -e "${c_changeLog}" | tee ${CHANGELOG_FILE}
+          #echo "${{ steps.build_changelog.outputs.changelog }}" | tee -a ${CHANGELOG_FILE}
           cat <<EOF >> "$CHANGELOG_FILE"
-          $c_changeLog
+          ${{ steps.build_changelog.outputs.changelog }}
           EOF
+          echo "Contents ---"
+          cat $CHANGELOG_FILE
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
