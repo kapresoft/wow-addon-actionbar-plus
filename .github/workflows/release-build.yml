@@ -115,6 +115,9 @@ jobs:
           echo "All ENV Vars:"
           echo "$(env|sort)"
       ## ------------------------------------------------ ##
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         if: ${{ env.createAddOnChangeLog != 'false' }}
         id: build_changelog
@@ -132,8 +135,13 @@ jobs:
           echo "---"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
-          echo -e "${c_changeLog}" | tee ${CHANGELOG_FILE}
-          echo '${{ steps.build_changelog.outputs.changelog }}' | tee -a ${CHANGELOG_FILE}
+      ## ------------------------------------------------ ##
+      - name: Write Changelog
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            fs.writeFileSync('${CHANGELOG_FILE}', `${ c_changeLog }`);
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
