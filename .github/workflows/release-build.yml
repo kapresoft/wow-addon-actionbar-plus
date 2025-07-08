@@ -132,13 +132,13 @@ jobs:
           export c_REPOSITORY="${{ env.repo }}"
           export c_RESOLVED_VERSION="${{ env.refName }}"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
-          echo "c_changeLog Contents ---"
+          echo "c_changeLog Contents After envsubst ---"
           echo "$c_changeLog"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           cat <<EOF > "$CHANGELOG_FILE"
-          ${{ steps.build_changelog.outputs.changelog }}
+          $c_changeLog
           EOF
-          echo "Contents ---"
+          echo "Final Changelog Contents ---"
           cat $CHANGELOG_FILE
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
