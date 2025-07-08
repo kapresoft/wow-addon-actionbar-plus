@@ -114,7 +114,7 @@ jobs:
       ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v4
+        uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: ".github/release-changelog-builder-action.json"
       ## ------------------------------------------------ ##
