@@ -137,11 +137,11 @@ jobs:
           echo "--- The c_changeLog Contents After envsubst ---"
           echo "$c_changeLog"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
-          cat <<EOF > "$CHANGELOG_FILE"
+          cat <<'EOF' > "$CHANGELOG_FILE"
           $c_changeLog
           EOF
           echo "--- Adding Release Changes ---"
-          cat <<EOF >> "$CHANGELOG_FILE"
+          cat <<'EOF' >> "$CHANGELOG_FILE"
           ${{ steps.build_changelog.outputs.changelog }}
           EOF
           echo "Final Changelog Contents ---"
