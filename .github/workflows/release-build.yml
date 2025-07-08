@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       createChangeLog:
-        description: 'Create Github Release Draft'
+        description: 'Create Changelog'
         required: false
         default: false
         type: boolean
@@ -34,6 +34,7 @@ env:
   artifact_retentionDays: 7
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
+  createChangeLog: false
   createDraftRelease: true
   uploadCurseForge: true
   uploadWowInterface: true
