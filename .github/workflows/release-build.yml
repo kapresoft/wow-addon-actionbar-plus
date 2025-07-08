@@ -134,7 +134,9 @@ jobs:
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           printf '%s\n' "${c_changeLog}" | tee "${CHANGELOG_FILE}"
-          printf '%s\n' "${{ steps.build_changelog.outputs.changelog }}" | tee -a "${CHANGELOG_FILE}"
+          cat <<'CHANGELOG' | tee -a "${CHANGELOG_FILE}"
+${{ steps.build_changelog.outputs.changelog }}
+CHANGELOG
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
