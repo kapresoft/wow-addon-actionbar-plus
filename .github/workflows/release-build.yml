@@ -36,8 +36,8 @@ env:
   refName: ${{ github.ref_name }}
   createAddOnChangeLog: true
   createDraftRelease: true
-  uploadCurseForge: true
-  uploadWowInterface: true
+  uploadCurseForge: false
+  uploadWowInterface: false
   repo: wow-addon-actionbar-plus
 
 jobs:
@@ -132,6 +132,7 @@ jobs:
           export c_REPOSITORY="${{ env.repo }}"
           export c_RESOLVED_VERSION="${{ env.refName }}"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
+          echo "Script is: $0"
           echo "c_changeLog Contents After envsubst ---"
           echo "$c_changeLog"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
