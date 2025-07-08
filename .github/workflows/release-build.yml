@@ -133,9 +133,7 @@ jobs:
           export c_RESOLVED_VERSION="${{ env.refName }}"
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           echo "--- Content of Script: $0 ---"
-          cat <<EOF
-          $0
-          EOF
+          cat $0
           echo "--- The c_changeLog Contents After envsubst ---"
           echo "$c_changeLog"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
