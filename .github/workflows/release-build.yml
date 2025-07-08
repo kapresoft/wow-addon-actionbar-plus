@@ -131,9 +131,7 @@ jobs:
           export c_ADDON_NAME="${{ env.addonName }}"
           export c_REPOSITORY="${{ env.repo }}"
           export c_RESOLVED_VERSION="${{ env.refName }}"
-          echo "$(ls -1l ${GITHUB_WORKSPACE}/.github)"
-          echo "---"
-          c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
+          export c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
       ## ------------------------------------------------ ##
       - name: Write Changelog
