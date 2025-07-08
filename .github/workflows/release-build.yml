@@ -114,10 +114,8 @@ jobs:
       ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v4
         with:
-          fromTag: "2025.6.2"
-          toTag: "2025.7.1"
           fetchViaCommits: true
           configuration: ".github/release-changelog-builder-action.json"
       ## ------------------------------------------------ ##
