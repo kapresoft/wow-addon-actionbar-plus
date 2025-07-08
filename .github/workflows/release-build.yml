@@ -134,18 +134,15 @@ jobs:
           c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           
-          echo "--- The c_changeLog Contents After envsubst ---"
-          echo "$c_changeLog"
           cat <<'EOF' > "$CHANGELOG_FILE"
           $c_changeLog
           EOF
           
-          echo "--- Adding Release Changes ---"
           cat <<'EOF' >> "$CHANGELOG_FILE"
           ${{ steps.build_changelog.outputs.changelog }}
           EOF
           
-          echo "Final Changelog Contents ---"
+          echo ":: Final Changelog Contents"
           cat $CHANGELOG_FILE
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
