@@ -35,7 +35,7 @@ env:
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
   createAddOnChangeLog: true
-  createDraftRelease: true
+  createDraftRelease: false
   uploadCurseForge: false
   uploadWowInterface: false
   repo: wow-addon-actionbar-plus
@@ -135,7 +135,7 @@ jobs:
           CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
           
           cat <<'EOF' > "$CHANGELOG_FILE"
-          $c_changeLog
+          ${c_changeLog}
           EOF
           
           cat <<'EOF' >> "$CHANGELOG_FILE"
@@ -143,7 +143,7 @@ jobs:
           EOF
           
           echo ":: Final Changelog Contents"
-          cat $CHANGELOG_FILE
+          cat ${CHANGELOG_FILE}
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
