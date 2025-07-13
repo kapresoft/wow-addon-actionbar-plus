@@ -342,7 +342,7 @@ Builder Methods
 -------------------------------------------------------------------------------]]
 
 ---Creates a new ButtonUI
---- @param dragFrameWidget FrameWidget The drag frame this button is attached to
+--- @param dragFrameWidget ActionBarFrameWidget The drag frame this button is attached to
 --- @param rowNum number The row number
 --- @param colNum number The column number
 --- @param btnIndex number The button index number
@@ -406,7 +406,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
         frameIndex = dragFrameWidget:GetIndex(),
         --- @type string
         buttonName = btnName,
-        --- @type fun() : FrameWidget
+        --- @type fun() : ActionBarFrameWidget
         dragFrame = function() return dragFrameWidget end,
         --- @type fun() : ButtonUI
         button = function() return button  end,

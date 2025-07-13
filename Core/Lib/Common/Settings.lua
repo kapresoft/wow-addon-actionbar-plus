@@ -32,8 +32,8 @@ local TTK
 --- @type TooltipAnchorTypeKey
 local TTAK
 --- @type ButtonFactory
-local BF
---- @type ButtonFrameFactory
+local FB
+--- @type ActionBarFrameBuilder
 local FF
 --- @type table<string, string|number>
 local L
@@ -148,8 +148,8 @@ local function PGet(config, key, fallback)
 end
 
 local function lazyInitLibs()
-    P, BF, FF = O.Profile, O.ButtonFactory, O.ButtonFrameFactory
-    PC = GC.Profile_Config_Names
+    P, FB, FF = O.Profile, O.ButtonFactory, O.ActionBarFrameBuilder
+    PC        = GC.Profile_Config_Names
     WC = GC.Profile_Config_Widget_Names
     TTK = P:GetTooltipKey()
     TTAK = P:GetTooltipAnchorTypeKey()

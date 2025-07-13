@@ -178,7 +178,7 @@ local function PropertiesAndMethods(o)
         WMX:ShowReloadUIConfirmation()
     end
 
-    --- @param sourceFrameWidget FrameWidget
+    --- @param sourceFrameWidget ActionBarFrameWidget
     function o:OpenConfig(sourceFrameWidget)
         --select the frame config tab if possible
         local optionsConfigPath

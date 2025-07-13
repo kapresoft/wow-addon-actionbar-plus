@@ -37,7 +37,7 @@ Support Functions
 --- @param btn ButtonUI
 local function AddPostCombat(btn)
     if not InCombatLockdown() then return end
-    O.ButtonFrameFactory:AddPostCombatUpdate(btn.widget)
+    O.ActionBarFrameBuilder:AddPostCombatUpdate(btn.widget)
 end
 local function GetTooltipOwner(btnUI, anchorType)
     if StartsWithIgnoreCase(anchorType, 'cursor') then return btnUI end

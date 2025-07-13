@@ -24,6 +24,60 @@ local function assertFrameIndex(frameIndex)
 end
 
 --[[-----------------------------------------------------------------------------
+Mixin::ActionBarFrameByIndexMixin
+-------------------------------------------------------------------------------]]
+--- @class ActionBarFrameByIndexMixin
+local F = {}
+
+--- @param f ActionBarFrameByIndexMixin
+local function PropsAndMethods_ActionBarFrameByIndexMixin(f)
+
+    --- @return ActionBarOperations
+    function f:o() return O.ActionBarOperations end
+
+    --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction|nil | "function(bw) return true end"
+    --- @return ActionBarFrameWidget
+    function f:ForEachButtonCondition(frameIndex, applyFn, predicateFn)
+        local pfn = predicateFn or function() return true end
+        assertFrameIndex(frameIndex)
+        local fw = self:o():GetFrameWidgetByIndex(frameIndex); if not fw then return nil end
+        for _, btn in ipairs(fw.buttonFrames) do
+            if pfn(btn.widget) == true then applyFn(btn.widget) end
+        end
+        return fw
+    end
+
+    --- Iterate and apply to each button under a frame
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @return ActionBarFrameWidget
+    function f:ForEachButton(frameIndex, applyFn)
+        return self:ForEachButtonCondition(frameIndex, applyFn)
+    end
+
+    --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @return ActionBarFrameWidget
+    function f:ForEachEmptyButton(frameIndex, applyFn)
+        return self:ForEachButtonCondition(frameIndex, applyFn,
+                                                function(bw) return bw:IsEmpty() end)
+    end
+
+    --- Includes Non-Visible in Settings
+    --- @param frameIndex Index
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @return ActionBarFrameWidget
+    function f:ForEachButton(frameIndex, applyFn)
+        return self:ForEachButtonCondition(frameIndex, applyFn)
+    end
+
+end; PropsAndMethods_ActionBarFrameByIndexMixin(F)
+
+--[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 ---@param o ActionBarHandlerMixin
@@ -50,66 +104,29 @@ local function PropsAndMethods(o)
     function o:a() return O.API end
     --- @return ActionBarOperations
     function o:o() return O.ActionBarOperations end
-
-    --- Includes Non-Visible in Settings
-    --- @param frameIndex Index
-    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    --- @param predicateFn ButtonPredicateFunction|nil | "function(bw) return true end"
-    --- @return FrameWidget
-    function o:FrameForEachButtonCondition(frameIndex, applyFn, predicateFn)
-        local pfn = predicateFn or function() return true end
-        assertFrameIndex(frameIndex)
-        local fw = self:o():GetFrameWidgetByIndex(frameIndex); if not fw then return nil end
-        for _, btn in ipairs(fw.buttonFrames) do
-            if pfn(btn.widget) == true then applyFn(btn.widget) end
-        end
-        return fw
-    end
-
-    --- Includes Non-Visible in Settings
-    --- @param frameIndex Index
-    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    --- @return FrameWidget
-    function o:FrameForEachEmptyButton(frameIndex, applyFn)
-        return self:FrameForEachButtonCondition(frameIndex, applyFn,
-                function(bw) return bw:IsEmpty() end)
-    end
-
-    --- Includes Non-Visible in Settings
-    --- @param frameIndex Index
-    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
-    --- @return FrameWidget
-    function o:FrameForAllButton(frameIndex, applyFn)
-        return self:FrameForEachButtonCondition(frameIndex, applyFn)
-    end
+    --- @return ActionBarFrameByIndexMixin
+    function o:f() return F end
 
     --- Includes Non-Visible in Settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
-    function o:ForEachFrames(applyFn)
+    function o:ForEachFrame(applyFn)
         local frames = self:o():GetAllBarFrames()
         if #frames <= 0 then return end
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
 
-    --- Visible in Settings
-    --- @see ActionBarHandlerMixin#ForEachSettingsVisibleFrames
+    --- Iterate through frames that are visible in settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
-    function o:ForEachVisibleFrames(applyFn)
-        return self:ForEachSettingsVisibleFrames(applyFn)
-    end
-
-    --- Visible in Settings
-    --- @see ActionBarHandlerMixin#ForEachSettingsVisibleFrames
-    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
-    function o:fevf(applyFn) return self:ForEachSettingsVisibleFrames(applyFn) end
-
-    --- Visible in Settings
-    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
-    function o:ForEachSettingsVisibleFrames(applyFn)
+    function o:ForEachVisibleFrame(applyFn)
         local frames = self:o():GetVisibleBarFrames()
         if #frames <= 0 then return end
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
+
+    --- Alias
+    --- @see ActionBarHandlerMixin#ForEachVisibleFrame
+    --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
+    function o:fevf(applyFn) return self:ForEachVisibleFrame(applyFn) end
 
     --- Apply for each button with a predicateFn
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"

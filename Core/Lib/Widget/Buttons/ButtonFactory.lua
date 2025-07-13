@@ -19,8 +19,8 @@ local O, GC, M, E, LibStub = ns.O, ns.GC, ns.M, ns.GC.E, ns.LibStub
 local toMsg = GC.toMsg
 local Table, P, MSG = ns:Table(), O.Profile, GC.M
 local IsEmptyTable = Table.isEmpty
-local ButtonFrameFactory = O.ButtonFrameFactory
-local WAttr = ns.GC.WidgetAttributes
+local frameBuilder = O.ActionBarFrameBuilder
+local WAttr        = ns.GC.WidgetAttributes
 local SPELL, ITEM, MACRO, MOUNT, COMPANION, BATTLE_PET, EQUIPMENT_SET =
 WAttr.SPELL, WAttr.ITEM, WAttr.MACRO,
 WAttr.MOUNT, WAttr.COMPANION, WAttr.BATTLE_PET,
@@ -114,15 +114,11 @@ Methods
 -------------------------------------------------------------------------------]]
 -- todo refactor:
 function L:Init()
-    local frameNames = ButtonFrameFactory:CreateActionbarFrames()
-    for i in ipairs(frameNames) do
-        local f = self:CreateActionbarGroup(i)
+    frameBuilder:CreateActionBarFrames(function(name, index)
+        local f = self:CreateActionbarGroup(index)
         tinsert(self.FRAMES, f)
         f:ShowGroupIfEnabled()
-        -- TODO next: revisit whether scrubbing is needed since default profile ace config
-        --            takes care of that
-        --f:ScrubEmptyButtons()
-    end
+    end)
 end
 
 function L:UpdateKeybindText()
@@ -134,13 +130,13 @@ end
 function L:CreateActionbarGroup(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
-    local f = ButtonFrameFactory:New(frameIndex)
+    local f = frameBuilder:New(frameIndex)
     self:CreateButtons(f, widget.rowSize, widget.colSize)
     f:SetInitialState()
     return f
 end
 
---- @param fw FrameWidget
+--- @param fw ActionBarFrameWidget
 function L:CreateButtons(fw, rowSize, colSize)
     fw:ClearButtons()
     local index = 0
@@ -154,7 +150,7 @@ function L:CreateButtons(fw, rowSize, colSize)
     fw:LayoutButtonGrid()
 end
 
---- @param frameWidget FrameWidget
+--- @param frameWidget ActionBarFrameWidget
 --- @param row number
 --- @param col number
 --- @param btnIndex number The button index number

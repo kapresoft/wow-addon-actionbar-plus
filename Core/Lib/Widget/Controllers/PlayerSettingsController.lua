@@ -46,7 +46,7 @@ local function PropsAndMethods(o)
 
     --- @param frameIndex Index
     function o.OnButtonSizeChanged(msg, src, frameIndex)
-        local fw = o:FrameForAllButton(frameIndex, function(bw)
+        local fw = o:f():ForEachButton(frameIndex, function(bw)
             bw:SetButtonProperties()
             bw:RefreshTexts()
             bw:UpdateKeybindTextState()
@@ -71,7 +71,7 @@ local function PropsAndMethods(o)
         fw:SetInitialState()
         fw:ShowGroupIfEnabled()
 
-        fw = o:FrameForAllButton(frameIndex, function(bw)
+        fw = o:f():ForEachButton(frameIndex, function(bw)
             bw:SetButtonProperties()
             bw:RefreshTexts()
             bw:UpdateKeybindTextState()
@@ -81,7 +81,7 @@ local function PropsAndMethods(o)
 
     --- @param frameIndex Index
     function o.OnShowEmptyButtons(msg, src, frameIndex)
-        o:FrameForEachEmptyButton(frameIndex, function(bw)
+        o:f():ForEachEmptyButton(frameIndex, function(bw)
             bw:SetTextureAsEmpty()
             bw:UpdateKeybindTextState()
         end)
