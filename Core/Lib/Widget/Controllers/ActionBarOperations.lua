@@ -45,16 +45,16 @@ local function PropsAndMethods(o)
     end
 
     --- @param frameIndex Index
-    --- @return ActionbarFrame
+    --- @return ActionBarFrame
     function o:GetFrameByIndex(frameIndex)
         assert(type(frameIndex) == 'number', 'Expected frameIndex to be a number but got ' .. type(frameIndex))
-        --- @type ActionbarFrame
+        --- @type ActionBarFrame
         local f = _G[self:GetFrameName(frameIndex)]
         return f and f.GetName and f
     end
 
     --- @param frameIndex Index
-    --- @return FrameWidget
+    --- @return ActionBarFrameWidget
     function o:GetFrameWidgetByIndex(frameIndex)
         local f = self:GetFrameByIndex(frameIndex)
         return f and f.widget
@@ -69,7 +69,7 @@ local function PropsAndMethods(o)
         return CreateFrame('Frame', frameName, nil, GC.C.FRAME_TEMPLATE)
     end
 
-    --- @return table<number, ActionbarFrame>
+    --- @return table<number, ActionBarFrame>
     function o:GetAllBarFrames()
         local barFrames = {}
         for i=1, self:GetActionbarFrameCount() do
@@ -79,7 +79,7 @@ local function PropsAndMethods(o)
         return barFrames
     end
 
-    --- @return table<number, ActionbarFrame>
+    --- @return table<number, ActionBarFrame>
     function o:GetVisibleBarFrames()
         local barFrames = {}
         for i=1, self:GetActionbarFrameCount() do
@@ -91,7 +91,7 @@ local function PropsAndMethods(o)
         return barFrames
     end
 
-    --- @return table<number, ActionbarFrame>
+    --- @return table<number, ActionBarFrame>
     function o:GetUsableBarFrames()
         local barFrames = {}
         for i=1, self:GetActionbarFrameCount() do
@@ -118,7 +118,7 @@ local function PropsAndMethods(o)
         end)
     end
 
-    --  TODO: Migrate ButtonFrameFactory to this method
+    --  TODO: Migrate ActionBarFrameBuilder to this method
     --- @param delay OptionalTimeDelayInMilli
     function o:ShowActionBars(delay)
         local m = 'ShowActionBars(delay)'
@@ -137,7 +137,7 @@ local function PropsAndMethods(o)
         p:f3(m .. ' After combat handler registered')
     end
 
-    --  TODO: Migrate ButtonFrameFactory to this method
+    --  TODO: Migrate ActionBarFrameBuilder to this method
     --- @param delay OptionalTimeDelayInMilli
     function o:HideActionBars(delay)
         local timeDelay = delay or 0.2
@@ -153,7 +153,7 @@ local function PropsAndMethods(o)
     function o:SetActionBarsLockState(lockState)
         if InCombatLockdown() then return end
         local m = 'SetActionBarsLockState()'
-        o:ForEachSettingsVisibleFrames(function(fw)
+        self:ForEachVisibleFrame(function(fw)
             if not fw:IsLockedInCombat() then return end
             if lockState == true then
                 p:f3(function() return '%s: state=%s', m, fw:GetName() end)

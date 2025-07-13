@@ -85,7 +85,6 @@ local function PropsAndMethods(o)
     end
 
     function o:SetButtonProperties()
-        --- @type FrameWidget
         local dragFrame = self.dragFrame()
         local barConfig = dragFrame:GetConfig()
         local buttonSize = barConfig.widget.buttonSize

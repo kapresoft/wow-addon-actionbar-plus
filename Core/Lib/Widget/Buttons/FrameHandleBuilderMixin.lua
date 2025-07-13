@@ -157,14 +157,14 @@ local function PropsAndMethods(o)
 
     --- Automatically called by Mixin and Init
     --- @private
-    --- @param widget FrameWidget
+    --- @param widget ActionBarFrameWidget
     function o:Init(widget)
         assert(type(widget) == 'table', 'Expected widget to be a FrameWidget object but was: ' .. type(widget))
         self.widget = widget
         self.frame = widget.frame
     end
 
-    --- @param widget FrameWidget
+    --- @param widget ActionBarFrameWidget
     --- @return FrameHandle
     function o:New(widget)
         return ns:K():CreateAndInitFromMixin(o, widget):CreateFrameHandle()

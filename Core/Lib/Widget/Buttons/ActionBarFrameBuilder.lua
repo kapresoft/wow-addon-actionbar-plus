@@ -1,7 +1,8 @@
 --
--- ButtonFrameFactory
+-- Module: ActionBarFrameBuilder
 -- Creates the actionbar frame (anchor) for the buttons
 --
+
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -40,9 +41,9 @@ local PostCombatButtonUpdates = {}
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @class ButtonFrameFactory : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.ButtonFrameFactory); if not L then return end
-local p = LC.FRAME:NewLogger(ns.M.ButtonFrameFactory)
+--- @class ActionBarFrameBuilder : BaseLibraryObject
+local L = LibStub:NewLibrary(ns.M.ActionBarFrameBuilder); if not L then return end
+local p = LC.FRAME:NewLogger(ns.M.ActionBarFrameBuilder)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -51,7 +52,7 @@ local function fh() return O.FrameHandleBuilderMixin end
 local function abh() return O.ActionBarHandlerMixin end
 local function abo() return O.ActionBarOperations end
 
---- @param widget FrameWidget
+--- @param widget ActionBarFrameWidget
 --- @param name string The widget name.
 local function RegisterWidget(widget, name)
     assert(widget ~= nil)
@@ -72,7 +73,7 @@ local function RegisterWidget(widget, name)
     setmetatable(widget, mt)
 end
 
---- @param fw FrameWidget
+--- @param fw ActionBarFrameWidget
 local function InitAnchor(fw)
     local frame = fw.frame
     local anchor = P:GetAnchor(fw.index)
@@ -90,13 +91,13 @@ end
 --- Show delayed due to anchor not setting until UI is fully loaded
 --- Event is fired from ActionbarPlus#OnAddonLoaded.
 --- Avoid taint() and return if in combat
---- @param fw FrameWidget
+--- @param fw ActionBarFrameWidget
 local function OnAddOnReady(fw)
     if InCombatLockdown() then return end
     C_Timer.After(0.1, function() InitAnchor(fw) end)
 end
 
----@param widget FrameWidget
+---@param widget ActionBarFrameWidget
 local function RegisterMessages(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
     local evt = ns:AceEvent()
@@ -106,7 +107,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param widget __FrameWidget | _Frame
+--- @param widget __ActionBarFrameWidget | _Frame
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
@@ -384,9 +385,9 @@ local function WidgetMethods(widget)
         local barConf = self:GetConfig()
         local buttonAlpha = barConf.widget.buttonAlpha
         if not buttonAlpha or buttonAlpha < 0 then buttonAlpha = 1.0 end
-        abh():ForEachButton(function(bw)
-            bw.button():SetAlpha(buttonAlpha)
-        end)
+        for _, btn in ipairs(self.buttonFrames) do
+            btn:SetAlpha(buttonAlpha)
+        end
     end
 
     function widget:UpdateFrameHandleAlpha()
@@ -468,38 +469,32 @@ function L:PostCombatUpdateComplete()
     end
 end
 
-function L:CreateActionbarFrames()
-    local frameNames = {}
+--- Creates the Initial ActionBarFrame(s)
+--- @param consumerFn ActionBarFrameBuilderConsumerFn
+function L:CreateActionBarFrames(consumerFn)
     for i=1, abh():o():GetActionbarFrameCount() do
         local actionbarFrame = abo():CreateBarFrame(i)
-        tinsert(frameNames, actionbarFrame:GetName())
+        consumerFn(actionbarFrame:GetName(), i)
     end
-    tsort(frameNames)
-    return frameNames
 end
 
+--- @param frameIndex number
 --- @public
---- @param frameIndex number
---- @return FrameWidget
-function L:New(frameIndex) return self:Constructor(frameIndex) end
+--- @return ActionBarFrameWidget
+function L:New(frameIndex)
 
---- @private
---- @param frameIndex number
---- @return FrameWidget
-function L:Constructor(frameIndex)
-
-    --- @class __ActionbarFrame
-    local f = abo():GetFrameByIndex(frameIndex) or abo():CreateBarFrame(frameIndex)
-    --- @alias ActionbarFrame __ActionbarFrame | Frame
+    --- @class __ActionBarFrame
+    local f = abo():GetFrameByIndex(frameIndex)
+    --- @alias ActionBarFrame __ActionBarFrame | Frame
 
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
-    ---Alpha needs to be zero so that we can hide the buttons
+    -- Alpha needs to be zero so that we can hide the buttons
     f:SetAlpha(0)
 
-    --- @alias FrameWidget __FrameWidget | _Frame
-    --- @class __FrameWidget : WidgetBase
+    --- @alias ActionBarFrameWidget __ActionBarFrameWidget | _Frame
+    --- @class __ActionBarFrameWidget : WidgetBase
     local __widget = {
         profile = P,
         index = frameIndex,
@@ -511,17 +506,16 @@ function L:Constructor(frameIndex)
         verticalButtonPadding = 1,
         frameStrata = frameStrata,
         frameLevel = 1,
-        --- @type ActionbarFrame
+        --- @type ActionBarFrame
         frame = f,
         --- @type FrameHandle
         frameHandle = nil,
         rendered = false,
-        buttons = {},
         --- @type table<number, ButtonUI>
         buttonFrames = {}
     }
 
-    --- @type FrameWidget
+    --- @type ActionBarFrameWidget
     local widget = __widget
 
     -- Allows call to Use callbacks / RegisterEvent
@@ -542,4 +536,3 @@ function L:Constructor(frameIndex)
     return widget
 end
 
-L.mt.__call = L.Constructor

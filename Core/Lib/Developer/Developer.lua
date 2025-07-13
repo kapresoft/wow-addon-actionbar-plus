@@ -104,8 +104,8 @@ end
 function L:ResetBarConfig()
 
     for i = 1, 8 do
+        --- @type ActionBarFrame
         local f = _G['ActionbarPlusF' .. i]
-        --- @type FrameWidget
         local w = f.widget
         local cf = w:GetConfig()
         cf.enabled = nil
@@ -135,9 +135,9 @@ function L:AnchorReset(frameIndex)
     print('Anchor Reset Done')
 end
 
---- @return FrameWidget
 --- @param frameIndex Index
 --- @param buttonIndex Index
+--- @return ActionBarFrameWidget
 function L:F(frameIndex, buttonIndex)
     if not buttonIndex then return _G['ActionbarPlusF' .. tostring(frameIndex)].widget end
     return self:B(frameIndex, buttonIndex)
