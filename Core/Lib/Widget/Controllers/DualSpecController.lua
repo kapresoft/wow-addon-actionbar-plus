@@ -19,7 +19,9 @@ local ps = ns:LC().TALENT:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
--- TODO next:: only copy primary spec action buttons if spec2_init ~= 1
+--- If the player is currently using a non-primary spec,
+--- set the spec2_init flag here to indicate the primary spec buttons
+--- will no longer be copied to the other specs on initial switch.
 --- Sets the 'Spec 2 Initialized' flag
 local function updateSpec2Init()
     if ns.db.profile.spec2_init == 1 or Compat:IsPrimarySpec() then return end
@@ -28,7 +30,11 @@ local function updateSpec2Init()
         return "Profile spec2_init=%s", ns.db.profile.spec2_init
     end)
 end
+
+--- @NotCombatSafe
 local function initButtonsSafe()
+    if InCombatLockdown() then return end
+
     local handler = function(error)
         p:e(function() return 'Unexpected error: %s', error end)
     end
@@ -47,7 +53,7 @@ local function PropsAndMethods(o)
     --- @private
     function o:OnAddOnInitialized()
         self:RegisterMessageCallbacks()
-        initButtonsSafe()
+        updateSpec2Init()
     end
 
     --- @private

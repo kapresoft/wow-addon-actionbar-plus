@@ -404,7 +404,10 @@ local function WidgetMethods(widget)
         end
     end
 
+    --- @NotCombatSafe
     function widget:SetFrameDimensions()
+        if InCombatLockdown() then return end
+
         local barData = self:GetConfig()
         local widgetData = barData.widget
         local f = self.frame
@@ -478,10 +481,12 @@ function L:CreateActionBarFrames(consumerFn)
     end
 end
 
+--- @NotCombatSafe
 --- @param frameIndex number
 --- @public
 --- @return ActionBarFrameWidget
 function L:New(frameIndex)
+    if InCombatLockdown() then return end
 
     --- @class __ActionBarFrame
     local f = abo():GetFrameByIndex(frameIndex)

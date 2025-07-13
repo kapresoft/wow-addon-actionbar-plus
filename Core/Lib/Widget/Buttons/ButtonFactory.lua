@@ -112,7 +112,8 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
--- todo refactor:
+
+--- @NotCombatSafe
 function L:Init()
     frameBuilder:CreateActionBarFrames(function(name, index)
         local f = self:CreateActionbarGroup(index)
