@@ -92,7 +92,7 @@ local function PropsAndMethods(o)
     --- @param bw ButtonUIWidget
     local isStealthSpellFn = function(bw) return bw:IsStealthSpell() end
     --- @param bw ButtonUIWidget
-    local isItemOrMacroFn = function(bw) return bw:IsItemOrMacro() end
+    local isItemOrMacroFn = function(bw) return bw:GetEffectiveItemID() ~= nil end
     --- @param bw ButtonUIWidget
     local isEquipmentSetFn = function(bw) return bw:IsEquipmentSet() end
 

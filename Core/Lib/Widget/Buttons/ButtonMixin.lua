@@ -1078,7 +1078,7 @@ local function PropsAndMethods(o)
             if IsBlank(spellID) then return true end
             return Compat:IsUsableSpell(spellID)
         elseif cd.details.item then
-            return Compat:IsUsableItemID(cd.details.item.id)
+            return Compat:IsUsableItem(cd.details.item.id)
         end
         return false
     end

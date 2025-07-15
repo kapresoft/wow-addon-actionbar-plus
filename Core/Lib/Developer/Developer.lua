@@ -15,6 +15,7 @@ local ns = select(2, ...)
 local O = ns.O
 local AceEvent = ns:AceLibrary().AceEvent
 local P = O.Profile
+local ab = O.ActionBarHandlerMixin
 
 ABP_enableV2 = false
 ns.features.enableV2 = ABP_enableV2
@@ -30,23 +31,17 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-function L:f1()
+function L:f()
 
-    -- Disc: 256
-    -- Shadow: 258
-    -- /dump GetSpecializationInfoForClassID(5, 1)
-    -- /dump GetSpecializationInfoForSpecID(258)
+    --- @type ButtonUI
+    local btn = ActionbarPlusF1Button2
+    local w = btn.widget
+    local itemID = w:GetEffectiveItemID()
+    p:vv(function() return 'ItemID: %s isEmpty? %s',
+        itemID,  w:IsEmpty()
+    end)
+    ab:ForEachItemButton(function(bw) print(bw:GetName()) end)
 
-    local D = O.DruidUnitMixin
-    local Pr = O.PriestUnitMixin
-
-    local playerC  = D:GetPlayerUnitClass()
-    local isDruid  = D:IsUs(playerC)
-    local isPriest = Pr:IsUs(playerC)
-
-    --ActionbarPlusF1.widget.frameHandle:ClearBackdrop()
-    p:vv(function() return 'f1 unit class: %s is-druid: %s is-priest: %s class-id: %s',
-            playerC, isDruid, isPriest, O.PriestUnitMixin:ClassID() end)
 end
 --- /dump IsSpellKnown(106785)
 --- /dump IsSpellKnown(C_Spell.GetSpellIDForSpellIdentifier('Swipe'))

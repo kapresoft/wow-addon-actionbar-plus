@@ -25,6 +25,7 @@ local function PropsAndMethods(o)
 
     --- @private
     function o:OnAddOnReady()
+        -- TODO next: Could we migrate this to BAG_UPDATE_DELAYED?
         self:RegisterBucketAddOnMessage(E.BAG_UPDATE, 0.2,
                 function(evt, source) self:OnBagUpdate(evt, source) end)
     end
@@ -33,9 +34,8 @@ local function PropsAndMethods(o)
     function o:OnBagUpdate(evt)
         pb:f3( function() return 'OnBagU(): called...' end)
         self:ForEachItemButton(function(bw)
-            local success, itemInfo = safecall(function() return bw:GetItemData() end)
-            if not (success and itemInfo) then return end
             bw:UpdateItemOrMacroState()
+            bw:UpdateUsable()
         end)
 
         --- @param handlerFn ButtonHandlerFunction

@@ -362,12 +362,14 @@ function P:IsShowKeybindText(frameIndex) return self:GetBar(frameIndex).show_key
 --- @param frameIndex number The frame index number
 function P:IsShowEmptyButtons(frameIndex) return self:GetBar(frameIndex).widget.show_empty_buttons == true end
 
+-- TODO Next: DELETE ME
 --- Only return the bars that do exist. Some old profile button info
 --- may exist even though the size of bar may not include these buttons.
 --- The number of buttons do not reflect how many buttons actually exist because
 --- the addon doesn't cleanup old data.
--- TODO: Should we cleanup old config?
+--- @deprecated
 --- @param btnType string spell, macro, item
+--- @return table<string, Profile_Button>
 function P:FindButtonsByType(btnType)
     local buttons = {}
     for _, bar in pairs(self:GetBars()) do

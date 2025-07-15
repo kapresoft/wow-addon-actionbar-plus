@@ -248,6 +248,17 @@ local function PropsAndMethods(o)
         return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
     end
 
+    function o:GetEffectiveItemID()
+        local item = self:GetItemData()
+        if item and item.id then return item.id end
+
+        local macro = self:GetMacroData()
+        if not macro or not macro.name then return nil end
+
+        local macroItem = API:GetMacroItem(macro.name)
+        return macroItem and macroItem.id
+    end
+
     -- TODO: replace with GetEffectiveSpell()
     --- @deprecated
     --- @return SpellName|nil
