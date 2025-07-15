@@ -557,6 +557,28 @@ function S:GetItemInfo(item)
     return itemInfo
 end
 
+--- @param itemID ItemID
+--- @return boolean|nil A possibility of returning nil if the item has not been resolved yet by the system
+function S:MightHaveChargesByID(itemID)
+    local item = self:GetItemInfo(itemID)
+    if not item or not item.id then return nil end
+
+    local classID = item.classID
+    local subclassID = item.subclassID
+
+    -- Classic Era heuristic: charges usually on Consumables
+    if classID == 0 then return true end
+
+    -- Other possibilities (Tools, Devices, etc.)
+    if classID == 7 and (subclassID == 1 or subclassID == 3) then
+        -- Trade Goods - Devices or Explosives
+        return true
+    end
+
+    return false
+end
+
+
 --- @param itemIdNameOrLink ItemName|ItemLink|Profile_Item
 --- @return string, number
 function S:GetItemSpellInfo(itemIdNameOrLink)

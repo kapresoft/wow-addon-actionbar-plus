@@ -25,6 +25,9 @@ local p = ns:LC().EVENT:NewLogger(M.MacroEventsHandler)
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+local function api() return ns.O.API end
+local function abh() return ns.O.ActionBarHandlerMixin end
+
 ---### Find first-matching macro by body
 --- @return MacroDetails
 --- @param matchingBody string The macro body to match
@@ -59,10 +62,27 @@ local function findMacroByBody(matchingBody)
     return nil
 end
 
-local function HandleChangedMacros(btnName, btnData)
+--- @param bw ButtonUIWidget
+local function UpdateMacroState(bw)
+    local macro = bw:GetMacroData()
+    local _, icon = GetMacroInfo(macro.index)
+    bw:SetIcon(icon)
+    bw:SetText('')
+    local itemID = bw:GetEffectiveItemID()
+    if not itemID then return end
+    local hasCharges = api():MightHaveChargesByID(itemID)
+    if not hasCharges then return bw:SetText('') end
+    bw:UpdateItemOrMacroState()
+end
+
+-- TODO next: This needs to be revisited.
+-- Something doesn't make sense in the behavior of this function.
+--- @param btnName Name
+--- @param btnData Profile_Button
+--- @param bw ButtonUIWidget
+local function HandleChangedMacros(btnName, btnData, bw)
     if btnData == nil or btnData.macro == nil or btnData.macro.index == nil then return false end
     local macroData = btnData.macro
-    local btnWidget = _G[btnName].widget
 
     local name, icon, body = GetMacroInfo(macroData.index)
     local macroIndex = GetMacroIndexByName(macroData.name)
@@ -113,17 +133,11 @@ local function HandleChangedMacros(btnName, btnData)
             end
     end
 
+    UpdateMacroState(bw)
+
     if changed then
         p:d( function() return '%s::Changed? %s [%s]', btnName, tostring(changed), toStringSorted(changeInfo) end)
-        btnWidget:Fire('OnMacroChanged')
-    end
-end
-
-local function OnMacroUpdate()
-    local buttons = P:FindButtonsByType('macro')
-    if Table.isEmpty(buttons) then return end
-    for name, data in pairs(buttons) do
-        HandleChangedMacros(name, data)
+        bw:Fire('OnMacroChanged')
     end
 end
 
@@ -135,7 +149,9 @@ local function OnAddonLoaded(frame, event, ...)
     p:t(function() return 'Event Received: %s combat=%s', event, tostring(inCombat) end)
     if inCombat then return end
 
-    OnMacroUpdate()
+    abh():ForEachMacroButton(function(bw)
+        HandleChangedMacros(bw:GetName(), bw:conf(), bw)
+    end)
 end
 
 --[[-----------------------------------------------------------------------------
