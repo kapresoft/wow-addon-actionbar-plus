@@ -33,14 +33,7 @@ local C = GC:GetAceLocale()
 --[[-----------------------------------------------------------------------------
 Interface Definition
 -------------------------------------------------------------------------------]]
---- @class TooltipKeyName
-local TooltipKeyName = {
-    ['SHOW'] = '',
-    ['ALT'] = 'alt',
-    ['CTRL'] = 'ctrl',
-    ['SHIFT'] = 'shift',
-    ['HIDE'] = 'hide',
-}
+local TooltipKeyName = GC.TooltipKeyName
 
 --- @class TooltipKey
 local TooltipKey = {
