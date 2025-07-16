@@ -586,6 +586,15 @@ local function GlobalConstantProperties(o)
         SCREEN_BOTTOMRIGHT = 'SCREEN_BOTTOMRIGHT',
     }
 
+    --- @class TooltipKeyName
+    local TooltipKeyName = {
+        ['SHOW'] = '',
+        ['ALT'] = 'alt',
+        ['CTRL'] = 'ctrl',
+        ['SHIFT'] = 'shift',
+        ['HIDE'] = 'hide',
+    }
+
     --- @param prefix string
     --- @param index number
     local function toSuffix(prefix, index) return prefix .. tostring(index) end
@@ -606,6 +615,7 @@ local function GlobalConstantProperties(o)
     o.BlendMode = BlendMode
     o.AlphaMode = BlendMode
     o.TooltipAnchor = TooltipAnchor
+    o.TooltipKeyName = TooltipKeyName
     --- @type Blizzard_UnitId
     o.UnitId = UnitId
     o.UnitClass = UnitClass

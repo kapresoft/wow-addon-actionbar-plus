@@ -324,8 +324,8 @@ local function PropsAndMethods(o)
                     values = TTK.kvPairs, sorting = TTK.sorting,
                     name = L['Tooltip Visibility'],
                     desc = L['Tooltip Visibility::Description'],
-                    get = PGet(self, PC.tooltip_visibility_key, TTK.names.SHOW),
-                    set = PSet(self, PC.tooltip_visibility_key, TTK.names.SHOW)
+                    get = PGet(self, PC.tooltip_visibility_key),
+                    set = PSet(self, PC.tooltip_visibility_key)
                 },
                 tooltip_visibility_combat_override_key = {
                     width = 'normal',
