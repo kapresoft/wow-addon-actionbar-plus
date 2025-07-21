@@ -141,6 +141,12 @@ local function PropsAndMethods(o)
         end)
     end
 
+    --- Alias
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
+    --- @see ActionBarHandlerMixin#ForEachButton
+    function o:ForEachVisibleButton(applyFn, predicateFn) self:ForEachButton(applyFn, predicateFn) end
+
     --- Apply for each non-empty button with a predicateFn
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"

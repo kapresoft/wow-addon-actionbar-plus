@@ -122,7 +122,7 @@ end
 local function CreateActionBarConfig()
     --- @type Profile_Bar
     local barConf = {
-        [ConfigNames.show_keybind_text] = false,
+        [ConfigNames.show_keybind_text] = true,
         [ConfigNames.show_button_index] = false,
         [ConfigNames.widget] = CreateFromMixins(defaultWidget),
         [ConfigNames.anchor] = {},

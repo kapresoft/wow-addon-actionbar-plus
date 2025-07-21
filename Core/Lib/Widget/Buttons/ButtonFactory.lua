@@ -122,12 +122,7 @@ function L:Init()
     end)
 end
 
-function L:UpdateKeybindText()
-    abh():fevf(function(fw)
-        if P:IsBarEnabled(fw.index) then fw:UpdateKeybindText() end
-    end)
-end
-
+--- @param frameIndex Index The index of the action bar
 function L:CreateActionbarGroup(frameIndex)
     local barConfig = P:GetBar(frameIndex)
     local widget = barConfig.widget
@@ -138,6 +133,8 @@ function L:CreateActionbarGroup(frameIndex)
 end
 
 --- @param fw ActionBarFrameWidget
+--- @param rowSize number
+--- @param colSize number
 function L:CreateButtons(fw, rowSize, colSize)
     fw:ClearButtons()
     local index = 0

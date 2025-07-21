@@ -46,6 +46,7 @@ local function PropsAndMethods(o)
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
             E.START_AUTOREPEAT_SPELL, E.STOP_AUTOREPEAT_SPELL,
             E.PLAYER_ENTER_COMBAT, E.PLAYER_LEAVE_COMBAT,
+            E.UPDATE_BINDINGS,
             E.UI_ERROR_MESSAGE
         }
 

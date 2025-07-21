@@ -1,4 +1,19 @@
 --[[-----------------------------------------------------------------------------
+Types
+-------------------------------------------------------------------------------]]
+--- @class BindingInfo
+--- @field btnName Name
+--- @field category string
+--- @field key1 string
+--- @field key1Short string
+--- @field key2 string
+--- @field details BindingDetails
+
+--- @class _FontStringTemplate
+--- @field widget FontStringWidget
+
+--- @alias FontStringTemplate _FontStringTemplate | FontString
+--[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip = GetNumBindings, GetBinding, GameTooltip_AddBlankLinesToTooltip
@@ -80,18 +95,12 @@ function FontStringWidget:ScaleWithButtonSize(buttonSize)
     fs:SetFont(fontName, fontHeight, "OVERLAY")
 end
 
---- @class FontStringTemplate
-local FontStringTemplate = {
-    --- @type FontStringWidget
-    widget = nil
-}
-
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 
 --- @param button ButtonUI
---- @return _FontString
+--- @return FontString
 function _L:CreateFontString(button)
     local fs = button:CreateFontString(nil, nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT", -3, 2)
@@ -103,9 +112,9 @@ end
 --- ### See: "Interface/FrameXML/ActionButtonTemplate.xml"
 --- ### See: [https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont](https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont)
 --- @param b ButtonUI The button UI
---- @return _FontString
+--- @return FontString
 function _L:CreateNameTextFontString(b)
-    --- @type _FontString
+    --- @type FontString
     local fs = b:CreateFontString("$parentName", "OVERLAY", 'NumberFontNormalSmallGray')
     local fontName, fontHeight = fs:GetFont()
     fs:SetFont(fontName, fontHeight - 1, "OUTLINE")
@@ -184,14 +193,7 @@ function _L:HideTooltipDelayed(delayInSec)
     C_Timer.After(actualDelayInSec, function() GameTooltip:Hide() end)
 end
 
---- @class BindingInfo
-local BindingInfo = {
-    btnName = '', category = '',
-    key1 = '', key1Short = '', key2 = key2,
-    details = { action = '', buttonPressed = '' }
-}
-
---- @return table The binding map with button names as the key
+--- @return table<string, BindingInfo> The binding map with button names as the key
 function _L:GetBarBindingsMap()
     local barBindingsMap = {}
     local bindCount = GetNumBindings()
@@ -208,11 +210,13 @@ function _L:GetBarBindingsMap()
                 key1Short = sreplace(key1Short, 'META', 'm')
                 key1Short = String.ReplaceAllCharButLast(key1Short, '-')
             end
-            barBindingsMap[bindingDetails.buttonName] = {
+            --- @type BindingInfo
+            local bindingInfo = {
                 btnName = bindingDetails.buttonName, category = cat,
                 key1 = key1, key1Short = key1Short, key2 = key2,
                 details = { action = bindingDetails.action, buttonPressed = bindingDetails.buttonPressed }
             }
+            barBindingsMap[bindingDetails.buttonName] = bindingInfo
         end
     end
     return barBindingsMap
@@ -263,9 +267,9 @@ end
 
 --- @param btnWidget ButtonUIWidget
 function _L:AddKeybindingInfo(btnWidget)
-    if not btnWidget:HasKeybindings() then return end
+    if not btnWidget.kbt:HasKeybindings() then return end
     GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
-    local bindings = btnWidget:GetBindings()
+    local bindings = btnWidget.kbt:GetBindings()
     if not bindings.key1 then return end
     GameTooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end

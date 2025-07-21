@@ -29,21 +29,22 @@ local ns = select(2, ...)
 local O, GC, LibStub, LC = ns.O, ns.GC, ns.LibStub, ns:LC()
 local Assert, P = ns:Assert(), O.Profile
 local AceGUI = ns:AceLibrary().AceGUI
-local E, M = GC.E, GC.M
+local M, MSG = GC.M, GC.M
 local configHandler = O.Settings
+local evt = ns:AceEvent()
 
 --- @see _ParentFrame.xml
 local frameTemplate = 'ActionbarPlusFrameTemplate'
 
 -- post combat updates (SetAttribute* is not allowed during combat)
 local PostCombatButtonUpdates = {}
-
+local libName = ns.M.ActionBarFrameBuilder
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class ActionBarFrameBuilder : BaseLibraryObject
-local L = LibStub:NewLibrary(ns.M.ActionBarFrameBuilder); if not L then return end
-local p = LC.FRAME:NewLogger(ns.M.ActionBarFrameBuilder)
+local L = LibStub:NewLibrary(libName); if not L then return end
+local p = LC.FRAME:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -100,7 +101,6 @@ end
 ---@param widget ActionBarFrameWidget
 local function RegisterMessages(widget)
     --- Use new AceEvent each time or else, the message handler will only be called once
-    local evt = ns:AceEvent()
     evt:RegisterMessage(M.OnAddOnReady, function() OnAddOnReady(widget) end)
 end
 
@@ -181,19 +181,6 @@ local function WidgetMethods(widget)
         self:GetConfig().show_button_index = theState
         abh():ForEachButton(function(bw) bw:ShowIndex(theState) end)
     end
-    --- @param state boolean true will show button indices
-    function widget:ShowKeybindText(state)
-        local theState = (state == true)
-        self:GetConfig().show_keybind_text = theState
-        abh():ForEachButton(function(bw)
-            bw:ShowKeybindText(theState)
-            bw:UpdateKeybindTextState()
-        end)
-    end
-
-    function widget:UpdateKeybindText()
-        self:ShowKeybindText(self:IsShowKeybindText())
-    end
 
     ---@param isShown boolean
     function widget:SetGroupState(isShown)
@@ -224,12 +211,14 @@ local function WidgetMethods(widget)
     function widget:HideGroup()
         self:Hide()
         self:HideButtons()
+        evt:SendMessage(MSG.OnActionBarHideGroup, libName, self)
     end
 
     function widget:ShowGroup()
         InitAnchor(self)
         self:Show()
         self:ShowButtons()
+        evt:SendMessage(MSG.OnActionBarShowGroup, libName, self)
     end
 
     --- @param predicateFn ButtonHandlerFunction | "function(btnWidget) return btnWidget:IsEmpty() end"
@@ -308,9 +297,7 @@ local function WidgetMethods(widget)
     end
 
     function widget:ShowButtons()
-        local isShowKeybindText = self:IsShowKeybindText()
         abh():ForEachButton(function(bw)
-            bw:ShowKeybindText(isShowKeybindText)
             bw:Show()
             bw:UpdateUsable()
         end)
@@ -367,7 +354,6 @@ local function WidgetMethods(widget)
         self:MarkRendered()
         self:SetLockedState()
         self:ShowButtonIndices(self:IsShowIndex())
-        self:ShowKeybindText(self:IsShowKeybindText())
         self:SetInitialStateOnFrameHandle()
         self:UpdateButtonAlpha()
         C_Timer.After(0.1, function()

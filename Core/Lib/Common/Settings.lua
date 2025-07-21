@@ -89,13 +89,6 @@ local function GetShowButtonIndexStateSetterHandler(frameIndex)
     --TODO: NEXT: Use events instead
     return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):ShowButtonIndices(v) end
 end
-local function GetShowKeybindTextStateGetterHandler(frameIndex)
-    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShowKeybindText() end
-end
-local function GetShowKeybindTextStateSetterHandler(frameIndex)
-    --TODO: NEXT: Use events instead
-    return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):ShowKeybindText(v) end
-end
 local function GetLockStateSetterHandler(frameIndex)
     return function(_, v)
         P:SetBarLockValue(frameIndex, v)
@@ -184,7 +177,7 @@ local function PropsAndMethods(o)
         lazyInitLibs()
         assert(ns.db.profile, "Profile is not initialized.")
         self.profile = ns.db.profile
-        self.eventHandler = O.SettingsEventHandlerMixin:New()
+        self.e = O.SettingsEventHandlerMixin:New()
         self:Initialize()
         self:SendMessage(GC.M.OnConfigInitialized, ns.M.Settings)
     end
@@ -295,8 +288,8 @@ local function PropsAndMethods(o)
                     name = 'Open Character Frame',
                     -- todo next: localize strings
                     desc = 'When the player clicks an equipment set button, the character frame should automatically open. This will provide the user with quick access to their character\'s equipped gear, without requiring them to manually open the frame.',
-                    get = PGet(self, PC.equipmentset_open_character_frame, false),
-                    set = self:CM(PC.equipmentset_open_character_frame, false),
+                    get = self.e:PC(PC.equipmentset_open_character_frame, false),
+                    set = self.e:PCSet(PC.equipmentset_open_character_frame),
                 },
                 equipmentset_open_equipment_manager = {
                     order = mainSeq:next(),
@@ -406,8 +399,8 @@ local function PropsAndMethods(o)
                     name = L['Show Keybind Text'],
                     desc = format(L['Show Keybind Text::Description'], configName),
                     order = barSeq:next(),
-                    get = GetShowKeybindTextStateGetterHandler(frameIndex),
-                    set = GetShowKeybindTextStateSetterHandler(frameIndex)
+                    get = self.e:BC(frameIndex, PC.show_keybind_text),
+                    set = self.e:BCSet(frameIndex, PC.show_keybind_text, MSG.OnShowKeybindTextSettingsUpdated)
                 },
                 spacer1 = { type="description", name = sp, width="full", order = barSeq:next() },
                 alpha = {
@@ -517,7 +510,7 @@ local function PropsAndMethods(o)
     --- @param message string The message to send
     --- @return fun(_, v:any) : void The function parameter "v" is the option value selected by the user
     --- @see SettingsEventHandlerMixin#SetConfigWithMessage
-    function o:CM(key, fallbackVal, message) return self.eventHandler:SetConfigWithMessage(key, fallbackVal, message) end
+    function o:CM(key, fallbackVal, message) return self.e:SetConfigWithMessage(key, fallbackVal, message) end
 
 end
 
@@ -531,7 +524,7 @@ local function NewInstance()
     --- @class Settings A settings class for addon configuration and event handling.
     --- @field addon ActionbarPlus The associated addon instance.
     --- @field profile Profile The user profile for settings and preferences.
-    --- @field eventHandler SettingsEventHandlerMixin Handles addon events.
+    --- @field e SettingsEventHandlerMixin Handles addon events.
     --- @field maxRows Index Maximum number of rows for UI elements.
     --- @field maxCols Index Maximum number of columns for UI elements.
     local newConfig = ns:NewLib(ns.M.Settings)

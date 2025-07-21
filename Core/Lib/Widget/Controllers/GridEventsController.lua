@@ -43,6 +43,7 @@ local function PropsAndMethods(o)
 
         o:ForEachButton(function(bw)
             bw:ShowEmptyGridEvent()
+            o:SendMessage(MSG.OnActionButtonShowGrid, libName, bw)
             C_Timer.After(0.1, function() bw:EnableMouse(true) end)
         end)
 
@@ -56,7 +57,11 @@ local function PropsAndMethods(o)
     function o.OnActionBarHideGrid()
         if InCombatLockdown() then return end
 
-        o:ForEachButton(function(bw) bw:HideEmptyGridEvent() end)
+        o:ForEachButton(function(bw)
+            bw:HideEmptyGridEvent()
+            o:SendMessage(MSG.OnActionButtonHideGrid, libName, bw)
+        end)
+
         C_Timer.After(1, function()
             o:EnableMouseAllButtons(GetCursorInfo() ~= nil)
         end)
@@ -73,7 +78,6 @@ local function PropsAndMethods(o)
         if InCombatLockdown() then return end
 
         local isDefault, newCursorType, oldCursorType = ...
-        pd:f3(function() return "OnCursorChangeInBags: isDefault=%s newCursorType=%s", isDefault, newCursorType end)
         if true == isDefault and oldCursorType == CURSOR_ITEM_TYPE then
             o.OnActionBarHideGrid()
             ns:a().ActionbarEmptyGridShowing = false

@@ -28,6 +28,8 @@ local libName = M.ButtonUI
 --- @class ButtonUILib
 local _L = LibStub:NewLibrary(libName, 1)
 local p = ns:LC().BUTTON:NewLogger(libName)
+local pe = ns:LC().EVENT:NewLogger(libName)
+local ps = ns:LC().SPELL_USABLE:NewLogger(libName)
 local pd = ns:LC().DRAG_AND_DROP:NewLogger(libName)
 
 --- @return ButtonUIWidgetBuilder
@@ -54,7 +56,7 @@ local function RegisterForClicks(widget, event, down, key)
     local useKeyDown = API:IsUseKeyDownActionButton()
     local lockActionBars = API:IsLockActionBars()
 
-    p:f1(function()
+    pe:t(function()
         return 'event=%s down=%s key=%s btn=%s lockAB=%s useKD=%s :: RegisterForClicks()',
         event, down, key, widget:GN(), lockActionBars, useKeyDown end)
 
@@ -129,7 +131,6 @@ local function OnDragStart(btnUI)
 
     w:SetButtonAsEmpty()
     w:ShowEmptyGrid()
-    w:ShowKeybindText(true)
 
     btnUI.widget:SendMessage(GC.M.OnAfterDragStart, libName, w)
 end
@@ -223,7 +224,7 @@ end
 --- @param w ButtonUIWidget
 --- @param event string Event string
 local function OnSpellUpdateUsable(w, event)
-    if w:IsNotUpdatable() then return end
+    if not w:IsShown() or w:IsEmpty() or w:IsNotUpdatable() then return end
     w:UpdateRangeIndicator()
     w:UpdateUsable()
     w:UpdateGlow()
@@ -249,7 +250,7 @@ end
 
 ---@param widget ButtonUIWidget
 local function OnPlayerStoppedMoving(widget, event)
-    p:f1(function() return 'moving-stopped[%s]: %s', widget:GN(), GetTime() end)
+    pe:t(function() return 'moving-stopped[%s]: %s', widget:GN(), GetTime() end)
     OnPlayerTargetChangedDelayed(widget, event)
 end
 --[[-----------------------------------------------------------------------------
@@ -397,6 +398,7 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --- @class __ButtonUIWidget
     --- @field AutoRepeatSpell AutoRepeatSpellData
     local __widget = {
+        --- @deprecated Use ns:a()
         --- @type fun() : ActionbarPlus
         addon = function() return ABP end,
         --- The button index number
