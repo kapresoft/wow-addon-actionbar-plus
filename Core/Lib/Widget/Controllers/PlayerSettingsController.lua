@@ -49,7 +49,6 @@ local function PropsAndMethods(o)
         local fw = o:f():ForEachButton(frameIndex, function(bw)
             bw:SetButtonProperties()
             bw:RefreshTexts()
-            bw:UpdateKeybindTextState()
         end); if not fw then return end
         fw:SetFrameDimensions()
         fw:LayoutButtonGrid()
@@ -74,7 +73,6 @@ local function PropsAndMethods(o)
         fw = o:f():ForEachButton(frameIndex, function(bw)
             bw:SetButtonProperties()
             bw:RefreshTexts()
-            bw:UpdateKeybindTextState()
         end)
         fw:SaveAndScrubDeletedButtons(true)
     end
@@ -83,7 +81,6 @@ local function PropsAndMethods(o)
     function o.OnShowEmptyButtons(msg, src, frameIndex)
         o:f():ForEachEmptyButton(frameIndex, function(bw)
             bw:SetTextureAsEmpty()
-            bw:UpdateKeybindTextState()
         end)
     end
 

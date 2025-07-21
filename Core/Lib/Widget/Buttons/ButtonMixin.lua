@@ -63,13 +63,15 @@ local function PropsAndMethods(o)
     --- @return ButtonMixin
     function o:New(widget)
         local newObj = ns:K():CreateAndInitFromMixin(o, widget)
+        -- todo next: move profile as function 'pr()'
         ns:K():Mixin(newObj, O.ButtonProfileMixin:New(widget))
         return newObj
     end
 
     --- @param widget ButtonUIWidget
     function o:Init(widget)
-        self.w = widget
+        self.w   = widget
+        self.kbt = O.KeybindTextMixin:New(widget)
     end
 
     function o:GetName() return self.button():GetName() end
@@ -168,7 +170,7 @@ local function PropsAndMethods(o)
         self:HideCountdownNumbers(hideCountdownNumbers)
         self:SetHideItemCountText(hideItemCountText)
         self:SetHideIndexText(hideIndexText)
-        self:SetHideKeybindText(hideKeybindText)
+        self.kbt:SetKeybindTextHidden(hideKeybindText)
 
     end
 
@@ -189,7 +191,7 @@ local function PropsAndMethods(o)
         local buttonSize = barConfig.widget.buttonSize
         if buttonSize > MIN_BUTTON_SIZE then return end
 
-        self:SetHideKeybindText(hideTexts)
+        self.kbt:SetKeybindTextHidden(hideTexts)
         self:SetHideIndexText(hideTexts)
         if not profile.hide_countdown_numbers then self:HideCountdownNumbers(hideTexts) end
     end
@@ -211,16 +213,6 @@ local function PropsAndMethods(o)
         btn.text:Show()
     end
 
-    --- @param state boolean
-    function o:SetHideKeybindText(state)
-        local btn = self.button()
-        if true == state then
-            btn.keybindText:Hide()
-            return
-        end
-
-        btn.keybindText:Show()
-    end
     --- @param state boolean
     function o:SetHideIndexText(state)
         local btn = self.button()
@@ -323,12 +315,6 @@ local function PropsAndMethods(o)
         self.cooldown():SetCooldown(start, duration)
     end
 
-    --- @type BindingInfo
-    function o:GetBindings()
-        local barBindings = self.addon().barBindings
-        return (barBindings and barBindings[self.buttonName]) or nil
-    end
-
     --- @param text string
     function o:SetText(text)
         if String.IsBlank(text) then text = '' end
@@ -349,33 +335,8 @@ local function PropsAndMethods(o)
         self:RefreshTexts()
     end
 
-    --- @param state boolean true will show the button index number
-    function o:ShowKeybindText(state)
-        local text = ''
-        local button = self.button()
-        if not self:HasKeybindings() then
-            button.keybindText:SetText(text)
-            return
-        end
-
-        if true == state then
-            local bindings = self:GetBindings()
-            if bindings and bindings.key1Short then
-                text = bindings.key1Short
-            end
-        end
-        button.keybindText:SetText(text)
-        self:RefreshTexts()
-    end
-
-    function o:HasKeybindings()
-        local b = self:GetBindings()
-        if not b then return false end
-        return b and String.IsNotBlank(b.key1)
-    end
     function o:ClearAllText()
         self:SetText('')
-        self.button().keybindText:SetText('')
         self.button().nameText:SetText('')
     end
 
@@ -619,30 +580,7 @@ local function PropsAndMethods(o)
         self:UpdateUsable()
         self:SetHighlightDefault()
         self:SetNormalIconAlphaDefault()
-
-        self:UpdateKeybindTextState()
         self:UpdateRangeIndicator()
-    end
-
-    --Dynamic toggling of keybind text for
-    --the actionbar grid event
-    function o:UpdateKeybindTextState()
-        local button = self.button()
-        if not self:IsShowKeybindText() then
-            button.keybindText:Hide()
-            return
-        end
-
-        if self:IsEmpty() then
-            if self:IsShowEmptyButtons() then
-                button.keybindText:Show()
-            else
-                button.keybindText:Hide()
-            end
-            return
-        end
-
-        if not self:IsEmpty() then button.keybindText:Show() end
     end
 
     function o:UpdateStateDelayed(inSeconds)
@@ -775,13 +713,6 @@ local function PropsAndMethods(o)
         if not self:IsEmpty() then return end
         self:SetButtonAsEmpty()
         self:ShowEmptyGrid()
-        self:ShowKeybindText(true)
-
-        if not self:IsShowKeybindText() then
-            self.button().keybindText:Hide()
-        elseif self:IsEmpty() then
-            self.button().keybindText:Show()
-        end
     end
 
     function o:HideEmptyGridEvent()
@@ -940,15 +871,18 @@ local function PropsAndMethods(o)
         self:UpdateRangeIndicatorBySpell(spell)
     end
 
-    ---@param spell SpellName
+    -- todo next: need to check individual buttons if it has a keybind.
+    --            currently checking entire frame
+    --- @param spell SpellName
     function o:UpdateRangeIndicatorBySpell(spell)
-        if self:IsHidden() then return end
-        if not spell then return nil end
-
-        local configIsShowKeybindText = self.dragFrame():IsShowKeybindText()
-        self:ShowKeybindText(configIsShowKeybindText)
+        if not spell
+                or not self:IsShown() or self:IsEmpty()
+                or self:IsHidden() then
+            return
+        end
 
         local hasTarget = API:IsValidActionTarget()
+        local configIsShowKeybindText = self.dragFrame():IsShowKeybindText()
         if configIsShowKeybindText == true then
             return self:UpdateRangeIndicatorWithShowKeybindOn(spell, hasTarget)
         end
@@ -958,9 +892,9 @@ local function PropsAndMethods(o)
     --- @param spell SpellName Effective spell name for spell, item, macro
     --- @param hasTarget boolean Player has a target
     function o:UpdateRangeIndicatorWithShowKeybindOn(spell, hasTarget)
-        local kb = self:GetKeybindText()
+        local kb = self.kbt:GetKeybindText()
         if not hasTarget then kb:SetVertexColorNormal(); return end
-        if not self:HasKeybindings() then kb:SetTextWithRangeIndicator() end
+        if not self.kbt:HasKeybindings() then kb:SetTextWithRangeIndicator() end
 
         -- else if in range, color is "white"
         local inRange = API:IsSpellInRange(spell, UNIT.TARGET)
@@ -968,14 +902,14 @@ local function PropsAndMethods(o)
         if inRange == false then
             kb:SetVertexColorOutOfRange()
         elseif inRange == nil then
-            if not self.w:HasKeybindings() then kb:ClearText() end
+            if not self.kbt:HasKeybindings() then kb:ClearText() end
         end
     end
 
     --- @param spell SpellName Effective spell name for spell, item, macro
     --- @param hasTarget boolean Player has a target
     function o:UpdateRangeIndicatorWithShowKeybindOff(spell, hasTarget)
-        local kb = self:GetKeybindText()
+        local kb = self.kbt:GetKeybindText()
         if not hasTarget then
             kb:ClearText()
             kb:SetVertexColorNormal()
@@ -1154,9 +1088,6 @@ local function PropsAndMethods(o)
     function o:EnableMouse(state) if InCombatLockdown() then return end; self.button():EnableMouse(state) end
     function o:Hide() if InCombatLockdown() then return end; self.button():Hide() end
     function o:Show() if InCombatLockdown() then return end; self.button():Show() end
-
-    --- @return FontStringWidget
-    function o:GetKeybindText() return self.button().keybindText.widget end
 
     ---@param spell SpellName|SpellID
     function o:SpellRequiresTarget(spell)

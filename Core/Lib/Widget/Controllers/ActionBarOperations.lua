@@ -20,14 +20,15 @@ local tinsert = table.insert
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'ActionBarOperations'
---- @class ActionBarOperations
+--- @class _ActionBarOperations
 local L = ns:NewController(libName)
 local p = ns:CreateDefaultLogger(libName)
+--- @alias ActionBarOperations _ActionBarOperations | ControllerV2
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o ActionBarOperations | ControllerV2
+--- @param o _ActionBarOperations | ControllerV2
 local function PropsAndMethods(o)
 
     o.BASE_FRAME_NAME = 'ActionbarPlusF'

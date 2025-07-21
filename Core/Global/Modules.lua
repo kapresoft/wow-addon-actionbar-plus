@@ -70,6 +70,8 @@ local M = {
     GlobalConstants                  = '',
     ItemAttributeSetter              = '',
     ItemDragEventHandler             = '',
+    KeybindController                = '',
+    KeybindTextMixin                 = '',
     LocalizationUtil                 = '',
     MacroAttributeSetter             = '',
     MacroDragEventHandler            = '',
@@ -128,6 +130,8 @@ local M = {
 --- @field FrameHandleBuilderMixin FrameHandleBuilderMixin
 --- @field ItemAttributeSetter ItemAttributeSetter
 --- @field ItemDragEventHandler ItemDragEventHandler
+--- @field KeybindController KeybindController
+--- @field KeybindTextMixin KeybindTextMixin
 --- @field LocalizationUtil LocalizationUtil
 --- @field LogFactory LogFactory
 --- @field Logger Logger

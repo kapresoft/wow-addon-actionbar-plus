@@ -64,8 +64,6 @@ local function OnShapeShift()
         L:ForEachShapeshiftButton(UpdateIcon)
     end, 2)
 end
--- TODO: Migrate to a new KeyBindingsController, i.e. controller:UpdateKeyBindings()
-local function OnUpdateBindings() addon():UpdateKeyBindings() end
 
 -- TODO: Migrate to a new "PlayerUnitAuraController", i.e. controller:OnPlayerUnitAura()
 --- @param event string The event name
@@ -169,7 +167,6 @@ local function PropsAndMethods(o)
     end
 
     o[E.COMPANION_UPDATE] = OnCompanionUpdate
-    o[E.UPDATE_BINDINGS]        = OnUpdateBindings
     o[E.UPDATE_STEALTH]         = OnUpdateStealth
     o[E.UPDATE_SHAPESHIFT_FORM] = OnShapeShift
 
@@ -194,7 +191,6 @@ local function OnAddOnReady(frame)
     OnStealthIconUpdate();
     OnShapeShift()
     OnCompanionUpdate();
-    OnUpdateBindings();
 
     RegisterFrameForEvents(frame, {
         E.PLAYER_TARGET_CHANGED,

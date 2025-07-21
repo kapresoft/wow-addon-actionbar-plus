@@ -79,7 +79,7 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     MESSAGE_TRACE = "MT",
     --- @type Kapresoft_LogCategory
-    MOUNT = "MT",
+    MOUNT = "MN",
     --- @type Kapresoft_LogCategory
     PET = "PT",
     --- @type Kapresoft_LogCategory
@@ -152,6 +152,7 @@ local function CreateNamespace(...)
     --- @field LibStub LocalLibStub
     --- @field LibStubAce LibStub
     --- @field O GlobalObjects
+    --- @field barBindings table<string, BindingInfo>
     --- @field CategoryLoggerMixin CategoryLoggerMixin
     --- @field ConfigDialogControllerEventFrame ConfigDialogControllerEventFrame
     --- @field uie fun(self:__Namespace) : UIError
@@ -185,6 +186,8 @@ local function CreateNamespace(...)
         --- Used in XML files to hook frame events: OnLoad and OnEvent
         --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
         o.H = {}
+
+        o.barBindings = nil
 
         --- @return ActionbarPlus
         function o:a() return ABP end
@@ -287,7 +290,7 @@ local function CreateNamespace(...)
         --- @param btnIndex Index
         --- @return string
         function o:ButtonConfigName(btnName, btnIndex)
-            local c     = ns.O.Compat
+            local c     = self.O.Compat
             local bName = btnName
             if not c:IsMultiSpecEnabled() or c:IsPrimarySpec() then return bName end
             assert(btnIndex, 'Namespace:: Unexpected error retrieving button index number.')
@@ -295,6 +298,25 @@ local function CreateNamespace(...)
             local activeSpec = c:GetSpecializationID()
             bName = self:GetSpecConfigName(btnIndex, activeSpec)
             return bName
+        end
+
+        --- @return table<string, BindingInfo>
+        function o:RetrieveKeyBindingsMap()
+            self.barBindings = self.O.WidgetMixin:GetBarBindingsMap()
+            return self.barBindings
+        end
+
+        --- @param buttonUIName string This is the global UI name of the actionbar, i.e. ActionbarPlusF1Button1
+        --- @return BindingInfo
+        function o:Button_GetBindings(buttonUIName)
+            assert(type(buttonUIName) == 'string', 'ButtonUIName is required.')
+
+            if not self.barBindings then
+                --assert(false, 'xx namespace')
+                self.logp('{{ ActionbarPlus::Namespace}}: ', 'Retrieving barBindings...')
+                self:RetrieveKeyBindingsMap()
+            end
+            return type(self.barBindings) == 'table' and self.barBindings[buttonUIName]
         end
 
     end; PropsAndMethods(ns)

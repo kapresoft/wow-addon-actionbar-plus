@@ -85,7 +85,6 @@ local function PropertiesAndMethods(o)
     end
 
     function o:InitDbDefaults() self:InitDefaultProfile() end
-    function o:RetrieveKeyBindingsMap() self.barBindings = WMX:GetBarBindingsMap() end
 
     function o:RegisterSlashCommands()
         self:RegisterChatCommand(GCC.CONSOLE_COMMAND_NAME, "SlashCommands")
@@ -128,12 +127,6 @@ local function PropertiesAndMethods(o)
             return
         end
         WMX:ShowReloadUIConfirmation()
-    end
-
-    -- TODO: Migrate to a new KeyBindingsController
-    function o:UpdateKeyBindings()
-        self.barBindings = WMX:GetBarBindingsMap()
-        if self.barBindings then BF:UpdateKeybindText() end
     end
 
     --- This is called automatically by Ace

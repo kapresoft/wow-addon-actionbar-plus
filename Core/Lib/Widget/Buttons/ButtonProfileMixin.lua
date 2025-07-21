@@ -412,9 +412,13 @@ local function PropsAndMethods(o)
     end
 
     --- @param pet Profile_BattlePet
+    --- @return boolean
     function o:IsInvalidBattlePet(pet) return IsNil(pet) or (IsNil(pet.guid) and IsNil(pet.name)) end
+    --- @return boolean
     function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
+    --- @return boolean
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
+    --- @return boolean
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
 
     function o:ResetButtonData()
