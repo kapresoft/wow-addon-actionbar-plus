@@ -31,6 +31,7 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
+local api = O.API
 local String, P = ns:String(), O.Profile
 local IsBlank, IsNotBlank, ParseBindingDetails = String.IsBlank, String.IsNotBlank, String.ParseBindingDetails
 local sreplace = String.replace
@@ -53,7 +54,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 -- todo next: rename to WidgetUtil?
 --- @class WidgetMixin : BaseLibraryObject
-local _L = LibStub:NewLibrary(M.WidgetMixin)
+local L = LibStub:NewLibrary(M.WidgetMixin)
 local p = ns:CreateDefaultLogger(M.WidgetMixin)
 
 --- @class FontStringWidget
@@ -71,7 +72,7 @@ end
 function FontStringWidget:SetVertexColorOutOfRange()
     self.fontString:SetVertexColor(self:GetRedFont():GetTextColor())
 end
-function FontStringWidget:SetTextWithRangeIndicator()
+function FontStringWidget:SetTextAsRangeIndicator()
     self.fontString:SetText(RANGE_INDICATOR)
 end
 function FontStringWidget:ClearText() self.fontString:SetText('') end
@@ -101,7 +102,7 @@ Methods
 
 --- @param button ButtonUI
 --- @return FontString
-function _L:CreateFontString(button)
+function L:CreateFontString(button)
     local fs = button:CreateFontString(nil, nil, "NumberFontNormal")
     fs:SetPoint("BOTTOMRIGHT", -3, 2)
     local _, fontHeight = fs:GetFont()
@@ -113,7 +114,7 @@ end
 --- ### See: [https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont](https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont)
 --- @param b ButtonUI The button UI
 --- @return FontString
-function _L:CreateNameTextFontString(b)
+function L:CreateNameTextFontString(b)
     --- @type FontString
     local fs = b:CreateFontString("$parentName", "OVERLAY", 'NumberFontNormalSmallGray')
     local fontName, fontHeight = fs:GetFont()
@@ -132,7 +133,7 @@ end
 ---Font Flags: OUTLINE, THICKOUTLINE, MONOCHROME
 --- @see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
 --- @param b ButtonUI The button UI
-function _L:CreateIndexTextFontString(b)
+function L:CreateIndexTextFontString(b)
     --- @type FontStringTemplate
     local fs = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmallGray")
     local fontName, fontHeight = fs:GetFont()
@@ -148,7 +149,7 @@ end
 --- @see "https://wowpedia.fandom.com/wiki/API_FontInstance_SetFont"
 --- @param b ButtonUI The button UI
 --- @return FontStringTemplate
-function _L:CreateKeybindTextFontString(b)
+function L:CreateKeybindTextFontString(b)
     --- @type FontStringTemplate
     local fs = b:CreateFontString(nil, "OVERLAY", 'ABP_NumberFontNormalShadow')
     fs:SetJustifyH("RIGHT")
@@ -163,7 +164,7 @@ end
 
 --- @see ActionBarHandlerMixin
 --- @deprecated
-function _L:ShowActionbarsDelayed(isShown, delayInSec)
+function L:ShowActionbarsDelayed(isShown, delayInSec)
     local actualDelayInSec = delayInSec
     local showActionBars = isShown == true
     if type(actualDelayInSec) ~= 'number' then actualDelayInSec = delayInSec end
@@ -174,7 +175,7 @@ function _L:ShowActionbarsDelayed(isShown, delayInSec)
 end
 
 --- @param isShown boolean Set to true to show action bar
-function _L:ShowActionbars(isShown)
+function L:ShowActionbars(isShown)
     abh():fevf(function(frameWidget)
         if frameWidget:IsShownInConfig() then
             frameWidget:SetGroupState(isShown)
@@ -182,9 +183,9 @@ function _L:ShowActionbars(isShown)
     end)
 end
 
-function _L:IsHideWhenTaxi() return P:IsHideWhenTaxi() end
+function L:IsHideWhenTaxi() return P:IsHideWhenTaxi() end
 
-function _L:HideTooltipDelayed(delayInSec)
+function L:HideTooltipDelayed(delayInSec)
     local actualDelayInSec = delayInSec
     if not actualDelayInSec or actualDelayInSec < 0 then
         GameTooltip:Hide()
@@ -194,7 +195,7 @@ function _L:HideTooltipDelayed(delayInSec)
 end
 
 --- @return table<string, BindingInfo> The binding map with button names as the key
-function _L:GetBarBindingsMap()
+function L:GetBarBindingsMap()
     local barBindingsMap = {}
     local bindCount = GetNumBindings()
     if bindCount <=0 then return nil end
@@ -224,7 +225,7 @@ end
 
 --- @return BindingDetails
 --- @param btnName string The button name
-function _L:GetBarBindings(btnName)
+function L:GetBarBindings(btnName)
     if IsBlank(btnName) then return nil end
     local bindCount = GetNumBindings()
     if bindCount <=0 then return nil end
@@ -248,48 +249,62 @@ function _L:GetBarBindings(btnName)
     end
     return nil
 end
---- @param frame ButtonUI In retail owner can be any frame; should be treated as a generic frame
-function _L:IsTypeMacro(frame)
-    if not (frame and frame.widget and frame.widget.buttonName) then return false end
-    --- @see ButtonProfileMixin#IsMacro
-    return frame.widget:IsMacro()
-end
 
-function _L:SetupTooltipKeybindingInfo(tooltip)
+function L:OnShowAdditionalTooltipInfo(tooltip)
+    --- @type ButtonUI
     local button = tooltip:GetOwner()
-    if not button then return end
-    local btnWidget = button.widget
-    if btnWidget then
-        self:AddKeybindingInfo(btnWidget)
-    end
+    if not (button and button.widget and button.widget.buttonName) then return end
+    --- @type ButtonUIWidget
+    local bw = button.widget
+    local c  = bw:conf(); if c:IsEmpty() then return end
+    if c:IsMacro() then
+        self:AddMacroInfo(tooltip, bw, c.macro) end
+    self:AddKeybindingInfo(tooltip, bw, c)
     tooltip:Show()
 end
 
---- @param btnWidget ButtonUIWidget
-function _L:AddKeybindingInfo(btnWidget)
-    if not btnWidget.kbt:HasKeybindings() then return end
-    GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
-    local bindings = btnWidget.kbt:GetBindings()
+--- @param tooltip GameTooltip
+--- @param bw ButtonUIWidget
+--- @param c ButtonProfileConfigMixin
+function L:AddKeybindingInfo(tooltip, bw, c)
+    if not bw.kbt:HasKeybindings() then return end
+    if not c:IsMacro() then
+        GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
+    end
+    local bindings = bw.kbt:GetBindings()
     if not bindings.key1 then return end
-    GameTooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
+    tooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end
 
-function _L:AddItemKeybindingInfo(btnWidget)
-    if not btnWidget:HasKeybindings() then return end
-    local bindings = btnWidget:GetBindings()
-    GameTooltip:AppendText(String.format(GC.C.ABP_KEYBIND_FORMAT, bindings.key1))
+--- @param tooltip GameTooltip
+--- @param bw ButtonUIWidget
+--- @param macroData Profile_Macro
+function L:AddMacroInfo(tooltip, bw, macroData)
+    GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+
+    local spid = bw:GetEffectiveSpellID()
+    if spid then
+        --- @type FontString
+        local right = GameTooltipTextRight1
+        if right then
+            local rank = api:GetSpellRankFormatted(spid)
+            right:SetText(rank)
+            right:Show()
+        end
+    end
+    tooltip:AddDoubleLine('Macro ::', macroData.name, 1, 1, 1, 1, 1, 1);
 end
 
-function _L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
+function L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
     local frame = frameInstance
     if frameInstance.frame then frame = frameInstance.frame end
     setglobal(frameName, frame)
     table.insert(UISpecialFrames, frameName)
 end
 
-function _L:ShowReloadUIConfirmation() StaticPopup_Show(GC.C.CONFIRM_RELOAD_UI) end
+function L:ShowReloadUIConfirmation() StaticPopup_Show(GC.C.CONFIRM_RELOAD_UI) end
 
-function _L:ConfirmAndReload()
+function L:ConfirmAndReload()
     local reloadUI = GC.C.CONFIRM_RELOAD_UI
     if StaticPopup_Visible(reloadUI) == nil then return StaticPopup_Show(reloadUI) end
     return false

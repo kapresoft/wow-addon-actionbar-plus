@@ -22,6 +22,7 @@ New Instance: ItemDragEventHandler
 -------------------------------------------------------------------------------]]
 ---@class ItemDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.ItemDragEventHandler); if not L then return end
+local p = ns:LC().ITEM:NewLogger(M.ItemDragEventHandler)
 
 --[[-----------------------------------------------------------------------------
 New Instance: ItemAttributeSetter

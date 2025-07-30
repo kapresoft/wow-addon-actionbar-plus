@@ -3,8 +3,10 @@
 
     <Script file="ActionType.lua"/>
     <Script file="PickupHandler.lua"/>
+    <Script file="ButtonProfileConfigMixin.lua"/>
     <Script file="ButtonProfileMixin.lua"/>
-    <Script file="KeybindTextMixin.lua"/>
+    <Script file="KeybindTextUtil.lua"/>
+    <Script file="RangeIndicatorUtil.lua"/>
     <Script file="ButtonMixin.lua"/>
     <Script file="ButtonUI.lua"/>
     <Script file="FrameHandleBuilderMixin.lua"/>

@@ -89,6 +89,7 @@ local function GlobalConstantProperties(o)
         ENABLE_LOGGING = true,
         ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST = true,
         ENABLE_MULTI_SPEC = true,
+        ENABLE_EXTERNAL_API = false,
     }
 
     --- @class GlobalAttributes
@@ -238,6 +239,7 @@ local function GlobalConstantProperties(o)
         --- Event Params: result, setID
         EQUIPMENT_SWAP_FINISHED = 'EQUIPMENT_SWAP_FINISHED',
         MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED',
+        UPDATE_MOUSEOVER_UNIT = 'UPDATE_MOUSEOVER_UNIT',
 
         --- This event is fired when the players gear changes. Example, a chest is changed to another chest piece.
         ---

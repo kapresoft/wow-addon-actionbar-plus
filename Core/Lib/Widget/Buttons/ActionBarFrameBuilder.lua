@@ -441,6 +441,33 @@ local function WidgetMethods(widget)
         local anchor = CreateAnchor("TOPLEFT", self:GetName(), "TOPLEFT", 0, -2);
         AnchorUtil.GridLayout(self.buttonFrames, anchor, layout);
     end
+
+    --- @param rows number
+    --- @param cols number
+    function widget:SetButtonCount(rows, cols)
+        assert(rows > 0 and cols > 0, 'Rows and Cols must be > 0')
+        local wc = self:conf().widget
+        wc.rowSize = rows
+        wc.colSize = cols
+        evt:SendMessage(MSG.OnButtonCountChanged, libName, self.index)
+    end
+
+    --- @param width number
+    function widget:SetButtonWidth(width)
+        assert(width > 10, 'Button width must be > 0')
+        local wc = self:conf().widget
+        wc.buttonSize = width
+        evt:SendMessage(MSG.OnButtonSizeChanged, libName, self.index)
+    end
+
+    --- @param alpha Alpha
+    function widget:SetButtonAlpha(alpha)
+        assert(alpha > 0 and alpha <= 1.0, 'Alpha must be [0.0, 1.0]')
+        local wc = self:conf().widget
+        wc.buttonAlpha = alpha
+        evt:SendMessage(MSG.OnActionbarFrameAlphaUpdated, libName, self.index)
+    end
+
 end
 
 -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.

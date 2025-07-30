@@ -123,6 +123,19 @@ local function PropsAndMethods(o)
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
 
+    --- Apply for each button with a predicateFn
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
+    function o:ForAllButtons(applyFn, predicateFn)
+        local pfn = predicateFn or function(bw) return true end
+        self:ForEachFrame(function(fw)
+            for _, btn in ipairs(fw.buttonFrames) do
+                local shouldApply = btn.widget and pfn(btn.widget)
+                if true == shouldApply then applyFn(btn.widget) end
+            end
+        end)
+    end
+
     --- Alias
     --- @see ActionBarHandlerMixin#ForEachVisibleFrame
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"

@@ -1,3 +1,5 @@
+--- @alias ButtonConfigSupplierFn fun() : Profile_Button, Name
+
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
@@ -10,6 +12,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local BCM = O.ButtonProfileConfigMixin
 
 local P, PI, Compat, API  = O.Profile, O.ProfileInitializer, O.Compat, O.API
 local ATTR, CN = GC.ButtonAttributes, GC.Profile_Config_Names
@@ -22,6 +25,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 local libName = M.ButtonProfileMixin
 --- @class ButtonProfileMixin : BaseLibraryObject
+--- @field _configFn ButtonConfigSupplierFn
 local L = LibStub:NewLibrary(libName)
 local p = ns:LC().PROFILE:NewLogger(libName)
 local ps = ns:LC().SPELL:NewLogger(libName)
@@ -29,6 +33,130 @@ local ps = ns:LC().SPELL:NewLogger(libName)
 Support Functions
 -------------------------------------------------------------------------------]]
 local function PR() return O.Profile end
+
+--[[-----------------------------------------------------------------------------
+Type: ButtonConfigFunctionBuilder
+-------------------------------------------------------------------------------]]
+--- @class ButtonConfigHelper
+
+--- @type ButtonConfigHelper
+local _A = {}
+
+--- @param a ButtonConfigHelper
+local function ButtonConfigHelper_Methods(a)
+
+    --- @param bw ButtonUIWidget
+    --- @return ButtonConfigSupplierFn
+    function a:fetchConfFn(bw)
+        if Compat:SupportsDualSpec() then return self:confDualSpecFn(bw) end
+        return self:confMultiSpecFn(bw)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return ButtonConfigSupplierFn
+    function a:confDualSpecFn(bw)
+        if not Compat:IsDualSpecEnabled() or Compat:IsPrimarySpec() then
+            return self:Button_ConfPrimaryFn(bw)
+        end
+        return self:Button_ConfSecondaryFn(bw)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return ButtonConfigSupplierFn
+    function a:confMultiSpecFn(bw)
+        local btnConfName = ns:ButtonConfigName(bw:GetName(), bw.index)
+        return function() return self:GetProfileConfig(bw.frameIndex, btnConfName) end
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    --- @param bw ButtonUIWidget
+    --- @return ButtonConfigSupplierFn
+    function a:Button_ConfPrimaryFn(bw)
+        local btnConfName = self:Button_GetPrimarySpecButtonConfigName(bw)
+        return function() return self:GetProfileConfig(bw.frameIndex, btnConfName) end
+    end
+
+    --- @return Profile_Button, Name The button config and the button config name
+    --- @param bw ButtonUIWidget
+    --- @return ButtonConfigSupplierFn
+    function a:Button_ConfSecondaryFn(bw)
+        local btnConfName = self:Button_GetSecondarySpecConfigName(bw)
+        return function() return self:GetProfileConfig(bw.frameIndex, btnConfName) end
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Name
+    function a:Button_GetPrimarySpecButtonConfigName(bw)
+        return ns:GetPrimarySpecButtonConfigName(bw.buttonName)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Name
+    function a:Button_GetSecondarySpecConfigName(bw)
+        return ns:GetSecondarySpecConfigName(bw.index)
+    end
+
+    --- @return Profile_Config, Name
+    function a:GetProfileConfig(frameIndex, btnConfName, initializerFn)
+        local barData = PR():GetBar(frameIndex)
+        local config = barData.buttons[btnConfName]
+        if not config then
+            config = initializerFn and initializerFn(barData, btnConfName) or PI:CreateSingleButtonTemplate()
+            barData.buttons[btnConfName] = config
+        end
+        return config, btnConfName
+    end
+
+    --[[---------------------------------------------------------
+    Legacy Stuff
+    -------------------------------------------------------------]]
+
+    --- @param bw ButtonUIWidget
+    --- @return Profile_Config, Name The button config and the button config name
+    function a:fetchConf(bw)
+        if Compat:SupportsDualSpec() then return self:confDualSpec(bw) end
+        return self:confMultiSpec(bw)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Profile_Config, Name
+    function a:confDualSpec(bw)
+        if not Compat:IsDualSpecEnabled() or Compat:IsPrimarySpec() then
+            return self:confPrimary(bw)
+        end
+        return self:confSecondary(bw)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Profile_Config, Name
+    function a:confPrimary(bw)
+        local btnConfName = self:Button_GetPrimarySpecButtonConfigName(bw)
+        return self:GetProfileConfig(bw.frameIndex, btnConfName)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Profile_Config, Name
+    function a:confSecondary(bw)
+        local btnConfName = self:Button_GetSecondarySpecConfigName(bw)
+        return self:GetProfileConfig(bw.frameIndex, btnConfName, function(barData, btnConfName)
+            local btnConfNamePrimary = self:Button_GetPrimarySpecButtonConfigName(bw)
+            local prim = barData.buttons[btnConfNamePrimary]
+            if not P:IsEmptyButtonConfig(prim) and P:ShouldCopyPrimarySpecButtons() then
+                ps:f1(function() return 'Should copy: %s', btnConfName end)
+                return Table.deep_copy(prim)
+            end
+            return PI:CreateSingleButtonTemplate()
+        end)
+    end
+
+    --- @param bw ButtonUIWidget
+    --- @return Profile_Button, Name The button config and the button config name
+    function a:confMultiSpec(bw)
+        local btnConfName = ns:ButtonConfigName(bw:GetName(), bw.index)
+        return self:GetProfileConfig(bw.frameIndex, btnConfName)
+    end
+
+end; ButtonConfigHelper_Methods(_A)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -46,68 +174,25 @@ local function PropsAndMethods(o)
         self.w = widget
     end
 
-    function o:GetPrimarySpecButtonConfigName()
-        return ns:GetPrimarySpecButtonConfigName(self.w.buttonName)
+    --- @private
+    --- @return ButtonConfigSupplierFn
+    function o:_fetchConfFn() return _A:fetchConfFn(self.w) end
+
+    --- @return ButtonProfileConfigMixin, Name The button config and the button config name
+    --- @param noMixin boolean|nil Set to true to return the raw table; otherwise returns the mixed in version.
+    function o:conf(noMixin)
+        local c, n = self._configFn();
+        if noMixin == true then return c, n end
+        return BCM:New(c), n
     end
 
-    function o:GetPrimarySpecButtonConfigNameNew()
-        return ns:GetPrimarySpecButtonConfigNameNew(self.w.index)
-    end
-
-    function o:GetSecondarySpecConfigName()
-        return ns:GetSecondarySpecConfigName(self.w.index)
-    end
-
-    --- @return Profile_Button, Name The button config and the button config name
-    function o:conf()
-        if Compat:SupportsDualSpec() then return self:_confDualSpec() end
-        return self:_confMultiSpec()
-    end
-
-    function o:_confDualSpec()
-        if not Compat:IsDualSpecEnabled() or Compat:IsPrimarySpec() then
-            return self:_confPrimary()
-        end
-        return self:_confSecondary()
-    end
-
-    --- @return Profile_Button, Name The button config and the button config name
-    function o:_confMultiSpec()
-        local barData = PR():GetBar(self.w.frameIndex)
-        local btnConfName = ns:ButtonConfigName(self.w:GetName(), self.w.index)
-
-        if not barData.buttons[btnConfName] then
-            barData.buttons[btnConfName] = PI:CreateSingleButtonTemplate()
-        end
-        return barData.buttons[btnConfName], btnConfName
-    end
-
-    --- @return Profile_Button, Name The button config and the button config name
-    function o:_confPrimary()
-        local barData = PR():GetBar(self.w.frameIndex)
-        local btnConfName = self:GetPrimarySpecButtonConfigName()
-        local btnConfPrim = barData.buttons[btnConfName]
-        if not btnConfPrim then
-            barData.buttons[btnConfName] = PI:CreateSingleButtonTemplate()
-        end
-        return barData.buttons[btnConfName], btnConfName
-    end
-
-    --- @return Profile_Button, Name The button config and the button config name
-    function o:_confSecondary()
-        local barData = PR():GetBar(self.w.frameIndex)
-        local btnConfName = self:GetSecondarySpecConfigName()
-
-        local btnConf = barData.buttons[btnConfName] or PI:CreateSingleButtonTemplate()
-        local btnConfNamePrimary = self:GetPrimarySpecButtonConfigName()
-        local prim = barData.buttons[btnConfNamePrimary]
-        if not P:IsEmptyButtonConfig(prim) and P:ShouldCopyPrimarySpecButtons() then
-            btnConf = Table.deep_copy(barData.buttons[btnConfNamePrimary])
-            ps:f1(function() return 'Should copy: %s', btnConf end)
-        end
-        barData.buttons[btnConfName] = btnConf
-        return barData.buttons[btnConfName], btnConfName
-    end
+    --[[--- This is the old config call.
+    --- @private
+    --- @return ButtonProfileConfigMixin, Name The button config and the button config name
+    function o:confXX()
+        local c, n = _A:fetchConf(self.w)
+        return BCM:New(c), n
+    end]]
 
     --- Used only for debugging
     --- @return SpellName, SpellName, string  The spell names for primary talent 1 and 2 and conf name
@@ -167,13 +252,7 @@ local function PropsAndMethods(o)
         return nil
     end
 
-    function o:IsEmpty()
-        if IsEmptyTable(self:conf()) then return true end
-        local type = self:conf().type
-        if IsBlankStr(type) then return true end
-        if IsEmptyTable(self:conf()[type]) then return true end
-        return false
-    end
+    function o:IsEmpty() return self:conf():IsEmpty() end
 
     --- @return Profile_Bar
     function o:GetBarConfig() return self.dragFrame():GetConfig() end
@@ -248,15 +327,16 @@ local function PropsAndMethods(o)
         return self:GetProfileConfig()[CN.tooltip_visibility_combat_override_key]
     end
 
+    --- @return ItemID, ItemName
     function o:GetEffectiveItemID()
-        local item = self:GetItemData()
-        if item and item.id then return item.id end
+        local c = self:conf(); if c:IsEmpty() then return end
+        if c:IsItem() then return c.item.id, c.item.name end
 
-        local macro = self:GetMacroData()
-        if not macro or not macro.name then return nil end
-
-        local macroItem = API:GetMacroItem(macro.name)
-        return macroItem and macroItem.id
+        if c:IsMacro() then
+            local item = API:GetMacroItem(c.macro.index)
+            if item then return item.id, item.name end
+        end
+        return nil
     end
 
     -- TODO: replace with GetEffectiveSpell()
@@ -268,13 +348,13 @@ local function PropsAndMethods(o)
         if IsBlankStr(actionType) then return nil end
 
         local spellName
-        if actionType == 'spell' and not IsBlankStr(conf.spell and conf.spell.name) then
+        if conf:IsSpell() and conf.spell.name then
             spellName = conf.spell.name
-        elseif actionType == 'macro' then
+        elseif conf:IsMacro() then
             spellName = API:GetMacroSpell(self:GetMacroIndex())
-        elseif actionType == 'item' then
+        elseif conf:IsItem() then
             spellName = API:GetItemSpellInfo(conf.item)
-        elseif actionType == 'mount' then
+        elseif conf:IsMount() then
             spellName = conf.mount and conf.mount.name
         end
 
@@ -283,20 +363,16 @@ local function PropsAndMethods(o)
 
     --- @return SpellID|nil
     function o:GetEffectiveSpellID()
-        local conf = self:conf(); if not conf then return nil end
-        local actionType = conf.type
-        if IsBlankStr(actionType) then return nil end
+        local c = self:conf(); if c:IsEmpty() then return nil end
 
         local spellID
-        local spellName = conf.spell and conf.spell.name
-        if actionType == 'spell' and not IsBlankStr(spellName) then
-            spellID = conf.spell.id
-        elseif actionType == 'macro' then
-            _, spellID = API:GetMacroSpell(self:GetMacroIndex())
-        elseif actionType == 'item' then
-            _, spellID = API:GetItemSpellInfo(conf.item)
+        if c:IsSpell() then
+            spellID = c.spell.id
+        elseif c:IsMacro() then
+            spellID = API:GetMacroSpellID(c.macro.index)
+        elseif c:IsItem() then
+            spellID = API:GetItemSpellID(c.item.id)
         end
-
         return spellID
     end
 
@@ -418,13 +494,13 @@ local function PropsAndMethods(o)
     function o:IsShowIndex() return P:IsShowIndex(self.w.frameIndex) end
     --- @return boolean
     function o:IsShowEmptyButtons() return P:IsShowEmptyButtons(self.w.frameIndex) end
+
+    --- @deprecated This setting is no longer being used. To be removed
     --- @return boolean
     function o:IsShowKeybindText() return P:IsShowKeybindText(self.w.frameIndex) end
 
     function o:ResetButtonData()
-        local conf = self:conf()
-        for _, a in ipairs(O.ActionType:GetNames()) do conf[a] = nil end
-        conf[W.TYPE] = ''
+        self:conf():Reset()
     end
 
     function o:CleanupActionTypeData()

@@ -6,10 +6,17 @@ local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles,
 --- Use C_AddOns.GetAddOnEnableStat(addonName, char) if available
 local C_AddOns_GetAddOnEnableState = C_AddOns.GetAddOnEnableState
 --- Else, WOTLK Uses GetAddOnEnableState(index, char)
-local GetAddOnEnableState = GetAddOnEnableState
+local GetAddOnEnableState, GetUnitName = GetAddOnEnableState, GetUnitName
 local UnitInVehicle, UnitOnTaxi = UnitInVehicle, UnitOnTaxi
+local UnitIsDead, UnitClass = UnitIsDead, UnitClass
+local InCombatLockdown, GetMacroItem = InCombatLockdown, GetMacroItem
+local GetMacroInfo, GetItemInfo = GetMacroInfo, GetItemInfo
+local GetItemInfoFromHyperlink = GetItemInfoFromHyperlink
 
 local ABP_M6 = 'ActionbarPlus-M6'
+local highestSpellRankCache = {}
+
+local RANK_FORMAT = ' |cff8e8e8e(%s)|r'
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -22,13 +29,13 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, Compat = ns.O, ns.GC, ns.O.Compat
 
-local String = ns:String()
+local String, sformat = ns:String(), string.format
 local IsAnyOf, IsBlank, IsNotBlank, strlower = String.IsAnyOf, String.IsBlank, String.IsNotBlank, string.lower
 local Unit, Druid, Shaman = O.UnitMixin, O.DruidUnitMixin, O.ShamanUnitMixin
 local Priest, Rogue = O.PriestUnitMixin, O.RogueUnitMixin
 
-local WAttr, UnitId = GC.WidgetAttributes, GC.UnitId
-local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+local WAttr, u = GC.WidgetAttributes, GC.UnitId
+local SPELL, ITEM, MACRO = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO
 
 local ROGUE_STEALTH_SPELL_ID = 1784
 local DRUID_PROWL_SPELL_ID = 5215
@@ -135,8 +142,8 @@ function S:IsAddOnEnabledLegacy(indexOrName, charName)
 end
 
 --- @see Blizzard_UnitId
-function S:IsValidActionTarget() return self:HasTarget() and not UnitIsDead(UnitId.target) end
-function S:HasTarget() return GetUnitName(UnitId.target) ~= nil end
+function S:IsValidActionTarget() return self:HasTarget() and not UnitIsDead(u.target) end
+function S:HasTarget() return GetUnitName(u.target) ~= nil end
 
 --- @param spell SpellName
 --- @param target UnitID
@@ -147,11 +154,24 @@ function S:IsSpellInRange(spell, target)
     return inRange == true or inRange == 1
 end
 
+--- @param spell SpellIdentifier
+--- @return NeitherHelpOrHarmful, Helpful, Harmful
+function S:IsSpellNeitherHelpOrHarmful(spell)
+    local helpful = Compat:IsSpellHelpful(spell)
+    local harmful = Compat:IsSpellHarmful(spell)
+    return not (helpful or harmful), helpful, harmful
+end
+
+--- @NotCombatSafe
 --- @param item ItemName
 --- @param target UnitID
 --- @return BooleanOptional A return of nil means that the item is not applicable for the target unit
 function S:IsItemInRange(item, target)
-    local inRange = IsItemInRange(item, target)
+    if InCombatLockdown() then
+        -- just return nil for now since IsItemInRange is a protected call
+        return nil
+    end
+    local inRange = Compat:IsItemInRange(item, target)
     if inRange == nil then return nil end
     return inRange == true or inRange == 1
 end
@@ -226,7 +246,7 @@ function S:IsItemConsumable(item, retrieveUpdate)
     return itemData.classID == Enum.ItemClass.Consumable
 end
 
-function S:CanApplySpellOnTarget(spellName) return Compat:IsSpellInRange(spellName, UnitId.target) ~= nil end
+function S:CanApplySpellOnTarget(spellName) return Compat:IsSpellInRange(spellName, u.target) ~= nil end
 
 
 ---@return boolean, SpellName, SpellID
@@ -261,6 +281,64 @@ function S:GetSpellInfoBasic(spellNameOrId)
     return spellInfo
 end
 
+--- @param spellID SpellID
+function S:GetSpellRankFormatted(spellID)
+    local rank = self:GetSpellRank(spellID)
+    return IsNotBlank(rank) and sformat(RANK_FORMAT, rank)
+end
+
+--- @param spell SpellIdentifier
+function S:GetSpellHighestRankFormatted(spell)
+    local rank = self:GetSpellHighestRank(spell)
+    return IsNotBlank(rank) and sformat(RANK_FORMAT, rank)
+end
+
+--- @param spell SpellIdentifier
+function S:GetSpellHighestRank(spell)
+    assert(type(spell) == 'string' or type(spell) == 'number', 'SpellIdentifier should be a name or ID')
+    if not GetSpellBookItemName then return nil end
+
+    local spellName
+    if type(spell) == 'string' then
+        spellName = spell
+    elseif type(spell) == 'number' then
+        spellName = self:GetSpellName(spell)
+    end
+    if IsBlank(spellName) then return nil end
+
+    -- Check cache first
+    local rank = highestSpellRankCache[spellName]
+    if rank ~= nil then return rank end
+
+    local i = 1
+    local lastRank
+    while true do
+        local name, r = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+        if not name then break end
+        if r and name == spellName then lastRank = r end
+        i = i + 1
+    end
+
+    highestSpellRankCache[spellName] = lastRank
+    return lastRank
+end
+
+--- @param spellID SpellID
+function S:GetSpellRank(spellID)
+    if not GetSpellBookItemName then return nil end
+
+    local spellName
+    local i = 1
+    while true do
+        local name, rank, spid = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+        if not name then break end
+        if rank and spellID == spid then return rank end
+        i = i + 1
+    end
+
+    return nil
+end
+
 --- @param unit UnitID|nil Defaults to 'player'
 --- @return SpellInfoBasic
 function S:GetCurrentSpellCasting(unit)
@@ -270,7 +348,7 @@ end
 --- @param unit UnitID|nil Defaults to 'player'
 --- @return SpellInfoBasic
 function S:GetUnitCastingInfoBasic(unit)
-    unit = unit or UnitId.player
+    unit = unit or u.player
     local spn, _, icon, _, _, _, _, _, spID = UnitCastingInfo(unit)
     if not spn then return nil end
 
@@ -282,7 +360,7 @@ end
 --- @param unit UnitID|nil Defaults to 'player'
 --- @return SpellInfoBasic
 function S:GetUnitChannelInfoBasic(unit)
-    unit = unit or UnitId.player
+    unit = unit or u.player
     local spn, _, icon, _, _, _, _, spID, isEmpowered = UnitChannelInfo(unit)
     if not spn then return nil end
 
@@ -393,7 +471,7 @@ end
 --- @see Blizzard_UnitId
 --- @return string One of DRUID, ROGUE, PRIEST, etc...
 function S:GetUnitClass(optionalUnit)
-    optionalUnit = optionalUnit or UnitId.player
+    optionalUnit = optionalUnit or u.player
     return select(2, UnitClass(optionalUnit))
 end
 
@@ -505,12 +583,35 @@ function S:IsToyItem(itemID)
     return not (_itemID == nil or toyName == nil)
 end
 
---- @param macroName string
+--- For items that are already in a player's inventory
+--- @param macroName MacroIdentifier
 --- @return ItemInfoDetails
 function S:GetMacroItem(macroName)
+    local name, itemLink = GetMacroItem(macroName); if not name then return end
+
+    local ItemID, ItemType, ItemSubType, ItemEquipLoc, Icon, ItemClassID, ItemSubClassID
+            = name and Compat:GetItemInfoInstant(name)
+    if not ItemID then return nil end
+
+    --- @type ItemInfoDetails
+    local item = {
+        name = name, link = itemLink, id = ItemID, icon = Icon, type = ItemType, subType = ItemSubType,
+        equipLoc = ItemEquipLoc, classID = ItemClassID, subclassID = ItemSubClassID
+    }
+    return item
+end
+
+--- Note that this is a heavy call
+--- @param macroName string
+--- @return ItemInfoDetails
+function S:GetMacroItemInfo(macroName)
     local name = GetMacroItem(macroName); if not name then return nil end
     return self:GetItemInfo(name)
 end
+
+--- @param macroIndex Index
+--- @return IconIDOrPath
+function S:GetMacroIcon(macroIndex) return select(2, GetMacroInfo(macroIndex)) end
 
 function S:GetItemID(itemName)
     if String.IsBlank(itemName) then return nil end
@@ -578,8 +679,12 @@ function S:MightHaveChargesByID(itemID)
     return false
 end
 
+--- A more performant way to get the item SpellID
+--- @param item ItemIdentifier
+--- @return SpellID
+function S:GetItemSpellID(item) return select(2, Compat:GetItemSpell(item)) end
 
---- @param itemIdNameOrLink ItemName|ItemLink|Profile_Item
+--- @param itemIdNameOrLink ItemIdentifier|Profile_Item
 --- @return string, number
 function S:GetItemSpellInfo(itemIdNameOrLink)
     if type(itemIdNameOrLink) == 'table' then
