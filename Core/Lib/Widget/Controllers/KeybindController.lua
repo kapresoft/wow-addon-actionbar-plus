@@ -97,11 +97,11 @@ local function PropsAndMethods(o)
     --- Show the Keybind Text based on the settings
     function o:ActionBars_UpdateAllKeybindTextState()
         self:ForEachButton(function(bw)
-            if bw:IsEmpty() then
-                if not bw:IsShowEmptyButtons() then bw.kbt:HideKeybindText() end
-            else
-                bw.kbt:UpdateKeybindTextState()
+            bw.kbt:ShowKeybindText()
+            if bw:IsEmpty() and not bw:IsShowEmptyButtons() then
+                return bw.kbt:HideKeybindText()
             end
+            bw.kbt:UpdateKeybindTextState()
         end)
     end
 
