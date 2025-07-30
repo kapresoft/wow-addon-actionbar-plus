@@ -3,6 +3,8 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CSpell_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
 local CSpell_IsCurrentSpell    = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
+local C_IsSpellHelpful         = C_Spell and C_Spell.IsSpellHelpful
+local C_IsSpellHarmful         = C_Spell and C_Spell.IsSpellHarmful
 local C_GetSpecializationInfo  = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo or GetSpecializationInfo
 local C_GetActiveSpecGroup     = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
 local C_GetItemCount           = C_Item and C_Item.GetItemCount or GetItemCount
@@ -10,6 +12,7 @@ local C_GetItemInfo            = C_Item and C_Item.GetItemInfo or GetItemInfo
 local C_GetItemInfoInstant     = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
 local C_GetItemSpell           = C_Item and C_Item.GetItemSpell or GetItemSpell
 local C_IsUsableItem           = C_Item and C_Item.IsUsableItem or IsUsableItem
+local C_IsItemInRange          = C_Item and C_Item.IsItemInRange or IsItemInRange
 local C_PickupItem             = C_Item and C_Item.PickupItem or PickupItem
 local GetSpecialization        = GetSpecialization
 local GetActiveTalentGroup     = GetActiveTalentGroup
@@ -144,6 +147,12 @@ function L:IsPassiveSpell(spellIDOrName)
     end
     return nil
 end
+
+--- @param spell SpellIdentifier
+--- @return boolean|nil
+function L:IsSpellHelpful(spell) return C_IsSpellHelpful(spell) == true end
+--- @param spell SpellIdentifier
+function L:IsSpellHarmful(spell) return C_IsSpellHarmful(spell) == true end
 
 --- Checks if a spell is in range for the specified target, compatible with both Retail and Classic WoW.
 --- @param spell SpellID_Name_Or_Index The ID, name, or index of the spell to check.
@@ -302,6 +311,15 @@ function L:GetItemSpell(item) return C_GetItemSpell(item) end
 --- @param item ItemInfo
 --- @return Usable, CannotBeCastedDueToLowMana
 function L:IsUsableItem(item) return C_IsUsableItem(item) end
+
+--- @NotCombatSafe
+--- We can just return true when player is in combat
+--- @param item ItemIdentifier The name or ID of the item to check.
+--- @param target UnitID The unit to check the range against. Defaults to "target" if nil.
+--- @return boolean|1|0|nil A return of nil means that the item is not applicable for the target unit. The older API (Non C_Item) returns 1 or 0.
+function L:IsItemInRange(item, target)
+    if InCombatLockdown() then return nil end; return C_IsItemInRange(item, target)
+end
 
 --- @param item ItemInfo
 function L:PickupItem(item) return C_PickupItem(item) end

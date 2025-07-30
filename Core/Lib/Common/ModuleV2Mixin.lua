@@ -56,7 +56,7 @@ local function CreateTraceFn(logger, callback, isBucket)
         local a = safeArgs(...)
         if type(source) == 'table' then source = tostring(source) end
         logger:i(function() return prefix .. "[%s] src=%s args=%s", msg, source, a end)
-        callback(msg, source, ...)
+        if callback then callback(msg, source, ...) end
     end
     return fn
 end
@@ -104,8 +104,9 @@ local function PropsAndMethods(o)
     --- @param fromEvent Name The event name from GC.E enum
     --- @param interval number The Bucket interval (burst interval)
     --- @param callbackFn HandlerFnNoArg|string The callback function, either as a function reference, or a string pointing to a method of the addon object.
+    --- @return any The bucket handle
     function o:RegisterBucketAddOnMessage(fromEvent, interval, callbackFn)
-        self:RegisterBucketMessage(GC.toMsg(fromEvent), interval, callbackFn)
+        return self:RegisterBucketMessage(GC.toMsg(fromEvent), interval, callbackFn)
     end
 
     --- @param event Name Use the GlobalConstant.E event names
@@ -116,16 +117,18 @@ local function PropsAndMethods(o)
 
     --- @param msg string The message name
     --- @param callbackFn fun(msg:string, source:string, ...:any) The callback function name or function(msg, src,...) in the instance of this object
+    --- @return any The bucket handle
     function o:RegisterMessage(msg, callbackFn)
-        _RegisterMessage(self, msg, CreateTraceFn(self.pm, callbackFn))
+        return _RegisterMessage(self, msg, CreateTraceFn(self.pm, callbackFn))
     end
 
     if _RegisterBucketMessage then
         --- @param msg string|table
         --- @param interval number The Bucket interval (burst interval)
         --- @param callbackFn HandlerFnNoArg|string The callback function, either as a function reference, or a string pointing to a method of the addon object.
+        --- @return any The bucket handle
         function o:RegisterBucketMessage(msg, interval, callbackFn)
-            _RegisterBucketMessage(self, msg, interval, CreateTraceFn(self.pm, callbackFn, true))
+            return _RegisterBucketMessage(self, msg, interval, CreateTraceFn(self.pm, callbackFn, true))
         end
     end
 
@@ -141,7 +144,7 @@ local function PropsAndMethods(o)
 
     --- @param msg string The message name
     function o:RegisterMessageHandler(msg)
-        self:RegisterMessage(msg, ResolveHandlerFunction(self, msg))
+        return self:RegisterMessage(msg, ResolveHandlerFunction(self, msg))
     end
 
 end; PropsAndMethods(L)

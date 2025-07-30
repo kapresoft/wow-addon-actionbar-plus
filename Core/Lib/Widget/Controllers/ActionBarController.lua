@@ -1,5 +1,8 @@
 --- @alias ActionBarController __ActionBarController | ControllerV2
 
+-- todo next: Issue #501: Pull Out Unit SpellCast Controller
+-- https://github.com/kapresoft/wow-addon-actionbar-plus/issues/501
+
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, Compat, LC = ns.O, ns.GC, ns.M, ns.O.Compat, ns:LC()
@@ -29,6 +32,8 @@ local bagL = LC.BAG:NewLogger(libName)
 local df = ns:CreateDefaultLogger(libName)
 local ua = LC.UNIT:NewLogger(libName)
 local pe = LC.EVENT:NewLogger(libName)
+
+local enableExternalAPI = GC.F.ENABLE_EXTERNAL_API
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -84,7 +89,9 @@ local function OnPlayerSpellCastStart(event, ...)
         end)
         bw:SetHighlightInUse()
     end)
-    ---@param handlerFn ButtonHandlerFunction
+    if not enableExternalAPI then return end
+
+    --- @param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastStartExt, libName, CallbackFn)
 end
@@ -99,6 +106,8 @@ local function OnPlayerSpellCastSent(evt)
         end)
         bw:SetButtonStateNormal();
     end)
+    if not enableExternalAPI then return end
+
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastSentExt, libName, CallbackFn)
@@ -133,6 +142,8 @@ local function OnPlayerSpellCastFailedQuietly(event, ...)
     L:ForEachMatchingSpellButton(evt.spellID, function(bw)
         bw:SetButtonStateNormal()
     end)
+    if not enableExternalAPI then return end
+
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
     L:SendMessage(MSG.OnSpellCastFailedExt, libName, CallbackFn)
@@ -148,6 +159,7 @@ local function OnPlayerSpellCastStop(event, ...)
             bw:ResetHighlight()
         end
     end)
+    if not enableExternalAPI then return end
 
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) ABPI():UpdateM6Macros(handlerFn) end
@@ -159,12 +171,6 @@ Methods
 -------------------------------------------------------------------------------]]
 ---@param o __ActionBarController | ActionBarController
 local function PropsAndMethods(o)
-
-    ---@param evt string
-    o[E.PLAYER_TARGET_CHANGED] = function(evt, ...)
-        local t = UnitName('target') or 'NONE'
-        ua:f1(function() return 'PLAYER_TARGET_CHANGED: %s', t end)
-    end
 
     o[E.COMPANION_UPDATE] = OnCompanionUpdate
     o[E.UPDATE_STEALTH]         = OnUpdateStealth
@@ -193,7 +199,6 @@ local function OnAddOnReady(frame)
     OnCompanionUpdate();
 
     RegisterFrameForEvents(frame, {
-        E.PLAYER_TARGET_CHANGED,
         E.COMPANION_UPDATE,
         E.UPDATE_BINDINGS,
         E.UPDATE_STEALTH, E.UPDATE_SHAPESHIFT_FORM,

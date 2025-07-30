@@ -393,7 +393,9 @@ local function PropsAndMethods(o)
                     get = GetShowButtonIndexStateGetterHandler(frameIndex),
                     set = GetShowButtonIndexStateSetterHandler(frameIndex)
                 },
+                -- note: showKeybindText is deprecated
                 showKeybindText = {
+                    hidden = true,
                     width = "normal",
                     type = "toggle",
                     name = L['Show Keybind Text'],

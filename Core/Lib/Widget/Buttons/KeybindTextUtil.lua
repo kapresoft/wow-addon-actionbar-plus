@@ -1,8 +1,8 @@
 --[[-----------------------------------------------------------------------------
 Types
 -------------------------------------------------------------------------------]]
---- @class KeybindTextMixin_Instance : KeybindTextMixin
---- @field private New fun(self:KeybindTextMixin_Instance)
+--- @class KeybindTextUtil_Instance : KeybindTextUtil
+--- @field private New fun(self:KeybindTextUtil_Instance)
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -16,22 +16,22 @@ local IsNotBlank = String.IsNotBlank
 New Instance
 -------------------------------------------------------------------------------]]
 
-local libName = ns.M.KeybindTextMixin
---- @class KeybindTextMixin
+local libName = ns.M.KeybindTextUtil
+--- @class KeybindTextUtil
 local S = {}
 local p = ns:CreateDefaultLogger(libName)
 
---- @type KeybindTextMixin
+--- @type KeybindTextUtil
 local LIB = S; ns:Register(libName, LIB)
 
 --- @param buttonWidget ButtonUIWidget
---- @return KeybindTextMixin_Instance
+--- @return KeybindTextUtil_Instance
 function LIB:New(buttonWidget)  return K:CreateAndInitFromMixin(S, buttonWidget) end
 
 --[[-----------------------------------------------------------------------------
 Instance Methods
 -------------------------------------------------------------------------------]]
---- @type KeybindTextMixin_Instance
+--- @type KeybindTextUtil_Instance
 local o = S
 
 --- @private
@@ -49,6 +49,7 @@ function o:UpdateKeybindTextState()
         self:HideKeybindText()
         return self:SetText('')
     end
+    self.keybindText.widget:SetVertexColorNormal()
     self:SetText(bindings.key1Short)
     return self:ShowKeybindText()
 end
@@ -72,8 +73,7 @@ end
 
 --- @return boolean
 function o:HasKeybindings()
-    local b = self:GetBindings()
-    if not b then return false end
+    local b = self:GetBindings(); if not b then return false end
     return b and IsNotBlank(b.key1)
 end
 

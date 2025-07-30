@@ -17,6 +17,7 @@ local AceGUI, AceHook = Ace.AceGUI, Ace.AceHook
 local A, PH, API = ns:Assert(), O.PickupHandler, O.API
 local WMX, ButtonMX = O.WidgetMixin, O.ButtonMixin
 local AssertThatMethodArgIsNotNil = A.AssertThatMethodArgIsNotNil
+local enableExternalAPI = GC.F.ENABLE_EXTERNAL_API
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -89,8 +90,6 @@ local function OnPreClick(btn, key, down)
     elseif w:IsNewLeatherWorkingSpell() then
         w:SendMessage(GC.M.OnButtonClickLeatherworking, libName, w)
         return
-    else
-        w:UpdateRangeIndicator()
     end
     -- This prevents the button from being clicked
     -- on sequential drag-and-drops (one after another)
@@ -109,6 +108,8 @@ local function OnPostClick(btn, key, down)
     if w:IsEmpty() then return end
     w:SendMessage(GC.M.OnButtonAfterPostClick, ns.M.ButtonUI, w)
 
+    -- todo: M6 integration to be removed
+    if not enableExternalAPI then return end
     ---@param handlerFn ButtonHandlerFunction
     local function CallbackFn(handlerFn) O.ActionbarPlusAPI:UpdateM6Macros(handlerFn) end
     w:SendMessage(GC.M.OnButtonPostClickExt, ns.M.ButtonUI, CallbackFn)
@@ -153,6 +154,9 @@ local function OnReceiveDrag(btnUI)
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
     btnUI.widget:UpdateStateDelayed(0.01)
 
+    -- While the modifier key is held down after dragging
+    -- we KeyUp will be active to prevent KeyDown from executing the action
+    btnUI.widget:UseKeyUpForClicks()
     btnUI.widget:SendMessage(GC.M.OnAfterReceiveDrag, libName, btnUI.widget)
 end
 
@@ -177,11 +181,7 @@ local function OnBeforeEnter(widget)
 end
 --- @param widget ButtonUIWidget
 local function OnBeforeLeave(widget)
-    --RegisterMacroEvent(widget)
-    if not widget:IsMacro() then
-        --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-        widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
-    end
+    widget:UnregisterEvent(E.MODIFIER_STATE_CHANGED)
     RegisterForClicks(widget, E.ON_LEAVE)
 end
 --- @param btn ButtonUI
@@ -225,7 +225,6 @@ end
 --- @param event string Event string
 local function OnSpellUpdateUsable(w, event)
     if not w:IsShown() or w:IsEmpty() or w:IsNotUpdatable() then return end
-    w:UpdateRangeIndicator()
     w:UpdateUsable()
     w:UpdateGlow()
 
@@ -233,26 +232,6 @@ local function OnSpellUpdateUsable(w, event)
     w:SendMessage(GC.M.OnPostUpdateSpellUsable, libName, w)
 end
 
---- @see "UnitDocumentation.lua"
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerTargetChanged(widget, event)
-    if widget:IsNotUpdatable() then return end
-    widget:UpdateRangeIndicator()
-end
-
---- @see "UnitDocumentation.lua"
---- @param widget ButtonUIWidget
---- @param event string
-local function OnPlayerTargetChangedDelayed(widget, event)
-    C_Timer.After(0.1, function() OnPlayerTargetChanged(widget, event) end)
-end
-
----@param widget ButtonUIWidget
-local function OnPlayerStoppedMoving(widget, event)
-    pe:t(function() return 'moving-stopped[%s]: %s', widget:GN(), GetTime() end)
-    OnPlayerTargetChangedDelayed(widget, event)
-end
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -297,31 +276,13 @@ local function RegisterSpellUpdateUsable(widget)
     end
 end
 
---- see: Interface_[Vanilla|TBC|etc.]/FrameXML/Constants.lua
---- ClassicExpansionAtLeast(LE_EXPANSION_CLASSIC)
---- ClassicExpansionAtLeast(LE_EXPANSION_BURNING_CRUSADE)
---- @param widget ButtonUIWidget
-local function RegisterUpdateRangeIndicatorOnSpellCast(widget)
-    if not GC.F.ENABLE_RANGE_INDICATOR_UPDATE_ON_SPELLCAST then return end
-    local bucketEvents = { E.UNIT_SPELLCAST_SENT, E.UNIT_SPELLCAST_FAILED }
-    widget:RegisterBucketEvent(bucketEvents, 0.5, function(units)
-        if not units.player then return end
-        if widget:IsHidden() or O.API:HasTarget() ~= true then return end
-        local spell, ranged = widget:GetEffectiveRangedSpellName()
-        if ranged == false then return end
-        widget:UpdateRangeIndicatorBySpell(spell)
-    end, widget)
-end
-
 --- @param widget ButtonUIWidget
 local function RegisterCallbacks(widget)
 
     -- TODO Next: Tracks changing spells such as Covenant abilities in Shadowlands.
     widget:RegisterEvent(E.SPELL_UPDATE_COOLDOWN, OnUpdateButtonCooldown, widget)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-    widget:RegisterEvent(E.PLAYER_STOPPED_MOVING, OnPlayerStoppedMoving, widget)
     RegisterSpellUpdateUsable(widget)
-    RegisterUpdateRangeIndicatorOnSpellCast(widget)
 
     -- TODO: Refactor to use messages (see #OnReceiveDrag())
     -- Callbacks (fired via Ace Events)
@@ -397,6 +358,8 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin
     --- @class __ButtonUIWidget
     --- @field AutoRepeatSpell AutoRepeatSpellData
+    --- @field private _conf ButtonProfileConfigMixin
+    --- @field private _rangeUtil RangeIndicatorUtil_Instance
     local __widget = {
         --- @deprecated Use ns:a()
         --- @type fun() : ActionbarPlus

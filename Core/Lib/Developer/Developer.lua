@@ -31,18 +31,21 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-function L:f()
+-- /dump a:c("\n\t  ")
+function L:c(str)
+    return ns:String().IsBlank(str)
+end
 
-    --- @type ButtonUI
-    local btn = ActionbarPlusF1Button2
-    local w = btn.widget
-    local itemID = w:GetEffectiveItemID()
-    p:vv(function() return 'ItemID: %s isEmpty? %s',
-        itemID,  w:IsEmpty()
-    end)
-    ab:ForEachItemButton(function(bw) print(bw:GetName()) end)
+-- /run a:f1()
+function L:f1()
+
+    --- @type ActionBarFrame
+    local f = ActionbarPlusF1
+    f:ClearAllPoints()
+    f:SetPoint("BOTTOMRIGHT", MultiBarBottomRight, "TOPRIGHT", 0, 5)
 
 end
+
 --- /dump IsSpellKnown(106785)
 --- /dump IsSpellKnown(C_Spell.GetSpellIDForSpellIdentifier('Swipe'))
 --- /dump C_Spell.GetSpellIDForSpellIdentifier('Swipe')
@@ -139,15 +142,9 @@ function L:F(frameIndex, buttonIndex)
 end
 
 --- @param frameIndex Index
---- @return Profile_Bar
-function L:C(frameIndex) return self:F(frameIndex):GetConfig() end
-
-function L:M() return GetMouseFocus() end
-
---- @param frameIndex Index
 --- @param buttonIndex Index
 --- @return ButtonUIWidget
-function L:B(frameIndex, buttonIndex)
+function L:GetButton(frameIndex, buttonIndex)
     local bn = string.format('ActionbarPlusF%sButton%s', frameIndex, buttonIndex)
     return _G[bn].widget
 end
@@ -219,8 +216,7 @@ function L:tr()
     end
 end
 
-
-function L:c()
+function L:PetAction()
     local c = ns.chatFrame
     for i=1, NUM_PET_ACTION_SLOTS, 1 do
         local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID, checksRange, inRange = GetPetActionInfo(i);
@@ -234,12 +230,127 @@ function L:c()
     end
 end
 
-function L:c1()
-    c('chatFrame:', ns.chatFrame:IsSelected())
+-- Name: ||::AB Form1
+-- /run a:align()
+function L:SetupButtonsLargeUI()
 
-    for i = 1, NUM_CHAT_WINDOWS do
-        local name, fontSize, r, g, b, alpha, isSelected = GetChatWindowInfo(i)
-        c('tab:', name, 'selected:', isSelected)
+    local fb = O.ActionBarFrameBuilder
+    --- @type _AnchorUtil
+    local AnchorUtil = AnchorUtil
+
+    --- @param fr ActionBarFrame
+    local function toUIParent(fr)
+        local screenX, screenY = fr:GetCenter()
+        fr:ClearAllPoints()
+        fr:SetPoint("CENTER", UIParent, "BOTTOMLEFT", screenX, screenY)
     end
 
+    --- @type ActionBarFrame
+    local f1 = ActionbarPlusF1
+    f1.widget:SetFrameState(true)
+    f1.widget:SetButtonCount(1, 11)
+    f1.widget:SetButtonWidth(50)
+    f1.widget:SetButtonAlpha(0.5)
+    f1:ClearAllPoints()
+    f1:SetPoint("TOP", UIParent, "TOP", 0, -5)
+    f1.widget:UpdateAnchor()
+
+    --- @type ActionBarFrame
+    local f2 = ActionbarPlusF2
+    f2.widget:SetFrameState(true)
+    f2.widget:SetButtonCount(1, 13)
+    f2.widget:SetButtonWidth(35)
+    f2.widget:SetButtonAlpha(0.4)
+    f2:ClearAllPoints()
+    f2:SetPoint("TOPRIGHT", f1, "BOTTOMRIGHT", -3, -3)
+    toUIParent(f2)
+    f2.widget:UpdateAnchor()
+
+    --- @type ActionBarFrame
+    local f3 = ActionbarPlusF4
+    f3.widget:SetFrameState(true)
+    f3.widget:SetButtonCount(2, 3)
+    f3.widget:SetButtonWidth(60)
+    f3.widget:SetButtonAlpha(0.3)
+    f3:ClearAllPoints()
+    f3:SetPoint("BOTTOMRIGHT", UIParent, "CENTER", -100, 50)
+    f3.widget:UpdateAnchor()
+
+    --- @type ActionBarFrame
+    local f4 = ActionbarPlusF5
+    f4.widget:SetFrameState(true)
+    f4.widget:SetButtonCount(2, 3)
+    f4.widget:SetButtonWidth(60)
+    f4.widget:SetButtonAlpha(0.99)
+    f4:ClearAllPoints()
+    f4:SetPoint("BOTTOMLEFT", UIParent, "CENTER", 100, 50)
+    f4.widget:UpdateAnchor()
+
+    --- @type ActionBarFrame
+    local f10 = ActionbarPlusF10
+    f10.widget:SetFrameState(true)
+    f10.widget:SetButtonCount(1, 7)
+    f10.widget:SetButtonWidth(30)
+    f10.widget:SetButtonAlpha(0.3)
+    f10:ClearAllPoints()
+    f10:SetPoint("BOTTOMRIGHT", MultiBarBottomRight, "TOPRIGHT", -3, 3)
+    toUIParent(f10)
+    f10.widget:UpdateAnchor()
 end
+
+function L:SecureFuncExample()
+    --[[--- @type ActionBarFrame
+    local f1 = ActionbarPlusF1
+    --- @type ActionBarFrame
+    local f2 = ActionbarPlusF2
+    f2.widget:SetButtonCount(1, 13)
+
+    -- example on how to lock
+    local function LockF2ToF1()
+        f2:ClearAllPoints()
+        f2:SetPoint("TOP", f1, "BOTTOM", 0, -4)
+    end
+    -- Initial positioning
+    LockF2ToF1()
+
+    -- Lock dynamically against outside modifications
+    hooksecurefunc(f2, "SetPoint", function()
+        if not InCombatLockdown() then
+            LockF2ToF1()
+        end
+    end)
+
+    hooksecurefunc(f2, "ClearAllPoints", function()
+        if not InCombatLockdown() then
+            LockF2ToF1()
+        end
+    end)]]
+end
+
+
+--[[-----------------------------------------------------------------------------
+OnAddOnReady
+-------------------------------------------------------------------------------]]
+function L.OnAddOnReady()
+    p:vv('OnAddOnReady() called...')
+    if not ShadowUF then L:CustomFrameLocations() end
+end
+
+-- /run a:p()
+function L:CustomFrameLocations()
+    local scale = 0.85
+    local ofsy = -200
+
+    --- @type Frame
+    local pf = PlayerFrame
+    pf:SetScale(scale)
+    pf:ClearAllPoints()
+    pf:SetPoint("TOPRIGHT", UIParent, "CENTER", -100, ofsy)
+
+    local tf = TargetFrame
+    tf:ClearAllPoints()
+    tf:SetScale(scale)
+    tf:SetPoint("TOPLEFT", UIParent, "CENTER", 100, ofsy)
+end
+
+L:RegisterMessage(ns.GC.M.OnAddOnReady, L.OnAddOnReady)

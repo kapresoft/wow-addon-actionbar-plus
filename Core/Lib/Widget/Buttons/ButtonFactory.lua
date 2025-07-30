@@ -7,7 +7,6 @@ local tinsert = table.insert
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local TooltipDataProcessor = TooltipDataProcessor
-local Enum, EmbeddedItemTooltip, ItemRefTooltip = Enum, EmbeddedItemTooltip, ItemRefTooltip
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -40,6 +39,7 @@ local L = LibStub:NewLibrary(libName); if not L then return end; ns:AceEvent(L)
 local p = ns:LC().BUTTON:NewLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
 
+-- todo next: Move Attribute setters to AttributeSetterRegistry #503
 --- @type table<string, AttributeSetter>
 local AttributeSetters = {
     [SPELL]         = O.SpellAttributeSetter,
@@ -60,40 +60,14 @@ local function abh() return O.ActionBarHandlerMixin end
 
 local function InitButtonGameTooltipHooksLegacy()
     GameTooltip:HookScript(E.OnShow, function(tooltip, ...)
-        if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        WMX:SetupTooltipKeybindingInfo(tooltip)
-    end)
-    GameTooltip:HookScript(E.OnTooltipSetSpell, function(tooltip, ...)
-        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        WMX:SetupTooltipKeybindingInfo(tooltip)
-    end)
-    GameTooltip:HookScript(E.OnTooltipSetItem, function(tooltip, ...)
-        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        WMX:SetupTooltipKeybindingInfo(tooltip)
+        WMX:OnShowAdditionalTooltipInfo(tooltip)
     end)
 end
 
 local function InitButtonGameTooltipHooksUsingTooltipDataProcessor()
-    ---For macros not using spells
     GameTooltip:HookScript("OnShow", function(tooltip, ...)
-        if not WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        WMX:SetupTooltipKeybindingInfo(tooltip)
+        WMX:OnShowAdditionalTooltipInfo(tooltip)
     end)
-
-    local onTooltipSetSpellFunction = function(tooltip, tooltipData)
-        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        if (tooltip == GameTooltip or tooltip == EmbeddedItemTooltip) then
-            WMX:SetupTooltipKeybindingInfo(tooltip)
-        end
-    end
-    local onTooltipSetItemFunction = function(tooltip, tooltipData)
-        if WMX:IsTypeMacro(tooltip:GetOwner()) then return end
-        if (tooltip == GameTooltip or tooltip == ItemRefTooltip) then
-            WMX:SetupTooltipKeybindingInfo(tooltip)
-        end
-    end
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, onTooltipSetSpellFunction)
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, onTooltipSetItemFunction)
 end
 
 local function InitButtonGameTooltipHooks()
@@ -158,6 +132,8 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
     local btnWidget = btnUI and btnUI.widget
     if not btnWidget then
         btnWidget = ButtonUI:WidgetBuilder():Create(frameWidget, row, col, btnIndex)
+    else
+        btnWidget:InitConfig()
     end
     btnWidget:ClearAllText()
     btnWidget:ResetCooldown()

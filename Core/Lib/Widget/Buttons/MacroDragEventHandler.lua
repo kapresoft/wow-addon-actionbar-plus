@@ -9,6 +9,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local api = O.API
 
 local Assert, String = ns:Assert(), ns:String()
 local WAttr, PH = GC.WidgetAttributes, O.PickupHandler
@@ -20,7 +21,9 @@ local highlightColor =  HIGHLIGHT_LIGHT_BLUE or BLUE_FONT_COLOR
 
 local MACRO_WITHOUT_SPELL_FORMAT = '%s |cfd5a5a5a(Macro)|r'
 local MACRO_WITH_SPELL_FORMAT = '|cfd03c2fc::|r |cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
+local MACRO_WITH_SPELL_RIGHT_FORMAT = '|cfd03c2fc%s|r |cfd5a5a5a(Macro)|r'
 
+local enableExternalAPI = GC.F.ENABLE_EXTERNAL_API
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -49,7 +52,8 @@ local function eventHandlerMethods(e)
     ---@param cursorInfo CursorInfo
     function e:Supports(cursorInfo)
         local c = ns:CreateCursorUtil(cursorInfo)
-        if c:IsM6Macro() then
+
+        if enableExternalAPI and c:IsM6Macro() then
             local isEnabled  = O.M6Support.enabled
             if isEnabled ~= true then
                 local msg = warnColor:WrapTextInColorCode(LL['Requires ActionbarPlus-M6::Message'])
@@ -137,7 +141,7 @@ local function attributeSetterMethods(a)
         btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
         w:SetIcon(icon)
 
-        if w:IsM6Macro(macroInfo.name) then
+        if enableExternalAPI and w:IsM6Macro(macroInfo.name) then
             self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, M.MacroAttributeSetter, function() return w, macroInfo.name end)
         end
 
@@ -145,32 +149,32 @@ local function attributeSetterMethods(a)
         self:OnAfterSetAttributes(btnUI)
     end
 
-    ---@param btnUI ButtonUI
+    --- @see ButtonFactory#InitButtonGameTooltipHooksLegacy
+    --- @see ButtonFactory#InitButtonGameTooltipHooksUsingTooltipDataProcessor
+    --- @param btnUI ButtonUI
     function a:ShowTooltip(btnUI)
         local w = btnUI.widget
-
         if not w:ConfigContainsValidActionType() then return end
 
         local macroInfo = w:GetMacroData()
         if w:IsInvalidMacro(macroInfo) then return end
 
-        if w:IsM6Macro(macroInfo.name) then
+        if enableExternalAPI and w:IsM6Macro(macroInfo.name) then
             self:SendMessage(GC.M.MacroAttributeSetter_OnShowTooltip, M.MacroAttributeSetter, function() return w, macroInfo.name end)
             return
         end
 
-        local spellId = GetMacroSpell(macroInfo.index)
-        if not spellId then
+        local spid = api:GetMacroSpellID(macroInfo.index)
+        if not spid then
             local _, itemLink = GetMacroItem(macroInfo.index)
             if not itemLink then
                 GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
                 return
             end
-            GameTooltip:SetHyperlink(itemLink)
+            GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
         else
-            GameTooltip:SetSpellByID(spellId)
+            GameTooltip:SetSpellByID(spid)
         end
-        GameTooltip:AppendText(' ' .. sformat(MACRO_WITH_SPELL_FORMAT, macroInfo.name))
     end
 end
 

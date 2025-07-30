@@ -31,6 +31,8 @@ local function PropsAndMethods(o)
         self:RegisterMessage(MSG.OnActionBarHideGroup, o.OnActionBarHideGroup)
         self:RegisterMessage(MSG.OnShowKeybindTextSettingsUpdated, o.OnShowKeybindTextSettingsUpdated)
         self:RegisterMessage(MSG.OnShowEmptyButtons, o.OnShowEmptyButtons)
+        self:RegisterMessage(MSG.OnAfterDragStart, o.OnAfterDragStart)
+
         self:RegisterAddOnMessage(GC.E.UPDATE_BINDINGS, o.OnUpdateBindings)
         C_Timer.After(0.01, function()
             o:ActionBars_UpdateAllKeybindTextState()
@@ -71,8 +73,7 @@ local function PropsAndMethods(o)
     --- @param msg string
     --- @param src string
     --- @param bw ButtonUIWidget
-    function o.OnActionButtonShowGrid(msg, src, bw) bw.kbt:UpdateKeybindTextState()
-    end
+    function o.OnActionButtonShowGrid(msg, src, bw) bw.kbt:UpdateKeybindTextState() end
 
     --- Nothing to do here, for now.
     --- @param msg string
@@ -82,6 +83,13 @@ local function PropsAndMethods(o)
 
     function o.OnAfterReceiveDrag() o:ActionBars_UpdateAllKeybindTextState() end
 
+    --- @param msg string
+    --- @param src string
+    --- @param bw ButtonUIWidget
+    function o.OnAfterDragStart(msg, src, bw)
+        bw.kbt:GetKeybindText():SetVertexColorNormal()
+    end
+
     --[[-------------------------------------------------------
     Support Methods
     ---------------------------------------------------------]]
@@ -90,18 +98,9 @@ local function PropsAndMethods(o)
     function o:ActionBars_UpdateAllKeybindTextState()
         self:ForEachButton(function(bw)
             if bw:IsEmpty() then
-                if not bw:IsShowEmptyButtons() then return bw.kbt:HideKeybindText() end
-                if bw:IsShowKeybindText() then
-                    bw.kbt:UpdateKeybindTextState()
-                else
-                    bw.kbt:HideKeybindText()
-                end
+                if not bw:IsShowEmptyButtons() then bw.kbt:HideKeybindText() end
             else
-                if bw:IsShowKeybindText() then
-                    bw.kbt:UpdateKeybindTextState()
-                else
-                    bw.kbt:HideKeybindText()
-                end
+                bw.kbt:UpdateKeybindTextState()
             end
         end)
     end

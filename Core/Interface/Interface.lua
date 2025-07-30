@@ -40,11 +40,11 @@ local CursorUtil = {}
 Profile
 -------------------------------------------------------------------------------]]
 --- @class Profile_Spell
---- @field public id SpellID The spell ID
---- @field public name SpellName The spell Name
---- @field public icon Icon The icon ID
---- @field public rank string The rank label number, i.e. "Rank 1"
---- @field public runeSpell RuneSpellInfo The actual spell that the run is casting
+--- @field id SpellID The spell ID
+--- @field name SpellName The spell Name
+--- @field icon Icon The icon ID
+--- @field rank string The rank label number, i.e. "Rank 1"
+--- @field runeSpell RuneSpellInfo The actual spell that the run is casting
 local Profile_Spell = { }
 
 --- @class Profile_Item
@@ -117,16 +117,17 @@ local Profile_EquipmentSet = {
     ['icon'] = 3038273,
 }
 
+--- @alias SpellType string |"'spell'"|"'item'"|"'mount'"|"'companion'"|"'macro'"|"'equipmentset'"|
+
 --- @class Profile_Button
-local Profile_Button = {
-    ['type'] = 'spell',
-    ["spell"] = Profile_Spell,
-    ["item"] = Profile_Item,
-    ["macro"] = Profile_Macro,
-    ["mount"] = Profile_Mount,
-    ["companion"] = Profile_Companion,
-    ["equipmentset"] = Profile_EquipmentSet,
-}
+--- @field type SpellType
+--- @field spell Profile_Spell
+--- @field item Profile_Item
+--- @field macro Profile_Macro
+--- @field mount Profile_Mount
+--- @field companion Profile_Companion
+--- @field equipmentset Profile_EquipmentSet
+--- @field battlepet Profile_BattlePet
 
 --- @class Profile_Bar_Widget
 local Profile_Bar_Widget = {
@@ -140,6 +141,7 @@ local Profile_Bar_Widget = {
 }
 
 --- @class Profile_Bar
+--- @field buttons table<string, Profile_Button>
 local Profile_Bar = {
     --- show/hide the actionbar frame
     ["enabled"] = false,
@@ -153,10 +155,7 @@ local Profile_Bar = {
     ["widget"] = Profile_Bar_Widget,
     --- @see _RegionAnchor
     ["anchor"] = { point="CENTER", relativeTo=nil, relativePoint='CENTER', x=0.0, y=0.0 },
-    --- @type table<number, Profile_Button>
-    ["buttons"] = {
-        ['ActionbarPlusF1Button1'] = Profile_Button
-    }
+    ["buttons"] = {}
 }
 
 --- @class Global_Profile_Bar

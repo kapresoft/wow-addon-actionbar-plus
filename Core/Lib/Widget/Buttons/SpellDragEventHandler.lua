@@ -5,11 +5,13 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
+local reg = O.AttributeSetterRegistry
 local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
 local Compat, Dru = O.Compat, O.DruidUnitMixin
+local SPELL = WAttr.SPELL
 
 -- Cache table for spell ranks
 local highestSpellRankCache = {}
@@ -129,17 +131,8 @@ local function attributeSetterMethods(a)
     function a:ShowTooltip(btnUI)
         local w = btnUI.widget
         if not w:ConfigContainsValidActionType() then return end
-
-        local spellInfo = w:GetSpellData()
-        if w:IsInvalidSpell(spellInfo) then return end
-
-        GameTooltip:SetSpellByID(spellInfo.id)
-
-        -- Replace 'Spell' with 'Spell (Rank #Rank)'
-        if not GetSpellBookItemName then return end
-        local rank = self:GetHighestSpellRank(spellInfo.name)
-        if IsBlank(rank) then return end
-        GameTooltip:AppendText(format(' |cff565656(%s)|r', rank))
+        local c = w:conf(); if not c:IsSpell() then return end
+        GameTooltip:SetSpellByID(c.spell.id)
     end
 
     function a:GetHighestSpellRank(spellName)
@@ -178,6 +171,9 @@ local function Init()
 
     S.mt.__index = BaseAttributeSetter
     S.mt.__call = S.SetAttributes
+
+    -- todo next: Move Attribute setters to AttributeSetterRegistry #503
+    reg:Register(SPELL, S)
 end
 
 Init()

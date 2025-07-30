@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+    <Script file="ThrottledUpdaterMixin.lua"/>
+
+    <Frame name="ABP_ThrottledUpdaterDriver" hidden="true">
+        <Scripts>
+            <OnUpdate>
+                ABP_NS.xml:ThrottledUpdaterMixin_OnUpdate(self, elapsed)
+            </OnUpdate>
+        </Scripts>
+    </Frame>
+
+</Ui>

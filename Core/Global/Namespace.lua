@@ -75,6 +75,8 @@ local LogCategories = {
     --- @type Kapresoft_LogCategory
     ITEM = "IT",
     --- @type Kapresoft_LogCategory
+    MACRO = "MA",
+    --- @type Kapresoft_LogCategory
     MESSAGE = "MS",
     --- @type Kapresoft_LogCategory
     MESSAGE_TRACE = "MT",
@@ -276,12 +278,6 @@ local function CreateNamespace(...)
 
         --- @param btnIndex Index
         --- @return string The secondary spec button name (i.e. b1_2 for button 1)
-        function o:GetPrimarySpecButtonConfigNameNew(btnIndex)
-            return self:GetSpecConfigName(btnIndex, 1)
-        end
-
-        --- @param btnIndex Index
-        --- @return string The secondary spec button name (i.e. b1_2 for button 1)
         function o:GetSecondarySpecConfigName(btnIndex)
             return self:GetSpecConfigName(btnIndex, 2)
         end
@@ -311,11 +307,7 @@ local function CreateNamespace(...)
         function o:Button_GetBindings(buttonUIName)
             assert(type(buttonUIName) == 'string', 'ButtonUIName is required.')
 
-            if not self.barBindings then
-                --assert(false, 'xx namespace')
-                self.logp('{{ ActionbarPlus::Namespace}}: ', 'Retrieving barBindings...')
-                self:RetrieveKeyBindingsMap()
-            end
+            if not self.barBindings then self:RetrieveKeyBindingsMap() end
             return type(self.barBindings) == 'table' and self.barBindings[buttonUIName]
         end
 
