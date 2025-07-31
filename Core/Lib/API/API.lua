@@ -58,6 +58,11 @@ S.LOCK_ACTION_BARS           = LOCK_ACTION_BARS
 S.AUTO_ATTACK_SPELL_ID       = AUTO_ATTACK_SPELL_ID
 
 --[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+local function itu() return O.ItemUtil end
+
+--[[-----------------------------------------------------------------------------
 Mixins
 -------------------------------------------------------------------------------]]
 --- @alias Mount MountMixin | C_MountJournal_MountInfo
@@ -337,6 +342,13 @@ function S:GetSpellRank(spellID)
     end
 
     return nil
+end
+
+--- @param spellID SpellID
+function S:GetSpellRankFormatted(spellID)
+    if not spellID then return nil end
+    local rank = self:GetSpellRank(spellID)
+    return IsNotBlank(rank) and sformat(RANK_FORMAT, rank)
 end
 
 --- @param unit UnitID|nil Defaults to 'player'
@@ -655,6 +667,22 @@ function S:GetItemInfo(item)
                        count = count, equipLoc=itemEquipLoc, classID=classID,
                        subclassID=subclassID, bindType=bindType,
                        isCraftingReagent=isCraftingReagent }
+    return itemInfo
+end
+
+--- Note that itemName is not provided in this method
+--- @param item ItemIdentifier
+--- @return ItemInfoDetails
+function S:GetItemInfoInstant(item)
+    local itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, subclassID = Compat:GetItemInfoInstant(item)
+    if not itemID then return nil end
+    local ok, name = pcall(C_Item.GetItemNameByID, itemID)
+    if not ok then p:w('Failed to retrieve item name[%s] from id[%s]', name, itemID) end
+    --- @type ItemInfoDetails
+    local itemInfo = { id = itemID, name = name, type = itemType, subType = itemSubType,
+                       icon = icon, classID = itemClassID, equipLoc=itemEquipLoc,
+                       subclassID=subclassID }
+    itemInfo.className = itu():GetItemClassNameByID(itemInfo.classID)
     return itemInfo
 end
 

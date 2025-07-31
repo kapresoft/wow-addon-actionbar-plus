@@ -95,6 +95,13 @@ local function MethodsAndProperties(o)
     end
 end; MethodsAndProperties(L)
 
+--- @see TooltipUtil.lua
+--- @see _TooltipFrame.xml
+--- @param frame _Frame
+function ns.xml:TooltipFrame_OnLoad(frame)
+    ns.O.TooltipUtil:OnLoad_InitButtonGameTooltipHooks()
+end
+
 --- @see _TooltipFrame.xml
 --- @param frame _Frame
 function ns.xml:TooltipFrame_OnShow(frame)

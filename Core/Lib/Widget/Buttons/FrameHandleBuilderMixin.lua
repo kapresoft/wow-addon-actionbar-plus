@@ -68,7 +68,6 @@ end
 --- @param self FrameHandle
 local function OnEnter(self)
     ShowConfigTooltip(self)
-    C_Timer.After(3, function() GameTooltip:Hide() end)
 
     if not self:IsMouseOverEnabled() then return end
     self:ShowBackdrop()
@@ -77,7 +76,8 @@ end
 ---@param self FrameHandle
 local function OnMouseDown(self, mouseButton)
     GameTooltip:Hide()
-    if ns.debug.flag.developer == true and IsShiftKeyDown() and MBU:IsLeftButton(mouseButton) then
+
+    if ns:IsDev() and IsShiftKeyDown() and MBU:IsLeftButton(mouseButton) then
         return ReloadUI()
     end
 
@@ -106,9 +106,7 @@ local function FrameHandle_PropsAndMethods(f)
 
     function f:GetMouseOverTooltipText()
         local dev = ''
-        if ns.debug.flag.developer == true then
-            dev = '\n• Shift-click to ReloadUI'
-        end
+        if ns:IsDev() then dev = '\n• Shift-click to ReloadUI' end
         return ns.sformat('%s• %s.\n• %s.%s', self.prettyName,
                 C['Click and drag to move the action bar'],
                 C['Right-click to open the settings dialog'],

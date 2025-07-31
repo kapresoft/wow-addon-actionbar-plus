@@ -4,11 +4,6 @@ Lua Vars
 local tinsert = table.insert
 
 --[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local TooltipDataProcessor = TooltipDataProcessor
-
---[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
@@ -57,31 +52,6 @@ L.FRAMES = {}
 Support Functions
 -------------------------------------------------------------------------------]]
 local function abh() return O.ActionBarHandlerMixin end
-
-local function InitButtonGameTooltipHooksLegacy()
-    GameTooltip:HookScript(E.OnShow, function(tooltip, ...)
-        WMX:OnShowAdditionalTooltipInfo(tooltip)
-    end)
-end
-
-local function InitButtonGameTooltipHooksUsingTooltipDataProcessor()
-    GameTooltip:HookScript("OnShow", function(tooltip, ...)
-        WMX:OnShowAdditionalTooltipInfo(tooltip)
-    end)
-end
-
-local function InitButtonGameTooltipHooks()
-    if TooltipDataProcessor then
-        InitButtonGameTooltipHooksUsingTooltipDataProcessor()
-        return
-    end
-    InitButtonGameTooltipHooksLegacy()
-end
-
---- @param btnWidget ButtonUIWidget
-local function OnMacroChanged(btnWidget)
-    AttributeSetters[MACRO]:SetAttributes(btnWidget.button())
-end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -162,7 +132,6 @@ end
 Initializer
 -------------------------------------------------------------------------------]]
 local function InitButtonFactory()
-    InitButtonGameTooltipHooks()
     L:RegisterMessage(MSG.OnAddOnEnabled, function(msg, source, addOn)
         L:Init()
     end)
