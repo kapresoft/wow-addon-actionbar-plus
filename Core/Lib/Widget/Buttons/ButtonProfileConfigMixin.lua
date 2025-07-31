@@ -79,7 +79,7 @@ local function PropsAndMethods(o)
     ---@return boolean
     function o:IsSpell() return self:VTD(W.SPELL, "id", "name", "icon") end
     ---@return boolean
-    function o:IsItem() return self:VTD(W.ITEM, "id") end
+    function o:IsItem() return self:VTD(W.ITEM, "id", "name") end
     ---@return boolean
     function o:IsMacro() return self:VTD(W.MACRO, "index", "name") end
     ---@return boolean

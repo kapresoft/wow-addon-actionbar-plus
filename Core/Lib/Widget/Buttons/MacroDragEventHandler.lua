@@ -12,8 +12,8 @@ local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 local api = O.API
 
 local Assert, String = ns:Assert(), ns:String()
-local WAttr, PH = GC.WidgetAttributes, O.PickupHandler
-local AceEvent = ns:AceLibrary().AceEvent
+local WAttr, PH    = GC.WidgetAttributes, O.PickupHandler
+local AceEvent, TT = ns:AceLibrary().AceEvent, O.TooltipUtil
 
 local IsNil = Assert.IsNil
 local warnColor = WARNING_FONT_COLOR or RED_FONT_COLOR
@@ -152,30 +152,7 @@ local function attributeSetterMethods(a)
     --- @see ButtonFactory#InitButtonGameTooltipHooksLegacy
     --- @see ButtonFactory#InitButtonGameTooltipHooksUsingTooltipDataProcessor
     --- @param btnUI ButtonUI
-    function a:ShowTooltip(btnUI)
-        local w = btnUI.widget
-        if not w:ConfigContainsValidActionType() then return end
-
-        local macroInfo = w:GetMacroData()
-        if w:IsInvalidMacro(macroInfo) then return end
-
-        if enableExternalAPI and w:IsM6Macro(macroInfo.name) then
-            self:SendMessage(GC.M.MacroAttributeSetter_OnShowTooltip, M.MacroAttributeSetter, function() return w, macroInfo.name end)
-            return
-        end
-
-        local spid = api:GetMacroSpellID(macroInfo.index)
-        if not spid then
-            local _, itemLink = GetMacroItem(macroInfo.index)
-            if not itemLink then
-                GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
-                return
-            end
-            GameTooltip:SetText(sformat(MACRO_WITHOUT_SPELL_FORMAT, macroInfo.name))
-        else
-            GameTooltip:SetSpellByID(spid)
-        end
-    end
+    function a:ShowTooltip(btnUI) TT:ShowTooltip_Macro(GameTooltip, btnUI.widget) end
 end
 
 --- @return MacroAttributeSetter

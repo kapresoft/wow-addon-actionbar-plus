@@ -172,12 +172,6 @@ end
 local function OnBeforeEnter(widget)
     RegisterForClicks(widget, E.ON_ENTER)
     widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, OnModifierStateChanged, widget)
-
-    -- handle stuff before event
-    --- @param down boolean true if the press is KeyDown
-    --widget:RegisterEvent(E.MODIFIER_STATE_CHANGED, function(w, event, key, down)
-    --    RegisterForClicks(w, E.MODIFIER_STATE_CHANGED, down)
-    --end, widget)
 end
 --- @param widget ButtonUIWidget
 local function OnBeforeLeave(widget)

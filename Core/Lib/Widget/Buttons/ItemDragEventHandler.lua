@@ -14,7 +14,7 @@ local E, MSG = GC.E, GC.M
 local P, Assert, Table, PH = O.Profile, ns:Assert(), ns:Table(), O.PickupHandler
 local WAttr = ns.GC.WidgetAttributes
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
-local API = O.API
+local API, TT = O.API, O.TooltipUtil
 local AceEvent = ns:AceLibrary().AceEvent
 
 --[[-----------------------------------------------------------------------------
@@ -109,24 +109,7 @@ local function attributeSetterMethods(a)
     end
 
     ---@param btnUI ButtonUI
-    function a:ShowTooltip(btnUI)
-        local w = btnUI.widget
-        if not w:ConfigContainsValidActionType() then
-            return
-        end
-
-        local itemInfo = w:GetItemData()
-        if w:IsInvalidItem(itemInfo) then
-            return
-        end
-        local itemId = itemInfo and itemInfo.id; if not itemId then return end
-
-        if API:IsToyItem(itemId) then
-            GameTooltip:SetToyByItemID(itemId)
-        else
-            GameTooltip:SetItemByID(itemId)
-        end
-    end
+    function a:ShowTooltip(btnUI) TT:ShowTooltip_Item(GameTooltip, btnUI.widget) end
 end
 
 --[[-----------------------------------------------------------------------------

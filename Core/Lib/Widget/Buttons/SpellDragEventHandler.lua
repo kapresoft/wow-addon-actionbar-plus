@@ -5,12 +5,12 @@ Local Vars
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
 
+local Compat, TT, Dru = O.Compat, O.TooltipUtil, O.DruidUnitMixin
 local reg = O.AttributeSetterRegistry
 local API, Assert, String, PH = O.API, ns:Assert(), ns:String(), O.PickupHandler
 local IsNil, AssertNotNil = Assert.IsNil, Assert.AssertNotNil
 local IsNotBlank, IsBlank = String.IsNotBlank, String.IsBlank
 local BAttr, WAttr, UAttr = GC.ButtonAttributes,  GC.WidgetAttributes, GC.UnitIDAttributes
-local Compat, Dru = O.Compat, O.DruidUnitMixin
 local SPELL = WAttr.SPELL
 
 -- Cache table for spell ranks
@@ -128,12 +128,7 @@ local function attributeSetterMethods(a)
     end
 
     --- @param btnUI ButtonUI
-    function a:ShowTooltip(btnUI)
-        local w = btnUI.widget
-        if not w:ConfigContainsValidActionType() then return end
-        local c = w:conf(); if not c:IsSpell() then return end
-        GameTooltip:SetSpellByID(c.spell.id)
-    end
+    function a:ShowTooltip(btnUI) TT:ShowTooltip_Spell(btnUI.widget) end
 
     function a:GetHighestSpellRank(spellName)
         if not GetSpellBookItemName then return nil end

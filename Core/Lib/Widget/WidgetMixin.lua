@@ -250,51 +250,6 @@ function L:GetBarBindings(btnName)
     return nil
 end
 
-function L:OnShowAdditionalTooltipInfo(tooltip)
-    --- @type ButtonUI
-    local button = tooltip:GetOwner()
-    if not (button and button.widget and button.widget.buttonName) then return end
-    --- @type ButtonUIWidget
-    local bw = button.widget
-    local c  = bw:conf(); if c:IsEmpty() then return end
-    if c:IsMacro() then
-        self:AddMacroInfo(tooltip, bw, c.macro) end
-    self:AddKeybindingInfo(tooltip, bw, c)
-    tooltip:Show()
-end
-
---- @param tooltip GameTooltip
---- @param bw ButtonUIWidget
---- @param c ButtonProfileConfigMixin
-function L:AddKeybindingInfo(tooltip, bw, c)
-    if not bw.kbt:HasKeybindings() then return end
-    if not c:IsMacro() then
-        GameTooltip_AddBlankLinesToTooltip(GameTooltip, 1)
-    end
-    local bindings = bw.kbt:GetBindings()
-    if not bindings.key1 then return end
-    tooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
-end
-
---- @param tooltip GameTooltip
---- @param bw ButtonUIWidget
---- @param macroData Profile_Macro
-function L:AddMacroInfo(tooltip, bw, macroData)
-    GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
-
-    local spid = bw:GetEffectiveSpellID()
-    if spid then
-        --- @type FontString
-        local right = GameTooltipTextRight1
-        if right then
-            local rank = api:GetSpellRankFormatted(spid)
-            right:SetText(rank)
-            right:Show()
-        end
-    end
-    tooltip:AddDoubleLine('Macro ::', macroData.name, 1, 1, 1, 1, 1, 1);
-end
-
 function L:ConfigureFrameToCloseOnEscapeKey(frameName, frameInstance)
     local frame = frameInstance
     if frameInstance.frame then frame = frameInstance.frame end

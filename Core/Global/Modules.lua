@@ -72,6 +72,7 @@ local M = {
     GlobalConstants                    = '',
     ItemAttributeSetter                = '',
     ItemDragEventHandler               = '',
+    ItemUtil                           = '',
     KeybindController                  = '',
     KeybindTextUtil                    = '',
     LocalizationUtil                   = '',
@@ -100,6 +101,7 @@ local M = {
     SpellAttributeSetter               = '',
     SpellDragEventHandler              = '',
     ThrottledUpdaterMixin              = '',
+    TooltipUtil                        = '',
     WidgetMixin                        = '',
 
     -- M6 AddOn Support
@@ -141,6 +143,7 @@ local M = {
 --- @field FrameHandleBuilderMixin FrameHandleBuilderMixin
 --- @field ItemAttributeSetter ItemAttributeSetter
 --- @field ItemDragEventHandler ItemDragEventHandler
+--- @field ItemUtil ItemUtil
 --- @field KeybindController KeybindController
 --- @field KeybindTextUtil KeybindTextUtil
 --- @field LocalizationUtil LocalizationUtil
@@ -172,6 +175,7 @@ local M = {
 --- @field SpellAttributeSetter SpellAttributeSetter
 --- @field SpellDragEventHandler SpellDragEventHandler
 --- @field ThrottledUpdaterMixin ThrottledUpdaterMixin
+--- @field TooltipUtil TooltipUtil
 --- @field UnitMixin UnitMixin
 --- @field VehicleAndPetBattleEventsStateDriver VehicleAndPetBattleEventsStateDriver
 --- @field WidgetMixin WidgetMixin
