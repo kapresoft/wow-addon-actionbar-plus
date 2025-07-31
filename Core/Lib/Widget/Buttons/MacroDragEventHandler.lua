@@ -131,6 +131,7 @@ local function attributeSetterMethods(a)
 
         local w = btnUI.widget
         w:ResetWidgetAttributes(btnUI)
+        local c = w:conf()
         local macroInfo = w:GetMacroData()
         if w:IsInvalidMacro(macroInfo) then return end
 
@@ -140,6 +141,7 @@ local function attributeSetterMethods(a)
         btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
         btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
         w:SetIcon(icon)
+        w:SetNameText(w:GetMacroName())
 
         if enableExternalAPI and w:IsM6Macro(macroInfo.name) then
             self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, M.MacroAttributeSetter, function() return w, macroInfo.name end)
