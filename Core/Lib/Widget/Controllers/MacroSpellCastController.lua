@@ -21,14 +21,13 @@ local L = ns:NewController(libNameMU, O.ThrottledUpdaterMixin); if not L then re
 local p = ns:LC().MACRO:NewLogger(libNameMU)
 
 --- @type MacroSpellCastController | ControllerV2
-local a = L
+local o = L
 
 --- @type C_TimerTicker
 local unregisterTask
 --- @type table
 local spellUpdateUsableHandle
 
-a:SetThrottleInterval(THROTTLE_INTERVAL_MACRO_UPDATES)
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -37,17 +36,25 @@ Methods
 --- Automatically called
 --- @private
 --- @see ModuleV2Mixin#Init
-function a:OnAddOnReady()
-    self:RegisterMessage(GC.M.OnPlayerSpellCastSucceeded, a.OnPlayerCastSucceeded)
+function o:OnAddOnReady()
+    self:SetThrottleInterval(THROTTLE_INTERVAL_MACRO_UPDATES)
+    self:RegisterMessage(GC.M.OnPlayerSpellCastSucceeded, o.OnPlayerCastSucceeded)
+    self:RegisterAddOnMessage(GC.E.PLAYER_TARGET_CHANGED, o.OnTargetChanged)
+    self:StartThrottledUpdates()
 end
 
-function a.OnPlayerCastSucceeded()
-    a:RegisterSpellUpdateUsable()
-    a:StartThrottledUpdates()
-    a:UnRegisterAfter(MACRO_UPDATE_TIMEOUT)
+function o.OnPlayerCastSucceeded()
+    o:RegisterSpellUpdateUsable()
+    o:StartThrottledUpdates()
+    o:UnRegisterAfter(MACRO_UPDATE_TIMEOUT)
 end
 
-function a.OnSpellUpdateUsable() a:StartThrottledUpdates() end
+function o.OnSpellUpdateUsable() o:StartThrottledUpdates() end
+
+function o.OnTargetChanged()
+    o:StartThrottledUpdates()
+    o:UnRegisterAfter(MACRO_UPDATE_TIMEOUT)
+end
 
 --- ======================================================
 --- Methods
@@ -55,18 +62,18 @@ function a.OnSpellUpdateUsable() a:StartThrottledUpdates() end
 
 --- @see ThrottledUpdaterMixin
 --- @param elapsed TimeInMilli
-function a:_OnUpdate(elapsed)
+function o:_OnUpdate(elapsed)
     C_Timer.After(0.01, function() local ctrl = self  mcc:UpdateMacros(ctrl) end)
 end
 
-function a:RegisterSpellUpdateUsable()
+function o:RegisterSpellUpdateUsable()
     if spellUpdateUsableHandle then return end
-    spellUpdateUsableHandle = a:RegisterBucketAddOnMessage(GC.E.SPELL_UPDATE_USABLE, SPELL_UPDATE_USABLE_BUCKET_INTERVAL, a.OnSpellUpdateUsable)
+    spellUpdateUsableHandle = o:RegisterBucketAddOnMessage(GC.E.SPELL_UPDATE_USABLE, SPELL_UPDATE_USABLE_BUCKET_INTERVAL, o.OnSpellUpdateUsable)
     p:d(function() return 'Msg Handler Registered. SpellUpdateUsable handle: %s', tostring(spellUpdateUsableHandle) end)
 end
 
 --- cancel previous, schedule new, stop updates and cleanup handle
-function a:UnRegisterAfter(duration)
+function o:UnRegisterAfter(duration)
     assert(type(duration) == 'number', 'Duration should be a number (in seconds).');
     local previousTask = unregisterTask
     if unregisterTask and not unregisterTask:IsCancelled() then

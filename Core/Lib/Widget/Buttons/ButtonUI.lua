@@ -150,6 +150,8 @@ local function OnReceiveDrag(btnUI)
     end
     ClearCursor()
 
+    btnUI.widget:ClearAllText()
+
     --- @type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
     btnUI.widget:UpdateStateDelayed(0.01)

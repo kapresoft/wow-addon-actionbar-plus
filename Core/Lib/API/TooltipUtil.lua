@@ -17,6 +17,7 @@ local itemLabelC = YELLOW_FONT_COLOR
 local countC = WHITE_FONT_COLOR
 local totalC = GREEN_FONT_COLOR
 
+local BLANK_TEXT = '[blank]'
 local RIGHT_TEXT_FORMAT = ' |cff8e8e8e(%s)|r'
 
 --[[-----------------------------------------------------------------------------
@@ -63,6 +64,17 @@ local function Tooltip_SetRightText(tooltip, text)
     right:Show()
 end
 
+local function Tooltip_SetLeftText(tooltip, text)
+    if IsEmpty(text) then return end
+
+    local left = Tooltip_LeftText()
+    if not left then return tooltip:AppendText(text) end
+
+    -- use the right text component
+    left:SetText(text)
+    left:Show()
+end
+
 --- @param tooltip GameTooltip
 --- @param leftText string
 --- @param rightText string
@@ -101,15 +113,25 @@ function o:Tooltip_OnShow(tooltip)
     --- @type ButtonUIWidget
     local bw = button.widget
     local c  = bw:conf(); if c:IsEmpty() then return end
-    if c:IsItem() then
-        self:Tooltip_AddItemInfo(tooltip, c.item.id)
-    elseif c:IsSpell() then
-        self:Tooltip_AddSpellInfo(tooltip, c.spell.id)
-    elseif c:IsMacro() then
-        GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+
+    local hasKeyBindings = bw.kbt:HasKeybindings()
+    tooltip._hasKeyBindings = hasKeyBindings
+    if c:IsMacro() then
         self:Tooltip_AddMacroInfo(tooltip, bw, c)
+    elseif c:IsItem() then
+        if hasKeyBindings then
+            GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+            self:Tooltip_AddKeybindingInfo(tooltip, bw, c)
+        end
+        self:Tooltip_AddItemInfo(tooltip, bw, c.item.id)
+    elseif c:IsSpell() then
+        if hasKeyBindings then
+            GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+            self:Tooltip_AddKeybindingInfo(tooltip, bw, c)
+        end
+        self:Tooltip_AddSpellInfo(tooltip, c.spell.id)
     end
-    self:Tooltip_AddKeybindingInfo(tooltip, bw, c)
+
     tooltip:Show()
 end
 
@@ -117,10 +139,8 @@ end
 --- @param bw ButtonUIWidget
 --- @param c ButtonProfileConfigMixin
 function o:Tooltip_AddKeybindingInfo(tooltip, bw, c)
-    if not bw.kbt:HasKeybindings() then return end
-
     local bindings = bw.kbt:GetBindings()
-    if not bindings.key1 then return end
+    if not bindings or not bindings.key1 then return end
     tooltip:AddDoubleLine('Keybind ::', bindings.key1, 1, 0.5, 0, 0 , 0.5, 1);
 end
 
@@ -148,22 +168,25 @@ function o:Tooltip_AddSpellInfo(tooltip, spid, highestRank)
 end
 
 --- @param tooltip GameTooltip
+--- @param bw ButtonUIWidget
 --- @param itemID ItemID
-function o:Tooltip_AddItemInfo(tooltip, itemID)
+function o:Tooltip_AddItemInfo(tooltip, bw, itemID)
     local bagCount = compat:GetItemCount(itemID, false, false, false)
     local item = api:GetItemInfoInstant(itemID)
     local cid = item and item.classID
     local itc = Enum.ItemClass
 
-    local showTotal = not (cid == itc.Miscellaneous or cid == itc.Armor or cid == itc.Profession)
-    if showTotal and bagCount > 0 then
-        GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
-        Tooltip_AddDoubleLine(tooltip, 'Total In Bags', bagCount, itemLabelC, countC)
-    end
-
     local totalInclBank = compat:GetItemCount(itemID, true, true, true)
     local bankCount = totalInclBank - bagCount
-    if bankCount > 0 then
+
+    -- only show if there are items in the bank, otherwise, the count will be shown in the button
+    -- this is to avoid showing redundant info
+    local showTotal = not (cid == itc.Miscellaneous or cid == itc.Armor or cid == itc.Profession)
+    if showTotal and bankCount > 0 then
+        if bagCount > 0 then
+            GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+            Tooltip_AddDoubleLine(tooltip, 'Total In Bags', bagCount, itemLabelC, countC)
+        end
         local total = totalInclBank
         Tooltip_AddDoubleLine(tooltip, 'Bank Total', bankCount, itemLabelC, countC)
         Tooltip_AddDoubleLine(tooltip, 'Inventory Total', total, itemLabelC, totalC)
@@ -182,15 +205,32 @@ function o:Tooltip_AddMacroInfo(tooltip, bw, c)
 
     local itid = bw:GetEffectiveItemID()
     if itid then
-        self:Tooltip_AddItemInfo(tooltip, itid)
-    else
-        local spid = bw:GetEffectiveSpellID()
-        if spid then
-            self:Tooltip_AddSpellInfo(tooltip, spid, false)
-        end
+        GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+        tooltip:AddDoubleLine('Macro ::', macro.name, 1, 1, 1, 1, 1, 1);
+        if tooltip._hasKeyBindings then self:Tooltip_AddKeybindingInfo(tooltip, bw, c) end
+        self:Tooltip_AddItemInfo(tooltip, bw, itid)
+        return
     end
 
-    tooltip:AddDoubleLine('Macro ::', macro.name, 1, 1, 1, 1, 1, 1);
+    local spid = bw:GetEffectiveSpellID()
+    if spid then
+        GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+        self:Tooltip_AddSpellInfo(tooltip, spid, false)
+        tooltip:AddDoubleLine('Macro ::', macro.name, 1, 1, 1, 1, 1, 1);
+        if tooltip._hasKeyBindings then self:Tooltip_AddKeybindingInfo(tooltip, bw, c) end
+        return
+    end
+
+    -- this is a case where the macro does not resolve to anything
+    local leftTextFS = Tooltip_LeftText()
+    local leftText = leftTextFS and leftTextFS:GetText()
+    if leftText ~= BLANK_TEXT then return end
+
+    Tooltip_SetLeftText(tooltip, macro.name)
+    if tooltip._hasKeyBindings then
+        GameTooltip_AddBlankLinesToTooltip(tooltip, 1)
+        self:Tooltip_AddKeybindingInfo(tooltip, bw, c)
+    end
 end
 
 --- This will setup the tooltip for the highest spell rank -- this is how ABP works now.
@@ -209,15 +249,17 @@ end
 --- @param bw ButtonUIWidget
 function o:ShowTooltip_Macro(tooltip, bw)
     local c = bw:conf(); if not c:IsMacro() then return end
-
     local itid = bw:GetEffectiveItemID()
-    if itid then
-        return tooltip:SetItemByID(itid)
-    end
+    if itid then return tooltip:SetItemByID(itid) end
 
-    local spid = bw:GetEffectiveSpellID(); if not spid then return end
-    tooltip:SetSpellByID(spid)
+    local spid = bw:GetEffectiveSpellID()
+    if spid then return tooltip:SetSpellByID(spid) end
 
+    -- [blank] will be replaced later in #Tooltip_AddMacroInfo()
+    tooltip:SetText(BLANK_TEXT)
+    Tooltip_SetRightText(tooltip, ns.sformat(RIGHT_TEXT_FORMAT, 'Macro'))
+
+    tooltip:Show()
 end
 
 --- Called by Attribute Setters
