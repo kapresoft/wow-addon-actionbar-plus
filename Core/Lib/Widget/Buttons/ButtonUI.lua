@@ -158,7 +158,7 @@ local function OnReceiveDrag(btnUI)
 
     -- While the modifier key is held down after dragging
     -- we KeyUp will be active to prevent KeyDown from executing the action
-    btnUI.widget:UseKeyUpForClicks()
+    C_Timer.After(0.3, function() btnUI.widget:UseKeyUpForClicks() end)
     btnUI.widget:SendMessage(GC.M.OnAfterReceiveDrag, libName, btnUI.widget)
 end
 
