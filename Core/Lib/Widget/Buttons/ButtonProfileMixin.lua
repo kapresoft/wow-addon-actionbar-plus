@@ -471,10 +471,6 @@ local function PropsAndMethods(o)
 
     --- @return boolean
     function o:IsHideWhenTaxi() return PR():IsHideWhenTaxi() end
-    ---@param s Profile_Spell
-    function o:IsInvalidSpell(s) return IsNil(s) or (IsNil(s.name) and IsNil(s.id) and IsNil(s.icon)) end
-    ---@param m Profile_Macro
-    function o:IsInvalidMacro(m) return IsNil(m) or (IsNil(m.name) and IsNil(m.index) and IsNil(m.icon)) end
 
     ---@param i Profile_Item
     function o:IsInvalidItem(i) return IsNil(i) or (IsNil(i.name)  and IsNil(i.id) and IsNil(i.icon)) end
