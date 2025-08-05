@@ -33,7 +33,7 @@ Methods
 -------------------------------------------------------------------------------]]
 -- /dump a:c("\n\t  ")
 function L:c(str)
-    return ns:String().IsBlank(str)
+    return O.MacroChangesController.OnMacroChanged()
 end
 
 -- /run a:f1()

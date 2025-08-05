@@ -56,16 +56,15 @@ local Profile_Item = {
     ["icon"] = 133848,
     ["count"] = 40,
 }
+
 --- @class Profile_Macro
-local Profile_Macro = {
-    ["type"] = "macro",
-    ["index"] = 41,
-    ["name"] = "z#LOL",
-    ["icon"] = 132093,
-    -- This macro is used by third-party plugins
-    ["icon2"] = 132093,
-    ["body"] = "/lol\n",
-}
+--- @field type "macro" Macro type identifier
+--- @field index number Macro index in the macro list
+--- @field name string Name of the macro
+--- @field bodyFingerprint string Fingerprint of the macro body
+--- @field icon number @deprecated Original macro icon texture ID
+--- @field icon2 number @deprecated Used by third-party plugins
+
 --- @class Profile_MacroText
 local Profile_MacroText = {
     ["type"] = "macrotext",

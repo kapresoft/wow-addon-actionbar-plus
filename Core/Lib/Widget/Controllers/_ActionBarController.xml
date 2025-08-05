@@ -21,6 +21,7 @@
     <Script file="PlayerLostControlHandler.lua"/>
     <Script file="PlayerSettingsController.lua"/>
     <Script file="DualSpecController.lua"/>
+    <Script file="MacroChangesController.lua"/>
     <Script file="MacroControllerCommon.lua"/>
     <Script file="MacroMouseOverController.lua"/>
     <Script file="MacroModifierStateChangeController.lua"/>

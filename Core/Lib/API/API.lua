@@ -17,6 +17,7 @@ local ABP_M6 = 'ActionbarPlus-M6'
 local highestSpellRankCache = {}
 
 local RANK_FORMAT = ' |cff8e8e8e(%s)|r'
+local BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
 --[[-----------------------------------------------------------------------------
 Lua Vars
@@ -878,3 +879,37 @@ function S:GSC(spellID) return S:GetSpellCooldown(spellID) end
 --- #### Alias for #GetItemCooldown(itemId)
 --- @return ItemCooldown
 function S:GIC(itemID) return S:GetItemCooldown(itemID) end
+
+--- @param data string
+--- @return string base64Encoded
+function S:Base64Encode(data)
+    return ((data:gsub('.', function(x)
+        local r, bcode = '', x:byte()
+        for i = 8, 1, -1 do
+            r = r .. (bcode % 2 ^ i - bcode % 2 ^ (i - 1) > 0 and '1' or '0')
+        end
+        return r
+    end) .. '0000'):gsub('%d%d%d?%d?%d?%d?', function(x)
+        if #x < 6 then return '' end
+        local c = tonumber(x, 2) + 1
+        return BASE64_CHARS:sub(c, c)
+    end) .. ({ '', '==', '=' })[#data % 3 + 1])
+end
+
+
+--- Returns a lightweight fingerprint string for a given macro body
+--- @param body string
+--- @return string
+function S:FingerprintMacroBody(body)
+    if type(body) ~= "string" then return nil end
+    local len = #body
+    local head = body:sub(1, 8)
+    local tail = body:sub(-8)
+    local bytes = { string.byte(body, math.floor(len / 2), math.floor(len / 2) + 3) }
+
+    local val = ns.sformat("%d:%s:%02x%02x%02x%02x:%s",
+                      len, head,
+                      bytes[1] or 0, bytes[2] or 0, bytes[3] or 0, bytes[4] or 0,
+                      tail)
+    return self:Base64Encode(val)
+end

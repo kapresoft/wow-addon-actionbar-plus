@@ -78,7 +78,7 @@ local M = {
     LocalizationUtil                   = '',
     MacroAttributeSetter               = '',
     MacroDragEventHandler              = '',
-    MacroEventsHandler                 = '',
+    MacroChangesController             = '',
     MacroControllerCommon              = '',
     MacroModifierStateChangeController = '',
     MacroMouseOverController           = '',
@@ -152,7 +152,7 @@ local M = {
 --- @field MacroAttributeSetter MacroAttributeSetter
 --- @field MacroControllerCommon MacroControllerCommon
 --- @field MacroDragEventHandler MacroDragEventHandler
---- @field MacroEventsHandler MacroEventsHandler
+--- @field MacroChangesController MacroChangesController
 --- @field MacroMouseOverController MacroMouseOverController
 --- @field MacroSpellCastController MacroSpellCastController
 --- @field MacrotextAttributeSetter MacrotextAttributeSetter

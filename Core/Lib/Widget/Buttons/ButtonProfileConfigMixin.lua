@@ -19,7 +19,7 @@ local function CreateLib()
     --- @class ButtonProfileConfigMixin : Profile_Button
     --- @field private conf Profile_Button
     local newLib = ns:NewMixin(libName); if not newLib then return nil end
-    local logger = ns:CreateDefaultLogger(libName)
+    local logger = ns:LC().MACRO:NewLogger(libName)
 
     --- Initializes the mixin with a configuration table.
     --- ```
@@ -123,7 +123,7 @@ local function PropsAndMethods(o)
     --- Clear all fields and set a blank type field
     function o:Reset()
         if not self:IsEmpty() then
-            p:i(function() return 'Reset[%s]: %s', self.type, self:GetName() end)
+            p:d(function() return 'Reset[%s]: %s', self.type, self:GetName() end)
         end
         local conf = self.conf
         for k in pairs(conf) do conf[k] = nil end

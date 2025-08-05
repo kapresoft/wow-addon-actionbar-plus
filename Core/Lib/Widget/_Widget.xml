@@ -8,8 +8,6 @@
     <Script file="CursorMixin.lua"/>
     <Script file="WidgetMixin.lua"/>
 
-    <Script file="MacroEventsHandler.lua"/>
-
     <Include file="Buttons\_Buttons.xml"/>
     <Include file="Controllers\_ActionBarController.xml"/>
 

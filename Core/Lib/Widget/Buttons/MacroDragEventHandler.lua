@@ -9,7 +9,6 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
-local api = O.API
 
 local Assert, String = ns:Assert(), ns:String()
 local WAttr, PH    = GC.WidgetAttributes, O.PickupHandler
@@ -30,7 +29,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 ---@class MacroDragEventHandler : DragEventHandler
 local L = LibStub:NewLibrary(M.MacroDragEventHandler)
-local p = ns:LC().EVENT:NewLogger(M.MacroEventsHandler)
+local p = ns:LC().MACRO:NewLogger(M.MacroDragEventHandler)
 local LL = GC:GetAceLocale()
 
 --[[-----------------------------------------------------------------------------
@@ -40,6 +39,18 @@ New Instance
 local S = LibStub:NewLibrary(ns.M.MacroAttributeSetter); if not S then return end; AceEvent:Embed(S)
 ---@type BaseAttributeSetter
 local BaseAttributeSetter = LibStub(ns.M.BaseAttributeSetter)
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+local function api() return O.API end
+
+-- todo next: move to api?
+--- @param bw ButtonUIWidget
+local function Button_UpdateMacro(bw)
+    local macroIndex = bw:GetMacroIndex(); if not macroIndex then return end
+    local icon = api():GetMacroIcon(macroIndex)
+    return icon and bw:SetIcon(icon)
+end
 
 --[[-----------------------------------------------------------------------------
 Methods: MacroDragEventHandler
@@ -71,11 +82,8 @@ local function eventHandlerMethods(e)
     ---@param btnUI ButtonUI
     function e:Handle(btnUI, cursorInfo)
         if cursorInfo == nil or cursorInfo.info1 == nil then return end
-        local macroInfo = self:GetMacroInfo(cursorInfo)
-        -- replace %s in macros, has log format issues
-        -- local macroInfoText = s_replace(pformat(macroInfo), '%s', '$s')
-        -- self:log(10, 'macroInfo: %s', macroInfoText)
-        -- DEVT:EvalObject(macroInfo, 'macroInfo')
+        local macroInfo = self:GetMacroData(cursorInfo)
+        p:d(function() return 'Macro: %s', macroInfo end)
 
         if self:IsMacrotext(macroInfo) then
             self:HandleMacrotext(btnUI, cursorInfo)
@@ -98,19 +106,18 @@ local function eventHandlerMethods(e)
     ---     name = '#GetRestedXP',
     ---     type = 'macro'
     --- }
-    ---@param cursorInfo table Cursor Info `{ type='type', info1='macroIndex' }`
-    function e:GetMacroInfo(cursorInfo)
+    --- @param cursorInfo table Cursor Info `{ type='type', info1='macroIndex' }`
+    --- @return Profile_Macro
+    function e:GetMacroData(cursorInfo)
         local macroIndex = cursorInfo.info1
-        local macroName, macroIconId, macroBody, isLocal = GetMacroInfo(macroIndex)
-        local macroInfo = {
-            type = cursorInfo.type,
-            index = macroIndex,
-            name = macroName, icon = macroIconId, body = macroBody,
-            isLocal = isLocal,
+        local macroName, macroIconId, macroBody = GetMacroInfo(macroIndex)
+
+        --- @type Profile_Macro
+        local macroData = {
+            type = WAttr.MACRO, index = macroIndex, name = macroName,
+            bodyFingerprint = api():FingerprintMacroBody(macroBody),
         }
-
-
-        return macroInfo
+        return macroData
     end
 
     function e:HandleMacrotext(btnUI, cursorInfo)
@@ -118,7 +125,6 @@ local function eventHandlerMethods(e)
     end
 
 end
-
 
 --[[-----------------------------------------------------------------------------
 Methods: MacroAttributeSetter
@@ -132,22 +138,17 @@ local function attributeSetterMethods(a)
         local w = btnUI.widget
         w:ResetWidgetAttributes(btnUI)
         local c = w:conf()
-        local macroInfo = w:GetMacroData()
-        if w:IsInvalidMacro(macroInfo) then return end
-
-        local icon = GC.Textures.TEXTURE_EMPTY
-        if macroInfo.icon then icon = macroInfo.icon end
+        local macroInfo = c.macro; if not c:IsMacro() then return end
 
         btnUI:SetAttribute(WAttr.TYPE, WAttr.MACRO)
-        btnUI:SetAttribute(WAttr.MACRO, macroInfo.index or macroInfo.macroIndex)
-        w:SetIcon(icon)
-        w:SetNameText(w:GetMacroName())
+        btnUI:SetAttribute(WAttr.MACRO, macroInfo.index)
+        w:SetNameText(macroInfo.name)
 
         if enableExternalAPI and w:IsM6Macro(macroInfo.name) then
             self:SendMessage(GC.M.MacroAttributeSetter_OnSetIcon, M.MacroAttributeSetter, function() return w, macroInfo.name end)
         end
 
-        C_Timer.NewTicker(0.01, function() w:UpdateMacroState() end, 2)
+        C_Timer.NewTicker(0.01, function() Button_UpdateMacro(w) end, 2)
         self:OnAfterSetAttributes(btnUI)
     end
 
