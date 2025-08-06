@@ -163,7 +163,7 @@ function o:HandleDeletedMacros(bw, macroConf)
     if found then return end
 
     -- Deletion confirmed
-    p:vv(function()
+    p:d(function()
         return "HandleDeletedMacros::Macro[%s, btn:%s] was deleted. index=%s body={%s}",
         bw:GetName(),
         macroConf.name, macroConf.index, macroConf.bodyFingerprint
@@ -183,7 +183,7 @@ function o:HandleIndexChange(bw, macroConf, macro)
     macroConf.name = macro.name
     macroConf.bodyFingerprint = macro.bodyFingerprint
     mas():SetAttributes(bw.button())
-    p:vv(function() return 'HandleIndexChange::Macro[%s] index changed, old=%s, new=%s',
+    p:d(function() return 'HandleIndexChange::Macro[%s] index changed, old=%s, new=%s',
         macroConf.name, oldIndex, macroConf.index end)
 end
 
@@ -196,7 +196,7 @@ function o:HandleNameChange(bw, macroConf, macro)
     macroConf.index = macro.index
     macroConf.name = macro.name
     macroConf.bodyFingerprint = macro.bodyFingerprint
-    p:vv(function() return 'HandleNameChange::Macro[index=%s] name changed, old=%s, new=%s',
+    p:d(function() return 'HandleNameChange::Macro[index=%s] name changed, old=%s, new=%s',
         macro.index, oldName, macroConf.name end)
 end
 
@@ -208,7 +208,7 @@ function o:HandleBodyUpdate(bw, macroConf, macro)
     if macroConf.bodyFingerprint == macro.bodyFingerprint then return end
     local oldBody = macroConf.bodyFingerprint
     macroConf.bodyFingerprint = api():FingerprintMacroBody(macro.body)
-    p:vv(function() return "HandleBodyUpdate::Macro[%s] body updated, old={%s}, new={%s}",
+    p:d(function() return "HandleBodyUpdate::Macro[%s] body updated, old={%s}, new={%s}",
         macroConf.name, oldBody, macroConf.bodyFingerprint end)
 end
 
@@ -218,7 +218,7 @@ end
 --- @param macro Macro
 --- @return boolean
 function o:HandleBodyMatch(bw, macroConf, macro)
-    p:vv(function() return "HandleBodyMatch:: MacroConf[%s] matched body: %s from name=[%s], index=[%s]",
+    p:d(function() return "HandleBodyMatch:: MacroConf[%s] matched body: %s from name=[%s], index=[%s]",
         macroConf.name, macroConf.bodyFingerprint, macro.name, macro.index end)
 
     macroConf.index = macro.index
