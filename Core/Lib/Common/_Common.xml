@@ -4,9 +4,10 @@
 
     <Script file="ModuleV2Mixin.lua"/>
 
+    <Include file='Util\_Util.xml'/>
+
     <Include file='_ParentFrame.xml'/>
     <Include file='_TooltipFrame.xml'/>
-    <Include file='_ThrottledUpdater.xml'/>
 
     <Script file="EventToMessageRelay.lua"/>
     <Frame parentKey="EventToMessageRelay" parent="ActionbarPlusEventFrame">

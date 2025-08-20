@@ -342,6 +342,10 @@ local function GlobalConstantProperties(o)
         OnHideWhenTaxiSettingsChanged       = newMsg('OnHideWhenTaxiSettingsChanged'),
         OnShowKeybindTextSettingsUpdated    = newMsg('OnShowKeybindTextSettingsUpdated'),
         OnMacroAttributesSet                = newMsg('OnMacroAttributesSet'),
+
+        --- arg: src, msg, btnWidget
+        Button_OnModifierStateChanged       = newMsg('Button_OnModifierStateChanged'),
+
         OnMouseOverGlowSettingsChanged      = newMsg('OnMouseOverGlowSettingsChanged'),
         OnMouseOverFrameHandleConfigChanged = newMsg('OnMouseOverFrameHandleConfigChanged'),
         OnUpdateMacroState                  = newMsg('OnUpdateMacroState'),

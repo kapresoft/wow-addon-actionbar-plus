@@ -22,11 +22,12 @@
     <Script file="PlayerSettingsController.lua"/>
     <Script file="DualSpecController.lua"/>
     <Script file="MacroChangesController.lua"/>
-    <Script file="MacroControllerCommon.lua"/>
     <Script file="MacroMouseOverController.lua"/>
     <Script file="MacroModifierStateChangeController.lua"/>
     <Script file="MacroSpellCastController.lua"/>
+    <Script file="MacroCooldownController.lua"/>
     <Script file="RangeIndicatorController.lua"/>
+
     <Script file="M6Support.lua"/>
 
     <Script file="ActionBarController.lua"/>

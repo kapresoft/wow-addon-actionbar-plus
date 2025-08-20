@@ -58,7 +58,7 @@ local function eventHandlerMethods(e)
         btnData[WAttr.ITEM] = itemData
 
         S(btnUI, btnData)
-        btnUI.widget:UpdateItemState()
+        btnUI.widget:UpdateItem()
 
         AceEvent:SendMessage(MSG.OnUpdateItemState,
                              M.ItemDragEventHandler, btnUI.widget)

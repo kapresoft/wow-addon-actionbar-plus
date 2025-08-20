@@ -61,6 +61,7 @@ function o:SetKeybindTextHidden(isHidden)
 end
 
 function o:ShowKeybindText() self.keybindText:Show() end
+function o:ShowRangeIndicator() self:ShowKeybindText() end
 function o:HideKeybindText() self.keybindText:Hide() end
 
 --- @return BindingInfo
@@ -82,3 +83,8 @@ function o:SetText(text) self.keybindText:SetText(text) end
 
 --- @return FontStringWidget
 function o:GetKeybindText() return self.keybindText.widget end
+
+--- @return string
+function o:GetText() return self.keybindText:GetText() end
+
+function o:IsShowingRangeIndicator() return self:GetText() == RANGE_INDICATOR end

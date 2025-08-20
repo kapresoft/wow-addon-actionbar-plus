@@ -96,6 +96,7 @@ local function OnPlayerSpellCastStart(event, ...)
     L:SendMessage(MSG.OnSpellCastStartExt, libName, CallbackFn)
 end
 
+-- todo next: maybe solve this in pre and post click? is it a frequent event?
 --- Triggered for non channeled spells, both instant and non-instant
 --- @param evt _SpellCastSentEventArguments
 local function OnPlayerSpellCastSent(evt)
@@ -124,13 +125,14 @@ end
 --- @param event string The event name
 local function OnSpellCastSucceeded(event, ...)
     local evt = B:ParseSpellCastEventArgs(...)
-    L:ForEachButton(function(bw)
+    L:ForEachNonEmptyButton(function(bw)
         sp:f1(function()
-            local r = Compat:GetSpellSubtext(evt.spellID)
-            return 'cast succeeded: %s(%s) rank=%s', evt.spellID, bw:GetEffectiveSpellName(), r
+            return 'cast succeeded: %s(%s)', Compat:GetSpellInfo(evt.spellID), evt.spellID
         end)
-        if bw:IsMatchingMacroOrSpell(evt.spellID) then bw:UpdateItemOrMacroState()
-        elseif bw:IsMacro() then bw:SetHighlightDefault() end
+        if bw:IsItem() then bw:UpdateItem() end
+        -- moved to MacroSpellCastController
+        --if bw:IsMatchingMacroOrSpell(evt.spellID) then bw:UpdateItemOrMacroState()
+        --elseif bw:IsMacro() then bw:SetHighlightDefault() end
     end)
     L:SendMessage(GC.M.OnSpellCastSucceeded, libName)
 end

@@ -10,7 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local active = {}
 local DEFAULT_THROTTLE_INTERVAL = 0.3
-local msg1                      = "Throttled update failed for obj %s: %s"
+local msg1 = "Throttled update failed for obj %s: %s"
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -28,6 +28,9 @@ end
 --[[-----------------------------------------------------------------------------
 Instance Methods
 -------------------------------------------------------------------------------]]
+
+function o:GetActiveCount() return #active end
+
 --- Sets the update throttle interval (in seconds)
 --- @param interval number
 function o:SetThrottleInterval(interval)
@@ -45,6 +48,8 @@ function o:StartThrottledUpdates()
     for _, obj in ipairs(active) do
         if obj == self then return end
     end
+
+    if not self._name then self._name = tostring(self) end
 
     table.insert(active, self)
     driver:Show()
@@ -65,7 +70,6 @@ function o:StopThrottledUpdates()
     end
 end
 
-function o:GetActiveCount() return #active end
 
 --[[-----------------------------------------------------------------------------
 Global Function
@@ -83,7 +87,7 @@ function ns.xml:ThrottledUpdaterMixin_OnUpdate(_, elapsed)
                 local ok, err = pcall(obj._OnUpdate, obj, elapsed)
                 if not ok then
                     table.remove(active, i)
-                    p:w(function() return msg1, tostring(obj), err end)
+                    p:w(function() return msg1, obj._name or tostring(obj), err end)
                 end
             end
         end

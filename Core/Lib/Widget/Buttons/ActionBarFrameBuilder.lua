@@ -250,7 +250,7 @@ local function WidgetMethods(widget)
         if setter then
             Mixin(btnWidget:conf(), conf)
             setter:SetAttributes(btnWidget.button())
-            btnWidget:UpdateStateDelayed()
+            btnWidget:UpdateDelayed()
             btnWidget:EnableMouse(true)
         end
         sourceWidget:SetButtonAsEmpty()

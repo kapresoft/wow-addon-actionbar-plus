@@ -317,11 +317,17 @@ local function PropsAndMethods(o)
         self.button():ClearOnUpdateCallbacks()
     end
 
-    function o:ResetCooldown() self:SetCooldown(0, 0) end
+    function o:ResetCooldown() self.cooldown():Clear() end
 
-    function o:SetCooldown(start, duration)
+    --- @param cd CooldownInfo
+    function o:SetCooldownByDetails(cd)
+        if not cd or not (cd.start or cd.duration) then return end
+        self:SetCooldown(cd.start, cd.duration, cd.modRate)
+    end
+
+    function o:SetCooldown(start, duration, modRate)
         if not (start or duration) then return end
-        self.cooldown():SetCooldown(start, duration)
+        self.cooldown():SetCooldown(start, duration, modRate or 1)
     end
 
     --- @param text string
@@ -356,18 +362,17 @@ local function PropsAndMethods(o)
         --- @type CooldownInfo
         local cd = { type=c.type, start=nil, duration=nil, enabled=0, details = {} }
         if c:IsSpell() then return self:GetSpellCooldown(cd)
-        elseif c:IsMacro() then return self:GetMacroCooldown(cd)
-        elseif c:IsItem() then return self:GetItemCooldown(cd) end
+        elseif c:IsItem() then return self:GetItemCooldown() end
 
         return nil
     end
 
-    --- @param cd CooldownInfo The cooldown info
     --- @return SpellCooldown
-    function o:GetSpellCooldown(cd)
+    function o:GetSpellCooldown()
         local spellID = self:GetEffectiveSpellID(); if not spellID then return nil end
         local spellCD = API:GetSpellCooldown(spellID); if not spellCD then return nil end
 
+        local cd = { type='spell', start=nil, duration=nil, enabled=0, details = {} }
         cd.details = spellCD
         cd.start = spellCD.start
         cd.duration = spellCD.duration
@@ -376,11 +381,13 @@ local function PropsAndMethods(o)
         return cd
     end
 
-    --- @param cd CooldownInfo The cooldown info
     --- @return ItemCooldown
-    function o:GetItemCooldown(cd)
-        local item = self:GetItemData()
-        if self:IsInvalidItem(item) then return nil end
+    function o:GetItemCooldown()
+        local c = self:conf(); if not c:IsItem() then return end
+
+        --- @type CooldownInfo
+        local cd = { type=c.type, start=nil, duration=nil, enabled=0, details = {} }
+        local item = c.item
         local itemCD = API:GIC(item.id)
         if itemCD ~= nil then
             cd.details = itemCD
@@ -390,54 +397,6 @@ local function PropsAndMethods(o)
             return cd
         end
         return nil
-    end
-
-    --- @param itemName string The cooldown info
-    --- @return CooldownInfo
-    function o:GetItemCooldownInfo(itemName)
-        if not itemName then return nil end
-        local itemCD = API:GIC(itemName)
-
-        --- @type CooldownInfo
-        local cd = {
-            type=type,
-            start=nil,
-            duration=nil,
-            enabled=0,
-            details = {}
-        }
-        if itemCD ~= nil then
-            cd.details = itemCD
-            cd.start = itemCD.start
-            cd.duration = itemCD.duration
-            cd.enabled = itemCD.enabled
-            return cd
-        end
-        return nil
-    end
-
-    --- @param cd CooldownInfo The cooldown info
-    function o:GetMacroCooldown(cd)
-        local spellCD = self:GetMacroSpellCooldown();
-        if spellCD and spellCD.spell then
-            cd.details = spellCD
-            cd.start = spellCD.start
-            cd.duration = spellCD.duration
-            cd.enabled = spellCD.enabled
-            cd.icon = spellCD.spell.icon
-            return cd
-        end
-
-        local itemCD = self:GetMacroItemCooldown()
-        if itemCD then
-            cd.details = itemCD
-            cd.start = itemCD.start
-            cd.duration = itemCD.duration
-            cd.enabled = itemCD.enabled
-            return cd
-        end
-
-        return nil;
     end
 
     --- @return SpellCooldown
@@ -485,11 +444,6 @@ local function PropsAndMethods(o)
         end
     end
 
-    --- @return boolean true if btn type is item or macro
-    function o:IsItemOrMacro()
-        return not self:IsEmpty() and (self:IsItem() or self:IsMacro())
-    end
-
     function o:IsRuneSpell()
         local d = self:GetSpellData()
         return d and d.runeSpell and (d.runeSpell.id ~= nil)
@@ -498,29 +452,29 @@ local function PropsAndMethods(o)
     function o:IsNewLeatherWorkingSpell() return PC():IsNewLeatherWorkingSpell(self:GetEffectiveSpell()) end
 
     function o:UpdateItemOrMacroState()
-        if self:IsItem() then self:UpdateItemState(); return end
-        self:UpdateMacroState()
+        if self:IsItem() then self:UpdateItem(); return end
+        self:UpdateMacro()
     end
 
-    function o:UpdateItemState()
+    function o:UpdateItem()
         self:ClearAllText()
         local item = self.w:GetItemData()
         if self:IsInvalidItem(item) then return end
         local itemID = item.id
         local itemInfo = API:GetItemInfo(itemID)
-        self:UpdateItemStateByItemInfo(itemInfo)
+        self:UpdateItemByItemInfo(itemInfo)
         self:SetActionUsable(self:IsUsableItem(itemID))
         self:UpdateCooldown()
         return
     end
 
-    --- @param itemIDOrName number|string The itemID or itemName
-    function o:UpdateItemStateByItem(itemIDOrName)
-        self:UpdateItemStateByItemInfo(API:GetItemInfo(itemIDOrName))
+    --- @param itemIDOrName ItemIdentifier
+    function o:UpdateItemByItem(itemIDOrName)
+        self:UpdateItemByItemInfo(API:GetItemInfo(itemIDOrName))
     end
 
     --- @param itemInfo ItemInfoDetails
-    function o:UpdateItemStateByItemInfo(itemInfo)
+    function o:UpdateItemByItemInfo(itemInfo)
         self:SetText('')
         if not itemInfo then return nil end
 
@@ -547,7 +501,7 @@ local function PropsAndMethods(o)
     end
 
     function o:UpdateUsable()
-        local c = self.w:conf()
+        local c = self:conf(); if c:IsEmpty() or c:IsMacro() then return end
         local isUsable = true
         local cd = self:GetCooldownInfo()
         local inCombat = InCombatLockdown()
@@ -561,26 +515,30 @@ local function PropsAndMethods(o)
             return
         end
 
+        -- todo next: disable other macro handlers
         if c.type == SPELL then
             isUsable = self:IsUsableSpell(cd)
-        elseif c.type == MACRO then
-            isUsable = self:IsUsableMacro(cd)
         elseif c.type == ITEM then
             isUsable = self:IsUsableItem(cd)
         end
         self:SetActionUsable(isUsable)
     end
 
-    function o:UpdateState()
+    -- ActionButton_UpdateState(self);
+    -- ActionButton_UpdateUsable(self);
+    -- ActionButton_UpdateCooldown(self);
+    -- ActionButton_UpdateCount(self): TODO
+    function o:Update()
+        local c = self:conf(); if c:IsEmpty() or c:IsMacro() then return end
         self:UpdateCooldown()
-        if self:UpdateItemOrMacroState() then self:UpdateItemOrMacroState() end
+        if self:IsItem() then self:UpdateItem() end
         self:UpdateUsable()
         self:SetHighlightDefault()
         self:SetNormalIconAlphaDefault()
     end
 
-    function o:UpdateStateDelayed(inSeconds)
-        C_Timer.After(inSeconds or 1, function() self:UpdateState() end)
+    function o:UpdateDelayed(inSeconds)
+        C_Timer.After(inSeconds or 1, function() self:Update() end)
     end
     function o:UpdateSpellCheckedStateDelayed()
         if not self:IsSpell() then return end
@@ -607,7 +565,7 @@ local function PropsAndMethods(o)
             self:ResetCooldown()
             return
         end
-        self:SetCooldown(cd.start, cd.duration)
+        self:SetCooldownByDetails(cd)
     end
     function o:UpdateCooldownDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateCooldown() end) end
 
@@ -846,6 +804,21 @@ local function PropsAndMethods(o)
         return false;
     end
 
+    function o:SetButtonAsUsable()
+        local tex = self.button():GetNormalTexture()
+        return tex and tex:SetVertexColor(1.0, 1.0, 1.0)
+    end
+    function o:SetButtonAsNotUsable()
+        local tex = self.button():GetNormalTexture()
+        return tex and tex:SetVertexColor(0.3, 0.3, 0.3)
+    end
+
+    function o:SetActionUsable2(isUsable)
+        if isUsable == true then return self:SetButtonAsUsable() end
+        self:SetButtonAsNotUsable()
+    end
+
+    --- This method will be reworked.  Use #SetActionUsable2() for macros.
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
         local normalTexture = self.button():GetNormalTexture()
@@ -923,7 +896,7 @@ local function PropsAndMethods(o)
 
     --- @param cd CooldownInfo
     function o:IsUsableMacro(cd)
-        if not (cd or cd.details) then return false end
+        if not (cd and cd.details) then return false end
         if cd.details.spell then
             local spellID = cd.details.spell.id
             if IsBlank(spellID) then return true end
@@ -936,6 +909,7 @@ local function PropsAndMethods(o)
 
     --- @param icon string Blizzard Icon
     function o:SetIcon(icon)
+        if not icon then return nil end
         local btn = self.button()
         self:SetNormalTexture(icon)
         self:SetPushedTexture(icon)
@@ -967,8 +941,8 @@ local function PropsAndMethods(o)
         return self:IsEquipmentSet()
     end
 
-    -- todo next: Pull Out UpdateMacroState() #504
-    function o:UpdateMacroState()
+    -- todo next: Pull Out UpdateMacro() #504
+    function o:UpdateMacro()
         --- @type SpellCooldown
         local scd = self:GetMacroSpellCooldown()
         if scd and scd.spell then
@@ -994,7 +968,7 @@ local function PropsAndMethods(o)
             local item = icd.item
             local icon = item.icon
             self:SetNameText(self:GetMacroName())
-            self:UpdateItemStateByItem(item.name)
+            self:UpdateItemByItem(item.name)
             if icon then self:SetIcon(icon) end
             self:UpdateCooldown(icd)
             return

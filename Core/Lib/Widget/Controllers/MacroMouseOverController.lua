@@ -10,7 +10,7 @@ Local Vars
 local ns     = select(2, ...)
 local O, GC  = ns.O, ns.GC
 local api, u = O.API, GC.UnitId
-local mcc = O.MacroControllerCommon
+local mcu    = O.MacroUtil
 
 --[[-----------------------------------------------------------------------------
 Module
@@ -27,61 +27,56 @@ Support Functions
 -------------------------------------------------------------------------------]]
 local function ri() return O.RangeIndicatorController  end
 
---- @type MacroMouseOverController | ControllerV2
-local o = L
+--- Checks if the current "target" unit is the same as the "mouseover" unit.
+--- @return boolean
+local function TargetUnitIsSameAsMouseOver()
+    local targetGUID = UnitGUID("target")
+    local mouseoverGUID = UnitGUID("mouseover")
+    return targetGUID ~= nil and targetGUID == mouseoverGUID
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+--- @type MacroMouseOverController | ControllerV2
+local o = L
+
 --- Automatically called
 --- @see ModuleV2Mixin#Init
 --- @private
 function o:OnAddOnReady()
+    self:SetThrottleInterval(0.1)
     self:RegisterAddOnMessage(GC.E.UPDATE_MOUSEOVER_UNIT, o.OnMouseOverUnit)
 end
 
 function o.OnMouseOverUnit()
-    -- Wrap in a timer so that mouse on and off doesn't have a
-    -- race condition when calling UnitName(mouseover)
-    C_Timer.After(0.01, function()
-        local name = UnitName(u.mouseover)
-        if name then return o:OnStartMouseOverUnit(name) end
-        o:OnStopMouseOverUnit()
-    end)
+    -- only activate if target ~= mouseover unit
+    if TargetUnitIsSameAsMouseOver() then return end
+    o:StartThrottledUpdates()
+    o:UpdateDelayed()
 end
 
 --- @see ThrottledUpdaterMixin
 --- @param elapsed TimeInMilli
-function o:_OnUpdate(elapsed) self:UpdateAllRangeIndicators() end
+function o:_OnUpdate(elapsed) self:UpdateMouseOverState() end
 
---- @param unitName Name The mouseover unit name
-function o:OnStartMouseOverUnit(unitName)
-    self:StartThrottledUpdates()
-    self:UpdateAllRangeIndicators()
+function o:UpdateMouseOverState()
+    local exists = UnitExists(u.mouseover)
+    if exists and not self._mouseoverWasSet then
+        self._mouseoverWasSet = true
+        self:StartThrottledUpdates()
+    elseif not exists and self._mouseoverWasSet then
+        self._mouseoverWasSet = false
+        self:StopThrottledUpdates()
+    end
 end
 
-function o:OnStopMouseOverUnit()
-    o:StopThrottledUpdates()
-    o:ForEachMacroButton(function(bw)
-        mcc:UpdateIcon(bw)
-        bw:UpdateCooldown()
-        if UnitIsDead(u.mouseover) then return end
+function o:UpdateDelayed() C_Timer.After(0.001, function() self:Update() end) end
 
-        self:ClearAllRangeIndicators()
-    end)
-end
-
-function o:UpdateAllRangeIndicators()
+function o:Update()
     o:ForEachMacroButton(function(bw)
-        mcc:UpdateIcon(bw)
-        bw:UpdateCooldown()
+        mcu:Button_UpdateIcon(bw)
+        mcu:Button_UpdateCooldown(bw)
         bw:ru():Button_UpdateRangeIndicator(bw, u.mouseover)
     end)
 end
-
-function o:ClearAllRangeIndicators()
-    self:ForEachMacroButton(function(bw)
-        ri():Button_ClearRangeIndicator(bw)
-    end)
-end
-

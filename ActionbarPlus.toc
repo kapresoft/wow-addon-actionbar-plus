@@ -1,4 +1,4 @@
-## Interface: 110107
+## Interface: 110200
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
 ## Notes: Actionbars Everywhere, Make you click happy.
