@@ -43,6 +43,7 @@ local M = {
     ActionBarHandlerMixin              = '',
     ButtonMixin                        = '',
     ButtonProfileMixin                 = '',
+    CooldownUtil                       = '',
     CursorMixin                        = '',
     DebuggingSettingsGroup             = '',
     DruidUnitMixin                     = '',
@@ -79,10 +80,13 @@ local M = {
     MacroAttributeSetter               = '',
     MacroDragEventHandler              = '',
     MacroChangesController             = '',
+    MacroEventsHandler                 = '',
     MacroControllerCommon              = '',
+    MacroUtil                          = '',
     MacroModifierStateChangeController = '',
     MacroMouseOverController           = '',
     MacroSpellCastController           = '',
+    MacroSpellUpdateUsableController   = '',
     MacrotextAttributeSetter           = '',
     Modules                            = '',
     MountAttributeSetter               = '',
@@ -119,6 +123,7 @@ local M = {
 --- @field AttributeSetterRegistry AttributeSetterRegistry
 --- @field BagController BagController
 --- @field BaseAPI BaseAPI
+--- @field CooldownUtil CooldownUtil
 --- @field Compat Compat
 --- @field ModuleV2Mixin ModuleV2Mixin
 --- @field BaseAttributeSetter BaseAttributeSetter
@@ -150,11 +155,12 @@ local M = {
 --- @field LogFactory LogFactory
 --- @field Logger Logger
 --- @field MacroAttributeSetter MacroAttributeSetter
---- @field MacroControllerCommon MacroControllerCommon
+--- @field MacroUtil MacroUtil
 --- @field MacroDragEventHandler MacroDragEventHandler
 --- @field MacroChangesController MacroChangesController
 --- @field MacroMouseOverController MacroMouseOverController
 --- @field MacroSpellCastController MacroSpellCastController
+--- @field MacroSpellUpdateUsableController MacroSpellUpdateUsableController
 --- @field MacrotextAttributeSetter MacrotextAttributeSetter
 --- @field Modules Modules
 --- @field MountAttributeSetter MountAttributeSetter

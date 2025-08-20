@@ -154,7 +154,7 @@ local function OnReceiveDrag(btnUI)
 
     --- @type ReceiveDragEventHandler
     O.ReceiveDragEventHandler:Handle(btnUI, cursorUtil)
-    btnUI.widget:UpdateStateDelayed(0.01)
+    btnUI.widget:UpdateDelayed(0.01)
 
     -- While the modifier key is held down after dragging
     -- we KeyUp will be active to prevent KeyDown from executing the action

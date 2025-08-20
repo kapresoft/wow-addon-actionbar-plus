@@ -110,7 +110,7 @@ function L:CreateSingleButton(frameWidget, row, col, btnIndex)
 
     btnWidget:SetButtonAttributes()
     btnWidget:SetCallback("OnMacroChanged", OnMacroChanged)
-    btnWidget:UpdateStateDelayed(0.05)
+    btnWidget:UpdateDelayed(0.05)
     btnWidget:CleanupActionTypeData()
     -- after a switch in spec, the buttons need to be cleared as needed
     if btnWidget:IsEmpty() then btnWidget:SetButtonAsEmpty() end

@@ -2,12 +2,12 @@
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
-local ns      = select(2, ...)
-local O, GC   = ns.O, ns.GC
-local api, mcc = O.API, O.MacroControllerCommon
+local ns            = select(2, ...)
+local O, GC         = ns.O, ns.GC
+local api, mcu, cdu, compat = O.API, O.MacroUtil, O.CooldownUtil, O.Compat
+local druid = O.DruidUnitMixin
 
-local THROTTLE_INTERVAL_MACRO_UPDATES   = 0.3
-
+local THROTTLE_INTERVAL_MACRO_UPDATES     = 0.1
 local MACRO_UPDATE_TIMEOUT                = 20
 local MACRO_UPDATE_COMBAT_RETRY_IN_SEC    = 10
 local SPELL_UPDATE_USABLE_BUCKET_INTERVAL = 0.3
@@ -28,7 +28,6 @@ local unregisterTask
 --- @type table
 local spellUpdateUsableHandle
 
-
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -40,16 +39,20 @@ function o:OnAddOnReady()
     self:SetThrottleInterval(THROTTLE_INTERVAL_MACRO_UPDATES)
     self:RegisterMessage(GC.M.OnPlayerSpellCastSucceeded, o.OnPlayerCastSucceeded)
     self:RegisterAddOnMessage(GC.E.PLAYER_TARGET_CHANGED, o.OnTargetChanged)
-    self:StartThrottledUpdates()
+    self:RegisterMessage(GC.M.OnAfterReceiveDrag, o.OnAfterReceiveDrag)
+    self:RegisterSpellUpdateUsable()
+
+    self:UpdateMacrosDelayed()
 end
+
+function o.OnAfterReceiveDrag() o:UpdateMacros() end
+function o.OnSpellUpdateUsable() o:UpdateMacros() end
 
 function o.OnPlayerCastSucceeded()
     o:RegisterSpellUpdateUsable()
     o:StartThrottledUpdates()
     o:UnRegisterAfter(MACRO_UPDATE_TIMEOUT)
 end
-
-function o.OnSpellUpdateUsable() o:StartThrottledUpdates() end
 
 function o.OnTargetChanged()
     o:StartThrottledUpdates()
@@ -63,7 +66,7 @@ end
 --- @see ThrottledUpdaterMixin
 --- @param elapsed TimeInMilli
 function o:_OnUpdate(elapsed)
-    C_Timer.After(0.01, function() local ctrl = self  mcc:UpdateMacros(ctrl) end)
+    C_Timer.After(0.01, function() local ctrl = self  self:UpdateMacros(ctrl) end)
 end
 
 function o:RegisterSpellUpdateUsable()
@@ -96,18 +99,56 @@ function o:UnRegisterAfter(duration)
             ctrl:UnregisterBucket(spellUpdateUsableHandle);
             local prev = spellUpdateUsableHandle
             spellUpdateUsableHandle = nil
-            p:d(function() return 'Macro update handler(%s), cleared=[%s]',
-                tostring(prev), spellUpdateUsableHandle == nil end)
+            p:d('Macro update handler cleared.')
         end
         tryUnregister()
     end)
     p:d(function()
         if previousTask then
-            return 'New unregister task to trigger in %ss.\nNew(%s), Prev(%s), cancelled=[%s]',
+            return 'New unreg task, trigger %ss.\nnew(%s), prev(%s), cancelled=[%s]',
                 duration, tostring(unregisterTask),
                 tostring(previousTask), previousTask:IsCancelled()
         end
-        return 'New Unregister task [%s], trigger in %ss.', tostring(unregisterTask), duration
+        return 'New unreg task [%s], trigger %ss.', tostring(unregisterTask), duration
     end)
 end
 
+function o:UpdateMacrosDelayed()
+    C_Timer.After(0.01, function() self:UpdateMacros() end)
+end
+
+function o:UpdateMacros()
+    self:ForEachMacroButton(function(bw) self:Button_Update(bw) end)
+end
+
+--- @param bw ButtonUIWidget
+function o:Button_Update(bw)
+
+    --- @type PreCallbackFn
+    local preCallbackFn = function(bw, c)
+        mcu:Button_UpdateIcon(bw)
+    end
+
+    --- @type ItemCallbackFn
+    local handleItem = function(c, itemID)
+        local usableItem = compat:IsUsableItem(itemID)
+        bw:SetActionUsable2(usableItem)
+        bw:UpdateCooldown(cdu:GetItemCooldown(itemID))
+        bw:UpdateItemByItemInfo(api:GetItemInfo(itemID))
+    end
+
+    --- @type SpellCallbackFn
+    local handleSpell = function(c, spellID)
+        local usableSpell = compat:IsUsableSpell(spellID)
+        if druid:IsProwl(spellID) then
+            bw:SetChecked(druid:IsStealthActive())
+            usableSpell = true
+        end
+
+        bw:SetActionUsable2(usableSpell)
+        mcu:Button_UpdateCooldownBySpell(bw, spellID)
+    end
+
+    mcu:_Button_Update(bw, preCallbackFn, handleItem, handleSpell)
+
+end

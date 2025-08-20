@@ -12,7 +12,5 @@
     <Script file="APIHooks.lua"/>
     <Script file="BaseAPI.lua"/>
     <Script file="API.lua"/>
-    <Script file="ItemUtil.lua"/>
-    <Script file="TooltipUtil.lua"/>
 
 </Ui>

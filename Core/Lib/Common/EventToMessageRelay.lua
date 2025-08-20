@@ -36,6 +36,7 @@ local function PropsAndMethods(o)
         --- Player-only Events
         local events = {
             E.PLAYER_ENTERING_WORLD, E.PLAYER_TARGET_CHANGED, E.UPDATE_MOUSEOVER_UNIT,
+            E.PLAYER_STARTED_MOVING, E.PLAYER_STOPPED_MOVING,
             E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
             E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
             E.BAG_UPDATE, E.BAG_UPDATE_DELAYED,
@@ -45,7 +46,7 @@ local function PropsAndMethods(o)
             E.MODIFIER_STATE_CHANGED,
             E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
             E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
-            E.SPELL_UPDATE_USABLE,
+            E.SPELL_UPDATE_USABLE, E.SPELL_UPDATE_COOLDOWN, E.ACTIONBAR_UPDATE_COOLDOWN,
             E.START_AUTOREPEAT_SPELL, E.STOP_AUTOREPEAT_SPELL,
             E.PLAYER_ENTER_COMBAT, E.PLAYER_LEAVE_COMBAT,
             E.UPDATE_BINDINGS,
@@ -91,10 +92,8 @@ local function PropsAndMethods(o)
     --- @param frame Frame
     --- @param event string
     function o.OnMessageTransmitter(frame, event, ...)
-        local a = {...}
         if StartsWith(event, 'UNIT_') then
-            local unitName = a[1]
-            return unitName == GC.UnitId.player and o.OnPlayerEvents(frame, event, ...)
+            return o.OnPlayerEvents(frame, event, ...)
         end
 
         local msg = transformations[event] or GC.toMsg(event)
@@ -103,9 +102,8 @@ local function PropsAndMethods(o)
     end
 
     function o.OnPlayerEvents(frame, event, ...)
-        local a = {...}
         local msg = unitTransformations[event] or GC.toMsg(event)
-        --pt:vv(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, a end)
+        --pt:vv(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, {...} end)
         o:SendMessage(msg, libName, ...)
     end
 

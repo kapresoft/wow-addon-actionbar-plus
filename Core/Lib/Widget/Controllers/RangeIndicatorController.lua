@@ -28,21 +28,29 @@ local function PropsAndMethods(o)
 
     --- Automatically called
     --- @see ModuleV2Mixin#Init
+    --- @see MacroMouseOverController This file handles the mouseover range-indicator events
     --- @private
     function o:OnAddOnReady()
         self:RegisterAddOnMessage(GC.E.PLAYER_TARGET_CHANGED, o.OnTargetChanged)
+        self:RegisterAddOnMessage(GC.E.MODIFIER_STATE_CHANGED, o.OnModifierStateChanged)
     end
-
-    --- /dump UnitExists('target')
-    --- /dump UnitIsDead('target')
-    --- @see ThrottledUpdaterMixin
-    --- @param elapsed TimeInMilli
-    function o:_OnUpdate(elapsed) self:UpdateAllRangeIndicators() end
 
     --- @private
     function o.OnTargetChanged()
         if UnitName(u.target) then return o:StartTargetingUnit() end
         return o:StopTargetingUnit()
+    end
+
+    ---@param keyPressed string
+    ---@param downPress number | "1" | "0"
+    function o.OnModifierStateChanged(evt, source, keyPressed, downPress)
+        o:UpdateAllRangeIndicatorsDelayed()
+    end
+
+    --- @see ThrottledUpdaterMixin
+    --- @param elapsed TimeInMilli
+    function o:_OnUpdate(elapsed)
+        self:UpdateAllRangeIndicators()
     end
 
     --- @private
@@ -59,6 +67,10 @@ local function PropsAndMethods(o)
         self:ClearAllRangeIndicators()
     end
 
+    function o:UpdateAllRangeIndicatorsDelayed()
+        C_Timer.After(0.001, function() o:UpdateAllRangeIndicators() end)
+    end
+
     --- @private
     function o:UpdateAllRangeIndicators()
         self:ForEachNonEmptyButton(function(bw)
@@ -68,12 +80,9 @@ local function PropsAndMethods(o)
 
     function o:ClearAllRangeIndicators()
         self:ForEachNonEmptyButton(function(bw)
-            self:Button_ClearRangeIndicator(bw)
+            bw:ru():ClearRangeIndicator()
         end)
     end
-
-    --- @param bw ButtonUIWidget
-    function o:Button_ClearRangeIndicator(bw) bw.kbt:UpdateKeybindTextState() end
 
 end; PropsAndMethods(L)
 

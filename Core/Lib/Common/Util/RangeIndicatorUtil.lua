@@ -35,14 +35,6 @@ local LIB = S; ns:Register(libName, LIB)
 --- @return RangeIndicatorUtil_Instance
 --- @param bw ButtonUIWidget
 function LIB:New(bw)  return K:CreateAndInitFromMixin(S, bw) end
---[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
--- UnitCanAssist('player', 'target')
---local function PlayerCanAssistTarget() return UnitCanAssist(u.player, u.target) == true end
---local function TargetIsHarmful() return not PlayerCanAssistTarget() end
---local function SpellRangeFn(spellID, unitID) return api():IsSpellInRange(spellID, unitID) end
---local function ItemRangeFn(itemID, unitID) return api():IsSpellInRange(itemID, unitID) end
 
 --[[-----------------------------------------------------------------------------
 Instance Methods
@@ -56,7 +48,7 @@ function o:Init(bw) self.w = bw end
 --- @param bw ButtonUIWidget
 --- @param unitID UnitID
 function o:Button_UpdateRangeIndicator(bw, unitID)
-    if type(unitID) ~= 'string' then unitID = UnitNameUnmodified(u.target) and u.target end
+    if not unitID then return end
 
     local kbt            = bw.kbt
     local kbf            = kbt:GetKeybindText()
@@ -66,8 +58,8 @@ function o:Button_UpdateRangeIndicator(bw, unitID)
     if not hasKeyBindings then
         kbf:SetTextAsRangeIndicator()
     end
+    kbt:ShowRangeIndicator()
 
-    local c = bw:conf()
     local inRange
     local itemID, itemN = bw:GetEffectiveItemID()
     if itemID then
@@ -76,18 +68,17 @@ function o:Button_UpdateRangeIndicator(bw, unitID)
         inRange = api:IsItemInRange(itemID, unitID)
     else
         local spid = bw:GetEffectiveSpellID()
-        inRange = spid and api:IsSpellInRange(spid, unitID)
+        if spid then inRange = api:IsSpellInRange(spid, unitID) end
     end
 
     -- inRange = nil means spell, item, etc., does not apply to target
-    if inRange == nil then return end
-
-    kbt:ShowKeybindText()
-    if inRange == true then return kbf:SetVertexColorNormal() end
+    if inRange == nil then return self:ClearRangeIndicator()
+    elseif inRange == true then return kbf:SetVertexColorNormal() end
     kbf:SetVertexColorOutOfRange()
 end
 
 --- We don't know whether unit is friend or enemy
+--- @private
 --- @param bw ButtonUIWidget
 --- @param c ButtonProfileConfigMixin
 --- @param spID EffectiveSpellIdentifier
@@ -95,6 +86,7 @@ end
 --- @return boolean|nil Returns nil if the action does not apply to the unitId
 function o:UpdateWhenUnitIsDead(bw, c, spID, unitID) end
 
+--- @private
 --- @param bw ButtonUIWidget
 --- @param c ButtonProfileConfigMixin
 --- @param spID EffectiveSpellIdentifier
@@ -106,6 +98,7 @@ function o:InRangeHelpfulAction(bw, c, spID, unitID)
     return api:IsSpellInRange(spID, unitID)
 end
 
+--- @private
 --- @param bw ButtonUIWidget
 --- @param c ButtonProfileConfigMixin
 --- @param spID EffectiveSpellIdentifier
@@ -119,11 +112,7 @@ end
 
 function o:ClearRangeIndicator()
     local kbt = self.w.kbt
-    local kbf = kbt:GetKeybindText()
-
-    if not kbt:HasKeybindings() then
-        kbt:HideKeybindText()
-    else
-        kbf:SetVertexColorNormal()
-    end
+    kbt:GetKeybindText():SetVertexColorNormal()
+    if kbt:IsShowingRangeIndicator() then kbt:HideKeybindText() end
 end
+

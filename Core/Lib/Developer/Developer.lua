@@ -238,6 +238,9 @@ function L:SetupButtonsLargeUI()
     --- @type _AnchorUtil
     local AnchorUtil = AnchorUtil
 
+    local alpha1 = 1
+    local alpha2  = 1
+
     --- @param fr ActionBarFrame
     local function toUIParent(fr)
         local screenX, screenY = fr:GetCenter()
@@ -250,48 +253,55 @@ function L:SetupButtonsLargeUI()
     f1.widget:SetFrameState(true)
     f1.widget:SetButtonCount(1, 11)
     f1.widget:SetButtonWidth(50)
-    f1.widget:SetButtonAlpha(0.5)
+    f1.widget:SetButtonAlpha(alpha1)
     f1:ClearAllPoints()
     f1:SetPoint("TOP", UIParent, "TOP", 0, -5)
     f1.widget:UpdateAnchor()
 
+    if not f1:IsShown() then return end
     --- @type ActionBarFrame
     local f2 = ActionbarPlusF2
     f2.widget:SetFrameState(true)
     f2.widget:SetButtonCount(1, 13)
     f2.widget:SetButtonWidth(35)
-    f2.widget:SetButtonAlpha(0.4)
+    f2.widget:SetButtonAlpha(alpha2)
     f2:ClearAllPoints()
     f2:SetPoint("TOPRIGHT", f1, "BOTTOMRIGHT", -3, -3)
     toUIParent(f2)
     f2.widget:UpdateAnchor()
 
     --- @type ActionBarFrame
-    local f3 = ActionbarPlusF4
-    f3.widget:SetFrameState(true)
-    f3.widget:SetButtonCount(2, 3)
-    f3.widget:SetButtonWidth(60)
-    f3.widget:SetButtonAlpha(0.3)
-    f3:ClearAllPoints()
-    f3:SetPoint("BOTTOMRIGHT", UIParent, "CENTER", -100, 50)
-    f3.widget:UpdateAnchor()
+    local f3 = ActionbarPlusF3
+    if f3:IsShown() then
+        f3.widget:SetButtonAlpha(alpha2)
+    end
 
     --- @type ActionBarFrame
-    local f4 = ActionbarPlusF5
+    local f4 = ActionbarPlusF4
     f4.widget:SetFrameState(true)
     f4.widget:SetButtonCount(2, 3)
     f4.widget:SetButtonWidth(60)
-    f4.widget:SetButtonAlpha(0.99)
+    f4.widget:SetButtonAlpha(alpha2)
     f4:ClearAllPoints()
-    f4:SetPoint("BOTTOMLEFT", UIParent, "CENTER", 100, 50)
+    f4:SetPoint("BOTTOMRIGHT", UIParent, "CENTER", -100, 50)
     f4.widget:UpdateAnchor()
+
+    --- @type ActionBarFrame
+    local f5 = ActionbarPlusF5
+    f5.widget:SetFrameState(true)
+    f5.widget:SetButtonCount(2, 3)
+    f5.widget:SetButtonWidth(60)
+    f5.widget:SetButtonAlpha(alpha2)
+    f5:ClearAllPoints()
+    f5:SetPoint("BOTTOMLEFT", UIParent, "CENTER", 100, 50)
+    f5.widget:UpdateAnchor()
 
     --- @type ActionBarFrame
     local f10 = ActionbarPlusF10
     f10.widget:SetFrameState(true)
     f10.widget:SetButtonCount(1, 7)
     f10.widget:SetButtonWidth(30)
-    f10.widget:SetButtonAlpha(0.3)
+    f10.widget:SetButtonAlpha(alpha2)
     f10:ClearAllPoints()
     f10:SetPoint("BOTTOMRIGHT", MultiBarBottomRight, "TOPRIGHT", -3, 3)
     toUIParent(f10)
@@ -338,8 +348,11 @@ end
 
 -- /run a:p()
 function L:CustomFrameLocations()
+    if ShadowUF then return end
+
     local scale = 0.85
     local ofsy = -200
+    if ns:IsMoP() then ofsy = -120 end
 
     --- @type Frame
     local pf = PlayerFrame

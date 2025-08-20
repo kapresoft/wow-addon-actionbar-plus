@@ -34,6 +34,7 @@ local function PropsAndMethods(o)
     function o:OnBagUpdate(evt)
         pb:f3( function() return 'OnBagU(): called...' end)
         self:ForEachItemButton(function(bw)
+            -- todo next: how to migrate?
             bw:UpdateItemOrMacroState()
             bw:UpdateUsable()
         end)

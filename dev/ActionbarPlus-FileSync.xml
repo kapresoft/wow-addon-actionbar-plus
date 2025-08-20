@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+  <option name="targetMappings">
+    <list>
+      <TargetMappings>
+        <option name="active" value="true" />
+        <option name="name" value="Classic Era" />
+        <option name="synchroMappings">
+          <array>
+            <SynchroMapping>
+              <option name="deleteObsoleteFiles" value="true" />
+              <option name="srcPath" value="$PROJECT_DIR$/" />
+              <option name="destPath" value="/Applications/World of Warcraft/_classic_era_/Interface/AddOns/ActionbarPlus" />
+            </SynchroMapping>
+          </array>
+        </option>
+        <option name="excludedCopyPaths">
+          <array>
+            <option value="**/.dependency-info/*" />
+            <option value="**/.git/*" />
+            <option value="**/.svn/*" />
+            <option value="**/CVS/*" />
+            <option value="**/*.java" />
+            <option value="**/doc/*" />
+            <option value="**/build/*" />
+            <option value="**/dev/*" />
+            <option value="**/_SV/*" />
+            <option value="**/Dev.toc" />
+            <option value="**/*.md" />
+            <option value="***/pkgmeta.yaml" />
+            <option value="**/.idea/*" />
+            <option value="**/.release/*" />
+          </array>
+        </option>
+        <option name="excludedDeletePaths">
+          <array />
+        </option>
+      </TargetMappings>
+      <TargetMappings>
+        <option name="active" value="true" />
+        <option name="name" value="Classic Beta" />
+        <option name="synchroMappings">
+          <array>
+            <SynchroMapping>
+              <option name="deleteObsoleteFiles" value="true" />
+              <option name="srcPath" value="$PROJECT_DIR$/" />
+              <option name="destPath" value="/Applications/World of Warcraft/_classic_beta_/Interface/AddOns/ActionbarPlus" />
+            </SynchroMapping>
+          </array>
+        </option>
+        <option name="excludedCopyPaths">
+          <array>
+            <option value="**/.dependency-info/*" />
+            <option value="**/.git/*" />
+            <option value="**/.svn/*" />
+            <option value="**/CVS/*" />
+            <option value="**/*.java" />
+            <option value="**/doc/*" />
+            <option value="**/build/*" />
+            <option value="**/dev/*" />
+            <option value="**/_SV/*" />
+            <option value="**/Dev.toc" />
+            <option value="**/*.md" />
+            <option value="***/pkgmeta.yaml" />
+            <option value="**/.idea/*" />
+            <option value="**/.release/*" />
+          </array>
+        </option>
+        <option name="excludedDeletePaths">
+          <array />
+        </option>
+      </TargetMappings>
+    </list>
+  </option>
+  <option name="generalOptions">
+    <GeneralOptions>
+      <option name="allowConcurrentRuns" value="true" />
+      <option name="copyOnSave" value="true" />
+      <option name="createMissingDirs" value="true" />
+      <option name="saveBeforeCopy" value="false" />
+      <option name="simulationMode" value="false" />
+      <option name="storeRelativePaths" value="true" />
+    </GeneralOptions>
+  </option>
+  <option name="logOptions">
+    <LogOptions>
+      <option name="autoPopup" value="true" />
+      <option name="clearBeforeSynchro" value="true" />
+      <option name="logExludedPaths" value="false" />
+      <option name="logIdenticalPaths" value="false" />
+      <option name="logSrcPaths" value="false" />
+      <option name="logFontFamily" value="Monospaced" />
+      <option name="logFontSize" value="12" />
+    </LogOptions>
+  </option>
+</Config>
+

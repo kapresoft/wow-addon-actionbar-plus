@@ -3,6 +3,8 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local C_ToyBox, C_Container = C_ToyBox, C_Container
 local C_MountJournal, C_PetBattles, C_PetJournal = C_MountJournal, C_PetBattles, C_PetJournal
+local C_GetItemCooldown = C_Container.GetItemCooldown or GetItemCooldown
+
 --- Use C_AddOns.GetAddOnEnableStat(addonName, char) if available
 local C_AddOns_GetAddOnEnableState = C_AddOns.GetAddOnEnableState
 --- Else, WOTLK Uses GetAddOnEnableState(index, char)
@@ -758,6 +760,25 @@ function S:GetItemCooldown(itemIDOrName)
         details = item
     }
 
+    return cd
+end
+
+--- See: [GetItemCooldown](https://wowpedia.fandom.com/wiki/API_GetItemCooldown)
+--- @param itemID ItemID
+--- @return ItemCooldown
+function S:GetItemCooldownQuick(itemID)
+    if not itemID then return nil end
+
+    local start, duration, enabled = C_GetItemCooldown(itemID)
+    if not (start and duration and enabled) then return end
+
+
+    local item  = { id = itemID }
+    if ns:IsDev() then
+        item = self:GetItemInfoInstant(itemID)
+    end
+    --- @type ItemCooldown
+    local cd = { item = item, start=start, duration=duration, enabled=enabled }
     return cd
 end
 
