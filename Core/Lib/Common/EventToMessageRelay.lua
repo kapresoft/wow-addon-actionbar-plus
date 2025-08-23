@@ -26,7 +26,7 @@ Support Functions
 -------------------------------------------------------------------------------]]
 local function logUnitEvents(event, msg, ...)
     local args = {...}
-    pt:vv(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, args end)
+    pt:t(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, args end)
 end
 
 --[[-----------------------------------------------------------------------------
