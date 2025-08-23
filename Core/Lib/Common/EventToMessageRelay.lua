@@ -21,6 +21,13 @@ Blizzard Vars
 -------------------------------------------------------------------------------]]
 local CreateFrame, FrameUtil = CreateFrame, FrameUtil
 local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+local function logUnitEvents(event, msg, ...)
+    local args = {...}
+    pt:vv(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, args end)
+end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -97,13 +104,13 @@ local function PropsAndMethods(o)
         end
 
         local msg = transformations[event] or GC.toMsg(event)
-        --pt:vv(function() return "OnMessageTransmitter::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, a end)
+        logUnitEvents(event, msg, ...)
         o:SendMessage(msg, libName, ...)
     end
 
     function o.OnPlayerEvents(frame, event, ...)
         local msg = unitTransformations[event] or GC.toMsg(event)
-        --pt:vv(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, {...} end)
+        logUnitEvents(event, msg, ...)
         o:SendMessage(msg, libName, ...)
     end
 
