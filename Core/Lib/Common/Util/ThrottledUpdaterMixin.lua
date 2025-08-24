@@ -11,6 +11,8 @@ local ns = select(2, ...)
 local active = {}
 local DEFAULT_THROTTLE_INTERVAL = 0.3
 local msg1 = "Throttled update failed for obj %s: %s"
+--- @type Frame
+local driver
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -40,8 +42,7 @@ end
 
 -- Starts throttled updates, using existing _interval or defaulting to 0.3 if not set
 function o:StartThrottledUpdates()
-    local driver = ABP_ThrottledUpdaterDriver
-
+    if not driver then return end
     if not self._interval then self._interval = 0.3 end
     self._nextCheck = 0
 
@@ -56,8 +57,7 @@ function o:StartThrottledUpdates()
 end
 
 function o:StopThrottledUpdates()
-    local driver = ABP_ThrottledUpdaterDriver
-
+    if not driver then return end
     for i = #active, 1, -1 do
         if active[i] == self then
             table.remove(active, i)
@@ -74,6 +74,11 @@ end
 --[[-----------------------------------------------------------------------------
 Global Function
 -------------------------------------------------------------------------------]]
+function ns.xml:ThrottledUpdaterMixin_OnLoad(frame)
+    assert(frame, 'OnLoad()::Frame is expected here.')
+    driver = frame
+end
+
 function ns.xml:ThrottledUpdaterMixin_OnUpdate(_, elapsed)
     -- this prevents index shifting from skipping over items.
     for i = #active, 1, -1 do

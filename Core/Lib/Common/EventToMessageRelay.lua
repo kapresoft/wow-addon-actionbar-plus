@@ -1,33 +1,25 @@
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local CreateFrame, FrameUtil = CreateFrame, FrameUtil
+local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
+
+--[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
 local GC, E, M, KO = ns.GC, ns.GC.E, ns.GC.M, ns:KO()
-local StartsWith = KO.String.StartsWith
 local libName = 'EventToMessageRelay'
 
-local tinsert = table.insert
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @class EventToMessageRelay
-local L = ns:NewLib(libName)
+local L = ns:NewLib(libName); if not L then return end
 local p = ns:CreateDefaultLogger(libName)
 local pm = ns:LC().MESSAGE:NewLogger(libName)
 local pt = ns:LC().MESSAGE_TRACE:NewLogger(libName)
---[[-----------------------------------------------------------------------------
-Blizzard Vars
--------------------------------------------------------------------------------]]
-local CreateFrame, FrameUtil = CreateFrame, FrameUtil
-local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
---[[-----------------------------------------------------------------------------
-Support Functions
--------------------------------------------------------------------------------]]
-local function logUnitEvents(event, msg, ...)
-    local args = {...}
-    pt:t(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, args end)
-end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -35,87 +27,57 @@ Methods
 --- @param o EventToMessageRelay | ModuleV2
 local function PropsAndMethods(o)
 
-    ---@param frame Frame
-    function o.OnLoad(frame)
+    --- Player-only Events
+    --- value of true means there is no transformation
+    local events = {
+        [E.ACTIONBAR_SHOWGRID]     = true,
+        [E.ACTIONBAR_HIDEGRID]     = true,
+        [E.MODIFIER_STATE_CHANGED] = true,
+        [E.PLAYER_ENTERING_WORLD]  = true,
+        [E.PLAYER_TARGET_CHANGED]  = true,
+        [E.PLAYER_REGEN_ENABLED]   = true,
+        [E.PLAYER_REGEN_DISABLED]  = true,
+        [E.PET_BAR_SHOWGRID]       = true,
+        [E.PET_BAR_HIDEGRID]       = true,
+        [E.UPDATE_BINDINGS]        = true,
+        [E.PLAYER_REGEN_DISABLED]  = M.OnPlayerEnterCombat,
+        [E.PLAYER_REGEN_ENABLED]   = M.OnPlayerLeaveCombat,
+    }
+
+    --- @param frame Frame
+    function ns.xml:EventToMessageRelay_OnLoad(frame)
         p:f3(function() return 'OnLoad called... frame=%s', frame:GetParentKey() end)
         frame:SetScript(E.OnEvent, o.OnMessageTransmitter)
 
-        --- Player-only Events
-        local events = {
-            E.PLAYER_ENTERING_WORLD, E.PLAYER_TARGET_CHANGED, E.UPDATE_MOUSEOVER_UNIT,
-            E.PLAYER_STARTED_MOVING, E.PLAYER_STOPPED_MOVING,
-            E.EQUIPMENT_SETS_CHANGED, E.EQUIPMENT_SWAP_FINISHED, E.PLAYER_EQUIPMENT_CHANGED,
-            E.PLAYER_MOUNT_DISPLAY_CHANGED, E.ZONE_CHANGED_NEW_AREA,
-            E.BAG_UPDATE, E.BAG_UPDATE_DELAYED,
-            E.ACTIONBAR_SHOWGRID, E.ACTIONBAR_HIDEGRID,
-            E.PET_BAR_SHOWGRID, E.PET_BAR_HIDEGRID,
-            E.CURSOR_CHANGED, E.UPDATE_MACROS,
-            E.MODIFIER_STATE_CHANGED,
-            E.PLAYER_REGEN_ENABLED, E.PLAYER_REGEN_DISABLED,
-            E.PLAYER_CONTROL_LOST, E.PLAYER_CONTROL_GAINED,
-            E.SPELL_UPDATE_USABLE, E.SPELL_UPDATE_COOLDOWN, E.ACTIONBAR_UPDATE_COOLDOWN,
-            E.START_AUTOREPEAT_SPELL, E.STOP_AUTOREPEAT_SPELL,
-            E.PLAYER_ENTER_COMBAT, E.PLAYER_LEAVE_COMBAT,
-            E.UPDATE_BINDINGS,
-            E.UI_ERROR_MESSAGE
-        }
-
         --- @see EquipmentSetController
         if ns:IsRetail() then
-            tinsert(events, E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED)
+            events[E.ACTIVE_PLAYER_SPECIALIZATION_CHANGED] = true
         elseif ns:IsMoP() then
-            tinsert(events, E.PLAYER_SPECIALIZATION_CHANGED)
+            events[E.PLAYER_SPECIALIZATION_CHANGED] = true
         else
-            tinsert(events, E.ACTIVE_TALENT_GROUP_CHANGED)
+            events[E.ACTIVE_TALENT_GROUP_CHANGED] = true
         end
 
-        --- Unit Events (fires for all Units) But has a filter for 'player' only
-        local playerUnitEvents = {
-            E.UNIT_SPELLCAST_START,
-            E.UNIT_SPELLCAST_STOP,
-            E.UNIT_SPELLCAST_SUCCEEDED,
-            E.UNIT_SPELLCAST_FAILED,
-            E.UNIT_SPELLCAST_FAILED_QUIET,
-        }
-
         --- @see GlobalConstants#M (Messages)
-        RegisterFrameForEvents(frame, events)
-        RegisterFrameForUnitEvents(frame, playerUnitEvents, 'player')
-
+        RegisterFrameForEvents(frame, GC.toArray(events))
     end
 
-    local transformations = {
-        [E.PLAYER_REGEN_DISABLED]       = M.OnPlayerEnterCombat,
-        [E.PLAYER_REGEN_ENABLED]        = M.OnPlayerLeaveCombat,
-    }
-    local unitTransformations = {
-        [E.UNIT_SPELLCAST_START]        = M.OnPlayerSpellCastStart,
-        [E.UNIT_SPELLCAST_STOP]         = M.OnPlayerSpellCastStop,
-        [E.UNIT_SPELLCAST_SUCCEEDED]    = M.OnPlayerSpellCastSucceeded,
-        [E.UNIT_SPELLCAST_FAILED]       = M.OnPlayerSpellCastFailed,
-        [E.UNIT_SPELLCAST_FAILED_QUIET] = M.OnPlayerSpellCastFailedQuiet,
-    }
+    local function toMessage(event)
+        local val = events[event]
+        if type(val) == "string" then return val end
+        return GC.toMsg(event)
+    end
+
+    local function logUnitEvents(event, msg, ...)
+        local args = {...}
+        pt:t(function() return "OnPlayerEvents::Relaying evt[%s] to msg[%s] args=[%s]", event, msg, args end)
+    end
 
     --- @param frame Frame
     --- @param event string
     function o.OnMessageTransmitter(frame, event, ...)
-        if StartsWith(event, 'UNIT_') then
-            return o.OnPlayerEvents(frame, event, ...)
-        end
-
-        local msg = transformations[event] or GC.toMsg(event)
-        logUnitEvents(event, msg, ...)
+        local msg = toMessage(event); logUnitEvents(event, msg, ...)
         o:SendMessage(msg, libName, ...)
     end
-
-    function o.OnPlayerEvents(frame, event, ...)
-        local msg = unitTransformations[event] or GC.toMsg(event)
-        logUnitEvents(event, msg, ...)
-        o:SendMessage(msg, libName, ...)
-    end
-
-    ns.H.EventToMessageRelay_OnLoad = o.OnLoad
 
 end; PropsAndMethods(L)
-
-

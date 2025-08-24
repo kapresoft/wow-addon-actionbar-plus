@@ -32,15 +32,14 @@ end; PropsAndMethods(L)
 Global Functions
 -------------------------------------------------------------------------------]]
 ---@param frame _Frame
-function ABP_BarController_OnLoad(frame)
-    --p:log('OnLoad:: called...')
+function ns.xml:BarController_OnLoad(frame)
     --for i, v in pairs(children) do
     --
     --end
     frame:RegisterEvent(E.PLAYER_ENTERING_WORLD)
 end
 
-function ABP_BarController_OnEvent(self, event, ...)
+function ns.xml:BarController_OnEvent(self, event, ...)
     local arg1, arg2 = ...;
     if ( event == E.PLAYER_ENTERING_WORLD ) then
         --p:log('event: %s', event)

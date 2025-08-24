@@ -56,6 +56,8 @@ local LogCategories = {
     DEFAULT = 'DEFAULT',
     --- @type Kapresoft_LogCategory
     ADDON = "AD",
+    --- @type Kapresoft_LogCategory "SuspendableEventRelayModule"
+    MOD_SERM = "SERM",
     --- @type Kapresoft_LogCategory
     API = "AP",
     --- @type Kapresoft_LogCategory
@@ -174,21 +176,17 @@ local function CreateNamespace(...)
     }
     ns.playerBuffs = ns.playerBuffs or {}
 
-    --- script handlers
-    ns.xml = {}
-
     ns:K():MixinWithDefExc(ns, ns.O.AceEventWithTraceMixin)
     ns.CategoryLoggerMixin:Configure(ns, LogCategories)
 
     --- @param o __Namespace | Namespace
     local function PropsAndMethods(o)
 
-        o.sformat = string.format
-
         --- Used in XML files to hook frame events: OnLoad and OnEvent
-        --- Example: <OnLoad>ABP_NS.H.[TypeName]_OnLoad(self)</OnLoad>
-        o.H = {}
+        --- Example: <OnLoad>ABP_XML:[TypeName]_OnLoad(self)</OnLoad>
+        ns.xml = {}
 
+        o.sformat = string.format
         o.barBindings = nil
 
         --- @return ActionbarPlus
@@ -323,7 +321,7 @@ local function CreateNamespace(...)
     --- Global Function
     pformat = pformat or ns.pformat
 
-    ABP_H = ns.H
+    ABP_XML = ns.xml
 
     return ns
 end
