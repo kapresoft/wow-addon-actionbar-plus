@@ -4,10 +4,10 @@
     <Script file="BarController.lua"/>
     <Include file="BarFrame.xml"/>
 
-    <Frame name="ABP_BarController" parent="UIParent">
+    <Frame name="BarController" parent="ActionbarPlusEventFrame">
         <Scripts>
-            <OnLoad function="ABP_BarController_OnLoad"/>
-            <OnEvent function="ABP_BarController_OnEvent"/>
+            <OnLoad>ABP_XML:BarController_OnLoad(self)</OnLoad>
+            <OnEvent>ABP_XML:BarController_OnEvent(self, event)</OnEvent>
         </Scripts>
     </Frame>
 </Ui>

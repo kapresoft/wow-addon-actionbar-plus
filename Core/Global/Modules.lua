@@ -71,6 +71,7 @@ local M = {
     EquipmentSetButtonMixin            = '',
     FrameHandleBuilderMixin            = '',
     GlobalConstants                    = '',
+    IdleTracker                        = '',
     ItemAttributeSetter                = '',
     ItemDragEventHandler               = '',
     ItemUtil                           = '',
@@ -146,6 +147,7 @@ local M = {
 --- @field EquipmentSetDragEventHandler EquipmentSetDragEventHandler
 --- @field EquipmentSetButtonMixin EquipmentSetButtonMixin
 --- @field FrameHandleBuilderMixin FrameHandleBuilderMixin
+--- @field IdleTracker IdleTracker
 --- @field ItemAttributeSetter ItemAttributeSetter
 --- @field ItemDragEventHandler ItemDragEventHandler
 --- @field ItemUtil ItemUtil

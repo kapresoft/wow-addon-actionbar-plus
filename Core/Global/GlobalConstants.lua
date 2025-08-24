@@ -301,6 +301,14 @@ local function GlobalConstantProperties(o)
         ZONE_CHANGED_NEW_AREA = 'ZONE_CHANGED_NEW_AREA',
     }
 
+    --- Converts a dictionary/set table into an array of keys
+    --- @param t table
+    --- @return table
+    local function toArray(t)
+        local arr = {}
+        for k in pairs(t) do table.insert(arr, k) end
+        return arr
+    end
     ---@param msg string Message name
     local function newMsg(msg) return sformat("%s::%s", addon, msg) end
     ---@param event string Event name
@@ -308,6 +316,8 @@ local function GlobalConstantProperties(o)
 
     --- @class MessageNames
     local Messages = {
+        OnPlayerIdle                        = newMsg('OnPlayerIdle'),
+        OnPlayerActive                      = newMsg('OnPlayerActive'),
         OnEnter                             = newMsg('OnEnter'),
         OnLeave                             = newMsg('OnLeave'),
         OnActionbarFrameAlphaUpdated        = newMsg('OnActionbarFrameAlphaUpdated'),
@@ -635,6 +645,7 @@ local function GlobalConstantProperties(o)
     o.ch = kch
     o.newMsg = newMsg
     o.toMsg = toMsg
+    o.toArray = toArray
 end
 
 --- @param o GlobalConstants

@@ -248,7 +248,7 @@ New Addon Instance
 -------------------------------------------------------------------------------]]
 --- @return ActionbarPlus
 local function NewInstance()
-    --- @class ActionbarPlus
+    --- @class ActionbarPlus : AceAddon
     local A = LibStub:NewAddon(addon); PropertiesAndMethods(A)
     function A.ns() return ns end
     return A
