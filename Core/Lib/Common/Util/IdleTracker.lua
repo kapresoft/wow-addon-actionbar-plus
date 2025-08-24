@@ -62,6 +62,13 @@ function ns.xml:IdleTracker_OnEvent(f, event)
     o:ResetIdleTimer()
 end
 
+local function logIdle()
+    if o.IDLE_MINUTES < 1 then
+        return p:d("Player has been idle for " .. o.IDLE_MINUTES * 60 .. " seconds.")
+    end
+    p:d("Player has been idle for " .. o.IDLE_MINUTES .. " minutes.")
+end
+
 --- @param elapsed TimeInMilli
 function ns.xml:IdleTracker_OnUpdate(_, elapsed)
     local idleLimit = o.IDLE_MINUTES * 60
@@ -69,6 +76,6 @@ function ns.xml:IdleTracker_OnUpdate(_, elapsed)
 
     o.isIdle = true
     -- Optional: fire a callback/event when idle detected
-    p:vv("Player has been idle for " .. o.IDLE_MINUTES .. " minutes.")
+    logIdle()
     o:SendMessage(MSG.OnPlayerIdle, libName)
 end
