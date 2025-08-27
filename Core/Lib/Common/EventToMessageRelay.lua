@@ -34,6 +34,8 @@ local function PropsAndMethods(o)
         [E.ACTIONBAR_HIDEGRID]     = true,
         [E.MODIFIER_STATE_CHANGED] = true,
         [E.PLAYER_ENTERING_WORLD]  = true,
+        [E.PLAYER_CONTROL_GAINED]  = true,
+        [E.PLAYER_CONTROL_LOST]    = true,
         [E.PLAYER_TARGET_CHANGED]  = true,
         [E.PLAYER_REGEN_ENABLED]   = true,
         [E.PLAYER_REGEN_DISABLED]  = true,
