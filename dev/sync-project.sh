@@ -25,7 +25,7 @@ DEST_BASES=(
 EX_PATTERNS=(
   '.*'
   '*.bak' '*.tmp' '*.yaml' '*.md'
-  'Dev.toc' 'dev/' 'build/' 'doc/'
+  '_SV' 'Dev.toc' 'dev/' 'build/' 'doc/'
 )
 EXCLUDES=( "${(@)EX_PATTERNS/#/--exclude=}" )
 
