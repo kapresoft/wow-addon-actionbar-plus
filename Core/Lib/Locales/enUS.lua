@@ -145,3 +145,11 @@ L['Secondary']           = true
 L['Equipment set is %s'] = true
 L['Equipped']            = true
 L['Talent Points']       = true
+
+L['Equipment Set Options'] = true
+L['Open Character Frame'] = true
+L['Open Character Frame::Description'] = "Automatically opens the Character Frame when an equipment set button is clicked, allowing quick access to your equipped gear."
+L['Open Equipment Manager'] = true
+L['Open Equipment Manager::Description'] = "Also opens the Equipment Manager when an equipment set button is clicked, making it easy to manage your gear while viewing your character. This option only applies if 'Open Character Frame' is enabled."
+L['Glow After Equip'] = true
+L['Glow After Equip::Description'] = 'Makes the button glow when a set is equipped, providing clear visual feedback that the equipment set was successfully applied.'

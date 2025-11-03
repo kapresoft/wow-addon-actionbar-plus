@@ -140,9 +140,10 @@ local function PropsAndMethods(o)
 
         --- Buttons:
         --- • GearManagerToggleButton (pre-retail)
-        --- • PaperDollSidebarTab3 (retail)
+        --- • PaperDollSidebarTab3 (retail, mop)
         --- @type Button
         local gmButton = GearManagerToggleButton or PaperDollSidebarTab3
+        if not gmButton then return end
         C_Timer.After(0.1, function()
             gmButton:Click()
             self:ClickEquipmentSetButtonDelayed(w)

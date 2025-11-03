@@ -323,3 +323,8 @@ end
 
 --- @param item ItemInfo
 function L:PickupItem(item) return C_PickupItem(item) end
+
+function L:SupportsEquipmentSet()
+    return type(PaperDollSidebarTab3) == 'table' and type(PaperDollSidebarTab3.Click) == 'function'
+end
+

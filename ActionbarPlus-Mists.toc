@@ -1,4 +1,4 @@
-## Interface: 50501
+## Interface: 50502
 ## Version: @project-version@
 ## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r MoP
 ## Notes: Actionbars Everywhere, Make you click happy.
