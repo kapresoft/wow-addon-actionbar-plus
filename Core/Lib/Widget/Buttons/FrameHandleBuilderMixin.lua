@@ -88,11 +88,17 @@ local function OnMouseDown(self, mouseButton)
     end
 end
 
+--- @NotCombatSafe
 --- @param self FrameHandle
-local function OnDragStart(self) self.widget.frame:StartMoving() end
+local function OnDragStart(self)
+    if InCombatLockdown() then return end
+    self.widget.frame:StartMoving()
+end
 
+--- @NotCombatSafe
 --- @param self FrameHandle
 local function OnDragStop(self)
+    if InCombatLockdown() then return end
     local fw = self.widget
     fw.frame:StopMovingOrSizing()
     AceEvent:SendMessage(MSG.OnDragStopFrameHandle, libName, self.widget.index)
@@ -165,9 +171,19 @@ local function PropsAndMethods(o)
     --- @param widget ActionBarFrameWidget
     --- @return FrameHandle
     function o:New(widget)
-        return ns:K():CreateAndInitFromMixin(o, widget):CreateFrameHandle()
+        --- @type FrameHandleBuilderMixin
+        local widget = ns:K():CreateAndInitFromMixin(o, widget);
+        return widget:CreateFrameHandle()
     end
 
+    --[[
+    +---------------------+     ← fh (the handle) — BOTTOM edge
+    |       HANDLE        |
+    +---------------------+     ← attached to...
+    |     ACTION BAR      |     ← self.frame — TOP edge
+    |                     |
+    +---------------------+
+    ]]
     --- @return FrameHandle
     function o:CreateFrameHandle()
         --- @class FrameHandle : Frame
@@ -186,20 +202,32 @@ local function PropsAndMethods(o)
         fh:SetIgnoreParentAlpha(true)
         fh:RegisterForDrag(GCC.LeftButton, GCC.RightButton);
         fh:EnableMouse(true)
+
         fh:SetMovable(true)
+        self.frame:SetMovable(true)
+
         fh:SetResizable(true)
-        --todo next: review height settings
-        --fh:SetHeight(self.widget.frameHandleHeight)
+        fh:SetClampedToScreen(false)
         fh:SetFrameStrata(self.widget.frameStrata)
-        fh:SetPoint(GCC.BOTTOM, self.frame, GCC.TOP, 0, 1)
+        fh:SetPoint('BOTTOM', self.frame, 'TOP', 0, 0)
         fh:ShowBackdrop()
         fh:RegisterScripts()
 
         --- Prelim alpha; this is configured on
         --- @see PlayerSettingsController#OnAddOnReady()
         fh:SetAlpha(1.0)
-
         return fh
+
+        -- Save for now
+        --[[self.frame:SetBackdrop({
+                                   bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+                                   edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+                                   edgeSize = 16,
+                                   insets = { left = 4, right = 4, top = 4, bottom = 4 }
+                               })
+        self.frame:SetBackdropColor(0, 0, 0, 0.8)      -- Background color
+        self.frame:SetBackdropBorderColor(1, 1, 1, 1)  -- Border color (white)
+        ]]
     end
 
 end; PropsAndMethods(L)
