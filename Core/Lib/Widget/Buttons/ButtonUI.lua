@@ -338,16 +338,18 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     --- see: Interface/AddOns/Blizzard_APIDocumentationGenerated/CooldownFrameAPIDocumentation.lua
     --- @class CooldownFrame : _CooldownFrame
-    local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button,  "CooldownFrameTemplate")
+    local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button, "CooldownFrameTemplate")
     cooldown:SetParentKey('Cooldown')
-    cooldown:SetAllPoints(button)
-    cooldown:SetSwipeColor(1, 1, 1)
+    cooldown:ClearAllPoints()
+    cooldown:SetPoint("TOPLEFT", button, "TOPLEFT", 6, -6)
+    cooldown:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -6, 6)
+
     cooldown:SetCountdownFont(GameFontHighlightSmallOutline:GetFont())
     cooldown:SetDrawEdge(true)
     cooldown:SetEdgeScale(0.0)
     cooldown:SetHideCountdownNumbers(false)
     cooldown:SetUseCircularEdge(false)
-    cooldown:SetPoint('CENTER')
+    cooldown:SetDrawBling(false)
 
     self:CreateCheckedTexture(button)
 

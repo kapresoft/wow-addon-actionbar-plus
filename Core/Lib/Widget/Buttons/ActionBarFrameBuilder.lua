@@ -398,14 +398,27 @@ local function WidgetMethods(widget)
         local widgetData = barData.widget
         local f = self.frame
         local frameHandle = self.frameHandle
-        local widthAdj = self.padding
-        local heightAdj = self.padding + self.dragHandleHeight
-        local frameWidth = (widgetData.colSize * widgetData.buttonSize) + widthAdj
+
+        local colSize = widgetData.colSize
+        local rowSize = widgetData.rowSize
+        local buttonSize = widgetData.buttonSize or 36
+
+        local paddingX = self.horizontalButtonPadding or 0
+        local paddingY = self.verticalButtonPadding or 0
+
+        local widthAdj = self.padding or 0
+        local heightAdj = (self.padding or 0) + (self.dragHandleHeight or 0)
+
+        -- Frame dimensions to correctly account for spacing
+        local visualFixOffset = 3
+        local frameWidth  = (colSize * buttonSize) + ((colSize - 1) * paddingX) + widthAdj - visualFixOffset
+        local frameHeight = (rowSize * buttonSize) + ((rowSize - 1) * paddingY) + heightAdj
+
         frameHandle:SetWidth(frameWidth)
         frameHandle:SetHeight(self.frameHandleHeight)
 
         f:SetWidth(frameWidth)
-        f:SetHeight((widgetData.rowSize * widgetData.buttonSize) + heightAdj)
+        f:SetHeight(frameHeight)
 
         --TODO: Clears the backdrop
         -- frame backdrop when button is empty state
@@ -413,7 +426,7 @@ local function WidgetMethods(widget)
         --f:SetBackdrop(BACKDROP_GOLD_DIALOG_32_32)
         --f:ApplyBackdrop()
         --f:SetAlpha(0)
-    end
+end
 
     function widget:ClearButtons() self.buttonFrames = {} end
 
