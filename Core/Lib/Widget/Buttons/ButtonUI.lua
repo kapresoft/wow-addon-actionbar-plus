@@ -341,15 +341,15 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     local cooldown = CreateFrame("Cooldown", btnName .. 'Cooldown', button, "CooldownFrameTemplate")
     cooldown:SetParentKey('Cooldown')
     cooldown:ClearAllPoints()
-    cooldown:SetPoint("TOPLEFT", button, "TOPLEFT", 6, -6)
-    cooldown:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -6, 6)
+    cooldown:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -4)
+    cooldown:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -4, 4)
 
     cooldown:SetCountdownFont(GameFontHighlightSmallOutline:GetFont())
-    cooldown:SetDrawEdge(true)
-    cooldown:SetEdgeScale(0.0)
     cooldown:SetHideCountdownNumbers(false)
-    cooldown:SetUseCircularEdge(false)
-    cooldown:SetDrawBling(false)
+    cooldown:SetEdgeScale(1.0)
+    -- todo next: DrawBling, DrawEdge as UI Option
+    cooldown:SetDrawEdge(false)
+    cooldown:SetDrawBling(true)
 
     self:CreateCheckedTexture(button)
 
