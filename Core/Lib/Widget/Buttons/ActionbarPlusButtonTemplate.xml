@@ -1,0 +1,48 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"
+    name="ActionbarPlus_UI">
+
+    <!-- Custom Secure Action Button Template -->
+    <Button name="ActionbarPlusButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+        <!--
+            Core visual textures — modeled after Blizzard's ActionButtonTemplate
+            but built from scratch to avoid version-specific dependencies.
+            BACKGROUND      – empty slot texture
+            ARTWORK         – Icon
+            BORDER          – item quality border
+            OVERLAY         – cooldown, checked glow overlay
+            HIGHLIGHT       – mouseover highlight
+        -->
+
+        <!-- The default "slot" frame border -->
+        <NormalTexture file="Interface\\addons\\actionbarplus\\Core\\Assets\\Textures\\ui-button-empty-grid" setAllPoints="true"/>
+        <!-- The depressed texture when pressed -->
+        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress" setAllPoints="true"/>
+        <!-- The glowing overlay when hovered -->
+        <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD" setAllPoints="true"/>
+
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty" setAllPoints="true" hidden="true"/>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="Border" file="Interface\Buttons\UI-ActionButton-Border" setAllPoints="true" hidden="false">
+                    <TexCoords left="0.04" right="0.96" top="0.04" bottom="0.96"/>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon" setAllPoints="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="1" y="-1"/>
+                        <Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <!--<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true"/>-->
+        </Frames>
+    </Button>
+</Ui>

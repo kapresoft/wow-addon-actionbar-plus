@@ -11,7 +11,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
-local WMX, String = O.WidgetMixin, ns:String()
+local API, WMX, String = O.API, O.WidgetMixin, ns:String()
 local StartsWithIgnoreCase, EndsWithIgnoreCase = String.StartsWithIgnoreCase, String.EndsWithIgnoreCase
 local PCN = GC.Profile_Config_Names
 
@@ -66,6 +66,7 @@ function L:OnAfterSetAttributes(btn)
     -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
     -- AddPostCombat(btn)
     self:HandleGameTooltipCallbacks(btn)
+    API:ReSkinMasque()
 end
 
 --- @param btn ButtonUI

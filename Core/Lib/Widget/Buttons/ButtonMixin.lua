@@ -90,6 +90,8 @@ local function PropsAndMethods(o)
         self:SetButtonProperties()
         self:InitTextures(emptyTexture)
         if self:IsEmpty() then self:SetTextureAsEmpty() end
+
+        API:RegisterMasqueGroup(self)
     end
 
     --- Initializes the Config function for the current talent spec
@@ -254,6 +256,11 @@ local function PropsAndMethods(o)
     --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
     --- @param icon string The icon texture path
     function o:InitTextures(icon)
+        -- todo: if masque
+        self:SetPushedTexture(nil)
+        self:SetHighlightTexture(nil)
+        if true then return end
+
         local btnUI = self.button()
 
         -- DrawLayer is 'ARTWORK' by default for icons
@@ -598,7 +605,12 @@ local function PropsAndMethods(o)
     function o:ResetHighlight() self:SetHighlightDefault() end
 
     --- @param texture string
-    function o:SetNormalTexture(texture) self.button():SetNormalTexture(texture) end
+    function o:SetNormalTexture(texture)
+        self.button():SetNormalTexture(texture)
+        O.API:IfMasqueGroup(function(maskGroup)
+            self.button().Icon:SetTexture(texture)
+        end)
+    end
     --- @param texture string
     function o:SetPushedTexture(texture)
         if texture then
@@ -643,7 +655,11 @@ local function PropsAndMethods(o)
     end
 
     --- @param alpha number 0.0 to 1.0
-    function o:SetNormalIconAlpha(alpha) self.button():GetNormalTexture():SetAlpha(alpha or 1.0) end
+    function o:SetNormalIconAlpha(alpha)
+        local btn = self.button()
+        if not (btn and btn.GetNormalTexture) then return end
+        p:f1(function() return 'Button: %s', tostring(self.button():GetNormalTexture()) end)
+        btn:GetNormalTexture():SetAlpha(alpha or 1.0) end
     function o:SetVertexColorNormal() self.button():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
 
     function o:SetNormalIconAlphaDefault()
@@ -696,8 +712,8 @@ local function PropsAndMethods(o)
         local hltTexture = btn:GetHighlightTexture()
         --highlight texture could be nil if action_button_mouseover_glow is disabled
         if not hltTexture then return end
-        hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
-        hltTexture:SetAlpha(highlightTextureInUseAlpha)
+        --hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
+        --hltTexture:SetAlpha(highlightTextureInUseAlpha)
         if hltTexture and not hltTexture.mask then CreateMask(btn, hltTexture, highlightTexture) end
     end
     function o:SetHighlightDefault()
@@ -717,7 +733,7 @@ local function PropsAndMethods(o)
         if state == true then
             btnUI:SetHighlightTexture(highlightTexture)
             btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
-            btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
+            --btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
             btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
             return
         end
@@ -821,8 +837,7 @@ local function PropsAndMethods(o)
     --- This method will be reworked.  Use #SetActionUsable2() for macros.
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
-        local normalTexture = self.button():GetNormalTexture()
-        if not normalTexture then return end
+        local icon = self.button().Icon; if not icon then return end
 
         local isStealthedOrShapeshifted = false
         local isStealth, spellID = self:IsStealthEffectiveSpell()
@@ -831,15 +846,23 @@ local function PropsAndMethods(o)
             isStealthedOrShapeshifted = true
         end
 
+        -- not need but leave here for now
+        if not isUsable then self:SetChecked(false) end
+
         -- energy based spells do not use 'notEnoughMana'
         if isStealthedOrShapeshifted == true then
-            normalTexture:SetVertexColor(0.6, 0.6, 0.6)
+            icon:SetVertexColor(0.6, 0.6, 0.6)
         elseif not isUsable then
-            normalTexture:SetVertexColor(0.3, 0.3, 0.3)
+            icon:SetVertexColor(0.3, 0.3, 0.3)
         else
-            normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+            icon:SetVertexColor(1.0, 1.0, 1.0)
         end
 
+        -- add to spell cast controller
+        --self.button():HookScript('PreClick', function()
+        --    if not isUsable then return self:SetChecked(false) end
+        --    self:SetChecked(true)
+        --end)
     end
 
     --- @param spellNameOrID SpellNameOrID
@@ -911,6 +934,12 @@ local function PropsAndMethods(o)
     function o:SetIcon(icon)
         if not icon then return nil end
         local btn = self.button()
+
+        if API:HasMaskGroup() then
+            btn.Icon:SetTexture(icon)
+            return btn.Icon:Show()
+        end
+
         self:SetNormalTexture(icon)
         self:SetPushedTexture(icon)
         local nTexture = btn:GetNormalTexture()
@@ -1051,9 +1080,10 @@ local function PropsAndMethods(o)
     --- @return EquipmentSetButtonMixin
     function o:EquipmentSetMixin() return O.EquipmentSetButtonMixin:New(self.w) end
 
-    function o:IsChecked() return self.button().CheckedTexture:IsShown() end
+    function o:IsChecked() return self.button():GetChecked() end
     ---@param checked boolean
     function o:SetChecked(checked)
+        --self.button():SetChecked(checked)
         if checked then
             self.button().CheckedTexture:Show(); return
         end

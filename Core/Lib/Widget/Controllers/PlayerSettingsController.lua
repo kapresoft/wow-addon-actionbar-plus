@@ -52,6 +52,7 @@ local function PropsAndMethods(o)
         end); if not fw then return end
         fw:SetFrameDimensions()
         fw:LayoutButtonGrid()
+        O.API:IfMasqueGroup(function(maskGroup) maskGroup:ReSkin() end)
     end
 
     --- @param frameIndex Index
