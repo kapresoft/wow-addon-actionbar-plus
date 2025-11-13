@@ -1,0 +1,57 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"
+    name="ActionbarPlus_UI">
+
+    <!-- Custom Secure Action Button Template -->
+    <CheckButton name="ActionbarPlusButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+        <!--
+            Core visual textures — modeled after Blizzard's ActionButtonTemplate
+            but built from scratch to avoid version-specific dependencies.
+        -->
+
+        <!-- The default "slot" frame border -->
+        <NormalTexture file="Interface\Buttons\UI-Quickslot2"/>
+        <!-- The depressed texture when pressed -->
+        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+        <!-- The glowing overlay when hovered -->
+        <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+        <!-- The glowing border when toggled/checked -->
+        <CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\Buttons\UI-Quickslot" setAllPoints="true" hidden="false"/>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="Border" file="Interface\Buttons\UI-ActionButton-Border" setAllPoints="true" hidden="false"/>
+            </Layer>
+            <!-- Spell/item icon -->
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Icon" setAllPoints="true">
+                    <TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93"/>
+                </Texture>
+            </Layer>
+
+            <!-- Optional hotkey text -->
+            <Layer level="ARTWORK">
+                <FontString parentKey="HotKey" inherits="NumberFontNormalSmall" justifyH="RIGHT" text=""/>
+            </Layer>
+
+            <!-- Optional name text (for macros or spells) -->
+            <Layer level="ARTWORK">
+                <FontString parentKey="Name" inherits="GameFontNormalSmall" justifyH="CENTER" text=""/>
+            </Layer>
+
+            <!-- Optional stack/count text -->
+            <Layer level="OVERLAY">
+                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" text=""/>
+            </Layer>
+        </Layers>
+
+        <!-- The cooldown frame (used by CooldownFrameTemplate) -->
+        <Frames>
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true"/>
+        </Frames>
+    </CheckButton>
+</Ui>

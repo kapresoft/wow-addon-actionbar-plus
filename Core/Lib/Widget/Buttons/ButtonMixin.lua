@@ -90,6 +90,8 @@ local function PropsAndMethods(o)
         self:SetButtonProperties()
         self:InitTextures(emptyTexture)
         if self:IsEmpty() then self:SetTextureAsEmpty() end
+
+        API:RegisterMasqueGroup(self)
     end
 
     --- Initializes the Config function for the current talent spec
@@ -598,7 +600,12 @@ local function PropsAndMethods(o)
     function o:ResetHighlight() self:SetHighlightDefault() end
 
     --- @param texture string
-    function o:SetNormalTexture(texture) self.button():SetNormalTexture(texture) end
+    function o:SetNormalTexture(texture)
+        self.button():SetNormalTexture(texture)
+        O.API:IfMasqueGroup(function(maskGroup)
+            self.button().icon:SetTexture(texture)
+        end)
+    end
     --- @param texture string
     function o:SetPushedTexture(texture)
         if texture then
@@ -821,8 +828,7 @@ local function PropsAndMethods(o)
     --- This method will be reworked.  Use #SetActionUsable2() for macros.
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
-        local normalTexture = self.button():GetNormalTexture()
-        if not normalTexture then return end
+        local icon = self.button().icon; if not icon then return end
 
         local isStealthedOrShapeshifted = false
         local isStealth, spellID = self:IsStealthEffectiveSpell()
@@ -831,15 +837,23 @@ local function PropsAndMethods(o)
             isStealthedOrShapeshifted = true
         end
 
+        -- not need but leave here for now
+        if not isUsable then self:SetChecked(false) end
+
         -- energy based spells do not use 'notEnoughMana'
         if isStealthedOrShapeshifted == true then
-            normalTexture:SetVertexColor(0.6, 0.6, 0.6)
+            icon:SetVertexColor(0.6, 0.6, 0.6)
         elseif not isUsable then
-            normalTexture:SetVertexColor(0.3, 0.3, 0.3)
+            icon:SetVertexColor(0.3, 0.3, 0.3)
         else
-            normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+            icon:SetVertexColor(1.0, 1.0, 1.0)
         end
 
+        -- add to spell cast controller
+        --self.button():HookScript('PreClick', function()
+        --    if not isUsable then return self:SetChecked(false) end
+        --    self:SetChecked(true)
+        --end)
     end
 
     --- @param spellNameOrID SpellNameOrID
@@ -911,8 +925,14 @@ local function PropsAndMethods(o)
     function o:SetIcon(icon)
         if not icon then return nil end
         local btn = self.button()
-        self:SetNormalTexture(icon)
+        btn.icon:SetTexture(icon)
+        --self:SetNormalTexture(icon)
         self:SetPushedTexture(icon)
+
+        --O.API:IfMasqueGroup(function(maskGroup)
+        --    btn.icon:SetTexture(icon)
+        --end)
+
         local nTexture = btn:GetNormalTexture()
         if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
     end
@@ -1051,13 +1071,14 @@ local function PropsAndMethods(o)
     --- @return EquipmentSetButtonMixin
     function o:EquipmentSetMixin() return O.EquipmentSetButtonMixin:New(self.w) end
 
-    function o:IsChecked() return self.button().CheckedTexture:IsShown() end
+    function o:IsChecked() return self.button():GetChecked() end
     ---@param checked boolean
     function o:SetChecked(checked)
-        if checked then
-            self.button().CheckedTexture:Show(); return
-        end
-        return self.button().CheckedTexture:Hide()
+        self.button():SetChecked(checked)
+        --if checked then
+            --self.button().CheckedTexture:Show(); return
+        --end
+        --return self.button().CheckedTexture:Hide()
     end
 
     function o:UseKeyUpForClicks()

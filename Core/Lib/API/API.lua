@@ -934,3 +934,81 @@ function S:FingerprintMacroBody(body)
                       tail)
     return self:Base64Encode(val)
 end
+
+--- @param bw ButtonUIWidget
+function S:RegisterMasqueGroup(bw)
+    self:IfMasqueGroup(function(maskGroup)
+        -- Register with Masque
+        local btn = bw.button()
+        maskGroup:AddButton(btn, {
+            Icon = btn.icon,
+            Border = btn.Border,
+            Normal = btn:GetNormalTexture(),
+            Pushed = btn:GetPushedTexture(),
+            Cooldown = btn.Cooldown,
+            Checked = btn.CheckedTexture,
+            HotKey = btn.keybindText,
+            Name = btn.nameText,
+            Count = btn.indexText,
+        })
+        maskGroup:ReSkin()
+    end)
+end
+
+--- @class MaskGroup
+local _MaskGroup = {}
+function _MaskGroup:ReSkin() end
+--- Add a button to the Masque group for skinning.
+--- See: https://github.com/stormfx/masque/wiki/API#groupaddbutton
+---
+--- @param button Button The button frame to register with Masque. Must be a valid `Button` widget.
+--- @param regions? table<string, Region> Optional. A table containing texture/fontstring regions used by the button.
+--- The following keys are recognized by Masque (all are optional):
+--- | Key | Type | Description |
+--- |------|------|-------------|
+--- | `Icon` | Texture | The button's icon texture (the spell/item image). |
+--- | `Cooldown` | Frame | The cooldown frame for the button (e.g., `button.cooldown`). |
+--- | `Normal` | Texture | The button's normal texture (`button:GetNormalTexture()`). |
+--- | `Pushed` | Texture | The texture shown when the button is pressed. |
+--- | `Disabled` | Texture | The texture shown when the button is disabled. |
+--- | `Checked` | Texture | The texture shown when the button is checked or toggled. |
+--- | `Border` | Texture | The texture shown as the border (optional for some skins). |
+--- | `Gloss` | Texture | The texture used for gloss overlay (Masque-managed). |
+--- | `Highlight` | Texture | The highlight texture for mouseover. |
+--- | `HotKey` | FontString | The hotkey text region. |
+--- | `Count` | FontString | The stack count or charges text. |
+--- | `Name` | FontString | The name label (if any). |
+--- | `Duration` | FontString | The duration text (optional). |
+--- | `AutoCastable` | Texture | The autocast ring texture. |
+--- | `AutoCastShine` | Frame | The autocast shine frame. |
+--- | `Flash` | Texture | The flashing texture for activation glow. |
+--- | `NewActionTexture` | Texture | Texture shown for new actions. |
+--- | `SpellHighlight` | Texture | Texture shown for spell highlights. |
+--- | `IconMask` | MaskTexture | The mask applied to the icon (if applicable). |
+---
+--- @param data? table<string, any> Optional. Additional button data, rarely used by most addons.
+--- For example, `{ ButtonType = "ActionButton" }`.
+---
+--- @return boolean success Returns `true` if the button was successfully added to the Masque group.
+function _MaskGroup:AddButton(button, regions, data) end
+
+--- @alias MaskGroup_CallbackFn fun(maskGroup:MaskGroup)  | "function(maskGroup) end"
+
+--- @return MaskGroup
+function S:MasqueGroup()
+    local m = ns.LibStubAce("Masque", true); if not m then return nil end
+    return m:Group("ActionbarPlus", "Buttons")
+end
+
+function S:ReSkinMasque()
+    local m = self:MasqueGroup(); return m and m:ReSkin()
+end
+
+
+--- @param callbackFn MaskGroup_CallbackFn  | "function(maskGroup) end"
+function S:IfMasqueGroup(callbackFn)
+    if not callbackFn then return end
+    local mg = self:MasqueGroup(); if not mg then return end
+    --p:vv('IfMaskGroup called')
+    return callbackFn(mg)
+end

@@ -6,7 +6,7 @@
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## OptionalDeps: Ace3
+## OptionalDeps: Ace3, Masque
 ## Category-enUS: Action Bars
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)

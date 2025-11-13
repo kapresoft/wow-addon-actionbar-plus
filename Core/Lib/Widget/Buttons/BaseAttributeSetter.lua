@@ -66,6 +66,9 @@ function L:OnAfterSetAttributes(btn)
     -- todo: delete PostCombat. This was for dragging buttons during combat. That is no longer allowed.
     -- AddPostCombat(btn)
     self:HandleGameTooltipCallbacks(btn)
+    O.API:IfMasqueGroup(function(maskGroup)
+        maskGroup:ReSkin()
+    end)
 end
 
 --- @param btn ButtonUI
