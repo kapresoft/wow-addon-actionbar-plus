@@ -941,7 +941,7 @@ function S:RegisterMasqueGroup(bw)
         -- Register with Masque
         local btn = bw.button()
         maskGroup:AddButton(btn, {
-            Icon = btn.icon,
+            Icon = btn.Icon,
             Border = btn.Border,
             Normal = btn:GetNormalTexture(),
             Pushed = btn:GetPushedTexture(),

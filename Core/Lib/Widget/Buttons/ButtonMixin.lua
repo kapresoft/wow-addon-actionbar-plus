@@ -256,6 +256,10 @@ local function PropsAndMethods(o)
     --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
     --- @param icon string The icon texture path
     function o:InitTextures(icon)
+        self:SetPushedTexture(nil)
+        self:SetHighlightTexture(nil)
+        if true then return end
+
         local btnUI = self.button()
 
         -- DrawLayer is 'ARTWORK' by default for icons
@@ -603,7 +607,7 @@ local function PropsAndMethods(o)
     function o:SetNormalTexture(texture)
         self.button():SetNormalTexture(texture)
         O.API:IfMasqueGroup(function(maskGroup)
-            self.button().icon:SetTexture(texture)
+            self.button().Icon:SetTexture(texture)
         end)
     end
     --- @param texture string
@@ -703,8 +707,8 @@ local function PropsAndMethods(o)
         local hltTexture = btn:GetHighlightTexture()
         --highlight texture could be nil if action_button_mouseover_glow is disabled
         if not hltTexture then return end
-        hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
-        hltTexture:SetAlpha(highlightTextureInUseAlpha)
+        --hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
+        --hltTexture:SetAlpha(highlightTextureInUseAlpha)
         if hltTexture and not hltTexture.mask then CreateMask(btn, hltTexture, highlightTexture) end
     end
     function o:SetHighlightDefault()
@@ -724,7 +728,7 @@ local function PropsAndMethods(o)
         if state == true then
             btnUI:SetHighlightTexture(highlightTexture)
             btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
-            btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
+            --btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
             btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
             return
         end
@@ -828,7 +832,7 @@ local function PropsAndMethods(o)
     --- This method will be reworked.  Use #SetActionUsable2() for macros.
     --- @param isUsable boolean
     function o:SetActionUsable(isUsable)
-        local icon = self.button().icon; if not icon then return end
+        local icon = self.button().Icon; if not icon then return end
 
         local isStealthedOrShapeshifted = false
         local isStealth, spellID = self:IsStealthEffectiveSpell()
@@ -925,16 +929,18 @@ local function PropsAndMethods(o)
     function o:SetIcon(icon)
         if not icon then return nil end
         local btn = self.button()
-        btn.icon:SetTexture(icon)
+        btn.Icon:SetTexture(icon)
+        btn.Icon:Show()
+
         --self:SetNormalTexture(icon)
-        self:SetPushedTexture(icon)
+        --self:SetPushedTexture(icon)
 
         --O.API:IfMasqueGroup(function(maskGroup)
         --    btn.icon:SetTexture(icon)
         --end)
 
-        local nTexture = btn:GetNormalTexture()
-        if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
+        --local nTexture = btn:GetNormalTexture()
+        --if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
     end
 
     --- @param buttonData Profile_Button

@@ -8,44 +8,51 @@
         <!--
             Core visual textures — modeled after Blizzard's ActionButtonTemplate
             but built from scratch to avoid version-specific dependencies.
+            BACKGROUND      – empty slot texture
+            ARTWORK         – Icon
+            BORDER          – item quality border
+            OVERLAY         – cooldown, checked glow overlay
+            HIGHLIGHT       – mouseover highlight
         -->
 
         <!-- The default "slot" frame border -->
-        <NormalTexture file="Interface\Buttons\UI-Quickslot2"/>
+        <NormalTexture file="Interface\\addons\\actionbarplus\\Core\\Assets\\Textures\\ui-button-empty-grid" setAllPoints="true"/>
         <!-- The depressed texture when pressed -->
-        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress" setAllPoints="true"/>
         <!-- The glowing overlay when hovered -->
-        <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+        <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD" setAllPoints="true"/>
         <!-- The glowing border when toggled/checked -->
-        <CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+        <CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD" setAllPoints="true"/>
 
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\Buttons\UI-Quickslot" setAllPoints="true" hidden="false"/>
+                <Texture parentKey="Background" file="Interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty" setAllPoints="true" hidden="true"/>
             </Layer>
             <Layer level="BORDER">
-                <Texture parentKey="Border" file="Interface\Buttons\UI-ActionButton-Border" setAllPoints="true" hidden="false"/>
+                <Texture parentKey="Border" file="Interface\Buttons\UI-ActionButton-Border" setAllPoints="true" hidden="true">
+                    <TexCoords left="0.04" right="0.96" top="0.04" bottom="0.96"/>
+                </Texture>
             </Layer>
             <!-- Spell/item icon -->
-            <Layer level="BACKGROUND">
+            <Layer level="ARTWORK">
                 <Texture parentKey="Icon" setAllPoints="true">
-                    <TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93"/>
+                    <TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92"/>
                 </Texture>
             </Layer>
 
             <!-- Optional hotkey text -->
             <Layer level="ARTWORK">
-                <FontString parentKey="HotKey" inherits="NumberFontNormalSmall" justifyH="RIGHT" text=""/>
+                <FontString parentKey="HotKey" inherits="NumberFontNormalSmall" justifyH="RIGHT" text="" hidden="false"/>
             </Layer>
 
             <!-- Optional name text (for macros or spells) -->
             <Layer level="ARTWORK">
-                <FontString parentKey="Name" inherits="GameFontNormalSmall" justifyH="CENTER" text=""/>
+                <FontString parentKey="Name" inherits="GameFontNormalSmall" justifyH="CENTER" text="" hidden="false"/>
             </Layer>
 
             <!-- Optional stack/count text -->
             <Layer level="OVERLAY">
-                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" text=""/>
+                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" text="" hidden="false"/>
             </Layer>
         </Layers>
 

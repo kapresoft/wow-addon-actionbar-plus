@@ -355,10 +355,10 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
 
     self:CreateCheckedTexture(button)
 
-    btn.icon = button:CreateTexture(nil, "BACKGROUND", nil, -7)
-    btn.icon:SetAllPoints(button)
-    btn.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-    btn.icon:SetTexture(nil)
+    --btn.icon = button:CreateTexture(nil, "BACKGROUND", nil, -7)
+    --btn.icon:SetAllPoints(button)
+    --btn.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    --btn.icon:SetTexture(nil)
 
     --- @alias ButtonUIWidget __ButtonUIWidget | BaseLibraryObject_WithAceEvent | ButtonMixin
     --- @class __ButtonUIWidget
