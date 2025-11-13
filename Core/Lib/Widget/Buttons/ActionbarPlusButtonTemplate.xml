@@ -25,38 +25,16 @@
         <CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD" setAllPoints="true"/>
 
         <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty" setAllPoints="true" hidden="true"/>
-            </Layer>
-            <Layer level="BORDER">
-                <Texture parentKey="Border" file="Interface\Buttons\UI-ActionButton-Border" setAllPoints="true" hidden="true">
-                    <TexCoords left="0.04" right="0.96" top="0.04" bottom="0.96"/>
-                </Texture>
-            </Layer>
-            <!-- Spell/item icon -->
             <Layer level="ARTWORK">
                 <Texture parentKey="Icon" setAllPoints="true">
-                    <TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="1" y="-1"/>
+                        <Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+                    </Anchors>
                 </Texture>
-            </Layer>
-
-            <!-- Optional hotkey text -->
-            <Layer level="ARTWORK">
-                <FontString parentKey="HotKey" inherits="NumberFontNormalSmall" justifyH="RIGHT" text="" hidden="false"/>
-            </Layer>
-
-            <!-- Optional name text (for macros or spells) -->
-            <Layer level="ARTWORK">
-                <FontString parentKey="Name" inherits="GameFontNormalSmall" justifyH="CENTER" text="" hidden="false"/>
-            </Layer>
-
-            <!-- Optional stack/count text -->
-            <Layer level="OVERLAY">
-                <FontString parentKey="Count" inherits="NumberFontNormal" justifyH="RIGHT" text="" hidden="false"/>
             </Layer>
         </Layers>
 
-        <!-- The cooldown frame (used by CooldownFrameTemplate) -->
         <Frames>
             <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true"/>
         </Frames>

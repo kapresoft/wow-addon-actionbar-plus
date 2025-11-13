@@ -931,13 +931,8 @@ local function PropsAndMethods(o)
         local btn = self.button()
         btn.Icon:SetTexture(icon)
         btn.Icon:Show()
-
         --self:SetNormalTexture(icon)
         --self:SetPushedTexture(icon)
-
-        --O.API:IfMasqueGroup(function(maskGroup)
-        --    btn.icon:SetTexture(icon)
-        --end)
 
         --local nTexture = btn:GetNormalTexture()
         --if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
