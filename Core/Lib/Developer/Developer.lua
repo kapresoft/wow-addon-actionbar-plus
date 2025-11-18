@@ -366,4 +366,26 @@ function L:CustomFrameLocations()
     tf:SetPoint("TOPLEFT", UIParent, "CENTER", 100, ofsy)
 end
 
+--s.CreateEquipmentSet('Heals', 135907)
+--s.CreateEquipmentSet('Shadow', 136207)
+--s.SaveEquipmentSet(1)
+--s.SaveEquipmentSet(0)
+--s.DeleteEquipmentSet(0)
+--s.PickupEquipmentSet(0)
+--s.PickupEquipmentSet(1)
+--s.DeleteEquipmentSet(0)
+function L:CreateES1() local icon=135907; C_EquipmentSet.CreateEquipmentSet('Heals', icon) end
+function L:CreateES2() local icon=136207; C_EquipmentSet.CreateEquipmentSet('Shadow', icon) end
+
+-- /dump a:SaveES1()
+function L:SaveES1() C_EquipmentSet.SaveEquipmentSet(0); p:vv('First EquipmentSet Saved.') end
+-- /dump a:SaveES2()
+function L:SaveES2() C_EquipmentSet.SaveEquipmentSet(1); p:vv('Second EquipmentSet Saved.') end
+function L:PickupES1() C_EquipmentSet.PickupEquipmentSet(0) end
+-- /dump a:PickupES2()
+function L:PickupES2() C_EquipmentSet.PickupEquipmentSet(1) end
+function L:DelES1() C_EquipmentSet.DeleteEquipmentSet(0) end
+function L:DelES2() C_EquipmentSet.DeleteEquipmentSet(1) end
+
+
 L:RegisterMessage(ns.GC.M.OnAddOnReady, L.OnAddOnReady)
