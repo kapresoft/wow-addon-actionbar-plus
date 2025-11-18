@@ -656,10 +656,10 @@ local function PropsAndMethods(o)
 
     --- @param alpha number 0.0 to 1.0
     function o:SetNormalIconAlpha(alpha)
+        local _alpha = alpha or 1.0
         local btn = self.button()
-        if not (btn and btn.GetNormalTexture) then return end
-        p:f1(function() return 'Button: %s', tostring(self.button():GetNormalTexture()) end)
-        btn:GetNormalTexture():SetAlpha(alpha or 1.0) end
+        local tex = btn and btn:GetNormalTexture(); if not tex then return end
+        tex:SetAlpha(_alpha) end
     function o:SetVertexColorNormal() self.button():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
 
     function o:SetNormalIconAlphaDefault()

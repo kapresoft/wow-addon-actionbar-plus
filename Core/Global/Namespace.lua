@@ -309,6 +309,8 @@ local function CreateNamespace(...)
             return type(self.barBindings) == 'table' and self.barBindings[buttonUIName]
         end
 
+        function o:ReSkinMasque() self.O.API:ReSkinMasque() end
+
     end; PropsAndMethods(ns)
 
     ns.LibStubAce = LibStub
