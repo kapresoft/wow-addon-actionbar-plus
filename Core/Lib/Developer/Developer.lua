@@ -31,6 +31,13 @@ local p = ns:LC().DEV:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+
+-- /dump a:GetColor('fcFBF879')
+function L:GetColor(str)
+    local color = ns:K().Objects.ColorUtil:NewColorFromHex(str)
+    return { color:GetRGBA() }
+end
+
 -- /dump a:c("\n\t  ")
 function L:c(str)
     return O.MacroChangesController.OnMacroChanged()
