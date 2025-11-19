@@ -11,7 +11,7 @@
     <Include file='Lib\_Lib.xml'/>
     <!--@do-not-package@-->
     <Include file='Lib\Developer\_Developer.xml'/>
-    <Include file='Lib\WidgetV2\_Widget.xml'/>
+    <Include file='Lib\WidgetV2-1\_Widget.xml'/>
 
     <!--@end-do-not-package@-->
     <Script file="ActionbarPlus.lua"/>
