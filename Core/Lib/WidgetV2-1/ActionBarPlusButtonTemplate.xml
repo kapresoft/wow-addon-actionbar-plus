@@ -1,7 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-	<CheckButton name="ABP_ButtonTemplate_V2_1" virtual="true" inherits="SecureActionButtonTemplate, ActionButtonTemplate">
+    <Script file="ButtonMixin_V2_1.lua"/>
+
+	<CheckButton name="ABP_ButtonTemplate_V2_1" virtual="true" inherits="SecureActionButtonTemplate">
 		<Size>
 			<AbsDimension x="36" y="36"/>
 		</Size>
@@ -78,7 +80,7 @@
 			</AnimationGroup>
 		</Animations>
 		<Frames>
-			<Frame parentKey="AutoCastShine" inherits="AutoCastShineTemplate">
+			<Frame name="$parentAutoCastShine" parentKey="AutoCastShine" inherits="AutoCastShineTemplate">
 				<Anchors>
 					<Anchor point="CENTER" x="0" y="0"/>
 				</Anchors>
@@ -107,4 +109,25 @@
 		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD"/>
 		<CheckedTexture parentKey="CheckedTexture" alphaMode="ADD"/>
 	</CheckButton>
+
+    <CheckButton name="ABP_ButtonTemplate" inherits="ABP_ButtonTemplate_V2_1, ActionButtonTemplate"
+                 mixin="ABP_ButtonMixin_V2_1" virtual="true">
+        <Scripts>
+            <OnLoad>
+                self:OnLoad()
+            </OnLoad>
+            <!--<OnLoad>
+                ABP_Button_OnLoad(self);
+            </OnLoad>
+            <OnAttributeChanged>
+                ABP_Button_UpdateAction(self, name, value);
+            </OnAttributeChanged>
+            <OnEvent>
+                ABP_Button_OnEvent(self, event, ...);
+            </OnEvent>
+            <PostClick>
+                ABP_Button_UpdateState(self, button, down);
+            </PostClick>-->
+        </Scripts>
+    </CheckButton>
 </Ui>
