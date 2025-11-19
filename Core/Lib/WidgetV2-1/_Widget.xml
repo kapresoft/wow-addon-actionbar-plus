@@ -2,8 +2,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <Include file="ActionBarPlusButtonTemplate.xml"/>
-    <Include file="BarFrame.xml"/>
+    <Include file="ButtonTemplate.xml"/>
+    <Include file="BarFrameTemplate.xml"/>
     <Include file="Modules\_Modules.xml"/>
 
 </Ui>

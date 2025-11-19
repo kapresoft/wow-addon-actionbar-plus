@@ -77,15 +77,18 @@ local function PropsAndMethods(o)
             ----------------------------------------------------
             -- create bar frame from XML virtual template
             ----------------------------------------------------
-            local frameName = "ABP_Bar" .. index
-            self.frame = CreateFrame("Frame", frameName, UIParent, "ABP_BarMainFrameTemplate")
+            local frameName = "ActionbarPlusF" .. index
+            self.frame = CreateFrame("Frame", frameName, UIParent, "ABP_BarFrameTemplate_V2_1_1")
 
             ----------------------------------------------------
             -- create buttons
             ----------------------------------------------------
+            local baseID = 1000
             for i = 1, cfg.numButtons do
                 local btnName = frameName .. "Button" .. i
-                local btn = CreateFrame("CheckButton", btnName, self.frame, "ABP_ButtonTemplate")
+                --- @type CheckButton
+                local btn = CreateFrame("CheckButton", btnName, self.frame, "ABP_ButtonTemplate_V2_1_1")
+                p:vv(function() return 'Btn Created[%s]: %s', btn:GetID(), btn:GetName() end)
                 table.insert(self.buttons, btn)
             end
 
