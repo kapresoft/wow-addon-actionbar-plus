@@ -102,7 +102,7 @@
         </Layers>
     </Frame>
 
-    <CheckButton name="ABP_Button1" inherits="ABP_ButtonTemplate" parent="ABP_BarMainFrame" id="1000">
+    <CheckButton name="ABP_Button1" parentKey="Button1" inherits="ABP_ButtonTemplate" parent="ABP_BarMainFrame" id="1000">
         <Anchors>
             <Anchor point="LEFT" relativePoint="LEFT">
                 <Offset>
