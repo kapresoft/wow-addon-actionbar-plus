@@ -113,21 +113,14 @@
     <CheckButton name="ABP_ButtonTemplate" inherits="ABP_ButtonTemplate_V2_1, ActionButtonTemplate"
                  mixin="ABP_ButtonMixin_V2_1" virtual="true">
         <Scripts>
-            <OnLoad>
-                self:OnLoad()
-            </OnLoad>
-            <!--<OnLoad>
-                ABP_Button_OnLoad(self);
-            </OnLoad>
+            <OnLoad>self:OnLoad()</OnLoad>
+            <PostClick>self:OnPostClick(button, down);</PostClick>
             <OnAttributeChanged>
-                ABP_Button_UpdateAction(self, name, value);
+                self:OnAttributeChanged(name, value);
             </OnAttributeChanged>
             <OnEvent>
-                ABP_Button_OnEvent(self, event, ...);
+                self:OnEvent(event, ...)
             </OnEvent>
-            <PostClick>
-                ABP_Button_UpdateState(self, button, down);
-            </PostClick>-->
         </Scripts>
     </CheckButton>
 </Ui>

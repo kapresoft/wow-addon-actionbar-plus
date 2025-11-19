@@ -20,10 +20,11 @@ local p = ns:LC().DEFAULT:NewLogger(libName)
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ButtonMixin_V2_1 | CheckButton
+--- @type ButtonMixin_V2_1
 local o = S
 
-function o:OnLoad()
+--- @param self ButtonMixin_V2_1
+function o.OnLoad(self)
     C_Timer.After(1, function()
         p:vv(function() return 'OnLoad: %s', self:GetID() end)
     end)
@@ -31,4 +32,37 @@ function o:OnLoad()
     self:EnableMouse(true)
     self:SetAttribute("action", self:GetID())
     self.action = self:GetID()
-end; ABP_ButtonMixin_V2_1 = o
+end
+
+--- @param self ButtonMixin_V2_1
+function o.OnPostClick(self, button, down)
+    p:vv(function() return 'OnPostClick[%s::%s]: button=%s, down=%s', self:GetName(), self:GetID(), button, down  end)
+    self:UpdateState(button, down)
+end
+
+--- @param self ButtonMixin_V2_1
+function o.OnAttributeChanged(self, name, val)
+    p:vv(function() return 'OnAttributeChanged[%s]: name=%s, val=%s', self:GetID(), name, val  end)
+    self:UpdateAction(name, val)
+end
+
+--- @param self ButtonMixin_V2_1
+function o.OnEvent(self, event, ...)
+    local args = { ... }
+    p:vv(function() return 'OnEvent[%s::%s]: name=%s, val=%s', self:GetName(), self:GetID(), event, args end)
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+function o:UpdateState(button, down)
+    self:SetChecked(false)
+end
+
+function o:UpdateAction(name, val)
+    -- empty for now
+end
+
+
+
+ABP_ButtonMixin_V2_1 = o
