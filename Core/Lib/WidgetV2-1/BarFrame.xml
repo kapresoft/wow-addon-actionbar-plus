@@ -1,0 +1,127 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="Button.lua"/>
+    <CheckButton name="ABP_BarButtonCodeTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+        <Scripts>
+            <OnLoad>
+                ABP_Button_OnLoad(self);
+            </OnLoad>
+            <OnAttributeChanged>
+                ABP_Button_UpdateAction(self, name, value);
+            </OnAttributeChanged>
+            <OnEvent>
+                ABP_Button_OnEvent(self, event, ...);
+            </OnEvent>
+            <PostClick>
+                ABP_Button_UpdateState(self, button, down);
+            </PostClick>
+        </Scripts>
+    </CheckButton>
+    <CheckButton name="ABP_BarButtonTemplate" inherits="ABP_BarButtonCodeTemplate, ActionButtonTemplate" virtual="true">
+    </CheckButton>
+
+    <!-- Note: Don't inherit from UIParent because it will inherit scale as well -->
+    <Frame name="ABP_BarMainFrame" frameStrata="MEDIUM" hidden="false"
+           movable="true" clampedToScreen="true" inherits="BackdropTemplate">
+        <Scripts>
+            <OnLoad>
+                if ABP_enableV2 ~= true then self:UnregisterAllEvents(); self:Hide(); return; end
+                self:RegisterForDrag("LeftButton")
+                self:SetScale(UIParent:GetScale())
+                self:SetBackdrop({
+                    bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
+                    edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
+                    tile = true, tileSize = 16, edgeSize = 12,
+                    insets = { left = 4, right = 4, top = 4, bottom = 4 }
+                })
+                self:SetBackdropColor(0.1, 0.3, 0.7, 0.8)
+                local numButtons = 5
+                local buttonSize = 36
+                local padding = 6 -- space between buttons
+                local paddingAll = 10
+
+                local totalWidth = paddingAll + (numButtons * buttonSize) + ((numButtons - 1) * padding) + paddingAll
+                local totalHeight = buttonSize + paddingAll + paddingAll
+
+                self:SetSize(totalWidth, totalHeight)
+            </OnLoad>
+            <OnDragStart>
+                self:StartMoving()
+            </OnDragStart>
+            <OnDragStop>
+                self:StopMovingOrSizing()
+            </OnDragStop>
+        </Scripts>
+        <Size>
+            <AbsDimension x="50" y="50"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER" y="100" x="100"/>
+        </Anchors>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentBackground">
+                    <Size>
+                        <AbsDimension x="220" y="50"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" y="-3"/>
+                    </Anchors>
+                    <Color r="0" g="0" b="0" a="0.3"/>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <CheckButton name="ABP_Button1" inherits="ABP_BarButtonTemplate" parent="ABP_BarMainFrame" id="1">
+        <Scripts>
+            <OnLoad>
+                self:EnableMouse(false)
+            </OnLoad>
+        </Scripts>
+        <Anchors>
+            <Anchor point="LEFT" relativePoint="LEFT">
+                <Offset>
+                    <AbsDimension x="10" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </CheckButton>
+    <CheckButton name="ABP_Button2" inherits="ABP_BarButtonTemplate" parent="ABP_BarMainFrame" id="2">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="ABP_Button1" relativePoint="RIGHT">
+                <Offset>
+                    <AbsDimension x="6" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </CheckButton>
+    <CheckButton name="ABP_Button3" inherits="ABP_BarButtonTemplate" parent="ABP_BarMainFrame" id="3">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="ABP_Button2" relativePoint="RIGHT">
+                <Offset>
+                    <AbsDimension x="6" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </CheckButton>
+    <CheckButton name="ABP_Button4" inherits="ABP_BarButtonTemplate" parent="ABP_BarMainFrame" id="4">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="ABP_Button3" relativePoint="RIGHT">
+                <Offset>
+                    <AbsDimension x="6" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </CheckButton>
+    <CheckButton name="ABP_Button5" inherits="ABP_BarButtonTemplate" parent="ABP_BarMainFrame" id="5">
+        <Anchors>
+            <Anchor point="LEFT" relativeTo="ABP_Button4" relativePoint="RIGHT">
+                <Offset>
+                    <AbsDimension x="6" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+    </CheckButton>
+
+</Ui>
