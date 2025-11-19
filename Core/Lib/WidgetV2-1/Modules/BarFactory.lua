@@ -34,11 +34,8 @@ local o = L
 --- @param o BarFactory
 local function PropsAndMethods(o)
 
-    --local ABP = ns:a()
-    --ABP.BarFactory = factory
-
     -- CONFIG: how many bars you want
-    local NUM_BARS = 1
+    local NUM_BARS = 2
 
     --========================================================
     -- Creates a new bar module with a given index
