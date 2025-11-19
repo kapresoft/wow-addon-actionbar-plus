@@ -58,12 +58,16 @@ local function PropertiesAndMethods(o)
     function o:OnInitialize()
         self:InitializeDb()
         self:RegisterSlashCommands()
-        self:SendMessage(M.OnAddOnInitialized, addon)
+        if ns.features.enableV2 ~= true then
+            return self:SendMessage(M.OnAddOnInitialized, addon)
+        end
+        self:OnInitializeV2()
+    end
 
-        if ns.features.enableV2 ~= true then return end
-        p:d(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
+    function o:OnInitializeV2()
+        p:vv(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
         self:SendMessage(M.OnAddOnInitializedV2, addon)
-        p:d(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
+        p:vv(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
     end
 
     function o:InitializeDb()
@@ -137,11 +141,14 @@ local function PropertiesAndMethods(o)
         -- Register Events, Hook functions, Create Frames, Get information from
         -- the game that wasn't available in OnInitialize
         self:RegisterHooks()
-        self:SendMessage(M.OnAddOnEnabled, addon, self)
-        if ns.features.enableV2 ~= true then return end
-
+        if ns.features.enableV2 ~= true then
+            return self:SendMessage(M.OnAddOnEnabled, addon, self)
+        end
+        self:OnEnableV2()
+    end
+    function o:OnEnableV2()
         self:SendMessage(M.OnAddOnEnabledV2, addon, self)
-        p:d('OnEnable():MSG:OnAddOnEnabledV2 Sent')
+        p:vv('OnEnable():MSG:OnAddOnEnabledV2 Sent')
     end
 
     function o:OnProfileChanged() self:ConfirmReloadUI() end
