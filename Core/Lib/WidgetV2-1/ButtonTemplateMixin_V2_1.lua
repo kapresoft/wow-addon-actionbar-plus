@@ -49,7 +49,7 @@ end
 
 --- @param self ButtonTemplateMixin_V2_1_1
 function o.OnAttributeChanged(self, name, val)
-    p:vv(function() return 'OnAttributeChanged[%s]: name=%s, val=%s', self:GetID(), name, val  end)
+    p:f1(function() return 'OnAttributeChanged[%s]: name=%s, val=%s', self:GetID(), name, val  end)
     self:UpdateAction(name, val)
 end
 

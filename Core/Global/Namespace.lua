@@ -1,3 +1,5 @@
+local enableV2 = true
+
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -84,6 +86,8 @@ local LogCategories = {
     MESSAGE_TRACE = "MT",
     --- @type Kapresoft_LogCategory
     MOUNT = "MN",
+    --- @type Kapresoft_LogCategory
+    MODULE = "MO",
     --- @type Kapresoft_LogCategory
     PET = "PT",
     --- @type Kapresoft_LogCategory
@@ -172,7 +176,7 @@ local function CreateNamespace(...)
     ns.pformat = ns:K().pformat:B()
 
     ns.features = {
-        enableV2 = false,
+        enableV2 = enableV2,
     }
     ns.playerBuffs = ns.playerBuffs or {}
 
@@ -193,6 +197,8 @@ local function CreateNamespace(...)
         function o:a() return ABP end
         --- @return Profile_Config
         function o:p() return self.db.profile end
+        --- @return boolean
+        function o:IsV2() return self.features.enableV2 == true end
 
         --- @return CursorUtil
         --- @param cursorInfo CursorInfo Optional cursorInfo instance

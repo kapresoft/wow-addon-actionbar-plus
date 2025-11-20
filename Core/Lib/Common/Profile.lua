@@ -222,11 +222,7 @@ end
 function P:GetBars() return ns.db.profile.bars end
 
 --- @return number
-function P:GetBarSize()
-    local bars = self:GetBars()
-    if IsNotTable(bars) then return 0 end
-    return TableSize(bars)
-end
+function P:GetBarSize() return PI:BarCount() end
 
 --- @param frameIndex number The frame index number
 --- @param isEnabled boolean The enabled state

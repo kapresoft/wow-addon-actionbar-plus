@@ -17,8 +17,8 @@ local AceEvent = ns:AceLibrary().AceEvent
 local P = O.Profile
 local ab = O.ActionBarHandlerMixin
 
-ABP_enableV2 = true
-ns.features.enableV2 = ABP_enableV2
+-- @see Namespace.features.enableV2
+print('xx ns.features.enableV2:', ns.features.enableV2)
 
 --[[-----------------------------------------------------------------------------
 New Instance
