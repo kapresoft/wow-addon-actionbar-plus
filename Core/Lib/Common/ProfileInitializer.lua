@@ -197,6 +197,8 @@ local function Methods(o)
 
     local specCount = ns:IsRetail() and 4 or 2
 
+    function o:BarCount() return ACTION_BAR_COUNT end
+
     --- @param g Global_Profile_Config
     --- @param barConfNameSupplierFn BarConfNameSupplierFn | "function(barIndex) return 'barName' end"
     function o:InitGlobalSettings(g, barConfNameSupplierFn)

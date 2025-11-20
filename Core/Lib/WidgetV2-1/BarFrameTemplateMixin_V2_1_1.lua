@@ -32,28 +32,19 @@ local function PropsAndMethods(o)
     --- @param self Frame
     function o.OnLoad(self)
         C_Timer.After(1, function()
-            p:vv(function() return 'OnLoad: %s', self:GetName() end)
+            p:f1(function() return 'OnLoad: %s', self:GetName() end)
         end)
-        if ABP_enableV2 ~= true then self:UnregisterAllEvents(); self:Hide(); return; end
+        --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
         self:RegisterForDrag("LeftButton")
-        self:SetScale(UIParent:GetScale())
-
-        ABP_ApplyBackdrop(self, ABP_BACKDROPS.backdrop)
-
-        --local numButtons = 5
-        --local buttonSize = 36
-        --local padding = 6 -- space between buttons
-        --local paddingAll = 14
-        --
-        --local totalWidth = paddingAll + (numButtons * buttonSize) + ((numButtons - 1) * padding) + paddingAll
-        --local totalHeight = buttonSize + paddingAll + paddingAll
-        --
-        --self:SetSize(totalWidth, totalHeight)
+        --self:SetScale(UIParent:GetScale())
+        --ABP_ApplyBackdrop(self, ABP_BACKDROPS.backdrop)
     end
 
     function o.OnDragStart(self) self:StartMoving() end
     function o.OnDragStop(self) self:StopMovingOrSizing() end
-
+    function o.OnSizeChanged(self)
+        ABP_ApplyBackdrop(self, ABP_BACKDROPS.backdrop)
+    end
 
 end; PropsAndMethods(L)
 

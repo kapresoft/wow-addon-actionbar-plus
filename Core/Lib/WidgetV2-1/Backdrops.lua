@@ -10,11 +10,12 @@ ABP_BACKDROPS = {
             borderColor = {1, 1, 1, 1},
         },
         stone = {
-            bgFile = "Interface/DialogFrame/UI-DialogBox-Background",
+            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
             edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
             tile = true, tileSize = 32, edgeSize = 32,
             insets = { left = 12, right = 12, top = 12, bottom = 12 },
-            bgColor = { 1, 1, 1, 1 },
+            --bgColor = { 0.5, 0.4, 0.1, 0.8 },
+            bgColor = {0.1, 0.3, 0.7, 0.8 },
             borderColor = { 0.9, 0.9, 0.9, 0.9 },
         },
         minimalist = {

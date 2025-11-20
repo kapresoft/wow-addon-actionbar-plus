@@ -13,19 +13,6 @@
         <Anchors>
             <Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER" y="100" x="100"/>
         </Anchors>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture name="$parentBackground">
-                    <Size>
-                        <AbsDimension x="220" y="50"/>
-                    </Size>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" y="-3"/>
-                    </Anchors>
-                    <Color r="0" g="0" b="0" a="0.3"/>
-                </Texture>
-            </Layer>
-        </Layers>
     </Frame>
     <Frame name="ABP_BarFrameTemplate_V2_1_1" inherits="ABP_BarFrameTemplate_V2_1"
            mixin="ABP_BarFrameTemplateMixin_V2_1_1" virtual="true">
@@ -33,6 +20,7 @@
             <OnLoad>self:OnLoad()</OnLoad>
             <OnDragStart>self:OnDragStart()</OnDragStart>
             <OnDragStop>self:OnDragStop()</OnDragStop>
+            <OnSizeChanged>self:OnSizeChanged()</OnSizeChanged>
         </Scripts>
     </Frame>
 

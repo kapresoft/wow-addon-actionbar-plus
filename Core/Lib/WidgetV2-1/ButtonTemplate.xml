@@ -80,20 +80,20 @@
 			</AnimationGroup>
 		</Animations>
 		<Frames>
-			<Frame name="$parentAutoCastShine" parentKey="AutoCastShine" inherits="AutoCastShineTemplate">
+			<Frame name="$parentAutoCastShine" parentKey="AutoCastShine" inherits="AutoCastShineTemplate" setAllPoints="true">
 				<Anchors>
 					<Anchor point="CENTER" x="0" y="0"/>
 				</Anchors>
 				<Size x="28" y="28"/>
 			</Frame>
-			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate">
+			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
 				<Size x="36" y="36"/>
 				<Anchors>
 					<Anchor point="CENTER" x="0" y="-1"/>
 				</Anchors>
 			</Cooldown>
 		</Frames>
-		<NormalTexture parentKey="NormalTexture">
+		<NormalTexture parentKey="NormalTexture" setAllPoints="true">
 			<Size>
 				<AbsDimension x="66" y="66"/>
 			</Size>
@@ -105,9 +105,9 @@
 				</Anchor>
 			</Anchors>
 		</NormalTexture>
-		<PushedTexture parentKey="PushedTexture"/>
-		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD"/>
-		<CheckedTexture parentKey="CheckedTexture" alphaMode="ADD"/>
+		<PushedTexture parentKey="PushedTexture" setAllPoints="true"/>
+		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" setAllPoints="true"/>
+		<CheckedTexture parentKey="CheckedTexture" alphaMode="ADD" setAllPoints="true"/>
 	</CheckButton>
 
     <CheckButton name="ABP_ButtonTemplate_V2_1_1" inherits="ABP_ButtonTemplate_V2_1, ActionButtonTemplate"

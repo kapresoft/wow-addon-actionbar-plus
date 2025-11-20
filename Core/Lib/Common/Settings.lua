@@ -541,5 +541,10 @@ local function NewInstance()
 
     PropsAndMethods(newConfig)
     newConfig:RegisterMessage(MSG.OnAddOnEnabled, function(evt, msg, ...) newConfig:InitConfig(evt, msg, ...) end)
+
+    if ns.features.enableV2 == true then
+        newConfig:RegisterMessage(MSG.OnAddOnEnabledV2, function(evt, msg, ...) newConfig:InitConfig(evt, msg, ...) end)
+    end
+
     return newConfig
 end; NewInstance()
