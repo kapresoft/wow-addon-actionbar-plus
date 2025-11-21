@@ -1,5 +1,5 @@
 ABP_BACKDROPS = {
-    backdrop = "stone",
+    backdrop = "stone", -- or 'none'
     backdropThemes = {
         modernDark = {
             bgFile = "Interface/Tooltips/UI-Tooltip-Background",
