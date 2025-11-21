@@ -3,114 +3,138 @@
 
     <Script file="ButtonTemplateMixin_V2_1.lua"/>
 
-	<CheckButton name="ABP_ButtonTemplate_V2_1" virtual="true" inherits="SecureActionButtonTemplate">
-		<Size>
-			<AbsDimension x="36" y="36"/>
-		</Size>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture parentKey="Icon"/>
-			</Layer>
-			<Layer level="ARTWORK" textureSubLevel="1">
-				<Texture parentKey="Flash" file="Interface\Buttons\UI-QuickslotRed" hidden="true"/>
-				<Texture inherits="ActionBarFlyoutButton-IconFrame" parentKey="FlyoutBorder" hidden="true">
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-				<Texture inherits="ActionBarFlyoutButton-IconShadow" parentKey="FlyoutBorderShadow" hidden="true">
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="ARTWORK" textureSubLevel="2">
-				<Texture inherits="ActionBarFlyoutButton-ArrowUp" parentKey="FlyoutArrow" hidden="true"/>
-				<FontString inherits="NumberFontNormalSmallGray" parentKey="HotKey" justifyH="RIGHT">
-					<Size x="32" y="10"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-5" y="-5"/>
-					</Anchors>
-				</FontString>
-				<FontString inherits="NumberFontNormal" parentKey="Count" justifyH="RIGHT">
-					<Anchors>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="OVERLAY">
-				<FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
-					<Size x="36" y="10"/>
-					<Anchors>
-						<Anchor point="BOTTOM" x="0" y="2"/>
-					</Anchors>
-				</FontString>
-				<Texture file="Interface\Buttons\UI-ActionButton-Border" parentKey="Border" hidden="true" alphaMode="ADD">
-					<Size x="62" y="62"/>
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="OVERLAY" textureSubLevel="1">
-				<Texture parentKey="NewActionTexture" atlas="bags-newitem" useAtlasSize="false" alphaMode="ADD" hidden="true">
-					<Size x="44" y="44"/>
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="SpellHighlightTexture" atlas="bags-newitem" useAtlasSize="false" alphaMode="ADD" hidden="true">
-					<Size x="44" y="44"/>
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="AutoCastable" file="Interface\Buttons\UI-AutoCastableOverlay" hidden="true">
-					<Size x="58" y="58"/>
-					<Anchors>
-						<Anchor point="CENTER" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Animations>
-			<AnimationGroup parentKey="SpellHighlightAnim" looping="REPEAT">
-				<Alpha childKey="SpellHighlightTexture" smoothing="OUT" duration=".35" order="1" fromAlpha="0" toAlpha="1"/>
-				<Alpha childKey="SpellHighlightTexture" smoothing="IN" duration=".35" order="2" fromAlpha="1" toAlpha="0"/>
-			</AnimationGroup>
-		</Animations>
-		<Frames>
-			<Frame name="$parentAutoCastShine" parentKey="AutoCastShine" inherits="AutoCastShineTemplate" setAllPoints="true">
-				<Anchors>
-					<Anchor point="CENTER" x="0" y="0"/>
-				</Anchors>
-				<Size x="28" y="28"/>
-			</Frame>
-			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
-				<Size x="36" y="36"/>
-				<Anchors>
-					<Anchor point="CENTER" x="0" y="-1"/>
-				</Anchors>
-			</Cooldown>
-		</Frames>
-		<NormalTexture parentKey="NormalTexture" setAllPoints="true">
-			<Size>
-				<AbsDimension x="66" y="66"/>
-			</Size>
-			<Anchors>
-				<Anchor point="CENTER">
-					<Offset>
-						<AbsDimension x="0" y="-1"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</NormalTexture>
-		<PushedTexture parentKey="PushedTexture" setAllPoints="true"/>
-		<HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" setAllPoints="true"/>
-		<CheckedTexture parentKey="CheckedTexture" alphaMode="ADD" setAllPoints="true"/>
+    <Texture name="ABP_ActionBarFlyoutButton-ArrowUp" file="Interface\Buttons\ActionBarFlyoutButton" virtual="true" >
+        <Size x="23" y="11"/>
+        <TexCoords left="0.62500000" right="0.98437500" top="0.74218750" bottom="0.82812500"/>
+    </Texture>
+    <Texture name="ABP_ActionBarFlyoutButton-IconFrame" file="Interface\Buttons\ActionBarFlyoutButton" virtual="true" >
+        <Size x="42" y="42"/>
+        <TexCoords left="0.01562500" right="0.67187500" top="0.39843750" bottom="0.72656250"/>
+    </Texture>
+    <Texture name="ABP_ActionBarFlyoutButton-IconShadow" file="Interface\Buttons\ActionBarFlyoutButton" virtual="true" >
+        <Size x="48" y="48"/>
+        <TexCoords left="0.01562500" right="0.76562500" top="0.00781250" bottom="0.38281250"/>
+    </Texture>
+
+	<CheckButton name="ABP_ButtonTemplate_V2_1" virtual="true">
+        <Size>
+            <AbsDimension x="36" y="36"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="icon">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="1">
+                <Texture name="$parentFlash" parentKey="Flash" file="Interface\Buttons\UI-QuickslotRed" hidden="true"/>
+                <Texture name="$parentFlyoutBorder" inherits="ABP_ActionBarFlyoutButton-IconFrame" parentKey="FlyoutBorder" hidden="true">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentFlyoutBorderShadow" inherits="ABP_ActionBarFlyoutButton-IconShadow" parentKey="FlyoutBorderShadow" hidden="true">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="2">
+                <Texture name="$parentFlyoutArrow" inherits="ActionBarFlyoutButton-ArrowUp" parentKey="FlyoutArrow" hidden="true"/>
+                <FontString name="$parentHotKey" inherits="LetterAndNumberFontNormalSmallGray" parentKey="HotKey" justifyH="RIGHT">
+                    <Size x="32" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="-5" y="-5"/>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentCount" inherits="NumberFontNormal" parentKey="Count" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString name="$parentName" parentKey="Name" inherits="GameFontHighlightSmallOutline"
+                            maxLines="1">
+                    <Anchors>
+                        <Anchor point="BOTTOM" x="0" y="2"/>
+                    </Anchors>
+                </FontString>
+                <Texture name="$parentBorder" file="Interface\Buttons\UI-ActionButton-Border" parentKey="Border" hidden="true" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <Texture name="$parentNewActionTexture" parentKey="NewActionTexture" atlas="bags-newitem" useAtlasSize="false" alphaMode="ADD" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentSpellHighlightTexture" parentKey="SpellHighlightTexture"
+                         atlas="bags-newitem" useAtlasSize="false" alphaMode="ADD" setAllPoints="true" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentAutoCastable" parentKey="AutoCastable" file="Interface\Buttons\UI-AutoCastableOverlay"
+                         setAllPoints="true" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Animations>
+            <AnimationGroup parentKey="SpellHighlightAnim" looping="REPEAT">
+                <Alpha childKey="SpellHighlightTexture" smoothing="OUT" duration=".35" order="1" fromAlpha="0" toAlpha="1"/>
+                <Alpha childKey="SpellHighlightTexture" smoothing="IN" duration=".35" order="2" fromAlpha="1" toAlpha="0"/>
+                <Scripts>
+                    <OnPlay>
+                        local btn = self:GetParent()
+                        local tex = btn and btn.SpellHighlightTexture; if not tex then return end
+                        -- others: FACTION_GREEN_COLOR, RED_THREAT_COLOR
+                        local c = YELLOW_THREAT_COLOR
+                        tex:SetVertexColor(c.r, c.g, c.b, c.a)
+                        tex:Show();
+                    </OnPlay>
+                </Scripts>
+            </AnimationGroup>
+        </Animations>
+        <Frames>
+            <Frame name="$parentAutoCastShine" parentKey="AutoCastShine" inherits="AutoCastShineTemplate" setAllPoints="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+            </Frame>
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+            </Cooldown>
+        </Frames>
+        <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty">
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+                <Anchor point="BOTTOMRIGHT"/>
+            </Anchors>
+        </NormalTexture>
+        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+        <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+        <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 	</CheckButton>
 
-    <CheckButton name="ABP_ButtonTemplate_V2_1_1" inherits="ABP_ButtonTemplate_V2_1, ActionButtonTemplate"
+    <CheckButton name="ABP_ButtonTemplate_V2_1_1" inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_V2_1"
                  mixin="ABP_ButtonTemplateMixin_V2_1_1" virtual="true">
         <Scripts>
             <OnLoad>self:OnLoad()</OnLoad>
