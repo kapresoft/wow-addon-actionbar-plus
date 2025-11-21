@@ -10,6 +10,8 @@ local P, PI = O.Profile, O.ProfileInitializer
 local lcfg = {
     spacing = 6,
 }
+local baseLevel = 1000
+local baseName = 'ActionbarPlusF'
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -25,23 +27,6 @@ end; local L, p = CreateLib(); if not L then return end
 p:v(function() return "Loaded: %s", L.name or tostring(L) end)
 
 --[[-----------------------------------------------------------------------------
-Types
--------------------------------------------------------------------------------]]
----
---- @class ActionbarPlusF1Module : ActionbarPlusModule
---- @class ActionbarPlusF2Module : ActionbarPlusModule
---- @class ActionbarPlusF3Module : ActionbarPlusModule
---- @class ActionbarPlusF4Module : ActionbarPlusModule
---- @class ActionbarPlusF5Module : ActionbarPlusModule
---- @class ActionbarPlusF6Module : ActionbarPlusModule
---- @class ActionbarPlusF7Module : ActionbarPlusModule
---- @class ActionbarPlusF8Module : ActionbarPlusModule
---- @class ActionbarPlusF9Module : ActionbarPlusModule
---- @class ActionbarPlusF10Module : ActionbarPlusModule
----
----
-
---[[-----------------------------------------------------------------------------
 Methods: BarModuleMixin
 -------------------------------------------------------------------------------]]
 --- @class BarModuleMixin
@@ -53,27 +38,24 @@ local function PropsAndMethods(o)
     local pp = ns:LC().MODULE:NewLogger('ActionbarPlusModule')
 
     --- @return ActionbarPlusModule
-    function o:New(index)
+    --- @param barFrame ActionBarFrame
+    function o:New(barFrame)
+        assert(barFrame, 'Actionbar frame is missing.')
+        local w = barFrame.widget
         -- Create the Ace module dynamically
-        local name = "ActionbarPlusF" .. index .. 'Module'
-        --self.nameShort = name
-        --self.frameName = "ActionbarPlusF" .. index
-        --self.index = index
+        local name = "ActionbarPlusF" .. w.index .. 'Module'
 
         --- @class ActionbarPlusModule : AceModule
         --- @field index Index
-        --- @field frameName Name The name of the frame instance
         --- @field barFrame ActionBarFrame
-        ----------------------------------
-        ----------------------------------
         local m = ns:a():NewModule(name, "AceEvent-3.0", "AceHook-3.0")
         if not m then return nil end
 
         --- @type ActionbarPlusModule
         local mod = ns:K():Mixin(m, o)
-        -- set index here so it's available in OnInitialize()
-        mod.index = index
-        mod:Init()
+
+        mod.barFrame = barFrame
+        mod.index = w.index
 
         pp:f1(function() return '%s created; enabled=%s', m:GetName(), m:IsEnabled() end)
 
@@ -84,24 +66,16 @@ local function PropsAndMethods(o)
         return mod
     end
 
-    function o:Init()
-        local baseName = 'ActionbarPlusF'
-        self.nameShort = baseName .. self.index .. 'Module'
-        self.frameName = baseName .. self.index
-    end
-
-    function o:GetDebugName() return 'ABP_Module::' .. self.nameShort end
-
     function o:SetInitialStateDelayed()
         C_Timer.After(0.01, function() self:SetInitialState() end)
     end
 
     function o:SetInitialState()
         local cfg = self:c()
-
-        if cfg.enabled and self:IsEnabled() then return end
-        if self:Disable() then
-            pp:vv(function() return '[SetInitialState] Disabled; index=%s', self.index end)
+        if cfg.enabled then
+            return self:IsEnabled() and pp:vv(function() return '[SetInitialState] Enabled; index=%s', self.index end)
+        else
+            return self:Disable() and pp:vv(function() return '[SetInitialState] Disabled; index=%s', self.index end)
         end
     end
 
@@ -110,16 +84,17 @@ local function PropsAndMethods(o)
 
     function o:OnInitialize()
         pp:f1(function() return 'OnInitialize() called; index=%s', self.index end)
-        self:SetInitialState()
+        self:SetInitialStateDelayed()
     end
 
     function o:OnEnable()
-        pp:vv(function() return 'OnEnable() called; index=%s', self.index end)
-        return self.frame:Show()
+        pp:f1(function() return 'OnEnable() called; index=%s', self.index end)
+        return self.barFrame:Show()
     end
+
     function o:OnDisable()
-        pp:vv(function() return 'OnDisable() called; index=%s', self.index end)
-        return self.frame:Hide()
+        pp:f1(function() return 'OnDisable() called; index=%s', self.index end)
+        return self.barFrame:Hide()
     end
 
 end; PropsAndMethods(bmm)
@@ -127,37 +102,40 @@ end; PropsAndMethods(bmm)
 --[[-----------------------------------------------------------------------------
 Methods: BarFactory
 -------------------------------------------------------------------------------]]
-function L.OnAddOnEnabled(msg, source, addOn)
-    p:vv('OnAddOnEnabled() called...')
+function L.OnAddOnInitialized(msg, source, addOn)
+    p:vv('OnAddOnInitialized() called...')
     L:Init(bmm)
 end
 
 --- @param mixin BarModuleMixin
----@param consumerFn ActionBarFrameBuilderConsumerFn
-function L:Init(mixin, consumerFn)
+function L:Init(mixin)
     for i = 1, PI.ActionbarCount do
-        local mod = mixin:New(i)
-        self:CreateBarGroup(mod)
+        self:CreateBarGroup(i, function(barFrame)
+            local mod = mixin:New(barFrame)
+            mod:OnInitialize()
+        end)
     end
 end
 
---- @param mod ActionbarPlusModule
-function L:CreateBarGroup(mod)
-    assert(mod)
-    local index, frameName = mod.index, mod.frameName
-    if _G[frameName] then return _G[frameName] end
+--- @param barIndex Index The bar frame index
+--- @param consumerFn BarFactoryConsumerFn
+function L:CreateBarGroup(barIndex, consumerFn)
+    assert(barIndex, 'Index is required.')
 
-    local cfg = mod:c()
+    local frameName = baseName .. barIndex
+    if _G[frameName] then
+        return consumerFn and consumerFn(_G[frameName])
+    end
 
+    local cfg = P:GetBar(barIndex)
     local cols = cfg.widget.colSize
     local rows = cfg.widget.rowSize
     local size = cfg.widget.buttonSize
     local spacing = lcfg.spacing
 
     --- @type ActionBarFrame
-    local frame = L:CreateBarFrame(index)
-    mod.frame = frame
-    local buttons = L:CreateButtons(frame, index)
+    local frame = L:CreateBarFrame(barIndex, frameName)
+    local buttons = L:CreateButtons(frame, barIndex)
     frame.widget.buttonFrames = buttons
 
     ----------------------------------------------------
@@ -196,21 +174,24 @@ function L:CreateBarGroup(mod)
         local y = startY - (size + spacing) * (row - 1)
 
         -- anchor inside the frame
-        btn:SetPoint("TOPLEFT", mod.frame, "TOPLEFT", x, y)
+        btn:SetPoint("TOPLEFT", frame, "TOPLEFT", x, y)
     end
+
+    return consumerFn and consumerFn(frame)
 end
 
 --- @private
 --- @param barIndex Index The frame index
+--- @param frameName Name The frame name
 --- @return ActionBarFrame
-function L:CreateBarFrame(barIndex)
-    ----------------------------------------------------
-    -- create bar frame from XML virtual template
-    ----------------------------------------------------
-    local frameName = "ActionbarPlusF" .. barIndex
+--- @param frameName Name
+function L:CreateBarFrame(barIndex, frameName)
+    assert(barIndex and frameName, 'Frame and index missing.')
 
     --- @type ActionBarFrame
     local f = CreateFrame("Frame", frameName, UIParent, "ABP_BarFrameTemplate_V2_1_1")
+    f:SetFrameLevel(baseLevel + barIndex * 10)
+    f:SetFrameStrata('MEDIUM')
     --f:SetScale(UIParent:GetScale())
 
     --- @type __ActionBarFrameWidget : WidgetBase
@@ -260,4 +241,4 @@ function L:CreateButtons(barFrame, barIndex)
     return buttons
 end
 
-L:RegisterMessage(MSG.OnAddOnEnabledV2, L.OnAddOnEnabled)
+L:RegisterMessage(MSG.OnAddOnInitializedV2, L.OnAddOnInitialized)

@@ -1,0 +1,16 @@
+--[[-----------------------------------------------------------------------------
+Types
+-------------------------------------------------------------------------------]]
+---
+--- @class ActionbarPlusF1Module : ActionbarPlusModule
+--- @class ActionbarPlusF2Module : ActionbarPlusModule
+--- @class ActionbarPlusF3Module : ActionbarPlusModule
+--- @class ActionbarPlusF4Module : ActionbarPlusModule
+--- @class ActionbarPlusF5Module : ActionbarPlusModule
+--- @class ActionbarPlusF6Module : ActionbarPlusModule
+--- @class ActionbarPlusF7Module : ActionbarPlusModule
+--- @class ActionbarPlusF8Module : ActionbarPlusModule
+--- @class ActionbarPlusF9Module : ActionbarPlusModule
+--- @class ActionbarPlusF10Module : ActionbarPlusModule
+---
+---

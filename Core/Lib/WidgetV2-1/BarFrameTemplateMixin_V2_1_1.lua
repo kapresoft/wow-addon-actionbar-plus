@@ -31,13 +31,8 @@ local function PropsAndMethods(o)
     -------------------------------------------------------------------------------]]
     --- @param self Frame
     function o.OnLoad(self)
-        C_Timer.After(1, function()
-            p:f1(function() return 'OnLoad: %s', self:GetName() end)
-        end)
         --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
         self:RegisterForDrag("LeftButton")
-        --self:SetScale(UIParent:GetScale())
-        --ABP_ApplyBackdrop(self, ABP_BACKDROPS.backdrop)
     end
 
     function o.OnDragStart(self) self:StartMoving() end

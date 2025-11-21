@@ -33,7 +33,7 @@ function o.OnLoad(self)
     self:SetID(NextID())
 
     C_Timer.After(1, function()
-        p:f1(function() return 'OnLoad: %s', self:GetID() end)
+        --p:f1(function() return 'OnLoad: %s', self:GetID() end)
     end)
 
     self:EnableMouse(true)
