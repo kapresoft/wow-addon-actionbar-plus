@@ -8,4 +8,6 @@
     <Include file="BarFrameTemplate.xml"/>
     <Include file="Modules\_Modules.xml"/>
 
+    <Script file="BarFactory.lua" />
+
 </Ui>

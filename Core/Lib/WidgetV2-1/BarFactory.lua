@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace
 local ns = select(2, ...)
 local O, GC, M, MSG, LibStub = ns.O, ns.GC, ns.M, ns.GC.M, ns.LibStub
-local P, PI = O.Profile, O.ProfileInitializer
+local P, PI, BM = O.Profile, O.ProfileInitializer, O.BarModule
 
 --- todo next: move to bars config
 local lcfg = {
@@ -27,85 +27,12 @@ end; local L, p = CreateLib(); if not L then return end
 p:v(function() return "Loaded: %s", L.name or tostring(L) end)
 
 --[[-----------------------------------------------------------------------------
-Methods: BarModuleMixin
--------------------------------------------------------------------------------]]
---- @class BarModuleMixin
-local bmm = {}
-
---- @param o BarModuleMixin | ActionbarPlusModule
-local function PropsAndMethods(o)
-
-    local pp = ns:LC().MODULE:NewLogger('BarFactory::Module')
-
-    --- @return ActionbarPlusModule
-    --- @param barFrame ActionBarFrame
-    function o:New(barFrame)
-        assert(barFrame, 'Actionbar frame is missing.')
-        local w = barFrame.widget
-        -- Create the Ace module dynamically
-        local name = "ActionbarPlusF" .. w.index .. 'Module'
-
-        --- @class ActionbarPlusModule : AceModule
-        --- @field index Index
-        --- @field barFrame ActionBarFrame
-        local m = ns:a():NewModule(name, "AceEvent-3.0", "AceHook-3.0")
-        if not m then return nil end
-
-        --- @type ActionbarPlusModule
-        local mod = ns:K():Mixin(m, o)
-
-        mod.barFrame = barFrame
-        mod.index = w.index
-
-        pp:f1(function() return '%s created; enabled=%s', m:GetName(), m:IsEnabled() end)
-
-        -- Set Global
-        -- example: ActionbarPlusF1Module
-        _G[name] = m
-
-        return mod
-    end
-
-    function o:SetInitialStateDelayed()
-        C_Timer.After(0.01, function() self:SetInitialState() end)
-    end
-
-    function o:SetInitialState()
-        local cfg = self:c()
-        if cfg.enabled then
-            return self:IsEnabled() and pp:f1(function() return '[SetInitialState] Enabled; index=%s', self.index end)
-        else
-            return self:Disable() and pp:f1(function() return '[SetInitialState] Disabled; index=%s', self.index end)
-        end
-    end
-
-    --- @return Profile_Bar
-    function o:c() return P:GetBar(self.index) end
-
-    function o:OnInitialize()
-        pp:f1(function() return 'OnInitialize() called; index=%s', self.index end)
-        self:SetInitialStateDelayed()
-    end
-
-    function o:OnEnable()
-        pp:f1(function() return 'OnEnable() called; index=%s', self.index end)
-        return self.barFrame:Show()
-    end
-
-    function o:OnDisable()
-        pp:f1(function() return 'OnDisable() called; index=%s', self.index end)
-        return self.barFrame:Hide()
-    end
-
-end; PropsAndMethods(bmm)
-
---[[-----------------------------------------------------------------------------
 Methods: BarFactory
 -------------------------------------------------------------------------------]]
 function L.OnAddOnInitialized(msg, source, addOn)
     if not ns:IsV2() then return end
     p:vv('OnAddOnInitialized() called...')
-    L:Init(bmm)
+    L:Init(BM)
 end
 
 --- @param mixin BarModuleMixin
