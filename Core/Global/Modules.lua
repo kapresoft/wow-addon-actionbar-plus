@@ -109,6 +109,9 @@ local M = {
     TooltipUtil                        = '',
     WidgetMixin                        = '',
 
+    -- WidgetV2-1
+    BarModule                          = '',
+
     -- M6 AddOn Support
     M6Support = ''
 }; for moduleName in pairs(M) do M[moduleName] = moduleName end
@@ -187,6 +190,8 @@ local M = {
 --- @field UnitMixin UnitMixin
 --- @field VehicleAndPetBattleEventsStateDriver VehicleAndPetBattleEventsStateDriver
 --- @field WidgetMixin WidgetMixin
+--- WidgetV2-1 Objects
+--- @field BarModule BarModule
 
 L.M = M
 kns.M = M
