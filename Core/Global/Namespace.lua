@@ -173,9 +173,6 @@ local function CreateNamespace(...)
     --- @type fun(fmt:string, ...)|fun(val:string)
     ns.pformat = ns:K().pformat:B()
 
-    ns.features = {
-        enableV2 = false,
-    }
     ns.playerBuffs = ns.playerBuffs or {}
 
     ns:K():MixinWithDefExc(ns, ns.O.AceEventWithTraceMixin)
@@ -184,10 +181,6 @@ local function CreateNamespace(...)
     --- @param o __Namespace | Namespace
     local function PropsAndMethods(o)
 
-        --- Used in XML files to hook frame events: OnLoad and OnEvent
-        --- Example: <OnLoad>ABP_XML:[TypeName]_OnLoad(self)</OnLoad>
-        ns.xml = {}
-
         o.sformat = string.format
         o.barBindings = nil
 
@@ -195,8 +188,6 @@ local function CreateNamespace(...)
         function o:a() return ABP end
         --- @return Profile_Config
         function o:p() return self.db.profile end
-        --- @return boolean
-        function o:IsV2() return self.features.enableV2 == true end
 
         --- @return CursorUtil
         --- @param cursorInfo CursorInfo Optional cursorInfo instance
@@ -324,8 +315,6 @@ local function CreateNamespace(...)
     --- print(ns.name .. '::Namespace:: pformat:', pformat)
     --- Global Function
     pformat = pformat or ns.pformat
-
-    ABP_XML = ns.xml
 
     return ns
 end

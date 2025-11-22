@@ -1,3 +1,5 @@
+local ENABLE_V2 = true
+
 --[[-----------------------------------------------------------------------------
 Type: CoreNamespace
 -------------------------------------------------------------------------------]]
@@ -12,6 +14,11 @@ K:MixinWithDefExc(ns, K.Objects.CoreNamespaceMixin, K.Objects.NamespaceAceLibrar
 ns.name = ns.addon
 ns.addonLogName   = 'ABP'
 
+--- Used in XML files to hook frame events: OnLoad and OnEvent
+--- Example: <OnLoad>ABP_XML:[TypeName]_OnLoad(self)</OnLoad>
+ns.xml = {}
+ABP_XML = ns.xml
+
 --- @type GlobalObjects
 local O = ns.O or {}; ns.O = O
 
@@ -24,8 +31,11 @@ ns.consoleColors = {
 ns.ch = ns:NewConsoleHelper(ns.consoleColors)
 
 --- @class AddOnFeatures
-local features = { enableV2 = false, }
+local features = { enableV2 = ENABLE_V2, }
 ns.features = features
+
+--- @return boolean
+function ns:IsV2() return ns.features.enableV2 == true end
 
 --[[-----------------------------------------------------------------------------
 Type: DebugSettingsFlag
