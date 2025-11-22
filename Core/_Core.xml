@@ -11,7 +11,6 @@
     <Include file='Lib\_Lib.xml'/>
     <!--@do-not-package@-->
 
-    <Include file='Lib\WidgetV2-1\_Widget.xml'/>
     <Include file='Lib\Developer\_Developer.xml'/>
 
     <!--@end-do-not-package@-->

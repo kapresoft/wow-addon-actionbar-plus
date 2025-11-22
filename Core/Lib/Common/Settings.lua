@@ -49,6 +49,7 @@ local barSeq = ns:CreateSequence()
 Support functions
 -------------------------------------------------------------------------------]]
 local function fo() return O.ActionBarOperations end
+local function pr() return O.Profile end
 local function ConfirmAndReload() return O.WidgetMixin:ConfirmAndReload() end
 
 --- @param frameIndex number
@@ -80,10 +81,10 @@ local function GetFrameStateSetterHandler(frameIndex)
     return function(_, v) fo():GetFrameWidgetByIndex(frameIndex):SetFrameState(v) end
 end
 local function GetFrameStateGetterHandler(frameIndex)
-    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShownInConfig() end
+    return function(_) return pr():IsBarEnabled(frameIndex) end
 end
 local function GetShowButtonIndexStateGetterHandler(frameIndex)
-    return function(_) return fo():GetFrameWidgetByIndex(frameIndex):IsShowIndex() end
+    return function(_) return pr():IsShowIndex(frameIndex) end
 end
 local function GetShowButtonIndexStateSetterHandler(frameIndex)
     --TODO: NEXT: Use events instead
