@@ -168,6 +168,8 @@ local function WidgetMethods(widget)
         if self.HideGroup then self:HideGroup() end
     end
 
+    -- todo next: remove
+    --- @deprecated
     --- @return boolean
     function widget:IsShownInConfig() return P:IsBarEnabled(self.index) end
     --- @return boolean
