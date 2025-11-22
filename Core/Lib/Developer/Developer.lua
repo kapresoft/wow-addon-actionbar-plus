@@ -17,9 +17,6 @@ local AceEvent = ns:AceLibrary().AceEvent
 local P = O.Profile
 local ab = O.ActionBarHandlerMixin
 
--- @see Namespace.features.enableV2
-print('xx ns.features.enableV2:', ns.features.enableV2)
-
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -27,6 +24,12 @@ local libName = 'Developer'
 --- @class Developer : BaseLibraryObject_WithAceEvent
 local L = {}; AceEvent:Embed(L); a = L
 local p = ns:LC().DEV:NewLogger(libName)
+
+-- Enable _Core.xml/WidgetV2-1\_Widget.xml
+-- @see _Core.xml/WidgetV2-1\_Widget.lua
+C_Timer.After(2, function()
+    p:vv(function() return 'features.enableV2: %s', ns.features.enableV2 end)
+end)
 
 --[[-----------------------------------------------------------------------------
 Methods
