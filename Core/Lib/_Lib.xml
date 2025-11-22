@@ -7,9 +7,5 @@
 
     <Include file='Common\_Common.xml'/>
     <Include file='Widget\_Widget.xml'/>
-    <!--@do-not-package@-->
-
-    <Include file='WidgetV2-1\_Widget.xml'/>
-    <!--@end-do-not-package@-->
 
 </Ui>

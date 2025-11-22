@@ -35,7 +35,7 @@ local bmm = {}
 --- @param o BarModuleMixin | ActionbarPlusModule
 local function PropsAndMethods(o)
 
-    local pp = ns:LC().MODULE:NewLogger('ActionbarPlusModule')
+    local pp = ns:LC().MODULE:NewLogger('BarFactory::Module')
 
     --- @return ActionbarPlusModule
     --- @param barFrame ActionBarFrame
@@ -73,9 +73,9 @@ local function PropsAndMethods(o)
     function o:SetInitialState()
         local cfg = self:c()
         if cfg.enabled then
-            return self:IsEnabled() and pp:vv(function() return '[SetInitialState] Enabled; index=%s', self.index end)
+            return self:IsEnabled() and pp:f1(function() return '[SetInitialState] Enabled; index=%s', self.index end)
         else
-            return self:Disable() and pp:vv(function() return '[SetInitialState] Disabled; index=%s', self.index end)
+            return self:Disable() and pp:f1(function() return '[SetInitialState] Disabled; index=%s', self.index end)
         end
     end
 
@@ -103,6 +103,7 @@ end; PropsAndMethods(bmm)
 Methods: BarFactory
 -------------------------------------------------------------------------------]]
 function L.OnAddOnInitialized(msg, source, addOn)
+    if not ns:IsV2() then return end
     p:vv('OnAddOnInitialized() called...')
     L:Init(bmm)
 end

@@ -1,5 +1,3 @@
-local enableV2 = true
-
 --[[-----------------------------------------------------------------------------
 Lua Vars
 -------------------------------------------------------------------------------]]
@@ -176,7 +174,7 @@ local function CreateNamespace(...)
     ns.pformat = ns:K().pformat:B()
 
     ns.features = {
-        enableV2 = enableV2,
+        enableV2 = false,
     }
     ns.playerBuffs = ns.playerBuffs or {}
 
