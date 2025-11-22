@@ -85,7 +85,7 @@ local function PropsAndMethods(o)
         local barFrames = {}
         for i=1, self:GetActionbarFrameCount() do
             local f = self:GetFrameByIndex(i)
-            if f and f.widget and f.widget:IsShownInConfig() then
+            if f and f.widget and f.widget.IsShownInConfig and f.widget:IsShownInConfig() then
                 tinsert(barFrames, f)
             end
         end

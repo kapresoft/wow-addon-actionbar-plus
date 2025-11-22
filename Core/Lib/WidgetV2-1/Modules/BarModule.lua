@@ -44,7 +44,7 @@ local function PropsAndMethods(o)
         mod.barFrame = barFrame
         mod.index = w.index
 
-        p:vv(function() return '%s created; enabled=%s', m:GetName(), m:IsEnabled() end)
+        p:f1(function() return '%s created; enabled=%s', m:GetName(), m:IsEnabled() end)
 
         -- Set Global
         -- example: ActionbarPlusF1Module

@@ -161,7 +161,27 @@ function L:CreateButtons(barFrame, barIndex)
     for i = 1, btnCount do
         local btnName = GC:ButtonName(barIndex, i)
         --- @type CheckButton
-        local btn = CreateFrame("CheckButton", btnName, barFrame, "ABP_ButtonTemplate_V2_1_1")
+        local btn = CreateFrame("CheckButton", btnName, barFrame,
+                                "ABP_ButtonTemplate_V2_1_1")
+        --btn:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
+
+        btn:SetAttribute("type", "action");
+        btn:SetAttribute("typerelease", "actionrelease");
+        btn:SetAttribute("checkselfcast", true);
+        btn:SetAttribute("checkfocuscast", true);
+        btn:SetAttribute("checkmouseovercast", true);
+        btn:RegisterForDrag("LeftButton", "RightButton");
+        btn:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
+
+        if barIndex == 2 and i == 1 then
+            local texture = select(3, GetSpellInfo("Lesser Heal"))
+            p:vv(function() return 'xx Icon[%s]: %s', i, texture end)
+            btn.icon:SetTexture(texture)
+            btn.icon:SetAllPoints(btn)
+            btn:SetAttribute('type', 'spell')
+            btn:SetAttribute('spell', 'Lesser Heal(Rank 1)')
+        end
+
         btn:SetSize(btnSize, btnSize)
         table.insert(buttons, btn)
         p:f1(function() return 'Btn Created[%s]: %s', btn:GetID(), btn:GetName() end)
