@@ -3,4 +3,3 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace
 local ns = select(2, ...)
-ns.features.enableV2 = false

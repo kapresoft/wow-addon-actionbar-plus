@@ -733,7 +733,7 @@ local function GlobalConstantMethods(o)
 
             s = s .. kvFormat(C['Use-KeyDown(cvar ActionButtonUseKeyDown)'], tostring(useKeyDown))
             s = s .. kvFormat(C['Features'], ' ')
-            s = s .. kvSubFormat('v2-enabled', tostring(kns.features.enableV2))
+            s = s .. kvSubFormat('v2-enabled', tostring(kns:IsV2()))
             return s
         end
 
