@@ -8,8 +8,8 @@
             <AbsDimension x="36" y="36"/>
         </Size>
         <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="icon">
+            <Layer level="ARTWORK">
+                <Texture parentKey="icon" name="$parentIcon">
                     <Anchors>
                         <Anchor point="TOPLEFT"/>
                         <Anchor point="BOTTOMRIGHT"/>
