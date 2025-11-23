@@ -6,7 +6,8 @@
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## OptionalDeps: Ace3
+## LoadOnDemand: 0
+## OptionalDeps: Ace3, ActionbarPlusLegacy, ActionbarPlusNext
 ## Category-enUS: Action Bars
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
@@ -37,5 +38,7 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
-Core\Vanilla.lua
-Core\_Core.xml
+# Core\Vanilla.lua
+# CoreV2-1\_Core.xml
+
+ActionbarPlus.lua

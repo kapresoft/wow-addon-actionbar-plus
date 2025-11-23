@@ -1,0 +1,22 @@
+## Interface: 11508
+## Version: @project-version@
+## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t ActionbarPlus|cff1784d1Legacy|r
+## Notes: Actionbars Everywhere, Make you click happy
+## Author: Antonio W. Lagnada (kapresoft@gmail.com)
+## DefaultState: enabled
+## LoadOnDemand: 1
+## RequiredDeps: ActionbarPlus
+## OptionalDeps: Ace3
+## Category-enUS: Action Bars
+
+## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
+## X-Category: Action Bars
+## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+
+# To get the Interface/Build Info
+# /dump select(4, GetBuildInfo())
+
+# Core\Vanilla.lua
+# CoreV2-1\_Core.xml
+
+ActionbarPlusLegacy.lua
