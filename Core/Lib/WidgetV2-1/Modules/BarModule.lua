@@ -53,16 +53,12 @@ local function PropsAndMethods(o)
         return mod
     end
 
-    function o:SetInitialStateDelayed()
-        C_Timer.After(0.01, function() self:SetInitialState() end)
-    end
-
     function o:SetInitialState()
         local cfg = self:c()
         if cfg.enabled then
-            return self:IsEnabled() and p:f1(function() return '[SetInitialState] Enabled; index=%s', self.index end)
+            return self:Enable() and p:f1(function() return '[SetInitialState] Enabled; index=%s', self.index end)
         else
-            return self:Disable() and p:f1(function() return '[SetInitialState] Disabled; index=%s', self.index end)
+            return self:Disable() and p:vv(function() return '[SetInitialState] Disabled; index=%s', self.index end)
         end
     end
 
@@ -71,7 +67,7 @@ local function PropsAndMethods(o)
 
     function o:OnInitialize()
         p:f1(function() return 'OnInitialize() called; index=%s', self.index end)
-        self:SetInitialStateDelayed()
+        self:SetInitialState()
     end
 
     function o:OnEnable()

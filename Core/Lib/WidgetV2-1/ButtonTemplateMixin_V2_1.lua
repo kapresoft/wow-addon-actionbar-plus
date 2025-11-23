@@ -32,13 +32,16 @@ local o = S
 function o.OnLoad(self)
     self:SetID(NextID())
 
-    C_Timer.After(1, function()
-        --p:f1(function() return 'OnLoad: %s', self:GetID() end)
-    end)
-
-    self:EnableMouse(true)
     self:SetAttribute("action", self:GetID())
     self.action = self:GetID()
+    self:EnableMouse(true)
+    self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
+
+    --self:SetAttribute("checkselfcast", true);
+    --self:SetAttribute("checkfocuscast", true);
+    --self:SetAttribute("checkmouseovercast", true);
+    self:RegisterForDrag("LeftButton", "RightButton");
+    self:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
 end
 
 --- @param self ButtonTemplateMixin_V2_1_1
@@ -62,11 +65,13 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+--- @param button ButtonName
 function o:UpdateState(button, down)
     self:SetChecked(false)
 end
 
 function o:UpdateAction(name, val)
+    p:vv('UpdateAction() called...')
     -- empty for now
 end
 
