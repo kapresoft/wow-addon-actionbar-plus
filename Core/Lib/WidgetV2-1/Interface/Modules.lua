@@ -1,16 +1,25 @@
 --[[-----------------------------------------------------------------------------
 Types
 -------------------------------------------------------------------------------]]
----
---- @class ActionbarPlusF1Module : ActionbarPlusModule
---- @class ActionbarPlusF2Module : ActionbarPlusModule
---- @class ActionbarPlusF3Module : ActionbarPlusModule
---- @class ActionbarPlusF4Module : ActionbarPlusModule
---- @class ActionbarPlusF5Module : ActionbarPlusModule
---- @class ActionbarPlusF6Module : ActionbarPlusModule
---- @class ActionbarPlusF7Module : ActionbarPlusModule
---- @class ActionbarPlusF8Module : ActionbarPlusModule
---- @class ActionbarPlusF9Module : ActionbarPlusModule
---- @class ActionbarPlusF10Module : ActionbarPlusModule
----
----
+
+--- @type ActionbarPlusModule
+ActionbarPlusF1Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF2Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF3Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF4Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF5Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF6Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF7Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF8Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF9Module = {}
+--- @type ActionbarPlusModule
+ActionbarPlusF10Module = {}
+

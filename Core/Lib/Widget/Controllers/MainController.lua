@@ -44,5 +44,6 @@ local function PropsAndMethods(o)
     end
 
     o:RegisterMessage(MSG.OnAddOnInitialized, o.OnAddOnInitialized)
+    o:RegisterMessage(MSG.OnAddOnInitializedV2, o.OnAddOnInitialized)
 
 end; PropsAndMethods(L)
