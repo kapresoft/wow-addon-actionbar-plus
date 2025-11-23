@@ -110,6 +110,7 @@ local M = {
     WidgetMixin                        = '',
 
     -- WidgetV2-1
+    BarFactory                         = '',
     BarModule                          = '',
 
     -- M6 AddOn Support
@@ -191,6 +192,7 @@ local M = {
 --- @field VehicleAndPetBattleEventsStateDriver VehicleAndPetBattleEventsStateDriver
 --- @field WidgetMixin WidgetMixin
 --- WidgetV2-1 Objects
+--- @field BarFactory BarFactory
 --- @field BarModule BarModule
 
 L.M = M

@@ -18,25 +18,18 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @return BarFactory, Kapresoft_CategoryLogger
 local function CreateLib()
-    local libName = M.BarFactory or 'BarFactory'
+    local libName = M.BarFactory
     --- @class BarFactory : BaseLibraryObject
     local newLib = ns:NewLib(libName); if not newLib then return nil end
     local logger = ns:CreateDefaultLogger(libName)
     return newLib, logger
 end; local L, p = CreateLib(); if not L then return end
-p:v(function() return "Loaded: %s", L.name or tostring(L) end)
 
 --[[-----------------------------------------------------------------------------
 Methods: BarFactory
 -------------------------------------------------------------------------------]]
-function L.OnAddOnInitialized(msg, source, addOn)
-    if not ns:IsV2() then return end
-    p:vv('OnAddOnInitialized() called...')
-    L:Init(BM)
-end
-
---- @param mixin BarModuleMixin
-function L:Init(mixin)
+function L:Init()
+    local mixin = O.BarModule
     for i = 1, PI.ActionbarCount do
         self:CreateBarGroup(i, function(barFrame)
             local mod = mixin:New(barFrame)
@@ -163,30 +156,24 @@ function L:CreateButtons(barFrame, barIndex)
         --- @type CheckButton
         local btn = CreateFrame("CheckButton", btnName, barFrame,
                                 "ABP_ButtonTemplate_V2_1_1")
-        --btn:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
-
-        btn:SetAttribute("type", "action");
-        btn:SetAttribute("typerelease", "actionrelease");
-        btn:SetAttribute("checkselfcast", true);
-        btn:SetAttribute("checkfocuscast", true);
-        btn:SetAttribute("checkmouseovercast", true);
-        btn:RegisterForDrag("LeftButton", "RightButton");
-        btn:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
-
-        if barIndex == 2 and i == 1 then
-            local texture = select(3, GetSpellInfo("Lesser Heal"))
-            p:vv(function() return 'xx Icon[%s]: %s', i, texture end)
-            btn.icon:SetTexture(texture)
-            btn.icon:SetAllPoints(btn)
-            btn:SetAttribute('type', 'spell')
-            btn:SetAttribute('spell', 'Lesser Heal(Rank 1)')
-        end
-
         btn:SetSize(btnSize, btnSize)
         table.insert(buttons, btn)
         p:f1(function() return 'Btn Created[%s]: %s', btn:GetID(), btn:GetName() end)
     end
+    barFrame.buttons = buttons
     return buttons
 end
 
-L:RegisterMessage(MSG.OnAddOnInitializedV2, L.OnAddOnInitialized)
+--- @type BarFactoryConsumerFn
+L:RegisterMessage(MSG.OnAddOnReady, function()
+    --- @type CheckButton
+    local btn = ActionbarPlusF2Module.barFrame.buttons[1]
+    local spName = 'Healing Touch'
+    local texture = select(3, GetSpellInfo(spName))
+    p:vv(function() return 'xx Icon[%s]: %s', i, texture end)
+    --btn.NormalTexture:Hide()
+    btn.icon:SetTexture(texture)
+    btn.icon:SetAllPoints(btn)
+    btn:SetAttribute('type', 'spell')
+    btn:SetAttribute('spell', spName)
+end)

@@ -54,20 +54,21 @@ local function PropertiesAndMethods(o)
     o.ActionbarEmptyGridShowing = false
 
 
-    --- This is called automatically by Ace
+    --- IMPORTANT:
+    --- AceAddon lifecycle:
+    ---   • module:OnInitialize() runs ONLY for modules created before this function ends
+    ---   • module:OnEnable() runs ONLY for modules created before addon:OnEnable()
+    --- Therefore, ALL ActionbarPlus V2 modules MUST be created here.
     function o:OnInitialize()
         self:InitializeDb()
         self:RegisterSlashCommands()
-        if ns.features.enableV2 ~= true then
-            return self:SendMessage(M.OnAddOnInitialized, addon)
-        end
+        if not ns:IsV2() then return self:SendMessage(M.OnAddOnInitialized, addon) end
         self:OnInitializeV2()
     end
 
     function o:OnInitializeV2()
-        p:vv(function() return 'OnInitialize(): IsV2Enabled: %s', tostring(ns.features.enableV2) end)
+        O.BarFactory:Init()
         self:SendMessage(M.OnAddOnInitializedV2, addon)
-        p:vv(function() return 'OnInitialize():MSG:OnAddOnInitializedV2 Sent' end)
     end
 
     function o:InitializeDb()
