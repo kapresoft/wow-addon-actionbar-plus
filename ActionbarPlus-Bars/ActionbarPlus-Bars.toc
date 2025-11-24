@@ -1,6 +1,7 @@
 ## Interface: 11508
 ## Version: @project-version@
-## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t ActionbarPlus|cff1784d1Legacy|r Classic Era
+## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t ActionbarPlus|cff1784d1Next|r
+## IconTexture: Interface/Addons/ActionbarPlus/Assets/Textures/abpn-logo1
 ## Notes: Actionbars Everywhere, Make you click happy
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## DefaultState: enabled
@@ -19,4 +20,4 @@
 # Core\Vanilla.lua
 # CoreV2-1\_Core.xml
 
-ActionbarPlusLegacy.lua
+ActionbarPlus-Bars.lua

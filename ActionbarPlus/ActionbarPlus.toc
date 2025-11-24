@@ -1,12 +1,13 @@
 ## Interface: 110205
 ## Version: @project-version@
-## Title: Actionbar|cff1784d1Plus|r
+## Title: |cff1784d1ActionbarPlus|r-Core
+## IconTexture: Interface/Addons/ActionbarPlus/Assets/Textures/abpn-logo1
+
 ## Notes: Actionbars Everywhere, Make you click happy.
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-v2-18x
 ## LoadOnDemand: 0
 ## OptionalDeps: Blizzard_Professions, Ace3, ActionbarPlusLegacy, ActionbarPlusNext
 ## Category-enUS: Action Bars
