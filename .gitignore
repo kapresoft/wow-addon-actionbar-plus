@@ -52,7 +52,7 @@ luac.out
 # BigWigMods/packager
 /.build
 /.release/
-/Interface
+/_Interface/
 /ActionbarPlus/Core/ExtLib/*
 /ActionbarPlus/Core/ExtLib/WoWAce/*
 
