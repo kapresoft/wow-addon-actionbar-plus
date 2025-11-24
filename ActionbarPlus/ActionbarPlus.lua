@@ -8,6 +8,25 @@ local function LoadSubAddon(name)
     return loaded
 end
 
+local function EnableAddOn(addOnName)
+    assert(addOnName, "AddOn name is required.")
+
+    local function LoadSubAddon(name)
+        local loaded, reason = LoadAddOn(name)
+
+        if not loaded then
+            print("ActionbarPlus: Failed to load sub-addon:", name, "Reason:", reason)
+        else
+            print(name, 'Loaded:', loaded)
+        end
+        return loaded
+    end
+
+    local charName = UnitName('player')
+    EnableAddOn(addOnName, charName)
+    LoadSubAddon(addOnName)
+end
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 
@@ -21,18 +40,17 @@ f:SetScript("OnEvent", function(_, event, addon)
     -- Any other initialization
     print(ADDON_NAME, "SavedVariables loaded. Mode:", ABP_PLUS_DB.mode)
 
-
-    ABP_Legacy = AceAddon:NewAddon("ActionbarPlusLegacy", "AceEvent-3.0")
-    ABP_Next    = AceAddon:NewAddon("ActionbarPlusNext", "AceEvent-3.0")
-
-    LoadSubAddon("ActionbarPlusLegacy")
-    LoadSubAddon("ActionbarPlusNext")
-
-    -- Decide which implementation to load
-    if ABP_PLUS_DB.mode == "Legacy" then
-        DisableAddOn("ActionbarPlusNext")
-    else
-    end
+    --ABP_Legacy = AceAddon:NewAddon("ActionbarPlusLegacy", "AceEvent-3.0")
+    --ABP_Next    = AceAddon:NewAddon("ActionbarPlusNext", "AceEvent-3.0")
+    --
+    --LoadSubAddon("ActionbarPlusLegacy")
+    --LoadSubAddon("ActionbarPlusNext")
+    --
+    ---- Decide which implementation to load
+    --if ABP_PLUS_DB.mode == "Legacy" then
+    --    DisableAddOn("ActionbarPlusNext")
+    --else
+    --end
 
     -- Unregister, fire only once
     f:UnregisterEvent("ADDON_LOADED")
