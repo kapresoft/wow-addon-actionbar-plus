@@ -35,6 +35,25 @@ end)
 Methods
 -------------------------------------------------------------------------------]]
 
+function L:EnableAddOn(addOnName)
+    assert(addOnName, "AddOn name is required.")
+
+    local function LoadSubAddon(name)
+        local loaded, reason = LoadAddOn(name)
+
+        if not loaded then
+            print("ActionbarPlus: Failed to load sub-addon:", name, "Reason:", reason)
+        else
+            print(name, 'Loaded:', loaded)
+        end
+        return loaded
+    end
+
+    local charName = UnitName('player')
+    EnableAddOn(addOnName, charName)
+    LoadSubAddon(addOnName)
+end
+
 -- /dump a:GetColor('fcFBF879')
 function L:GetColor(str)
     local color = ns:K().Objects.ColorUtil:NewColorFromHex(str)
