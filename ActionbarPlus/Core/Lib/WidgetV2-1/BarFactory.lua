@@ -166,6 +166,8 @@ end
 
 --- @type BarFactoryConsumerFn
 L:RegisterMessage(MSG.OnAddOnReady, function()
+    if not ActionbarPlusF2Module then return end
+
     --- @type CheckButton
     local btn = ActionbarPlusF2Module.barFrame.buttons[1]
     local spName = 'Healing Touch'
