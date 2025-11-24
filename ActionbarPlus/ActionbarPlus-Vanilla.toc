@@ -41,4 +41,5 @@
 # Core\Vanilla.lua
 # CoreV2-1\_Core.xml
 
-ActionbarPlus.lua
+Core\Vanilla.lua
+Core\_Core.xml

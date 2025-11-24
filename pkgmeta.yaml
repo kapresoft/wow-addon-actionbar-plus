@@ -1,13 +1,8 @@
 package-as: ActionbarPlus
 # --------------------------
 
-license-output: LICENSE.txt
 enable-nolib-creation: no
-#enable-toc-creation: yes
-
-manual-changelog:
-  filename: CHANGELOG.txt
-  markup-type: markdown
+changelog-title: ActionbarPlus
 
 embedded-libraries:
   - LibStub
@@ -39,22 +34,22 @@ tools-used:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  Core/ExtLib/Kapresoft-LibUtil:
+  ActionbarPlus/Core/ExtLib/Kapresoft-LibUtil:
     url: https://github.com/kapresoft/wow-lib-util
     tag: latest
   # Sourcing Ace3 addon directly from github
   # LibStub is included in Ace3 add
-  Core/ExtLib/WowAce/Ace3:
+  ActionbarPlus/Core/ExtLib/WowAce/Ace3:
     url: https://repos.wowace.com/wow/ace3/trunk
     tag: latest
-  Core/ExtLib/WowAce/LibCompress/LibCompress:
+  ActionbarPlus/Core/ExtLib/WowAce/LibCompress/LibCompress:
     # https://www.wowace.com/projects/libcompress
     url: https://repos.wowace.com/wow/libcompress/trunk
     tag: latest
-  Core/ExtLib/WowAce/LibSharedMedia/LibSharedMedia-3.0:
+  ActionbarPlus/Core/ExtLib/WowAce/LibSharedMedia/LibSharedMedia-3.0:
     url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
     tag: latest
-  Core/ExtLib/WowAce/LibQTip/LibQTip-1.0:
+  ActionbarPlus/Core/ExtLib/WowAce/LibQTip/LibQTip-1.0:
     # https://www.wowace.com/projects/libqtip-1-0
     url: https://repos.wowace.com/wow/libqtip-1-0
     tag: latest
@@ -65,8 +60,11 @@ ignore:
   - "*.yaml"
   - "*.yml"
   - dev
+  - ActionbarPlus/_*
+  - ActionbarPlus/tmp*
   - doc
   - scripts
+  - _Interface*
   - Core*
   - Core/ExtLib/Kapresoft-LibUtil/LICENSE
   - Core/ExtLib/Kapresoft-LibUtil/Kapresoft-LibUtil.toc
@@ -94,6 +92,7 @@ ignore:
 
 move-folders:
   ActionbarPlus/ActionbarPlus: ActionbarPlus
-  ActionbarPlus/ActionbarPlusNext: ActionbarPlusNext
-  ActionbarPlus/ActionbarPlusLegacy: ActionbarPlusLegacy
+  ActionbarPlus/ActionbarPlus-Bars: ActionbarPlus-Bars
+  ActionbarPlus/ActionbarPlus-Bars-Legacy: ActionbarPlus-Bars-Legacy
+  ActionbarPlus/ActionbarPlus-Options-GUI: ActionbarPlus-Options-GUI
 
