@@ -63,3 +63,7 @@ luac.out
 
 # Ignore Saved Variables folder with symlinks
 /_SV
+
+# temp ignore for now
+/_Interface
+/ActionbarPlus/
