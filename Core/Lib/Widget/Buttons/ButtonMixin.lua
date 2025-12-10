@@ -1006,11 +1006,13 @@ local function PropsAndMethods(o)
         if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
         return GC:IsM6Macro(self.w:GetMacroData().name)
     end
-    function o:ShowOverlayGlow() ActionButton_ShowOverlayGlow(self.button()) end
-    function o:HideOverlayGlow() ActionButton_HideOverlayGlow(self.button()) end
+    --- @return boolean
+    function o:ShowOverlayGlow() return ActionButton_ShowOverlayGlow and ActionButton_ShowOverlayGlow(self.button()) end
+    --- @return boolean
+    function o:HideOverlayGlow() return ActionButton_HideOverlayGlow and ActionButton_HideOverlayGlow(self.button()) end
     function o:ShowOverlayGlowAsActiveButton()
         local btn = self.button()
-        ActionButton_ShowOverlayGlow(btn)
+        self:ShowOverlayGlow()
 
         local overlay = btn.overlay
         if overlay then
