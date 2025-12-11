@@ -1,14 +1,26 @@
 ## Interface: 110205
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
-## Notes: Actionbars Everywhere, Make you click happy.
+## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/ActionbarPlus-v2-18x
+## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
 ## OptionalDeps: Blizzard_Professions, Ace3
+
 ## Category-enUS: Action Bars
+## Category-deDE: Aktionsleisten
+## Category-esES: Barras de acción
+## Category-esMX: Barras de acción
+## Category-frFR: Barres d’actions
+## Category-itIT: Barre delle azioni
+## Category-koKR: 행동 단축바
+## Category-ptBR: Barras de ação
+## Category-ruRU: Панели действий
+## Category-zhCN: 动作条
+## Category-zhTW: 動作條
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: Action Bars
