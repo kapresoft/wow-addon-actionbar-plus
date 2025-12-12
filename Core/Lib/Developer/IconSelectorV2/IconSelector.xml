@@ -9,7 +9,7 @@
     </Frame>
 
     <Frame name="ABP_IconSelectorFrame" hidden="true" movable="true" enableMouse="true">
-        <Size x="470" y="340"/>
+        <Size x="430" y="340"/>
         <Anchors>
             <Anchor point="CENTER" x="-100" y="100"/>
         </Anchors>
@@ -31,16 +31,16 @@
                               type="global"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parent" x="10" y="-40"/>
-                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-38" y="50"/>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" x="12" y="-40"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-12" y="50"/>
                 </Anchors>
 
                 <Frames>
                     <Slider name="$parentScrollBar" parentKey="scrollBar"
                             inherits="HybridScrollBarTemplate">
                         <Anchors>
-                            <Anchor point="TOPRIGHT" relativeTo="$parent" x="-18" y="-16"/>
-                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-18" y="16"/>
+                            <Anchor point="TOPRIGHT" relativeTo="$parent" x="-35" y="-16"/>
+                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-35" y="16"/>
                         </Anchors>
                     </Slider>
                 </Frames>
