@@ -14,8 +14,11 @@ local S = ABP_IconSelector
 -- Settings
 local ICON_SIZE = 32
 local ICON_PAD = 6
-local ICON_COLS = 12
+local ICON_COLS = 10
 local ROW_HEIGHT = ICON_SIZE + ICON_PAD
+
+-- The button padding
+local GRID_PADDING_LEFT = 0
 
 local MAX_BUTTONS = 200   -- cap regardless of scroll area height
 
@@ -136,11 +139,12 @@ function ABPIconRowTemplate_OnLoad(self)
 
     -- Each row gets 12 icon buttons
     for col = 1, ICON_COLS do
+        --- @type Button
         local b = CreateFrame("Button", nil, self)
         b:SetSize(ICON_SIZE, ICON_SIZE)
 
         if col == 1 then
-            b:SetPoint("LEFT", self, "LEFT", 4, 0)
+            b:SetPoint("LEFT", self, "LEFT", GRID_PADDING_LEFT, 0)
         else
             b:SetPoint("LEFT", self[col-1], "RIGHT", ICON_PAD, 0)
         end

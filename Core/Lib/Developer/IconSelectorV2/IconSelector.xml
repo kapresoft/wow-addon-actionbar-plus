@@ -9,10 +9,9 @@
     </Frame>
 
     <Frame name="ABP_IconSelectorFrame" hidden="true" movable="true" enableMouse="true">
-        <Size x="540" y="300"/>
-
+        <Size x="500" y="340"/>
         <Anchors>
-            <Anchor point="CENTER"/>
+            <Anchor point="CENTER" x="-100" y="100"/>
         </Anchors>
 
         <!-- Dark background -->
@@ -26,25 +25,31 @@
 
         <!-- Scroll area for icons -->
         <Frames>
-            <ScrollFrame parentKey="ScrollBox" inherits="HybridScrollFrameTemplate">
-                <Size x="460" y="250"/>
+            <ScrollFrame parentKey="ScrollBox" inherits="HybridScrollFrameTemplate,BackdropTemplate">
+                <KeyValues>
+                    <KeyValue key="backdropInfo" value="BACKDROP_TEXT_PANEL_0_16"
+                              type="global"/>
+                </KeyValues>
                 <Anchors>
-                    <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP" x="-40" y="-20"/>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" x="10" y="-40"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-10" y="50"/>
                 </Anchors>
 
                 <Frames>
-                    <Slider parentKey="scrollBar" inherits="HybridScrollBarTemplate">
+                    <Slider name="$parentScrollBar" parentKey="scrollBar" inherits="HybridScrollBarTemplate">
                         <Anchors>
-                            <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" x="-60" y="-16"/>
-                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT" x="-60" y="16"/>
+                            <Anchor point="TOPRIGHT" relativeTo="$parent"
+                                    relativePoint="TOPRIGHT" x="-60" y="-16"/>
+                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent"
+                                    relativePoint="BOTTOMRIGHT" x="-60" y="16"/>
                         </Anchors>
                     </Slider>
                 </Frames>
                 <ScrollChild>
                     <Frame parentKey="scrollChild">
                         <Anchors>
-                            <Anchor point="TOPLEFT"/>
-                            <Anchor point="TOPRIGHT"/>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="TOPRIGHT" x="-60"/>
                         </Anchors>
                     </Frame>
                 </ScrollChild>
