@@ -16,9 +16,14 @@ local ICON_SIZE = 32
 local ICON_PAD = 6
 local ICON_COLS = 10
 local ROW_HEIGHT = ICON_SIZE + ICON_PAD
+local ROW_WIDTH =
+(ICON_COLS * ICON_SIZE) +
+        ((ICON_COLS - 1) * ICON_PAD)
 
 -- The button padding
 local GRID_PADDING_LEFT = 0
+local ROW_PADDING_LEFT = 5
+local ROW_PADDING_TOP = 0
 
 local MAX_BUTTONS = 200   -- cap regardless of scroll area height
 
@@ -79,6 +84,14 @@ function S:InitGrid()
     self:Redraw()
 end
 
+function S:ResetRowPoints(row, rowIndex)
+    row:ClearAllPoints()
+    if rowIndex == 1 then
+        row:SetPoint("TOPLEFT", scrollFrame.scrollChild, "TOPLEFT", ROW_PADDING_LEFT, ROW_PADDING_TOP)
+    else
+        row:SetPoint("TOPLEFT", scrollFrame.buttons[rowIndex-1], "BOTTOMLEFT", 0, 0)
+    end
+end
 
 -- -----------------------------------------------------
 -- VIRTUAL SCROLL UPDATE
@@ -95,6 +108,9 @@ function S:Redraw()
 
     for rowIndex = 1, visibleRows do
         local row = scrollFrame.buttons[rowIndex]
+
+        self:ResetRowPoints(row, rowIndex)
+
         local virtualRow = rowIndex + offset
 
         if virtualRow > rows then
@@ -133,6 +149,7 @@ end
 -- -----------------------------------------------------
 -- ROW TEMPLATE POPULATION (called by CreateButtons)
 -- -----------------------------------------------------
+--- @param self Frame
 function ABPIconRowTemplate_OnLoad(self)
     print("xx ROW LOAD", self)
     self:SetHeight(ROW_HEIGHT)
