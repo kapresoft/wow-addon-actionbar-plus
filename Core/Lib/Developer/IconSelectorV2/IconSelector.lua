@@ -32,6 +32,18 @@ local scrollFrame = frame.ScrollBox
 C_Timer.After(1, function()
     print('xx scrollFrame:', scrollFrame)
 end)
+--[[-----------------------------------------------------------------------------
+Handlers
+-------------------------------------------------------------------------------]]
+function ABP_IconSelector_OnOkay(self)
+    print("IconSelector: Okay clicked")
+end
+
+function ABP_IconSelector_OnCancel(self)
+    print("IconSelector: Cancel clicked")
+    ABP_IconSelectorFrame:Hide()
+end
+
 -- -----------------------------------------------------
 -- PUBLIC API
 -- -----------------------------------------------------

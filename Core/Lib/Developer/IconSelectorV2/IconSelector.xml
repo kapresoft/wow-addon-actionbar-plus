@@ -65,6 +65,32 @@
                     </OnClick>
                 </Scripts>
             </Button>
+            <!-- Bottom action buttons -->
+            <Button parentKey="OkayButton"
+                    inherits="UIPanelButtonTemplate"
+                    text="Okay">
+                <Size x="90" y="22"/>
+                <Anchors>
+                    <!-- Left button -->
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-115" y="12"/>
+                </Anchors>
+                <!--<Scripts>
+                    <OnClick function="ABP_IconSelector_OnOkay"/>
+                </Scripts>-->
+            </Button>
+
+            <Button parentKey="CancelButton"
+                    inherits="UIPanelButtonTemplate"
+                    text="Cancel">
+                <Size x="90" y="22"/>
+                <Anchors>
+                    <!-- Right button -->
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-15" y="12"/>
+                </Anchors>
+                <!--<Scripts>
+                    <OnClick function="ABP_IconSelector_OnCancel"/>
+                </Scripts>-->
+            </Button>
         </Frames>
     </Frame>
 
