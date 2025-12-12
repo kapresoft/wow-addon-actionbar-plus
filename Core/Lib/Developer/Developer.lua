@@ -346,7 +346,7 @@ function L.OnAddOnReady()
     if not ShadowUF then L:CustomFrameLocations() end
 end
 
--- /run a:p()
+-- /run a:CustomFrameLocations()
 function L:CustomFrameLocations()
     if ShadowUF then return end
 

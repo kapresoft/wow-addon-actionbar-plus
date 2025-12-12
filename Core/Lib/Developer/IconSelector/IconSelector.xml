@@ -1,0 +1,138 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <Script file="IconSelector.lua"/>
+    <Button name="ABP_IconSelectorButtonTemplate" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon" setAllPoints="true"/>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="Border" setAllPoints="true">
+                    <Color r="0" g="0" b="0" a="0.9"/>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="Highlight" file="Interface\\Buttons\\ButtonHilight-Square" alphaMode="ADD" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <Frame name="ABP_IconSelector" movable="true" clampedToScreen="true" toplevel="true" hidden="true" parent="UIParent" enableMouse="true"
+           mixin="ABP_IconSelectorMixin" inherits="BackdropTemplate">
+
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+        </Scripts>
+
+        <Size x="350" y="410"/>
+
+        <Anchors>
+            <Anchor point="CENTER" relativeTo="UIParent" relativePoint="TOP" y="-400"/>
+        </Anchors>
+
+        <Layers></Layers>
+
+        <Frames>
+
+            <!-- Selected Icon Preview -->
+            <Frame name="$parentSelectedIconArea" parentKey="SelectedIconArea">
+                <Size x="64" y="64"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="20" y="-20"/>
+                </Anchors>
+
+                <Frames>
+                    <Button parentKey="SelectedIconButton" inherits="ABP_IconSelectorButtonTemplate">
+                        <Size x="64" y="64"/>
+                        <Anchors>
+                            <Anchor point="CENTER"/>
+                        </Anchors>
+                    </Button>
+                </Frames>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="SelectedIconText" inherits="GameFontHighlightSmall">
+                            <Anchors>
+                                <Anchor point="TOP" relativeKey="$parent" relativePoint="BOTTOM" y="-6"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+
+            <!-- Search Header -->
+            <EditBox parentKey="SearchBox" autoFocus="false" inherits="InputBoxTemplate">
+                <Size x="200" y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentSelectedIconArea" relativePoint="TOPRIGHT" x="10" y="-5"/>
+                    <Anchor point="TOPRIGHT" x="-20" y="-25"/>
+                </Anchors>
+                <FontString inherits="GameFontHighlightSmall"/>
+            </EditBox>
+
+            <Button name="$parentChunk1Button" parentKey="Chunk1Button" inherits="UIPanelButtonTemplate" text="Spells #1">
+                <Size x="130" y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentSelectedIconArea"
+                            relativePoint="BOTTOMLEFT" x="0" y="-5"/>
+                </Anchors>
+            </Button>
+            <Button name="$parentChunk2Button" parentKey="Chunk2Button" inherits="UIPanelButtonTemplate" text="Spells #2">
+                <Size x="130" y="20"/>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentChunk1Button"
+                            relativePoint="RIGHT" x="5" y="0"/>
+                </Anchors>
+            </Button>
+
+            <!-- Scrollbox containing all icon buttons -->
+            <ScrollFrame name="$parentScrollFrame" parentKey="IconSelectorScroll"
+                         inherits="UIPanelScrollFrameTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="20" y="-120"/>
+                    <Anchor point="BOTTOMRIGHT" x="-40" y="50"/>
+                </Anchors>
+
+                <ScrollChild>
+                    <Frame parentKey="IconSelector">
+                        <Size x="260" y="2000"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </ScrollChild>
+            </ScrollFrame>
+
+            <!-- OK / Cancel -->
+            <Button parentKey="OkayButton" inherits="UIPanelButtonTemplate" text="OK">
+                <Size x="100" y="22"/>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" x="-20" y="15"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():OkayButton_OnClick();
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <Button parentKey="CancelButton" inherits="UIPanelButtonTemplate" text="Cancel">
+                <Size x="100" y="22"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="20" y="15"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():CancelButton_OnClick();
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+        </Frames>
+    </Frame>
+
+
+</Ui>

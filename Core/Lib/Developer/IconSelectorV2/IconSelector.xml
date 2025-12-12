@@ -1,0 +1,70 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <Frame name="ABP_IconRowTemplate" virtual="true">
+        <Size x="1" y="36"/>
+        <Scripts>
+            <OnLoad function="ABPIconRowTemplate_OnLoad"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="ABP_IconSelectorFrame" hidden="true" movable="true" enableMouse="true">
+        <Size x="540" y="300"/>
+
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+
+        <!-- Dark background -->
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture setAllPoints="true">
+                    <Color r="0" g="0" b="0" a="0.85"/>
+                </Texture>
+            </Layer>
+        </Layers>
+
+        <!-- Scroll area for icons -->
+        <Frames>
+            <ScrollFrame parentKey="ScrollBox" inherits="HybridScrollFrameTemplate">
+                <Size x="460" y="250"/>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP" x="-40" y="-20"/>
+                </Anchors>
+
+                <Frames>
+                    <Slider parentKey="scrollBar" inherits="HybridScrollBarTemplate">
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" x="-60" y="-16"/>
+                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT" x="-60" y="16"/>
+                        </Anchors>
+                    </Slider>
+                </Frames>
+                <ScrollChild>
+                    <Frame parentKey="scrollChild">
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                            <Anchor point="TOPRIGHT"/>
+                        </Anchors>
+                    </Frame>
+                </ScrollChild>
+            </ScrollFrame>
+
+            <!-- Close button -->
+            <Button parentKey="CloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" x="-5" y="-5"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        ABP_IconSelectorFrame:Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+
+    <Script file="IconSelector.lua"/>
+    <Script file="IconSelectorProvider.lua"/>
+
+</Ui>
