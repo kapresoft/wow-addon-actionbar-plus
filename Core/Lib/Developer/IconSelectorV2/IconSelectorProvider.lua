@@ -12,6 +12,9 @@ local function EnsureProvider()
 
     provider = CreateAndInitFromMixin(
             IconDataProviderMixin
+            -- adding these will filter player-only spells/items
+            --,IconDataProviderExtraType.Spellbook
+            --,IconDataProviderExtraType.Equipment
     )
 end
 

@@ -1,100 +1,99 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
+    <Script file="IconSelectorBackdrops.lua"/>
+    <Script file="IconSelector.lua"/>
+    <Script file="IconSelectorProvider.lua"/>
+
     <Frame name="ABP_IconRowTemplate" virtual="true">
         <Size x="1" y="36"/>
         <Scripts>
-            <OnLoad function="ABPIconRowTemplate_OnLoad"/>
+            <OnLoad>ABP_IconSelectorMixin.OnLoadRow(self)</OnLoad>
         </Scripts>
     </Frame>
 
-    <Frame name="ABP_IconSelectorFrame" hidden="true" movable="true" enableMouse="true">
-        <Size x="430" y="340"/>
+    <Frame name="ABP_IconSelectorFrameTemplate" virtual="true" hidden="true" movable="true" enableMouse="true"
+           frameStrata="DIALOG"
+           mixin="ABP_IconSelectorMixin">
+
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+
+        <Size x="450" y="340"/>
         <Anchors>
             <Anchor point="CENTER" x="-100" y="100"/>
         </Anchors>
 
-        <!-- Dark background -->
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture setAllPoints="true">
-                    <Color r="0" g="0" b="0" a="0.85"/>
-                </Texture>
-            </Layer>
-        </Layers>
+        <Layers></Layers>
 
         <!-- Scroll area for icons -->
         <Frames>
             <ScrollFrame parentKey="ScrollBox" inherits="HybridScrollFrameTemplate,BackdropTemplate">
-                <KeyValues>
-                    <KeyValue key="backdropInfo" value="BACKDROP_TEXT_PANEL_0_16"
+                <!--<KeyValues>
+                    <KeyValue key="backdropInfo" value="BACKDROP_GOLD_DIALOG_32_32"
                               type="global"/>
-                </KeyValues>
+                </KeyValues>-->
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parent" x="12" y="-40"/>
-                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-12" y="50"/>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" x="16" y="-50"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-28" y="69"/>
                 </Anchors>
-
                 <Frames>
                     <Slider name="$parentScrollBar" parentKey="scrollBar"
                             inherits="HybridScrollBarTemplate">
                         <Anchors>
-                            <Anchor point="TOPRIGHT" relativeTo="$parent" x="-35" y="-16"/>
-                            <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-35" y="16"/>
+                            <Anchor point="TOPRIGHT" x="-20" />
+                            <Anchor point="BOTTOMRIGHT" x="-20" />
                         </Anchors>
                     </Slider>
                 </Frames>
                 <ScrollChild>
-                    <Frame parentKey="scrollChild">
+                    <Frame name="$parentScrollChild" parentKey="scrollChild">
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativeTo="$parent"/>
-                            <Anchor point="TOPRIGHT" relativeTo="$parent"/>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
                         </Anchors>
                     </Frame>
                 </ScrollChild>
             </ScrollFrame>
 
-            <!-- Close button -->
             <Button parentKey="CloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
                     <Anchor point="TOPRIGHT" x="-5" y="-5"/>
                 </Anchors>
                 <Scripts>
-                    <OnClick>
-                        ABP_IconSelectorFrame:Hide();
-                    </OnClick>
+                    <OnClick>self:GetParent():OnClickClose()</OnClick>
                 </Scripts>
             </Button>
-            <!-- Bottom action buttons -->
-            <Button parentKey="OkayButton"
-                    inherits="UIPanelButtonTemplate"
-                    text="Okay">
-                <Size x="90" y="22"/>
-                <Anchors>
-                    <!-- Left button -->
-                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-115" y="12"/>
-                </Anchors>
-                <!--<Scripts>
-                    <OnClick function="ABP_IconSelector_OnOkay"/>
-                </Scripts>-->
-            </Button>
-
-            <Button parentKey="CancelButton"
+            <Button parentKey="CancelButton" name="$parentCancelButton"
                     inherits="UIPanelButtonTemplate"
                     text="Cancel">
                 <Size x="90" y="22"/>
                 <Anchors>
-                    <!-- Right button -->
-                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-15" y="12"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parent" x="-24" y="25"/>
                 </Anchors>
-                <!--<Scripts>
-                    <OnClick function="ABP_IconSelector_OnCancel"/>
-                </Scripts>-->
+                <Scripts>
+                    <OnClick>self:GetParent():OnClickCancel()</OnClick>
+                </Scripts>
             </Button>
+            <Button parentKey="OkayButton" name="$parentOkayButton"
+                    inherits="UIPanelButtonTemplate"
+                    text="Okay">
+                <Size x="90" y="22"/>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentCancelButton"
+                            relativePoint="LEFT"
+                            x="-5" y="0"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>self:GetParent():OnClickOkay()</OnClick>
+                </Scripts>
+            </Button>
+
         </Frames>
     </Frame>
 
-    <Script file="IconSelector.lua"/>
-    <Script file="IconSelectorProvider.lua"/>
-
+    <Frame name="ABP_IconSelector" hidden="true" movable="true" enableMouse="true"
+           inherits="BackdropTemplate, ABP_IconSelectorFrameTemplate">
+    </Frame>
 </Ui>

@@ -4,12 +4,15 @@ Blizzard Vars
 local HybridScrollFrame_Update = HybridScrollFrame_Update
 local HybridScrollFrame_GetOffset = HybridScrollFrame_GetOffset
 local HybridScrollFrame_CreateButtons = HybridScrollFrame_CreateButtons
-
 --[[-----------------------------------------------------------------------------
 New Library
 -------------------------------------------------------------------------------]]
-ABP_IconSelector = {}
-local S = ABP_IconSelector
+--- @class IconSelector
+--- @field scrollFrame Frame
+
+ABP_IconSelectorMixin = {}
+--- @type IconSelector | Frame
+local S = ABP_IconSelectorMixin
 
 -- Settings
 local ICON_SIZE = 32
@@ -27,41 +30,84 @@ local ROW_PADDING_TOP = 0
 
 local MAX_BUTTONS = 200   -- cap regardless of scroll area height
 
-local frame = ABP_IconSelectorFrame
-local scrollFrame = frame.ScrollBox
-C_Timer.After(1, function()
-    print('xx scrollFrame:', scrollFrame)
-end)
+--local frame = ABP_IconSelectorFrame
+--local scrollFrame = frame.ScrollBox
+
 --[[-----------------------------------------------------------------------------
 Handlers
 -------------------------------------------------------------------------------]]
-function ABP_IconSelector_OnOkay(self)
-    print("IconSelector: Okay clicked")
-end
+-- -----------------------------------------------------
+-- ROW TEMPLATE POPULATION (called by CreateButtons)
+-- -----------------------------------------------------
+--- @param self Frame The frame of the row
+function S.OnLoadRow(self)
+    self:SetHeight(ROW_HEIGHT)
 
-function ABP_IconSelector_OnCancel(self)
-    print("IconSelector: Cancel clicked")
-    ABP_IconSelectorFrame:Hide()
+    -- Each row gets 12 icon buttons
+    for col = 1, ICON_COLS do
+        --- @type Button
+        local b = CreateFrame("Button", nil, self)
+        b:SetSize(ICON_SIZE, ICON_SIZE)
+
+        if col == 1 then
+            b:SetPoint("LEFT", self, "LEFT", GRID_PADDING_LEFT, 0)
+        else
+            b:SetPoint("LEFT", self[col-1], "RIGHT", ICON_PAD, 0)
+        end
+
+        b.icon = b:CreateTexture(nil, "ARTWORK")
+        b.icon:SetAllPoints()
+
+        b:SetScript("OnClick", function(self)
+            if S.callback then
+                S.callback(self.iconTexture)
+            end
+        end)
+
+        self[col] = b
+    end
 end
 
 -- -----------------------------------------------------
 -- PUBLIC API
 -- -----------------------------------------------------
-function S:Show(callback)
+function S:OnLoad()
+    C_Timer.After(1, function()
+        print('xxx onLoad called.')
+        print("xx Has BackdropTemplate:", self.SetBackdrop ~= nil)
+    end)
+    self.scrollFrame = self.ScrollBox
+
+    --self:SetBackdrop(ABP_ICON_SELECTOR_BACKDROPS.backdropThemes.modernDark)
+    self:SetBackdrop(ABP_ICON_SELECTOR_BACKDROPS.backdropThemes.modernDark)
+
+    -- REQUIRED in modern WoW
+    --self:SetBackdropColor(0, 0, 0, 0.85)
+    --self:SetBackdropBorderColor(1, 1, 1, 1)
+end
+
+function S:ShowDialog(callback)
     self.callback = callback
-    frame:Show()
 
     -- reload icons
     self.icons = ABP_IconSelectorProvider:GetIcons()
     self.filtered = self.icons
 
     self:InitGrid()
+    self:Show()
+
 end
 
-function S:Hide()
-    frame:Hide()
-end
+function S:OnClickClose() self:Hide() end
 
+function S:OnClickOkay()
+    print(self:GetName() .. '::', 'OK clicked')
+    self:Hide()
+end
+function S:OnClickCancel()
+    print(self:GetName() .. '::', 'Cancel clicked')
+    self:Hide()
+end
 
 -- -----------------------------------------------------
 -- SEARCH FILTER
@@ -89,8 +135,8 @@ end
 -- GRID INITIALIZATION
 -- -----------------------------------------------------
 function S:InitGrid()
-    if not scrollFrame.buttons then
-        HybridScrollFrame_CreateButtons(scrollFrame, "ABP_IconRowTemplate", ROW_HEIGHT, 0)
+    if not self.scrollFrame.buttons then
+        HybridScrollFrame_CreateButtons(self.scrollFrame, "ABP_IconRowTemplate", ROW_HEIGHT, 0)
     end
 
     self:Redraw()
@@ -99,9 +145,9 @@ end
 function S:ResetRowPoints(row, rowIndex)
     row:ClearAllPoints()
     if rowIndex == 1 then
-        row:SetPoint("TOPLEFT", scrollFrame.scrollChild, "TOPLEFT", ROW_PADDING_LEFT, ROW_PADDING_TOP)
+        row:SetPoint("TOPLEFT", self.scrollFrame.scrollChild, "TOPLEFT", ROW_PADDING_LEFT, ROW_PADDING_TOP)
     else
-        row:SetPoint("TOPLEFT", scrollFrame.buttons[rowIndex-1], "BOTTOMLEFT", 0, 0)
+        row:SetPoint("TOPLEFT", self.scrollFrame.buttons[rowIndex-1], "BOTTOMLEFT", 0, 0)
     end
 end
 
@@ -114,12 +160,12 @@ function S:Redraw()
     print('xx total icons:', total)
     local rows = math.ceil(total / ICON_COLS)
 
-    local offset = HybridScrollFrame_GetOffset(scrollFrame)
-    local visibleRows = #scrollFrame.buttons
+    local offset = HybridScrollFrame_GetOffset(self.scrollFrame)
+    local visibleRows = #self.scrollFrame.buttons
     print('xx visibleRows:', visibleRows)
 
     for rowIndex = 1, visibleRows do
-        local row = scrollFrame.buttons[rowIndex]
+        local row = self.scrollFrame.buttons[rowIndex]
 
         self:ResetRowPoints(row, rowIndex)
 
@@ -149,44 +195,13 @@ function S:Redraw()
     end
 
     local contentHeight = rows * ROW_HEIGHT
-    scrollFrame.scrollChild:SetHeight(contentHeight)
+    self.scrollFrame.scrollChild:SetHeight(contentHeight)
 
     HybridScrollFrame_Update(
-            scrollFrame,
+            self.scrollFrame,
             contentHeight,
-            scrollFrame:GetHeight()
+            self.scrollFrame:GetHeight()
     )
 end
 
--- -----------------------------------------------------
--- ROW TEMPLATE POPULATION (called by CreateButtons)
--- -----------------------------------------------------
---- @param self Frame
-function ABPIconRowTemplate_OnLoad(self)
-    print("xx ROW LOAD", self)
-    self:SetHeight(ROW_HEIGHT)
 
-    -- Each row gets 12 icon buttons
-    for col = 1, ICON_COLS do
-        --- @type Button
-        local b = CreateFrame("Button", nil, self)
-        b:SetSize(ICON_SIZE, ICON_SIZE)
-
-        if col == 1 then
-            b:SetPoint("LEFT", self, "LEFT", GRID_PADDING_LEFT, 0)
-        else
-            b:SetPoint("LEFT", self[col-1], "RIGHT", ICON_PAD, 0)
-        end
-
-        b.icon = b:CreateTexture(nil, "ARTWORK")
-        b.icon:SetAllPoints()
-
-        b:SetScript("OnClick", function(self)
-            if S.callback then
-                S.callback(self.iconTexture)
-            end
-        end)
-
-        self[col] = b
-    end
-end
