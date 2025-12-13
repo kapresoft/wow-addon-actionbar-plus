@@ -72,10 +72,6 @@ end
 -- PUBLIC API
 -- -----------------------------------------------------
 function S:OnLoad()
-    C_Timer.After(1, function()
-        print('xxx onLoad called.')
-        print("xx Has BackdropTemplate:", self.SetBackdrop ~= nil)
-    end)
     self.scrollFrame = self.ScrollBox
 
     --self:SetBackdrop(ABP_ICON_SELECTOR_BACKDROPS.backdropThemes.modernDark)
