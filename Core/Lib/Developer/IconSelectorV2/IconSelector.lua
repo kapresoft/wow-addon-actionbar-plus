@@ -138,15 +138,14 @@ end
 -- VIRTUAL SCROLL UPDATE
 -- -----------------------------------------------------
 function S:Redraw()
-    print('xxx Redraw() called...')
     local icons = self.filtered
     local total = #icons
-    print('xx total icons:', total)
     local rows = math.ceil(total / ICON_COLS)
 
     local offset = HybridScrollFrame_GetOffset(self.scrollFrame)
     local visibleRows = #self.scrollFrame.buttons
-    print('xx visibleRows:', visibleRows)
+
+    print('xx total icons:', total, 'visibleRows:', visibleRows)
 
     for rowIndex = 1, visibleRows do
         local row = self.scrollFrame.buttons[rowIndex]
