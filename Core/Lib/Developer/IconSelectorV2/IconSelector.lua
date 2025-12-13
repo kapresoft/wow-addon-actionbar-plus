@@ -80,6 +80,15 @@ function S:OnLoad()
     -- REQUIRED in modern WoW
     --self:SetBackdropColor(0, 0, 0, 0.85)
     --self:SetBackdropBorderColor(1, 1, 1, 1)
+
+    self.scrollFrame:SetScript("OnVerticalScroll", function(sf, offset)
+        sf:SetVerticalScroll(offset)
+        self:Redraw()
+    end)
+    self.scrollFrame:SetScript("OnMouseWheel", function(sf, delta)
+        HybridScrollFrame_OnMouseWheel(sf, delta)
+        self:Redraw()
+    end)
 end
 
 function S:ShowDialog(callback)
@@ -106,28 +115,6 @@ function S:OnClickCancel()
 end
 
 -- -----------------------------------------------------
--- SEARCH FILTER
--- -----------------------------------------------------
-function S:OnSearchChanged(text)
-    text = text:lower()
-
-    if text == "" then
-        self.filtered = self.icons
-    else
-        local result = {}
-        for _, tex in ipairs(self.icons) do
-            if tex:lower():find(text) then
-                table.insert(result, tex)
-            end
-        end
-        self.filtered = result
-    end
-
-    self:Redraw()
-end
-
-
--- -----------------------------------------------------
 -- GRID INITIALIZATION
 -- -----------------------------------------------------
 function S:InitGrid()
@@ -151,6 +138,7 @@ end
 -- VIRTUAL SCROLL UPDATE
 -- -----------------------------------------------------
 function S:Redraw()
+    print('xxx Redraw() called...')
     local icons = self.filtered
     local total = #icons
     print('xx total icons:', total)
