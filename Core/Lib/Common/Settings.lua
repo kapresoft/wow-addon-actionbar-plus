@@ -195,7 +195,7 @@ local function PropsAndMethods(o)
 
     function o:GetOptions()
         return {
-            name = GC.C.ADDON_NAME, handler = self.addon, type = "group",
+            name = GC:GetSettingsDialogTitle(), handler = self.addon, type = "group",
             args = self:CreateConfig(),
         }
     end

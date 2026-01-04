@@ -686,8 +686,13 @@ local function GlobalConstantMethods(o)
         return o.AddonUtil
     end
 
+    --- Use this instead so that ns:IsDev() is initialized properly
     --- @return string The ActionbarPlus version string. Example: 2024.3.1
-    function o:GetVersion() return self:AIU():GetVersion() end
+    function o:GetVersion()
+        if kns:IsDev() then return '1.0.0.dev' end
+        return GetAddOnMetadata(addon, 'Version')
+    end
+
 
     --- @return string The time in ISO Date Format. Example: 2024-03-22T17:34:00Z
     function o:GetLastUpdate() return self:AIU():GetLastUpdate() end
@@ -711,6 +716,8 @@ local function GlobalConstantMethods(o)
 
         return lastCompatibleDate
     end
+
+    function o:GetSettingsDialogTitle() return sformat("%s v%s", addon, self:GetVersion()) end
 
     --- @return string
     function o:GetAddonInfoFormatted()
