@@ -1,0 +1,24 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Include file='_ParentFrame.xml'/>
+    <Script file="ModuleV2Mixin.lua"/>
+    <Include file='Util\_Util.xml'/>
+    <Include file='_TooltipFrame.xml'/>
+
+    <Script file="EventToMessageRelay.lua"/>
+    <Frame parentKey="EventToMessageRelay" parent="ActionbarPlusEventFrame">
+        <Scripts>
+            <OnLoad>ABP_XML:EventToMessageRelay_OnLoad(self)</OnLoad>
+        </Scripts>
+    </Frame>
+
+    <Script file="DebuggingSettingsGroup.lua"/>
+    <Script file="SettingsEventHandlerMixin.lua"/>
+    <Script file="Settings.lua"/>
+    <Script file="ProfileInitializer.lua"/>
+    <Script file="Profile.lua"/>
+    <Script file="AttributeSetterRegistry.lua"/>
+
+</Ui>

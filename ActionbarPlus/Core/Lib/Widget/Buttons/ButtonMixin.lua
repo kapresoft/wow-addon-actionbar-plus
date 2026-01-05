@@ -1,0 +1,1076 @@
+--[[-----------------------------------------------------------------------------
+Lua Vars
+-------------------------------------------------------------------------------]]
+local tostring, format, strlower, tinsert = tostring, string.format, string.lower, table.insert
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+--- @type Namespace
+local ns = select(2, ...)
+local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local KeybindTextUtil, RangeIndicatorUtil = O.KeybindTextUtil, O.RangeIndicatorUtil
+
+local P, Compat, API, BaseAPI = O.Profile, O.Compat, O.API, O.BaseAPI
+local String = ns:String()
+local AceEvent = ns:AceLibrary().AceEvent
+local IsBlank, IsNotBlank = String.IsBlank, String.IsNotBlank
+
+local WAttr = ns.GC.WidgetAttributes
+local SPELL, ITEM, MACRO, MOUNT = WAttr.SPELL, WAttr.ITEM, WAttr.MACRO, WAttr.MOUNT
+
+local Unit, Priest = O.UnitMixin, O.PriestUnitMixin
+local Druid, Rogue = O.DruidUnitMixin, O.RogueUnitMixin
+
+local C, T = GC.C, GC.Textures
+local UNIT = GC.UnitIDAttributes
+
+local emptyTexture = GC.Textures.TEXTURE_EMPTY
+local emptyGridTexture = GC.Textures.TEXTURE_EMPTY_GRID
+local highlightTexture = GC.Textures.TEXTURE_EMPTY_GRID
+local pushedTextureMask = GC.Textures.TEXTURE_EMPTY_GRID
+
+local highlightTextureAlpha = 0.5
+local highlightTextureInUseAlpha = 0.5
+local pushedTextureInUseAlpha = 0.5
+local nonEmptySlotAlpha = 1.0
+local showEmptyGridAlpha = 0.6
+local MIN_BUTTON_SIZE = GC.C.MIN_BUTTON_SIZE_FOR_HIDING_TEXTS
+local PC = function() return O.ProfessionController end
+--[[-----------------------------------------------------------------------------
+New Instance
+self: widget
+button: widget.button
+-------------------------------------------------------------------------------]]
+local libName = M.ButtonMixin
+--- @class ButtonMixin : ButtonProfileMixin @ButtonMixin extends ButtonProfileMixin
+--- @see ButtonUIWidget
+local L = LibStub:NewLibrary(libName); if not L then return end; AceEvent:Embed(L)
+local p = ns:LC().BUTTON:NewLogger(libName)
+local pi = ns:LC().ITEM:NewLogger(libName)
+
+--[[-----------------------------------------------------------------------------
+Instance Methods
+-------------------------------------------------------------------------------]]
+
+--- @param o ButtonMixin|ButtonUIWidget
+local function PropsAndMethods(o)
+
+    --- Create a new ButtonMixin instance and
+    --- @param widget ButtonUIWidget
+    function o:Mixin(widget) ns:K():Mixin(widget, self:New(widget)) end
+
+    --- @param widget ButtonUIWidget
+    --- @return ButtonMixin
+    function o:New(widget)
+        local newObj = ns:K():CreateAndInitFromMixin(o, widget)
+        -- todo next: move profile as function 'pr()'
+        ns:K():Mixin(newObj, O.ButtonProfileMixin:New(widget))
+        return newObj
+    end
+
+    --- @param widget ButtonUIWidget
+    function o:Init(widget)
+        self.w         = widget
+        self.kbt       = KeybindTextUtil:New(widget)
+        self.rangeUtil = RangeIndicatorUtil:New(self.w)
+    end
+
+    --- @return RangeIndicatorUtil_Instance
+    function o:ru() return self.rangeUtil end
+    --- @return Name
+    function o:GetName() return self.button():GetName() end
+
+    --- Only used for prefixing logs
+    --- @return string F1-B1 for Frame 1 and Button 1
+    function o:GN() return format(GC.C.BUTTON_NAME_SHORT_FORMAT, tostring(self.frameIndex), tostring(self.index)) end
+
+    function o:InitWidget()
+        self:InitConfig()
+        self:SetButtonProperties()
+        self:InitTextures(emptyTexture)
+        if self:IsEmpty() then self:SetTextureAsEmpty() end
+    end
+
+    --- Initializes the Config function for the current talent spec
+    function o:InitConfig() self._configFn = self:_fetchConfFn() end
+
+    function o:SetButtonProperties()
+        local dragFrame = self.dragFrame()
+        local barConfig = dragFrame:GetConfig()
+        local buttonSize = barConfig.widget.buttonSize
+        local buttonPadding = dragFrame.horizontalButtonPadding
+        local frameStrata = self.frameStrata
+        local frameLevel = self.frameLevel
+        local button = self.button()
+
+        button:SetFrameStrata(frameStrata)
+        button:SetFrameLevel(frameLevel)
+        button:SetSize(buttonSize - buttonPadding, buttonSize - buttonPadding)
+
+        self:Scale(buttonSize)
+    end
+
+    --- @param buttonSize number
+    function o:Scale(buttonSize)
+        local button = self.button()
+        button.keybindText.widget:ScaleWithButtonSize(buttonSize)
+        --todo next: move to a ButtonScaleMixin?
+        self:ScaleButtonTextsWithButtonSize(buttonSize)
+        self:ScaleItemCountOffset(buttonSize)
+    end
+
+    --- @param buttonSize number
+    function o:ScaleItemCountOffset(buttonSize)
+        local offsetX = -2
+        local offsetY = 7
+        local scaleFactorX = 50
+        local scaleFactorY = 100
+        offsetX = (buttonSize/100) - (offsetX + buttonSize/15)
+        local scaleXOffset = buttonSize/scaleFactorX * offsetX
+        local scaleYOffset = buttonSize/scaleFactorY * offsetY
+        self.button().text:SetPoint("BOTTOMRIGHT", scaleXOffset, scaleYOffset)
+    end
+
+    --- @see "BlizzardInterfaceCode/Interface/SharedXML/SharedFontStyles.xml" for font styles
+    --- @param buttonSize number
+    function o:ScaleButtonTextsWithButtonSize(buttonSize)
+        local hideItemCountText = false
+        local hideCountdownNumbers = false
+        local hideIndexText = false
+        local hideKeybindText = false
+        local countdownFont
+        local itemCountFont
+        local profile = self.w:GetProfileConfig()
+        local textUI = self.button().text
+        local itemCountFontHeight = textUI.textDefaultFontHeight
+
+        if true == profile.hide_countdown_numbers then hideCountdownNumbers = true end
+
+        if buttonSize > 80 then
+            itemCountFont = "GameFontNormalOutline"
+            countdownFont = "GameFontNormalHuge4Outline"
+            itemCountFontHeight = textUI.textDefaultFontHeight
+        elseif buttonSize >= 70 and buttonSize <= 80 then
+            itemCountFontHeight = 12
+            countdownFont = "GameFontNormalHuge3Outline"
+        elseif buttonSize >= 40 and buttonSize < 70 then
+            itemCountFontHeight = 11
+            countdownFont = "GameFontNormalLargeOutline"
+        elseif buttonSize >= MIN_BUTTON_SIZE and buttonSize < 40 then
+            itemCountFontHeight = 10
+            countdownFont = "GameFontNormalMed3Outline"
+        else
+            countdownFont = "GameFontNormalOutline"
+            itemCountFontHeight = 9
+
+            if true == profile.hide_text_on_small_buttons then
+                hideItemCountText = true
+                hideIndexText = true
+                hideCountdownNumbers = true
+                hideKeybindText = true
+            end
+
+        end
+        local fontName, _, fontAttr = textUI:GetFont()
+        textUI:SetFont(fontName, itemCountFontHeight, fontAttr)
+
+        self.cooldown():SetCountdownFont(countdownFont)
+        self:HideCountdownNumbers(hideCountdownNumbers)
+        self:SetHideItemCountText(hideItemCountText)
+        self:SetHideIndexText(hideIndexText)
+        self.kbt:SetKeybindTextHidden(hideKeybindText)
+
+    end
+
+    function o:RefreshTexts()
+        local profile = self.w:GetProfileConfig()
+        self:HideCountdownNumbers(true == profile.hide_countdown_numbers)
+        local hideTexts = true == profile.hide_text_on_small_buttons
+        if not hideTexts then
+            local fw = self.dragFrame()
+            local barConf = fw:GetConfig()
+            if true == barConf.show_button_index then
+                self:SetHideIndexText(false)
+            end
+            return
+        end
+
+        local barConfig = self.dragFrame():GetConfig()
+        local buttonSize = barConfig.widget.buttonSize
+        if buttonSize > MIN_BUTTON_SIZE then return end
+
+        self.kbt:SetKeybindTextHidden(hideTexts)
+        self:SetHideIndexText(hideTexts)
+        if not profile.hide_countdown_numbers then self:HideCountdownNumbers(hideTexts) end
+    end
+
+    --- @param state boolean
+    function o:HideCountdownNumbers(state)
+        self.cooldown():SetHideCountdownNumbers(state)
+    end
+
+    ---This is the item count text
+    --- @param state boolean
+    function o:SetHideItemCountText(state)
+        local btn = self.button()
+        if true == state then
+            btn.text:Hide()
+            return
+        end
+
+        btn.text:Show()
+    end
+
+    --- @param state boolean
+    function o:SetHideIndexText(state)
+        local btn = self.button()
+        if true == state then
+            btn.indexText:Hide()
+            return
+        end
+
+        btn.indexText:Show()
+    end
+
+    --- @param btn _Button
+    --- @param texture _Texture
+    --- @param texturePath string
+    local function CreateMask(btn, texture, texturePath)
+        local mask = btn:CreateMaskTexture()
+        local topx, topy = 1, -1
+        local botx, boty = -1, 1
+        mask:SetPoint(C.TOPLEFT, texture, C.TOPLEFT, topx, topy)
+        mask:SetPoint(C.BOTTOMRIGHT, texture, C.BOTTOMRIGHT, botx, boty)
+        mask:SetTexture(texturePath, C.CLAMPTOBLACKADDITIVE, C.CLAMPTOBLACKADDITIVE)
+        texture.mask = mask
+        texture:AddMaskTexture(mask)
+        return mask
+    end
+
+    --- - Call this function once only; otherwise *CRASH* if called N times
+    --- - [UIOBJECT MaskTexture](https://wowpedia.fandom.com/wiki/UIOBJECT_MaskTexture)
+    --- - [Texture:SetTexture()](https://wowpedia.fandom.com/wiki/API_Texture_SetTexture)
+    --- - [alphamask](https://wow.tools/files/#search=alphamask&page=5&sort=1&desc=asc)
+    --- @param icon string The icon texture path
+    function o:InitTextures(icon)
+        local btnUI = self.button()
+
+        -- DrawLayer is 'ARTWORK' by default for icons
+        btnUI:SetNormalTexture(icon)
+        --Blend mode "Blend" gets rid of the dark edges in buttons
+        btnUI:GetNormalTexture():SetBlendMode(GC.BlendMode.BLEND)
+
+        self:SetHighlightDefault(btnUI)
+        btnUI:SetPushedTexture(icon)
+
+        local tex = btnUI:GetPushedTexture()
+        CreateMask(btnUI, tex, pushedTextureMask)
+        tex:SetAlpha(pushedTextureInUseAlpha)
+
+        local hTexture = btnUI:GetHighlightTexture()
+        if hTexture and not hTexture.mask then
+            CreateMask(btnUI, hTexture, highlightTexture)
+        end
+    end
+
+    --- @return Index
+    function o:GetIndex() return self.w.index end
+    --- @return Index
+    function o:GetFrameIndex() return self.w.frameIndex end
+
+    --- @return boolean
+    function o:IsParentFrameShown() return self.dragFrame():IsShown() end
+    --- @return boolean
+    function o:IsShown() return self:IsParentFrameShown() end
+    --- @return boolean
+    function o:IsHidden() return self:IsParentFrameShown() ~= true end
+    --- @return boolean
+    function o:IsUpdatable() return self:IsSpellUpdatable(self:GetEffectiveSpellName()) end
+    --- @return boolean
+    function o:IsNotUpdatable() return self:IsSpellNotUpdatable(self:GetEffectiveSpellName()) end
+    --- @param spellName SpellName
+    --- @return boolean
+    function o:IsSpellNotUpdatable(spellName) return self:IsHidden() or IsBlank(spellName) end
+    --- @param spellName SpellName
+    --- @return boolean
+    function o:IsSpellUpdatable(spellName) return not self:IsSpellNotUpdatable(spellName) end
+
+    function o:ResetConfig()
+        self.w:ResetButtonData()
+        self:ResetWidgetAttributes()
+    end
+
+    --- Note: Don't call self:EnableMouse(..) here
+    function o:SetButtonAsEmpty()
+        self:ResetConfig()
+        self:SetTextureAsEmpty()
+        self:SetChecked(false)
+        self:ClearAllText()
+        self.button():ClearOnUpdateCallbacks()
+    end
+
+    function o:Reset()
+        self:ResetCooldown()
+        self:HideOverlayGlow()
+        self:ClearAllText()
+        self.button():ClearOnUpdateCallbacks()
+    end
+
+    function o:ResetCooldown() self.cooldown():Clear() end
+
+    --- @param cd CooldownInfo
+    function o:SetCooldownByDetails(cd)
+        if not cd or not (cd.start or cd.duration) then return end
+        self:SetCooldown(cd.start, cd.duration, cd.modRate)
+    end
+
+    function o:SetCooldown(start, duration, modRate)
+        if not (start or duration) then return end
+        self.cooldown():SetCooldown(start, duration, modRate or 1)
+    end
+
+    --- @param text string
+    function o:SetText(text)
+        if String.IsBlank(text) then text = '' end
+        self.button().text:SetText(text)
+    end
+    --- Sets the name of the button (Used by Macros)
+    --- @param text string
+    function o:SetNameText(text) self.button().nameText:SetEllipsesText(text) end
+
+    function o:SetTextDelayed(text, optionalDelay)
+        C_Timer.After(optionalDelay or 0.1, function() self:SetText(text) end)
+    end
+    --- @param state boolean true will show the button index number
+    function o:ShowIndex(state)
+        local text = ''
+        if true == state then text = self.w.index end
+        self.button().indexText:SetText(text)
+        self:RefreshTexts()
+    end
+
+    function o:ClearAllText()
+        self:SetText('')
+        self.button().nameText:SetText('')
+    end
+
+    --- @return CooldownInfo
+    function o:GetCooldownInfo()
+        local c = self:conf(); if c:IsEmpty() then return nil end
+
+        --- @type CooldownInfo
+        local cd = { type=c.type, start=nil, duration=nil, enabled=0, details = {} }
+        if c:IsSpell() then return self:GetSpellCooldown(cd)
+        elseif c:IsItem() then return self:GetItemCooldown() end
+
+        return nil
+    end
+
+    --- @return SpellCooldown
+    function o:GetSpellCooldown()
+        local spellID = self:GetEffectiveSpellID(); if not spellID then return nil end
+        local spellCD = API:GetSpellCooldown(spellID); if not spellCD then return nil end
+
+        local cd = { type='spell', start=nil, duration=nil, enabled=0, details = {} }
+        cd.details = spellCD
+        cd.start = spellCD.start
+        cd.duration = spellCD.duration
+        cd.enabled = spellCD.enabled
+
+        return cd
+    end
+
+    --- @return ItemCooldown
+    function o:GetItemCooldown()
+        local c = self:conf(); if not c:IsItem() then return end
+
+        --- @type CooldownInfo
+        local cd = { type=c.type, start=nil, duration=nil, enabled=0, details = {} }
+        local item = c.item
+        local itemCD = API:GIC(item.id)
+        if itemCD ~= nil then
+            cd.details = itemCD
+            cd.start = itemCD.start
+            cd.duration = itemCD.duration
+            cd.enabled = itemCD.enabled
+            return cd
+        end
+        return nil
+    end
+
+    --- @return SpellCooldown
+    function o:GetMacroSpellCooldown()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+
+        -- GetMacroInfo() must be called before GetMacroSpell() to get the updated spell info
+        -- This fixes the macro sequence icon issue
+        local i = macro.index
+        local _, icon = GetMacroInfo(i)
+        local spellID = GetMacroSpell(i); if not spellID then return nil end
+        local spellCD = API:GetSpellCooldown(spellID); if not spellCD then return nil end
+
+        spellCD.spell.icon = icon
+        return spellCD
+    end
+
+    --- @return ItemCooldown
+    function o:GetMacroItemCooldown()
+        local macro = self:GetMacroData();
+        if not macro then return nil end
+
+        local itemName = GetMacroItem(macro.index)
+        if not itemName then return nil end
+
+        local itemCD = API:GetItemCooldown(itemName); if not itemCD then return nil end
+        -- GetMacroInfo has the updated icon
+        local icon = API:GetMacroIcon(macro.index)
+        itemCD.item = {
+            id = itemCD.item.id,
+            name = itemName,
+            icon = icon
+        }
+        return itemCD
+    end
+
+    function o:ResetWidgetAttributes()
+        if InCombatLockdown() then return end
+        local button = self.button()
+        for _, v in pairs(GC.ButtonAttributes) do
+            if not InCombatLockdown() then
+                button:SetAttribute(v, nil)
+            end
+        end
+    end
+
+    function o:IsRuneSpell()
+        local d = self:GetSpellData()
+        return d and d.runeSpell and (d.runeSpell.id ~= nil)
+    end
+
+    function o:IsNewLeatherWorkingSpell() return PC():IsNewLeatherWorkingSpell(self:GetEffectiveSpell()) end
+
+    function o:UpdateItemOrMacroState()
+        if self:IsItem() then self:UpdateItem(); return end
+        self:UpdateMacro()
+    end
+
+    function o:UpdateItem()
+        self:ClearAllText()
+        local item = self.w:GetItemData()
+        if self:IsInvalidItem(item) then return end
+        local itemID = item.id
+        local itemInfo = API:GetItemInfo(itemID)
+        self:UpdateItemByItemInfo(itemInfo)
+        self:SetActionUsable(self:IsUsableItem(itemID))
+        self:UpdateCooldown()
+        return
+    end
+
+    --- @param itemIDOrName ItemIdentifier
+    function o:UpdateItemByItem(itemIDOrName)
+        self:UpdateItemByItemInfo(API:GetItemInfo(itemIDOrName))
+    end
+
+    --- @param itemInfo ItemInfoDetails
+    function o:UpdateItemByItemInfo(itemInfo)
+        self:SetText('')
+        if not itemInfo then return nil end
+
+        local itemID = itemInfo and itemInfo.name and itemInfo.id
+        if itemID == nil then return end
+        if API:IsToyItem(itemID) then self:SetActionUsable(true); return end
+
+        local stackCount = itemInfo.stackCount or 1
+        local count = itemInfo.count
+        -- chargeCount: health stones, mana gems/emeralds
+        -- stackCount: How many you can stack in bags, i.e. water x 20
+        local chargeCount = Compat:GetItemCount(itemInfo.name, false, true, false)
+        if chargeCount > 1 then
+            stackCount = chargeCount
+            count = chargeCount
+        end
+        if stackCount > 1 and count > 0 then self:SetText(count) end
+        if count <= 0 then
+            self:SetText('')
+            self:SetActionUsable(false)
+        end
+        pi:d(function() return "Item[%s] count=%s chargeCount=%s stackCount=%s details=%s",
+                   itemInfo.name, count, chargeCount, stackCount, itemInfo end)
+    end
+
+    function o:UpdateUsable()
+        local c = self:conf(); if c:IsEmpty() or c:IsMacro() then return end
+        local isUsable = true
+        local cd = self:GetCooldownInfo()
+        local inCombat = InCombatLockdown()
+        if (cd == nil or cd.details == nil) then
+            if self:IsCompanion() then isUsable = true
+            elseif c.type == MOUNT then
+                if inCombat then isUsable = false
+                else isUsable = not IsIndoors() end
+            elseif self:IsEquipmentSet() then isUsable = not inCombat end
+            self:SetActionUsable(isUsable)
+            return
+        end
+
+        -- todo next: disable other macro handlers
+        if c.type == SPELL then
+            isUsable = self:IsUsableSpell(cd)
+        elseif c.type == ITEM then
+            isUsable = self:IsUsableItem(cd)
+        end
+        self:SetActionUsable(isUsable)
+    end
+
+    -- ActionButton_UpdateState(self);
+    -- ActionButton_UpdateUsable(self);
+    -- ActionButton_UpdateCooldown(self);
+    -- ActionButton_UpdateCount(self): TODO
+    function o:Update()
+        local c = self:conf(); if c:IsEmpty() or c:IsMacro() then return end
+        self:UpdateCooldown()
+        if self:IsItem() then self:UpdateItem() end
+        self:UpdateUsable()
+        self:SetHighlightDefault()
+        self:SetNormalIconAlphaDefault()
+    end
+
+    function o:UpdateDelayed(inSeconds)
+        C_Timer.After(inSeconds or 1, function() self:Update() end)
+    end
+    function o:UpdateSpellCheckedStateDelayed()
+        if not self:IsSpell() then return end
+        local spId = self:GetSpellID()
+        local checked = false
+        local unitClass = Unit:GetPlayerUnitClass()
+        if Priest:IsUs(unitClass) and Priest:IsShadowFormSpell(spId) then
+            checked = Priest:IsInShadowForm()
+        elseif Druid:IsUs(unitClass) and Druid:IsProwl(spId)  then
+            checked = Druid:IsStealthActive()
+        elseif Rogue:IsUs(unitClass) and Rogue:IsStealth(spId) then
+            checked = Rogue:IsStealthActive()
+        end
+        C_Timer.After(0.001, function() self:SetChecked(checked) end)
+    end
+
+    --  TODO: Revisit UpdateCooldown() and make sure it's not being called multiple times
+    --- @param optionalCooldownInfo CooldownInfo
+    function o:UpdateCooldown(optionalCooldownInfo)
+        local cd = optionalCooldownInfo or self:GetCooldownInfo()
+        if not cd or cd.enabled == 0 then return end
+        -- Instant cast spells have zero duration, skip
+        if (not cd.duration) or cd.duration <= 0 then
+            self:ResetCooldown()
+            return
+        end
+        self:SetCooldownByDetails(cd)
+    end
+    function o:UpdateCooldownDelayed(inSeconds) C_Timer.After(inSeconds, function() self:UpdateCooldown() end) end
+
+    --- IsSpellOverlayed() is available in Retail Version
+    function o:UpdateGlow()
+        if not IsSpellOverlayed then return end
+        local spell = self:GetEffectiveSpellName(); if not spell then return end
+        local spellID = select(7, Compat:GetSpellInfo(spell)); if not spellID then return end
+        local isGlowing = IsSpellOverlayed(spellID)
+        if isGlowing then self:ShowOverlayGlow(); return else end
+        self:HideOverlayGlow()
+    end
+
+    --- @return ActionBarInfo
+    function o:GetActionbarInfo()
+        local index = self.index
+        local dragFrame = self.dragFrame();
+        local frameName = dragFrame:GetName()
+        local btnName = format('%sButton%s', frameName, tostring(index))
+
+        --- @class ActionBarInfo
+        local info = {
+            name = frameName, index = dragFrame:GetIndex(),
+            button = { name = btnName, index = index },
+        }
+        return info
+    end
+
+    function o:ClearHighlight() self.button():SetHighlightTexture(nil) end
+    function o:ResetHighlight() self:SetHighlightDefault() end
+
+    --- @param texture string
+    function o:SetNormalTexture(texture) self.button():SetNormalTexture(texture) end
+    --- @param texture string
+    function o:SetPushedTexture(texture)
+        if texture then
+            self.button():SetPushedTexture(texture)
+            self:SetPushedTextureAlpha(pushedTextureInUseAlpha)
+            return
+        end
+        self.button():SetPushedTexture(emptyTexture)
+        if not self:IsShowEmptyButtons() then
+            self:SetPushedTextureAlpha(0)
+        end
+    end
+
+    --- @param texture string
+    function o:SetHighlightTexture(texture)
+        if texture then
+            self.button():SetHighlightTexture(texture)
+            self:SetHighlightTextureAlpha(highlightTextureAlpha)
+            return
+        end
+        self.button():SetHighlightTexture(emptyTexture)
+        self:SetHighlightTextureAlpha(0)
+    end
+
+    --- @param alpha number 1 (opaque) to zero (transparent)
+    function o:SetPushedTextureAlpha(alpha) self.button():GetPushedTexture():SetAlpha(alpha or 1) end
+    --- @param alpha number 1 (opaque) to zero (transparent)
+    function o:SetHighlightTextureAlpha(alpha) self.button():GetHighlightTexture():SetAlpha(alpha or 1) end
+
+    function o:SetTextureAsEmpty()
+        self:SetNormalTexture(emptyTexture)
+        self:SetPushedTexture(nil)
+        self:SetHighlightTexture(nil)
+        self:SetNormalIconAlphaAsEmpty()
+        self:SetVertexColorNormal()
+    end
+
+    function o:SetNormalIconAlphaAsEmpty()
+        local alpha = showEmptyGridAlpha
+        if true ~= self.w:IsShowEmptyButtons() then alpha = 0 end
+        self:SetNormalIconAlpha(alpha)
+    end
+
+    --- @param alpha number 0.0 to 1.0
+    function o:SetNormalIconAlpha(alpha) self.button():GetNormalTexture():SetAlpha(alpha or 1.0) end
+    function o:SetVertexColorNormal() self.button():GetNormalTexture():SetVertexColor(1.0, 1.0, 1.0) end
+
+    function o:SetNormalIconAlphaDefault()
+        if self:IsEmpty() then
+            self:SetNormalIconAlphaAsEmpty()
+            return
+        end
+        self:SetNormalIconAlpha(nonEmptySlotAlpha)
+    end
+
+    function o:SetPushedTextureDisabled() self.button():SetPushedTexture(nil) end
+
+    ---This is used when an action button starts dragging to highlight other drag targets (empty slots).
+    function o:ShowEmptyGrid()
+        if not self:IsEmpty() then return end
+        self:SetNormalTexture(emptyTexture)
+        self:SetHighlightEmptyButtonEnabled(false)
+    end
+
+    function o:ShowEmptyGridEvent()
+        if not self:IsEmpty() then return end
+        self:SetButtonAsEmpty()
+        self:ShowEmptyGrid()
+    end
+
+    function o:HideEmptyGridEvent()
+        if not self:IsEmpty() then return end
+        self:SetTextureAsEmpty()
+        self:SetHighlightEmptyButtonEnabled(true)
+        self:SetNormalTexture(emptyTexture)
+        self:SetNormalIconAlphaAsEmpty()
+        if self:IsEmpty() and not self:IsShowEmptyButtons() then
+            self.button().keybindText:Hide()
+        end
+    end
+
+    function o:SetCooldownTextures(icon)
+        local btnUI = self.button()
+        btnUI:SetNormalTexture(icon)
+        btnUI:SetPushedTexture(icon)
+    end
+
+    function o:SetButtonStateNormal() self.button():SetButtonState('NORMAL') end
+    function o:SetButtonStatePushed() self.button():SetButtonState('PUSHED') end
+
+    ---Typically used when casting spells that take longer than GCD
+    function o:SetHighlightInUse()
+        local btn = self.button()
+        self:SetNormalIconAlpha(highlightTextureInUseAlpha)
+        local hltTexture = btn:GetHighlightTexture()
+        --highlight texture could be nil if action_button_mouseover_glow is disabled
+        if not hltTexture then return end
+        hltTexture:SetDrawLayer(C.ARTWORK_DRAW_LAYER)
+        hltTexture:SetAlpha(highlightTextureInUseAlpha)
+        if hltTexture and not hltTexture.mask then CreateMask(btn, hltTexture, highlightTexture) end
+    end
+    function o:SetHighlightDefault()
+        if self:IsEmpty() then return end
+        self:SetHighlightEnabled(P:IsActionButtonMouseoverGlowEnabled())
+        self:SetNormalIconAlpha(1.0)
+    end
+
+    function o:RefreshHighlightEnabled()
+        local profile = self.w:GetProfileConfig()
+        self:SetHighlightEnabled(true == profile.action_button_mouseover_glow)
+    end
+
+    --- @param state boolean true, to enable highlight
+    function o:SetHighlightEnabled(state)
+        local btnUI = self.button()
+        if state == true then
+            btnUI:SetHighlightTexture(highlightTexture)
+            btnUI:GetHighlightTexture():SetBlendMode(GC.BlendMode.ADD)
+            btnUI:GetHighlightTexture():SetDrawLayer(GC.DrawLayer.HIGHLIGHT)
+            btnUI:GetHighlightTexture():SetAlpha(highlightTextureAlpha)
+            return
+        end
+        self:SetHighlightTexture(nil)
+    end
+
+    ---This is used for mouseover when dragging a cursor
+    ---to highlight an empty slot
+    function o:SetHighlightEmptyButtonEnabled(state)
+        if not self:IsEmpty() then return end
+        if true == state then
+            self:SetNormalTexture(emptyGridTexture)
+            self:SetNormalIconAlpha(showEmptyGridAlpha)
+            return
+        end
+        self:SetNormalTexture(emptyTexture)
+        self:SetNormalIconAlpha(showEmptyGridAlpha)
+    end
+
+    --- @param spellID string The spellID to match
+    --- @param optionalBtnConf Profile_Button
+    --- @return boolean
+    function o:IsMatchingItemSpellID(spellID, optionalBtnConf)
+        if not self:IsValidItemProfile(optionalBtnConf) then return end
+        local _, btnItemSpellId = API:GetItemSpellInfo(optionalBtnConf.item.id)
+        if spellID == btnItemSpellId then return true end
+        return false
+    end
+
+    --- @param spellID string The spellID to match
+    --- @param optionalBtnConf Profile_Button
+    --- @return boolean
+    function o:IsMatchingSpellID(spellID, optionalBtnConf)
+        local buttonData = optionalBtnConf or self:conf()
+        local w = self.w
+        if w:IsSpell() then
+            return spellID == buttonData.spell.id
+        elseif w:IsItem() then
+            return w:IsMatchingItemSpellID(spellID, buttonData)
+        elseif w:IsMount() then
+            return spellID == buttonData.mount.spell.id
+        end
+        return false
+    end
+
+    --- @param spellName SpellName
+    --- @param buttonData Profile_Button
+    function o:IsMatchingSpellName(spellName, buttonData)
+        local s = buttonData or self:conf()
+        if not (s.spell and s.spell.name) then return false end
+        if not (s and spellName == s.spell.name) then return false end
+        return true
+    end
+
+    --- @param spellID string
+    --- @param optionalProfileButton Profile_Button
+    function o:IsMatchingMacroSpellID(spellID, optionalProfileButton)
+        optionalProfileButton = optionalProfileButton or self:conf()
+        if not self:IsValidMacroProfile(optionalProfileButton) then return end
+        local macroSpellId =  GetMacroSpell(optionalProfileButton.macro.index)
+        if not macroSpellId then return false end
+        if spellID == macroSpellId then return true end
+        return false
+    end
+
+    -- TODO Next: Delete Me
+    --- @deprecated Use #GetEffectiveSpell<IDorName>()
+    --- @param spellID string The spellID to match
+    --- @return boolean
+    function o:IsMatchingMacroOrSpell(spellID)
+        --- @type Profile_Button
+        local conf = self:conf()
+        if not conf and (conf.spell or conf.macro) then return false end
+        if self:IsConfigOfType(conf, SPELL) then
+            return spellID == conf.spell and conf.spell.id
+        elseif self:IsConfigOfType(conf, MACRO) and conf.macro.index then
+            local macroSpellId =  GetMacroSpell(conf.macro and conf.macro.index)
+            return spellID == macroSpellId
+        elseif self:IsConfigOfType(conf, ITEM) and IsNotBlank(conf.item.link) then
+            local _, itemSpellID = API:GetItemSpellInfo(conf.item and conf.item.link)
+            return spellID == itemSpellID
+        end
+
+        return false;
+    end
+
+    function o:SetButtonAsUsable()
+        local tex = self.button():GetNormalTexture()
+        return tex and tex:SetVertexColor(1.0, 1.0, 1.0)
+    end
+    function o:SetButtonAsNotUsable()
+        local tex = self.button():GetNormalTexture()
+        return tex and tex:SetVertexColor(0.3, 0.3, 0.3)
+    end
+
+    function o:SetActionUsable2(isUsable)
+        if isUsable == true then return self:SetButtonAsUsable() end
+        self:SetButtonAsNotUsable()
+    end
+
+    --- This method will be reworked.  Use #SetActionUsable2() for macros.
+    --- @param isUsable boolean
+    function o:SetActionUsable(isUsable)
+        local normalTexture = self.button():GetNormalTexture()
+        if not normalTexture then return end
+
+        local isStealthedOrShapeshifted = false
+        local isStealth, spellID = self:IsStealthEffectiveSpell()
+
+        if spellID and (isStealth and (IsStealthed() or API:IsShapeShiftActiveBySpellID(spellID))) then
+            isStealthedOrShapeshifted = true
+        end
+
+        -- energy based spells do not use 'notEnoughMana'
+        if isStealthedOrShapeshifted == true then
+            normalTexture:SetVertexColor(0.6, 0.6, 0.6)
+        elseif not isUsable then
+            normalTexture:SetVertexColor(0.3, 0.3, 0.3)
+        else
+            normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+        end
+
+    end
+
+    --- @param spellNameOrID SpellNameOrID
+    --- @param callbackFn fun(spell:SpellInfoBasic) end | "function(spell) print(spell.id) end
+    function o:IfStealthSpell(spellNameOrID, callbackFn)
+        if not spellNameOrID then return end
+        local isStealthSpell = spellNameOrID and self:IsStealthSpell(spellNameOrID)
+        if not isStealthSpell then return end
+
+        local spell = API:GetSpellInfoBasic(spellNameOrID)
+        local spellId = spell and spell.id; if not spellId then return end
+        if not IsStealthed() then return end
+        local stealthIcon = API:GetStealthIcon(spellId)
+        if stealthIcon then spell.icon = stealthIcon end
+        callbackFn(spell)
+    end
+
+    --- @param cd CooldownInfo
+    function o:IsUsableSpell(cd)
+        -- only use spell names here for 'usable' state
+        local spellName = cd.details.spell.name
+        local spellID = cd.details.spell.id
+        if IsBlank(spellName) then return true end
+        return spellID and Compat:IsUsableSpell(spellID)
+    end
+
+    function o:IsUsableToy(itemID)
+        local _, spellID = API:GetItemSpellInfo(itemID)
+        if not spellID then return false end
+        return Compat:IsUsableSpell(spellID)
+    end
+
+    --- @param itemID ItemID
+    function o:IsUsableItemID(itemID)
+        if IsBlank(itemID) then return true
+        elseif self:IsWeaponOrArmor(itemID) then return true
+        elseif API:IsToyItem(itemID) then return self:IsUsableToy(itemID)
+        end
+        return Compat:IsUsableItem(itemID)
+    end
+
+    --- @return boolean
+    function o:IsWeaponOrArmor(itemID)
+        local classID = API:GetItemClass(itemID)
+        return Enum.ItemClass.Weapon == classID or Enum.ItemClass.Armor == classID
+    end
+
+    --- @param cdOrItemID CooldownInfo|number
+    function o:IsUsableItem(cdOrItemID)
+        if 'number' == type(cdOrItemID) then return self:IsUsableItemID(cdOrItemID) end
+        local itemID = cdOrItemID.details.item.id
+        return itemID and self:IsUsableItemID(itemID)
+    end
+
+    --- @param cd CooldownInfo
+    function o:IsUsableMacro(cd)
+        if not (cd and cd.details) then return false end
+        if cd.details.spell then
+            local spellID = cd.details.spell.id
+            if IsBlank(spellID) then return true end
+            return Compat:IsUsableSpell(spellID)
+        elseif cd.details.item then
+            return Compat:IsUsableItem(cd.details.item.id)
+        end
+        return false
+    end
+
+    --- @param icon string Blizzard Icon
+    function o:SetIcon(icon)
+        if not icon then return nil end
+        local btn = self.button()
+        self:SetNormalTexture(icon)
+        self:SetPushedTexture(icon)
+        local nTexture = btn:GetNormalTexture()
+        if not nTexture.mask then CreateMask(btn, nTexture, emptyTexture) end
+    end
+
+    --- @param buttonData Profile_Button
+    function o:IsValidItemProfile(buttonData)
+        return not (buttonData == nil or buttonData.item == nil
+                or IsBlank(buttonData.item.id))
+    end
+
+    --- @param buttonData Profile_Button
+    function o:IsValidSpellProfile(buttonData)
+        return not (buttonData == nil or buttonData.spell == nil
+                or IsBlank(buttonData.spell.id))
+    end
+
+    --- @param buttonData Profile_Button
+    function o:IsValidMacroProfile(buttonData)
+        return not (buttonData == nil or buttonData.macro == nil
+                or IsBlank(buttonData.macro.index)
+                or IsBlank(buttonData.macro.name))
+    end
+
+    function o:CanChangeEquipmentSet()
+        if not (C_EquipmentSet and C_EquipmentSet.CanUseEquipmentSets()) then return false end
+        return self:IsEquipmentSet()
+    end
+
+    -- todo next: Pull Out UpdateMacro() #504
+    function o:UpdateMacro()
+        --- @type SpellCooldown
+        local scd = self:GetMacroSpellCooldown()
+        if scd and scd.spell then
+            -- clear the text since item counts doesn't apply for spells
+            self:SetText('')
+            self:SetNameText(self:GetMacroName())
+            local icon
+            icon = scd.spell.icon
+            if self:IsStealthSpell() then
+                local spellInfo = self:GetSpellData()
+                icon = API:GetSpellIcon(spellInfo)
+            elseif self:IsShapeshiftSpell() then
+                local spellInfo = self:GetSpellData()
+                icon = API:GetSpellIcon(spellInfo)
+            end
+            if icon then self:SetIcon(icon) end
+            self:UpdateCooldown(scd)
+            return
+        end
+
+        local icd = self:GetMacroItemCooldown()
+        if icd and icd.item then
+            local item = icd.item
+            local icon = item.icon
+            self:SetNameText(self:GetMacroName())
+            self:UpdateItemByItem(item.name)
+            if icon then self:SetIcon(icon) end
+            self:UpdateCooldown(icd)
+            return
+        end
+
+        -- todo next: UpdateCooldown() is being called twice when called via self:UpdateState()
+    end
+
+    ---@param state boolean Set to true to enable mouse
+    function o:EnableMouse(state) if InCombatLockdown() then return end; self.button():EnableMouse(state) end
+    function o:Hide() if InCombatLockdown() then return end; self.button():Hide() end
+    function o:Show() if InCombatLockdown() then return end; self.button():Show() end
+
+    ---@param spell SpellName|SpellID
+    function o:SpellRequiresTarget(spell)
+        if not spell then return false end
+
+        if 'string' == type(spell) then
+            return Compat:SpellHasRange(spell) == true
+        elseif 'number' == type(spell) then
+            return Compat:SpellHasRange(Compat:GetSpellInfo(spell)) == true
+        end
+        return false
+    end
+
+    function o:GetIcon()
+        local texture = self.button():GetNormalTexture()
+        if texture then return texture:GetTexture() end
+        return nil
+    end
+
+    ---@param optionalMacroName string Optional. Will pull from btn data if not supplied
+    function o:IsM6Macro(optionalMacroName)
+        if not self.w:IsMacro() then return false end
+        if type(optionalMacroName) == 'string' then return GC:IsM6Macro(optionalMacroName) end
+        return GC:IsM6Macro(self.w:GetMacroData().name)
+    end
+    --- @return boolean
+    function o:ShowOverlayGlow() return ActionButton_ShowOverlayGlow and ActionButton_ShowOverlayGlow(self.button()) end
+    --- @return boolean
+    function o:HideOverlayGlow() return ActionButton_HideOverlayGlow and ActionButton_HideOverlayGlow(self.button()) end
+    function o:ShowOverlayGlowAsActiveButton()
+        local btn = self.button()
+        self:ShowOverlayGlow()
+
+        local overlay = btn.overlay
+        if overlay then
+            C_Timer.After(1, function()
+                overlay.ants:SetAlpha(0)
+                overlay.outerGlow:SetAlpha(0.7)
+            end)
+            return
+        end
+
+        if not btn.SpellActivationAlert then return end
+        -- retail
+        btn.SpellActivationAlert:SetAlpha(0.4)
+    end
+
+    function o:UpdateCompanionActiveState()
+        local summonedPetID, petID, isSummoned
+        if C_PetJournal.IsCurrentlySummoned and self:IsCompanion() then
+            local comp = self:GetCompanionData()
+            local petInfo = comp and comp.petID and BaseAPI:GetPetInfo_CJournal(comp.petID)
+            petID = petInfo and petInfo.petID
+            isSummoned = petID and C_PetJournal.IsCurrentlySummoned(petID)
+        elseif C_PetJournal.GetSummonedPetGUID and self:IsBattlePet() then
+            local battlePet = self:GetBattlePetData()
+            petID = battlePet.guid
+            summonedPetID = C_PetJournal.GetSummonedPetGUID()
+            isSummoned = petID == summonedPetID
+        end
+        if not petID then return end
+
+        if isSummoned ~= true then
+            self:HideOverlayGlow()
+            return
+        end
+        self:ShowOverlayGlowAsActiveButton()
+    end
+
+    --- @return EquipmentSetButtonMixin
+    function o:EquipmentSetMixin() return O.EquipmentSetButtonMixin:New(self.w) end
+
+    function o:IsChecked() return self.button().CheckedTexture:IsShown() end
+    ---@param checked boolean
+    function o:SetChecked(checked)
+        if checked then
+            self.button().CheckedTexture:Show(); return
+        end
+        return self.button().CheckedTexture:Hide()
+    end
+
+    function o:UseKeyUpForClicks()
+        self.button():RegisterForClicks('AnyUp')
+        if ns:IsRetail() then SetCVar("ActionButtonUseKeyDown", 0) end
+    end
+    function o:UseKeyDownForClicks()
+        self.button():RegisterForClicks('AnyDown')
+        if ns:IsRetail() then SetCVar("ActionButtonUseKeyDown", 1) end
+    end
+
+end
+
+PropsAndMethods(L)

@@ -3,7 +3,7 @@
 ## PRE-Release
 
 ### README.md
-- Create a new version section in [CHANGELOG.txt](../CHANGELOG.txt) file.  Move previous release notes to doc/CHANGELOG-previous.md
+- Create a new version section in [CHANGELOG.txt](../ActionbarPlus/CHANGELOG.md) file.  Move previous release notes to doc/CHANGELOG-previous.md
 - Create a new github DRAFT release in /release page - copy contents of CHANGELOG.txt
 
 ### Commit Changes and check CurseForge Build Page

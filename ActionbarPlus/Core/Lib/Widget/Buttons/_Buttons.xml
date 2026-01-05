@@ -1,0 +1,33 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Script file="ActionType.lua"/>
+    <Script file="PickupHandler.lua"/>
+    <Script file="ButtonProfileConfigMixin.lua"/>
+    <Script file="ButtonProfileMixin.lua"/>
+    <Script file="ButtonMixin.lua"/>
+    <Script file="ButtonUI.lua"/>
+    <Script file="FrameHandleBuilderMixin.lua"/>
+    <Script file="ActionBarFrameBuilder.lua"/>
+    <Script file="BaseAttributeSetter.lua"/>
+    <Script file="MacrotextAttributeSetter.lua"/>
+    <Script file="ItemDragEventHandler.lua"/>
+    <Script file="SpellDragEventHandler.lua"/>
+    <Script file="MacroDragEventHandler.lua"/>
+    <Script file="MountDragEventHandler.lua"/>
+    <Script file="CompanionDragEventHandler.lua"/>
+    <Script file="BattlePetDragEventHandler.lua"/>
+    <Script file="EquipmentSetDragEventHandler.lua"/>
+    <Script file="EquipmentSetButtonMixin.lua"/>
+    <Script file="ReceiveDragEventHandler.lua"/>
+    <Script file="ButtonFactory.lua"/>
+
+    <Font name="ABP_NumberFontNormalShadow" inherits="NumberFontNormal" virtual="true">
+        <Color r="0.9" g="0.9" b="0.9"/>
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+        </Shadow>
+    </Font>
+</Ui>

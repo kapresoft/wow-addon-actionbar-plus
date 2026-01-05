@@ -1,0 +1,53 @@
+## Interface: 30403
+## Version: @project-version@
+## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r Classic
+## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+
+## Author: Antonio W. Lagnada (kapresoft@gmail.com)
+## DefaultState: enabled
+## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
+## SavedVariablesPerCharacter: ABP_CHARACTER_DB
+## OptionalDeps: Ace3
+
+## Category-enUS: Action Bars
+## Category-deDE: Aktionsleisten
+## Category-esES: Barras de acción
+## Category-esMX: Barras de acción
+## Category-frFR: Barres d’actions
+## Category-itIT: Barre delle azioni
+## Category-koKR: 행동 단축바
+## Category-ptBR: Barras de ação
+## Category-ruRU: Панели действий
+## Category-zhCN: 动作条
+## Category-zhTW: 動作條
+
+## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
+## X-Category: Action Bars
+## X-License: All Rights Reserved. |cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+
+## X-Github-Repo: https://github.com/kapresoft/wow-addon-actionbar-plus
+## X-Github-Issues: https://github.com/kapresoft/wow-addon-actionbar-plus/issues
+## X-CurseForge: https://www.curseforge.com/wow/addons/actionbarplus
+## X-Curse-Project-ID: 566626
+## X-Github-Project-Author: @project-author@
+## X-Github-Project-Hash: @project-hash@
+## X-Github-Project-Last-Changed-Date: @project-date-iso@
+## X-Github-Project-Version: @project-version@
+
+# Set the compatible date here with ActionbarPlus-M6. The date represents compatible version update date
+# between ActionbarPlus-M6 and ActionbarPlus. Any dates lower than this will prompt the user of
+# ActionbarPlus-M6 addon to update to the latest ActionbarPlus.
+# X-ActionbarPlus-M6-Compatible-Version is only for informational purpose.
+## X-ActionbarPlus-M6-Compatible-Version: 2023.3.3
+## X-ActionbarPlus-M6-Compatible-Version-Date: 2024-03-20T17:13:44Z
+
+## X-WoWI-ID: 26522
+
+## X-PayPal-Donation-ID: AX58YP3GSGXVU
+## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
+
+# To get the Interface/Build Info
+# /dump select(4, GetBuildInfo())
+
+Core\Wrath.lua
+Core\_Core.xml

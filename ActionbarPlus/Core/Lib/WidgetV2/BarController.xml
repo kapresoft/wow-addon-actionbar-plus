@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Include file="ButtonTemplate.xml"/>
+    <Script file="BarController.lua"/>
+    <Include file="BarFrame.xml"/>
+
+    <Frame name="BarController" parent="ActionbarPlusEventFrame">
+        <Scripts>
+            <OnLoad>ABP_XML:BarController_OnLoad(self)</OnLoad>
+            <OnEvent>ABP_XML:BarController_OnEvent(self, event)</OnEvent>
+        </Scripts>
+    </Frame>
+</Ui>

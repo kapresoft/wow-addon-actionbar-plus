@@ -1,0 +1,19 @@
+<!--suppress XmlPathReference -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Script file="_TooltipFrame.lua" />
+    <Frame name="ActionbarPlusTooltipAnchorFrame" inherits="ABP_ParentFrameTemplate" frameStrata="LOW"
+           hidden="false" enableMouse="false" movable="false" alpha="0">
+        <Size x="1" y="1" />
+        <Scripts>
+            <OnLoad>ABP_XML:TooltipFrame_OnLoad(self)</OnLoad>
+            <OnShow>ABP_XML:TooltipFrame_OnShow(self)</OnShow>
+        </Scripts>
+        <Anchors>
+            <Anchor point="TOPRIGHT" relativeto="UIParent" relativePoint="TOPRIGHT" x="0" y="0" />
+        </Anchors>
+    </Frame>
+
+</Ui>

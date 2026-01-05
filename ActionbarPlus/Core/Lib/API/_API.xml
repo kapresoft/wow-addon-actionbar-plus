@@ -1,0 +1,16 @@
+<!--suppress ALL -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <Script file="Compat.lua"/>
+    <Script file="UnitMixin.lua"/>
+    <Script file="DruidUnitMixin.lua"/>
+    <Script file="PriestUnitMixin.lua"/>
+    <Script file="ShamanUnitMixin.lua"/>
+    <Script file="RogueUnitMixin.lua"/>
+
+    <Script file="APIHooks.lua"/>
+    <Script file="BaseAPI.lua"/>
+    <Script file="API.lua"/>
+
+</Ui>

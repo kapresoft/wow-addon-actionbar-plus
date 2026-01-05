@@ -1,0 +1,13 @@
+<!--suppress XmlPathReference -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Script file="_Widget.lua" />
+
+    <Include file="ButtonTemplate.xml"/>
+    <Include file="BarFrameTemplate.xml"/>
+    <Include file="Modules\_Modules.xml"/>
+
+    <Script file="BarFactory.lua" />
+
+</Ui>
