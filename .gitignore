@@ -50,20 +50,18 @@ luac.out
 /.deploy
 
 # BigWigMods/packager
-/build
+/.build
 /.release/
-/Core/ExtLib/*
-/Core/ExtLib/WoWAce/*
+/Interface
+/ActionbarPlus/Core/ExtLib/*
+/ActionbarPlus/Core/ExtLib/WoWAce/*
 
-!/Core/ExtLib/pprint/
-!/Core/ExtLib/_ExtLib.xml
-!/Core/ExtLib/_WowAce.xml
-!/Core/ExtLib/_ExtLib.lua
-!/Core/ExtLib/ExtLib.lua
+!/ActionbarPlus/Core/ExtLib/pprint/
+!/ActionbarPlus/Core/ExtLib/_ExtLib.xml
+!/ActionbarPlus/Core/ExtLib/_WowAce.xml
+!/ActionbarPlus/Core/ExtLib/_ExtLib.lua
+!/ActionbarPlus/Core/ExtLib/ExtLib.lua
 
 # Ignore Saved Variables folder with symlinks
 /_SV
 
-# temp ignore for now
-/_Interface
-/ActionbarPlus/
