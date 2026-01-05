@@ -49,5 +49,6 @@
 # /dump select(4, GetBuildInfo())
 
 Core\Vanilla.lua
-CoreV2-1\_Core.xml
+Core\_Core.xml
+#CoreV2-1\_Core.xml
 
