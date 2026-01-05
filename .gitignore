@@ -58,6 +58,8 @@ luac.out
 
 # New Structure
 /ActionbarPlus/ExtLib/Lib/
+
+# Legacy
 /ActionbarPlus-Legacy/Core/ExtLib/*
 /ActionbarPlus-Legacy/Core/ExtLib/WoWAce/*
 
