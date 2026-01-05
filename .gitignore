@@ -51,8 +51,10 @@ luac.out
 
 # BigWigMods/packager
 /.build
+/.build
 /.release/
 /_Interface/
+/Interface/
 /ActionbarPlus/Core/ExtLib/*
 /ActionbarPlus/Core/ExtLib/WoWAce/*
 
@@ -64,4 +66,3 @@ luac.out
 
 # Ignore Saved Variables folder with symlinks
 /_SV
-
