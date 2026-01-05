@@ -48,8 +48,5 @@
 # To get the Interface/Build Info.
 # /dump select(4, GetBuildInfo())
 
-ExtLib\_ExtLib.xml
-Core\_Core.xml
-
 Core\Retail.lua
-Core\ActionbarPlus.lua
+Core\_Core.xml

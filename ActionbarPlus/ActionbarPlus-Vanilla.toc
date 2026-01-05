@@ -1,11 +1,13 @@
 ## Interface: 11508
 ## Version: @project-version@
-## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r Classic Era
+## Title: |TInterface/Addons/ActionbarPlus/Assets/Textures/abpn-logo1.png:18:18|t |cff1784d1ActionbarPlus|r
 ## Notes: Actionbars Everywhere, Make you click happy
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
-## DefaultState: enabled
+
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
+
+## DefaultState: enabled
 ## OptionalDeps: Ace3
 
 ## Category-enUS: Action Bars
@@ -45,10 +47,12 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-# To get the Interface/Build Info
+# To get the Interface/Build Info.
 # /dump select(4, GetBuildInfo())
 
-Core\Vanilla.lua
+ExtLib\_ExtLib.xml
 Core\_Core.xml
-#CoreV2-1\_Core.xml
+
+Core\Vanilla.lua
+Core\ActionbarPlus.lua
 

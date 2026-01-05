@@ -1,21 +1,18 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-    <Include file='_ExtLib.xml'/>
-
     <Script file='_Core.lua'/>
     <!--@do-not-package@-->
-    <Include file='Lib\Developer\_DeveloperComponents.xml'/>
+    <!--<Include file='Lib\Developer\_DeveloperComponents.xml'/>-->
     <!--@end-do-not-package@-->
-    <Include file='Global\_Global.xml'/>
-    <Include file='Lib\_Lib.xml'/>
+    <!--<Include file='Global\_Global.xml'/>
+    <Include file='Lib\_Lib.xml'/>-->
     <!--@do-not-package@-->
 
-    <Include file='Lib\Developer\_Developer.xml'/>
+<!--    <Include file='Lib\Developer\_Developer.xml'/>-->
 
     <!--@end-do-not-package@-->
-    <Script file="ActionbarPlus.lua"/>
-    <Script file="ActionbarPlusAPI.lua"/>
-    <Include file='Lib\Modules\_Modules.xml'/>
+<!--    <Script file="ActionbarPlusAPI.lua"/>-->
+<!--    <Include file='Lib\Modules\_Modules.xml'/>-->
 
 </Ui>

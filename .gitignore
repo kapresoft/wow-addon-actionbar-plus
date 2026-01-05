@@ -55,14 +55,11 @@ luac.out
 /.release/
 /_Interface/
 /Interface/
-/ActionbarPlus/Core/ExtLib/*
-/ActionbarPlus/Core/ExtLib/WoWAce/*
 
-!/ActionbarPlus/Core/ExtLib/pprint/
-!/ActionbarPlus/Core/ExtLib/_ExtLib.xml
-!/ActionbarPlus/Core/ExtLib/_WowAce.xml
-!/ActionbarPlus/Core/ExtLib/_ExtLib.lua
-!/ActionbarPlus/Core/ExtLib/ExtLib.lua
+# New Structure
+/ActionbarPlus/ExtLib/Lib/
+/ActionbarPlus-Legacy/Core/ExtLib/*
+/ActionbarPlus-Legacy/Core/ExtLib/WoWAce/*
 
 # Ignore Saved Variables folder with symlinks
 /_SV
