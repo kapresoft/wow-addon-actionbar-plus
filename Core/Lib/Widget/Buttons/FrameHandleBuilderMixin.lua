@@ -207,7 +207,7 @@ local function PropsAndMethods(o)
         self.frame:SetMovable(true)
 
         fh:SetResizable(true)
-        fh:SetClampedToScreen(false)
+        fh:SetClampedToScreen(true)
         fh:SetFrameStrata(self.widget.frameStrata)
         fh:SetPoint('BOTTOM', self.frame, 'TOP', 0, 0)
         fh:ShowBackdrop()

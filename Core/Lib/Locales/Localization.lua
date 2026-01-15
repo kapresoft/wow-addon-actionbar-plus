@@ -21,19 +21,21 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ns.name)
 if not L then return end
 
 -- General
-ABP_TITLE                    = "ActionbarPlus"
-ABP_TITLE_SHORT              = "ABP"
-ABP_TITLE_KEYB               = ns.sformat(c1(' (%s)'), ABP_TITLE_SHORT)
-ABP_CATEGORY                 = "AddOns/" .. ABP_TITLE
+ABP_TITLE              = "ActionbarPlus"
+ABP_TITLE_SHORT        = "ABP"
+ABP_TITLE_KEYB         = ns.sformat(c1(' (%s)'), ABP_TITLE_SHORT)
+ABP_CATEGORY           = "AddOns/" .. ABP_TITLE
 
--- Key binding localization text
-BINDING_HEADER_ABP           = ABP_TITLE
-BINDING_HEADER_ABP_CATEGORY  = ABP_CATEGORY
-BINDING_NAME_ABP_OPTIONS_DLG = L['Options Dialog'] .. ABP_TITLE_KEYB
-
+-- Key binding localization text;
+-- The value of name parameter in Bindings.xml doesn't have the "BINDING_NAME_" prefix, i.e. name="ABP_OPTIONS_DLG"
+BINDING_HEADER_ABP                  = ABP_TITLE
+BINDING_HEADER_ABP_CATEGORY         = ABP_CATEGORY
+BINDING_NAME_ABP_TOGGLE_ACTION_BARS = L['Toggle Action Bars']
+BINDING_NAME_ABP_OPTIONS_DLG        = L['Options Dialog'] .. ABP_TITLE_KEYB
 --[[-----------------------------------------------------------------------------
 Localization
 -------------------------------------------------------------------------------]]
+ABP_GENERAL = L['General']
 
 ABP_ACTIONBAR_BASE_NAME = L['ABP_ACTIONBAR_BASE_NAME']
 ABP_BUTTON_BASE_NAME    = L['ABP_BUTTON_BASE_NAME']

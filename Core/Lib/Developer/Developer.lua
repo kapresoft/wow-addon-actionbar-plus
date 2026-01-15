@@ -29,6 +29,13 @@ local L = {}; AceEvent:Embed(L); a = L
 local p = ns:LC().DEV:NewLogger(libName)
 
 --[[-----------------------------------------------------------------------------
+Hooks
+-------------------------------------------------------------------------------]]
+function L.OnAddOnReady()
+    if not ShadowUF then L:CustomFrameLocations() end
+end
+
+--[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
 -- /dump a:c("\n\t  ")
@@ -335,15 +342,6 @@ function L:SecureFuncExample()
             LockF2ToF1()
         end
     end)]]
-end
-
-
---[[-----------------------------------------------------------------------------
-OnAddOnReady
--------------------------------------------------------------------------------]]
-function L.OnAddOnReady()
-    p:vv('OnAddOnReady() called...')
-    if not ShadowUF then L:CustomFrameLocations() end
 end
 
 -- /run a:p()
