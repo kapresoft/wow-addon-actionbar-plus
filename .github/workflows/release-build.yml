@@ -207,6 +207,7 @@ jobs:
           prerelease: false
           footer: |
             
+            
             #### ${{ env.buildArtifactFilename }}
             ```text
             sha256:${{ env.buildArtifactChecksum }}
