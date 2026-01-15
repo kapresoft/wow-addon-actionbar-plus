@@ -53,6 +53,7 @@ local function PropertiesAndMethods(o)
     o.companionID = nil
     o.ActionbarEmptyGridShowing = false
 
+    local function abh() return O.ActionBarHandlerMixin end
 
     --- This is called automatically by Ace
     function o:OnInitialize()
@@ -212,6 +213,8 @@ local function PropertiesAndMethods(o)
             if success ~= true then p:f3(function() return "onHideHookFailed: %s", msg end) end
         end
     end
+
+    function o:ToggleBars() abh():ToggleFrames() end
 
     --- Since AceConfigDialog caches the frames, we want to make sure the appName is this addOn
     --- @param name Name The appName

@@ -107,7 +107,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param widget __ActionBarFrameWidget | _Frame
+--- @param widget __ActionBarFrameWidget | Frame
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
@@ -189,18 +189,6 @@ local function WidgetMethods(widget)
             return
         end
         if self.HideGroup then self:HideGroup() end
-    end
-
-    function widget:ToggleVisibility()
-        local barData = self:GetConfig()
-        local enabled = barData.enabled
-        barData.enabled = not enabled
-        if enabled then
-            self:HideGroup()
-            return
-        end
-
-        self:ShowGroup()
     end
 
     function widget:LockGroup() if InCombatLockdown() then return end; self.frameHandle:Hide() end
@@ -514,15 +502,16 @@ end
 function L:New(frameIndex)
     if InCombatLockdown() then return end
 
-    --- @class __ActionBarFrame
+    --- @class __ActionBarFrame : Frame
     local f = abo():GetFrameByIndex(frameIndex)
-    --- @alias ActionBarFrame __ActionBarFrame | Frame
+    --- @alias ActionBarFrame __ActionBarFrame
 
     --TODO: NEXT: Move frame strata to Settings
     local frameStrata = 'MEDIUM'
     f:SetFrameStrata(frameStrata)
     -- Alpha needs to be zero so that we can hide the buttons
     f:SetAlpha(0)
+    f:SetClampedToScreen(true)
 
     --- @alias ActionBarFrameWidget __ActionBarFrameWidget | _Frame
     --- @class __ActionBarFrameWidget : WidgetBase

@@ -2,6 +2,9 @@
     <Binding name="ABP_OPTIONS_DLG" category="BINDING_HEADER_ABP_CATEGORY" header="ABP_GENERAL">
         ABP:OpenConfig();
     </Binding>
+    <Binding name="ABP_TOGGLE_ACTION_BARS" category="BINDING_HEADER_ABP_CATEGORY">
+        ABP:ToggleBars();
+    </Binding>
     <Binding name="CLICK ActionbarPlusF1Button1:LeftButton" category="BINDING_HEADER_ABP_CATEGORY" header="ABP_HEADER_ACTIONBAR1"/>
     <Binding name="CLICK ActionbarPlusF1Button2:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>
     <Binding name="CLICK ActionbarPlusF1Button3:LeftButton" category="BINDING_HEADER_ABP_CATEGORY"/>

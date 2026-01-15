@@ -115,12 +115,39 @@ local function PropsAndMethods(o)
         for _, f in ipairs(frames) do applyFn(f.widget) end
     end
 
+    --- Includes Non-Visible in Settings
+    --- @param fw ActionBarFrameWidget
+    --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
+    function o:ForEachFrameButton(fw, applyFn)
+        for _, btn in ipairs(fw.buttonFrames) do applyFn(btn.widget) end
+    end
+
     --- Iterate through frames that are visible in settings
     --- @param applyFn FrameHandlerFunction | "function(fw) print(fw:GetName()) end"
     function o:ForEachVisibleFrame(applyFn)
         local frames = self:o():GetVisibleBarFrames()
         if #frames <= 0 then return end
         for _, f in ipairs(frames) do applyFn(f.widget) end
+    end
+
+    -- If any of the frames are shown, then we hide all
+    -- Else, we hide all
+    function o:ToggleFrames()
+        if InCombatLockdown() then return end
+        local anyIsShowing = false
+
+        self:ForEachFrame(function(f)
+            if f:IsShown() then
+                anyIsShowing = true
+                f:HideGroup()
+            end
+        end); if anyIsShowing then return end
+
+        self:ForEachFrame(function(f)
+            if anyIsShowing == false then
+                f:ShowGroup()
+            end
+        end)
     end
 
     --- Apply for each button with a predicateFn

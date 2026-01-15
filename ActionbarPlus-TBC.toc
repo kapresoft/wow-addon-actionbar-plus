@@ -1,13 +1,14 @@
 ## Interface: 20505
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
-## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
 
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
+## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
+
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
 ## OptionalDeps: Ace3
 
 ## Category-enUS: Action Bars
