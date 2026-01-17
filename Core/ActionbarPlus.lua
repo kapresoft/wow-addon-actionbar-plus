@@ -103,7 +103,7 @@ local function PropertiesAndMethods(o)
             self:OpenConfig();
             return
         end
-        if IsAnyOf('clear', unpack(args)) then return self:SlashCommand_ClearConsole_Handler() end
+        if IsAnyOf('toggle', unpack(args)) then return self:ToggleBars() end
         if IsAnyOf('info', unpack(args)) then return self:SlashCommand_Info_Handler() end
         self:SlashCommand_Help_Handler()
     end
@@ -114,6 +114,7 @@ local function PropertiesAndMethods(o)
         pd:a(function() return GCC.ABP_CONSOLE_HEADER_FORMAT, C['Available console commands'] end)
         pd:a(function() return '%s:  /abp [%s]', C['usage'], C['options'] end)
         pd:a(function() return '%s:', C['options'] end)
+        pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'toggle', C['Toggles visibility'] end)
         pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'config', C['Shows the config UI (default)'] end)
         pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'info', C['Info Console Command Text'] end)
         pd:a(function() return GCC.ABP_CONSOLE_OPTIONS_FORMAT, 'help', C['Shows this help'] end)
