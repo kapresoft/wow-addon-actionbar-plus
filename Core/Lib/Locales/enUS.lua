@@ -60,6 +60,7 @@ L['Settings']                                       = true
 L['SHIFT']                                          = true
 L['Show']                                           = true
 L['Shows the config UI (default)']                  = true
+L['Toggles visibility']                             = 'Toggles the visibility of all ActionbarPlus action bars. Use this to quickly hide or show the bars without opening the UI or options panel.'
 L['Shows this help']                                = true
 L['usage']                                          = true
 L['No']                                             = true
