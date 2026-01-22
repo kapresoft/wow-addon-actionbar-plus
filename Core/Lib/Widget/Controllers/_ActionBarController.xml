@@ -19,6 +19,7 @@
     <Script file="ModifierStateChangeController.lua"/>
     <Script file="VehicleAndPetBattleEventsStateDriver.lua"/>
     <Script file="PlayerLostControlHandler.lua"/>
+    <Script file="PlayerGhostStateController.lua"/>
     <Script file="PlayerSettingsController.lua"/>
     <Script file="DualSpecController.lua"/>
     <Script file="MacroChangesController.lua"/>

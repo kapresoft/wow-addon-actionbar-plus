@@ -150,6 +150,20 @@ local function PropsAndMethods(o)
         end)
     end
 
+    function o:ShowAll()
+        if InCombatLockdown() then return end
+        self:ForEachFrame(function(f)
+            if f:IsShownInConfig() then f:ShowGroup() end
+        end)
+    end
+
+    function o:HideAll()
+        if InCombatLockdown() then return end
+        self:ForEachFrame(function(f)
+            if f:IsShown() then f:HideGroup() end
+        end)
+    end
+
     --- Apply for each button with a predicateFn
     --- @param applyFn ButtonHandlerFunction | "function(bw) print(bw:GetName()) end"
     --- @param predicateFn ButtonPredicateFunction | "function(bw) return true end"
