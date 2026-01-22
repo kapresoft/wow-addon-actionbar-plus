@@ -42,6 +42,8 @@ local function PropsAndMethods(o)
         [E.PET_BAR_SHOWGRID]       = true,
         [E.PET_BAR_HIDEGRID]       = true,
         [E.UPDATE_BINDINGS]        = true,
+        [E.PLAYER_ALIVE]           = true,
+        [E.PLAYER_UNGHOST]         = true,
         [E.PLAYER_REGEN_DISABLED]  = M.OnPlayerEnterCombat,
         [E.PLAYER_REGEN_ENABLED]   = M.OnPlayerLeaveCombat,
     }

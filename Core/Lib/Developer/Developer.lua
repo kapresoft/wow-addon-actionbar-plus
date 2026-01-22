@@ -32,7 +32,7 @@ local p = ns:LC().DEV:NewLogger(libName)
 Hooks
 -------------------------------------------------------------------------------]]
 function L.OnAddOnReady()
-    if not ShadowUF then L:Formation2() end
+    --if not ShadowUF then L:Formation2() end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -344,45 +344,7 @@ function L:SecureFuncExample()
     end)]]
 end
 
--- /run a:Formation1()
-function L:Formation1()
-    if ShadowUF then return end
 
-    local scale = 0.85
-    local ofsy = -200
-    if ns:IsMoP() then ofsy = -120 end
-
-    --- @type Frame
-    local pf = PlayerFrame
-    pf:SetScale(scale)
-    pf:ClearAllPoints()
-    pf:SetPoint("TOPRIGHT", UIParent, "CENTER", -100, ofsy)
-
-    local tf = TargetFrame
-    tf:ClearAllPoints()
-    tf:SetScale(scale)
-    tf:SetPoint("TOPLEFT", UIParent, "CENTER", 100, ofsy)
-end
-
--- /run a:Formation2()
-function L:Formation2()
-    if ShadowUF then return end
-
-    local scale = 0.85
-    local ofsy = -100
-    if ns:IsMoP() then ofsy = -120 end
-
-    --- @type Frame
-    local pf = PlayerFrame
-    pf:SetScale(scale)
-    pf:ClearAllPoints()
-    pf:SetPoint("TOPRIGHT", UIParent, "TOP", -100, ofsy)
-
-    local tf = TargetFrame
-    tf:ClearAllPoints()
-    tf:SetScale(scale)
-    tf:SetPoint("TOPLEFT", UIParent, "TOP", 100, ofsy)
-end
 
 --s.CreateEquipmentSet('Heals', 135907)
 --s.CreateEquipmentSet('Shadow', 136207)
