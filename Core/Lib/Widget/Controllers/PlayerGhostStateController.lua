@@ -22,29 +22,26 @@ local p = ns:CreateDefaultLogger(libName)
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param o PlayerGhostStateController | ControllerV2
-local function PropsAndMethods(o)
+--- @type PlayerGhostStateController | ControllerV2
+local o = L
 
-  --- Automatically called
-  --- @see ModuleV2Mixin#Init
-  --- @private
-  function o:OnAddOnReady()
-    self:RegisterAddOnMessage(E.PLAYER_ALIVE, o.OnPlayerAlive)
-    self:RegisterAddOnMessage(E.PLAYER_UNGHOST, o.OnPlayerUnghost)
-  end
+--- Automatically called
+--- @see ModuleV2Mixin#Init
+--- @private
+function o:OnAddOnReady()
+  self:RegisterAddOnMessage(E.PLAYER_ALIVE, o.OnPlayerAlive)
+  self:RegisterAddOnMessage(E.PLAYER_UNGHOST, o.OnPlayerUnghost)
+end
 
-  --- Fired when the player releases from death to a graveyard;
-  --- or accepts a resurrect before releasing their spirit.
-  function o.OnPlayerAlive()
-    local isGhost = UnitIsGhost('player')
-    if not isGhost then return end
-    C_Timer.After(0.2, function() o:HideAll() end)
-  end
+--- Fired when the player releases from death to a graveyard;
+--- or accepts a resurrect before releasing their spirit.
+function o.OnPlayerAlive()
+  local isGhost = UnitIsGhost('player')
+  if not isGhost then return end
+  C_Timer.After(0.2, function() o:HideAll() end)
+end
 
-  --- Fired when the player is alive after being a ghost.
-  function o.OnPlayerUnghost()
-    C_Timer.After(0.2, function() o:ShowAll() end)
-  end
-
-end; PropsAndMethods(L)
-
+--- Fired when the player is alive after being a ghost.
+function o.OnPlayerUnghost()
+  C_Timer.After(0.2, function() o:ShowAll() end)
+end
