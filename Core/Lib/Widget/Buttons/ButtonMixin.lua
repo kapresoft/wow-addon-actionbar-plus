@@ -321,12 +321,13 @@ local function PropsAndMethods(o)
 
     --- @param cd CooldownInfo
     function o:SetCooldownByDetails(cd)
-        if not cd or not (cd.start or cd.duration) then return end
+        if not cd then return end
         self:SetCooldown(cd.start, cd.duration, cd.modRate)
     end
 
     function o:SetCooldown(start, duration, modRate)
         if not (start or duration) then return end
+        self.cooldown():Clear()
         self.cooldown():SetCooldown(start, duration, modRate or 1)
     end
 
@@ -561,7 +562,9 @@ local function PropsAndMethods(o)
         local cd = optionalCooldownInfo or self:GetCooldownInfo()
         if not cd or cd.enabled == 0 then return end
         -- Instant cast spells have zero duration, skip
-        if (not cd.duration) or cd.duration <= 0 then
+        -- Use pcall for Midnight fix
+        local ok, isLTZ = pcall(function() return cd.duration <= 0 end)
+        if (ok and isLTZ) or not cd.duration then
             self:ResetCooldown()
             return
         end
