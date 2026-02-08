@@ -79,13 +79,19 @@ local function PropsAndMethods(o)
         local unitClass = self:GetUnitClass()
         return unitClass and IsAnyOf(unitClass, ...)
     end
-
-    --- @vararg any list of Unit Class IDs
-    --- @return Boolean
-    function o:IsPlayerClassAnyOfID(...)
-        local _, _, unitClassID = UnitClass('player')
-        return unitClassID and GC:IsAnyOfNumber(unitClassID, ...)
-    end
+  
+  --- @vararg any list of Unit Class IDs
+  --- @return Boolean
+  function o:IsPlayerClassAnyOfID(...)
+    local _, _, unitClassID = UnitClass('player')
+    if not unitClassID then return false end
+    local args = { ... }
+    -- Fix for Midnight
+    local ok, result = pcall(function()
+      return GC:IsAnyOfNumber(unitClassID, unpack(args))
+    end)
+    return (ok and result) or false
+  end
 
     --- Notes:
     --- - `PriestUnitMixin:IsUs()` returns true if player is a priest, otherwise false
@@ -123,11 +129,14 @@ local function PropsAndMethods(o)
                 O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
                 O.PriestUnitMixin.SHADOW_FORM_SPELL_ID_RETAIL
     end
-
+  
     function o:UpdateShapeshiftBuffs()
+      --- Wrap in pcall for Midnight Fix
+      pcall(function()
         self:UpdateBuffs(function(spellID)
-            return GC:IsAnyOfNumber(spellID, self:GeTrackedShapeshiftSpells());
+          return GC:IsAnyOfNumber(spellID, self:GeTrackedShapeshiftSpells());
         end)
+      end)
     end
 
     --- TODO: Move to API

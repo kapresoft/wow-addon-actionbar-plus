@@ -1,4 +1,4 @@
-## Interface: 110207
+## Interface: 120000
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
 ## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
