@@ -5,7 +5,7 @@
 # Note: This will build in ./.release/_setup directory
 package-as: _setup
 # --------------------------
-manual-changelog: CHANGELOG.md
+manual-changelog: CHANGELOG.txt
 
 # Use GitHub because svn repos are slower
 # basepath is ${package-as}
@@ -13,10 +13,9 @@ manual-changelog: CHANGELOG.md
 #  - This is faster: https://github.com/WoWUIDev/Ace3
 #  - But this is the official: https://repos.wowace.com/wow/ace3/trunk
 externals:
-  ThirdParty-Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+  ThirdParty-Libs/Ace3: https://github.com/WoWUIDev/Ace3
   ThirdParty-Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
   ThirdParty-Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
-  ThirdParty-Libs/Ace3: https://github.com/WoWUIDev/Ace3
   ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 
 ignore:
@@ -25,17 +24,17 @@ ignore:
   - "*.yaml"
   - "*.yml"
   - "*.toc"
+  - "*.txt"
   - dev
   - doc
-  - Gears
-  - Gears-OptionsUI
-  - ThirdParty-Libs/LibStub/tests
+  - ActionbarPlus
+  - ThirdParty-Libs/Ace3/LibStub/tests
   - ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0/lib.xml
+  - ThirdParty-Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
   - ThirdParty-Libs/Ace3/Ace3.lua
   - ThirdParty-Libs/Ace3/Bindings.xml
   - ThirdParty-Libs/Ace3/changelog.txt
   - ThirdParty-Libs/Ace3/LICENSE.txt
-  - ThirdParty-Libs/Ace3/LibStub
   - ThirdParty-Libs/LibPrettyPrint/dev
   - ThirdParty-Libs/LibPrettyPrint/doc
   - ThirdParty-Libs/LibPrettyPrint/*.toc
