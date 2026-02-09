@@ -2,7 +2,6 @@ package-as: ActionbarPlus
 # --------------------------
 license-output: LICENSE.txt
 enable-nolib-creation: no
-#enable-toc-creation: yes
 
 manual-changelog:
   filename: CHANGELOG.txt
@@ -38,25 +37,10 @@ tools-used:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  Core/ExtLib/Kapresoft-LibUtil:
-    url: https://github.com/kapresoft/wow-lib-util
-    tag: latest
-  # Sourcing Ace3 addon directly from github
-  # LibStub is included in Ace3 add
-  Core/ExtLib/WowAce/Ace3:
-    url: https://repos.wowace.com/wow/ace3/trunk
-    tag: latest
-  Core/ExtLib/WowAce/LibCompress/LibCompress:
-    # https://www.wowace.com/projects/libcompress
-    url: https://repos.wowace.com/wow/libcompress/trunk
-    tag: latest
-  Core/ExtLib/WowAce/LibSharedMedia/LibSharedMedia-3.0:
-    url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
-    tag: latest
-  Core/ExtLib/WowAce/LibQTip/LibQTip-1.0:
-    # https://www.wowace.com/projects/libqtip-1-0
-    url: https://repos.wowace.com/wow/libqtip-1-0
-    tag: latest
+  ActionbarPlus/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+  ActionbarPlus/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
+  ActionbarPlus/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+  ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
 
 ignore:
   - "*.sh"
@@ -66,24 +50,32 @@ ignore:
   - dev
   - doc
   - scripts
-  - Core/ExtLib/Kapresoft-LibUtil/LICENSE
-  - Core/ExtLib/Kapresoft-LibUtil/Kapresoft-LibUtil.toc
-  - Core/ExtLib/Kapresoft-LibUtil/External
-  - Core/ExtLib/Kapresoft-LibUtil/dev
-  - Core/ExtLib/Kapresoft-LibUtil/sync-extlibs.sh
-  - Core/ExtLib/WowAce/LibQTip/LibQTip-1.0/LibStub
-  - Core/ExtLib/WowAce/LibQTip/LibQTip-1.0/LibQTip-1.0.toc
-  - Core/ExtLib/WowAce/LibCompress/LibCompress/LibCompress.toc
-  - Core/ExtLib/WowAce/Ace3/tests
-  - Core/ExtLib/WowAce/Ace3/Ace3.lua
-  - Core/ExtLib/WowAce/Ace3/Ace3.toc
-  - Core/ExtLib/WowAce/Ace3/Ace3_TBC.toc
-  - Core/ExtLib/WowAce/Ace3/Ace3_Vanilla.toc
-  - Core/ExtLib/WowAce/Ace3/Ace3_Wrath.toc
-  - Core/ExtLib/WowAce/Ace3/Bindings.xml
-  - Core/ExtLib/WowAce/Ace3/Bindings.xml
-  - Core/Lib/Developer
-  - Dev.toc
+  - ActionbarPlus-2.0
+  - ActionbarPlus/Core/Lib/Developer
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/LICENSE
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/External
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/dev
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/doc
+  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.sh
+  - ActionbarPlus/ThirdParty/Libs/Ace3/*.toc
+  - ActionbarPlus/ThirdParty/Libs/Ace3/tests
+  - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
+  - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
+  - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
 
-## Potentially helpful libraries
-## - https://www.wowace.com/projects/libactionbutton-1-0
+# REQUIRED for CurseForge packager (non-obvious):
+# The LEFT side MUST be <repo-folder>/<addon-folder>
+#   - <addon-folder> MUST be the folder that contains the .toc files
+# The RIGHT side MUST be the addon name:
+#   - Must match the .toc filename (AddonName.toc)
+#   - Must match `package-as`
+#
+# NOTE:
+# CurseForge release.sh (poorly) relies on `move-folders` for *addon discovery*,
+# not just post-processing. If this does not exactly match
+# <repo>/<addon>, `toc_root_paths` will be empty and packaging WILL fail.
+#
+# ⚠️ Do not change unless you also change the repo/addon layout.
+move-folders:
+  ActionbarPlus/ActionbarPlus: ActionbarPlus
