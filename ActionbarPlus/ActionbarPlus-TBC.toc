@@ -1,6 +1,7 @@
-## Interface: 50503
+## Interface: 20505
 ## Version: @project-version@
-## Title: |TInterface/Addons/ActionbarPlus/Core/Assets/Textures/logo-v2-64x:18:18|t Actionbar|cff1784d1Plus|r MoP
+## Title: Actionbar|cff1784d1Plus|r
+## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
 
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
@@ -50,5 +51,6 @@
 # To get the Interface/Build Info
 # /dump select(4, GetBuildInfo())
 
-Core\Mists.lua
+ThirdParty\ThirdParty.xml
+Core\TBC.lua
 Core\_Core.xml

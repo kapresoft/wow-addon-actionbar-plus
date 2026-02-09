@@ -1,5 +1,4 @@
 ## Interface: 100002
-## Title: Dev
+## Title: Developer Setup/Bootstrap
 ## Author: kapresoft@gmail.com
 
-Core\_Core.xml
