@@ -1,4 +1,4 @@
-## Interface: 20505
+## Interface: 120000
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r
 ## IconTexture: Interface/AddOns/ActionbarPlus/Core/Assets/Textures/logo-v2-64x
@@ -9,7 +9,7 @@
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_DB, ABP_LOG_LEVEL, ABP_DEBUG_MODE, ABP_DEBUG_ENABLED_CATEGORIES
 ## SavedVariablesPerCharacter: ABP_CHARACTER_DB
-## OptionalDeps: Ace3
+## OptionalDeps: Blizzard_Professions, Ace3
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten
@@ -48,8 +48,9 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-# To get the Interface/Build Info
+# To get the Interface/Build Info.
 # /dump select(4, GetBuildInfo())
 
-Core\TBC.lua
+ThirdParty\ThirdParty.xml
+Core\Retail.lua
 Core\_Core.xml
