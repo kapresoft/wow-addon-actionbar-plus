@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI
 local ns = select(2, ...)
-local p = ns:cns():log()
+local p = ns:log('BarController')
 
 --[[-------------------------------------------------------------------
 Type: ActionbarPlus_BarsUI_BarController
@@ -22,7 +22,9 @@ local function ControllerMethods()
     local c = ActionbarPlus_BarsUI_BarController
 
     function c:OnLoad()
-    
+        C_Timer.After(1, function()
+            p('OnLoad...')
+        end)
     end
     
 end; ControllerMethods()
