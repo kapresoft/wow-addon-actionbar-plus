@@ -15,7 +15,7 @@ Namespace_ABP_BarsUI
 local addon
 --- @type Namespace_ABP_BarsUIImpl | Namespace_ABP_BarsUI
 local ns
-addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2_BarsUI'
+addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
 
 --- @type Namespace_ABP_2_0
 function ns:cns() return ABP_CORE_NS end

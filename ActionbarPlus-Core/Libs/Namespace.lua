@@ -4,8 +4,6 @@ local addon
 local ns
 addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
 
-local shortName = 'ABP_2_0'
-
 --[[-------------------------------------------------------------------
 Type:Namespace
 ---------------------------------------------------------------------]]
