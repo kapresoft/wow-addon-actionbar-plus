@@ -14,6 +14,7 @@ manual-changelog: CHANGELOG.txt
 #  - But this is the official: https://repos.wowace.com/wow/ace3/trunk
 externals:
   ThirdParty-Libs/Ace3: https://github.com/WoWUIDev/Ace3
+  ThirdParty-Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
   ThirdParty-Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
   ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 
@@ -45,4 +46,4 @@ ignore:
 # Base path is .release/; Moves Libs to the folder above .release and into
 # the project folders
 move-folders:
-  _setup/ThirdParty-Libs: ../ActionbarPlus/ThirdParty/Libs
+  _setup/ThirdParty-Libs: ../ActionbarPlus-2-0/ThirdParty/Libs
