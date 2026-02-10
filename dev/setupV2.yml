@@ -46,4 +46,4 @@ ignore:
 # Base path is .release/; Moves Libs to the folder above .release and into
 # the project folders
 move-folders:
-  _setup/ThirdParty-Libs: ../ActionbarPlus-2-0/ThirdParty/Libs
+  _setup/ThirdParty-Libs: ../ActionbarPlus-Core/ThirdParty/Libs
