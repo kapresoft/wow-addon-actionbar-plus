@@ -52,3 +52,8 @@ function ns:log(moduleName)
     local tracer2 = ns:cns():traceFn(m)
     return printer, tracer1, tracer2
 end
+
+--[[-------------------------------------------------------------------
+Namespace Methods
+---------------------------------------------------------------------]]
+function ns:a() return ABP_BarsUI end

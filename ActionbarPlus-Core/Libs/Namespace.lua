@@ -50,6 +50,26 @@ ns.printer = LibPrettyPrint:Printer({
 --[[-------------------------------------------------------------------
 Methods
 ---------------------------------------------------------------------]]
+--- @type AceEvent
+local AceEvent = LibStub("AceEvent-3.0")
+--- @type AceBucket
+local AceBucket = LibStub("AceBucket-3.0")
+
+--- @type AceAddonObj
+ns.AceAddon = LibStub("AceAddon-3.0")
+
+--- @param targetObj any|nil An optional targetObj for embedding
+function ns:AceEvent(targetObj)
+  if targetObj then return AceEvent:Embed(targetObj) end
+  return AceEvent:Embed({})
+end
+
+--- @param targetObj any|nil An optional targetObj for embedding
+function ns:AceBucket(targetObj)
+  if targetObj then return AceBucket:Embed(targetObj) end
+  return AceBucket:Embed({})
+end
+
 --- @param tracer EventTracePrinter_ABP_2_0
 function ns:RegisterTracer(tracer)
   self.tracerMixin = tracer
