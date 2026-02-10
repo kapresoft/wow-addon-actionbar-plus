@@ -104,10 +104,10 @@
     <CheckButton name="ABP_ButtonTemplate_V2_1_1" inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_V2_1"
                  mixin="ABP_ButtonTemplateMixin_V2_1_1" virtual="true">
         <Scripts>
-            <OnLoad>self:OnLoad()</OnLoad>
-            <PostClick>self:OnPostClick(button, down)</PostClick>
-            <OnAttributeChanged>self:OnAttributeChanged(name, value)</OnAttributeChanged>
-            <OnEvent>self:OnEvent(event, ...)</OnEvent>
+            <OnLoad method="OnLoad"/>
+            <PostClick method="OnPostClick"/>
+            <OnAttributeChanged method="OnAttributeChanged"/>
+            <OnEvent method="OnEvent"/>
         </Scripts>
     </CheckButton>
 </Ui>
