@@ -45,3 +45,4 @@ ignore:
 # the project folders
 move-folders:
   _setup/ThirdParty-Libs: ../ActionbarPlus/ThirdParty/Libs
+#  _setup/ThirdParty-Libs: ../ActionbarPlus-2-0/ThirdParty/Libs
