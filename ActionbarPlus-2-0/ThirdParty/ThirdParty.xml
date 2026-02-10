@@ -19,5 +19,6 @@
     <Include file="Ace3.xml"/>
     @end-non-debug@-->
     <Include file='Libs\Kapresoft-LibUtil\_Lib.xml'/>
+    <Include file='LibPrettyPrint.xml'/>
 
 </Ui>

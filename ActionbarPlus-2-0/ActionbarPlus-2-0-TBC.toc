@@ -51,5 +51,5 @@
 # /dump select(4, GetBuildInfo())
 
 ThirdParty\ThirdParty.xml
-Libs\TBC-2-0.lua
-# Core\_Core.xml
+Libs\Flavor\TBC-2-0.lua
+Libs\_Libs.xml
