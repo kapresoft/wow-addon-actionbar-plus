@@ -67,4 +67,6 @@ luac.out
 /_SV
 
 ActionbarPlus/ThirdParty/Libs
-ActionbarPlus-2-0/ThirdParty/Libs
+ActionbarPlus-Core/ThirdParty/Libs
+ActionbarPlus-BarsUI/ThirdParty/Libs
+ActionbarPlus-OptionsUI/ThirdParty/Libs
