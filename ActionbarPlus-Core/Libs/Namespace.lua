@@ -2,7 +2,7 @@
 local addon
 --- @type NamespaceImpl_ABP_2_0 | Namespace_ABP_2_0
 local ns
-addon, ns = ...; ns.addon = addon; ABP_2_0_NS = ns
+addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
 
 local shortName = 'ABP_2_0'
 
@@ -10,10 +10,13 @@ local shortName = 'ABP_2_0'
 Type:Namespace
 ---------------------------------------------------------------------]]
 --- @class NamespaceImpl_ABP_2_0
---- @field xml table
+--- @field name Name The addon name
+--- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion GameVersion
+--- @field private fmt LibPrettyPrint_Formatter
+--- @field private printer LibPrettyPrint_Printer
 --- @field tracer EventTracePrinter_ABP_2_0
---- @field p LibPrettyPrint_Printer The base printer
+
 --[[-------------------------------------------------------------------
 Aliases
 ---------------------------------------------------------------------]]
@@ -33,9 +36,7 @@ function ns:IsDev() return ns.settings.developer == true end
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
-local function predicateFn()
-  print('xxx isDev:', ns:IsDev())
-  return ns:IsDev() end
+local function predicateFn() return ns:IsDev() end
 
 --[[-------------------------------------------------------------------
 Formatter/Printer
@@ -44,19 +45,31 @@ ns.fmt = LibPrettyPrint:Formatter({
   show_all = true, depth_limit = 3
 })
 ns.printer = LibPrettyPrint:Printer({
-  prefix    = ns.addon, prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
+  prefix    = ns.name, prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
   formatter = ns.fmt
-}, function() return ns:IsDev() end)
+}, predicateFn)
 
 --[[-------------------------------------------------------------------
 Methods
 ---------------------------------------------------------------------]]
 --- @param tracer EventTracePrinter_ABP_2_0
 function ns:RegisterTracer(tracer)
-  self.tracer = tracer:New(shortName, predicateFn)
+  self.tracerMixin = tracer
+  self.tracer = tracer:New(ns.nameShort, predicateFn)
   if not (ns:IsDev() and settings.enableTraceUI) then
     self.tracer.evt:Hide()
   end
+end
+
+--- @param name Name
+--- @param predicateFn fun():boolean @Optional - The predicate function
+--- @return EventTracePrinter_ABP_2_0
+function ns:NewTracer(name, predicateFn)
+  local tr = self.tracerMixin:New(name, predicateFn)
+  if not (ns:IsDev() and settings.enableTraceUI) then
+    tr.evt:Hide()
+  end
+  return tr
 end
 
 function ns:MixinGameVersion(gameVersion) Mixin(self, gameVersion) end
@@ -89,6 +102,7 @@ function ns:traceFnWithFormatting(prefix)
   return function(...) return self.tracer:tf(strtrim(prefix), ...) end
 end
 
+--- Returns the print, tracer1, tracer2 functions
 --- @param moduleName Name
 --- @return LibPrettyPrint_Printer | LibPrettyPrint_PrintFn, fun(...), fun(...)
 function ns:log(moduleName)
@@ -104,3 +118,6 @@ function ns:log(moduleName)
   local tracer2 = ns:traceFn(m)
   return printer, tracer1, tracer2
 end
+
+--- @type Namespace_ABP_2_0
+ABP_CORE_NS = ns
