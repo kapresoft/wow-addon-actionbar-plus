@@ -6,25 +6,35 @@ local ns = select(2, ...)
 local p = ns:log('BarController')
 
 --[[-------------------------------------------------------------------
-Type: ActionbarPlus_BarsUI_BarController
+Type: ActionbarPlus_BarsUI_BarControllerMixin
 ---------------------------------------------------------------------]]
---- @alias ActionbarPlus_BarsUI_BarController ActionbarPlus_BarsUI_BarControllerImpl|FrameObj
+--- @alias ActionbarPlus_BarsUI_BarControllerMixin ActionbarPlus_BarsUI_BarControllerMixinImpl|FrameObj
 --
 --
---- @class ActionbarPlus_BarsUI_BarControllerImpl
-ActionbarPlus_BarsUI_BarController = {};
+--- @class ActionbarPlus_BarsUI_BarControllerMixinImpl
+ActionbarPlus_BarsUI_BarControllerMixin = {};
 
 --[[-------------------------------------------------------------------
-Methods: ActionbarPlus_BarsUI_BarController
+Methods: ActionbarPlus_BarsUI_BarControllerMixin
 ---------------------------------------------------------------------]]
 local function ControllerMethods()
-    --- @type ActionbarPlus_BarsUI_BarControllerImpl|ActionbarPlus_BarsUI_BarController
-    local c = ActionbarPlus_BarsUI_BarController
+    --- @type ActionbarPlus_BarsUI_BarControllerMixinImpl|ActionbarPlus_BarsUI_BarControllerMixin
+    local c = ActionbarPlus_BarsUI_BarControllerMixin
 
     function c:OnLoad()
-        C_Timer.After(1, function()
-            p('OnLoad...')
-        end)
+        self:RegisterEvent('PLAYER_ENTERING_WORLD')
+        self:RegisterEvent('UNIT_SPELLCAST_SENT')
+    end
+    
+    function c:OnEvent(evt, ...)
+        p('OnEvent:: event=', evt)
+
+        local arg1, arg2 = ...;
+        if ( evt == 'PLAYER_ENTERING_WORLD' ) then
+        elseif ( evt == 'UNIT_SPELLCAST_SENT' ) then
+            --p('OnEvent:: event=', evt)
+            --ActionBarController_UpdateAll();
+        end
     end
     
 end; ControllerMethods()

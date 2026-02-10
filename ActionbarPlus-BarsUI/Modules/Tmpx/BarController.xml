@@ -5,9 +5,10 @@
     <Include file="BarFrame.xml"/>
 
     <Frame name="BarController" hidden="true"
-           mixin="ActionbarPlus_BarsUI_BarController">
+           mixin="ActionbarPlus_BarsUI_BarControllerMixin">
         <Scripts>
             <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
             <!--<OnLoad>ABP_XML:BarController_OnLoad(self)</OnLoad>
             <OnEvent>ABP_XML:BarController_OnEvent(self, event)</OnEvent>-->
         </Scripts>
