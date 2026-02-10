@@ -7,7 +7,7 @@
 
     <!--@end-do-not-package@-->
     <Include file='Modules\_Modules.xml'/>
-    <Script file="ActionbarPlus-2-0.lua"/>
+    <Script file="ActionbarPlus-Core.lua"/>
     <!--@do-not-package@-->
 
     <Script file='Libs\Developer\Developer.lua'/>

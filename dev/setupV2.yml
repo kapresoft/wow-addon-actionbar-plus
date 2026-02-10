@@ -38,7 +38,8 @@ ignore:
   - ThirdParty-Libs/Ace3/LICENSE.txt
   - ThirdParty-Libs/LibPrettyPrint/dev
   - ThirdParty-Libs/LibPrettyPrint/doc
-  - ThirdParty-Libs/LibPrettyPrint/Libs/Developer
+  - ThirdParty-Libs/LibPrettyPrint/Libs/Developer/*.xml
+  - ThirdParty-Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
   - ThirdParty-Libs/LibPrettyPrint/*.toc
   - ThirdParty-Libs/Kapresoft-LibUtil/dev
   - ThirdParty-Libs/Kapresoft-LibUtil/External
