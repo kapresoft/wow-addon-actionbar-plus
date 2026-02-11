@@ -4,6 +4,11 @@ local addon
 local ns
 addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
 
+ns.DB_NAME = 'ABP_PLUS_CORE_DB'
+
+--- @type Modules_ABP_2_0
+ns.O = ns.O or {}
+
 --[[-------------------------------------------------------------------
 Type:Namespace
 ---------------------------------------------------------------------]]
@@ -14,6 +19,8 @@ Type:Namespace
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --- @field tracer EventTracePrinter_ABP_2_0
+--- @field M Modules_ABP_2_0 The module names
+--- @field O Modules_ABP_2_0 The module objects
 
 --[[-------------------------------------------------------------------
 Aliases
@@ -50,25 +57,49 @@ ns.printer = LibPrettyPrint:Printer({
 --[[-------------------------------------------------------------------
 Methods
 ---------------------------------------------------------------------]]
---- @type AceEvent
-local AceEvent = LibStub("AceEvent-3.0")
---- @type AceBucket
-local AceBucket = LibStub("AceBucket-3.0")
-
---- @type AceAddonObj
-ns.AceAddon = LibStub("AceAddon-3.0")
-
---- @param targetObj any|nil An optional targetObj for embedding
-function ns:AceEvent(targetObj)
-  if targetObj then return AceEvent:Embed(targetObj) end
-  return AceEvent:Embed({})
+do
+  local obj = ns.O
+  --- @type AceEvent
+  obj.AceEvent = LibStub("AceEvent-3.0")
+  --- @type AceBucketObj
+  obj.AceBucket = LibStub("AceBucket-3.0")
+  --- @type AceAddonObj
+  obj.AceAddon = LibStub("AceAddon-3.0")
+  --- @type AceDB
+  obj.AceDB = LibStub("AceDB-3.0")
+  
+  --- @param targetObj any|nil An optional targetObj for embedding
+  function ns:NewAceEvent(targetObj)
+    if targetObj then return self.O.AceEvent:Embed(targetObj) end
+    return self.O.AceEvent:Embed({})
+  end
+  
+  --- @param targetObj any|nil An optional targetObj for embedding
+  function ns:NewAceBucket(targetObj)
+    if targetObj then return self.O.AceBucket:Embed(targetObj) end
+    return self.O.AceBucket:Embed({})
+  end
 end
 
---- @param targetObj any|nil An optional targetObj for embedding
-function ns:AceBucket(targetObj)
-  if targetObj then return AceBucket:Embed(targetObj) end
-  return AceBucket:Embed({})
+--- Register a Namespace Module
+--- @generic T
+--- @param obj T The library object instance
+--- @return T
+function ns:Register(libName, obj)
+  assert(type(libName) == 'string' and type(obj) == 'table',
+          'Register(libName, obj): libName(string) and obj(table) is required.')
+  self.O[libName] = obj
+  return obj
 end
+
+--- @param db AceDBObject
+function ns:RegisterDB(db)
+  assert(type(db) == 'table', "RegisterDB(db): The param db is required.")
+  self.addonDbFn = function() return db end
+end
+
+--- @return AceDBObjectObj
+function ns:db() return self.addonDbFn() end
 
 --- @param tracer EventTracePrinter_ABP_2_0
 function ns:RegisterTracer(tracer)
