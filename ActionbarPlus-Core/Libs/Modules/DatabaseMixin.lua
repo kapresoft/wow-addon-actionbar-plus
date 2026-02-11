@@ -15,7 +15,7 @@ local AceDB = ns.O.AceDB
 New Instance
 -------------------------------------------------------------------------------]]
 --- @alias DatabaseMixin_ABP_2_0 DatabaseMixinImpl_ABP_2_0 | AceDB
---- @alias Database_ABP_2_0 DatabaseMixin_ABP_2_0
+--- @alias Database_ABP_2_0 DatabaseMixin_ABP_2_0 | ABP_Core_2_0
 --
 --
 local libName = ns.M.DatabaseMixin()
@@ -23,9 +23,29 @@ local libName = ns.M.DatabaseMixin()
 local S = ns:Register(libName, {})
 local p = ns:log(libName)
 
---- @type DatabaseMixinImpl_ABP_2_0 | DatabaseMixin_ABP_2_0
+--- @type DatabaseMixinImpl_ABP_2_0 | Database_ABP_2_0
 local o = S
 
+--[[-------------------------------------------------------------------
+Support Functions
+---------------------------------------------------------------------]]
+--- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
+--- @param db AceDBObjectObj
+local function DatabaseMixin_RegisterCallbacks(self, db)
+    db.RegisterCallback(self, "OnNewProfile", "OnNewProfile")
+    db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+    db.RegisterCallback(self, "OnProfileCopied", "OnProfileCopied")
+    db.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
+    db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
+end
+--- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
+--- @param db AceDBObjectObj
+local function DatabaseMixin_InitDBDefaults(self, db)
+    --todo next: setup default db
+    --db:RegisterDefaults(ns.DefaultAddOnDatabase)
+    db.profile.enable = true
+    p(('Current Profile: %s'):format(ns:db():GetCurrentProfile()))
+end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -35,60 +55,10 @@ function o:OnProfileDeleted(evt, db, profileKey) p('OnProfileDeleted called...ke
 function o:OnProfileCopied() p('OnProfileCopied called...') end
 function o:OnProfileReset() p('OnProfileReset called...') end
 
---ns:db().RegisterCallback(o, "OnNewProfile", "OnNewProfile")
---ns:db().RegisterCallback(o, "OnProfileChanged", "OnProfileChanged")
---ns:db().RegisterCallback(o, "OnProfileCopied", "OnProfileCopied")
---ns:db().RegisterCallback(o, "OnProfileReset", "OnProfileReset")
---ns:db().RegisterCallback(o, "OnProfileDeleted", "OnProfileDeleted")
-
---- @param addon ABP_Core_2_0_Impl
+--- @param addon ABP_Core_2_0
 function o:InitDb(addon)
-    
-    local db = AceDB:New(ns.DB_NAME)
-    ns:RegisterDB(db)
-    
-    --C_Timer.After(1, function()
-    --    p('xx db keys:', db.keys)
-    --end)
-    
-    Mixin(addon, self)
-    --self:InitDbDefaults()
+    Mixin(addon, o)
+    local db = AceDB:New(ns.DB_NAME); ns:RegisterDB(db)
+    DatabaseMixin_RegisterCallbacks(addon, db)
+    DatabaseMixin_InitDBDefaults(addon, db)
 end
-
---[[-----------------------------------------------------------------------------
-Library Methods
--------------------------------------------------------------------------------]]
------ @type DatabaseMixinImpl_ABP_2_0
---local LIB = S
-
-
---[[-----------------------------------------------------------------------------
-Instance Methods
--------------------------------------------------------------------------------]]
---- @type AceDbInitializer
---local o = S
-
---[[--- Called by CreateAndInitFromMixin(..) Automatically
---- @param addon AddonSuite
-function o:Init(addon)
-    assert(addon, "AddonSuite is required")
-    self.addon = addon
-    self.addon.db = AceDB:New(GC.C.DB_NAME)
-    self.addon.dbInit = self
-    ns:SetAddOnFn(function() return self.addon.db end)
-end]]
-
---[[--- @return AceDB
-function o:GetDB() return self.addon.db end]]
-
---function o:InitDb()
---    p( 'Initialize called...')
---    AddonCallbackMethods(self.addon)
---    self:InitDbDefaults()
---end
-
---function o:InitDbDefaults()
---    ns:db():RegisterDefaults(ns.DefaultAddOnDatabase)
---    ns:db().profile.enable = true
---    p:i(function() return 'Profile: %s', ns:db():GetCurrentProfile() end)
---end
