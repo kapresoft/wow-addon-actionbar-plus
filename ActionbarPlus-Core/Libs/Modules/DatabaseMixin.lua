@@ -15,23 +15,24 @@ local DB_VERSION = 1
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @alias DatabaseMixin_ABP_2_0 DatabaseMixinImpl_ABP_2_0 | AceDB
+--- @alias DatabaseMixin_ABP_2_0 DatabaseMixin_ABP_2_0 | AceDB_3_0
 --- @alias Database_ABP_2_0 DatabaseMixin_ABP_2_0 | ABP_Core_2_0
 --
 --
 local libName = ns.M.DatabaseMixin()
---- @class DatabaseMixinImpl_ABP_2_0
+--- @class DatabaseMixin_ABP_2_0
 local S = ns:Register(libName, {})
 local p = ns:log(libName)
 
---- @type DatabaseMixinImpl_ABP_2_0 | Database_ABP_2_0
+--- @type DatabaseMixin_ABP_2_0 | Database_ABP_2_0
 local o = S
+
 
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
---- @param self DatabaseMixinImpl_ABP_2_0
---- @param db AceDBObjectObj
+--- @param self DatabaseMixin_ABP_2_0
+--- @param db AceDBObject_3_0
 local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnNewProfile", "OnNewProfile")
     db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -39,7 +40,7 @@ local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
 end
---- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
+--- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
 --- @param db Config_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
     db:RegisterDefaults(ns.O.DatabaseSchema:GetDefaultDatabase())
@@ -48,8 +49,8 @@ local function DatabaseMixin_InitDBDefaults(self, db)
     --p('Schema: keys=', db.keys)
 end
 
---- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
---- @param db AceDBObjectObj
+--- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
+--- @param db AceDBObject_3_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
     local current = db.global.schemaVersion or 1
     if current < DB_VERSION then
