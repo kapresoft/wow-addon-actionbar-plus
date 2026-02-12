@@ -27,7 +27,6 @@ local o = A
 function o:OnInitialize()
   C_Timer.After(1, function()
     DatabaseMixin:InitDb(self)
-   p('OnInit::InitDb keys=', ns:db().keys)
   end)
 end
 

@@ -46,12 +46,10 @@ local function predicateFn() return ns:IsDev() end
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
-ns.fmt = LibPrettyPrint:Formatter({
-  show_all = true, depth_limit = 3
-})
+ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 })
 ns.printer = LibPrettyPrint:Printer({
-  prefix    = ns.name, prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
-  formatter = ns.fmt
+  prefix = ns.nameShort, formatter = ns.fmt,
+  prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
 }, predicateFn)
 
 --[[-------------------------------------------------------------------
@@ -98,7 +96,7 @@ function ns:RegisterDB(db)
   self.addonDbFn = function() return db end
 end
 
---- @return AceDBObjectObj
+--- @return Database_ABP_2_0
 function ns:db() return self.addonDbFn() end
 
 --- @param tracer EventTracePrinter_ABP_2_0

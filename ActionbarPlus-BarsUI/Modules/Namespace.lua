@@ -28,12 +28,10 @@ local function predicateFn() return ns:cns():IsDev() end
 
 ns.tracer = ns:cns():NewTracer(ns.nameShort, predicateFn)
 
-ns.fmt = LibPrettyPrint:Formatter({
-    show_all = true, depth_limit = 3
-})
+ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 })
 ns.printer = LibPrettyPrint:Printer({
-    prefix    = ns.nameShort, prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
-    formatter = ns.fmt
+    prefix = ns.nameShort, formatter = ns.fmt,
+    prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
 }, predicateFn)
 
 --- Returns the print, tracer1, tracer2 functions
