@@ -15,6 +15,8 @@ local ModuleNames = {
   
   --- @type DatabaseMixin_ABP_2_0
   DatabaseMixin = {},
+  --- @type DatabaseSchema_ABP_2_0
+  DatabaseSchema = {},
   
   -----------------------
   ----- ThirdParty ------

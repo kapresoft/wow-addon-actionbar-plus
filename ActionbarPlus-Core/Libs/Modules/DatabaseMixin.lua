@@ -8,8 +8,9 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-
 local AceDB = ns.O.AceDB
+
+local DB_VERSION = 1
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -29,7 +30,7 @@ local o = S
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
---- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
+--- @param self DatabaseMixinImpl_ABP_2_0
 --- @param db AceDBObjectObj
 local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnNewProfile", "OnNewProfile")
@@ -39,13 +40,24 @@ local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
 end
 --- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
---- @param db AceDBObjectObj
+--- @param db Config_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
-    --todo next: setup default db
-    --db:RegisterDefaults(ns.DefaultAddOnDatabase)
-    db.profile.enable = true
-    p(('Current Profile: %s'):format(ns:db():GetCurrentProfile()))
+    db:RegisterDefaults(ns.O.DatabaseSchema:GetDefaultDatabase())
+    p(('Current Profile: %s'):format(db:GetCurrentProfile()))
+    p('Schema: version=', db.global.schemaVersion , 'global=', db.global, 'profile=', db.profile)
+    --p('Schema: keys=', db.keys)
 end
+
+--- @param self DatabaseMixinImpl_ABP_2_0|Database_ABP_2_0
+--- @param db AceDBObjectObj
+local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
+    local current = db.global.schemaVersion or 1
+    if current < DB_VERSION then
+        self:RunMigrations(current)
+        db.global.schemaVersion = DB_VERSION
+    end
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -59,6 +71,18 @@ function o:OnProfileReset() p('OnProfileReset called...') end
 function o:InitDb(addon)
     Mixin(addon, o)
     local db = AceDB:New(ns.DB_NAME); ns:RegisterDB(db)
-    DatabaseMixin_RegisterCallbacks(addon, db)
     DatabaseMixin_InitDBDefaults(addon, db)
+    --DatabaseMixin_EnsureSchemaUpToDate(addon, db)
+    DatabaseMixin_RegisterCallbacks(addon, db)
+end
+
+-- Empty for now; an example of a migration strategy
+function o:RunMigrations(fromVersion)
+    if fromVersion < 1 then
+        --self:MigrateToV1()
+    end
+    
+    if fromVersion < 2 then
+        --self:MigrateToV2()
+    end
 end
