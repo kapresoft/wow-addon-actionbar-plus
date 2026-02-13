@@ -63,7 +63,9 @@ ignore:
   - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
   - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
   - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
-
+  - ActionbarPlus-Core
+  - ActionbarPlus-BarsUI
+  - ActionbarPlus-OptionsUI
 # REQUIRED for CurseForge packager (non-obvious):
 # The LEFT side MUST be <repo-folder>/<addon-folder>
 #   - <addon-folder> MUST be the folder that contains the .toc files
