@@ -56,51 +56,35 @@ local function BarModuleProtoMethods()
 end; BarModuleProtoMethods()
 
 --[[-----------------------------------------------------------------------------
-Methods
+Methods: BarModuleBuilder
+
+Dump:
+-- /dump ActionbarPlusF1Module_2_0:Enable()
+-- /dump ActionbarPlusF1Module_2_0:Disable()
+-- /dump ActionbarPlusF1Module_2_0:IsEnabled()
+-- /dump ActionbarPlusF1Module_2_0.enabledState
 -------------------------------------------------------------------------------]]
 local function PropsAndMethods()
     
     --- @type BarModuleBuilder_2_0 | AceModuleLifecycleMixin_3_0
     local o = S
     
+    --- Create the Ace module dynamically
     --- @param barFrame ActionBarFrame
     --- @return BarModule_2_0
     function o:New(barFrame)
         assert(barFrame, 'Actionbar frame is missing.')
         local w = barFrame.widget
-        -- Create the Ace module dynamically
-        --local name = "ActionbarPlusF" .. w.index .. 'Module_2_0'
         local name = ('ActionbarPlusF%sModule_2_0'):format(w.index)
-        -- /dump ActionbarPlusF1Module_2_0:Enable()
-        -- /dump ActionbarPlusF1Module_2_0:Disable()
-        -- /dump ActionbarPlusF1Module_2_0:IsEnabled()
-        -- /dump ActionbarPlusF1Module_2_0.enabledState
-        --BarModule_2_0
         --- @type BarModule_2_0
         local m = ns:a():NewModule(name, BarModuleProto_2_0)
         m.barFrame = barFrame
         m.index = w.index
         m:__SetInitialState()
+
         p(('%s created; enabled=%s'):format(m:GetName(), tostring(m:IsEnabled())))
         _G[name] = m
         return m
     end
-
---[[    function o:OnInitialize()
-        p('OnInitialize() called; index=', self.index)
-        --self:SetInitialState()
-    end
-
-    function o:OnEnable()
-        --ABP_BarFactory_2_0
-        --print('xx OnEnable() called; index=', self.index)
-        --p('xx OnEnable() called; index=', self.index)
-        --return self.barFrame:Show()
-    end
-
-    function o:OnDisable()
-        p:f1(function() return 'OnDisable() called; index=%s', self.index end)
-        return self.barFrame:Hide()
-    end]]
 
 end; PropsAndMethods()
