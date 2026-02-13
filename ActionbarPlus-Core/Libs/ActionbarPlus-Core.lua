@@ -15,7 +15,7 @@ AddOn: ActionbarPlus_Core
 --
 ------ @class ABP_Core_2_0_Impl : AceAddonObj
 local A = AceAddon:NewAddon(ns.name, "AceEvent-3.0", "AceBucket-3.0", "AceConsole-3.0")
---ActionbarPlus_Core = ABP_Core
+ABP_Core_2_0 = A
 --
 --- @type ABP_Core_2_0_Impl | ABP_Core_2_0
 local o = A
@@ -25,11 +25,9 @@ local o = A
 --- • All addon Lua/XML files are loaded
 --- • Init default AceDB
 function o:OnInitialize()
-  C_Timer.After(1, function()
-    DatabaseMixin:InitDb(self)
-  end)
+  DatabaseMixin:InitDb(self)
 end
 
 function o:OnEnable()
-  --C_Timer.After(1, function() p('xx OnEnable...') end)
+  p('xx OnEnable...')
 end
