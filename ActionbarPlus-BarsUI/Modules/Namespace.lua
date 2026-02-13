@@ -54,4 +54,5 @@ end
 --[[-------------------------------------------------------------------
 Namespace Methods
 ---------------------------------------------------------------------]]
-function ns:a() return ABP_BarsUI end
+--- @type ABP_BarsUI_2_0
+function ns:a() return ABP_BarsUI_2_0 end

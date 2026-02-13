@@ -6,7 +6,8 @@
 
     <Include file="ButtonTemplate.xml"/>
     <Include file="BarFrameTemplate.xml"/>
-    <Script file="BarModule.lua" />
+
+    <Script file="BarModuleBuilder.lua" />
     <Script file="BarFactory.lua" />
 
 </Ui>

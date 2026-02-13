@@ -22,13 +22,13 @@ local ModuleNames = {
   ----- ThirdParty ------
   -----------------------
   
-  --- @type AceEvent
+  --- @type AceEvent_3_0
   AceEvent  = {},
-  --- @type AceBucketObj
+  --- @type AceBucket_3_0
   AceBucket = {},
-  --- @type AceAddonObj
+  --- @type AceAddon_3_0
   AceAddon  = {},
-  --- @type AceDBObj
+  --- @type AceDB_3_0
   AceDB     = {},
   
 }; LibModule.EnrichModules(ModuleNames); ns.M = ModuleNames

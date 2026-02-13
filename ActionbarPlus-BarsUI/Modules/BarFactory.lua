@@ -40,27 +40,37 @@ local lcfg = {
     spacing = 6,
 }
 local baseLevel = 1000
-local baseName = 'ActionbarPlusF'
+local function barName(index) return ('ActionbarPlusF%s_2_0'):format(index) end
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'BarFactory'
 --- @class BarFactory
-local newLib = {}
+local S = {}; ABP_BarFactory_2_0 = S;
 local p = ns:log(libName)
 
 --- @type BarFactory
-local o = newLib
+local o = S
 
 --[[-----------------------------------------------------------------------------
 Methods: BarFactory
 -------------------------------------------------------------------------------]]
 function o:Init()
+    p('xx Init() called')
     for i = 1, barCount do
         self:CreateBarGroup(i, function(barFrame)
+            barFrame:Hide()
             local mod =  ABPV2_BarModule:New(barFrame)
-            mod:OnInitialize()
+            --if ns:a():IsEnabled() then
+            --    p('xxx IsEnabled() addon')
+            --    mod:Disable()
+            --    mod:Enable()
+            --end
+            --C_Timer.After(3, function()
+            --    p('xx Disable()')
+            --    mod:Disable()
+            --end)
         end)
     end
 end
@@ -70,7 +80,7 @@ end
 function o:CreateBarGroup(barIndex, consumerFn)
     assert(barIndex, 'Index is required.')
 
-    local frameName = baseName .. barIndex
+    local frameName = barName(barIndex)
     if _G[frameName] then
         return consumerFn and consumerFn(_G[frameName])
     end
@@ -213,6 +223,5 @@ o:RegisterMessage(MSG.OnAddOnReady, function()
 end)]]
 
 
-C_Timer.After(1, function()
-    o:Init()
-end)
+--C_Timer.After(1, function() o:Init() end)
+--o:Init()
