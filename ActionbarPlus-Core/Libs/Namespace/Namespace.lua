@@ -1,18 +1,10 @@
---- @type string
-local addon
---- @type NamespaceImpl_ABP_2_0 | Namespace_ABP_2_0
-local ns
-addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
-
-ns.DB_NAME = 'ABP_PLUS_CORE_DB'
-
---- @type Modules_ABP_2_0
-ns.O = ns.O or {}
-
 --[[-------------------------------------------------------------------
 Type:Namespace
 ---------------------------------------------------------------------]]
---- @class NamespaceImpl_ABP_2_0
+--- @alias Namespace_ABP_2_0 NamespaceImpl_ABP_2_0 | GameVersionMixin_ABP_2_0
+--
+--
+------ @class NamespaceImpl_ABP_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion GameVersion
@@ -21,11 +13,21 @@ Type:Namespace
 --- @field tracer EventTracePrinter_ABP_2_0
 --- @field M Modules_ABP_2_0 The module names
 --- @field O Modules_ABP_2_0 The module objects
+--
+--
+--- @type string
+local addon
+--- @type NamespaceImpl_ABP_2_0 | Namespace_ABP_2_0
+local ns
+addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
 
 --[[-------------------------------------------------------------------
-Aliases
+Local Vars
 ---------------------------------------------------------------------]]
---- @alias Namespace_ABP_2_0 NamespaceImpl_ABP_2_0 | GameVersionMixin_ABP_2_0
+ns.DB_NAME = 'ABP_PLUS_CORE_DB'
+
+--- @type Modules_ABP_2_0
+ns.O = ns.O or {}
 
 --[[-----------------------------------------------------------------------------
 Type: Settings
