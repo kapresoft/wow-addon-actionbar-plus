@@ -22,7 +22,7 @@ BarModuleProto
 --- @field barFrame FrameObj
 local BarModuleProto_2_0 = {}
 
-local function BarModuleMethods()
+local function BarModuleProtoMethods()
     --- @type BarModuleProto_2_0|BarModule_2_0
     local bm = BarModuleProto_2_0
     
@@ -53,7 +53,7 @@ local function BarModuleMethods()
         else self:Disable() end
     end
 
-end; BarModuleMethods()
+end; BarModuleProtoMethods()
 
 --[[-----------------------------------------------------------------------------
 Methods
