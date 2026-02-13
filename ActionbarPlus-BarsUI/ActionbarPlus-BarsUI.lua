@@ -1,4 +1,4 @@
---- @type Namespace_ABP_BarsUI
+--- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local p, t1, t2 = ns:log()
 local O = ns:cns().O
@@ -27,7 +27,7 @@ function A:OnDisable()
     p('xx OnDisable...')
 end
 
-ABP_BarFactory_2_0:Init()
+ABP_BarModuleFactory_2_0:CreateAddonModules()
 
 C_Timer.After(1, function()
     p('AddOn created. name=', A:GetName())

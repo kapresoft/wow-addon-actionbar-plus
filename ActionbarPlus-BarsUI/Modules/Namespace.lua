@@ -1,9 +1,9 @@
 --[[-------------------------------------------------------------------
 Namespace_ABP_BarsUI
 ---------------------------------------------------------------------]]
---- @alias Namespace_ABP_BarsUI Namespace_ABP_BarsUIImpl
+--- @alias Namespace_ABP_BarsUI_2_0 Namespace_ABP_BarsUI_Impl_2_0
 --
---- @class Namespace_ABP_BarsUIImpl
+--- @class Namespace_ABP_BarsUI_Impl_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field tracer EventTracePrinter_ABP_2_0
@@ -13,7 +13,7 @@ Namespace_ABP_BarsUI
 --
 --- @type string
 local addon
---- @type Namespace_ABP_BarsUIImpl | Namespace_ABP_BarsUI
+--- @type Namespace_ABP_BarsUI_Impl_2_0 | Namespace_ABP_BarsUI_2_0
 local ns
 addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
 
