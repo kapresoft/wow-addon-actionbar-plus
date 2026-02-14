@@ -1,9 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-    <Script file="ButtonTemplateMixin_V2_1.lua"/>
-
-	<CheckButton name="ABP_ButtonTemplate_V2_1" virtual="true">
+	<CheckButton name="ABP_ButtonTemplate_2_0" virtual="true">
         <Size>
             <AbsDimension x="36" y="36"/>
         </Size>
@@ -101,13 +99,4 @@
         <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 	</CheckButton>
 
-    <CheckButton name="ABP_ButtonTemplate_V2_1_1" inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_V2_1"
-                 mixin="ABP_ButtonTemplateMixin_V2_1_1" virtual="true">
-        <Scripts>
-            <OnLoad method="OnLoad"/>
-            <PostClick method="OnPostClick"/>
-            <OnAttributeChanged method="OnAttributeChanged"/>
-            <OnEvent method="OnEvent"/>
-        </Scripts>
-    </CheckButton>
 </Ui>

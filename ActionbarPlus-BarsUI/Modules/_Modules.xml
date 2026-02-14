@@ -4,8 +4,9 @@
 
     <Script file="Namespace.lua"/>
 
-    <Include file="BarFrameTemplate.xml"/>
     <Include file="ButtonTemplate.xml"/>
+    <Include file="BarFrame.xml"/>
+
     <Script file="BarModuleFactory.lua" />
 
 </Ui>
