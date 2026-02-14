@@ -1,19 +1,74 @@
--- Create ConsumableButtonMixin?
--- mixin:Onload()
-function ABP_Button_OnLoad(self)
-    --print('ConsumableButton_OnLoad:: called...')
+--[[-----------------------------------------------------------------------------
+@see ActionBarPlusButtonTemplate.xml
+-------------------------------------------------------------------------------]]
+
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+--- @type Namespace_ABP_BarsUI_2_0
+local ns = select(2, ...)
+
+local seedID = 999
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+--- @alias ABP_Button_2_0_1 ABP_ButtonMixin_2_0_1 | CheckButtonObj
+--
+--
+local libName = 'ABP_ButtonMixin_2_0_1'
+--- @class ABP_ButtonMixin_2_0_1
+local S = {}; ABP_ButtonMixin_2_0_1 = S
+local p = ns:log(libName)
+
+local function NextID() seedID = seedID + 1; return seedID end
+
+--[[-----------------------------------------------------------------------------
+Mixin Methods
+-------------------------------------------------------------------------------]]
+--- @type ABP_ButtonMixin_2_0_1 | ABP_Button_2_0_1
+local o = S
+
+function o:OnLoad()
+    self:SetID(NextID())
+
+    self:SetAttribute("action", self:GetID())
+    self.action = self:GetID()
+    self:EnableMouse(true)
+    self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
+
+    --self:SetAttribute("checkselfcast", true);
+    --self:SetAttribute("checkfocuscast", true);
+    --self:SetAttribute("checkmouseovercast", true);
+    self:RegisterForDrag("LeftButton", "RightButton");
+    self:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
 end
 
-function ABP_Button_UpdateAction(self, name, value)
-    --print('ConsumableButton_UpdateAction:: called...')
+function o:OnPostClick(button, down)
+    p(('OnPostClick[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
+    self:UpdateState(button, down)
 end
 
-function ABP_Button_OnEvent(self, event, ...)
-    --print('ConsumableButton_OnEvent:: called...')
+function o:OnAttributeChanged(name, val)
+    --p(('OnAttributeChanged[%s]: name=%s, val=%s'):format(self:GetID(), name, val))
+    self:UpdateAction(name, val)
 end
 
+function o:OnEvent(event, ...)
+    local args = { ... }
+    p(('OnEvent[%s::%s]: name=%s, val=%s'):format(self:GetName(), self:GetID(), event, args))
+end
 
----@param self _CheckButton
-function ABP_Button_UpdateState(self, button, down)
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+--- @param button ButtonName
+function o:UpdateState(button, down)
     self:SetChecked(false)
 end
+
+function o:UpdateAction(name, val)
+    --p('UpdateAction:: called...')
+    -- empty for now
+end
+

@@ -10,13 +10,13 @@ New Instance
 local libName = 'BarModuleFactory'
 --- @class BarModuleFactory_2_0
 local S = {}; ABP_BarModuleFactory_2_0 = S
-local p = ns:log(libName)
+local p, f1, f2 = ns:log(libName)
 
 --- @alias BarModule_2_0 BarModuleProto_2_0 | AddonModuleObj_3_0_Type2
 --[[-------------------------------------------------------------------
 Temporary Config
 ---------------------------------------------------------------------]]
-local barCount = 1
+local barCount = 2
 
 --- @class Profile_Bar_V2
 --- @field buttons table<string, Profile_Button>
@@ -87,13 +87,6 @@ local function BarModuleProtoMethods()
         p('OnDisable() called')
         if self.barFrame then self.barFrame:Hide() end
     end
-    
-    --- @protected
-    function bm:__SetInitialState()
-        p('SetInitialState called...')
-        if self:c().enabled then self:Enable()
-        else self:Disable() end
-    end
 
 end; BarModuleProtoMethods()
 
@@ -122,7 +115,7 @@ local function PropsAndMethods()
         local m = ns:a():NewModule(name, BarModuleProto_2_0)
         m.barFrame = barFrame
         m.index = w.index
-        m:__SetInitialState()
+        m:SetEnabledState(m:c().enabled)
 
         C_Timer.After(1, function()
             p(('%s created; enabled=%s'):format(m:GetName(), tostring(m:IsEnabled())))
@@ -131,21 +124,12 @@ local function PropsAndMethods()
         return m
     end
     
+    --- barFrame should be hidden by default in xml template
     function o:CreateAddonModules()
         p('xx Init() called')
         for i = 1, barCount do
             self:__CreateBarGroup(i, function(barFrame)
-                barFrame:Hide()
-                local mod =  self:New(barFrame)
-                --if ns:a():IsEnabled() then
-                --    p('xxx IsEnabled() addon')
-                --    mod:Disable()
-                --    mod:Enable()
-                --end
-                --C_Timer.After(3, function()
-                --    p('xx Disable()')
-                --    mod:Disable()
-                --end)
+                self:New(barFrame)
             end)
         end
     end
@@ -221,22 +205,19 @@ local function PropsAndMethods()
     --- @param frameName Name
     function o:__CreateBarFrame(barIndex, frameName)
         assert(barIndex and frameName, 'Frame and index missing.')
-        
-        --- @type ActionBarFrame
-        local f = CreateFrame("Frame", frameName, UIParent, "ABPV2_BarFrameTemplate_V2_1_1")
-        f:SetFrameLevel(baseLevel + barIndex * 10)
-        f:SetFrameStrata('MEDIUM')
-        --f:SetScale(UIParent:GetScale())
-        
-        --- @type __ActionBarFrameWidget : WidgetBase
+        --- @alias ABP_BarFrameObj_2_0 ABP_BarFrameObjImpl_2_0 | FrameObj
+        --
+        --- @class ABP_BarFrameObjImpl_2_0 : ABP_BarFrameMixin_2_0_1
+        --- @field widget ABP_BarFrameObjWidget_2_0
+        local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1")
+        --- @type ABP_BarFrameObjImpl_2_0 | ABP_BarFrameObj_2_0
+        local f = barFrame
+        f:SetParentKey(frameName)
+        f:SetFrameLevel(barIndex)
+        f2('CreateBarFrame', 'n=' .. frameName .. ' fL=' .. f:GetFrameLevel())
+        --- @class ABP_BarFrameObjWidget_2_0
         local __widget = {
             index = barIndex,
-            frameHandleHeight = 4,
-            dragHandleHeight = 0,
-            padding = 2,
-            --todo next: add to options UI
-            horizontalButtonPadding = 1,
-            verticalButtonPadding = 1,
             frameStrata = 'MEDIUM',
             frameLevel = 1,
             --- @type ActionBarFrame
@@ -270,7 +251,7 @@ local function PropsAndMethods()
             local btnName = btnName(barIndex, i)
             --- @type CheckButton
             local btn = CreateFrame("CheckButton", btnName, barFrame,
-                    "ABP_ButtonTemplate_V2_1_1")
+                    "ABP_ButtonTemplate_2_0_1")
             btn:SetSize(btnSize, btnSize)
             table.insert(buttons, btn)
         end

@@ -2,6 +2,6 @@
 local ns = select(2, ...)
 local s = ns.settings
 s.developer = true
---s.enableTraceUI = true
+s.enableTraceUI = true
 
 print('DeveloperSetup::', 'loaded...')
