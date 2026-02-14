@@ -7,7 +7,7 @@ local ns = select(2, ...)
 --[[-----------------------------------------------------------------------------
 Module::DatabaseSchema
 -------------------------------------------------------------------------------]]
---- @see Modules_ABP_2_0
+--- @see Core_Modules_ABP_2_0
 local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
 local S = {}; ns:Register(libName, S)
