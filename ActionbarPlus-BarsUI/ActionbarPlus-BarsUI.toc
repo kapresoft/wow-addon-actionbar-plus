@@ -1,7 +1,6 @@
-## Interface: 20505
+## Interface: 120001
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r|cffffffff-BarsUI|r
-
 ## IconTexture: Interface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x
 
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)

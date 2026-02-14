@@ -13,6 +13,9 @@ Type: Modules
 --- @class Core_Modules_ABP_2_0
 local ModuleNames = {
   
+  --- @type Compat_ABP_2_0
+  Compat = {},
+  
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   

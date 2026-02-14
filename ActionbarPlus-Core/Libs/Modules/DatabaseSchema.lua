@@ -11,7 +11,7 @@ Module::DatabaseSchema
 local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
 local S = {}; ns:Register(libName, S)
-local p = ns:log(libName)
+local p, t, tt = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::DatabaseSchema (Methods)

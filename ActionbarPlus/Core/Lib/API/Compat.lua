@@ -66,7 +66,7 @@ end
 function L:GetSpecializationInfo(specIndex) return C_GetSpecializationInfo(specIndex, false, false) end
 
 --- C_SpecializationInfo.GetSpecialization
---- 1, 2, 3 retail ; 1, 2 classic
+--- 1, 2, 3 retail, 4 for druids ; 1, 2 classic
 --- @return number
 function L:GetSpecializationID()
     if IsFn(GetSpecialization) then return GetSpecialization()

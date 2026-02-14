@@ -1,6 +1,6 @@
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-local p, t1, t2 = ns:log()
+local p, t, tt = ns:log()
 local O = ns:cns().O
 local EMBEDS = { 'AceEvent-3.0', 'AceBucket-3.0', 'AceConsole-3.0', 'AceHook-3.0'}
 
