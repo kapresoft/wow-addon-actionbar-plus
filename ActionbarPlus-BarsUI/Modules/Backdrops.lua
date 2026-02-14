@@ -1,4 +1,26 @@
-ABPV2_BACKDROPS = {
+--[[-----------------------------------------------------------------------------
+Local Vars
+-------------------------------------------------------------------------------]]
+--- @type Namespace_ABP_BarsUI_2_0
+local ns = select(2, ...)
+
+--[[-----------------------------------------------------------------------------
+Module::Backdrops
+-------------------------------------------------------------------------------]]
+--- @see BarsUI_Modules_ABP_2_0
+local libName = ns.M.Backdrops()
+--- @class Backdrops_ABP_2_0
+local S = {}; ns:Register(libName, S)
+local p, f1, f2 = ns:log(libName)
+
+--[[-----------------------------------------------------------------------------
+Module::Backdrops (Methods)
+-------------------------------------------------------------------------------]]
+--- @type Backdrops_ABP_2_0
+local o = S
+
+--o.ABPV2_BACKDROPS = {
+o.BACKDROPS = {
     backdrop = "stone", -- or 'none'
     backdropThemes = {
         modernDark = {
@@ -29,23 +51,26 @@ ABPV2_BACKDROPS = {
     },
 }
 
-function ABPV2_ApplyBackdrop(frame, theme)
+--- @param frame FrameObj
+function o:ApplyDefaultBackdrop(frame) self:ApplyBackdrop(frame, self.BACKDROPS.backdrop) end
+
+function o:ApplyBackdrop(frame, theme)
     if theme == "none" then
         frame:SetBackdrop(nil)
         return
     end
 
-    local config = ABPV2_BACKDROPS.backdropThemes[theme]
+    local config = self.BACKDROPS.backdropThemes[theme]
     if not config then return end
-
+    
     frame:SetBackdrop({
-                          bgFile = config.bgFile,
-                          edgeFile = config.edgeFile,
-                          tile = config.tile,
-                          tileSize = config.tileSize,
-                          edgeSize = config.edgeSize,
-                          insets = config.insets,
-                      })
+        bgFile   = config.bgFile,
+        edgeFile = config.edgeFile,
+        tile     = config.tile,
+        tileSize = config.tileSize,
+        edgeSize = config.edgeSize,
+        insets   = config.insets,
+    })
 
     frame:SetBackdropColor(unpack(config.bgColor))
     frame:SetBackdropBorderColor(unpack(config.borderColor))

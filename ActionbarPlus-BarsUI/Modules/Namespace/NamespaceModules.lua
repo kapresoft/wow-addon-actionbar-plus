@@ -1,4 +1,4 @@
---- @type Namespace_ABP_2_0
+--- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 
 --[[-------------------------------------------------------------------
@@ -10,29 +10,11 @@ local LibModule = LibStub('Kapresoft-LibModule-1.0')
 --[[-----------------------------------------------------------------------------
 Type: Modules
 -------------------------------------------------------------------------------]]
---- @class Core_Modules_ABP_2_0
+--- @class BarsUI_Modules_ABP_2_0
 local ModuleNames = {
   
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
-  
-  --- @type DatabaseMixin_ABP_2_0
-  DatabaseMixin = {},
-  --- @type DatabaseSchema_ABP_2_0
-  DatabaseSchema = {},
-  
-  -----------------------
-  ----- ThirdParty ------
-  -----------------------
-  
-  --- @type AceEvent_3_0
-  AceEvent  = {},
-  --- @type AceBucket_3_0
-  AceBucket = {},
-  --- @type AceAddon_3_0
-  AceAddon  = {},
-  --- @type AceDB_3_0
-  AceDB     = {},
   
 }; LibModule.EnrichModules(ModuleNames); ns.M = ModuleNames
 

@@ -4,15 +4,15 @@ Type:Namespace
 --- @alias Namespace_ABP_2_0 NamespaceImpl_ABP_2_0 | GameVersionMixin_ABP_2_0
 --
 --
------- @class NamespaceImpl_ABP_2_0
+--- @class NamespaceImpl_ABP_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion GameVersion
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --- @field tracer EventTracePrinter_ABP_2_0
---- @field M Modules_ABP_2_0 The module names
---- @field O Modules_ABP_2_0 The module objects
+--- @field M Core_Modules_ABP_2_0 The module names
+--- @field O Core_Modules_ABP_2_0 The module objects
 --
 --
 --- @type string
@@ -26,7 +26,7 @@ Local Vars
 ---------------------------------------------------------------------]]
 ns.DB_NAME = 'ABP_PLUS_CORE_DB'
 
---- @type Modules_ABP_2_0
+--- @type Core_Modules_ABP_2_0
 ns.O = ns.O or {}
 
 --[[-----------------------------------------------------------------------------

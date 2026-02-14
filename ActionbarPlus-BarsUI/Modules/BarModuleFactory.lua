@@ -16,7 +16,9 @@ local p, f1, f2 = ns:log(libName)
 --[[-------------------------------------------------------------------
 Temporary Config
 ---------------------------------------------------------------------]]
-local barCount = 2
+local barCount = 1
+--- todo next: move to bars config
+local lcfg = { spacing = 6, }
 
 --- @class Profile_Bar_V2
 --- @field buttons table<string, Profile_Button>
@@ -46,10 +48,6 @@ local Profile_Bar_Config = {
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
---- todo next: move to bars config
-local lcfg = { spacing = 6, }
-local baseLevel = 1000
-
 local function barName(index) return ('ABP_2_0_F%s'):format(index) end
 local function moduleName(index) return ('ABP_2_0_F%sModule'):format(index) end
 local function btnName(barIndex, btnIndex)

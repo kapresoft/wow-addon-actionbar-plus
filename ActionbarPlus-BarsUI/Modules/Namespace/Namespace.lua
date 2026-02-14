@@ -6,6 +6,8 @@ Namespace_ABP_BarsUI
 --- @class Namespace_ABP_BarsUI_Impl_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
+--- @field M BarsUI_Modules_ABP_2_0 The module names
+--- @field O BarsUI_Modules_ABP_2_0 The module objects
 --- @field tracer EventTracePrinter_ABP_2_0
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
@@ -16,6 +18,9 @@ local addon
 --- @type Namespace_ABP_BarsUI_Impl_2_0 | Namespace_ABP_BarsUI_2_0
 local ns
 addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
+
+--- @type BarsUI_Modules_ABP_2_0
+ns.O = ns.O or {}
 
 --- @type Namespace_ABP_2_0
 function ns:cns() return ABP_CORE_NS end
@@ -56,3 +61,14 @@ Namespace Methods
 ---------------------------------------------------------------------]]
 --- @type ABP_BarsUI_2_0
 function ns:a() return ABP_BarsUI_2_0 end
+
+--- Register a Namespace Module
+--- @generic T
+--- @param obj T The library object instance
+--- @return T
+function ns:Register(libName, obj)
+    assert(type(libName) == 'string' and type(obj) == 'table',
+            'Register(libName, obj): libName(string) and obj(table) is required.')
+    self.O[libName] = obj
+    return obj
+end
