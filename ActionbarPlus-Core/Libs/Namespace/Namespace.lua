@@ -7,7 +7,7 @@ Type:Namespace
 --- @class NamespaceImpl_ABP_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
---- @field gameVersion GameVersion
+--- @field gameVersion GameVersion_2_0
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --- @field tracer EventTracePrinter_ABP_2_0
@@ -105,9 +105,13 @@ function ns:db() return self.addonDbFn() end
 function ns:RegisterTracer(tracer)
   self.tracerMixin = tracer
   self.tracer = tracer:New(ns.nameShort, predicateFn)
-  if not (ns:IsDev() and settings.enableTraceUI) then
-    self.tracer.evt:Hide()
-  end
+  C_Timer.After(0.01, function()
+      if not (ns:IsDev() and settings.enableTraceUI) then
+        self.tracer.evt:Hide()
+      elseif not self.tracer.evt:IsShown() then
+          self.tracer.evt:Show()
+      end
+  end)
 end
 
 --- @param name Name

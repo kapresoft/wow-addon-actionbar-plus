@@ -1,14 +1,13 @@
 ## Interface: 20505
 ## Version: @project-version@
-## Title: Actionbar|cff1784d1Plus|r|cffffffff-BarsUI|r
-
-## IconTexture: Interface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x
+## Title: |TInterface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x:18:18|tActionbar|cff1784d1Plus|r|cffffffff-Core|r
 
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
 ## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 
 ## DefaultState: enabled
-## RequiredDeps: ActionbarPlus-Core
+## SavedVariables: ABP_PLUS_CORE_DB
+## OptionalDeps: Ace3
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten
@@ -47,5 +46,9 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-Modules\_Modules.xml
-ActionbarPlus-BarsUI.lua
+# To get the Interface/Build Info
+# /dump select(4, GetBuildInfo())
+
+ThirdParty\ThirdParty.xml
+Libs\Flavor\Cata.lua
+Libs\_Libs.xml

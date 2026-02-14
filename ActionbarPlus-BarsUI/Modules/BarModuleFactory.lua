@@ -10,7 +10,7 @@ New Instance
 local libName = 'BarModuleFactory'
 --- @class BarModuleFactory_2_0
 local S = {}; ABP_BarModuleFactory_2_0 = S
-local p, f1, f2 = ns:log(libName)
+local p, t, tt = ns:log(libName)
 
 --- @alias BarModule_2_0 BarModuleProto_2_0 | AddonModuleObj_3_0_Type2
 --[[-------------------------------------------------------------------
@@ -212,7 +212,7 @@ local function PropsAndMethods()
         local f = barFrame
         f:SetParentKey(frameName)
         f:SetFrameLevel(barIndex)
-        f2('CreateBarFrame', 'n=' .. frameName .. ' fL=' .. f:GetFrameLevel())
+        --t2('CreateBarFrame', 'n=' .. frameName .. ' fL=' .. f:GetFrameLevel())
         --- @class ABP_BarFrameObjWidget_2_0
         local __widget = {
             index = barIndex,

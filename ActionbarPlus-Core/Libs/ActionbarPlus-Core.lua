@@ -4,7 +4,7 @@ local ns = select(2, ...)
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
-local p, t1, t2 = ns:log()
+local p, t, tt = ns:log()
 local AceAddon, DatabaseMixin = ns.O.AceAddon, ns.O.DatabaseMixin
 
 --[[-------------------------------------------------------------------
@@ -29,5 +29,5 @@ function o:OnInitialize()
 end
 
 function o:OnEnable()
-  p('xx OnEnable...')
+  t('OnEnable::', 'specID=', ns.O.Compat:GetSpecializationID())
 end

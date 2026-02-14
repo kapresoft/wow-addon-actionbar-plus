@@ -1,3 +1,9 @@
+--[[-------------------------------------------------------------------
+GameVersion
+---------------------------------------------------------------------]]
+--- @alias GameVersion_2_0 string |"'classic-era'"|"'tbc'"|"'wotlk'"|"'cataclysm'"|"'mists'"|"'mainline'"
+--
+--
 --- For additional info, @see Blizzard_FrameXMLBase/Cata/Constants.lua
 -- WOW_PROJECT_MAINLINE = 1;
 -- WOW_PROJECT_CLASSIC = 2;
@@ -21,7 +27,7 @@ do
   o.GAME_VERSION_CATACLYSM   = "cataclysm"
   o.GAME_VERSION_MISTS       = "mists"
   o.GAME_VERSION_MAINLINE    = "mainline"
-
+  
   --- @return boolean
   function o:IsClassicEra() return ns.gameVersion == self.GAME_VERSION_CLASSIC_ERA end
   --- @return boolean

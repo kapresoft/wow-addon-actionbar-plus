@@ -22,7 +22,7 @@ New Instance
 local libName = ns.M.DatabaseMixin()
 --- @class DatabaseMixin_ABP_2_0
 local S = ns:Register(libName, {})
-local p = ns:log(libName)
+local p, t, tt = ns:log(libName)
 
 --- @type DatabaseMixin_ABP_2_0 | Database_ABP_2_0
 local o = S
