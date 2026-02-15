@@ -35,7 +35,7 @@ local Profile_Bar_Config = {
     ["show_keybind_text"] = true,
     ["widget"] = {
         ["rowSize"] = 1,
-        ["colSize"] = 8,
+        ["colSize"] = 4,
         ["buttonSize"] = 40,
         ["buttonAlpha"] = 0.1,
         ["frame_handle_mouseover"] = false,
@@ -196,6 +196,8 @@ local function PropsAndMethods()
         return consumerFn and consumerFn(frame)
     end
     
+    --- @alias SecureHandler SecureHandlerBaseTemplateObj|ButtonObj
+    
     --- @private
     --- @param barIndex Index The frame index
     --- @param frameName Name The frame name
@@ -207,6 +209,7 @@ local function PropsAndMethods()
         --
         --- @class ABP_BarFrameObjImpl_2_0 : ABP_BarFrameMixin_2_0_1
         --- @field widget ABP_BarFrameObjWidget_2_0
+        --- @field handler SecureHandler
         local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1")
         --- @type ABP_BarFrameObjImpl_2_0 | ABP_BarFrameObj_2_0
         local f = barFrame
@@ -249,7 +252,7 @@ local function PropsAndMethods()
             local btnName = btnName(barIndex, i)
             --- @type CheckButton
             local btn = CreateFrame("CheckButton", btnName, barFrame,
-                    "ABP_ButtonTemplate_2_0_1")
+                    "ABP_ButtonTemplate_2_0_1_1")
             btn:SetSize(btnSize, btnSize)
             table.insert(buttons, btn)
         end

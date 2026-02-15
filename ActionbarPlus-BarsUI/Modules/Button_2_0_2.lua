@@ -12,13 +12,15 @@ local seedID = 999
 
 --[[-----------------------------------------------------------------------------
 New Instance
+/run print("Protected:", GetMouseFocus():IsProtected())
+/run print("Protected:", GetMouseFoci():IsProtected())
 -------------------------------------------------------------------------------]]
---- @alias ABP_Button_2_0_1 ABP_ButtonMixin_2_0_1 | CheckButtonObj
+--- @alias ABP_Button_2_0_2 ABP_ButtonMixin_2_0_2 | CheckButtonObj
 --
 --
-local libName = 'ABP_ButtonMixin_2_0_1'
---- @class ABP_ButtonMixin_2_0_1
-local S = {}; ABP_ButtonMixin_2_0_1 = S
+local libName = 'ABP_ButtonMixin_2_0_2'
+--- @class ABP_ButtonMixin_2_0_2
+local S = {}; ABP_ButtonMixin_2_0_2 = S
 local p = ns:log(libName)
 
 local function NextID() seedID = seedID + 1; return seedID end
@@ -26,7 +28,7 @@ local function NextID() seedID = seedID + 1; return seedID end
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ABP_ButtonMixin_2_0_1 | ABP_Button_2_0_1
+--- @type ABP_ButtonMixin_2_0_2 | ABP_Button_2_0_2
 local o = S
 
 function o:OnLoad()
@@ -44,56 +46,91 @@ function o:OnLoad()
     self:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
     --self:RegisterForClicks("AnyUp", "LeftButtonUp", "RightButtonUp");
     
-    local header = CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
+    --local header = CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
     --self:SetParent(header)
     
     if self:GetID() ~= 1000 then return end
-    local GetSpellInfo = GetSpellInfo or C_Spell.GetSpellInfo
+    
+    --- @type ABP_BarFrameObj_2_0
+    --local barFrame = self:GetParent()
+    --local header = barFrame.Handler
+    --local proxy    = barFrame.SecureProxy
+    --proxy:SetAttribute('type', 'spell')
+    ----
+    ----print('header:', header)
+    ----print('proxy:', proxy)
+    --SecureHandlerSetFrameRef(header, "proxy", proxy)
+    ----
+    ------/dump ABP_2_0_F1.Handler:Click()
+    --SecureHandlerWrapScript(
+    --        self,
+    --        "OnClick",
+    --        header,
+    --        [[
+    --            print('xx here')
+    --            local proxy = self:GetFrameRef("proxy")
+    --            print('proxy:', proxy)
+    --            self:SetScript("OnClick", function()
+    --                header:SetAttribute("spell", "holy light")
+    --                header:Click()
+    --            end)
+    --            return true, 'ok'
+    --        ]],
+    --        [[
+    --            print("xx Post click snippet: clicked.")
+    --        ]]
+    --)
+end
+
+function o:OnClick(button, down)
+    --- @type ABP_BarFrameObj_2_0
+    local barFrame = self:GetParent()
+    local header, proxy = barFrame.Handler, barFrame.SecureProxy
+    header:SetAttribute('spell_abp', 'holy light')
+    --proxy:SetAttribute('type', 'spell')
+    --proxy:SetAttribute('spell', 'holy light')
+    --proxy:Click()
+    p(('OnClick[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
+end
+
+function o:_SaveOldStuff()
     --/dump GetSpellInfo('mend pet') 136
     --/dump GetSpellInfo("Hunter's Mark") 1130
     --/dump GetSpellInfo('Aspect of the iron hawk') -- 109260
     --/dump GetSpellInfo('Aspect of the pack') -- 13159
-    local holyLight = GetSpellInfo('holy light(rank 1)')
-    local arcaneInt = GetSpellInfo('arcane intellect(rank 1)')
-    local conjureWater = GetSpellInfo('conjure water')
     local mendPet = GetSpellInfo(136)
     local ironHawk = GetSpellInfo(109260)
     local huntersMark = GetSpellInfo(1130)
-    if ns:cns():IsMainLine() then
-        mendPet = mendPet.name
-        huntersMark = huntersMark.name
-    end
-    p('mendPet:', mendPet)
-    self:SetAttribute('ABP_2_0_spellName1', holyLight)
-    self:SetAttribute('ABP_2_0_spellName2', arcaneInt)
+    self:SetAttribute('ABP_2_0_spellName1', mendPet)
+    self:SetAttribute('ABP_2_0_spellName2', huntersMark)
     self:SetAttribute('type', 'spell')
     p('name=', self:GetName(), 'id=', self:GetID())
     -- btn: frame to wrap
     -- header: -- header with restricted environment
     -- /dump GetSpellInfo(109260) 'Aspect of the Hawk'
-    SecureHandlerWrapScript(
-            self,
-            "OnClick",
-            header,
-            [[
-                if button == "RightButton" then
-                    local spellName = self:GetAttribute('ABP_2_0_spellName1')
-                    print("xx RIGHT click secure snippet: sp=", spellName)
-                    self:SetAttribute("spell", spellName)
-                    return true, 'ok'
-                elseif button == "LeftButton" then
-                    local spellName = self:GetAttribute('ABP_2_0_spellName2')
-                    print("xx LEFT click secure snippet: sp=", spellName)
-                    self:SetAttribute("spell", spellName)
-                    return true, 'ok'
-                else
-                    self:SetAttribute("spell", nil)
-                end
-            ]],
-            [[
-                print("xx Post click snippet: clicked.")
-            ]]
-    )
+    --SecureHandlerWrapScript(
+    --        self,
+    --        "OnClick",
+    --        header,
+    --        [[
+    --            if button == "RightButton" then
+    --                local spellName = self:GetAttribute('ABP_2_0_spellName1')
+    --                print("xx RIGHT click secure snippet: sp=", spellName)
+    --                self:SetAttribute("spell", spellName)
+    --                return true, 'ok'
+    --            elseif button == "LeftButton" then
+    --                local spellName = self:GetAttribute('ABP_2_0_spellName2')
+    --                print("xx LEFT click secure snippet: sp=", spellName)
+    --                self:SetAttribute("spell", spellName)
+    --                return true, 'ok'
+    --            else
+    --                self:SetAttribute("spell", nil)
+    --            end
+    --        ]],
+    --        [[
+    --            print("xx Post click snippet: clicked.")
+    --        ]]
+    --)
     
     --self:WrapScript(self, "OnClick", [[
     --if button == "RightButton" then
@@ -103,8 +140,9 @@ function o:OnLoad()
     --]])
 end
 
+
 function o:OnPostClick(button, down)
-    p(('OnPostClick[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
+    --p(('OnPostClick[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
     self:UpdateState(button, down)
 end
 
