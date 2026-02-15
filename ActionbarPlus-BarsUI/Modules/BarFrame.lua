@@ -8,6 +8,8 @@ local seedID = 4999
 
 --[[-----------------------------------------------------------------------------
 New Instance
+BarFrame (secure)
+    └── Handler (protected, hidden)
 -------------------------------------------------------------------------------]]
 --
 --
@@ -31,6 +33,39 @@ local function PropsAndMethods()
     function o:OnLoad()
         --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
         self:RegisterForDrag("LeftButton")
+        
+        --self:SetScript("OnUpdate", function(frame)
+        --    frame:SetScript("OnUpdate", nil)
+        --    frame:InitSecure()
+        --end)
+    end
+    
+    function o:InitSecure()
+        p('xx InitSecure')
+        local header = self.Handler
+        local proxy  = self.SecureProxy
+        proxy:SetAttribute("type", "spell")
+        --proxy:SetScript('OnClick', function()
+        --    p('xx proxy clicked...')
+        --    self:SetAttribute("spell", 'holy light')
+        --end)
+        SecureHandlerSetFrameRef(header, "proxy", proxy)
+        
+        SecureHandlerWrapScript(
+                header,
+                "OnAttributeChanged",
+                header,
+                [[
+                    local proxy = self:GetFrameRef("proxy")
+                    local spellName = self:GetAttribute("spell_abp")
+                    if proxy and spellName then
+                        proxy:SetAttribute("spell", spellName)
+                    print('xx proxy=', proxy, 'spellN=', spellName, 'CastSpellByName=', CastSpellByName)
+                    
+                    end
+                    return true, "ok"
+                ]]
+        )
     end
 
     function o:OnDragStart()

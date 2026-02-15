@@ -6,8 +6,8 @@
             <AbsDimension x="36" y="36"/>
         </Size>
         <Layers>
-            <Layer level="ARTWORK">
-                <Texture parentKey="icon" name="$parentIcon">
+            <Layer level="ARTWORK" textureSubLevel="-2">
+                <Texture parentKey="icon" name="$parentIcon" alpha="0.8">
                     <Anchors>
                         <Anchor point="TOPLEFT"/>
                         <Anchor point="BOTTOMRIGHT"/>
@@ -81,20 +81,10 @@
             </AnimationGroup>
         </Animations>
         <Frames>
-            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
-                <Anchors>
-                    <Anchor point="TOPLEFT"/>
-                    <Anchor point="BOTTOMRIGHT"/>
-                </Anchors>
-            </Cooldown>
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true"/>
         </Frames>
-        <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty">
-            <Anchors>
-                <Anchor point="TOPLEFT"/>
-                <Anchor point="BOTTOMRIGHT"/>
-            </Anchors>
-        </NormalTexture>
-        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+        <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty"/>
+        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress" alpha="0.6" alphaMode="ADD"/>
         <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
         <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 	</CheckButton>
