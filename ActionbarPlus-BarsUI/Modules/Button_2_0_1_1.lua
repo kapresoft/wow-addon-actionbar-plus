@@ -35,16 +35,22 @@ local o = S
 
 local prev = CreateFrame('Frame',  nil, UIParent, "SecureHandlerBaseTemplate")
 
+--- Signature (implicit vars): self,button,kind,value
+--- kind: spell, item, equipment
+--- value(spell) ~ SpellBook?
+--- @see FrameXML/SecureHandlers.lua#Wrapped_Drag
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnReceiveDrag(self)
     local handler = self:GetParent().handler
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnReceiveDrag", [[
         local prev = self:GetFrameRef('prev')
+        
+        -- GetCursorInfo() return values
         local cursorType, a1, a2, a3 = ...
-        if cursorType ~= "spell" then return end
-        local spellID = a3 or a1
-        if not spellID then return end
+        local spellID = a1
+        if cursorType ~= "spell" and type(spellID) ~= 'number' then return end
+        print('Kind=', kind, 'spellID(arg1)=', spellID, 'args:: 1=', a1, '2=', a2, '3=', a3)
         
         local oldSpellID = self:GetAttribute("spell2_id")
         --print('OnReceiveDrag::Args type=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
@@ -65,8 +71,9 @@ local function Btn_WrapScript_OnReceiveDrag(self)
         
         self:SetAttribute("spell2_id", spellID)
         self:SetAttribute("spell2", spellID)
-        self:SetAttribute("type2", "spell")
+        self:SetAttribute("type2", cursorType)
         
+        print('xx attr set:: t=', cursorType, 'spid=', spellID)
         if prevSpellID then
             return 'clear', 'spell', prevSpellID
         else
