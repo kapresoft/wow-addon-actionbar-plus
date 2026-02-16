@@ -23,7 +23,7 @@
                  mixin="ABP_ButtonMixin_2_0_1_1" virtual="true">
         <Scripts>
             <OnLoad method="OnLoad"/>
-            <PostClick method="OnPostClick"/>
+            <PostClick method="PostClick"/>
             <OnAttributeChanged method="OnAttributeChanged"/>
             <OnEvent method="OnEvent"/>
         </Scripts>

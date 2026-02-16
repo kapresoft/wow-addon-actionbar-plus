@@ -33,30 +33,70 @@ Mixin Methods
 --- @type ABP_ButtonMixin_2_0_1_1 | ABP_Button_2_0_1_1
 local o = S
 
+local prev = CreateFrame('Frame',  nil, UIParent, "SecureHandlerBaseTemplate")
+
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnReceiveDrag(self)
     local handler = self:GetParent().handler
+    SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnReceiveDrag", [[
-        print('xx OnReceiveDrag')
+        local prev = self:GetFrameRef('prev')
         local cursorType, a1, a2, a3 = ...
         if cursorType ~= "spell" then return end
         local spellID = a3 or a1
         if not spellID then return end
+        
         local oldSpellID = self:GetAttribute("spell2_id")
-        print('OnReceiveDrag::Args type=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+        --print('OnReceiveDrag::Args type=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+        
+        local prevSpellID = self:GetAttribute("spell2_id")
+        local prevSpell = self:GetAttribute("spell2")
+        local prevType = self:GetAttribute("type2")
+        print('OnReceiveDrag::Prev type=', prevType, 'spid=', prevSpell)
+        if prevSpellID then
+            prev:SetAttribute("type2", prevType)
+            prev:SetAttribute("spell2", prevSpell)
+            prev:SetAttribute("spell2_id", prevSpellID)
+        else
+            prev:SetAttribute("type2", nil)
+            prev:SetAttribute("spell2", nil)
+            prev:SetAttribute("spell2_id", nil)
+        end
         
         self:SetAttribute("spell2_id", spellID)
         self:SetAttribute("spell2", spellID)
         self:SetAttribute("type2", "spell")
         
-        if oldSpellID then
-            return 'clear', 'spell', oldSpellID
+        if prevSpellID then
+            return 'clear', 'spell', prevSpellID
         else
             return 'clear'
         end
     ]])
 end
 
+--- @param self ABP_Button_2_0_1_1
+local function Btn_WrapScript_PreClick(self)
+    local handler = self:GetParent().handler
+    SecureHandlerSetFrameRef(self, "prev", prev)
+    handler:WrapScript(self, "PreClick", [[
+        if down then return end
+        
+        local prev = self:GetFrameRef('prev')
+        local type = prev:GetAttribute("type2")
+        local sp = prev:GetAttribute("spell2")
+        local spid = prev:GetAttribute("spell2_id")
+        if spid then
+            print('xx type2=', type, 'spid=', spid, 'sp=', sp)
+            self:SetAttribute("spell2_id", spid)
+            self:SetAttribute("spell2", sp)
+            self:SetAttribute("type2", type)
+        end
+        prev:SetAttribute("type2", nil)
+        prev:SetAttribute("spell2", nil)
+        prev:SetAttribute("spell2_id", nil)
+    ]])
+end
 
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnDragStart(self)
@@ -74,19 +114,7 @@ local function Btn_WrapScript_OnDragStart(self)
     ]])
 end
 
---- @param self ABP_Button_2_0_1_1
-local function Btn_WrapScript_OnClick(self)
-    local handler = self:GetParent().handler
-        handler:WrapScript(self, "OnClick", [[
-            -- parameters are: self, button, down
-            if down then return end  -- only act on mouse up
-            print('xx OnClick... btn=', button, 'kind=', kind)
-            local kind, a1, a2, a3 = GetCursorInfo()
-            if kind ~= "spell" then return end
-            -- perform drop logic
-            return false
-        ]])
-end
+
 
 function o:OnLoad()
     self:SetID(NextID())
@@ -104,16 +132,42 @@ function o:OnLoad()
     
     Btn_WrapScript_OnDragStart(self)
     Btn_WrapScript_OnReceiveDrag(self)
+    Btn_WrapScript_PreClick(self)
     
-    if self:GetID() == 1000 then
-        self:InitButton1000()
-    elseif self:GetID() == 1001 then
-        self:InitButton1001()
-    end
+    
+    -- TODO: Hook to event with SPELLS_CHANGED
+    C_Timer.After(0.01, function()
+        if self:GetID() == 1000 then
+            self:InitButton1000()
+        elseif self:GetID() == 1001 then
+            self:InitButton1001()
+        end
+    end)
 end
 
-function o:XXXOnReceiveDrag(...)
-    p('OnReceiveDrag... args=', {...})
+function o:PreClickXX(button, down)
+    p(('function o:PreClick(button, down)[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
+    if down then return end  -- only act on release
+    
+    local kind, a1, a2, a3 = GetCursorInfo()
+    if kind ~= "spell" then return end
+    
+    local spellID = a3 or a1
+    if not spellID then return end
+    
+    local oldSpellID = self:GetAttribute("spell2_id")
+    
+    -- Change this button’s secure action
+    self:SetAttribute("spell2_id", spellID)
+    self:SetAttribute("spell2", spellID)
+    self:SetAttribute("type2", "spell")
+    
+    -- Swap cursor
+    if oldSpellID then
+        C_Spell.PickupSpell(oldSpellID)
+    else
+        ClearCursor()
+    end
 end
 
 function o:InitButton1000()
@@ -122,7 +176,6 @@ function o:InitButton1000()
     --/dump GetSpellInfo("Hunter's Mark") 1130
     --/dump GetSpellInfo('Aspect of the iron hawk') -- 109260
     --/dump GetSpellInfo('Aspect of the pack') -- 13159
-    local c = ns:cns().O.Compat
     local holyLight = c:GetSpellInfo('holy light(rank 1)')
     self:SetAttribute('ABP_2_0_spellName1', holyLight.name)
     --self:SetAttribute('ABP_2_0_spellName2', arcaneInt)
@@ -145,7 +198,7 @@ function o:InitButton1001()
     self:SetAttribute('spell2_icon', sp.icon)
 end
 
-function o:OnPostClick(button, down)
+function o:PostClick(button, down)
     --p(('OnPostClick[%s::%s]: button=%s, down=%s'):format(self:GetName(), self:GetID(), button, tostring(down)))
     self:UpdateState(button, down)
 end
@@ -171,6 +224,7 @@ end
 function o:UpdateAction(name, val)
     --p('UpdateAction:: called...')
     -- empty for now
+    --p('attr name=', name, 'val=', val)
     if name ~= "spell2_id" then return end
     if not val then
         self.icon:SetTexture(nil)
@@ -183,5 +237,11 @@ function o:UpdateAction(name, val)
     -- Retail vs Classic safe
     self.icon:SetTexture(info.iconID)
     
+    p('attr name=', name, 'val=', val)
+    
+    
+    local kind = GetCursorInfo()
+    if not kind then return end
+    ClearCursor()
 end
 
