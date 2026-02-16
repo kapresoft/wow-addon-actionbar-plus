@@ -52,8 +52,8 @@ local function Btn_WrapScript_OnReceiveDrag(self)
         local prevSpellID = self:GetAttribute("spell2_id")
         local prevSpell = self:GetAttribute("spell2")
         local prevType = self:GetAttribute("type2")
-        print('OnReceiveDrag::Prev type=', prevType, 'spid=', prevSpell)
         if prevSpellID then
+            print('OnReceiveDrag::Prev type=', prevType, 'spid=', prevSpell)
             prev:SetAttribute("type2", prevType)
             prev:SetAttribute("spell2", prevSpell)
             prev:SetAttribute("spell2_id", prevSpellID)
@@ -104,8 +104,6 @@ local function Btn_WrapScript_OnDragStart(self)
     handler:WrapScript(self, "OnDragStart", [[
         local spellID = self:GetAttribute("spell2_id")
         if not spellID then return end
-        print('xxr OnDragStart: spID=', spellID)
-
         -- Clear this button's action
         self:SetAttribute("spell2_id", nil)
         self:SetAttribute("spell2", nil)
@@ -236,9 +234,6 @@ function o:UpdateAction(name, val)
     
     -- Retail vs Classic safe
     self.icon:SetTexture(info.iconID)
-    
-    p('attr name=', name, 'val=', val)
-    
     
     local kind = GetCursorInfo()
     if not kind then return end
