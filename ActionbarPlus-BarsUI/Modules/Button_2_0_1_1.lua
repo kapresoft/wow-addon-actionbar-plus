@@ -7,6 +7,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+--- @type Compat_ABP_2_0
 local c = ns:cns().O.Compat
 
 local seedID = 999
@@ -39,6 +40,11 @@ local function Btn_WrapScript(self)
         local cursorType, spellID = ...
         local oldSpellID = self:GetAttribute("spell2_id")
         print('xxr OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+        -- assign dropped spell
+        self:SetAttribute("spell2_id", spellID)
+        self:SetAttribute("spell2", spellID)
+        self:SetAttribute("type2", "spell")
+        
         if oldSpellID then
             return "clear", "spell", oldSpellID
         else
@@ -180,7 +186,7 @@ function o:OnPostClick(button, down)
 end
 
 function o:OnAttributeChanged(name, val)
-    --p(('OnAttributeChanged[%s]: name=%s, val=%s'):format(self:GetID(), name, val))
+    --p(('OnAttributeChanged[%s]: name=%s, val=%s'):format(self:GetID(), tostring(name), tostring(val)))
     self:UpdateAction(name, val)
 end
 
@@ -200,5 +206,16 @@ end
 function o:UpdateAction(name, val)
     --p('UpdateAction:: called...')
     -- empty for now
+    if name ~= "spell2_id" then return end
+    if not val then
+        self.icon:SetTexture(nil)
+        return
+    end
+    
+    local info = c:GetSpellInfo(val)
+    if not info and not info.iconID then return end
+    
+    -- Retail vs Classic safe
+    self.icon:SetTexture(info.iconID)
 end
 
