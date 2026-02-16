@@ -37,18 +37,22 @@ local o = S
 local function Btn_WrapScript_OnReceiveDrag(self)
     local handler = self:GetParent().handler
     handler:WrapScript(self, "OnReceiveDrag", [[
-        local cursorType, spellID = ...
+        print('xx OnReceiveDrag')
+        local cursorType, a1, a2, a3 = ...
+        if cursorType ~= "spell" then return end
+        local spellID = a3 or a1
+        if not spellID then return end
         local oldSpellID = self:GetAttribute("spell2_id")
-        print('xxr OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
-        -- assign dropped spell
+        print('OnReceiveDrag::Args type=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+        
         self:SetAttribute("spell2_id", spellID)
         self:SetAttribute("spell2", spellID)
         self:SetAttribute("type2", "spell")
         
         if oldSpellID then
-            return "clear", "spell", oldSpellID
+            return 'clear', 'spell', oldSpellID
         else
-            return "clear"
+            return 'clear'
         end
     ]])
 end
@@ -59,7 +63,9 @@ local function Btn_WrapScript_OnDragStart(self)
     local handler = self:GetParent().handler
     handler:WrapScript(self, "OnDragStart", [[
         local spellID = self:GetAttribute("spell2_id")
-        print('xx OnDragStart...btnId=', self:GetID())
+        if not spellID then return end
+        print('xxr OnDragStart: spID=', spellID)
+
         -- Clear this button's action
         self:SetAttribute("spell2_id", nil)
         self:SetAttribute("spell2", nil)
@@ -68,10 +74,24 @@ local function Btn_WrapScript_OnDragStart(self)
     ]])
 end
 
+--- @param self ABP_Button_2_0_1_1
+local function Btn_WrapScript_OnClick(self)
+    local handler = self:GetParent().handler
+        handler:WrapScript(self, "OnClick", [[
+            -- parameters are: self, button, down
+            if down then return end  -- only act on mouse up
+            print('xx OnClick... btn=', button, 'kind=', kind)
+            local kind, a1, a2, a3 = GetCursorInfo()
+            if kind ~= "spell" then return end
+            -- perform drop logic
+            return false
+        ]])
+end
+
 function o:OnLoad()
     self:SetID(NextID())
     
-    self:SetAttribute("action", self:GetID())
+    --self:SetAttribute("action", self:GetID())
     self.action = self:GetID()
     self:EnableMouse(true)
     self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
@@ -80,53 +100,23 @@ function o:OnLoad()
     --self:SetAttribute("checkfocuscast", true);
     --self:SetAttribute("checkmouseovercast", true);
     self:RegisterForDrag("LeftButton", "RightButton");
-    self:RegisterForClicks("AnyDown", "LeftButtonDown", "RightButtonDown");
-    --self:RegisterForClicks("AnyUp", "LeftButtonUp", "RightButtonUp");
+    self:RegisterForClicks("AnyDown", "AnyUp");
     
-    --local header = CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
-    --self:SetParent(header)
+    Btn_WrapScript_OnDragStart(self)
+    Btn_WrapScript_OnReceiveDrag(self)
     
     if self:GetID() == 1000 then
         self:InitButton1000()
     elseif self:GetID() == 1001 then
         self:InitButton1001()
     end
-    if self:GetID() <= 1001 then return end
-    
-    Btn_WrapScript_OnReceiveDrag(self)
-    
+end
+
+function o:XXXOnReceiveDrag(...)
+    p('OnReceiveDrag... args=', {...})
 end
 
 function o:InitButton1000()
-    local handler = self:GetParent().handler
-    
-    --self:SetScript('OnDragStart', function(btn)
-    --    local spid = btn:GetAttribute('spell2_id')
-    --    p('xx ondragstart:', spid)
-    --    PickupSpell(spid)
-    --end)
-    -- Wrap drag securely
-    
-    --handler:WrapScript(self, "OnDragStart", [[
-    --    print('xx OnDragStart...btnId=', self:GetID())
-    --    return "spell", self:GetAttribute("spell2_id")
-    --]])
-    Btn_WrapScript_OnDragStart(self)
-    -- Same as
-    --SecureHandlerWrapScript(self, "OnDragStart", header, [[
-    --    print('xx OnDragStart...btnId=', self:GetID())
-    --    return "spell", self:GetAttribute("spell2_id")
-    --]])
-    ---@param btn ABP_Button_2_0_1_1
-    --self:SetScript('OnDragStop', function(btn)
-    --    p('xx OnDragStop: btnId=', btn:GetID())
-    --end)
-    
-    ------
-    --print('header:', header)
-    --print('proxy:', proxy)
-    --SecureHandlerSetFrameRef(self, "proxy", proxy)
-    
     local GetSpellInfo = GetSpellInfo or C_Spell.GetSpellInfo
     --/dump GetSpellInfo('mend pet') 136
     --/dump GetSpellInfo("Hunter's Mark") 1130
@@ -134,16 +124,6 @@ function o:InitButton1000()
     --/dump GetSpellInfo('Aspect of the pack') -- 13159
     local c = ns:cns().O.Compat
     local holyLight = c:GetSpellInfo('holy light(rank 1)')
-    local arcaneInt = GetSpellInfo('arcane intellect(rank 1)')
-    local conjureWater = GetSpellInfo('conjure water')
-    local mendPet = GetSpellInfo(136)
-    local ironHawk = GetSpellInfo(109260)
-    local huntersMark = GetSpellInfo(1130)
-    if ns:cns():IsMainLine() then
-        mendPet = mendPet.name
-        huntersMark = huntersMark.name
-    end
-    p('mendPet:', mendPet)
     self:SetAttribute('ABP_2_0_spellName1', holyLight.name)
     --self:SetAttribute('ABP_2_0_spellName2', arcaneInt)
     self.icon:SetTexture(holyLight.iconID)
@@ -152,49 +132,17 @@ function o:InitButton1000()
     self:SetAttribute('spell2', holyLight.name)
     self:SetAttribute('spell2_id', holyLight.spellID)
     self:SetAttribute('spell2_icon', holyLight.icon)
-    
-    --handler:WrapScript(self, "OnReceiveDrag", [[
-    --    local cursorType, spellID = ...
-    --    local oldSpellID = self:GetAttribute("spell2_id")
-    --    print('xx OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
-    --    return "spell", oldSpellID
-    --]])
-    Btn_WrapScript_OnReceiveDrag(self)
-    
 end
 
 function o:InitButton1001()
-    local handler = self:GetParent().handler
-    
     local spName = 'seal of the crusader'
     local sp = c:GetSpellInfo(spName)
-    
-    Btn_WrapScript_OnDragStart(self)
-    
-    --handler:WrapScript(self, "OnDragStart", [[
-    --    print('xx OnDragStart...btnId=', self:GetID())
-    --    return "spell", self:GetAttribute("spell2_id")
-    --]])
-    -----@param btn ABP_Button_2_0_1_1
-    --self:SetScript('OnDragStop', function(btn)
-    --    p('xx OnDragStop: btnId=', btn:GetID())
-    --end)
-    
     self.icon:SetTexture(sp.iconID)
     self:SetAttribute("type1", nil) -- Left click does nothing
     self:SetAttribute('type2', 'spell')
     self:SetAttribute('spell2', sp.name)
     self:SetAttribute('spell2_id', sp.spellID)
     self:SetAttribute('spell2_icon', sp.icon)
-    
-    --handler:WrapScript(self, "OnReceiveDrag", [[
-    --    local cursorType, spellID = ...
-    --    local oldSpellID = self:GetAttribute("spell2_id")
-    --    print('xx OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
-    --    return "spell", oldSpellID
-    --]])
-    Btn_WrapScript_OnReceiveDrag(self)
-    
 end
 
 function o:OnPostClick(button, down)
@@ -234,5 +182,6 @@ function o:UpdateAction(name, val)
     
     -- Retail vs Classic safe
     self.icon:SetTexture(info.iconID)
+    
 end
 
