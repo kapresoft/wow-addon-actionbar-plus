@@ -32,6 +32,21 @@ Mixin Methods
 --- @type ABP_ButtonMixin_2_0_1_1 | ABP_Button_2_0_1_1
 local o = S
 
+--- @param self ABP_Button_2_0_1_1
+local function Btn_WrapScript(self)
+    local handler = self:GetParent().handler
+    handler:WrapScript(self, "OnReceiveDrag", [[
+        local cursorType, spellID = ...
+        local oldSpellID = self:GetAttribute("spell2_id")
+        print('xxr OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+        if oldSpellID then
+            return "clear", "spell", oldSpellID
+        else
+            return "clear"
+        end
+    ]])
+end
+
 function o:OnLoad()
     self:SetID(NextID())
     
@@ -55,7 +70,9 @@ function o:OnLoad()
     elseif self:GetID() == 1001 then
         self:InitButton1001()
     end
+    if self:GetID() <= 1001 then return end
     
+    Btn_WrapScript(self)
     
 end
 
@@ -114,6 +131,15 @@ function o:InitButton1000()
     self:SetAttribute('spell2', holyLight.name)
     self:SetAttribute('spell2_id', holyLight.spellID)
     self:SetAttribute('spell2_icon', holyLight.icon)
+    
+    --handler:WrapScript(self, "OnReceiveDrag", [[
+    --    local cursorType, spellID = ...
+    --    local oldSpellID = self:GetAttribute("spell2_id")
+    --    print('xx OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+    --    return "spell", oldSpellID
+    --]])
+    Btn_WrapScript(self)
+    
 end
 
 function o:InitButton1001()
@@ -137,6 +163,15 @@ function o:InitButton1001()
     self:SetAttribute('spell2', sp.name)
     self:SetAttribute('spell2_id', sp.spellID)
     self:SetAttribute('spell2_icon', sp.icon)
+    
+    --handler:WrapScript(self, "OnReceiveDrag", [[
+    --    local cursorType, spellID = ...
+    --    local oldSpellID = self:GetAttribute("spell2_id")
+    --    print('xx OnReceiveDrag: GetCursorInfo=', cursorType, 'spID=', spellID, 'oldSP=', oldSpellID)
+    --    return "spell", oldSpellID
+    --]])
+    Btn_WrapScript(self)
+    
 end
 
 function o:OnPostClick(button, down)
