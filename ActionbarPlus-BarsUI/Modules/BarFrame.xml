@@ -24,6 +24,7 @@
         <Scripts>
             <OnLoad method="OnLoad"/>
             <PostClick method="PostClick"/>
+            <OnDragStop method="OnDragStop"/>
             <OnAttributeChanged method="OnAttributeChanged"/>
             <OnEvent method="OnEvent"/>
         </Scripts>
