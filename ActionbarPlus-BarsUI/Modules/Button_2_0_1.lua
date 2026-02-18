@@ -1,5 +1,19 @@
 --[[-----------------------------------------------------------------------------
-@see ActionBarPlusButtonTemplate.xml
+@see BarFrame.xml
+@see also ActionBarPlusButtonTemplate.xml
+
+Enable by:
+<Script file="Button_2_0_1.lua"/>
+<CheckButton name="ABP_ButtonTemplate_2_0_1"
+             inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
+             mixin="ABP_ButtonMixin_2_0_1" virtual="true">
+    <Scripts>
+        <OnLoad method="OnLoad"/>
+        <PostClick method="OnPostClick"/>
+        <OnAttributeChanged method="OnAttributeChanged"/>
+        <OnEvent method="OnEvent"/>
+    </Scripts>
+</CheckButton>
 -------------------------------------------------------------------------------]]
 
 --[[-----------------------------------------------------------------------------
@@ -7,6 +21,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_1'
 
 local seedID = 999
 
