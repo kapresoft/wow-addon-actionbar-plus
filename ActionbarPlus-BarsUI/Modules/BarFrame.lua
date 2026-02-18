@@ -17,7 +17,7 @@ local libName = 'ABP_BarFrameMixin_2_0_1'
 --- @class ABP_BarFrameMixin_2_0_1 : Frame
 --- @field _originalLevel number
 local S = {}; ABP_BarFrameMixin_2_0_1 = S
-local p, t, tt = ns:log(libName)
+local p, pd, t, tf = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods

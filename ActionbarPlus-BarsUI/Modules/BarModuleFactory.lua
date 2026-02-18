@@ -10,7 +10,7 @@ New Instance
 local libName = 'BarModuleFactory'
 --- @class BarModuleFactory_2_0
 local S = {}; ABP_BarModuleFactory_2_0 = S
-local p, t, tt = ns:log(libName)
+local p, pd, t, tf = ns:log(libName)
 
 --- @alias BarModule_2_0 BarModuleProto_2_0 | AddonModuleObj_3_0_Type2
 --[[-------------------------------------------------------------------
@@ -245,14 +245,12 @@ local function PropsAndMethods()
         local cols = cfg.widget.colSize
         local rows = cfg.widget.rowSize
         local btnCount = rows * cols
-        p('xx CreateButtons::btnCount:', btnCount)
-        
+        pd(('CreateButtons:: btnCount=%s btnTemplate=%s'):format(btnCount, ns.buttonTemplate))
         local buttons = {}
         for i = 1, btnCount do
             local btnName = btnName(barIndex, i)
             --- @type CheckButton
-            local btn = CreateFrame("CheckButton", btnName, barFrame,
-                    "ABP_ButtonTemplate_2_0_1_1")
+            local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate)
             btn:SetSize(btnSize, btnSize)
             table.insert(buttons, btn)
         end

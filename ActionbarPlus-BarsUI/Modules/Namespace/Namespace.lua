@@ -6,9 +6,11 @@ Namespace_ABP_BarsUI
 --- @class Namespace_ABP_BarsUI_Impl_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
+--- @field buttonTemplate Name The button template name to use for action buttons (see BarFrame.xml and BarModuleFactory.lua)
 --- @field M BarsUI_Modules_ABP_2_0 The module names
 --- @field O BarsUI_Modules_ABP_2_0 The module objects
 --- @field tracer EventTracePrinter_ABP_2_0
+--- @field private logBuilder LogBuilderFn
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --
@@ -39,21 +41,15 @@ ns.printer = LibPrettyPrint:Printer({
     prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
 }, predicateFn)
 
---- Returns the print, tracer1, tracer2 functions
+--- Returns the print, delayed-print, tracer, formatted-tracer functions
+--- ```
+--- local p, pd, t, tf = ns:log('EventHandler')
+--- ```
 --- @param moduleName Name
---- @return LibPrettyPrint_Printer | LibPrettyPrint_PrintFn, fun(...), fun(...)
+--- @return LogBuilderFn
 function ns:log(moduleName)
-    local m = moduleName
-    if type(m) == 'string' then m = strtrim(m)
-    else m = nil end
-    
-    local printer = self.printer
-    if m and #m > 0 then
-        printer = self.printer:WithSubPrefix(m)
-    end
-    local tracer1 = ns:cns():traceFnWithFormatting(m)
-    local tracer2 = ns:cns():traceFn(m)
-    return printer, tracer1, tracer2
+    if not self.logBuilder then self.logBuilder = self:cns():__CreateLogBuilder(self.printer) end
+    return self.logBuilder(moduleName)
 end
 
 --[[-------------------------------------------------------------------

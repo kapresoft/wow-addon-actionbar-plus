@@ -2,6 +2,9 @@
 Type:Namespace
 ---------------------------------------------------------------------]]
 --- @alias Namespace_ABP_2_0 NamespaceImpl_ABP_2_0 | GameVersionMixin_ABP_2_0
+--- @alias LogBuilderFn fun(moduleName:string) : LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
+--- @alias ABP_2_0_TraceFn fun(...: any) : void @Printer function that outputs plain values to Blizzard Trace UI (like print)
+--- @alias ABP_2_0_TraceFnFormatted fun(...: any) : void @Printer function that outputs formatted values to Blizzard Trace UI (like print)
 --
 --
 --- @class NamespaceImpl_ABP_2_0
@@ -10,6 +13,7 @@ Type:Namespace
 --- @field gameVersion GameVersion_2_0
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
+--- @field private logBuilder LogBuilderFn
 --- @field tracer EventTracePrinter_ABP_2_0
 --- @field M Core_Modules_ABP_2_0 The module names
 --- @field O Core_Modules_ABP_2_0 The module objects
@@ -45,6 +49,16 @@ Support Functions
 ---------------------------------------------------------------------]]
 local function predicateFn() return ns:IsDev() end
 
+local function DelayedCall(delay, fn, ...)
+  assert(type(delay) == 'number' and delay > 0)
+  return function(...)
+    local args = { ... }
+    C_Timer.After(delay, function()
+      fn(unpack(args))
+    end)
+  end
+end
+
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
@@ -59,13 +73,13 @@ Methods
 ---------------------------------------------------------------------]]
 do
   local obj = ns.O
-  --- @type AceEvent
+  --- @type AceEvent_3_0
   obj.AceEvent = LibStub("AceEvent-3.0")
-  --- @type AceBucketObj
+  --- @type AceBucket_3_0
   obj.AceBucket = LibStub("AceBucket-3.0")
-  --- @type AceAddonObj
+  --- @type AceAddon_3_0
   obj.AceAddon = LibStub("AceAddon-3.0")
-  --- @type AceDB
+  --- @type AceDB_3_0
   obj.AceDB = LibStub("AceDB-3.0")
   
   --- @param targetObj any|nil An optional targetObj for embedding
@@ -137,8 +151,8 @@ function ns:colorFn(rgbHex)
   end
 end
 
---- @param prefix string
---- @return fun(...): any
+--- @param prefix string|any
+--- @return ABP_2_0_TraceFn @Printer function that outputs plain values to Blizzard Trace UI (like print)
 function ns:traceFn(prefix)
   if type(prefix) ~= 'string' then
     return function(...) return self.tracer:td(...) end
@@ -146,8 +160,8 @@ function ns:traceFn(prefix)
   return function(...) return self.tracer:t(strtrim(prefix), ...) end
 end
 
---- @param prefix string
---- @return fun(...): any
+--- @param prefix string|any
+--- @return ABP_2_0_TraceFnFormatted @Printer function that outputs formatted values to Blizzard Trace UI (like print)
 function ns:traceFnWithFormatting(prefix)
   if type(prefix) ~= 'string' then
     return function(...) return self.tracer:tdf(...) end
@@ -155,22 +169,41 @@ function ns:traceFnWithFormatting(prefix)
   return function(...) return self.tracer:tf(strtrim(prefix), ...) end
 end
 
---- Returns the print, tracer1, tracer2 functions
+--- Returns the print, delayed-print, tracer, formatted-tracer functions
+--- ```
+--- local p, pd, t, tf = ns:log('EventHandler')
+--- ```
 --- @param moduleName Name
---- @return LibPrettyPrint_Printer | LibPrettyPrint_PrintFn, fun(...), fun(...)
+--- @return LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
 function ns:log(moduleName)
-  local m = moduleName
-  if type(m) == 'string' then m = strtrim(m)
-  else m = nil end
-  
-  local printer = self.printer
-  if m and #m > 0 then
-    printer = self.printer:WithSubPrefix(m)
-  end
-  local tracer1 = ns:traceFnWithFormatting(m)
-  local tracer2 = ns:traceFn(m)
-  return printer, tracer1, tracer2
+  if not self.logBuilder then self.logBuilder = self:__CreateLogBuilder(self.printer) end
+  return self.logBuilder(moduleName)
 end
+
+--- @protected
+--- @param printer LibPrettyPrint_Printer
+--- @return LogBuilderFn
+function ns:__CreateLogBuilder(printer)
+  assert(printer, 'Printer is required.')
+  
+  --- @param moduleName Name
+  local function builderFn(moduleName)
+    local m = moduleName
+    local pr = printer
+    if type(m) == 'string' then m = strtrim(m)
+    else m = nil end
+    
+    if m and #m > 0 then pr = printer:WithSubPrefix(m) end
+    
+    local printerDelayed = DelayedCall(1, pr)
+    local tracer1 = self:traceFn(m)
+    local tracer2 = self:traceFnWithFormatting(m)
+    return pr, printerDelayed, tracer1, tracer2
+  end
+  
+  return builderFn
+end
+
 
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns
