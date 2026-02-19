@@ -96,8 +96,8 @@ function o:OnSpellsChanged()
     }
     local id = self:GetID()
     local spell = tmpBtnSpells[id]
-    pd('xx spell=', spell, 'id=', id)
     if not spell then return end
+    
     Btn_SetSpell(self, spell)
 end
 
