@@ -4,6 +4,8 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
+local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
+
 --[[-----------------------------------------------------------------------------
 Module::Compat
 -------------------------------------------------------------------------------]]
@@ -60,12 +62,15 @@ function o:__GetSpellInfoLegacy(id)
   return sp
 end
 
---- @param id SpellIdentifier
+--- @param spell SpellIdentifier
 --- @return SpellInfo|nil
-function o:GetSpellInfo(id)
-  local pt = type(id)
+function o:GetSpellInfo(spell)
+  local pt = type(spell)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
-  if C_GetSpellInfo then return C_GetSpellInfo(id) end
-  return self:__GetSpellInfoLegacy(id)
+  if C_GetSpellInfo then return C_GetSpellInfo(spell) end
+  return self:__GetSpellInfoLegacy(spell)
 end
-c = o
+
+--- Picks up the specified spell, compatible with both Retail and Classic WoW.
+--- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
+function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end
