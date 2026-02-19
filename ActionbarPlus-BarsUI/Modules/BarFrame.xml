@@ -10,6 +10,9 @@
                  mixin="ABP_ButtonMixin_2_0_3" virtual="true">
         <Scripts>
             <OnLoad method="OnLoad"/>
+            <PreClick method="PreClick"/>
+            <PostClick method="PostClick"/>
+            <OnAttributeChanged method="OnAttributeChanged"/>
         </Scripts>
     </CheckButton>
 
