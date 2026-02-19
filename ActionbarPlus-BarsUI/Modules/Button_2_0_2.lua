@@ -1,6 +1,6 @@
 --[[-----------------------------------------------------------------------------
 @see BarFrame.xml
-@see also ActionBarPlusButtonTemplate.xml
+@see also Blizzard_FrameXML/Classic/SecureTemplates.xml#SecureActionButtonTemplate
 
 Enable by:
 <Script file="Button_2_0_2.lua"/>

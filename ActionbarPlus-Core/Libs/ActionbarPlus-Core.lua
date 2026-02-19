@@ -35,6 +35,7 @@ end
 
 function o:SPELLS_CHANGED()
   self:UnregisterEvent("SPELLS_CHANGED")
-  p('xx SPELLS_CHANGED...')
-  self:SendMessage('ABP_2_0::SPELLS_CHANGED')
+  C_Timer.After(0.2, function()
+      self:SendMessage('ABP_2_0::SPELLS_CHANGED')
+  end)
 end
