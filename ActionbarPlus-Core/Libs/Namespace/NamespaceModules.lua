@@ -16,6 +16,9 @@ local ModuleNames = {
   --- @type Compat_ABP_2_0
   Compat = {},
   
+  --- @type Cursor_ABP_2_0
+  Cursor = {},
+  
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   
