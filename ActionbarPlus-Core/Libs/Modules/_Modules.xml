@@ -6,5 +6,6 @@
     <Script file="GameVersionMixin.lua" />
     <Script file="DatabaseSchema.lua" />
     <Script file="DatabaseMixin.lua" />
+    <Script file="Cursor.lua"/>
 
 </Ui>

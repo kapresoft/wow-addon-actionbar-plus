@@ -14,6 +14,9 @@
             <PostClick method="PostClick"/>
             <OnLeave method="OnLeave"/>
             <OnEnter method="OnEnter"/>
+            <OnDragStart method="OnDragStart"/>
+            <OnDragStop method="OnDragStop"/>
+            <OnReceiveDrag method="OnReceiveDrag"/>
             <OnAttributeChanged method="OnAttributeChanged"/>
         </Scripts>
     </CheckButton>

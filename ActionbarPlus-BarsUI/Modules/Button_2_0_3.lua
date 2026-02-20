@@ -48,7 +48,6 @@ local function NextSeedID() local current = seedID; seedID = seedID + 1; return 
 Support Functions
 ---------------------------------------------------------------------]]
 local function Btn_IsDragAllowed()
-    if InCombatLockdown() then return false end
     return not Settings.GetValue("lockActionBars") or IsModifiedClick("PICKUPACTION")
 end
 
@@ -87,15 +86,6 @@ local function Btn_UpdateFlash(self)
 
 end
 
---- @param self ABP_Button_2_0_3
---- @param button ButtonName
-local function Btn_OnDragStart(self, button)
-    if not Btn_IsDragAllowed() then return end
-    Btn_PickupAction(self)
-    Btn_UpdateState(self)
-    Btn_UpdateFlash(self)
-end
-
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
@@ -117,7 +107,6 @@ function o:OnLoad()
     
     self:RegisterForDrag("LeftButton", "RightButton");
     self:RegisterForClicks('AnyDown', 'AnyUp');
-    self:SetScript("OnDragStart", Btn_OnDragStart)
     
     self:RegisterMessage('ABP_2_0::SPELLS_CHANGED', 'OnSpellsChanged')
     --self:RegisterEvent('MODIFIER_STATE_CHANGED')
@@ -166,6 +155,7 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PreClick(button, down)
+    if InCombatLockdown() then return false end
    -- prevent spell from firing
     if down == true and Btn_IsDragAllowed() then
         self:DisableAttributeType()
@@ -174,13 +164,50 @@ function o:PreClick(button, down)
 end
 
 function o:OnEnter() self:ClearAttributeSavedType() end
-function o:OnLeave() self:RestoreAttributeType() end
+function o:OnLeave()
+    p('xx OnLeave')
+    self:RestoreAttributeType() end
 
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
-    if not down then self:RestoreAttributeType() end
+    if InCombatLockdown() then return false end
+    --if not down then self:RestoreAttributeType() end
     self:UpdateState(button, down)
+end
+
+--- @param button ButtonName
+function o:OnDragStart(button)
+    p('OnDragStart...')
+    if InCombatLockdown() then return false end
+    if not Btn_IsDragAllowed() then return end
+    Btn_PickupAction(self)
+    Btn_UpdateState(self)
+    Btn_UpdateFlash(self)
+end
+
+function o:OnDragStop()
+    p('xx OnDragStop...')
+    self:RestoreAttributeType()
+end
+
+function o:OnReceiveDrag()
+    p('xx OnReceiveDrag...')
+    if InCombatLockdown() then return end
+    
+    local kind, a1, a2, a3, a4 = GetCursorInfo()
+    print(('ORD:: kind=%s, a1=%s, a2=%s a3=%s'):format(kind, a1, a2, a3, a4))
+    if kind ~= "spell" then return end
+    
+    -- non-combat safeguard (v2 design: drag/drop is OOC only)
+    if InCombatLockdown() then return end
+    
+    -- set spell on this button
+    Btn_SetSpell(self, arg1)
+    
+    ClearCursor()
+    Btn_UpdateState(self)
+    Btn_UpdateFlash(self)
 end
 
 --- Add temporary spells for testing
@@ -196,10 +223,6 @@ function o:OnSpellsChanged()
     if not spell then return end
     
     Btn_SetSpell(self, spell)
-end
-
-function o:OnDragStop()
-    p('xx OnDragStop...')
 end
 
 function o:OnAttributeChanged(name, val)
