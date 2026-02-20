@@ -48,6 +48,7 @@ local function NextSeedID() local current = seedID; seedID = seedID + 1; return 
 Support Functions
 ---------------------------------------------------------------------]]
 local function Btn_IsDragAllowed()
+    if InCombatLockdown() then return false end
     return not Settings.GetValue("lockActionBars") or IsModifiedClick("PICKUPACTION")
 end
 
@@ -69,7 +70,6 @@ local function Btn_PickupAction(self)
     local type = self:GetAttributeType()
     if self:IsSpellType() then
         local spell = self:GetAttributeSpell()
-        p('xx type spell:', spell)
         self:ClearAttributeType()
         self:ClearAttributeSpell()
         c:PickupSpell(spell)
@@ -90,7 +90,6 @@ end
 --- @param self ABP_Button_2_0_3
 --- @param button ButtonName
 local function Btn_OnDragStart(self, button)
-    p('Btn_OnDragStart:', self.__name, 'btn:', button)
     if not Btn_IsDragAllowed() then return end
     Btn_PickupAction(self)
     Btn_UpdateState(self)
@@ -167,21 +166,22 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PreClick(button, down)
-    --p(('PreClick[%s]: button=%s, down=%s'):format(self.__name, button, tostring(down)))
+   -- prevent spell from firing
     if down == true and Btn_IsDragAllowed() then
-        -- prevent spell from firing
-        p('PreClick...type disabled')
         self:DisableAttributeType()
-    else
-        p('PreClick...type restored')
-        self:RestoreAttributeType()
     end
-    
     self:UpdateState(button, down)
 end
 
+function o:OnEnter() self:ClearAttributeSavedType() end
+function o:OnLeave() self:RestoreAttributeType() end
+
+--- @param button ButtonName
+--- @param down ButtonDown
 function o:PostClick(button, down)
-    --p(('PostClick[%s]: button=%s, down=%s'):format(self.__name, button, tostring(down)))
+    if not down then
+        self:RestoreAttributeType()
+    end
     self:UpdateState(button, down)
 end
 
@@ -255,9 +255,14 @@ function o:DisableAttributeType()
     self:ClearAttributeType()
 end
 function o:GetAttributeSavedType() return self:GetAttribute(saved_type) end
+function o:ClearAttributeSavedType()
+    if not self:GetAttributeSavedType() then return end
+    self:SetAttribute(saved_type, nil)
+end
 function o:RestoreAttributeType()
     if not self:GetAttributeSavedType() then return end
     self:SetAttribute(type, self:GetAttribute(saved_type))
+    self:SetAttribute(saved_type, nil)
 end
 
 function o:IsSpellType()
