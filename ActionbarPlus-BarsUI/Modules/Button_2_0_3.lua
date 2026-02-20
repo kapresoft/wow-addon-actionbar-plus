@@ -179,9 +179,7 @@ function o:OnLeave() self:RestoreAttributeType() end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
-    if not down then
-        self:RestoreAttributeType()
-    end
+    if not down then self:RestoreAttributeType() end
     self:UpdateState(button, down)
 end
 
