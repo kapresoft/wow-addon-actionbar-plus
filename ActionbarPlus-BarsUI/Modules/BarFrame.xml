@@ -12,6 +12,8 @@
             <OnLoad method="OnLoad"/>
             <PreClick method="PreClick"/>
             <PostClick method="PostClick"/>
+            <OnLeave method="OnLeave"/>
+            <OnEnter method="OnEnter"/>
             <OnAttributeChanged method="OnAttributeChanged"/>
         </Scripts>
     </CheckButton>
