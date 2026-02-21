@@ -271,7 +271,7 @@ local function Btn_WrapScript_OnClick(self)
         print('OnC:: down=', down, 'btn=', button)
         local prev = self:GetFrameRef('prev')
 
-        -- virtual cursor
+        -- virtual cursor,
         -- state: has cursor, then mouse up will place the current cursor here
         -- action is on mouse up so that it doesn't trigger the spell
         local cursorPrevType = prev:GetAttribute('abp_cursor_type')
