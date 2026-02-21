@@ -80,21 +80,25 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnDragStart(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
-    handler:WrapScript(self, "OnDragStart", [[
+    --SecureHandlerSetFrameRef(self, 'prev', prev)
+    handler:WrapScript(self, 'OnDragStart', [[
         local prev = self:GetFrameRef('prev')
         local isDragAllowed = prev:GetAttribute('abp_is_drag_allowed') or false
         local actionType = self:GetAttribute('type')
-        local actionID = actionType and self:GetAttribute(actionType)
-        print('OnDragS:: isDragAllowed=', isDragAllowed, 'type=', actionType, 'actionID=', actionID)
+        local action = actionType and self:GetAttribute(actionType)
+        print('ODStart:: isDragAllowed=', isDragAllowed, 'type=',
+            actionType, 'action=', action, 'btnID=', self:GetID())
         if not isDragAllowed then return false end
-        if not (actionType and actionID) then return end
+        if not (actionType and action) then return end
         
         -- 1: Pickup Action
-        self:SetAttribute("type", nil)
+        self:SetAttribute('type', nil)
         self:SetAttribute(actionType, nil)
+
+        prev:SetAttribute('ondragstart_to_onleave_type', actionType)
+        prev:SetAttribute('ondragstart_to_onleave_' .. actionType, action)
         
-        return 'clear', actionType, actionID
+        return 'clear', actionType, action
     ]])
 end
 
@@ -116,26 +120,26 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnReceiveDrag(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnReceiveDrag", [[
         local prev = self:GetFrameRef('prev')
-        local bookType, actionID = ...
+        local bookType, action = ...
         
-        local actionType = kind
-        print('ORDrag:: actionType=', actionType, 'actionID=', actionID)
-        if not actionID then return 'clear' end
+        local rcvActionType = kind
+        print('ORDrag:: rcvActionType=', rcvActionType, 'action=', action)
+        if not action then return 'clear' end
         
         self:SetAttribute('abp_2_0_start_drag_spell', nil)
         
         local prevActionType = self:GetAttribute('type')
         local prevActionID = self:GetAttribute(prevActionType)
         prev:SetAttribute('abp_on_receive_drag_previous_type', prevActionType)
-        prev:SetAttribute('abp_on_receive_drag_previous_spell', prevActionID)
-        print('ORDrag:: prevActionType=', actionType, 'prevActionID=', actionID)
+        prev:SetAttribute('abp_on_receive_drag_previous_action', prevActionID)
+        print('ORDrag:: id=', self:GetID(), 'prevActionType=', prevActionType, 'prevActionID=', prevActionID)
 
         -- overwrite B immediately
-        self:SetAttribute('type', actionType)
-        self:SetAttribute(actionType, actionID)
+        self:SetAttribute('type', rcvActionType)
+        self:SetAttribute(rcvActionType, action)
         
         if prevActionType and prevActionID then
             return 'clear', prevActionType, prevActionID
@@ -148,7 +152,7 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_PreClick(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "PreClick", [[
         local prev = self:GetFrameRef('prev')
         local current = self:GetAttribute("spell")
@@ -202,11 +206,10 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnEnter(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnEnter", [[
-        print('OnEnter...GetMouseButtonClicked=', GetMouseButtonClicked())
+        --print('OnEnter...')
         local prev = self:GetFrameRef('prev')
-        ---print('OnEnter:: lockActionBars=', prev:GetAttribute('abp_lock_actionbars'))
 
         -- OnEnter, save existing spell; a cursor may exists
         --local currentType = self:GetAttribute('type')
@@ -230,39 +233,82 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnLeave(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnLeave", [[
-        print('OnLeave...GetMouseButtonClicked=', GetMouseButtonClicked())
+        print('OnL... id=', self:GetID())
         local prev = self:GetFrameRef('prev')
-        local prevType = self:GetAttribute('abp_on_receive_drag_previous_type')
-        local prevSpellID = self:GetAttribute('abp_on_receive_drag_previous_spell')
-        if not (prevType and prevSpellID) then
-            self:SetAttribute('abp_on_receive_drag_previous_type', nil)
-            self:SetAttribute('abp_on_receive_drag_previous_spell', nil)
-            return
+        
+        local actionType = prev:GetAttribute('ondragstart_to_onleave_type')
+        if actionType then
+            local action = prev:GetAttribute('ondragstart_to_onleave_' .. actionType)
+            if actionType and action then
+                print('OnL:: type=', actionType, 'action=', action)
+              -- TODO NEXT??? Process 'OnClick'
+            end
         end
-        prev:SetAttribute('abp_previous_type', prevType)
-        prev:SetAttribute('abp_previous_spell', prevSpellID)
-        p('xx OnLeave... prev=', prevType, 'spellID=', prevSpellID)
+        
+        local prevType = prev:GetAttribute('abp_on_receive_drag_previous_type')
+        local prevAction = prev:GetAttribute('abp_on_receive_drag_previous_action')
+        print('OnL... prevType=', prevType, 'prevAction=', prevAction)
+        --if not (prevType and prevAction) then
+        --    prev:SetAttribute('abp_on_receive_drag_previous_type', nil)
+        --    prev:SetAttribute('abp_on_receive_drag_previous_action', nil)
+        --    return
+        --end
+        prev:SetAttribute('abp_cursor_type', prevType)
+        prev:SetAttribute('abp_cursor_action', prevAction)
+        prev:SetAttribute('abp_on_receive_drag_previous_type', nil)
+        prev:SetAttribute('abp_on_receive_drag_previous_action', nil)
+
     ]])
 end
 
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnClick(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnClick", [[
-        print(('OnC: down=%s, btn=%s'):format(tostring(down), button))
+        print('OnC:: down=', down, 'btn=', button)
         local prev = self:GetFrameRef('prev')
+
+        -- virtual cursor
+        -- state: has cursor, then mouse up will place the current cursor here
+        -- action is on mouse up so that it doesn't trigger the spell
+        local cursorPrevType = prev:GetAttribute('abp_cursor_type')
+        local cursorPrevAction = prev:GetAttribute('abp_cursor_action')
+        --prev:SetAttribute('abp_onup_cursor_type', cursorPrevType)
+        --prev:SetAttribute('abp_onup_cursor_action', cursorPrevAction)
+        if cursorPrevType and cursorPrevAction then
+            if down then
+                -- set type to nil so it won't execute
+                self:SetAttribute('type', nil)
+                self:SetAttribute('type', nil)
+                self:SetAttribute(cursorPrevType, nil)
+                return nil
+            end
+            
+            --cursorPrevType = prev:GetAttribute('abp_onup_cursor_type')
+            --cursorPrevAction = prev:GetAttribute('abp_onup_cursor_action')
+            -- executed on 'up'
+            self:SetAttribute('type', cursorPrevType)
+            self:SetAttribute(cursorPrevType, cursorPrevAction)
+        end
+        prev:SetAttribute('abp_on_receive_drag_previous_type', nil)
+        prev:SetAttribute('abp_on_receive_drag_previous_action', nil)
+        print('OnC:: cursorPrevType=', cursorPrevType, 'cursorPrevAction=', cursorPrevAction)
+        
         local isDragAllowed = prev:GetAttribute('abp_is_drag_allowed')
+        print('OnC:: isDragAllowed=', isDragAllowed)
         if isDragAllowed then return false end
+        
+
     ]])
 end
 
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_PostClick(self)
     local handler = self:GetParent().handler
-    SecureHandlerSetFrameRef(self, "prev", prev)
+    --SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "PostClick", [[
         print('PostC:: called...down=', down)
         local prev = self:GetFrameRef("prev")
@@ -308,18 +354,28 @@ function o:OnPlayerEnteringWorld()
     
     Btn_AddTempSpells(self)
     
+    SecureHandlerSetFrameRef(self, "prev", prev)
     Btn_WrapScript_OnDragStart(self)
     Btn_WrapScript_OnReceiveDrag(self)
     Btn_WrapScript_PreClick(self)
     Btn_WrapScript_OnClick(self)
     --Btn_WrapScript_PostClick(self)
+    -- OnEnter/OnLeave has to be both turned on
     Btn_WrapScript_OnEnter(self)
     Btn_WrapScript_OnLeave(self)
+    self:SetAttribute("_onenter", [[
+        local prev = self:GetFrameRef('prev')
+        print('XX OnEnter... prev=', prev)
+    ]])
+    self:SetAttribute("_onleave", [[
+        print('XX OnLeave...')
+    ]])
 end
 
 function o:OnDragStop()
-    local kind, _, _, spellID = GetCursorInfo()
-    p('OnDragStop...spellID=', spellID)
+    --local kind, _, _, spellID = GetCursorInfo()
+    --p('OnDragStop...spellID=', spellID)
+    p('OnDStop:: btnID=', self:GetID())
 end
 
 function o:PostClick(button, down)
