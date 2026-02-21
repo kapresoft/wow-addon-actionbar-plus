@@ -80,30 +80,21 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnDragStart(self)
     local handler = self:GetParent().handler
-    --if not InCombatLockdown() then
-    --    prev:SetAttribute('abp_lock_actionbars', lockActionBars)
-    --end
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnDragStart", [[
         local prev = self:GetFrameRef('prev')
-
-        local modifiedClick = IsModifiedClick("PICKUPACTION")
-        if not modifiedClick then return end
-        local lockActionBars = prev:GetAttribute('abp_lock_actionbars')
-        --print('OnDragS:: xx modifiedClick=', modifiedClick, 'lockAB=', lockActionBars)
-
-        -- 1: Pickup Action
-        local spellID = self:GetAttribute("spell")
-        if not spellID then return false end
-        if modifiedClick then spellID = self:GetAttribute('abp_drag_spellid') end
-        --print('OnDragS:: modifiedClick=', modifiedClick, 'spellID=', spellID)
-
-        -- Clear this button's action
-        self:SetAttribute("type", nil)
-        self:SetAttribute("spell", nil)
-        --self:SetAttribute("abp_2_0_spellid", nil)
+        local isDragAllowed = prev:GetAttribute('abp_is_drag_allowed') or false
+        local actionType = self:GetAttribute('type')
+        local actionID = actionType and self:GetAttribute(actionType)
+        print('OnDragS:: isDragAllowed=', isDragAllowed, 'type=', actionType, 'actionID=', actionID)
+        if not isDragAllowed then return false end
+        if not (actionType and actionID) then return end
         
-        return 'clear', 'spell', spellID
+        -- 1: Pickup Action
+        self:SetAttribute("type", nil)
+        self:SetAttribute(actionType, nil)
+        
+        return 'clear', actionType, actionID
     ]])
 end
 
@@ -128,27 +119,28 @@ local function Btn_WrapScript_OnReceiveDrag(self)
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnReceiveDrag", [[
         local prev = self:GetFrameRef('prev')
-        local bookType, spellID = ...
-        print('ORD:: PickupAny=', PickupAny)
-        print(('ORD:: kind=%s, spellID=%s'):format(tostring(kind), tostring(spellID)))
-        if not spellID then return 'clear' end
+        local bookType, actionID = ...
+        
+        local actionType = kind
+        print('ORD:: actionType=', actionType, 'actionID=', actionID)
+        if not actionID then return 'clear' end
         
         self:SetAttribute('abp_2_0_start_drag_spell', nil)
         
-        --if kind ~= "spell" and type(spellID) ~= 'number' then return end
-        --print('ORDrag:: spid=', spellID)
-        local prevSpellID = self:GetAttribute("spell")
-        local prevType = self:GetAttribute("type")
-        prev:SetAttribute('abp_on_receive_drag_previous_type', prevType)
-        prev:SetAttribute('abp_on_receive_drag_previous_spell', prevSpellID)
-        print(('ORD:: prevT=%s, prevSpellID=%s'):format(tostring(prevType), tostring(prevSpellID)))
-        
+        --if kind ~= "spell" and type(actionID) ~= 'number' then return end
+        --print('ORDrag:: spid=', actionID)
+        local prevActionType = self:GetAttribute('type')
+        local prevActionID = self:GetAttribute(prevActionType)
+        prev:SetAttribute('abp_on_receive_drag_previous_type', prevActionType)
+        prev:SetAttribute('abp_on_receive_drag_previous_spell', prevActionID)
+        print('ORD:: prevActionType=', actionType, 'prevActionID=', actionID)
+
         -- overwrite B immediately
-        self:SetAttribute("type", "spell")
-        self:SetAttribute("spell", spellID)
+        self:SetAttribute('type', actionType)
+        self:SetAttribute(actionType, actionID)
         
-        if prevSpellID then
-            return 'clear', 'spell', prevSpellID
+        if prevActionType and prevActionID then
+            return 'clear', prevActionType, prevActionID
         else
             return 'clear'
         end
@@ -160,28 +152,52 @@ local function Btn_WrapScript_PreClick(self)
     local handler = self:GetParent().handler
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "PreClick", [[
-       local prev = self:GetFrameRef('prev')
-
-        if not down then
-            -- restore spell saved on previous cursor (virtually)
-            local prevType = prev:GetAttribute('abp_previous_type')
-            local prevSpellID = prev:GetAttribute('abp_previous_spell')
-            if prevType and prevSpellID then
-                print(('ORD:: prevT=%s, prevSpellID=%s'):format(tostring(prevType), tostring(prevSpellID)))
-                self:SetAttribute('type', prevType)
-                self:SetAttribute('spell', prevSpellID)
-            end
-            return
-        end
-        
-        local modifiedClick = IsModifiedClick("PICKUPACTION")
+        local prev = self:GetFrameRef('prev')
         local current = self:GetAttribute("spell")
-        if not modifiedClick then return end
+        print('PreC:: current=', current)
+        -- this will change when it fires (up or down key)
+        local shouldFire = down == true
+        
+        local isDragAllowed = false
+        local lockedInSettings = prev:GetAttribute('abp_lock_actionbars')
+        if shouldFire then
+            if lockedInSettings == true then
+                local modifiedClick = IsModifiedClick("PICKUPACTION")
+                if lockedInSettings and modifiedClick then
+                    isDragAllowed = true
+                end
+            else
+                isDragAllowed = true
+            end
+        end
+        prev:SetAttribute('abp_is_drag_allowed', isDragAllowed)
+        if not isDragAllowed then return end
+        
+        --self:SetAttribute("abp_drag_spellid", current)
 
-        print('PreClick:: xx no op, spell=', current)
-        self:SetAttribute("abp_drag_spellid", current)
-        self:SetAttribute("abp_2_0_start_drag_spell", current)
-        --self:SetAttribute("spell", nil)
+        -- drag happens on 'up' and shift
+        --if not down then
+        --    -- restore spell saved on previous cursor (virtually)
+        --    local prevType = prev:GetAttribute('abp_previous_type')
+        --    local prevSpellID = prev:GetAttribute('abp_previous_spell')
+        --    if prevType and prevSpellID then
+        --        print(('PreC:: prevT=%s, prevSpellID=%s'):format(tostring(prevType), tostring(prevSpellID)))
+        --        self:SetAttribute('type', prevType)
+        --        self:SetAttribute('spell', prevSpellID)
+        --    end
+        --    return
+        --end
+        --
+        --local lockedInSettings = prev:GetAttribute('abp_lock_actionbars')
+        --local modifiedClick = IsModifiedClick("PICKUPACTION")
+        --if down and lockedInSettings and modifiedClick then
+        --    prev:SetAttribute('abp_is_drag_allowed', true)
+        --end
+        --if not modifiedClick then return end
+        --
+        --print('PreClick:: xx no op, spell=', current)
+        --self:SetAttribute("abp_2_0_start_drag_spell", current)
+        ----self:SetAttribute("spell", nil)
     ]])
 end
 
@@ -240,39 +256,8 @@ local function Btn_WrapScript_OnClick(self)
     handler:WrapScript(self, "OnClick", [[
         print(('OnC: down=%s, btn=%s'):format(tostring(down), button))
         local prev = self:GetFrameRef('prev')
-        
-        local prevType = prev:GetAttribute('abp_previous_type')
-        local prevSpellID = prev:GetAttribute('abp_previous_spell')
-        print(('OnClick::XX prevT=%s, prevSpellID=%s'):format(tostring(prevType), tostring(prevSpellID)))
-        if prevType then
-            print('xx prev type')
-            return 'clear', 'spell', prevSpellID
-        end
-        
-        if not down then
-            -- restore spell saved on previous cursor (virtually)
-            if prevType and prevSpellID then
-                print(('OnClick:: prevT=%s, prevSpellID=%s'):format(tostring(prevType), tostring(prevSpellID)))
-                
-                local currentType = self:GetAttribute("type")
-                local currentSpellID = self:GetAttribute("spell")
-                
-                self:SetAttribute('type', prevType)
-                self:SetAttribute('spell', prevSpellID)
-    
-                prev:SetAttribute('abp_previous_type', nil)
-                prev:SetAttribute('abp_previous_spell', nil)
-                if not currentType then
-                end
-            end
-            return
-        end
-        
-        if self:GetAttribute("abp_2_0_start_drag_spell") then
-            print('OnC: abp_2_0_start_drag_spell')
-            return false
-        end
-        
+        local isDragAllowed = prev:GetAttribute('abp_is_drag_allowed')
+        if isDragAllowed then return false end
     ]])
 end
 
@@ -335,7 +320,8 @@ function o:OnPlayerEnteringWorld()
 end
 
 function o:OnDragStop()
-    p('OnDragStop...')
+    local kind, _, _, spellID = GetCursorInfo()
+    p('OnDragStop...spellID=', spellID)
 end
 
 function o:PostClick(button, down)
