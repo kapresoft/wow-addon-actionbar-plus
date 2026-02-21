@@ -80,7 +80,9 @@ end
 --- @param self ABP_Button_2_0_1_1
 local function Btn_WrapScript_OnDragStart(self)
     local handler = self:GetParent().handler
-    prev:SetAttribute('abp_lock_actionbars', lockActionBars)
+    --if not InCombatLockdown() then
+    --    prev:SetAttribute('abp_lock_actionbars', lockActionBars)
+    --end
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnDragStart", [[
         local prev = self:GetFrameRef('prev')
@@ -188,17 +190,17 @@ local function Btn_WrapScript_OnEnter(self)
     local handler = self:GetParent().handler
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnEnter", [[
-        print('OnEnter...GetMouseButtonClicked=', GetMouseButtonClicked(), 'RegisterStateDriver=', RegisterStateDriver)
+        print('OnEnter...GetMouseButtonClicked=', GetMouseButtonClicked())
         local prev = self:GetFrameRef('prev')
-        
+        ---print('OnEnter:: lockActionBars=', prev:GetAttribute('abp_lock_actionbars'))
+
         -- OnEnter, save existing spell; a cursor may exists
-        local currentType = self:GetAttribute('type')
-        local currentSpell = self:GetAttribute('spell')
-        if currentType and currentSpell then
-            -- save
-            
-        end
-        
+        --local currentType = self:GetAttribute('type')
+        --local currentSpell = self:GetAttribute('spell')
+        --if currentType and currentSpell then
+        --    -- save
+        --
+        --end
         
         -- restore spell saved on previous cursor (virtually)
         --local prevType = prev:GetAttribute('abp_previous_type')
@@ -216,10 +218,18 @@ local function Btn_WrapScript_OnLeave(self)
     local handler = self:GetParent().handler
     SecureHandlerSetFrameRef(self, "prev", prev)
     handler:WrapScript(self, "OnLeave", [[
-        print('OnLeave...')
-        --local prev = self:GetFrameRef('prev')
-        --prev:SetAttribute('abp_previous_type', nil)
-        --prev:SetAttribute('abp_previous_spell', nil)
+        print('OnLeave...GetMouseButtonClicked=', GetMouseButtonClicked())
+        local prev = self:GetFrameRef('prev')
+        local prevType = self:GetAttribute('abp_on_receive_drag_previous_type')
+        local prevSpellID = self:GetAttribute('abp_on_receive_drag_previous_spell')
+        if not (prevType and prevSpellID) then
+            self:SetAttribute('abp_on_receive_drag_previous_type', nil)
+            self:SetAttribute('abp_on_receive_drag_previous_spell', nil)
+            return
+        end
+        prev:SetAttribute('abp_previous_type', prevType)
+        prev:SetAttribute('abp_previous_spell', prevSpellID)
+        p('xx OnLeave... prev=', prevType, 'spellID=', prevSpellID)
     ]])
 end
 
@@ -277,6 +287,20 @@ local function Btn_WrapScript_PostClick(self)
     ]])
 end
 
+--- @param self ABP_Button_2_0_1_1
+local function Btn_AddTempSpells(self)
+    local tmpBtnSpells = {
+        [1000] = 'holy light(rank 1)',
+        [1001] = 'seal of the crusader',
+        --[1002] = 'seal of righteousness',
+        [1002] = 'jewelcrafting',
+    }
+    local id = self:GetID()
+    local spell = tmpBtnSpells[id]
+    if not spell then return end
+    Btn_SetSpell(self, spell)
+end
+
 function o:OnLoad()
     self:SetID(NextSeedID())
     self.__name = ('%s:%s)'):format(self:GetName(), self:GetID())
@@ -292,28 +316,14 @@ function o:OnLoad()
     
     self:RegisterForDrag("LeftButton", "RightButton");
     self:RegisterForClicks('AnyDown', 'AnyUp');
-    self:RegisterMessage('ABP_2_0::SPELLS_CHANGED', 'OnSpellsChanged')
+    self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnPlayerEnteringWorld')
     --RegisterStateDriver(self, "abp_shift", "[mod:shift] shift; [mod:ctrl] ctrl; [mod:alt] alt; none")
 end
 
---- @param self ABP_Button_2_0_1_1
-local function Btn_AddTempSpells(self)
-    local tmpBtnSpells = {
-        [1000] = 'holy light(rank 1)',
-        [1001] = 'seal of the crusader',
-        --[1002] = 'seal of righteousness',
-        [1002] = 'jewelcrafting',
-    }
-    local id = self:GetID()
-    local spell = tmpBtnSpells[id]
-    if not spell then return end
-    Btn_SetSpell(self, spell)
-end
-
-function o:OnSpellsChanged()
-    Btn_AddTempSpells(self)
+function o:OnPlayerEnteringWorld()
+    prev:SetAttribute('abp_lock_actionbars', ns:cns().lockActionBars)
     
-    lockActionBars = Settings.GetValue("lockActionBars")
+    Btn_AddTempSpells(self)
     
     Btn_WrapScript_OnDragStart(self)
     Btn_WrapScript_OnReceiveDrag(self)
@@ -325,16 +335,7 @@ function o:OnSpellsChanged()
 end
 
 function o:OnDragStop()
-    local prevType = self:GetAttribute("abp_on_receive_drag_previous_type")
-    local prevSpellID = self:GetAttribute("abp_on_receive_drag_previous_spell")
-    if not (prevType and prevSpellID) then
-        self:SetAttribute('abp_on_receive_drag_previous_type', nil)
-        self:SetAttribute('abp_on_receive_drag_previous_spell', nil)
-        return
-    end
-    prev:SetAttribute('abp_previous_type', prevType)
-    prev:SetAttribute('abp_previous_spell', prevSpellID)
-    p('xx OnDragStop... prev=', prevType, 'spellID=', prevSpellID)
+    p('OnDragStop...')
 end
 
 function o:PostClick(button, down)

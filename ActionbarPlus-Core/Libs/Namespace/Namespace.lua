@@ -11,6 +11,7 @@ Type:Namespace
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion GameVersion_2_0
+--- @field lockActionBars boolean
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --- @field private logBuilder LogBuilderFn
