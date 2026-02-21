@@ -122,18 +122,16 @@ local function Btn_WrapScript_OnReceiveDrag(self)
         local bookType, actionID = ...
         
         local actionType = kind
-        print('ORD:: actionType=', actionType, 'actionID=', actionID)
+        print('ORDrag:: actionType=', actionType, 'actionID=', actionID)
         if not actionID then return 'clear' end
         
         self:SetAttribute('abp_2_0_start_drag_spell', nil)
         
-        --if kind ~= "spell" and type(actionID) ~= 'number' then return end
-        --print('ORDrag:: spid=', actionID)
         local prevActionType = self:GetAttribute('type')
         local prevActionID = self:GetAttribute(prevActionType)
         prev:SetAttribute('abp_on_receive_drag_previous_type', prevActionType)
         prev:SetAttribute('abp_on_receive_drag_previous_spell', prevActionID)
-        print('ORD:: prevActionType=', actionType, 'prevActionID=', actionID)
+        print('ORDrag:: prevActionType=', actionType, 'prevActionID=', actionID)
 
         -- overwrite B immediately
         self:SetAttribute('type', actionType)
