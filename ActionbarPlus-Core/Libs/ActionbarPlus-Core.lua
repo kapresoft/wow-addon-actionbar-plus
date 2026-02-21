@@ -39,3 +39,13 @@ function o:SPELLS_CHANGED()
       self:SendMessage('ABP_2_0::SPELLS_CHANGED')
   end)
 end
+
+function o:PLAYER_ENTERING_WORLD()
+  ns.lockActionBars = Settings.GetValue("lockActionBars")
+  self:SendMessage('ABP_2_0::PLAYER_ENTERING_WORLD')
+  C_Timer.After(1, function()
+    print('PLAYER_ENTERING_WORLD:: lockActionBars=', ns.lockActionBars)
+  end)
+end
+o:RegisterEvent('PLAYER_ENTERING_WORLD')
+
