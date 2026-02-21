@@ -43,10 +43,11 @@ local libName = 'ABP_ButtonMixin_2_0_3'
 local S = ns:cns():NewAceEvent(); ABP_ButtonMixin_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
 
-local function NextSeedID() local current = seedID; seedID = seedID + 1; return current end
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
+local function NextSeedID() local current = seedID; seedID = seedID + 1; return current end
+
 local function Btn_IsDragAllowed()
     return not Settings.GetValue("lockActionBars") or IsModifiedClick("PICKUPACTION")
 end

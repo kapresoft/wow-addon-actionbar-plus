@@ -2,8 +2,20 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="Backdrops.lua"/>
-    <Script file="Button_2_0_3.lua"/>
+    <!--<Script file="Button_2_0_3.lua"/>-->
+    <Script file="Button_2_0_1_1.lua"/>
     <Script file="BarFrame.lua"/>
+
+    <CheckButton name="ABP_ButtonTemplate_2_0_1_1"
+                 inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
+                 mixin="ABP_ButtonMixin_2_0_1_1" virtual="true">
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <PostClick method="PostClick"/>
+            <OnDragStop method="OnDragStop"/>
+            <OnAttributeChanged method="OnAttributeChanged"/>
+        </Scripts>
+    </CheckButton>
 
     <CheckButton name="ABP_ButtonTemplate_2_0_3"
                  inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
