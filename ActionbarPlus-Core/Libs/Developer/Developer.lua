@@ -4,7 +4,6 @@ local p, pd, t, tf = ns:log('Developer')
 
 --- @class Developer_ABP_2_0
 local o = {}; dd = o
-pd('loaded...')
 
 function o:skills()
   for i = 1, GetNumSkillLines() do

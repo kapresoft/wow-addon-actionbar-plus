@@ -14,7 +14,6 @@ local libName = ns.M.Compat()
 --- @class Compat_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, pd, t, tf = ns:log(libName)
-C_Timer.After(1, function() p("xxx Loaded...") end)
 
 --[[-----------------------------------------------------------------------------
 Module::Compat (Methods)
