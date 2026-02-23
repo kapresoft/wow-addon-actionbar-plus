@@ -43,3 +43,29 @@ local ns = select(2, ...)
 local p, pd, t, tf = ns:log('BarButtonUpdateFrameMixin')
 
 pd('xxx Loaded...')
+--- @alias ButtonUpdateFrame_ABP_2_0 ButtonUpdateFrameMixin_ABP_2_0 | FrameObj
+--
+--
+--- @class ButtonUpdateFrameMixin_ABP_2_0
+ABP_2_0_ButtonUpdateFrameMixin = {};
+
+--- @type ButtonUpdateFrameMixin_ABP_2_0 | ButtonUpdateFrame_ABP_2_0
+local o = ABP_2_0_ButtonUpdateFrameMixin
+
+function o:OnLoad()
+  self.frames = {};
+end
+
+function o:OnUpdate(elapsed)
+  for k, frame in pairs(self.frames) do
+    frame:OnUpdate(elapsed);
+  end
+end
+
+function o:RegisterFrame(frame)
+  self.frames[frame] = frame;
+end
+
+function o:UnregisterFrame(frame)
+  self.frames[frame] = nil;
+end
