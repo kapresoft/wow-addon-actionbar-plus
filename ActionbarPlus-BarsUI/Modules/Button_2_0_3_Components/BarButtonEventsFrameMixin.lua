@@ -36,12 +36,13 @@ Mental model:
 local ns = select(2, ...)
 local p, pd, t, tf = ns:log('BarButtonEventsFrameMixin')
 
-pd('xxx Loaded...')
-
+--- @alias ButtonEventsFrame_ABP_2_0 ButtonEventsFrameMixin_ABP_2_0 | FrameObj
+--
+--
 --- @class ButtonEventsFrameMixin_ABP_2_0
 ABP_2_0_ButtonEventsFrameMixin = {};
 
---- @type ButtonEventsFrameMixin_ABP_2_0
+--- @type ButtonEventsFrameMixin_ABP_2_0 | ButtonEventsFrame_ABP_2_0
 local o = ABP_2_0_ButtonEventsFrameMixin
 
 function o:OnLoad()
@@ -85,5 +86,7 @@ function o:ForEachFrame(func)
   end
 end
 
---- @class ButtonEventsDerivedFrameMixin_2_0: ButtonEventsFrameMixin_ABP_2_0
+--- @alias ButtonEventsDerivedFrameMixin_2_0 ButtonEventsFrame_ABP_2_0
+--
+--- @type ButtonEventsDerivedFrameMixin_2_0
 ABP_2_0_ButtonEventsDerivedFrameMixin = CreateFromMixins(o)

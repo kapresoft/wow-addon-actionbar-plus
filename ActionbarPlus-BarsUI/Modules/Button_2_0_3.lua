@@ -168,7 +168,16 @@ function o:OnLoad()
   self:RegisterForClicks('AnyDown', 'AnyUp');
   self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
   
-  Btn_RegisterCallbacks(self)
+  --Btn_RegisterCallbacks(self)
+  
+  --- @type ButtonEventsFrame_ABP_2_0
+  local ABP_2_0_ButtonEventsFrame = ABP_2_0_ButtonEventsFrame
+  ABP_2_0_ButtonEventsFrame:RegisterFrame(self)
+end
+
+---@param evt Name The event name
+function o:OnEvent(evt, ...)
+  p(('xx OnEvent[%s]...'):format(tostring(evt)))
 end
 
 -- /dump GetShapeshiftFormInfo(1)

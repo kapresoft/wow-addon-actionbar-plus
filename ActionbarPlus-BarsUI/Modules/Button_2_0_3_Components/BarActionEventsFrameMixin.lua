@@ -33,8 +33,6 @@ Key Characteristics:
 
 This frame performs no state logic itself; it only routes events.
 ---------------------------------------------------------------------]]
-
-
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local p, pd, t, tf = ns:log('BarActionEventsFrameMixin')
@@ -43,10 +41,13 @@ pd('xxx Loaded...')
 --[[-------------------------------------------------------------------
 Mixin
 ---------------------------------------------------------------------]]
---- @class ABP_2_0_ActionEventsFrameMixin
+--- @alias ActionEventsFrame_ABP_2_0 ActionEventsFrameMixin_ABP_2_0 | FrameObj
+--
+--
+--- @class ActionEventsFrameMixin_ABP_2_0
 ABP_2_0_ActionEventsFrameMixin = {};
 
---- @type ABP_2_0_ActionEventsFrameMixin
+--- @type ActionEventsFrameMixin_ABP_2_0 | ActionEventsFrame_ABP_2_0
 local o = ABP_2_0_ActionEventsFrameMixin
 
 function o:OnLoad()
