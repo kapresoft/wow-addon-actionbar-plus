@@ -24,7 +24,7 @@ addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
 --- @type BarsUI_Modules_ABP_2_0
 ns.O = ns.O or {}
 
---- @type Namespace_ABP_2_0
+--- @return Namespace_ABP_2_0
 function ns:cns() return ABP_CORE_NS end
 
 --[[-------------------------------------------------------------------

@@ -63,7 +63,7 @@ end
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
-ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 })
+ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = ns.fmt
 ns.printer = LibPrettyPrint:Printer({
   prefix = ns.nameShort, formatter = ns.fmt,
   prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
@@ -128,6 +128,9 @@ function ns:RegisterTracer(tracer)
       end
   end)
 end
+
+--- @return Cursor_ABP_2_0
+function ns:cursor() return self.O.CursorProvider:GetCursor() end
 
 --- @param name Name
 --- @param predicateFn fun():boolean @Optional - The predicate function
@@ -203,6 +206,11 @@ function ns:__CreateLogBuilder(printer)
   end
   
   return builderFn
+end
+
+function ns.Str_IsBlank(str)
+  if type(str) ~= "string" then return str == nil end
+  return strtrim(str) == ""
 end
 
 
