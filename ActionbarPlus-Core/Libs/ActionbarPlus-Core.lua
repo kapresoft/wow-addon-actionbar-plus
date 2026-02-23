@@ -42,13 +42,8 @@ end
 
 function o:PLAYER_ENTERING_WORLD(evt, isInitialLogin, isReloadingUi)
   ns.lockActionBars = Settings.GetValue("lockActionBars")
-  local delay = 1
-  if isReloadingUi then delay = 0.01 end
+  p('PLAYER_ENTERING_WORLD:: isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
   self:SendMessage('ABP_2_0::PLAYER_ENTERING_WORLD', isInitialLogin, isReloadingUi)
-  C_Timer.After(delay, function()
-    p('XXX delay=', delay, 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
-    --self:SendMessage('ABP_2_0::PLAYER_ENTERING_WORLD', isInitialLogin, isReloadingUi)
-  end)
 end
 o:RegisterEvent('PLAYER_ENTERING_WORLD')
 

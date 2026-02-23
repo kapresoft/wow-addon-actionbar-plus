@@ -64,6 +64,11 @@ local t = {
   equipmentset = 'equipmentset',
 }
 
+local Btn_UpdateState = buttonState.Btn_UpdateState
+local Btn_OnSpellCast = buttonState.Btn_OnSpellCast
+local Btn_OnTradeSkill = buttonState.Btn_OnTradeSkill
+local Btn_IsDragAllowed = buttonState.Btn_IsDragAllowed
+local Btn_UpdateFlash = buttonState.Btn_UpdateFlash
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
@@ -76,11 +81,15 @@ end
 --- @param unitTarget UnitID
 local function IsPlayer(unitTarget) return player == unitTarget end
 
-local Btn_UpdateState = buttonState.Btn_UpdateState
-local Btn_OnSpellCast = buttonState.Btn_OnSpellCast
-local Btn_OnTradeSkill = buttonState.Btn_OnTradeSkill
-local Btn_IsDragAllowed = buttonState.Btn_IsDragAllowed
-local Btn_UpdateFlash = buttonState.Btn_UpdateFlash
+--- @return boolean
+local function IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
+
+--- @param down boolean
+--- @return boolean
+local function ShouldFire(down)
+  if IsActionbarLockedByUser() then return down == true end
+  return down ~= true
+end
 
 --- @param self ABP_Button_2_0_3
 --- @param spell SpellIdentifier
@@ -157,20 +166,59 @@ function o:OnLoad()
   
   self:RegisterForDrag("LeftButton", "RightButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
-  self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnPlayerEnteringWorld')
+  self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
   
   Btn_RegisterCallbacks(self)
 end
 
---- @return boolean
-local function IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
-
---- @param down boolean
---- @return boolean
-local function ShouldFire(down)
-  if IsActionbarLockedByUser() then return down == true end
-  return down ~= true
+-- /dump GetShapeshiftFormInfo(1)
+-- /dump GetSpellTexture('shadowform')
+-- /dump GetSpellInfo('shadowform'), active=136200
+--- Add temporary spells for testing
+function o:OnInit(evt, isInitialLogin, isReloadingUi)
+  --pd('OnInit():: isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
+  
+  --/dump SetCVar('ActionButtonUseKeyDown', 1)
+  --/dump GetCVarBool('ActionButtonUseKeyDown')
+  if not GetCVarBool('ActionButtonUseKeyDown') then
+    SetCVar('ActionButtonUseKeyDown', 1)
+    p('ActionButtonUseKeyDown=', GetCVarBool('ActionButtonUseKeyDown'))
+  end
+  
+  -- /dump C_Spell.GetSpellInfo('flash of light')
+  local tmpBtnSpells = {
+    [1000] = 'holy light(rank 1)',
+    [1001] = 'seal of the crusader(rank 1)',
+    --[1002] = 'seal of righteousness',
+    [1002] = 'jewelcrafting',
+  }
+  if cns:IsMainLine() then
+    tmpBtnSpells = {
+      [1000] = 'flash of light',
+      [1001] = 'sense undead',
+      --[1002] = 'seal of righteousness',
+      [1002] = 'jewelcrafting',
+    }
+  end
+  
+  if InCombatLockdown() then return end
+  
+  local id = self:GetID()
+  local spell = tmpBtnSpells[id]
+  if not spell then return end
+  
+  if isInitialLogin then
+    self:RegisterEvent('SPELLS_CHANGED', function(evt)
+      Btn_SetSpell(self, spell)
+      pd('OnInit():: spell=', spell)
+    end)
+  else
+    Btn_SetSpell(self, spell)
+  end
+  
+  Btn_UpdateState(self)
 end
+
 
 --- @param button ButtonName
 --- @param down ButtonDown
@@ -235,55 +283,6 @@ function o:OnReceiveDrag()
   ClearCursor()
   Btn_UpdateState(self)
   Btn_UpdateFlash(self)
-end
-
--- /dump GetShapeshiftFormInfo(1)
--- /dump GetSpellTexture('shadowform')
--- /dump GetSpellInfo('shadowform'), active=136200
---- Add temporary spells for testing
-function o:OnPlayerEnteringWorld(evt, isInitialLogin, isReloadingUi)
-  pd(evt .. 'args:: isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
-
-  --/dump SetCVar('ActionButtonUseKeyDown', 1)
-  --/dump GetCVarBool('ActionButtonUseKeyDown')
-  if not GetCVarBool('ActionButtonUseKeyDown') then
-    
-    SetCVar('ActionButtonUseKeyDown', 1)
-    p('ActionButtonUseKeyDown=', GetCVarBool('ActionButtonUseKeyDown'))
-  end
-  
-  -- /dump C_Spell.GetSpellInfo('flash of light')
-  local tmpBtnSpells = {
-    [1000] = 'holy light(rank 1)',
-    [1001] = 'seal of the crusader(rank 1)',
-    --[1002] = 'seal of righteousness',
-    [1002] = 'jewelcrafting',
-  }
-  if cns:IsMainLine() then
-    tmpBtnSpells = {
-      [1000] = 'flash of light',
-      [1001] = 'sense undead',
-      --[1002] = 'seal of righteousness',
-      [1002] = 'jewelcrafting',
-    }
-  end
-  
-  if InCombatLockdown() then return end
-  
-  local id = self:GetID()
-  local spell = tmpBtnSpells[id]
-  if not spell then return end
-  
-  if isInitialLogin then
-    self:RegisterEvent('SPELLS_CHANGED', function(evt)
-      Btn_SetSpell(self, spell)
-      pd('OnPlayerEnteringWorld():: init spell=', spell)
-    end)
-  else
-    Btn_SetSpell(self, spell)
-  end
-  
-  Btn_UpdateState(self)
 end
 
 function o:OnAttributeChanged(name, val)
