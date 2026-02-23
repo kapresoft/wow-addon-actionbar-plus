@@ -71,9 +71,14 @@ function o.Btn_OnSpellCast(self, event, unitTarget, ...)
       spellDesc = spellDesc .. '[' .. sp.name .. ']'
     end)
   end
+  local m = ('OnSpellCast[%s] %s::'):format(self:GetID(), event)
+  if event == 'UNIT_SPELLCAST_START' then
+    local _, evtSpellID = ...
+    p(m, 'evtSpellID=', evtSpellID, 'spell=', spellDesc, 'current=', current)
+  end
+  
   if event == 'UNIT_SPELLCAST_STOP' or event == 'UNIT_SPELLCAST_SUCCEEDED' then
     current = C_IsCurrentSpell(spellID)
-    local m = ('OnSpellCast[%s] %s::'):format(self:GetID(), event)
     local _, evtSpellID = ...
     p(m, 'evtSpellID=', evtSpellID, 'spell=', spellDesc, 'current=', current)
     if evtSpellID == spellID then

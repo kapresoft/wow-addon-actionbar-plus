@@ -2,8 +2,33 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="Backdrops.lua"/>
-    <Include file="Button_2_0_3_Controllers/_Controllers.xml"/>
+    <Script file="Button_2_0_3_Controllers/ButtonState.lua"/>
     <Script file="Button_2_0_3.lua"/>
+    <Script file="Button_2_0_3_Components/BarActionEventsFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/BarButtonEventsFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/BarButtonUpdateFrameMixin.lua"/>
+
+    <Frame name="ABP_2_0_ButtonEventsFrame" mixin="ABP_2_0_ButtonEventsDerivedFrameMixin">
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="ABP_2_0_ActionEventsFrame" mixin="ABP_2_0_ActionEventsFrameMixin">
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="ActionBarButtonUpdateFrame" mixin="ActionBarButtonUpdateFrameMixin">
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnUpdate method="OnUpdate"/>
+        </Scripts>
+    </Frame>
+
     <!--<Script file="Button_2_0_1_1.lua"/>-->
     <Script file="BarFrame.lua"/>
 

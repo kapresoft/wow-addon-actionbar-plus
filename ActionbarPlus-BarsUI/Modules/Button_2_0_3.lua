@@ -233,7 +233,6 @@ function o:PreClick(button, down)
   if ShouldFire(down) and Btn_IsDragAllowed() then
     self:DisableAttributeType()
   end
-  
 end
 
 --- @param button ButtonName
@@ -244,6 +243,7 @@ function o:PostClick(button, down)
   
   --if not down then self:RestoreAttributeType() end
   Btn_UpdateState(self)
+  -- todo move to ButtonStates#Btn_OnSpellCast
 end
 
 function o:OnEnter() self:ClearAttributeSavedType() end
