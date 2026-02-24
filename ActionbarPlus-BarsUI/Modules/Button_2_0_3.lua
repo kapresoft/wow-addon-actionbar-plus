@@ -39,6 +39,9 @@ New Instance
 --- @alias ABP_Button_2_0_3 ABP_ButtonMixin_2_0_3 | SecureCheckButtonObj | AceEvent_3_0
 --
 --
+--- @class ABP_ButtonMixin_IconFrame_2_0_3
+--- @field icon TextureObj
+--
 local libName = 'ABP_ButtonMixin_2_0_3'
 --- @class ABP_ButtonMixin_2_0_3
 --- @field __name Name The debug name
@@ -100,18 +103,6 @@ local function ShouldFire(down)
 end
 
 --- @param self ABP_Button_2_0_3
---- @param spell SpellIdentifier
-local function Btn_SetSpell(self, spell)
-  local sp = comp:GetSpellInfo(spell)
-  if not sp then return end
-  self:SetAttribute('type', 'spell')
-  self:SetAttribute('spell', sp.spellID)
-  self.icon:SetTexture(sp.iconID)
-  --self:SetAttribute(type, t.spell)
-  --self:SetAttribute(t.spell, sp.spellID)end
-end
-
---- @param self ABP_Button_2_0_3
 local function Btn_PickupAction(self)
   local type = self:GetAttributeType()
   if self:IsSpellType() then
@@ -167,6 +158,7 @@ function o:OnLoad()
   
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
+  self.icon:AddMaskTexture(self.IconMask)
   
   self:SetAttribute("checkselfcast", true);
   self:SetAttribute("checkfocuscast", true);
@@ -199,7 +191,7 @@ function o:OnEvent(evt, ...)
           or evt == 'SPELL_UPDATE_COOLDOWN'
           or evt == 'LOSS_OF_CONTROL_ADDED' then
     self:UpdateCooldown()
-    p(self:__prefix('OnEvent()'), 'XXX evt=', evt)
+    self:p('OnEvent', 'evt=', evt)
   end
 end
 
@@ -216,7 +208,15 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
     SetCVar('ActionButtonUseKeyDown', 1)
     p('ActionButtonUseKeyDown=', GetCVarBool('ActionButtonUseKeyDown'))
   end
+  if InCombatLockdown() then return end
   
+  self:__InitDevSpells(isInitialLogin)
+  
+  self:UpdateState()
+end
+
+--- @param isInitialLogin boolean
+function o:__InitDevSpells(isInitialLogin)
   -- /dump C_Spell.GetSpellInfo('flash of light')
   local tmpBtnSpells = {
     [1000] = 'holy light(rank 1)',
@@ -234,22 +234,17 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
     }
   end
   
-  if InCombatLockdown() then return end
-  
   local id = self:GetID()
   local spell = tmpBtnSpells[id]
   if not spell then return end
   
   if isInitialLogin then
     self:RegisterEvent('SPELLS_CHANGED', function(evt)
-      Btn_SetSpell(self, spell)
-      pd('OnInit():: spell=', spell)
+      self:__SetSpell(spell)
     end)
   else
-    Btn_SetSpell(self, spell)
+    self:__SetSpell(spell)
   end
-  
-  Btn_UpdateState(self)
 end
 
 
@@ -309,7 +304,7 @@ function o:OnReceiveDrag()
   if cursor.type == 'spell' then
     cursor:IfSpell(function(spell)
       p('OnReceiveDrag:: spell=', spell)
-      Btn_SetSpell(self, spell.spellID)
+      self:__SetSpell(spell.spellID)
     end)
   end
   
@@ -483,11 +478,8 @@ function o:UpdateCooldown()
     return
   end
   
-  cd:SetSwipeColor(0, 0, 0)
   cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
   CooldownFrame_Set(cd, start, duration, enable, false, modRate or 1)
-
-  --p(self:__prefix('UpdateCooldown'), 'done... st=', start, 'dur=', duration, 'sp=', name)
 end
 
 --- Update the button's checked state
@@ -516,6 +508,20 @@ function o:UpdateState()
 end
 
 
-function o:__prefix(prefix)
-  return ("%s(%s)::"):format(prefix, self.__name)
+--- @param spell SpellIdentifier
+function o:__SetSpell(spell)
+  local sp = comp:GetSpellInfo(spell)
+  if not sp then return end
+  self:SetAttribute(c.type, t.spell)
+  self:SetAttribute(t.spell, sp.spellID)
+  self.icon:SetTexture(sp.iconID)
 end
+
+function o:p(prefix, ...)
+  local a = { ... }; p(self:pid(prefix), unpack(a))
+end
+function o:pd(prefix, ...)
+  local a = { ... }; pd(self:pid(prefix), unpack(a))
+end
+function o:pid(prefix) return ("%s(%s)::"):format(prefix, self.__name) end
+

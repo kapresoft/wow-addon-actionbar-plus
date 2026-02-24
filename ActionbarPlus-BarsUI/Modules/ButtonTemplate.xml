@@ -9,10 +9,20 @@
             <Layer level="ARTWORK" textureSubLevel="-2">
                 <Texture parentKey="icon" name="$parentIcon" alpha="0.8">
                     <Anchors>
+                        <!--<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>-->
                         <Anchor point="TOPLEFT"/>
                         <Anchor point="BOTTOMRIGHT"/>
                     </Anchors>
                 </Texture>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="-1">
+                <MaskTexture parentKey="IconMask" file="interface\addons\actionbarplus\core\assets\textures\ui-button-mask">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parentIcon"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parentIcon"/>
+                   </Anchors>
+                </MaskTexture>
             </Layer>
             <Layer level="ARTWORK" textureSubLevel="2">
                 <FontString name="$parentHotKey" inherits="NumberFontNormalSmallGray" parentKey="HotKey" justifyH="RIGHT">
@@ -87,11 +97,11 @@
                     <KeyValue key="edgeTextureLOC" value="Interface\Cooldown\edge" type="string"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPLEFT" x="1.5" y="-1.5"/>
-                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon" relativePoint="BOTTOMRIGHT" x="-1.5" y="1.5"/>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
                 </Anchors>
                 <SwipeTexture>
-                    <Color r="1" g="1" b="1" a="0.8"/>
+                    <Color r="0" g="0" b="0" a="0.6"/>
                 </SwipeTexture>
             </Cooldown>
         </Frames>
