@@ -213,6 +213,19 @@ function ns.Str_IsBlank(str)
   return strtrim(str) == ""
 end
 
+--- Match {match} for any occurrence in ...
+--- @param match string
+--- @param ... string
+--- @return boolean
+function ns.Str_IfAnyOf(match, ...)
+  if not match then return false end
+  for i = 1, select('#', ...) do
+    local v = select(i, ...)
+    if v == match then return true end
+  end
+  return false
+end
+
 
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns
