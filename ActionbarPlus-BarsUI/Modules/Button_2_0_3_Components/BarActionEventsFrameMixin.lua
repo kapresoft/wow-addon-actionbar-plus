@@ -45,6 +45,7 @@ Mixin
 --
 --
 --- @class ActionEventsFrameMixin_ABP_2_0
+--- @field frames table<number, ABP_Button_2_0_3>
 ABP_2_0_ActionEventsFrameMixin = {};
 
 --- @type ActionEventsFrameMixin_ABP_2_0 | ActionEventsFrame_ABP_2_0
@@ -97,7 +98,6 @@ function o:OnLoad()
   end);
 end
 
-
 function o:IsSpellcastEvent(event)
   if ( event == "UNIT_SPELLCAST_INTERRUPTED" or
           event == "UNIT_SPELLCAST_SUCCEEDED" or
@@ -117,30 +117,34 @@ function o:IsSpellcastEvent(event)
   end
 end
 
-function o:OnEvent(event, ...)
-  if ( event == "UNIT_INVENTORY_CHANGED" ) then
+---@param evt Name The event name
+---@param ... any
+function o:OnEvent(evt, ...)
+  if ( evt == "UNIT_INVENTORY_CHANGED" ) then
     local unit = ...;
     if ( unit == "player" and self.tooltipOwner and GameTooltip:GetOwner() == self.tooltipOwner ) then
       self.tooltipOwner:SetTooltip();
     end
-  elseif ( self:IsSpellcastEvent(event) ) then
-    for k, frame in pairs(self.frames) do
+  elseif ( self:IsSpellcastEvent(evt) ) then
+    ---@param btn ABP_Button_2_0_3
+    for k, btn in pairs(self.frames) do
       local spellID;
       local unit = ...;
       
-      if(event == "UNIT_SPELLCAST_SENT") then
+      if(evt == "UNIT_SPELLCAST_SENT") then
         spellID = select(4, ...);
       else
         spellID = select(3, ...);
       end
       
-      if (unit == "player" and frame:MatchesActiveButtonSpellID(spellID)) then
-        frame:OnEvent(event, ...);
+      if (unit == "player" and btn:MatchesActiveButtonSpellID(spellID)) then
+        p('OnEvent():: matches spellID=', spellID, 'evt=', evt)
+        btn:OnEvent(evt, ...);
       end
     end
   else
     for k, frame in pairs(self.frames) do
-      frame:OnEvent(event, ...);
+      frame:OnEvent(evt, ...);
     end
   end
 end

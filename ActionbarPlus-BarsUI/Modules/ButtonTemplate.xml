@@ -81,7 +81,18 @@
             </AnimationGroup>
         </Animations>
         <Frames>
-            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true"/>
+            <Cooldown parentKey="cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
+                <KeyValues>
+                    <KeyValue key="edgeTextureNormal" value="Interface\Cooldown\edge-LoC" type="string"/>
+                    <KeyValue key="edgeTextureLOC" value="Interface\Cooldown\edge" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="CENTER" x="0" y="0"/>
+                </Anchors>
+                <SwipeTexture>
+                    <Color r="1" g="1" b="1" a="0.8"/>
+                </SwipeTexture>
+            </Cooldown>
         </Frames>
         <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty"/>
         <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress" alpha="0.6" alphaMode="ADD"/>
