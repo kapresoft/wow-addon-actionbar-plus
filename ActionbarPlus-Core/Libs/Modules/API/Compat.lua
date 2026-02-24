@@ -70,6 +70,11 @@ function o:GetSpellInfo(spell)
   return self:__GetSpellInfoLegacy(spell)
 end
 
+--- @param id SpellID
+function o:GetSpellName(id)
+  local sp = self:GetSpellInfo(id); return sp and sp.name
+end
+
 --- Picks up the specified spell, compatible with both Retail and Classic WoW.
 --- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
 function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end

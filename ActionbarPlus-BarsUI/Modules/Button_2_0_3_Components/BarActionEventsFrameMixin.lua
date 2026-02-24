@@ -55,7 +55,8 @@ function o:OnLoad()
   self.frames = {};
   --self:RegisterEvent("ACTIONBAR_UPDATE_STATE");			not updating state from lua anymore, see SetActionUIButton
   --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");		replaced with ACTION_USABLE_CHANGED
-  --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");		not updating cooldown from lua anymore, see SetActionUIButton
+  self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+  self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_CHARGES");
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
   self:RegisterEvent("TRADE_SKILL_SHOW");
