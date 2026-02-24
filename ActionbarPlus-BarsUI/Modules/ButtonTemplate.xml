@@ -87,7 +87,8 @@
                     <KeyValue key="edgeTextureLOC" value="Interface\Cooldown\edge" type="string"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="CENTER" x="0" y="0"/>
+                    <Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPLEFT" x="1.5" y="-1.5"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon" relativePoint="BOTTOMRIGHT" x="-1.5" y="1.5"/>
                 </Anchors>
                 <SwipeTexture>
                     <Color r="1" g="1" b="1" a="0.8"/>

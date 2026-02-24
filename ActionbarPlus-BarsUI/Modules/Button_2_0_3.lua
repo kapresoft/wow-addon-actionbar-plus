@@ -193,6 +193,13 @@ function o:OnEvent(evt, ...)
   --self:PlaySpellInterruptedAnim()
   if evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
     self:SetChecked(false)
+  elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
+    self:UpdateCooldown()
+  elseif evt == 'SPELL_UPDATE_COOLDOWN'
+          or evt == 'SPELL_UPDATE_COOLDOWN'
+          or evt == 'LOSS_OF_CONTROL_ADDED' then
+    self:UpdateCooldown()
+    p(self:__prefix('OnEvent()'), 'XXX evt=', evt)
   end
 end
 
@@ -215,7 +222,8 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
     [1000] = 'holy light(rank 1)',
     [1001] = 'seal of the crusader(rank 1)',
     --[1002] = 'seal of righteousness',
-    [1002] = 'jewelcrafting',
+    --[1002] = 'jewelcrafting',
+    [1002] = 'arcane torrent',
   }
   if cns:IsMainLine() then
     tmpBtnSpells = {
@@ -352,11 +360,12 @@ function o:Update()
     end
     self:UpdateState()
     --self:UpdateUsable()
-    --self:UpdateProfessionQuality()o
-    --self:UpdateTypeOverlay()o
-    --ActionButton_UpdateCooldown(self)o
-    --self:UpdateFlash()o
-    --self:UpdateHighlightMark()o
+    --self:UpdateProfessionQuality()
+    --self:UpdateTypeOverlay()
+    --ActionButton_UpdateCooldown(self)
+    self:UpdateCooldown()
+    --self:UpdateFlash()
+    --self:UpdateHighlightMark()
     --self:UpdateSpellHighlightMark()
   else
     if ( self.eventsRegistered ) then
@@ -430,6 +439,57 @@ function o:MatchesActiveButtonSpellID(spellID)
   return id == spellID;
 end
 
+function o:UpdateCooldown()
+  p('UpdateCooldown():: called...')
+  local cd = self.cooldown
+  if not cd then return end
+  
+  if not self:HasAction() then
+    CooldownFrame_Clear(cd)
+    return
+  end
+  
+  local actionType, id = self:GetActionInfo()
+  if not actionType or not id then
+    CooldownFrame_Clear(cd)
+    return
+  end
+  
+  local name = ''
+  local start, duration, enable, modRate = 0, 0, 0, 1
+  
+  if actionType == t.spell then
+    name = comp:GetSpellName(id)
+    if C_Spell and C_Spell.GetSpellCooldown then
+      local info = C_Spell.GetSpellCooldown(id)
+      if info then
+        start = info.startTime or 0
+        duration = info.duration or 0
+        enable = info.isEnabled and 1 or 0
+        modRate = info.modRate or 1
+      end
+    else
+      start, duration, enable = GetSpellCooldown(id)
+    end
+  elseif actionType == t.item then
+    start, duration, enable = GetItemCooldown(id)
+  else
+    CooldownFrame_Clear(cd)
+    return
+  end
+  
+  if not start or duration == 0 then
+    CooldownFrame_Clear(cd)
+    return
+  end
+  
+  cd:SetSwipeColor(0, 0, 0)
+  cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
+  CooldownFrame_Set(cd, start, duration, enable, false, modRate or 1)
+
+  --p(self:__prefix('UpdateCooldown'), 'done... st=', start, 'dur=', duration, 'sp=', name)
+end
+
 --- Update the button's checked state
 function o:UpdateState()
   p('UpdateState():: called...')
@@ -453,4 +513,9 @@ function o:UpdateState()
           :format('UpdateSt', self:GetID(), type, id, name,
           tostring(current), tostring(checked)))
   self:SetChecked(checked)
+end
+
+
+function o:__prefix(prefix)
+  return ("%s(%s)::"):format(prefix, self.__name)
 end
