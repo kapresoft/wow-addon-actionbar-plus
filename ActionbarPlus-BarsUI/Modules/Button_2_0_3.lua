@@ -286,8 +286,10 @@ function o:OnDragStart(button)
   if InCombatLockdown() then return false end
   if not Btn_IsDragAllowed() then return end
   Btn_PickupAction(self)
-  Btn_UpdateState(self)
+  self:UpdateState()
+  self:UpdateCooldown()
   Btn_UpdateFlash(self)
+  
   self:SetChecked(false)
 end
 
