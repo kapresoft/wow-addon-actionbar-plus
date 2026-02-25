@@ -43,15 +43,16 @@ pd('xxx Loaded...')
 --[[-------------------------------------------------------------------
 Mixin
 ---------------------------------------------------------------------]]
---- @alias ActionEventsFrame_ABP_2_0 ActionEventsFrameMixin_ABP_2_0 | FrameObj
---
---
+--- =======================================================
 --- @class ActionEventsFrameMixin_ABP_2_0
---- @field frames table<number, ABP_Button_2_0_3>
-ABP_2_0_ActionEventsFrameMixin = {};
+--- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+ActionEventsFrameMixin_ABP_2_0 = {};
+--
+--- @alias ActionEventsFrame_ABP_2_0 ActionEventsFrameMixin_ABP_2_0 | FrameObj
+--- =======================================================
 
 --- @type ActionEventsFrameMixin_ABP_2_0 | ActionEventsFrame_ABP_2_0
-local o = ABP_2_0_ActionEventsFrameMixin
+local o = ActionEventsFrameMixin_ABP_2_0
 
 function o:OnLoad()
   self.frames = {};
@@ -101,6 +102,7 @@ function o:OnLoad()
   end);]]
 end
 
+--- @param event EventName
 function o:IsSpellcastEvent(event)
   if ( event == "UNIT_SPELLCAST_INTERRUPTED" or
           event == "UNIT_SPELLCAST_SUCCEEDED" or
@@ -120,7 +122,7 @@ function o:IsSpellcastEvent(event)
   end
 end
 
----@param evt Name The event name
+---@param evt EventName
 ---@param ... any
 function o:OnEvent(evt, ...)
   if ( evt == "UNIT_INVENTORY_CHANGED" ) then
@@ -155,12 +157,10 @@ function o:OnEvent(evt, ...)
   end
 end
 
-function o:RegisterFrame(frame)
-  self.frames[frame] = frame;
-end
+--- @param frame ABP_Button_2_0_3
+function o:RegisterFrame(frame) self.frames[frame] = frame; end
 
-function o:UnregisterFrame(frame)
-  self.frames[frame] = nil;
-end
+--- @param frame ABP_Button_2_0_3
+function o:UnregisterFrame(frame) self.frames[frame] = nil; end
 
 

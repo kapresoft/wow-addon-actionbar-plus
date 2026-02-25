@@ -4,25 +4,25 @@
     <Script file="Backdrops.lua"/>
     <Script file="Button_2_0_3_Controllers/ButtonState.lua"/>
     <Script file="Button_2_0_3.lua"/>
-    <Script file="Button_2_0_3_Components/BarActionEventsFrameMixin.lua"/>
-    <Script file="Button_2_0_3_Components/BarButtonEventsFrameMixin.lua"/>
-    <Script file="Button_2_0_3_Components/BarButtonUpdateFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
 
-    <Frame name="ABP_2_0_ActionEventsFrame" mixin="ABP_2_0_ActionEventsFrameMixin">
+    <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
 
-    <Frame name="ABP_2_0_ButtonEventsFrame" mixin="ABP_2_0_ButtonEventsDerivedFrameMixin">
+    <Frame name="WorldEventsFrame_ABP_2_0" mixin="WorldEventsFrameMixinDerived_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
 
-    <Frame name="ActionBarButtonUpdateFrame" mixin="ABP_2_0_ButtonUpdateFrameMixin">
+    <Frame name="ButtonUpdateFrame_ABP_2_0" mixin="ButtonUpdateFrameMixin_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnUpdate method="OnUpdate"/>
