@@ -49,15 +49,15 @@ function o:OnLoad()
   
   self.frames = {};
   self:RegisterEvent("PLAYER_ENTERING_WORLD");
-  self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
-  self:RegisterEvent("UPDATE_BINDINGS");
-  self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
+  --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
+  --self:RegisterEvent("UPDATE_BINDINGS");
+  --self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
   self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
-  self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-  self:RegisterEvent("PET_BAR_UPDATE");
-  self:RegisterUnitEvent("UNIT_FLAGS", "pet");
-  self:RegisterUnitEvent("UNIT_AURA", "pet");
-  self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
+  --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
+  --self:RegisterEvent("PET_BAR_UPDATE");
+  --self:RegisterUnitEvent("UNIT_FLAGS", "pet");
+  self:RegisterUnitEvent("UNIT_AURA", "player");
+  --self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
   
   --CVarCallbackRegistry:SetCVarCachable(countdownForCooldownsCVarName);
   --CVarCallbackRegistry:RegisterCallback(countdownForCooldownsCVarName, self.OnCountdownForCooldownsChanged, self);
@@ -77,7 +77,7 @@ function o:OnCountdownForCooldownsChanged()
 end
 
 function o:RegisterFrame(frame)
-  tinsert(self.frames, frame);
+  self.frames[frame] = frame
 end
 
 function o:ForEachFrame(func)

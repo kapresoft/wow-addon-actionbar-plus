@@ -136,6 +136,7 @@ function ns:cursor() return self.O.CursorProvider:GetCursor() end
 --- @param predicateFn fun():boolean @Optional - The predicate function
 --- @return EventTracePrinter_ABP_2_0
 function ns:NewTracer(name, predicateFn)
+  if not self.tracerMixin then return end
   local tr = self.tracerMixin:New(name, predicateFn)
   if not (ns:IsDev() and settings.enableTraceUI) then
     tr.evt:Hide()
@@ -158,6 +159,7 @@ end
 --- @param prefix string|any
 --- @return ABP_2_0_TraceFn @Printer function that outputs plain values to Blizzard Trace UI (like print)
 function ns:traceFn(prefix)
+  if not self.tracer then return function()  end end
   if type(prefix) ~= 'string' then
     return function(...) return self.tracer:td(...) end
   end
@@ -214,18 +216,46 @@ function ns.Str_IsBlank(str)
 end
 
 --- Match {match} for any occurrence in ...
---- @param match string
---- @param ... string
---- @return boolean
-function ns.Str_IfAnyOf(match, ...)
-  if not match then return false end
+--- @param toMatch string
+--- @param ... string The string values to match
+--- @return boolean true if `toMatch` is found in the varargs, false otherwise.
+function ns.Str_IsAnyOf(toMatch, ...)
+  if not toMatch then return false end
+  if type(toMatch) ~= "string" then return false end
   for i = 1, select('#', ...) do
     local v = select(i, ...)
-    if v == match then return true end
+    if type(v) == "string" and v == toMatch then return true end
   end
   return false
 end
 
+function ns.Str_IsAnyOfCaseInsensitive(valueToMatch, ...)
+  if not valueToMatch then return false end
+  if type(valueToMatch) ~= "string" then return false end
+  local toMatch = strlower(valueToMatch)
+  for i = 1, select('#', ...) do
+    local val = select(i, ...)
+    if type(val) == "string" and strlower(val) == toMatch then return true
+    end
+  end
+  return false
+end
+
+--- Checks if the first argument matches any of the subsequent arguments.
+--- @param toMatch number The value to match against the varargs.
+--- @param ... number The number values to check for a match.
+--- @return boolean true if `toMatch` is found in the varargs, false otherwise.
+function ns.Nbr_IsAnyOf(toMatch, ...)
+  if toMatch == nil then return false end
+  for i = 1, select('#', ...) do
+    if select(i, ...) == toMatch then return true end
+  end
+  return false
+end
+
+--- @param t table
+--- @return boolean true if table is empty
+function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
 
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns

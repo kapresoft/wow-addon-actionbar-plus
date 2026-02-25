@@ -1,7 +1,7 @@
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
-local c = cns.O.Compat
+local comp = cns.O.Compat
 
 local p, pd, t, tf = ns:log('ButtonState')
 
@@ -35,21 +35,13 @@ function o.Btn_UpdateState(self)
   end
   local name = '';
   if type == 'spell' then
-    local sp = c:GetSpellInfo(actionID)
+    local sp = comp:GetSpellInfo(actionID)
     if sp then name = '[' .. sp.name .. ']' end
   end
   p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
           :format('UpdateSt', self:GetID(), type, actionID, name,
             tostring(current), tostring(checked)))
   self:SetChecked(checked)
-end
-
---- @param spellID SpellIdentifier
---- @param callbackFn fun(spell:SpellInfo)
-local function IfSpell(spellID, callbackFn)
-  if not spellID then return end
-  local sp = c:GetSpellInfo(spellID)
-  return sp and callbackFn(sp)
 end
 
 --- @param self ABP_Button_2_0_3
@@ -67,7 +59,7 @@ function o.Btn_OnSpellCast(self, event, unitTarget, ...)
   
   local spellDesc = tostring(spellID);
   if type == 'spell' then
-    IfSpell(spellID, function(sp)
+    comp:IfSpell(spellID, function(sp)
       spellDesc = spellDesc .. '[' .. sp.name .. ']'
     end)
   end

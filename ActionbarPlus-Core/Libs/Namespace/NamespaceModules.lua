@@ -4,7 +4,7 @@ local ns = select(2, ...)
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
---- @type Kapresoft_LibUtil_Module
+--- @type Kapresoft_LibUtil_LibModule
 local LibModule = LibStub('Kapresoft-LibModule-1.0')
 
 --[[-----------------------------------------------------------------------------
@@ -15,6 +15,12 @@ local ModuleNames = {
   
   --- @type Compat_ABP_2_0
   Compat = {},
+  
+  --- @type UnitUtil_ABP_2_0
+  UnitUtil = {},
+  
+  --- @type DruidUtil_ABP_2_0
+  DruidUtil = {},
   
   --- @type CursorProvider_ABP_2_0
   CursorProvider = {},

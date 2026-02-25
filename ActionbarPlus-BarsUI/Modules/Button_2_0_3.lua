@@ -27,6 +27,7 @@ ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 local cns = ns:cns()
 --- @type Compat_ABP_2_0
 local comp = cns.O.Compat
+local unit, dru = cns.O.UnitUtil, cns.O.DruidUtil
 
 --- @type ABP_ButtonStateMixin_2_0_3
 local buttonState = ns.__ButtonState;
@@ -154,7 +155,7 @@ local o = S
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
   self:SetID(NextSeedID())
-  self.__name = ('%s:%s)'):format(self:GetName(), self:GetID())
+  self.__name = ('%s:%s'):format(self:GetName(), self:GetID())
   
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
@@ -166,13 +167,69 @@ function o:OnLoad()
   
   self:RegisterForDrag("LeftButton", "RightButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
-  self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
-  
+  --self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
   --Btn_RegisterCallbacks(self)
   
   --- @type ButtonEventsFrame_ABP_2_0
   local ABP_2_0_ButtonEventsFrame = ABP_2_0_ButtonEventsFrame
   ABP_2_0_ButtonEventsFrame:RegisterFrame(self)
+end
+
+function o:UpdateStealthSpells()
+  local type, id = self:GetActionInfo()
+  local icon = self:GetActionTexture()
+  if dru:IsDruidClass() and dru:IsProwl(id) then
+    if dru:IsStealthActive() then
+      icon = dru:GetStealthedIcon()
+      self:pd("UpdateStealthSpells", 'xxx IsDruid stealth active')
+      self:DimIcon()
+      self.icon:SetTexture(icon)
+      return
+    end
+    return
+  end
+  self:SetIconNormalVertex()
+  self.icon:SetTexture(icon)
+end
+
+---@param callbackFn fun(icon:Icon):void
+function o:IfActionTexture(callbackFn)
+  local icon = self:GetActionTexture()
+  if not icon then return end
+  callbackFn(icon)
+end
+
+--- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
+function o:GetActionTexture()
+  local type, id = self:GetActionInfo()
+  if not id then return end
+  -- todo next: move prowl logic from UpdateStealthSpells()
+  
+  -- todo add rogue, priest, shammy
+  -- 🔴 Prowl active override
+  if type == t.spell and dru:IsDruidClass() and dru:IsProwl(id) then
+    if dru:IsStealthActive() then
+      self:DimIcon()
+      return unit:GetStealthedIcon()
+    end
+    self:SetIconNormalVertex()
+  end
+  
+  local icon
+  if unit:CanShapeShift() then
+    unit:IfShapeShifted(function(data)
+      if data.active and id == data.spellID then
+        icon = data.shapeshiftIcon
+      end
+    end)
+  end
+  if icon then return icon end
+  
+  comp:IfSpell(id, function(spell)
+    icon = spell.iconID
+    --self:p('GetActionTexture', 'sp=', spell.name)
+  end)
+  return icon
 end
 
 --- Handles spellcast lifecycle events routed from ABP_2_0_ActionEventsFrame.
@@ -181,9 +238,20 @@ end
 --- @param evt string Blizzard event name
 --- @param ... any Event payload (unit, castGUID, spellID, etc.)
 function o:OnEvent(evt, ...)
+  --self:pd('OnEvent', 'evt=', evt)
   --p(('xx OnEvent[%s]...'):format(tostring(evt)))
   --self:PlaySpellInterruptedAnim()
-  if evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
+  
+  if evt == 'PLAYER_ENTERING_WORLD' then
+    local isInitialLogin, isReloadingUi = ...
+    self:OnInit(evt, isInitialLogin, isReloadingUi)
+    --self:Update()
+    --local texture = self:GetActionTexture()
+    --if (texture) then self.icon:SetTexture(texture) end
+    self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+  elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
+    self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+  elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
     self:SetChecked(false)
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
@@ -191,7 +259,9 @@ function o:OnEvent(evt, ...)
           or evt == 'SPELL_UPDATE_COOLDOWN'
           or evt == 'LOSS_OF_CONTROL_ADDED' then
     self:UpdateCooldown()
-    self:p('OnEvent', 'evt=', evt)
+    --self:p('OnEvent', 'evt=', evt)
+  elseif evt == 'UNIT_AURA' then
+    --self:UpdateStealthSpells()
   end
 end
 
@@ -200,7 +270,7 @@ end
 -- /dump GetSpellInfo('shadowform'), active=136200
 --- Add temporary spells for testing
 function o:OnInit(evt, isInitialLogin, isReloadingUi)
-  --pd('OnInit():: isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
+  self:pd('OnInit', 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
   
   --/dump SetCVar('ActionButtonUseKeyDown', 1)
   --/dump GetCVarBool('ActionButtonUseKeyDown')
@@ -210,13 +280,11 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
   end
   if InCombatLockdown() then return end
   
-  self:__InitDevSpells(isInitialLogin)
-  
-  self:UpdateState()
+  self:__InitTestData(isInitialLogin)
 end
 
 --- @param isInitialLogin boolean
-function o:__InitDevSpells(isInitialLogin)
+function o:__InitTestData(isInitialLogin)
   -- /dump C_Spell.GetSpellInfo('flash of light')
   local tmpBtnSpells = {
     [1000] = 'holy light(rank 1)',
@@ -226,13 +294,21 @@ function o:__InitDevSpells(isInitialLogin)
     [1002] = 'arcane torrent',
   }
   if cns:IsMainLine() then
-    tmpBtnSpells = {
-      [1000] = 'flash of light',
-      [1001] = 'sense undead',
-      --[1002] = 'seal of righteousness',
-      [1002] = 'jewelcrafting',
-    }
+    -- pally
+    --tmpBtnSpells = {
+    --  [1000] = 'flash of light',
+    --  [1001] = 'sense undead',
+    --  --[1002] = 'seal of righteousness',
+    --  [1002] = 'jewelcrafting',
+    --}
+    -- druid
   end
+  
+  tmpBtnSpells = {
+    [1000] = 'cat form',
+    [1001] = 'prowl',
+    [1002] = 'barkskin',
+  }
   
   local id = self:GetID()
   local spell = tmpBtnSpells[id]
@@ -240,13 +316,15 @@ function o:__InitDevSpells(isInitialLogin)
   
   if isInitialLogin then
     self:RegisterEvent('SPELLS_CHANGED', function(evt)
+      self:UnregisterEvent('SPELLS_CHANGED')
       self:__SetSpell(spell)
+      --self:UpdateStealthSpells()
     end)
-  else
-    self:__SetSpell(spell)
+    return
   end
+  self:__SetSpell(spell)
+  --self:UpdateStealthSpells()
 end
-
 
 --- @param button ButtonName
 --- @param down ButtonDown
@@ -311,8 +389,8 @@ function o:OnReceiveDrag()
   end
   
   ClearCursor()
-  Btn_UpdateState(self)
-  Btn_UpdateFlash(self)
+  self:UpdateState()
+  -- Btn_UpdateFlash(self)
 end
 
 function o:OnAttributeChanged(name, val)
@@ -323,25 +401,11 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @return string, number The type (i.e. spell, item) and typeID (i.e. spellID, itemID)
-function o:GetActionInfo()
-  local type = self:GetAttribute(actionType)
-  if not type then return nil end
-  local id = self:GetAttribute(type)
-  if not id then return nil end
-  return type, id
-end
-
---- @return boolean
-function o:HasAction()
-  local type = self:GetAttribute(actionType)
-  if not type then return false end
-  local id = self:GetAttribute(type)
-  return id ~= nil
-end
-
 function o:Update()
-  p('Update(): called...')
+  if self.__updating then return end
+  self.__updating = true
+  if self.__updating then self:pd('Update', 'updating=', self.__updating) end
+  --p('Update(): called...')
   local icon = self.icon
   local buttonCooldown = self.cooldown;
   
@@ -349,12 +413,19 @@ function o:Update()
   local ABP_2_0_ActionEventsFrame = ABP_2_0_ActionEventsFrame
   
   icon:SetDesaturated(false)
-  local id, type = self:GetActionInfo()
+  
+  local type, id = self:GetActionInfo()
   if self:HasAction() then
     if ( not self.eventsRegistered ) then
       ABP_2_0_ActionEventsFrame:RegisterFrame(self);
       self.eventsRegistered = true;
     end
+    
+    local texture = self:GetActionTexture()
+    if texture then
+      self.icon:SetTexture(texture)
+    end
+    
     self:UpdateState()
     --self:UpdateUsable()
     --self:UpdateProfessionQuality()
@@ -369,20 +440,18 @@ function o:Update()
       ABP_2_0_ActionEventsFrame:UnregisterFrame(self);
       self.eventsRegistered = nil;
     end
-    buttonCooldown:Hide()
     --self:ClearFlash()
     self:SetChecked(false);
     --self:ClearProfessionQuality();
     --self:ClearTypeOverlay();
   end
+  
+  self.__updating = false
 end
 
 function o:UpdateAction(name, val)
-  p('UpdateAction:: attr name=', name, 'val=', val)
-  
-  --if name ~= SPELL_ID_ATTR then return end
   if not val then self.icon:SetTexture(nil); return end
-  if not cns.Str_IfAnyOf(name, t.spell, t.item) then return end
+  if not cns.Str_IsAnyOf(name, t.spell, t.item) then return end
 
   if name == t.spell then
     local info = comp:GetSpellInfo(val)
@@ -437,7 +506,7 @@ function o:MatchesActiveButtonSpellID(spellID)
 end
 
 function o:UpdateCooldown()
-  p('UpdateCooldown():: called...')
+  --self:p('UpdateCooldown():: called...')
   local cd = self.cooldown
   if not cd then return end
   
@@ -484,9 +553,26 @@ function o:UpdateCooldown()
   CooldownFrame_Set(cd, start, duration, enable, false, modRate or 1)
 end
 
+--- @return string, number The type (i.e. spell, item) and typeID (i.e. spellID, itemID)
+function o:GetActionInfo()
+  local type = self:GetAttribute(actionType)
+  if not type then return nil end
+  local id = self:GetAttribute(type)
+  if not id then return nil end
+  return type, id
+end
+
+--- @return boolean
+function o:HasAction()
+  local type = self:GetAttribute(actionType)
+  if not type then return false end
+  local id = self:GetAttribute(type)
+  return id ~= nil
+end
+
 --- Update the button's checked state
 function o:UpdateState()
-  p('UpdateState():: called...')
+  --p('UpdateState():: called...')
   local type, id = self:GetActionInfo()
   if not type or not id then return end local checked = false
   
@@ -503,9 +589,9 @@ function o:UpdateState()
     if sp then name = '[' .. sp.name .. ']' end
   end
   
-  p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
-          :format('UpdateSt', self:GetID(), type, id, name,
-          tostring(current), tostring(checked)))
+  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
+  --        :format('UpdateSt', self:GetID(), type, id, name,
+  --        tostring(current), tostring(checked)))
   self:SetChecked(checked)
 end
 
@@ -517,6 +603,7 @@ function o:__SetSpell(spell)
   self:SetAttribute(c.type, t.spell)
   self:SetAttribute(t.spell, sp.spellID)
   self.icon:SetTexture(sp.iconID)
+  self:Update()
 end
 
 function o:p(prefix, ...)
@@ -527,3 +614,9 @@ function o:pd(prefix, ...)
 end
 function o:pid(prefix) return ("%s(%s)::"):format(prefix, self.__name) end
 
+--- @param r RGBColor
+--- @param g RGBColor
+--- @param b RGBColor
+function o:SetIconVertex(r, g, b) self.icon:SetVertexColor(r, g, b) end
+function o:SetIconNormalVertex() self:SetIconVertex(1, 1, 1) end
+function o:DimIcon() self:SetIconVertex(0.5, 0.5, 0.5) end

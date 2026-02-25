@@ -4,10 +4,6 @@ BarButtonUpdateFrameMixin
 
 @see Blizz/Shared/ActionButton.lua#ActionBarButtonUpdateFrameMixin
 
--- /dump EventRegistry:TriggerEvent('CURSOR_CHANGED', false, 3, 0 , 0)
--- /dump EventRegistry:TriggerEvent('ACTIONBAR_SHOWGRID')
--- /dump EventRegistry:TriggerEvent('Actionbar.Hello', ABP_2_0_F1Button1)
-
 Purpose:
 Centralized OnUpdate loop for buttons that need ticking behavior.
 
