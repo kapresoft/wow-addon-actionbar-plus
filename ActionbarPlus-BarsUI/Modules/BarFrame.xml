@@ -8,13 +8,6 @@
     <Script file="Button_2_0_3_Components/BarButtonEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/BarButtonUpdateFrameMixin.lua"/>
 
-    <Frame name="ABP_2_0_ButtonEventsFrame" mixin="ABP_2_0_ButtonEventsDerivedFrameMixin">
-        <Scripts>
-            <OnLoad method="OnLoad"/>
-            <OnEvent method="OnEvent"/>
-        </Scripts>
-    </Frame>
-
     <Frame name="ABP_2_0_ActionEventsFrame" mixin="ABP_2_0_ActionEventsFrameMixin">
         <Scripts>
             <OnLoad method="OnLoad"/>
@@ -22,7 +15,14 @@
         </Scripts>
     </Frame>
 
-    <Frame name="ActionBarButtonUpdateFrame" mixin="ActionBarButtonUpdateFrameMixin">
+    <Frame name="ABP_2_0_ButtonEventsFrame" mixin="ABP_2_0_ButtonEventsDerivedFrameMixin">
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="ActionBarButtonUpdateFrame" mixin="ABP_2_0_ButtonUpdateFrameMixin">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnUpdate method="OnUpdate"/>

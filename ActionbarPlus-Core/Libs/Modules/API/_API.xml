@@ -2,5 +2,11 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="Compat.lua" />
+    <Script file="UnitUtil.lua"/>
+    <Script file="DruidUtil.lua"/>
+    <!--
+    <Script file="PriestUnitMixin.lua"/>
+    <Script file="ShamanUnitMixin.lua"/>
+    <Script file="RogueUnitMixin.lua"/>-->
 
 </Ui>

@@ -33,8 +33,10 @@ Key Characteristics:
 
 This frame performs no state logic itself; it only routes events.
 ---------------------------------------------------------------------]]
---- @type Namespace_ABP_2_0
+--- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+local cns = ns:cns()
+local comp = cns.O.Compat
 local p, pd, t, tf = ns:log('BarActionEventsFrameMixin')
 pd('xxx Loaded...')
 
@@ -55,7 +57,6 @@ function o:OnLoad()
   self.frames = {};
   --self:RegisterEvent("ACTIONBAR_UPDATE_STATE");			not updating state from lua anymore, see SetActionUIButton
   --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");		replaced with ACTION_USABLE_CHANGED
-  self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_CHARGES");
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
@@ -78,12 +79,12 @@ function o:OnLoad()
   self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
-  self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_TARGET", "player");
-  self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_CLEAR", "player");
-  self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_START", "player");
-  self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_STOP", "player");
+  --self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_TARGET", "player");
+  --self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_CLEAR", "player");
+  --self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_START", "player");
+  --self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_STOP", "player");
   
-  self:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE");
+  --self:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE");
   self:RegisterEvent("PET_STABLE_UPDATE");
   self:RegisterEvent("PET_STABLE_SHOW");
   self:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
@@ -92,11 +93,12 @@ function o:OnLoad()
   self:RegisterUnitEvent("LOSS_OF_CONTROL_ADDED", "player");
   self:RegisterUnitEvent("LOSS_OF_CONTROL_UPDATE", "player");
   self:RegisterEvent("SPELL_UPDATE_ICON");
+  self:RegisterEvent("UPDATE_STEALTH");
   
-  EventRegistry:RegisterCallback("AssistedCombatManager.OnSetActionSpell", function(o)
+  --[[EventRegistry:RegisterCallback("AssistedCombatManager.OnSetActionSpell", function(o)
     -- May not be the best way, but it is a unique string which is what the event system cares about
     self:OnEvent("AssistedCombatManager.OnSetActionSpell");
-  end);
+  end);]]
 end
 
 function o:IsSpellcastEvent(event)
@@ -139,7 +141,10 @@ function o:OnEvent(evt, ...)
       end
       
       if (unit == "player" and btn:MatchesActiveButtonSpellID(spellID)) then
-        p('OnEvent():: matches spellID=', spellID, 'evt=', evt)
+        comp:IfSpell(spellID, function(spell)
+          local sp = ('%s(%s)'):format(spellID, spell.name)
+          p('OnEvent():: matches spellID=', sp, 'evt=', evt)
+        end)
         btn:OnEvent(evt, ...);
       end
     end
