@@ -38,19 +38,18 @@ Think of it as:
 local ns = select(2, ...)
 local p, pd, t, tf = ns:log('BarButtonUpdateFrameMixin')
 
-pd('xxx Loaded...')
---- @alias ButtonUpdateFrame_ABP_2_0 ButtonUpdateFrameMixin_ABP_2_0 | FrameObj
---
---
+--- =======================================================
 --- @class ButtonUpdateFrameMixin_ABP_2_0
-ABP_2_0_ButtonUpdateFrameMixin = {};
+--- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+ButtonUpdateFrameMixin_ABP_2_0 = {}
+--
+--- @alias ButtonUpdateFrame_ABP_2_0 ButtonUpdateFrameMixin_ABP_2_0 | FrameObj
+--- =======================================================
 
 --- @type ButtonUpdateFrameMixin_ABP_2_0 | ButtonUpdateFrame_ABP_2_0
-local o = ABP_2_0_ButtonUpdateFrameMixin
+local o = ButtonUpdateFrameMixin_ABP_2_0
 
-function o:OnLoad()
-  self.frames = {};
-end
+function o:OnLoad() self.frames = {}; end
 
 function o:OnUpdate(elapsed)
   for k, frame in pairs(self.frames) do
@@ -62,6 +61,5 @@ function o:RegisterFrame(frame)
   self.frames[frame] = frame;
 end
 
-function o:UnregisterFrame(frame)
-  self.frames[frame] = nil;
-end
+--- @param frame ABP_Button_2_0_3
+function o:UnregisterFrame(frame) self.frames[frame] = nil; end

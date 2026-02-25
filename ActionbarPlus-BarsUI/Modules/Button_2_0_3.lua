@@ -170,9 +170,20 @@ function o:OnLoad()
   --self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
   --Btn_RegisterCallbacks(self)
   
-  --- @type ButtonEventsFrame_ABP_2_0
-  local ABP_2_0_ButtonEventsFrame = ABP_2_0_ButtonEventsFrame
-  ABP_2_0_ButtonEventsFrame:RegisterFrame(self)
+  --local function RegisterWorldEventsFrame()
+  --
+  --end
+  
+  WorldEventsFrame_ABP_2_0:RegisterFrame(self)
+end
+
+--- Still needs to be wired
+--- @see BarFrame.xml#ButtonUpdateFrame_ABP_2_0
+--- @see ButtonUpdateFrame_ABP_2_0#OnUpdate()
+--- @param elapsed number
+function o:OnUpdate(elapsed)
+  self:p('xxx OnUpdate')
+  -- tbd
 end
 
 function o:UpdateStealthSpells()
@@ -232,7 +243,7 @@ function o:GetActionTexture()
   return icon
 end
 
---- Handles spellcast lifecycle events routed from ABP_2_0_ActionEventsFrame.
+--- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
 --- Unchecks the button when the active spell cast finishes.
 ---
 --- @param evt string Blizzard event name
@@ -406,18 +417,17 @@ function o:Update()
   self.__updating = true
   if self.__updating then self:pd('Update', 'updating=', self.__updating) end
   --p('Update(): called...')
+  
+  local eventsFrame = ActionEventsFrame_ABP_2_0
   local icon = self.icon
   local buttonCooldown = self.cooldown;
-  
-  --- @type ActionEventsFrame_ABP_2_0
-  local ABP_2_0_ActionEventsFrame = ABP_2_0_ActionEventsFrame
   
   icon:SetDesaturated(false)
   
   local type, id = self:GetActionInfo()
   if self:HasAction() then
     if ( not self.eventsRegistered ) then
-      ABP_2_0_ActionEventsFrame:RegisterFrame(self);
+      eventsFrame:RegisterFrame(self);
       self.eventsRegistered = true;
     end
     
@@ -437,7 +447,7 @@ function o:Update()
     --self:UpdateSpellHighlightMark()
   else
     if ( self.eventsRegistered ) then
-      ABP_2_0_ActionEventsFrame:UnregisterFrame(self);
+      eventsFrame:UnregisterFrame(self);
       self.eventsRegistered = nil;
     end
     --self:ClearFlash()

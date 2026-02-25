@@ -1,5 +1,5 @@
 --[[-------------------------------------------------------------------
-ButtonEventsFrameMixin
+WorldEventsFrameMixin (ButtonEventsFrameMixin)
 @see Blizz/Shared/ActionButton.lua#ActionBarButtonEventsFrameMixin
 
 Purpose:
@@ -34,16 +34,20 @@ Mental model:
 
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local p, pd, t, tf = ns:log('BarButtonEventsFrameMixin')
+local p, pd, t, tf = ns:log('WorldEventsFrame')
 
---- @alias ButtonEventsFrame_ABP_2_0 ButtonEventsFrameMixin_ABP_2_0 | FrameObj
---
---
+--- =======================================================
+--- Buttons register/unregister here to receive world/environment-level events.
+--- @see ABP_Button_2_0_3#OnLoad
 --- @class ButtonEventsFrameMixin_ABP_2_0
-ABP_2_0_ButtonEventsFrameMixin = {};
+--- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+WorldEventsFrameMixin_ABP_2_0 = {};
+--
+--- @alias WorldEventsFrame_ABP_2_0 ButtonEventsFrameMixin_ABP_2_0 | FrameObj
+--- =======================================================
 
---- @type ButtonEventsFrameMixin_ABP_2_0 | ButtonEventsFrame_ABP_2_0
-local o = ABP_2_0_ButtonEventsFrameMixin
+--- @type ButtonEventsFrameMixin_ABP_2_0 | WorldEventsFrame_ABP_2_0
+local o = WorldEventsFrameMixin_ABP_2_0
 
 function o:OnLoad()
   
@@ -76,17 +80,17 @@ function o:OnCountdownForCooldownsChanged()
   end
 end
 
-function o:RegisterFrame(frame)
-  self.frames[frame] = frame
-end
+--- Unregister when bar modules are enabled
+--- @param frame ABP_Button_2_0_3
+function o:RegisterFrame(frame) self.frames[frame] = frame end
 
+--- Unregister when bar modules are disabled
+--- @param frame ABP_Button_2_0_3
+function o:UnregisterFrame(frame) self.frames[frame] = nil end
+
+--- @param func fun(frame:ABP_Button_2_0_3):void
 function o:ForEachFrame(func)
-  for k, frame in pairs(self.frames) do
-    func(frame);
-  end
+  for k, frame in pairs(self.frames) do func(frame); end
 end
 
---- @alias ButtonEventsDerivedFrameMixin_2_0 ButtonEventsFrame_ABP_2_0
---
---- @type ButtonEventsDerivedFrameMixin_2_0
-ABP_2_0_ButtonEventsDerivedFrameMixin = CreateFromMixins(o)
+WorldEventsFrameMixinDerived_ABP_2_0 = CreateFromMixins(o)
