@@ -186,42 +186,18 @@ function o:OnUpdate(elapsed)
   -- tbd
 end
 
-function o:UpdateStealthSpells()
-  local type, id = self:GetActionInfo()
-  local icon = self:GetActionTexture()
-  if dru:IsDruidClass() and dru:IsProwl(id) then
-    if dru:IsStealthActive() then
-      icon = dru:GetStealthedIcon()
-      self:pd("UpdateStealthSpells", 'xxx IsDruid stealth active')
-      self:DimIcon()
-      self.icon:SetTexture(icon)
-      return
-    end
-    return
-  end
-  self:SetIconNormalVertex()
-  self.icon:SetTexture(icon)
-end
-
 --- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
 --- Unchecks the button when the active spell cast finishes.
 ---
 --- @param evt string Blizzard event name
 --- @param ... any Event payload (unit, castGUID, spellID, etc.)
 function o:OnEvent(evt, ...)
-  --self:pd('OnEvent', 'evt=', evt)
-  --p(('xx OnEvent[%s]...'):format(tostring(evt)))
-  --self:PlaySpellInterruptedAnim()
-  
   if evt == 'PLAYER_ENTERING_WORLD' then
     local isInitialLogin, isReloadingUi = ...
     self:OnInit(evt, isInitialLogin, isReloadingUi)
-    --self:Update()
-    --local texture = self:GetActionTexture()
-    --if (texture) then self.icon:SetTexture(texture) end
-    self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+    self:UpdateTexture()
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
-    self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+    self:UpdateTexture()
   elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
     self:SetChecked(false)
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
@@ -251,74 +227,7 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
   end
   if InCombatLockdown() then return end
   
-  self:__InitTestData(isInitialLogin)
-end
-
---- @param isInitialLogin boolean
-function o:__InitTestData(isInitialLogin)
-  -- /dump C_Spell.GetSpellInfo('flash of light')
-  local tmpBtnSpells = {
-    [1000] = 'holy light(rank 1)',
-    [1001] = 'seal of the crusader(rank 1)',
-    --[1002] = 'seal of righteousness',
-    --[1002] = 'jewelcrafting',
-    [1002] = 'arcane torrent',
-  }
-  if cns:IsMainLine() then
-    -- pally
-    --tmpBtnSpells = {
-    --  [1000] = 'flash of light',
-    --  [1001] = 'sense undead',
-    --  --[1002] = 'seal of righteousness',
-    --  [1002] = 'jewelcrafting',
-    --}
-    -- druid
-  end
-  if unit:IsPriest() then
-    tmpBtnSpells = {
-      [1000] = 'shadowform',
-      [1001] = 'mind blast',
-      [1002] = 'mind flay',
-    }
-  elseif unit:IsDruid() then
-    tmpBtnSpells = {
-      [1000] = 'cat form',
-      [1001] = 'prowl',
-      [1002] = 'barkskin',
-    }
-  elseif unit:IsPaladin() then
-    tmpBtnSpells = {
-      [1000] = 'holy light(rank 1)',
-      [1001] = 'seal of the crusader(rank 1)',
-      --[1002] = 'seal of righteousness',
-      --[1002] = 'jewelcrafting',
-      [1002] = 'arcane torrent',
-    }
-    if cns:IsMainLine() then
-      tmpBtnSpells = {
-        [1000] = 'flash of light',
-        [1001] = 'sense undead',
-        --[1002] = 'seal of righteousness',
-        [1002] = 'jewelcrafting',
-      }
-    end
-  end
-  
-  
-  local id = self:GetID()
-  local spell = tmpBtnSpells[id]
-  if not spell then return end
-  
-  if isInitialLogin then
-    self:RegisterEvent('SPELLS_CHANGED', function(evt)
-      self:UnregisterEvent('SPELLS_CHANGED')
-      self:__SetSpell(spell)
-      --self:UpdateStealthSpells()
-    end)
-    return
-  end
-  self:__SetSpell(spell)
-  --self:UpdateStealthSpells()
+  ABP_ButtonTestData:AddTestData(isInitialLogin, self)
 end
 
 --- @param button ButtonName
@@ -414,11 +323,7 @@ function o:Update()
       eventsFrame:RegisterFrame(self);
       self.eventsRegistered = true;
     end
-    
-    local texture = self:GetActionTexture()
-    if texture then
-      self.icon:SetTexture(texture)
-    end
+    self:UpdateTexture()
     
     self:UpdateState()
     --self:UpdateUsable()
@@ -476,11 +381,14 @@ function o:GetActionTexture()
   --  end
   --  self:SetIconNormalVertex()
   --end
-  self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
+  local druid = cns.O.DruidUtil
+  --self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
   if type == t.spell then
     if unit:IsStealthActive() then
-      self:DimIcon()
-      return unit:GetStealthedIcon()
+      if druid:IsProwl(id) then
+        self:DimIcon()
+        return unit:GetStealthedIcon()
+      end
     end
     self:SetIconNormalVertex()
   end
@@ -546,57 +454,39 @@ function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
   
-  if not self:HasAction() then
-    CooldownFrame_Clear(cd)
-    return
-  end
+  if not self:HasAction() then cd:Clear(); return end
   
   local actionType, id = self:GetActionInfo()
-  if not actionType or not id then
-    CooldownFrame_Clear(cd)
-    return
-  end
+  if not actionType or not id then cd:Clear(); return end
   
   local name = ''
   local start, duration, enable, modRate = 0, 0, 0, 1
   
-  local function _info(info, fieldName, defaultVal)
-    local ok, value = pcall(function()
-      return info and info[fieldName]
-    end)
-    
-    if ok and value ~= nil then return value end
-    
-    return defaultVal
-  end
-  
   if actionType == t.spell then
     name = comp:GetSpellName(id)
-    if C_Spell and C_Spell.GetSpellCooldown then
-      local info = C_Spell.GetSpellCooldown(id)
-      if info then
-        start = info.startTime or 0
-        duration = info.duration or 0
-        enable = info.isEnabled
-        modRate = info.modRate
-      end
-    else
-      start, duration, enable = GetSpellCooldown(id)
+    local info = comp:GetSpellCooldown(id)
+    --self:p('UpdateCD', 'name=', name, 'info=', tostring(info))
+    if info then
+      start = info.startTime or 0
+      duration = info.duration or 0
+      modRate = info.modRate
     end
   elseif actionType == t.item then
     start, duration, enable = GetItemCooldown(id)
   else
-    CooldownFrame_Clear(cd)
+    cd:Clear()
     return
   end
+  if not start or not duration then cd:Clear(); return end
   
-  if not start or not duration then
-    CooldownFrame_Clear(cd)
-    return
-  end
-  
+  --local _enable=false
+  --local ok, _valEnable = pcall(function() return enable == true end)
+  --if ok then _enable = _valEnable end
+  --self:p('UpdateCD', 'name=', name, 'ok=', ok, 'isEnabledVal=', _enable)
+  -- not sure if we need currentCooldownType
   cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
-  CooldownFrame_Set(cd, start, duration, enable, false, modRate or 1)
+  --CooldownFrame_Set(cd, start, duration, _enable, false, modRate or 1)
+  cd:SetCooldown(start, duration, modRate or 1)
 end
 
 --- @return string, number The type (i.e. spell, item) and typeID (i.e. spellID, itemID)
@@ -672,4 +562,8 @@ function o:IfActionTexture(callbackFn)
   local icon = self:GetActionTexture()
   if not icon then return end
   callbackFn(icon)
+end
+
+function o:UpdateTexture()
+  self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
 end

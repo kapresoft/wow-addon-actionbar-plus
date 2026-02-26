@@ -1,12 +1,16 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
+    <Script file="Button_TestData.lua"/>
     <Script file="Backdrops.lua"/>
     <Script file="Button_2_0_3_Controllers/ButtonState.lua"/>
     <Script file="Button_2_0_3.lua"/>
     <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
+    <Script file="BarFrame.lua"/>
+
+    <!--<Script file="Button_2_0_1_1.lua"/>-->
 
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>
@@ -29,8 +33,6 @@
         </Scripts>
     </Frame>
 
-    <!--<Script file="Button_2_0_1_1.lua"/>-->
-    <Script file="BarFrame.lua"/>
 
     <!--<CheckButton name="ABP_ButtonTemplate_2_0_1_1"
                  inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"

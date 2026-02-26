@@ -5,6 +5,10 @@ Local Vars
 local ns = select(2, ...)
 
 local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
+local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
+
+--- return data has the same structure for C_Item or legacy GetItemCooldown
+local C_GetItemCooldown = C_Item and C_Item.GetItemCooldown or GetItemCooldown
 
 --[[-----------------------------------------------------------------------------
 Module::Compat
@@ -107,4 +111,37 @@ function o:GetShapeshiftFormInfo(index)
     spellID = spellID, active = active, castable = castable,
   }
   return c
+end
+
+--- Retrieves the cooldown information for a spell, compatible with both Retail and Classic WoW.
+--- @param spellID SpellName A known spell name for the character class.
+--- @return SpellCooldownInfo
+function o:GetSpellCooldown(spellID)
+  assert(type(spellID) == 'number', 'GetSpellCooldown(spellID):: spellID should be a number.')
+  if C_GetSpellCooldown then return C_GetSpellCooldown(spellID) end
+  
+  local startTime, duration, isEnabled, modRate = GetSpellCooldown(spellID)
+  --- @type SpellCooldownInfo
+  local cd = { startTime = startTime, duration = duration,
+               isEnabled = isEnabled, modRate = modRate, }
+  return startTime and cd
+end
+
+--- @param itemName Name
+--- @return ItemCooldownData
+function o:GetItemCooldown(itemName)
+  -- todo: needs to take name or id
+  local startTime, duration, enable
+  --- @type ItemCooldownData
+  local cd
+  if C_GetItemCooldown then
+    startTime, duration, enable = C_GetItemCooldown(itemName)
+  elseif C_Container and C_Container.GetItemCooldown then
+    startTime, duration, enable = C_Container.GetItemCooldown(id)
+  elseif GetItemCooldown then
+    startTime, duration, enable = GetItemCooldown(id)
+  end
+  if not startTime then return nil end
+  cd = { startTime = startTime, duration = duration, enable = enable }
+  return cd
 end
