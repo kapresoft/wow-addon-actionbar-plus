@@ -3,60 +3,11 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
-local UnitUtil = O.UnitUtil
+local UnitUtil = ns.O.UnitUtil
 
 local BEAR_SHAPESHIFT_FORM_INDEX = 1
 local CAT_SHAPESHIFT_FORM_INDEX = 3
---[[-------------------------------------------------------------------
-Types
----------------------------------------------------------------------]]
--- Note: Monk class was added in Mists of Pandaria.
--- Note: Demon Hunter class was added in Legion.
-local UnitClass = {
-  WARRIOR = "WARRIOR",
-  PALADIN = "PALADIN",
-  HUNTER = "HUNTER",
-  ROGUE = "ROGUE",
-  PRIEST = "PRIEST",
-  DEATHKNIGHT = "DEATHKNIGHT",
-  SHAMAN = "SHAMAN",
-  MAGE = "MAGE",
-  WARLOCK = "WARLOCK",
-  MONK = "MONK",
-  DRUID = "DRUID",
-  DEMONHUNTER = "DEMONHUNTER"
-}
 
-local UnitClassID = {
-  WARRIOR = 1,
-  PALADIN = 2,
-  HUNTER = 3,
-  ROGUE = 4,
-  PRIEST = 5,
-  DEATHKNIGHT = 6,
-  SHAMAN = 7,
-  MAGE = 8,
-  WARLOCK = 9,
-  MONK = 10,      -- Note: Monk class was added in Mists of Pandaria
-  DRUID = 11,
-  DEMONHUNTER = 12 -- Note: Demon Hunter class was added in Legion
-}
-
-local UnitClasses = {
-  WARRIOR = { id = UnitClassID.WARRIOR, name = UnitClass.WARRIOR },
-  PALADIN = { id = UnitClassID.PALADIN, name = UnitClass.PALADIN },
-  HUNTER = { id = UnitClassID.HUNTER, name = UnitClass.HUNTER },
-  ROGUE = { id = UnitClassID.ROGUE, name = UnitClass.ROGUE },
-  PRIEST = { id = UnitClassID.PRIEST, name = UnitClass.PRIEST },
-  DEATHKNIGHT = { id = UnitClassID.DEATHKNIGHT, name = UnitClass.DEATHKNIGHT },
-  SHAMAN = { id = UnitClassID.SHAMAN, name = UnitClass.SHAMAN },
-  MAGE = { id = UnitClassID.MAGE, name = UnitClass.MAGE },
-  WARLOCK = { id = UnitClassID.WARLOCK, name = UnitClass.WARLOCK },
-  MONK = { id = UnitClassID.MONK, name = UnitClass.MONK },
-  DRUID = { id = UnitClassID.DRUID, name = UnitClass.DRUID },
-  DEMONHUNTER = { id = UnitClassID.DEMONHUNTER, name = UnitClass.DEMONHUNTER },
-}
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -84,7 +35,7 @@ New Instance
 -------------------------------------------------------------------------------]]
 --- @see Core_Modules_ABP_2_0
 --- @type string
-local libName = M.DruidUtil()
+local libName = ns.M.DruidUtil()
 --- @class DruidUtil_ABP_2_0 : UnitUtil_ABP_2_0
 local S = UnitUtil:New('DRUID');
 ns:Register(libName, S)
@@ -205,11 +156,6 @@ function o:IsCatSpell(spellID) return CATACLYSM_CAT_SPELLS[spellID] == true end
 --- @param spellID SpellID
 --- @return boolean
 function o:IsBearSpell(spellID) return CATACLYSM_BEAR_SPELLS[spellID] == true end
-
-function o:IsDruidClass()
-  local _, id = self:GetPlayerUnitClass();
-  return UnitClasses.DRUID.id == id
-end
 
 --- @param spellID SpellID
 --- @return boolean

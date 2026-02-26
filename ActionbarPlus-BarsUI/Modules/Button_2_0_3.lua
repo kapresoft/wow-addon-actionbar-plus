@@ -203,46 +203,6 @@ function o:UpdateStealthSpells()
   self.icon:SetTexture(icon)
 end
 
----@param callbackFn fun(icon:Icon):void
-function o:IfActionTexture(callbackFn)
-  local icon = self:GetActionTexture()
-  if not icon then return end
-  callbackFn(icon)
-end
-
---- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
-function o:GetActionTexture()
-  local type, id = self:GetActionInfo()
-  if not id then return end
-  -- todo next: move prowl logic from UpdateStealthSpells()
-  
-  -- todo add rogue, priest, shammy
-  -- 🔴 Prowl active override
-  if type == t.spell and dru:IsDruidClass() and dru:IsProwl(id) then
-    if dru:IsStealthActive() then
-      self:DimIcon()
-      return unit:GetStealthedIcon()
-    end
-    self:SetIconNormalVertex()
-  end
-  
-  local icon
-  if unit:CanShapeShift() then
-    unit:IfShapeShifted(function(data)
-      if data.active and id == data.spellID then
-        icon = data.shapeshiftIcon
-      end
-    end)
-  end
-  if icon then return icon end
-  
-  comp:IfSpell(id, function(spell)
-    icon = spell.iconID
-    --self:p('GetActionTexture', 'sp=', spell.name)
-  end)
-  return icon
-end
-
 --- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
 --- Unchecks the button when the active spell cast finishes.
 ---
@@ -314,12 +274,36 @@ function o:__InitTestData(isInitialLogin)
     --}
     -- druid
   end
+  if unit:IsPriest() then
+    tmpBtnSpells = {
+      [1000] = 'shadowform',
+      [1001] = 'mind blast',
+      [1002] = 'mind flay',
+    }
+  elseif unit:IsDruid() then
+    tmpBtnSpells = {
+      [1000] = 'cat form',
+      [1001] = 'prowl',
+      [1002] = 'barkskin',
+    }
+  elseif unit:IsPaladin() then
+    tmpBtnSpells = {
+      [1000] = 'holy light(rank 1)',
+      [1001] = 'seal of the crusader(rank 1)',
+      --[1002] = 'seal of righteousness',
+      --[1002] = 'jewelcrafting',
+      [1002] = 'arcane torrent',
+    }
+    if cns:IsMainLine() then
+      tmpBtnSpells = {
+        [1000] = 'flash of light',
+        [1001] = 'sense undead',
+        --[1002] = 'seal of righteousness',
+        [1002] = 'jewelcrafting',
+      }
+    end
+  end
   
-  tmpBtnSpells = {
-    [1000] = 'cat form',
-    [1001] = 'prowl',
-    [1002] = 'barkskin',
-  }
   
   local id = self:GetID()
   local spell = tmpBtnSpells[id]
@@ -476,6 +460,48 @@ function o:UpdateAction(name, val)
   self:Update()
 end
 
+--- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
+--- @return TextureIcon
+function o:GetActionTexture()
+  local type, id = self:GetActionInfo()
+  if not id then return end
+  -- todo next: move prowl logic from UpdateStealthSpells()
+  
+  -- todo add rogue, priest, shammy
+  -- Prowl active override
+  --if type == t.spell and dru:IsDruidClass() and dru:IsProwl(id) then
+  --  if dru:IsStealthActive() then
+  --    self:DimIcon()
+  --    return unit:GetStealthedIcon()
+  --  end
+  --  self:SetIconNormalVertex()
+  --end
+  self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
+  if type == t.spell then
+    if unit:IsStealthActive() then
+      self:DimIcon()
+      return unit:GetStealthedIcon()
+    end
+    self:SetIconNormalVertex()
+  end
+  
+  local icon
+  if unit:CanShapeShift() then
+    unit:IfShapeShifted(function(data)
+      if data.active and id == data.spellID then
+        icon = data.shapeshiftIcon
+      end
+    end)
+  end
+  if icon then return icon end
+  
+  comp:IfSpell(id, function(spell)
+    icon = spell.iconID
+    --self:p('GetActionTexture', 'sp=', spell.name)
+  end)
+  return icon
+end
+
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
@@ -534,6 +560,16 @@ function o:UpdateCooldown()
   local name = ''
   local start, duration, enable, modRate = 0, 0, 0, 1
   
+  local function _info(info, fieldName, defaultVal)
+    local ok, value = pcall(function()
+      return info and info[fieldName]
+    end)
+    
+    if ok and value ~= nil then return value end
+    
+    return defaultVal
+  end
+  
   if actionType == t.spell then
     name = comp:GetSpellName(id)
     if C_Spell and C_Spell.GetSpellCooldown then
@@ -541,8 +577,8 @@ function o:UpdateCooldown()
       if info then
         start = info.startTime or 0
         duration = info.duration or 0
-        enable = info.isEnabled and 1 or 0
-        modRate = info.modRate or 1
+        enable = info.isEnabled
+        modRate = info.modRate
       end
     else
       start, duration, enable = GetSpellCooldown(id)
@@ -554,7 +590,7 @@ function o:UpdateCooldown()
     return
   end
   
-  if not start or duration == 0 then
+  if not start or not duration then
     CooldownFrame_Clear(cd)
     return
   end
@@ -630,3 +666,10 @@ function o:pid(prefix) return ("%s(%s)::"):format(prefix, self.__name) end
 function o:SetIconVertex(r, g, b) self.icon:SetVertexColor(r, g, b) end
 function o:SetIconNormalVertex() self:SetIconVertex(1, 1, 1) end
 function o:DimIcon() self:SetIconVertex(0.5, 0.5, 0.5) end
+
+---@param callbackFn fun(icon:Icon):void
+function o:IfActionTexture(callbackFn)
+  local icon = self:GetActionTexture()
+  if not icon then return end
+  callbackFn(icon)
+end
