@@ -13,6 +13,9 @@ Type: Modules
 --- @class Core_Modules_ABP_2_0
 local ModuleNames = {
   
+  --- @type APIConstants_ABP_2_0
+  APIConstants = {},
+  
   --- @type Compat_ABP_2_0
   Compat = {},
   
@@ -21,6 +24,9 @@ local ModuleNames = {
   
   --- @type DruidUtil_ABP_2_0
   DruidUtil = {},
+  
+  --- @type PriestUtil_ABP_2_0
+  PriestUtil = {},
   
   --- @type CursorProvider_ABP_2_0
   CursorProvider = {},

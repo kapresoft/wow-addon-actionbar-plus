@@ -1,9 +1,11 @@
+--- @type Namespace_ABP_2_0
+local ns = select(2, ...)
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace_ABP_2_0
-local ns = select(2, ...)
 local O, M, comp = ns.O, ns.M, ns.O.Compat
+local UnitClasses = ns.O.APIConstants.UnitClasses
 local tinsert, tconcat = table.insert, table.concat
 
 --- For all stealth
@@ -44,6 +46,8 @@ Methods
 ---@type UnitUtil_ABP_2_0
 local o = S
 
+o.C = { UnitClasses = UnitClasses }
+
 o.ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
 o.stealthedIcon = o.ADDON_TEXTURES_DIR_FORMAT:format('spell_nature_invisibilty_active')
 
@@ -58,6 +62,7 @@ function o:New(obj, unitClass)
   end
   assert(type(_class) == 'string', 'Param UnitClass must be one of @UnitClass')
   _obj.CLASS_ID = strupper(_class)
+  assert(self.C.UnitClasses[_obj.CLASS_ID], ('UnitUtil:New(UNIT_CLASS):: Invalid UNIT_CLASS: "%s"'):format(tostring(_class)))
   return setmetatable(_obj, self)
 end
 
@@ -69,12 +74,17 @@ function o:ClassID() return self.CLASS_ID end
 --- Class names are not locale-specific (The second return value of UnitClass())
 ---Example:
 --- @param optionalUnit string
---- @see GlobalConstants#UnitId
 --- @see Blizzard_UnitId
 --- @return UnitClass, UnitClassID One of DRUID, ROGUE, PRIEST, etc... returned with the ID
 function o:GetUnitClass(optionalUnit) return UnitClassBase(optionalUnit or 'player') end
 
---- @see GC#UnitClasses
+--- @return UnitClassType
+function o:GetUnitClassX(optionalUnit)
+  local name = self:GetUnitClass(optionalUnit)
+  return UnitClasses[name]
+end
+
+--- @see UnitClasses
 --- @return string, number One of DRUID, ROGUE, PRIEST, etc...
 function o:GetPlayerUnitClass() return self:GetUnitClass() end
 
@@ -95,7 +105,7 @@ end
 --- @vararg any list of Unit Class IDs
 --- @return Boolean
 function o:IsPlayerClassAnyOfID(...)
-  local _, _, unitClassID = UnitClass('player')
+  local _, _, unitClassID = UnitClassNames('player')
   if not unitClassID then return false end
   local args = { ... }
   -- Fix for Midnight
@@ -114,26 +124,33 @@ end
 --- @see UnitClass
 --- @param unitClass UnitClass|nil Optional unit class. If passed, unitClass is checked against the player class.
 function o:IsUs(unitClass)
+  local pClass = self:GetPlayerUnitClass()
+  if type(unitClass) == 'string' then return pClass == unitClass end
   assert(self.CLASS_ID, 'CLASS_ID is missing')
-  local pClass = unitClass or self:GetPlayerUnitClass()
   return self.CLASS_ID == pClass
 end
+
+function o:IsDruid() return self:IsUs(UnitClasses.DRUID()) end
+function o:IsPriest() return self:IsUs(UnitClasses.PRIEST()) end
+function o:IsPaladin() return self:IsUs(UnitClasses.PALADIN()) end
+function o:IsRogue() return self:IsUs(UnitClasses.ROGUE()) end
 
 --- @return Boolean
 function o:IsStealthActive() return IsStealthed and IsStealthed() end
 --- @return Boolean
-function o:CanShapeShift() return GetNumShapeshiftForms() > 0 end
+function o:CanShapeShift() return GetNumShapeshiftForms and GetNumShapeshiftForms() > 0 end
 --- @return boolean
-function o:IsShapeShifted() return GetShapeshiftForm() > 0 end
+function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
 --- @return Icon
 function o:GetStealthedIcon() return STEALTHED_ICON end
-
+--- @return Index|0 The form index if any; 0 if not shapeshifted
+function o:GetShapeshiftForm() return GetShapeshiftForm and GetShapeshiftForm() end
 --shapeshiftIcon, active, castable, spellID
 
 --- @return boolean
 ---@param callbackFn fun(data:ShapeshiftFormData):void
 function o:IfShapeShifted(callbackFn)
-  local index = GetShapeshiftForm()
+  local index = self:GetShapeshiftForm()
   if index == 0 then return end
   local data = comp:GetShapeshiftFormInfo(index)
   if not data then return end
