@@ -7,6 +7,7 @@ local ns = select(2, ...)
 local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
 local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
 local GetSpellInfo, C_GetSpellInfo = GetSpellInfo, C_Spell and C_Spell.GetSpellInfo
+local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
 
 --- return data has the same structure for C_Item or legacy GetItemCooldown
 local C_GetItemCooldown = C_Item and C_Item.GetItemCooldown or GetItemCooldown

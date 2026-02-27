@@ -8,6 +8,7 @@
     <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/SpecController.lua"/>
     <Script file="BarFrame.lua"/>
 
     <!--<Script file="Button_2_0_1_1.lua"/>-->
@@ -18,14 +19,12 @@
             <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
-
     <Frame name="WorldEventsFrame_ABP_2_0" mixin="WorldEventsFrameMixinDerived_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
-
     <Frame name="ButtonUpdateFrame_ABP_2_0" mixin="ButtonUpdateFrameMixin_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
