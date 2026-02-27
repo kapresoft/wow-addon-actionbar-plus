@@ -13,6 +13,7 @@ Module::Button_TestData
 local libName = 'Button_TestData'
 --- @class Button_TestData_ABP_2_0 : AceEvent_3_0
 local S = cns:NewAceEvent(); ABP_ButtonTestData = S
+local p, pd, t, tf = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::Button_TestData (Methods)
@@ -46,11 +47,9 @@ local function GetSpellsForTesting()
   }
   if cns:IsMainLine() then
     spells['PALADIN'] = {
-      [1000] = 'holy light(rank 1)',
-      [1001] = 'seal of the crusader(rank 1)',
-      --[1002] = 'seal of righteousness',
-      --[1002] = 'jewelcrafting',
-      [1002] = 'arcane torrent',
+      [1000] = 'judgment',
+      [1001] = 'flash of light',
+      [1002] = 'divine protection',
     }
   end
   
@@ -58,7 +57,7 @@ local function GetSpellsForTesting()
 end; local testSpells = GetSpellsForTesting()
 
 --- @param isInitialLogin boolean
----@param btn ABP_Button_2_0_3
+--- @param btn ABP_Button_2_0_3
 function o:AddTestData(isInitialLogin, btn)
   if not testSpells then return end
   local characterSpells = testSpells[unit:GetPlayerUnitClass()]
