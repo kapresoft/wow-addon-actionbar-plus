@@ -253,34 +253,26 @@ function o:GetActiveSpecGroupIndex()
   -- Prefer your unified wrapper first
   if C_GetActiveSpecGroup then
     ok, result = pcall(C_GetActiveSpecGroup)
-    if ok and type(result) == "number" then
-      return result
-    end
-    p("GetActiveSpecGroupIndex: C_GetActiveSpecGroup failed:", result)
+    if ok and type(result) == "number" then return result end
+    p("GetActiveSpecGroupIndex:: C_GetActiveSpecGroup failed:", result)
   end
   
   if C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup then
     ok, result = pcall(C_SpecializationInfo.GetActiveSpecGroup)
-    if ok and type(result) == "number" then
-      return result
-    end
-    p("GetActiveSpecGroupIndex: C_SpecializationInfo.GetActiveSpecGroup failed:", result)
+    if ok and type(result) == "number" then return result end
+    p("GetActiveSpecGroupIndex:: C_SpecializationInfo.GetActiveSpecGroup failed:", result)
   end
   
   if GetActiveSpecGroup then
     ok, result = pcall(GetActiveSpecGroup)
-    if ok and type(result) == "number" then
-      return result
-    end
-    p("GetActiveSpecGroupIndex: GetActiveSpecGroup failed:", result)
+    if ok and type(result) == "number" then return result end
+    p("GetActiveSpecGroupIndex:: GetActiveSpecGroup failed:", result)
   end
   
   if GetActiveTalentGroup then
     ok, result = pcall(GetActiveTalentGroup)
-    if ok and type(result) == "number" then
-      return result
-    end
-    p("GetActiveSpecGroupIndex: GetActiveTalentGroup failed:", result)
+    if ok and type(result) == "number" then return result end
+    p("GetActiveSpecGroupIndex:: GetActiveTalentGroup failed:", result)
   end
   
   return 1
