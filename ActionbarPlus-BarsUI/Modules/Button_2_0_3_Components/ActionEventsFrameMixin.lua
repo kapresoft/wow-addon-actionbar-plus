@@ -37,8 +37,7 @@ This frame performs no state logic itself; it only routes events.
 local ns = select(2, ...)
 local cns = ns:cns()
 local comp = cns.O.Compat
-local p, pd, t, tf = ns:log('BarActionEventsFrameMixin')
-pd('xxx Loaded...')
+local p, pd, t, tf = ns:log('ActionEventsFrame')
 
 --[[-------------------------------------------------------------------
 Mixin
@@ -63,7 +62,7 @@ function o:OnLoad()
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
   self:RegisterEvent("TRADE_SKILL_SHOW");
   self:RegisterEvent("TRADE_SKILL_CLOSE");
-  self:RegisterEvent("ARCHAEOLOGY_CLOSED");
+  --self:RegisterEvent("ARCHAEOLOGY_CLOSED");
   self:RegisterEvent("PLAYER_ENTER_COMBAT");
   self:RegisterEvent("PLAYER_LEAVE_COMBAT");
   self:RegisterEvent("START_AUTOREPEAT_SPELL");
