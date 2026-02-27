@@ -16,5 +16,9 @@ local ModuleNames = {
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   
+  --- @type BarModuleFactory_2_0
+  BarModuleFactory = {},
+  
+  
 }; LibModule.EnrichModules(ModuleNames); ns.M = ModuleNames
 

@@ -7,10 +7,11 @@ local ns = select(2, ...)
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local libName = 'BarModuleFactory'
+--- @see Namespace_ABP_BarsUI_2_0
+--- @type string
+local libName = ns.M.BarModuleFactory()
 --- @class BarModuleFactory_2_0
-local S = {};
-ABP_BarModuleFactory_2_0 = S
+local S = {}; ns:Register(libName, S)
 local p, pd, t, tf = ns:log(libName)
 
 --- @alias BarModule_2_0 BarModuleProto_2_0 | AddonModuleObj_3_0_Type2
@@ -107,13 +108,20 @@ local function PropsAndMethods()
   --- @return BarModule_2_0
   function o:New(barFrame)
     assert(barFrame, 'New(barFrame):: barFrame is missing.')
+    local core = ns:a()
     local w = barFrame.widget
     local name = moduleName(w.index)
+    
     --- @type BarModule_2_0
-    local m = ns:a():NewModule(name, BarModuleProto_2_0)
+    local m = core:GetModule(name, true)
+    if m then return m end
+    
+    m = core:NewModule(name, BarModuleProto_2_0)
     m.barFrame = barFrame
     m.index = w.index
-    m:SetEnabledState(m:c().enabled)
+    pd('New:: enabled=', m:c().enabled)
+    if m:c().enabled then m:Enable()
+    else m:Disable() end
     
     pd(('New:: %s created; enabled=%s'):format(m:GetName(), tostring(m:IsEnabled())))
     _G[name] = m
