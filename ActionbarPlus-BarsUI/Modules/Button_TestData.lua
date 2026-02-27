@@ -55,41 +55,6 @@ local function GetSpellsForTesting()
     }
   end
   
-  --[[if unit:IsPriest() then
-    data = {
-      [1000] = 'shadowform',
-      [1001] = 'mind blast',
-      [1002] = 'mind flay',
-    }
-  elseif unit:IsDruid() then
-    data = {
-      [1000] = 'cat form',
-      [1001] = 'prowl',
-      [1002] = 'barkskin',
-    }
-  elseif unit:IsRogue() then
-    data = {
-      [1000] = 'stealth',
-      [1001] = 'pick pocket',
-      [1002] = 'arcane torrent',
-    }
-  elseif unit:IsPaladin() then
-    data = {
-      [1000] = 'holy light(rank 1)',
-      [1001] = 'seal of the crusader(rank 1)',
-      --[1002] = 'seal of righteousness',
-      --[1002] = 'jewelcrafting',
-      [1002] = 'arcane torrent',
-    }
-    if cns:IsMainLine() then
-      data = {
-        [1000] = 'flash of light',
-        [1001] = 'crusader strike',
-        [1002] = 'judgment',
-        [1003] = 'hammer of justice',
-      }
-    end
-  end]]
   return spells
 end; local testSpells = GetSpellsForTesting()
 
