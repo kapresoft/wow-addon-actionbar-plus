@@ -4,6 +4,9 @@ local s = ns.settings
 s.developer = true
 --s.enableTraceUI = true
 
+--- @class DeveloperSetup_ABP_2_0
+local o = {}
+
 print('DeveloperSetup::', 'loaded...')
 
 local function WrapScriptExample()
@@ -22,3 +25,4 @@ local function WrapScriptExample()
   ]])
 
 end
+

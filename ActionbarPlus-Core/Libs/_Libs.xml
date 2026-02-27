@@ -5,6 +5,7 @@
 
     <!--@do-not-package@-->
     <Script file='Libs\Developer\DeveloperSetup.lua'/>
+    <Script file='Libs\Developer\EventTracePrinter.lua'/>
 
     <!--@end-do-not-package@-->
     <Include file='Modules\_Modules.xml'/>

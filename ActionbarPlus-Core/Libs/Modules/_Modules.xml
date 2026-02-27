@@ -2,7 +2,6 @@
 ..\FrameXML\UI.xsd">
 
     <Include file="API\_API.xml" />
-    <Script file="EventTracePrinter.lua" />
     <Script file="GameVersionMixin.lua" />
     <Script file="DatabaseSchema.lua" />
     <Script file="DatabaseMixin.lua" />

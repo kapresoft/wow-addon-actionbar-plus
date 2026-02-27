@@ -103,4 +103,9 @@ end
 Register
 ---------------------------------------------------------------------]]
 -- todo: register at a later event
---ns:RegisterTracer(o)
+--- @see DeveloperSetup_ABP_2_0
+if ns:IsDev() then
+  ns:RegisterTracer(o)
+  local p, pd, t, tf = ns:log('EventTracePrinter')
+  tf('Registered... IsDev=', ns:IsDev())
+end
