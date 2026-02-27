@@ -355,7 +355,7 @@ function o:UpdateAction(name, val)
 
   if name == t.spell then
     local info = comp:GetSpellInfo(val)
-    tf('UpdateAction:: sp=', info.name, 'info=', info)
+    tf('UpdateAction:: info=', info)
     if not info and not info.iconID then return end
     ClearCursor()
     -- Retail vs Classic safe
