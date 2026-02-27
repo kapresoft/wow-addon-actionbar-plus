@@ -28,6 +28,7 @@ local cns = ns:cns()
 --- @type Compat_ABP_2_0
 local comp = cns.O.Compat
 local unit, dru = cns.O.UnitUtil, cns.O.DruidUtil
+local Str_IsAnyOf = cns.Str_IsAnyOf
 
 --- @type ABP_ButtonStateMixin_2_0_3
 local buttonState = ns.__ButtonState;
@@ -217,7 +218,7 @@ end
 -- /dump GetSpellInfo('shadowform'), active=136200
 --- Add temporary spells for testing
 function o:OnInit(evt, isInitialLogin, isReloadingUi)
-  self:pd('OnInit', 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
+  --self:pd('OnInit', 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
   
   --/dump SetCVar('ActionButtonUseKeyDown', 1)
   --/dump GetCVarBool('ActionButtonUseKeyDown')
@@ -308,7 +309,7 @@ Methods
 function o:Update()
   if self.__updating then return end
   self.__updating = true
-  if self.__updating then self:pd('Update', 'updating=', self.__updating) end
+  --if self.__updating then self:pd('Update', 'updating=', self.__updating) end
   --p('Update(): called...')
   
   local eventsFrame = ActionEventsFrame_ABP_2_0
@@ -350,10 +351,11 @@ end
 
 function o:UpdateAction(name, val)
   if not val then self.icon:SetTexture(nil); return end
-  if not cns.Str_IsAnyOf(name, t.spell, t.item) then return end
+  if not Str_IsAnyOf(name, t.spell, t.item) then return end
 
   if name == t.spell then
     local info = comp:GetSpellInfo(val)
+    tf('UpdateAction:: sp=', info.name, 'info=', info)
     if not info and not info.iconID then return end
     ClearCursor()
     -- Retail vs Classic safe
@@ -457,6 +459,7 @@ function o:UpdateCooldown()
   if not self:HasAction() then cd:Clear(); return end
   
   local actionType, id = self:GetActionInfo()
+  if not id then return end
   if not actionType or not id then cd:Clear(); return end
   
   local name = ''
@@ -489,13 +492,24 @@ function o:UpdateCooldown()
   cd:SetCooldown(start, duration, modRate or 1)
 end
 
---- @return string, number The type (i.e. spell, item) and typeID (i.e. spellID, itemID)
+--- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo()
-  local type = self:GetAttribute(actionType)
-  if not type then return nil end
-  local id = self:GetAttribute(type)
-  if not id then return nil end
-  return type, id
+  local aType = self:GetAttribute(actionType)
+  if not aType then return nil end
+  
+  --- @type number|string|nil
+  local val = self:GetAttribute(aType)
+  if not val then return nil end
+  
+  if type(val) == "number" then return aType, val end
+  
+  if type(val) == "string" then
+    local sp = comp:GetSpellInfo(val)
+    if not sp then return nil end
+    return aType, sp.spellID
+  end
+  
+  return nil
 end
 
 --- @return boolean

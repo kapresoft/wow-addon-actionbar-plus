@@ -40,6 +40,9 @@ do
   function o:IsMists() return ns.gameVersion == self.GAME_VERSION_MISTS end
   --- @return boolean
   function o:IsMainLine() return ns.gameVersion == self.GAME_VERSION_MAINLINE end
+  --- @see #IsMainLine()
+  --- @return boolean
+  function o:IsRetail() return self:IsMainLine() end
 end
 ns:MixinGameVersion(o)
 

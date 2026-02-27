@@ -6,6 +6,7 @@ local ns = select(2, ...)
 
 local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
 local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
+local GetSpellInfo, C_GetSpellInfo = GetSpellInfo, C_Spell and C_Spell.GetSpellInfo
 
 --- return data has the same structure for C_Item or legacy GetItemCooldown
 local C_GetItemCooldown = C_Item and C_Item.GetItemCooldown or GetItemCooldown
@@ -43,9 +44,6 @@ function o:GetSpecializationID()
   end
   return 1
 end
-
-local GetSpellInfo = GetSpellInfo
-local C_GetSpellInfo = C_Spell.GetSpellInfo
 
 --- @param id SpellIdentifier
 --- @return SpellInfoData|nil
@@ -86,11 +84,11 @@ end
 --- @boolean true if the player can cast the spell
 function o:IsOwnSpell(id) return self:GetSpellInfo(self:GetSpellName(id)) ~= nil end
 
---- @param spellID SpellIdentifier
+--- @param spell SpellIdentifier
 --- @param callbackFn fun(spell:SpellInfoData)
-function o:IfSpell(spellID, callbackFn)
-  if not spellID then return end
-  local sp = self:GetSpellInfo(spellID)
+function o:IfSpell(spell, callbackFn)
+  if not spell then return end
+  local sp = self:GetSpellInfo(spell)
   return sp and callbackFn(sp)
 end
 

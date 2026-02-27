@@ -1,6 +1,25 @@
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
+local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
+local C_GetSpecializationInfo = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo
+local C_GetSpecialization = C_SpecializationInfo and C_SpecializationInfo.GetSpecialization
+local GetActiveTalentGroup, GetActiveSpecGroup = GetActiveTalentGroup, GetActiveSpecGroup
+
+--[[-------------------------------------------------------------------
+Types
+---------------------------------------------------------------------]]
+--- @class SpecInfo_ABP_2_0
+--- @field id Identifier The specialization ID
+--- @field name Name
+--- @field index Index The active spec index
+--- @field groupIndex Index The active spec group index
+--- @field groupCount number The number of available talent spec groups (build contexts); Wrath/Cata/MoP: 1 if dual-spec is not learned, 2 if unlocked; Retail: always 1, as spec groups do not exist (all talents are available).
+--- @field maxCount Count
+--- @field icon IconIDOrPath
+--- @field names table<number, Name>
+--- @field points table<Name, number>
+
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
@@ -24,7 +43,16 @@ S.__index = S
 S.__type = libName
 
 local p, pd, t, tf = ns:log(libName)
-
+--[[-------------------------------------------------------------------
+Support Functions
+---------------------------------------------------------------------]]
+--- @return SpecInfo_ABP_2_0
+local function NewSpecInfo()
+  return {
+    name   = nil, index  = -1, icon   = nil,
+    --names  = {}, points = {},
+  }
+end
 --- Checks if the first argument matches any of the subsequent arguments.
 --- @param toMatch number The value to match against the varargs.
 --- @vararg string SpellInfoShort The list of values to check for a match.
@@ -209,22 +237,6 @@ function o:IsBuffActive(spellID)
   return IsAnyOfBuff(spellID, unpack(ns.playerBuffs))
 end
 
-local function NewTalentInfo()
-  --- @class TalentInfo_ABP_2_0
-  local info = {
-    --- @type table<number, Name>
-    names       = {},
-    --- @type table<Name, number>
-    points      = {},
-    --- @type string
-    spec        = nil,
-    talentIndex = -1,
-    --- @type string
-    icon        = nil,
-  }
-  return info
-end
-
 --- @class TalentTabInfoMixin_ABP_2_0
 local TalentTabInfoMixin = {}
 --- @param name Name
@@ -237,11 +249,19 @@ function TalentTabInfoMixin:New(name, icon, pointsSpent)
   return info
 end
 
---- @return TalentInfo_ABP_2_0
-function o:GetTalentInfo()
-  if ns:IsRetail() then return self:GetTalentInfoRetail() end
-  if not GetNumTalentTabs then return nil end
-  return self:GetTalentInfoPreRetail()
+--- @return SpecInfo_ABP_2_0
+function o:GetSpec()
+  local count = self:GetSpecializationCount()
+  --- @type SpecInfo_ABP_2_0
+  local spec
+  if ns:IsMainLine() then
+    spec = self:GetSpecRetail()
+  else
+    --if not GetNumTalentTabs then return nil end
+    spec = self:GetSpecPreRetail()
+  end
+  spec.groupCount = count
+  return spec
 end
 
 --- @param tabIndex Index
@@ -257,11 +277,11 @@ local function GetTalentTabInfo_Cataclysm(tabIndex)
 end
 
 --- @private
---- @return TalentInfo_ABP_2_0
-function o:GetTalentInfoPreRetail()
+--- @return SpecInfo_ABP_2_0
+function o:GetSpecPreRetail()
   local totalPoints = 0
-  --- @type TalentInfo_ABP_2_0
-  local info = NewTalentInfo()
+  --- @type SpecInfo_ABP_2_0
+  local info = NewSpecInfo()
   function info:summary()
     local s = {}
     for name, points in pairs(self.points) do
@@ -285,7 +305,7 @@ function o:GetTalentInfoPreRetail()
     local specIndex = comp:GetSpecializationID()
     if specIndex then
       local specId, specName = comp:GetSpecializationInfo(specIndex)
-      info.spec = specName
+      info.name = specName
     end
     return info
   end
@@ -301,8 +321,8 @@ function o:GetTalentInfoPreRetail()
       table.insert(info.names, tabInfo.name)
       info.points[tabInfo.name] = tabInfo.pointsSpent
       if tabInfo.pointsSpent > max then
-        info.spec = tabInfo.name
-        info.talentIndex = i
+        info.name = tabInfo.name
+        info.index = i
         info.icon = ('|T%s:18:18:0:0|t'):format(tabInfo.icon)
         max = tabInfo.pointsSpent
       end
@@ -312,20 +332,68 @@ function o:GetTalentInfoPreRetail()
   return info
 end
 
---- @private
---- @return TalentInfo_ABP_2_0
-function o:GetTalentInfoRetail()
-  --- @type TalentInfo_ABP_2_0
-  local info = NewTalentInfo()
+--- Verified In: MoP, Retail
+--- /dump u:GetSpecInfo()
+--- @return SpecInfo_ABP_2_0
+function o:GetSpecInfo()
+  --- @type SpecInfo_ABP_2_0
+  local info = NewSpecInfo()
   function info:summary() return nil end
   
   --- @param callbackFn fun(name:string, points:number) | "function(name, points) end"
   function info:ForEachTalent(callbackFn) end
   
-  local specIndex = GetSpecialization();
+  local specIndex = self:GetSpecIndex()
   if not specIndex then return nil end
-  local _, spec = GetSpecializationInfo(specIndex);
-  info.spec = spec
+  
+  local id, name = self:__GetSpecInfo(specIndex)
+  info.id = id
+  info.name = name
+  info.index = specIndex
+  info.maxCount = GetNumSpecializations()
+  info.groupIndex = self:GetActiveSpecGroupIndex()
+  info.groupCount = GetNumSpecGroups()
+  
   return info
 end
 
+--- The is what we want for the database
+--- Example: Druid
+--- SpecIndex 1: Balance, 2:Feral, 3:Guardian, 4:Restoration
+--- Each Spec Index will have its own configuration
+--- Verified in: Retail
+--- @return number
+function o:GetSpecIndex()
+  if C_GetSpecialization then return C_GetSpecialization() end
+end
+
+--- Retail: 'specialization index', pre-retail: 'active spec group'
+--- • Retail: C_GetActiveSpecGroup
+--- • MoP: GetActiveTalentGroup
+--- @return number
+function o:GetActiveSpecGroupIndex()
+  if C_GetActiveSpecGroup then return C_GetActiveSpecGroup()
+  elseif GetActiveTalentGroup then return GetActiveTalentGroup() end
+  return GetActiveSpecGroup()
+end
+
+--- @private
+--- @param specIndex number
+function o:__GetSpecInfo(specIndex)
+  if C_GetSpecializationInfo then
+    local specId, name, desc, icon = C_GetSpecializationInfo(specIndex)
+    return specId, name
+  end
+end
+
+--- @return number|1 The number of available specs
+function o:GetSpecializationCount()
+  if GetNumSpecializations then return GetNumSpecializations() end
+  local ok, val = pcall(function() return GetNumTalentGroups() end)
+  if ok then return val end
+  return 1
+end
+
+u = o
+-- /dump u:GetSpec()
+-- /dump u:GetMaxSpecCount()
