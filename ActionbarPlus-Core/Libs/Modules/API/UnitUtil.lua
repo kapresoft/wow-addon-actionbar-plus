@@ -237,163 +237,51 @@ function o:IsBuffActive(spellID)
   return IsAnyOfBuff(spellID, unpack(ns.playerBuffs))
 end
 
---- @class TalentTabInfoMixin_ABP_2_0
-local TalentTabInfoMixin = {}
---- @param name Name
---- @param icon TextureIDOrPath
---- @param pointsSpent Number
---- @return TalentTabInfo_ABP_2_0
-function TalentTabInfoMixin:New(name, icon, pointsSpent)
-  --- @class TalentTabInfo_ABP_2_0
-  local info = { name = name, icon = icon, pointsSpent = pointsSpent }
-  return info
-end
-
---- @return SpecInfo_ABP_2_0
-function o:GetSpec()
-  local count = self:GetSpecializationCount()
-  --- @type SpecInfo_ABP_2_0
-  local spec
-  if ns:IsMainLine() then
-    spec = self:GetSpecRetail()
-  else
-    --if not GetNumTalentTabs then return nil end
-    spec = self:GetSpecPreRetail()
-  end
-  spec.groupCount = count
-  return spec
-end
-
---- @param tabIndex Index
-local function GetTalentTabInfoPreCataclysm(tabIndex)
-  local name, icon, pointsSpent = GetTalentTabInfo(tabIndex)
-  return TalentTabInfoMixin:New(name, icon, pointsSpent)
-end
-
---- @param tabIndex Index
-local function GetTalentTabInfo_Cataclysm(tabIndex)
-  local id, name, talentDesc, icon, pointsSpent = GetTalentTabInfo(tabIndex)
-  return TalentTabInfoMixin:New(name, icon, pointsSpent)
-end
-
---- @private
---- @return SpecInfo_ABP_2_0
-function o:GetSpecPreRetail()
-  local totalPoints = 0
-  --- @type SpecInfo_ABP_2_0
-  local info = NewSpecInfo()
-  function info:summary()
-    local s = {}
-    for name, points in pairs(self.points) do
-      points = points or 0
-      tinsert(s, name .. ': ' .. tostring(points))
-    end
-    return tconcat(s, ', ')
-  end
-  --- @param callbackFn fun(name:string, points:number) | "function(name, points) end"
-  function info:ForEachTalent(callbackFn)
-    for name, points in pairs(self.points) do
-      points = points or 0
-      callbackFn(name, points)
-    end
-  end
-  
-  local max = 0
-  
-  -- skip MoP for now (uses GetNumSpecGroups)
-  if GetNumSpecGroups then
-    local specIndex = comp:GetSpecializationID()
-    if specIndex then
-      local specId, specName = comp:GetSpecializationInfo(specIndex)
-      info.name = specName
-    end
-    return info
-  end
-  
-  -- /dump GetTalentTabInfo(1)
-  for i = 1, GetNumTalentTabs() do
-    --- @type TalentTabInfo_ABP_2_0
-    local tabInfo
-    if ns:IsCataclysm() then tabInfo = GetTalentTabInfo_Cataclysm(i)
-    else tabInfo = GetTalentTabInfoPreCataclysm(i) end
-    
-    if tabInfo then
-      table.insert(info.names, tabInfo.name)
-      info.points[tabInfo.name] = tabInfo.pointsSpent
-      if tabInfo.pointsSpent > max then
-        info.name = tabInfo.name
-        info.index = i
-        info.icon = ('|T%s:18:18:0:0|t'):format(tabInfo.icon)
-        max = tabInfo.pointsSpent
-      end
-      totalPoints = totalPoints + tabInfo.pointsSpent
-    end
-  end
-  return info
-end
-
---- Verified In: MoP, Retail
---- /dump u:GetSpecInfo()
---- @return SpecInfo_ABP_2_0
-function o:GetSpecInfo()
-  --- @type SpecInfo_ABP_2_0
-  local info = NewSpecInfo()
-  function info:summary() return nil end
-  
-  --- @param callbackFn fun(name:string, points:number) | "function(name, points) end"
-  function info:ForEachTalent(callbackFn) end
-  
-  local specIndex = self:GetSpecIndex()
-  if not specIndex then return nil end
-  
-  local id, name = self:__GetSpecInfo(specIndex)
-  info.id = id
-  info.name = name
-  info.index = specIndex
-  info.maxCount = GetNumSpecializations()
-  info.groupIndex = self:GetActiveSpecGroupIndex()
-  info.groupCount = GetNumSpecGroups()
-  
-  return info
-end
-
---- The is what we want for the database
---- Example: Druid
---- SpecIndex 1: Balance, 2:Feral, 3:Guardian, 4:Restoration
---- Each Spec Index will have its own configuration
---- Verified in: Retail
---- @return number
-function o:GetSpecIndex()
-  if C_GetSpecialization then return C_GetSpecialization() end
-end
-
---- Retail: 'specialization index', pre-retail: 'active spec group'
---- • Retail: C_GetActiveSpecGroup
---- • MoP: GetActiveTalentGroup
---- @return number
+--- Returns the active spec group index used for profile partitioning.
+--- Each API call is wrapped in pcall because some clients expose the function but throw on invocation.
+--- Retail/Anniversary: C_SpecializationInfo.GetActiveSpecGroup() (spec groups map to specializations).
+--- MoP: GetActiveSpecGroup() (dual-spec system).
+--- Wrath/Cata: GetActiveTalentGroup() (dual-spec slot index).
+--- Classic Era: returns 1 (no dual-spec support).
+--- Falls back to 1 on error.
+--- Verified:
+--- - Anniversary(TBC): YES
+--- @return number specGroupIndex 1-based spec group index
 function o:GetActiveSpecGroupIndex()
-  if C_GetActiveSpecGroup then return C_GetActiveSpecGroup()
-  elseif GetActiveTalentGroup then return GetActiveTalentGroup() end
-  return GetActiveSpecGroup()
-end
-
---- @private
---- @param specIndex number
-function o:__GetSpecInfo(specIndex)
-  if C_GetSpecializationInfo then
-    local specId, name, desc, icon = C_GetSpecializationInfo(specIndex)
-    return specId, name
+  local ok, result
+  
+  -- Prefer your unified wrapper first
+  if C_GetActiveSpecGroup then
+    ok, result = pcall(C_GetActiveSpecGroup)
+    if ok and type(result) == "number" then
+      return result
+    end
+    p("GetActiveSpecGroupIndex: C_GetActiveSpecGroup failed:", result)
   end
-end
-
---- @return number|1 The number of available specs
-function o:GetSpecializationCount()
-  if GetNumSpecializations then return GetNumSpecializations() end
-  local ok, val = pcall(function() return GetNumTalentGroups() end)
-  if ok then return val end
+  
+  if C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup then
+    ok, result = pcall(C_SpecializationInfo.GetActiveSpecGroup)
+    if ok and type(result) == "number" then
+      return result
+    end
+    p("GetActiveSpecGroupIndex: C_SpecializationInfo.GetActiveSpecGroup failed:", result)
+  end
+  
+  if GetActiveSpecGroup then
+    ok, result = pcall(GetActiveSpecGroup)
+    if ok and type(result) == "number" then
+      return result
+    end
+    p("GetActiveSpecGroupIndex: GetActiveSpecGroup failed:", result)
+  end
+  
+  if GetActiveTalentGroup then
+    ok, result = pcall(GetActiveTalentGroup)
+    if ok and type(result) == "number" then
+      return result
+    end
+    p("GetActiveSpecGroupIndex: GetActiveTalentGroup failed:", result)
+  end
+  
   return 1
 end
-
-u = o
--- /dump u:GetSpec()
--- /dump u:GetMaxSpecCount()

@@ -1,9 +1,11 @@
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
+
 local p, pd, t, tf = ns:log('Developer')
+local unit = ns.O.UnitUtil
 
 --- @class Developer_ABP_2_0
-local o = {}; dd = o
+local o = {}; dd = o; u = unit
 
 function o:skills()
   for i = 1, GetNumSkillLines() do

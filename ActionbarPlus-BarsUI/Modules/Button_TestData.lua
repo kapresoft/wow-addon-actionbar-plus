@@ -38,10 +38,10 @@ local function GetSpellsForTesting()
       [1002] = 'arcane torrent',
     },
     ['PALADIN'] = {
-      [1000] = 'holy light(rank 1)',
-      [1001] = 'seal of the crusader(rank 1)',
-      [1002] = 'arcane torrent',
-      [1003] = 'judgement',
+      [1000] = 'judgement',
+      [1001] = 'holy light(rank 1)',
+      [1002] = 'seal of the crusader(rank 1)',
+      [1003] = 'arcane torrent',
     }
   }
   if cns:IsMainLine() then
