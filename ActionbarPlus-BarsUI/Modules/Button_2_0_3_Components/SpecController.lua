@@ -31,7 +31,8 @@ end
 --- and rebuilding the current action bar module and its buttons.
 function o:ACTIVE_TALENT_GROUP_CHANGED(event, ...)
   local currentIndex, prevIndex = ...
-  p('OnEvent::' .. event, 'from=', prevIndex, 'to=', currentIndex)
+  local activeIndex = unit:GetActiveSpecGroupIndex()
+  p('OnEvent::' .. event, 'from=', prevIndex, 'to=', currentIndex, 'activeIndex[detected]=', activeIndex)
   
   -- TBD: Implementation
 end
