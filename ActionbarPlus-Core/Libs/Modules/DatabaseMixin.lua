@@ -9,6 +9,7 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local AceDB = ns.O.AceDB
+local DatabaseSchema = ns.O.DatabaseSchema
 
 local DB_VERSION = 1
 
@@ -43,7 +44,7 @@ end
 --- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
 --- @param db Config_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
-    db:RegisterDefaults(ns.O.DatabaseSchema:GetDefaultDatabase())
+    db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
     p(('Current Profile: %s'):format(db:GetCurrentProfile()))
     p('Schema: version=', db.global.schemaVersion , 'global=', db.global, 'profile=', db.profile)
     --p('Schema: keys=', db.keys)
