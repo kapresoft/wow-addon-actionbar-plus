@@ -42,18 +42,18 @@ local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
 end
 --- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
---- @param db Config_ABP_2_0
+--- @param db DatabaseSchemaDefinition_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
     db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
-    p(('Current Profile: %s'):format(db:GetCurrentProfile()))
-    p('Schema: version=', db.global.schemaVersion , 'global=', db.global, 'profile=', db.profile)
+    pd(('Current Profile: %s'):format(db:GetCurrentProfile()))
+    --pd('Schema: version=', db.global.schemaVersion , 'global=', db.global, 'profile=', db.profile)
     --p('Schema: keys=', db.keys)
 end
 
 --- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
---- @param db AceDBObject_3_0
+--- @param db DatabaseSchemaDefinition_ABP_2_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
-    local current = db.global.schemaVersion or 1
+    local current = db.global.schemaVersion
     if current < DB_VERSION then
         self:RunMigrations(current)
         db.global.schemaVersion = DB_VERSION
@@ -71,20 +71,22 @@ function o:OnProfileReset() p('OnProfileReset called...') end
 
 --- @param addon ABP_Core_2_0
 function o:InitDb(addon)
-    Mixin(addon, o)
-    local db = AceDB:New(ns.DB_NAME); ns:RegisterDB(db)
-    DatabaseMixin_InitDBDefaults(addon, db)
-    --DatabaseMixin_EnsureSchemaUpToDate(addon, db)
-    DatabaseMixin_RegisterCallbacks(addon, db)
+  Mixin(addon, o)
+  --- @type DatabaseSchemaDefinition_ABP_2_0
+  local db = AceDB:New(ns.DB_NAME);
+  ns:RegisterDB(db)
+  DatabaseMixin_InitDBDefaults(addon, db)
+  --DatabaseMixin_EnsureSchemaUpToDate(addon, db)
+  DatabaseMixin_RegisterCallbacks(addon, db)
 end
 
 -- Empty for now; an example of a migration strategy
 function o:RunMigrations(fromVersion)
-    if fromVersion < 1 then
-        --self:MigrateToV1()
-    end
-    
-    if fromVersion < 2 then
-        --self:MigrateToV2()
-    end
+  if fromVersion < 1 then
+    --self:MigrateToV1()
+  end
+  
+  if fromVersion < 2 then
+    --self:MigrateToV2()
+  end
 end

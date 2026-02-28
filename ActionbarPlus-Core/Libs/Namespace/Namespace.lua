@@ -113,7 +113,7 @@ function ns:RegisterDB(db)
   self.addonDbFn = function() return db end
 end
 
---- @return Database_ABP_2_0
+--- @return DatabaseSchemaDefinition_ABP_2_0
 function ns:db() return self.addonDbFn() end
 
 --- @param tracer EventTracePrinter_ABP_2_0

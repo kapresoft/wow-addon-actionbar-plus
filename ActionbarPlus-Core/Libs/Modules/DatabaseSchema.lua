@@ -52,10 +52,11 @@ Type Definitions
 --- @field buttons table<number, table<number, ButtonData_ABP_2_0>>
 --  ================================================
 --- @class GlobalData_ABP_2_0 : RootConfigData_ABP_2_0
+--- @field schemaVersion number
 --  ================================================
 --- @class ProfileData_ABP_2_0 : RootConfigData_ABP_2_0
 --  ================================================
---- @class Database_ABP_2_0
+--- @class DatabaseSchemaDefinition_ABP_2_0
 --- @field global GlobalData_ABP_2_0
 --- @field profile ProfileData_ABP_2_0
 --- @field char table|nil
@@ -74,9 +75,11 @@ local p, pd, t, tf = ns:log(libName)
 --[[-------------------------------------------------------------------
 Schema
 ---------------------------------------------------------------------]]
---- @type Database_ABP_2_0
+local DB_VERSION = 1
+
+--- @type DatabaseSchemaDefinition_ABP_2_0
 local DEFAULT_DB = {
-  global = { bars = {} },
+  global = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {
     hideWhenTaxi                  = true,
@@ -142,6 +145,15 @@ local o = S
 --[[-------------------------------------------------------------------
 Default Database
 ---------------------------------------------------------------------]]
---- @return Database_ABP_2_0
+--- @return DatabaseSchemaDefinition_ABP_2_0
 function o:GetDefaultDatabase() return Table.DeepCopy(DEFAULT_DB) end
 
+--- @param db DatabaseSchemaDefinition_ABP_2_0
+--- @return number
+function o:GetVersion(db)
+  assert(type(db) == "table", "GetVersion:: db is required.")
+  assert(type(db.global) == "table", "GetVersion:: db.global missing.")
+  local v = db.global.schemaVersion
+  if type(v) ~= "number" then return DB_VERSION end
+  return v
+end
