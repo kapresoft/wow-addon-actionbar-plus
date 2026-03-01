@@ -95,15 +95,15 @@ end
 --[[-------------------------------------------------------------------
 Methods
 ---------------------------------------------------------------------]]
---- @return GlobalData_ABP_2_0
+--- @return GlobalConfig_ABP_2_0
 function o:g() return ns:db().global end
 
---- @return ProfileData_ABP_2_0
+--- @return ProfileConfig_ABP_2_0
 function o:p() return ns:db().profile end
 
 --- @param barIndex number
 --- @param btnIndex number
---- @return ButtonData_ABP_2_0|nil
+--- @return ButtonConfig_ABP_2_0|nil
 function o:c(barIndex, btnIndex)
   assert(type(barIndex) == "number", "c(): barIndex must be number")
   assert(type(btnIndex) == "number", "c(): btnIndex must be number")

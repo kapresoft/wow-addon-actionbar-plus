@@ -5,7 +5,7 @@ local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetAc
 local C_GetSpecializationInfo = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo
 local C_GetSpecialization = C_SpecializationInfo and C_SpecializationInfo.GetSpecialization
 local GetActiveTalentGroup, GetActiveSpecGroup = GetActiveTalentGroup, GetActiveSpecGroup
-
+local GetNumSpecializations = GetNumSpecializations
 --[[-------------------------------------------------------------------
 Types
 ---------------------------------------------------------------------]]
@@ -275,5 +275,43 @@ function o:GetActiveSpecGroupIndex()
     p("GetActiveSpecGroupIndex:: GetActiveTalentGroup failed:", result)
   end
   
+  return 1
+end
+
+--- Returns the total number of available spec groups (build contexts).
+--- Retail: always 1 (no dual spec groups; spec groups concept removed).
+--- MoP: GetNumSpecGroups()
+--- Wrath/Cata/TBC: GetNumTalentGroups()
+--- Classic Era: 1
+--- Each call wrapped in pcall because some clients expose but throw.
+--- @return number specGroupCount
+function o:GetSpecGroupCount()
+  local ok, result
+  
+  if ns:IsRetail() then
+    -- MoP
+    if GetNumSpecializations  then
+      p('retail: GetNumSpecializations')
+      ok, result = pcall(GetNumSpecializations)
+      if ok and type(result) == "number" then return result end
+      p("GetSpecGroupCount:: C_GetNumSpecializations failed:", result)
+    end
+  end
+  
+  -- MoP
+  if GetNumSpecGroups then
+    ok, result = pcall(GetNumSpecGroups)
+    if ok and type(result) == "number" then return result end
+    p("GetSpecGroupCount:: GetNumSpecGroups failed:", result)
+  end
+  
+  -- Wrath / Cata / TBC
+  if GetNumTalentGroups then
+    ok, result = pcall(GetNumTalentGroups)
+    if ok and type(result) == "number" then return result end
+    p("GetSpecGroupCount:: GetNumTalentGroups failed:", result)
+  end
+  
+  -- Retail / Classic fallback
   return 1
 end
