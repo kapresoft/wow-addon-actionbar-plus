@@ -107,7 +107,7 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @param widget __ActionBarFrameWidget | Frame
+--- @param widget __ActionBarFrameWidget | ActionBarFrameWidget
 local function WidgetMethods(widget)
     local AssertThatMethodArgIsNotNil = Assert.AssertThatMethodArgIsNotNil
 
@@ -513,7 +513,7 @@ function L:New(frameIndex)
     f:SetAlpha(0)
     f:SetClampedToScreen(true)
 
-    --- @alias ActionBarFrameWidget __ActionBarFrameWidget | _Frame
+    --- @alias ActionBarFrameWidget __ActionBarFrameWidget | FrameObj
     --- @class __ActionBarFrameWidget : WidgetBase
     local __widget = {
         profile = P,

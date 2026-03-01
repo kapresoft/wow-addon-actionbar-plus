@@ -107,14 +107,17 @@ function ns:Register(libName, obj)
   return obj
 end
 
---- @param db AceDBObject
+--- @param db DatabaseObj_ABP_2_0
 function ns:RegisterDB(db)
   assert(type(db) == 'table', "RegisterDB(db): The param db is required.")
   self.addonDbFn = function() return db end
 end
 
---- @return DatabaseSchemaDefinition_ABP_2_0
+--- @return DatabaseObj_ABP_2_0
 function ns:db() return self.addonDbFn() end
+
+--- @return ABP_Core_2_0
+function ns:a() return ABP_Core_2_0 end
 
 --- @param tracer EventTracePrinter_ABP_2_0
 function ns:RegisterTracer(tracer)

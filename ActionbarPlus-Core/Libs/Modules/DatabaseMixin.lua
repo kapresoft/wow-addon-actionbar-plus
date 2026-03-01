@@ -9,7 +9,7 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local AceDB = ns.O.AceDB
-local DatabaseSchema = ns.O.DatabaseSchema
+local DatabaseSchema, unit = ns.O.DatabaseSchema, ns.O.UnitUtil
 
 local DB_VERSION = 1
 
@@ -42,7 +42,7 @@ local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
 end
 --- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
---- @param db DatabaseSchemaDefinition_ABP_2_0
+--- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
     db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
     pd(('Current Profile: %s'):format(db:GetCurrentProfile()))
@@ -51,7 +51,7 @@ local function DatabaseMixin_InitDBDefaults(self, db)
 end
 
 --- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
---- @param db DatabaseSchemaDefinition_ABP_2_0
+--- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
     local current = db.global.schemaVersion
     if current < DB_VERSION then
@@ -72,12 +72,13 @@ function o:OnProfileReset() p('OnProfileReset called...') end
 --- @param addon ABP_Core_2_0
 function o:InitDb(addon)
   Mixin(addon, o)
-  --- @type DatabaseSchemaDefinition_ABP_2_0
+  --- @type DatabaseObj_ABP_2_0
   local db = AceDB:New(ns.DB_NAME);
-  ns:RegisterDB(db)
   DatabaseMixin_InitDBDefaults(addon, db)
   --DatabaseMixin_EnsureSchemaUpToDate(addon, db)
   DatabaseMixin_RegisterCallbacks(addon, db)
+  
+  ns:RegisterDB(db)
 end
 
 -- Empty for now; an example of a migration strategy
@@ -89,4 +90,36 @@ function o:RunMigrations(fromVersion)
   if fromVersion < 2 then
     --self:MigrateToV2()
   end
+end
+
+--[[-------------------------------------------------------------------
+Methods
+---------------------------------------------------------------------]]
+--- @return GlobalData_ABP_2_0
+function o:g() return ns:db().global end
+
+--- @return ProfileData_ABP_2_0
+function o:p() return ns:db().profile end
+
+--- @param barIndex number
+--- @param btnIndex number
+--- @return ButtonData_ABP_2_0|nil
+function o:c(barIndex, btnIndex)
+  assert(type(barIndex) == "number", "c(): barIndex must be number")
+  assert(type(btnIndex) == "number", "c(): btnIndex must be number")
+  
+  local profile = self:p()
+  local bars = profile.bars
+  assert(type(bars) == "table", "c(): profile.bars missing")
+  
+  local bar = bars[barIndex]
+  assert(type(bar) == "table", "c(): invalid barIndex " .. barIndex)
+  
+  local buttons = bar.buttons
+  assert(type(buttons) == "table", "c(): bar.buttons missing")
+  
+  local btnSpecs = buttons[btnIndex]
+  assert(type(btnSpecs) == "table", "c(): invalid btnIndex " .. btnIndex)
+
+  return btnSpecs[unit:GetActiveSpecGroupIndex()]
 end

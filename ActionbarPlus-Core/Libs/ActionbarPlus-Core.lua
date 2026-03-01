@@ -10,15 +10,15 @@ local AceAddon, DatabaseMixin = ns.O.AceAddon, ns.O.DatabaseMixin
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
 ---------------------------------------------------------------------]]
---- @alias ABP_Core_2_0 AceAddon_3_0 | AceEvent_3_0 | AceBucket_3_0 | AceConsole_3_0
+--- @alias ABP_Core_2_0 AceAddon_3_0 | AceEvent_3_0 | AceBucket_3_0 | AceConsole_3_0 | Database_ABP_2_0
 --
 --
------- @class ABP_Core_2_0_Impl : AceAddonObj
+--- @class ABP_Core_2_0_Impl : AceAddonObj
 local A = AceAddon:NewAddon(ns.name, "AceEvent-3.0", "AceBucket-3.0", "AceConsole-3.0")
-ABP_Core_2_0 = A
+
 --
 --- @type ABP_Core_2_0_Impl | ABP_Core_2_0
-local o = A
+local o = A; ABP_Core_2_0 = o
 
 --- Called once, after:
 --- • SavedVariables are loaded
