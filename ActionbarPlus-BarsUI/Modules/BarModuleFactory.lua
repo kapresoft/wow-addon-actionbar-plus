@@ -159,8 +159,8 @@ local function PropsAndMethods()
     local spacing = lcfg.spacing
     
     --- @type ActionBarFrame
-    local frame = self:__CreateBarFrame(barIndex, frameName)
-    local buttons = self:__CreateButtons(frame, barIndex)
+    local frame = self:__CreateBarFrame(barConf, barIndex, frameName)
+    local buttons = self:__CreateButtons(barConf, frame, barIndex)
     frame.widget.buttonFrames = buttons
     
     ----------------------------------------------------
@@ -208,11 +208,12 @@ local function PropsAndMethods()
   --- @alias SecureHandler SecureHandlerBaseTemplateObj|ButtonObj
   
   --- @private
+  --- @param barConf ButtonConfig_ABP_2_0 The frame index
   --- @param barIndex Index The frame index
   --- @param frameName Name The frame name
   --- @return ActionBarFrame
   --- @param frameName Name
-  function o:__CreateBarFrame(barIndex, frameName)
+  function o:__CreateBarFrame(barConf, barIndex, frameName)
     assert(barIndex and frameName, 'Frame and index missing.')
     --- @alias ABP_BarFrameObj_2_0 ABP_BarFrameObjImpl_2_0 | FrameObj
     --
@@ -227,29 +228,21 @@ local function PropsAndMethods()
     --t2('CreateBarFrame', 'n=' .. frameName .. ' fL=' .. f:GetFrameLevel())
     --- @class ABP_BarFrameObjWidget_2_0
     local __widget = {
-      index        = barIndex,
-      frameStrata  = 'MEDIUM',
-      frameLevel   = 1,
+      index = barIndex,
       --- @type ActionBarFrame
-      frame        = f,
-      --- @type FrameHandle
-      frameHandle  = nil,
-      rendered     = false,
-      --- @type table<number, ButtonUI>
-      buttonFrames = {}
+      frame = f,
     }
     f.widget = __widget
-    
     f:Show()
     
     return f
   end
   
+  --- @param barConf ButtonConfig_ABP_2_0 The frame index
   --- @param barIndex Index
   --- @param barFrame ActionBarFrame
-  function o:__CreateButtons(barFrame, barIndex)
+  function o:__CreateButtons(barConf, barFrame, barIndex)
     --local cfg = P:GetBar(barIndex)
-    local barConf = cns:a():p().bars[barIndex]
     local ui = barConf.ui
     pd('ui=', ui)
     
