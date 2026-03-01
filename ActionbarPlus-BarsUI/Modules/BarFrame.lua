@@ -30,15 +30,15 @@ local function PropsAndMethods()
     --[[-----------------------------------------------------------------------------
     Mixin Methods
     -------------------------------------------------------------------------------]]
-    function o:OnLoad()
-        --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
-        self:RegisterForDrag("LeftButton")
-        
-        --self:SetScript("OnUpdate", function(frame)
-        --    frame:SetScript("OnUpdate", nil)
-        --    frame:InitSecure()
-        --end)
-    end
+  function o:OnLoad()
+    --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
+    self:RegisterForDrag("LeftButton")
+    
+    --self:SetScript("OnUpdate", function(frame)
+    --    frame:SetScript("OnUpdate", nil)
+    --    frame:InitSecure()
+    --end)
+  end
     
     function o:InitSecure()
         p('xx InitSecure')

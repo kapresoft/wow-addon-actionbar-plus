@@ -3,6 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+local cns = ns:cns()
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -148,9 +149,12 @@ local function PropsAndMethods()
       return consumerFn and consumerFn(_G[frameName])
     end
     
+    local barConf = cns:a():p().bars[barIndex]
+    local ui = barConf.ui
+    
     local cfg = Profile_Bar_Config
-    local cols = cfg.widget.colSize
-    local rows = cfg.widget.rowSize
+    local cols = ui.colSize
+    local rows = ui.rowSize
     local size = cfg.widget.buttonSize
     local spacing = lcfg.spacing
     
@@ -245,10 +249,16 @@ local function PropsAndMethods()
   --- @param barFrame ActionBarFrame
   function o:__CreateButtons(barFrame, barIndex)
     --local cfg = P:GetBar(barIndex)
+    local barConf = cns:a():p().bars[barIndex]
+    local ui = barConf.ui
+    pd('ui=', ui)
+    
     local cfg = Profile_Bar_Config
     local btnSize = cfg.widget.buttonSize
-    local cols = cfg.widget.colSize
-    local rows = cfg.widget.rowSize
+    --local cols = cfg.widget.colSize
+    --local rows = cfg.widget.rowSize
+    local cols = ui.colSize
+    local rows = ui.rowSize
     local btnCount = rows * cols
     pd(('CreateButtons:: btnCount=%s btnTemplate=%s'):format(btnCount, ns.buttonTemplate))
     local buttons = {}

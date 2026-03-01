@@ -152,7 +152,6 @@ Mixin Methods
 --- @type ABP_ButtonMixin_2_0_3 | ABP_Button_2_0_3
 local o = S
 
-
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
   self:SetID(NextSeedID())
@@ -290,6 +289,7 @@ function o:OnReceiveDrag()
     cursor:IfSpell(function(spell)
       p('OnReceiveDrag:: spell=', spell)
       self:__SetSpell(spell.spellID)
+      --local btnc = ABP_Core_2_0:c(self:GetIndex())
     end)
   end
   

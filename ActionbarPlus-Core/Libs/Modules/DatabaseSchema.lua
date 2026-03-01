@@ -56,7 +56,7 @@ Type Definitions
 --  ================================================
 --- @class ProfileData_ABP_2_0 : RootConfigData_ABP_2_0
 --  ================================================
---- @class DatabaseSchemaDefinition_ABP_2_0
+--- @class DatabaseObj_ABP_2_0 : AceDBObject_3_0
 --- @field global GlobalData_ABP_2_0
 --- @field profile ProfileData_ABP_2_0
 --- @field char table|nil
@@ -77,7 +77,7 @@ Schema
 ---------------------------------------------------------------------]]
 local DB_VERSION = 1
 
---- @type DatabaseSchemaDefinition_ABP_2_0
+--- @type DatabaseObj_ABP_2_0
 local DEFAULT_DB = {
   global = { schemaVersion = DB_VERSION, bars = {} },
   
@@ -105,7 +105,7 @@ local DEFAULT_DB = {
         showButtonIndex           = false,
         ui = { -- Appearance (bar-specific)
           rowSize                 = 2,
-          colSize                 = 6,
+          colSize                 = 5,
           buttonSize              = 40,
           alpha                   = 0.8,
           showEmptyButtons        = true,
@@ -145,10 +145,10 @@ local o = S
 --[[-------------------------------------------------------------------
 Default Database
 ---------------------------------------------------------------------]]
---- @return DatabaseSchemaDefinition_ABP_2_0
+--- @return DatabaseObj_ABP_2_0
 function o:GetDefaultDatabase() return Table.DeepCopy(DEFAULT_DB) end
 
---- @param db DatabaseSchemaDefinition_ABP_2_0
+--- @param db DatabaseObj_ABP_2_0
 --- @return number
 function o:GetVersion(db)
   assert(type(db) == "table", "GetVersion:: db is required.")
