@@ -32,7 +32,11 @@ local function ri() return O.RangeIndicatorController  end
 local function TargetUnitIsSameAsMouseOver()
     local targetGUID = UnitGUID("target")
     local mouseoverGUID = UnitGUID("mouseover")
-    return targetGUID ~= nil and targetGUID == mouseoverGUID
+    local ok, result = pcall(function()
+        return targetGUID ~= nil and targetGUID == mouseoverGUID
+    end)
+    if not ok then return false end
+    return result
 end
 
 --[[-----------------------------------------------------------------------------
