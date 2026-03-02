@@ -214,16 +214,17 @@ local function Methods(o)
         self:InitGlobalButtonConfigAnchor(g, barConfName)
         return g.bars[barConfName]
     end
-
-    --- @param g Global_Profile_Config
-    --- @param barConfName string
-    function o:InitGlobalButtonConfigAnchor(g, barConfName)
-        local defaultBars = DEFAULT_PROFILE_DATA.bars
-        --- @type Global_Profile_Bar
-        local btnConf = g.bars[barConfName]
-        btnConf.anchor = shallow_copy(defaultBars[barConfName].anchor)
-        return btnConf.anchor
-    end
+  
+  --- @param g Global_Profile_Config
+  --- @param barConfName string
+  function o:InitGlobalButtonConfigAnchor(g, barConfName)
+    local defaultBars = DEFAULT_PROFILE_DATA.bars
+    --- @type Global_Profile_Bar
+    local btnConf = g.bars[barConfName]
+    btnConf.anchor = { point="CENTER", relativeTo=nil,
+                       relativePoint='CENTER', x=0.0, y=0.0 }
+    return btnConf.anchor
+  end
 
     --- DEFAULT_PROFILE_DATA is initialized in #InitDefaultProfileData()
     --- @param barConfNameSupplierFn BarConfNameSupplierFn | "function(barIndex) return 'barName' end"
