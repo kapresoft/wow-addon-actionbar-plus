@@ -118,6 +118,13 @@ function ns:db() return self.addonDbFn() end
 
 --- @return ABP_Core_2_0
 function ns:a() return ABP_Core_2_0 end
+--- @return ProfileConfig_ABP_2_0
+function ns:p() return self:a():p() end
+--- @return GlobalConfig_ABP_2_0
+function ns:g() return self:a():g() end
+--- @param index Index
+--- @return BarConfig_ABP_2_0
+function ns:bars(index) return self:p().bars[index] end
 
 --- @param tracer EventTracePrinter_ABP_2_0
 function ns:RegisterTracer(tracer)
@@ -169,7 +176,7 @@ function ns:traceFn(prefix)
   return function(...) return self.tracer:t(strtrim(prefix), ...) end
 end
 
---- @param prefix string|any
+--- @param prefix string|nil
 --- @return ABP_2_0_TraceFnFormatted @Printer function that outputs formatted values to Blizzard Trace UI (like print)
 function ns:traceFnWithFormatting(prefix)
   if type(prefix) ~= 'string' then

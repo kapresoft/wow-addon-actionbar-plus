@@ -88,9 +88,6 @@
             <OnDragStop>self:OnDragStop()</OnDragStop>
             <OnSizeChanged>self:OnSizeChanged()</OnSizeChanged>
         </Scripts>
-        <Frames>
-            <Button parentKey="handler" inherits="SecureHandlerBaseTemplate" hidden="true"/>
-        </Frames>
     </Frame>
 
 </Ui>

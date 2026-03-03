@@ -39,6 +39,7 @@ local seedID = 1000
 New Instance
 -------------------------------------------------------------------------------]]
 --- @alias ABP_Button_2_0_3 ABP_ButtonMixin_2_0_3 | SecureCheckButtonObj | AceEvent_3_0
+--- @alias ABP_Button_2_X ABP_Button_2_0_3 @Use this externally so we don't have to rename if we use a different button
 --
 --
 --- @class ABP_ButtonMixin_IconFrame_2_0_3

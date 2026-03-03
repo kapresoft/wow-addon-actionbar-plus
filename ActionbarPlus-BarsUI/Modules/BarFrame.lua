@@ -67,21 +67,22 @@ local function PropsAndMethods()
                 ]]
         )
     end
-
-    function o:OnDragStart()
-        self._originalLevel = self:GetFrameLevel()
-        self:SetFrameLevel(self._originalLevel + 100)
-        self:StartMoving()
+  
+  function o:OnDragStart()
+    if InCombatLockdown() then return end
+    self._originalLevel = self:GetFrameLevel()
+    self:StartMoving()
+  end
+  function o:OnDragStop()
+    if InCombatLockdown() then return end
+    self:StopMovingOrSizing()
+    if self._originalLevel then
+      self:SetFrameLevel(self._originalLevel)
+      self._originalLevel = nil
     end
-    function o:OnDragStop()
-        self:StopMovingOrSizing()
-        if self._originalLevel then
-            self:SetFrameLevel(self._originalLevel)
-            self._originalLevel = nil
-        end
-    end
-    function o:OnSizeChanged()
-        ns.O.Backdrops:ApplyDefaultBackdrop(self)
-    end
+  end
+  function o:OnSizeChanged()
+    ns.O.Backdrops:ApplyDefaultBackdrop(self)
+  end
 
 end; PropsAndMethods()

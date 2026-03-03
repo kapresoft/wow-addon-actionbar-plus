@@ -125,34 +125,24 @@ local DEFAULT_BAR = {
   enabled                   = true,
   showKeybindText           = true,
   showButtonIndex           = false,
-  ui = {                    -- BarUIConfig_ABP_2_0
+  -- BarUIConfig_ABP_2_0
+  ui = {
     rowSize                 = 2,
     colSize                 = 5,
     alpha                   = 0.8,
     showEmptyButtons        = true,
     frameHandleMouseover    = false,
     frameHandleAlpha        = 1.0,
-    padding = {
-      left = 4,
-      right = 4,
-      top = 4,
-      bottom = 4,
-    },
+    -- PaddingConfig_ABP_2_0
+    padding = { left = 5, right = 5, top = 5, bottom = 5, },
+    -- BarButtonUIConfig_ABP_2_0
     button = {
       size = 40,
-      spacing = {
-        horizontal = 2,
-        vertical = 2,
-      },
+      spacing = { horizontal = 3, vertical = 3, },
     },
   },
-  anchor = { -- Anchor (same as V1)
-    point                   = "CENTER",
-    relativePoint           = "CENTER",
-    x                       = 0,
-    y                       = 0,
-    relativeTo              = nil,
-  },
+  -- Anchor (same as V1)
+  anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },
 }
 
 --[[-----------------------------------------------------------------------------
