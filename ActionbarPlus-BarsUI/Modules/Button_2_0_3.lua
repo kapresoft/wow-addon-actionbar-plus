@@ -25,10 +25,12 @@ local ns = select(2, ...)
 ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 --- @type Namespace_ABP_2_0 - Core Namespace
 local cns = ns:cns()
---- @type Compat_ABP_2_0
-local comp = cns.O.Compat
-local unit, dru = cns.O.UnitUtil, cns.O.DruidUtil
+local O = cns.O
+local comp, spu, unit, dru = O.Compat, O.SpellUtil, O.UnitUtil, O.DruidUtil
 local Str_IsAnyOf = cns.Str_IsAnyOf
+
+--- @type Color
+local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 
 --- @type ABP_ButtonStateMixin_2_0_3
 local buttonState = ns.__ButtonState;
@@ -257,10 +259,36 @@ function o:PostClick(button, down)
   -- todo move to ButtonStates#Btn_OnSpellCast
 end
 
-function o:OnEnter() self:ClearAttributeSavedType() end
+function o:OnEnter()
+  self:ClearAttributeSavedType()
+  
+  local type, id = self:GetActionInfo()
+  if not id then return end
+  --todo: GameTooltip owner will be user configurable
+  --GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+  GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+  GameTooltip:ClearAllPoints()
+  GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
+  
+  --- @type FontStringObj
+  local right = _G["GameTooltipTextRight1"]
+  
+  if type == t.spell then
+    GameTooltip:SetSpellByID(id)
+    local rank = spu:GetHighestSpellRank(id)
+    if right and rank then
+      right:SetText(rank);
+      right:SetTextColor(rankColor:GetRGBA())
+      right:Show()
+    end
+    GameTooltip:Show()
+  end
+end
+
 function o:OnLeave()
   --p('xx OnLeave')
   self:RestoreAttributeType()
+  GameTooltip:Hide()
 end
 
 --- @param button ButtonName

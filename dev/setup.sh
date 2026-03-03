@@ -64,4 +64,5 @@ _Release() {
     }
 }
 
+# Usage: ./dev/setup or ./dev/setup v2
 _Release $*
