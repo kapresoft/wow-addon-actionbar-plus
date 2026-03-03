@@ -144,7 +144,7 @@ function o:OnEvent(evt, ...)
       if (unit == "player" and btn:MatchesActiveButtonSpellID(spellID)) then
         comp:IfSpell(spellID, function(spell)
           local sp = ('%s(%s)'):format(spellID, spell.name)
-          p('OnEvent():: matches spellID=', sp, 'evt=', evt)
+          --p('OnEvent():: matches spellID=', sp, 'evt=', evt)
         end)
         btn:OnEvent(evt, ...);
       end
