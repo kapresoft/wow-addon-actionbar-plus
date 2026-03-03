@@ -41,8 +41,9 @@ local function GetSpellsForTesting()
     ['PALADIN'] = {
       [1000] = 'judgement',
       [1001] = 'holy light(rank 1)',
-      [1002] = 'seal of the crusader(rank 1)',
-      [1003] = 'arcane torrent',
+      [1002] = 'seal of the crusader',
+      [1005] = 'mana tap',
+      [1006] = 'arcane torrent',
     }
   }
   if cns:IsMainLine() then
