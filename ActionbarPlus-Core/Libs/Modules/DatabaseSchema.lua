@@ -6,7 +6,8 @@ local ns = select(2, ...)
 local unit = ns.O.UnitUtil
 
 --- @type Kapresoft_Table_2_0
-local Table = LibStub('Kapresoft-Table-2.0')
+local Table = LibStub('Kapresoft-Table-2-0')
+local tbl_DeepCopy = Table.DeepCopy
 
 local MAX_BAR_COUNT = 10
 
@@ -156,7 +157,7 @@ Default Database
 ---------------------------------------------------------------------]]
 --- @return DatabaseObj_ABP_2_0
 function o:GetDefaultDatabase()
-  local db = Table.DeepCopy(DEFAULT_DB)
+  local db = tbl_DeepCopy(DEFAULT_DB)
   
   for barIndex = 1, MAX_BAR_COUNT do
     db.profile.bars[barIndex] = self:CreateDefaultBar(barIndex)
@@ -174,7 +175,7 @@ function o:CreateDefaultBar(barIndex)
   assert(type(barIndex) == "number", "CreateDefaultBar(barIndex):: barIndex must be number")
 
   --- @type BarConfig_ABP_2_0
-  local bar = Table.DeepCopy(DEFAULT_BAR)
+  local bar = tbl_DeepCopy(DEFAULT_BAR)
 
   -- Clear buttons to avoid copying seeded defaults
   

@@ -40,9 +40,9 @@ local function GetSpellsForTesting()
     },
     ['PALADIN'] = {
       [1000] = 'judgement',
-      [1001] = 'holy light(rank 1)',
+      [1001] = 'seal of righteousness',
       [1002] = 'seal of the crusader',
-      [1003] = 'seal of righteousness',
+      [1003] = 'flash of light(rank 1)',
       [1005] = 'mana tap',
       [1006] = 'arcane torrent',
     }
