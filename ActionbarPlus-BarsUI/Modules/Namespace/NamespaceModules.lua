@@ -1,11 +1,8 @@
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 
---[[-------------------------------------------------------------------
-Local Vars
----------------------------------------------------------------------]]
---- @type Kapresoft_LibUtil_Module
-local LibModule = LibStub('Kapresoft-LibModule-1.0')
+--- @type Kapresoft_ModuleUtil_2_0
+local ModuleUtil = LibStub('Kapresoft-ModuleUtil-2-0')
 
 --[[-----------------------------------------------------------------------------
 Type: Modules
@@ -19,6 +16,5 @@ local ModuleNames = {
   --- @type BarModuleFactory_2_0
   BarModuleFactory = {},
   
-  
-}; LibModule.EnrichModules(ModuleNames); ns.M = ModuleNames
+}; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

@@ -5,7 +5,7 @@ local ns = select(2, ...)
 Local Vars
 ---------------------------------------------------------------------]]
 --- @type Kapresoft_LibUtil_LibModule
-local LibModule = LibStub('Kapresoft-LibModule-1.0')
+local ModuleUtil = LibStub('Kapresoft-ModuleUtil-2-0')
 
 --[[-----------------------------------------------------------------------------
 Type: Modules
@@ -18,6 +18,9 @@ local ModuleNames = {
   
   --- @type Compat_ABP_2_0
   Compat = {},
+  
+  --- @type SpellUtil_ABP_2_0
+  SpellUtil = {},
   
   --- @type UnitUtil_ABP_2_0
   UnitUtil = {},
@@ -52,5 +55,5 @@ local ModuleNames = {
   --- @type AceDB_3_0
   AceDB     = {},
   
-}; LibModule.EnrichModules(ModuleNames); ns.M = ModuleNames
+}; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

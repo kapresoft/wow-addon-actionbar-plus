@@ -18,9 +18,11 @@
     <!--@non-debug@
     <Include file="Ace3.xml"/>
     @end-non-debug@-->
-    <Script file='Libs\Kapresoft-LibUtil\Lib-2.0\String.lua'/>
-    <Script file='Libs\Kapresoft-LibUtil\Lib-2.0\Table.lua'/>
-    <Include file='Libs\Kapresoft-LibUtil\_Lib.xml'/>
+
+    <Script file='Libs\Kapresoft-LibUtil\Lib-2-0\ModuleUtil.lua'/>
+    <Script file='Libs\Kapresoft-LibUtil\Lib-2-0\AceLocaleUtil.lua'/>
+    <Script file='Libs\Kapresoft-LibUtil\Lib-2-0\String.lua'/>
+    <Script file='Libs\Kapresoft-LibUtil\Lib-2-0\Table.lua'/>
     <Include file='LibPrettyPrint.xml'/>
 
 </Ui>

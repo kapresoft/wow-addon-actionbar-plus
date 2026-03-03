@@ -3,6 +3,7 @@
 
     <Script file="APIConstants.lua" />
     <Script file="Compat.lua" />
+    <Script file="SpellUtil.lua" />
     <Script file="UnitUtil.lua"/>
     <Script file="DruidUtil.lua"/>
     <Script file="PriestUtil.lua"/>
