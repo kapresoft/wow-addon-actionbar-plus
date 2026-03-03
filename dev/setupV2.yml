@@ -43,6 +43,8 @@ ignore:
   - ThirdParty-Libs/LibPrettyPrint/*.toc
   - ThirdParty-Libs/Kapresoft-LibUtil/dev
   - ThirdParty-Libs/Kapresoft-LibUtil/External
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib
+  - ThirdParty-Libs/Kapresoft-LibUtil/_Lib.xml
 
 # Base path is .release/; Moves Libs to the folder above .release and into
 # the project folders
