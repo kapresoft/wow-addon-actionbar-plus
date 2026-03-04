@@ -67,7 +67,7 @@ Type Definitions
 --- @field showKeybindText boolean               -- Show keybind text on buttons
 --- @field showButtonIndex boolean               -- Show button index overlay
 --- @field anchor Anchor                         -- Frame anchor definition
---- @field buttons table<number, table<number, ButtonConfig_ABP_2_0>>
+--- @field buttons table<string, table<string, ButtonConfig_ABP_2_0>> -- i.e., buttons['b1']
 --- @field ui BarUIConfig_ABP_2_0                -- Visual/layout configuration
 --  ================================================
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
@@ -90,6 +90,35 @@ local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, pd, t, tf = ns:log(libName)
+--[[-------------------------------------------------------------------
+Support Functions
+---------------------------------------------------------------------]]
+--- @param barIndex Index
+--- @return string
+local function barKey(barIndex)
+  assert(type(barIndex) == 'number', 'barKey(barIndex):: expected a numeric index.')
+  return 'bar_' .. barIndex
+end
+
+--- @param btnIndex Index
+--- @return string
+local function buttonKey(btnIndex)
+  assert(type(btnIndex) == 'number', 'buttonKey(btnIndex):: expected a numeric index.')
+  return 'btn_' .. btnIndex
+end
+
+--- @param specGroupIndex Index
+--- @return string
+local function specGroupKey(specGroupIndex)
+  assert(type(specGroupIndex) == 'number', 'buttonKey(activeSpecGroup):: expected a numeric index.')
+  return 'spg_' .. specGroupIndex
+end
+
+S.Util = {
+  barKey = barKey,
+  buttonKey = buttonKey,
+  specGroupKey = specGroupKey
+}
 
 --[[-------------------------------------------------------------------
 Schema
@@ -144,6 +173,13 @@ local DEFAULT_BAR = {
   },
   -- Anchor (same as V1)
   anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },
+  
+  --buttons = {
+  --  ['btn1'] = {
+  --    ['spec1'] = {},
+  --    ['spec2'] = {},
+  --  }
+  --}
 }
 
 --[[-----------------------------------------------------------------------------
@@ -160,7 +196,8 @@ function o:GetDefaultDatabase()
   local db = tbl_DeepCopy(DEFAULT_DB)
   
   for barIndex = 1, MAX_BAR_COUNT do
-    db.profile.bars[barIndex] = self:CreateDefaultBar(barIndex)
+    local key = barKey(barIndex)
+    db.profile.bars[key] = self:CreateDefaultBar(barIndex)
   end
   
   return db
@@ -186,11 +223,14 @@ function o:CreateDefaultBar(barIndex)
   bar.buttons = {}
   local specIndex = unit:GetActiveSpecGroupIndex()
   for btnIndex = 1, totalButtons do
-    bar.buttons[btnIndex] = {}
-    bar.buttons[btnIndex][specIndex] = {}
+    local key, specKey = buttonKey(btnIndex), specGroupKey(specIndex)
+    bar.buttons[key] = {}
+    bar.buttons[key][specKey] = {}
   end
   return bar
 end
+
+function o:GetBar(barIndex) end
 
 --- @param actionType string @spell, item, equipmentset, etc...
 --- @param action number|string @If 'spell', then the spell name or id, etc...

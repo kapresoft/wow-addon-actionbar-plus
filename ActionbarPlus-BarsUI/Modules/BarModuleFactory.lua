@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
+local tbl_IsEmpty = cns.O.Table.IsEmpty
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -53,16 +54,19 @@ Support Functions
 ---------------------------------------------------------------------]]
 local function barName(index) return ('ABP_2_0_F%s'):format(index) end
 local function moduleName(index) return ('ABP_2_0_F%sModule'):format(index) end
+--- ABP_2_0_F1Button1, ABP_2_0_F1Button2, etc...
+--- @return string, string Button name and button parent key
 local function btnName(barIndex, btnIndex)
-  return ('ABP_2_0_F%sButton%s'):format(barIndex, btnIndex)
+  local parentKey = ('Button%s'):format(btnIndex)
+  return ('ABP_2_0_F%s%s'):format(barIndex, parentKey), parentKey
 end
 --[[-------------------------------------------------------------------
 Mixin: BarFrameObjWidgetMixin_2_0
 ---------------------------------------------------------------------]]
 --- @class BarFrameObjWidgetMixin_2_0
 --- @field index Index
---- @field frame ABP_BarFrameObj_2_0
---- @field buttons table<number, ABP_Button_2_X>
+--- @field frame ABP_BarFrameObj_ABP_2_0
+--- @field buttons table<number, Button_ABP_2_0_X>
 local BarFrameObjWidgetMixin = {}
 
 local function BarFrameWidgetMethods()
@@ -70,7 +74,7 @@ local function BarFrameWidgetMethods()
   --- @type BarFrameObjWidgetMixin_2_0
   local wm = BarFrameObjWidgetMixin
   
-  ---@param frame ABP_BarFrameObj_2_0
+  ---@param frame ABP_BarFrameObj_ABP_2_0
   function wm:Init(frame, index)
     assert(type(frame) == 'table' and strlower(frame:GetObjectType()) == 'frame',
             'BarFrameObjWidgetMixin::Init(frame, index):: Param frame is expected to be a Frame.')
@@ -82,11 +86,45 @@ local function BarFrameWidgetMethods()
   --- @return Index
   function wm:GetIndex() return self.index end
   
-  --- @return ABP_BarFrameObj_2_0
+  --- @return ABP_BarFrameObj_ABP_2_0
   function wm:GetFrame() return self.frame end
+  
+  function wm:GetDebugName()
+    return ('%s(Widget):: index=%s')
+            :format(self.frame:GetName(), self.index)
+  end
+
 
 end; BarFrameWidgetMethods()
 
+--[[-------------------------------------------------------------------
+Mixin: BarFrameObjWidgetMixin_2_0
+---------------------------------------------------------------------]]
+--- @alias ButtonWidget_ABP_2_0 ButtonWidgetMixin_ABP_2_0
+--
+--- @class ButtonWidgetMixin_ABP_2_0
+--- @field button Button_ABP_2_0_X
+--- @field index Index The button index
+--- @field barIndex Index The owner frame index
+local ButtonWidgetMixin = {}
+local function ButtonWidgetMixinMethods()
+  
+  --- @type ButtonWidgetMixin_ABP_2_0
+  local bw = ButtonWidgetMixin
+  
+  --- @param btn Button_ABP_2_0_X
+  --- @param btnIndex Index
+  --- @param parentFrameIndex Index
+  function bw:Init(btn, btnIndex, parentFrameIndex)
+    self.button = btn
+    self.index = btnIndex
+    self.barIndex = parentFrameIndex
+  end
+  function bw:GetDebugName()
+    return ('%s(Widget):: index=%s frameIndex=%s')
+            :format(self.button:GetName(), self.index, self.barIndex)
+  end
+end; ButtonWidgetMixinMethods()
 
 --[[-------------------------------------------------------------------
 BarModuleProto
@@ -176,7 +214,8 @@ local function PropsAndMethods()
     -- if the frame is already created, return that frame instance
     if _G[frameName] then return consumerFn and consumerFn(_G[frameName]) end
     
-    local barConf = cns:bars(barIndex)
+    --local barConf = cns:bars(barIndex)
+    local barConf = cns:a():bar(barIndex)
     local ui = barConf.ui
     
     local cols = ui.colSize
@@ -185,7 +224,7 @@ local function PropsAndMethods()
     --local spacing = lcfg.spacing
     local spacing = ui.button.spacing
     
-    --- @type ABP_BarFrameObj_2_0
+    --- @type ABP_BarFrameObj_ABP_2_0
     local frame = self:__CreateBarFrame(barConf, barIndex, frameName)
     local buttons = self:__CreateButtons(barConf, frame, barIndex)
     frame.widget.buttons = buttons
@@ -246,21 +285,20 @@ local function PropsAndMethods()
     return consumerFn and consumerFn(frame)
   end
   
+  --- Bar name: ABP_2_0_F{INDEX}, i.e. ABP_2_0_F1, ABP_2_0_F2, ...
   --- @param barConf ButtonConfig_ABP_2_0 The frame index
   --- @param barIndex Index The frame index
   --- @param frameName Name The frame name
-  --- @return ActionBarFrame
-  --- @param frameName Name
-  --- @return ABP_BarFrameObj_2_0
+  --- @return ABP_BarFrameObj_ABP_2_0
   function o:__CreateBarFrame(barConf, barIndex, frameName)
     assert(barIndex and frameName, 'Frame and index missing.')
-    --- @alias ABP_BarFrameObj_2_0 ABP_BarFrameObjImpl_2_0 | FrameObj
+    --- @alias ABP_BarFrameObj_ABP_2_0 ABP_BarFrameObjImpl_ABP_2_0 | FrameObj
     --
-    --- @class ABP_BarFrameObjImpl_2_0 : ABP_BarFrameMixin_2_0_1
+    --- @class ABP_BarFrameObjImpl_ABP_2_0 : BarFrameMixin_ABP_2_0_1
     --- @field widget ABP_BarFrameObjWidget_2_0
     local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1")
     
-    --- @type ABP_BarFrameObjImpl_2_0 | ABP_BarFrameObj_2_0
+    --- @type ABP_BarFrameObjImpl_ABP_2_0 | ABP_BarFrameObj_ABP_2_0
     local f = barFrame
     f:SetParentKey(frameName)
     f:SetFrameLevel(barIndex)
@@ -274,29 +312,32 @@ local function PropsAndMethods()
   
   --- @param barConf BarConfig_ABP_2_0 The frame index
   --- @param barIndex Index
-  --- @param barFrame ActionBarFrame
-  --- @return table<number, ABP_Button_2_X>
+  --- @param barFrame ABP_BarFrameObj_ABP_2_0
+  --- @return table<number, Button_ABP_2_0_X>
   function o:__CreateButtons(barConf, barFrame, barIndex)
-    --local cfg = P:GetBar(barIndex)
     local ui = barConf.ui
-    
-    local cfg = Profile_Bar_Config
-    --local btnSize = cfg.widget.buttonSize
-    --local cols = cfg.widget.colSize
-    --local rows = cfg.widget.rowSize
-    local cols = ui.colSize
-    local rows = ui.rowSize
+    local cols, rows = ui.colSize, ui.rowSize
     local btnCount = rows * cols
-    --pd('CreateButtons:: btn.size=', btnSize)
-    --pd(('CreateButtons:: btnCount=%s btnTemplate=%s'):format(btnCount, ns.buttonTemplate))
     
-    --- @type table<number, ABP_Button_2_X>
+    --- @type table<number, Button_ABP_2_0_X>
     local buttons = {}
     for i = 1, btnCount do
-      local btnName = btnName(barIndex, i)
-      --- @type CheckButton
+      local btnName, btnKey = btnName(barIndex, i)
+      --- @type Button_ABP_2_0_X
       local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate)
-      --btn:SetSize(btnSize, btnSize)
+      btn:SetParentKey(btnKey)
+      btn.widget = CreateAndInitFromMixin(ButtonWidgetMixin, btn, i, barIndex)
+      local bc = btn:GetButtonConfig()
+      if not tbl_IsEmpty(bc) then
+        pd('CreateButtons:: button=', btnName, 'bc=', fmt(bc))
+        if bc.type and bc.id then
+          btn:SetAttribute('type', bc.type)
+          btn:SetAttribute(bc.type, bc.id)
+        end
+      else
+        --ABP_ButtonTestData:AddTestData(btn)
+      end
+      
       table.insert(buttons, btn)
     end
     

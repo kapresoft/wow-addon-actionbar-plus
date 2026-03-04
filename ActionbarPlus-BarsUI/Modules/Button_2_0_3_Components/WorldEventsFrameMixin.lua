@@ -38,9 +38,9 @@ local p, pd, t, tf = ns:log('WorldEventsFrame')
 
 --- =======================================================
 --- Buttons register/unregister here to receive world/environment-level events.
---- @see ABP_Button_2_0_3#OnLoad
+--- @see Button_ABP_2_0_3#OnLoad
 --- @class ButtonEventsFrameMixin_ABP_2_0
---- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+--- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
 WorldEventsFrameMixin_ABP_2_0 = {};
 --
 --- @alias WorldEventsFrame_ABP_2_0 ButtonEventsFrameMixin_ABP_2_0 | FrameObj
@@ -81,14 +81,14 @@ function o:OnCountdownForCooldownsChanged()
 end
 
 --- Unregister when bar modules are enabled
---- @param frame ABP_Button_2_0_3
+--- @param frame Button_ABP_2_0_3
 function o:RegisterFrame(frame) self.frames[frame] = frame end
 
 --- Unregister when bar modules are disabled
---- @param frame ABP_Button_2_0_3
+--- @param frame Button_ABP_2_0_3
 function o:UnregisterFrame(frame) self.frames[frame] = nil end
 
---- @param func fun(frame:ABP_Button_2_0_3):void
+--- @param func fun(frame:Button_ABP_2_0_3):void
 function o:ForEachFrame(func)
   for k, frame in pairs(self.frames) do func(frame); end
 end

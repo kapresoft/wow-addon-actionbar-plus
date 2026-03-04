@@ -13,10 +13,10 @@ BarFrame (secure)
 -------------------------------------------------------------------------------]]
 --
 --
-local libName = 'ABP_BarFrameMixin_2_0_1'
---- @class ABP_BarFrameMixin_2_0_1 : Frame
+local libName = 'BarFrameMixin_ABP_2_0_1'
+--- @class BarFrameMixin_ABP_2_0_1 : Frame
 --- @field _originalLevel number
-local S = {}; ABP_BarFrameMixin_2_0_1 = S
+local S = {}; BarFrameMixin_ABP_2_0_1 = S
 local p, pd, t, tf = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ Methods
 -------------------------------------------------------------------------------]]
 local function PropsAndMethods()
 
-    --- @type ABP_BarFrameMixin_2_0_1 | ABP_BarFrameObj_2_0
+    --- @type BarFrameMixin_ABP_2_0_1 | ABP_BarFrameObj_ABP_2_0
     local o = S
     
     --[[-----------------------------------------------------------------------------

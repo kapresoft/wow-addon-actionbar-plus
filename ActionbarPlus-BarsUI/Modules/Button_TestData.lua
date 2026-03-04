@@ -58,9 +58,8 @@ local function GetSpellsForTesting()
   return spells
 end; local testSpells = GetSpellsForTesting()
 
---- @param isInitialLogin boolean
---- @param btn ABP_Button_2_0_3
-function o:AddTestData(isInitialLogin, btn)
+--- @param btn Button_ABP_2_0_3
+function o:AddTestData(btn)
   if not testSpells then return end
   local characterSpells = testSpells[unit:GetPlayerUnitClass()]
   if not characterSpells then return end
@@ -69,6 +68,8 @@ function o:AddTestData(isInitialLogin, btn)
   local spellName = characterSpells[id]
   if not spellName then return end
   
+  local type, id = btn:GetActionInfo()
+  if id then return end
   -- Setting attribute will call button:UpdateAction()
   btn:SetAttribute('type', 'spell')
   btn:SetAttribute('spell', spellName)

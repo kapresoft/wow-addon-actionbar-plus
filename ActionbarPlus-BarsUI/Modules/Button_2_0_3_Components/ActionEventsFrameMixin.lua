@@ -44,7 +44,7 @@ Mixin
 ---------------------------------------------------------------------]]
 --- =======================================================
 --- @class ActionEventsFrameMixin_ABP_2_0
---- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+--- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
 ActionEventsFrameMixin_ABP_2_0 = {};
 --
 --- @alias ActionEventsFrame_ABP_2_0 ActionEventsFrameMixin_ABP_2_0 | FrameObj
@@ -130,7 +130,7 @@ function o:OnEvent(evt, ...)
       self.tooltipOwner:SetTooltip();
     end
   elseif ( self:IsSpellcastEvent(evt) ) then
-    ---@param btn ABP_Button_2_0_3
+    ---@param btn Button_ABP_2_0_3
     for k, btn in pairs(self.frames) do
       local spellID;
       local unit = ...;
@@ -156,10 +156,10 @@ function o:OnEvent(evt, ...)
   end
 end
 
---- @param frame ABP_Button_2_0_3
+--- @param frame Button_ABP_2_0_3
 function o:RegisterFrame(frame) self.frames[frame] = frame; end
 
---- @param frame ABP_Button_2_0_3
+--- @param frame Button_ABP_2_0_3
 function o:UnregisterFrame(frame) self.frames[frame] = nil; end
 
 

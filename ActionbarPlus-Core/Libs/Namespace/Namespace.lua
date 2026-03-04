@@ -70,7 +70,7 @@ ns.printer = LibPrettyPrint:Printer({
 }, predicateFn)
 
 --[[-------------------------------------------------------------------
-Methods
+Ace3 Modules
 ---------------------------------------------------------------------]]
 do
   local obj = ns.O
@@ -94,6 +94,14 @@ do
     if targetObj then return self.O.AceBucket:Embed(targetObj) end
     return self.O.AceBucket:Embed({})
   end
+end
+--[[-------------------------------------------------------------------
+Kapresoft Modules
+---------------------------------------------------------------------]]
+do
+  local obj = ns.O
+  --- @type Kapresoft_Table_2_0
+  obj.Table = LibStub('Kapresoft-Table-2-0')
 end
 
 --- Register a Namespace Module
