@@ -6,7 +6,7 @@ Enable by:
 <Script file="Button_2_0_3.lua"/>
 <CheckButton name="ABP_ButtonTemplate_2_0_3"
              inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
-             mixin="ABP_ButtonMixin_2_0_3" virtual="true">
+             mixin="ButtonMixin_ABP_2_0_3" virtual="true">
     <Scripts>
         <OnLoad method="OnLoad"/>
     </Scripts>
@@ -40,25 +40,19 @@ local seedID = 1000
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @alias ABP_Button_2_0_3 ABP_ButtonMixin_2_0_3 | SecureCheckButtonObj | AceEvent_3_0
---- @alias ABP_Button_2_X ABP_Button_2_0_3 @Use this externally so we don't have to rename if we use a different button
+--- @alias Button_ABP_2_0_3 ButtonMixin_ABP_2_0_3 | ButtonConfigAccessor_ABP_2_0 | SecureCheckButtonObj | AceEvent_3_0
+--- @alias Button_ABP_2_0_X Button_ABP_2_0_3 @Use this externally so we don't have to rename if we use a different button
 --
---
---- @class ABP_ButtonMixin_IconFrame_2_0_3
---- @field icon TextureObj
---
-local libName = 'ABP_ButtonMixin_2_0_3'
---- @class ABP_ButtonMixin_2_0_3
+local libName = 'ButtonMixin_ABP_2_0_3'
+--- @class ButtonMixin_ABP_2_0_3
 --- @field __name Name The debug name
 --- @field icon TextureObj
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
---- @field GetParent fun(self:ABP_ButtonMixin_2_0_3) : ABP_BarFrameObj_2_0
-local S = cns:NewAceEvent();
-ABP_ButtonMixin_2_0_3 = S
+--- @field widget ButtonWidget_ABP_2_0
+--- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : ABP_BarFrameObj_ABP_2_0
+local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
-
-local spellType, itemType, equipmentsetType = 'spell', 'item', 'equipmentset'
 
 local actionType = 'type'
 local player = 'player'
@@ -107,7 +101,7 @@ local function ShouldFire(down)
   return down ~= true
 end
 
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 local function Btn_PickupAction(self)
   local type = self:GetAttributeType()
   if self:IsSpellType() then
@@ -118,7 +112,7 @@ local function Btn_PickupAction(self)
   end
 end
 
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 local function Btn_RegisterCallbacks(self)
   --self:RegisterEvent('MODIFIER_STATE_CHANGED')
   --self:RegisterEvent("CVAR_UPDATE")
@@ -152,13 +146,15 @@ end
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ABP_ButtonMixin_2_0_3 | ABP_Button_2_0_3
+--- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3 | ButtonConfigAccessor_ABP_2_0
 local o = S
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
   self:SetID(NextSeedID())
   self.__name = ('%s:%s'):format(self:GetName(), self:GetID())
+  
+  Mixin(self, ns.O.ButtonConfigAccessorMixin)
   
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
@@ -229,8 +225,6 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
     p('ActionButtonUseKeyDown=', GetCVarBool('ActionButtonUseKeyDown'))
   end
   if InCombatLockdown() then return end
-  
-  ABP_ButtonTestData:AddTestData(isInitialLogin, self)
 end
 
 --- @param button ButtonName
@@ -302,6 +296,7 @@ function o:OnDragStart(button)
   Btn_UpdateFlash(self)
   
   self:SetChecked(false)
+  self:ClearButtonConf()
 end
 
 function o:OnDragStop()
@@ -309,16 +304,31 @@ function o:OnDragStop()
   self:RestoreAttributeType()
 end
 
+--function o:__btnConfOrNew()
+--  local barIndex, btnIndex = self.widget.barIndex, self.widget.index
+--  local barConf = cns:a():bar(barIndex)
+--  return cns:a():buttonOrNew(barConf, btnIndex)
+--end
+
 function o:OnReceiveDrag()
   if InCombatLockdown() then return end
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   
+  local barIndex, btnIndex = self.widget.barIndex, self.widget.index
+  local barConf = cns:a():bar(barIndex)
+  --- @type ButtonConfig_ABP_2_0
+  local btnC = self:GetButtonConfig(true)
+  --local btnC = cns:a():buttonOrNew(barConf, btnIndex)
+  --local btnC = {}
+  self:pd('OnReceiveDrag', 'btnInd=', btnIndex, 'btnC=', btnC)
+  
   if cursor.type == 'spell' then
     cursor:IfSpell(function(spell)
       p('OnReceiveDrag:: spell=', spell)
       self:__SetSpell(spell.spellID)
-      --local btnc = ABP_Core_2_0:c(self:GetIndex())
+      btnC.type = t.spell
+      btnC.id = spell.spellID
     end)
   end
   

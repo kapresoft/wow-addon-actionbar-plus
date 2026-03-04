@@ -5,6 +5,7 @@
     <Script file="Backdrops.lua"/>
     <Script file="Button_2_0_3_Controllers/ButtonState.lua"/>
     <Script file="Button_2_0_3.lua"/>
+    <Script file="Button_2_0_3_Components/ButtonConfigAccessorMixin.lua"/>
     <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
@@ -46,7 +47,7 @@
 
     <CheckButton name="ABP_ButtonTemplate_2_0_3"
                  inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
-                 mixin="ABP_ButtonMixin_2_0_3" virtual="true">
+                 mixin="ButtonMixin_ABP_2_0_3" virtual="true">
         <Scripts>
             <OnLoad method="OnLoad"/>
             <PreClick method="PreClick"/>
@@ -81,7 +82,7 @@
         </Anchors>
     </Frame>
     <Frame name="ABP_BarFrameTemplate_2_0_1" inherits="ABP_BarFrameTemplate_2_0"
-           mixin="ABP_BarFrameMixin_2_0_1" hidden="true" virtual="true">
+           mixin="BarFrameMixin_ABP_2_0_1" hidden="true" virtual="true">
         <Scripts>
             <OnLoad>self:OnLoad()</OnLoad>
             <OnDragStart>self:OnDragStart()</OnDragStart>

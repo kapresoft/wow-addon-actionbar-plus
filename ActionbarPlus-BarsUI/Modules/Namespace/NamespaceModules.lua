@@ -15,6 +15,8 @@ local ModuleNames = {
   
   --- @type BarModuleFactory_2_0
   BarModuleFactory = {},
+  --- @type ButtonConfigAccessorMixin_ABP_2_0
+  ButtonConfigAccessorMixin = {},
   
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

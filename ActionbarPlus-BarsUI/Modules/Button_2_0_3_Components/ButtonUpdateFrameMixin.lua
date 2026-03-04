@@ -40,7 +40,7 @@ local p, pd, t, tf = ns:log('BarButtonUpdateFrameMixin')
 
 --- =======================================================
 --- @class ButtonUpdateFrameMixin_ABP_2_0
---- @field frames table<ABP_Button_2_0_3, ABP_Button_2_0_3>
+--- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
 ButtonUpdateFrameMixin_ABP_2_0 = {}
 --
 --- @alias ButtonUpdateFrame_ABP_2_0 ButtonUpdateFrameMixin_ABP_2_0 | FrameObj
@@ -61,5 +61,5 @@ function o:RegisterFrame(frame)
   self.frames[frame] = frame;
 end
 
---- @param frame ABP_Button_2_0_3
+--- @param frame Button_ABP_2_0_3
 function o:UnregisterFrame(frame) self.frames[frame] = nil; end

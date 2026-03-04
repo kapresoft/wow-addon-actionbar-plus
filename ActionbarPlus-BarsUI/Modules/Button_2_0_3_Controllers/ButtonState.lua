@@ -19,7 +19,7 @@ function o.Btn_IsDragAllowed()
 end
 
 --- Update the button's checked state
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 function o.Btn_UpdateState(self)
   local type = self:GetAttribute('type'); if not type then return end
   --p('type=', type)
@@ -44,7 +44,7 @@ function o.Btn_UpdateState(self)
   self:SetChecked(checked)
 end
 
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 --- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
 function o.Btn_OnSpellCast(self, event, unitTarget, ...)
   if unitTarget ~= "player" then return end
@@ -79,12 +79,12 @@ function o.Btn_OnSpellCast(self, event, unitTarget, ...)
   end
 end
 
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 function o.Btn_UpdateFlash(self)
 
 end
 
---- @param self ABP_Button_2_0_3
+--- @param self Button_ABP_2_0_3
 ---@param show boolean
 function o.Btn_OnTradeSkill(self, show)
   p(('%s[%s]:: show=%s'):format('OnTradeSkill', self:GetID(), tostring(show)))

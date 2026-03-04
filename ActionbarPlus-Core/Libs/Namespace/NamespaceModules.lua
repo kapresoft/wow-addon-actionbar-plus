@@ -13,38 +13,9 @@ Type: Modules
 --- @class Core_Modules_ABP_2_0
 local ModuleNames = {
   
-  --- @type APIConstants_ABP_2_0
-  APIConstants = {},
-  
-  --- @type Compat_ABP_2_0
-  Compat = {},
-  
-  --- @type SpellUtil_ABP_2_0
-  SpellUtil = {},
-  
-  --- @type UnitUtil_ABP_2_0
-  UnitUtil = {},
-  
-  --- @type DruidUtil_ABP_2_0
-  DruidUtil = {},
-  
-  --- @type PriestUtil_ABP_2_0
-  PriestUtil = {},
-  
-  --- @type CursorProvider_ABP_2_0
-  CursorProvider = {},
-  
-  --- @type Backdrops_ABP_2_0
-  Backdrops = {},
-  
-  --- @type DatabaseMixin_ABP_2_0
-  DatabaseMixin = {},
-  --- @type DatabaseSchema_ABP_2_0
-  DatabaseSchema = {},
-  
-  -----------------------
-  ----- ThirdParty ------
-  -----------------------
+  ---------------------------------------
+  ----- ThirdParty::Ace3 ----------------
+  ---------------------------------------
   
   --- @type AceEvent_3_0
   AceEvent  = {},
@@ -54,6 +25,38 @@ local ModuleNames = {
   AceAddon  = {},
   --- @type AceDB_3_0
   AceDB     = {},
+  
+  ---------------------------------------
+  ----- ThirdParty::Kapresoft Libs ------
+  ---------------------------------------
+  
+  --- @type Kapresoft_Table_2_0
+  Table = {},
+  
+  ---------------------------------------
+  ----- ActionbarPlus_2_0 Libs ----------
+  ---------------------------------------
+  
+  --- @type APIConstants_ABP_2_0
+  APIConstants = {},
+  --- @type Compat_ABP_2_0
+  Compat = {},
+  --- @type SpellUtil_ABP_2_0
+  SpellUtil = {},
+  --- @type UnitUtil_ABP_2_0
+  UnitUtil = {},
+  --- @type DruidUtil_ABP_2_0
+  DruidUtil = {},
+  --- @type PriestUtil_ABP_2_0
+  PriestUtil = {},
+  --- @type CursorProvider_ABP_2_0
+  CursorProvider = {},
+  --- @type Backdrops_ABP_2_0
+  Backdrops = {},
+  --- @type DatabaseMixin_ABP_2_0
+  DatabaseMixin = {},
+  --- @type DatabaseSchema_ABP_2_0
+  DatabaseSchema = {},
   
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

@@ -10,7 +10,7 @@ World Events Frame
 WorldEventsFrame_ABP_2_0 = {}
 
 --- Buttons register/unregister dynamically here to receive world/environment-level events.
---- @see ABP_Button_2_0_3#Update
+--- @see Button_ABP_2_0_3#Update
 --- @see BarFrame.xml#ActionEventsFrame_ABP_2_0
 --- @type ActionEventsFrame_ABP_2_0
 ActionEventsFrame_ABP_2_0 = {}

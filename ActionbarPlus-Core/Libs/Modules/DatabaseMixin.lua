@@ -10,6 +10,7 @@ Local Vars
 local ns = select(2, ...)
 local AceDB = ns.O.AceDB
 local DatabaseSchema, unit = ns.O.DatabaseSchema, ns.O.UnitUtil
+local dsu = DatabaseSchema.Util
 
 local DB_VERSION = 1
 
@@ -79,6 +80,8 @@ function o:InitDb(addon)
   DatabaseMixin_RegisterCallbacks(addon, db)
   
   ns:RegisterDB(db)
+  --xdb = db
+  -- /dump xdb:ResetProfile()
 end
 
 -- Empty for now; an example of a migration strategy
@@ -101,6 +104,49 @@ function o:g() return ns:db().global end
 --- @return ProfileConfig_ABP_2_0
 function o:p() return ns:db().profile end
 
+
+--- @param barIndex number
+--- @return BarConfig_ABP_2_0
+function o:bar(barIndex)
+  local barKey = dsu.barKey(barIndex)
+  local profile = self:p()
+  local bars = profile.bars
+  local barConf = bars[barKey]
+  p('bar(barIndex):: barConf=', barConf)
+  return barConf
+end
+
+--- @param barConf BarConfig_ABP_2_0
+--- @param btnIndex number
+--- @overload fun(btnIndex:Index) : ButtonConfig_ABP_2_0
+--- @return ButtonConfig_ABP_2_0|nil
+function o:button(barConf, btnIndex)
+  if not barConf then return nil end
+  local btnKey = dsu.buttonKey(btnIndex)
+  return barConf[btnKey]
+end
+
+--- Get button config; create if missing
+--- @param barConf BarConfig_ABP_2_0
+--- @param btnIndex number
+--- @overload fun(btnIndex:Index) : ButtonConfig_ABP_2_0
+--- @return ButtonConfig_ABP_2_0|nil
+function o:buttonOrNew(barConf, btnIndex)
+  if not barConf then return nil end
+  local btnKey = dsu.buttonKey(btnIndex)
+  -- init the buttonGroup if missing
+  -- structure: btnGroup[btnKey][activeSpecKey]
+  if not barConf.buttons[btnKey] then
+    barConf.buttons[btnKey] = {}
+  end
+  local btnGroup = barConf.buttons[btnKey]
+  local specGroupKey = dsu.specGroupKey(unit:GetActiveSpecGroupIndex())
+  p('buttonOrNew():: btnKey=', btnKey, 'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
+  if not btnGroup[specGroupKey] then btnGroup[specGroupKey] = {} end
+  return btnGroup[specGroupKey]
+end
+
+--dm = o
 --- @param barIndex number
 --- @param btnIndex number
 --- @return ButtonConfig_ABP_2_0|nil
