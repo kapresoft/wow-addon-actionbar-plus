@@ -47,7 +47,7 @@ local function CursorMixinMethods()
     return nil
   end
   
-  ---@param callbackFn fun(spell: SpellInfo) end
+  ---@param callbackFn fun(spell: SpellInfoData) end
   function o:IfSpell(callbackFn)
     if not self:IsSpell() then return end
     local spellInfo = c:GetSpellInfo(self:GetSpell())

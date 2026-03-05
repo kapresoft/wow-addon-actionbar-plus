@@ -13,10 +13,11 @@ local ModuleNames = {
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   
-  --- @type BarModuleFactory_2_0
+  --- @type BarModuleFactory_ABP_2_0
   BarModuleFactory = {},
   --- @type ButtonConfigAccessorMixin_ABP_2_0
   ButtonConfigAccessorMixin = {},
-  
+  --- @type ButtonStateMixin_ABP_2_0
+  ButtonStateMixin = {},
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

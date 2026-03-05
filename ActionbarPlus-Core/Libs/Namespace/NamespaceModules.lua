@@ -39,6 +39,8 @@ local ModuleNames = {
   
   --- @type APIConstants_ABP_2_0
   APIConstants = {},
+  --- @type Constants_ABP_2_0
+  Constants = {},
   --- @type Compat_ABP_2_0
   Compat = {},
   --- @type SpellUtil_ABP_2_0

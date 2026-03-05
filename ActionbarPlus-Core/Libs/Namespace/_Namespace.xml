@@ -3,5 +3,6 @@
 
     <Script file="NamespaceModules.lua" />
     <Script file='Namespace.lua'/>
+    <Script file="Constants.lua" />
 
 </Ui>

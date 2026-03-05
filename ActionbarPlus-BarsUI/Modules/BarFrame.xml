@@ -3,8 +3,8 @@
 
     <Script file="Button_TestData.lua"/>
     <Script file="Backdrops.lua"/>
-    <Script file="Button_2_0_3_Controllers/ButtonState.lua"/>
     <Script file="Button_2_0_3.lua"/>
+    <Script file="Button_2_0_3_Components/ButtonStateMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonConfigAccessorMixin.lua"/>
     <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
