@@ -388,11 +388,14 @@ function o:Update()
   self.__updating = false
 end
 
---- If type
+--- Clear Icon When:
+--- - type is invalid (blank or nil)
+--- - name=spell|item|etc and val is invalid (blank or nil)
 function o:UpdateAction(name, val)
   if name == c.type then
     if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
   end
+  
   if Str_IsAnyOf(name, t.spell, t.item) then
     if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
   elseif not Str_IsAnyOf(name, t.spell, t.item) then return end
