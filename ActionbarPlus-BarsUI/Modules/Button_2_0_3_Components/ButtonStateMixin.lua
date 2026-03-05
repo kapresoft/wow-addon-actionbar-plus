@@ -10,7 +10,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
-local comp = cns.O.Compat
+local comp, au = cns.O.Compat, cns.O.ActionUtil
 local type, spell = 'type', 'spell'
 
 local attr, atyp = cns:constants()
@@ -44,47 +44,57 @@ local o = S
 --- Update the button's checked state
 function o:UpdateState()
   --p('UpdateState():: called...')
-  local type, id = self:GetActionInfo()
-  if not type or not id then return end local checked = false
+  local _type, id = self:GetActionInfo()
+  if not _type or not id then return end
   
-  local current = false
-  if type == attr.spell then
-    current = C_IsCurrentSpell(id)
-    checked = current or C_IsAutoRepeatSpell(id);
+  if self.__castingSpellID and self.__castingSpellID == id then
+    self:SetChecked(true)
+    return
   end
   
-  self:SetChecked(checked)
+  local checked = false
+  local current = false
+  if _type == attr.spell then
+    current = C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id);
+  end
+  --self:t('Checked', 'UpdateState:: spellID=', id, 'current=', tostring(current), 'checked=', tostring(checked))
+  self:SetChecked(current)
 end
 
 --- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
 function o:OnSpellCast(event, unitTarget, ...)
   if unitTarget ~= "player" then return end
-  local actionType, id = self:GetActionInfo()
-  if not ActionType_IsSpell(actionType) then return end
+  --self:t('OnSpellCast', 'evt=', event)
+  local actionType, spellID = self:GetActionInfo()
+  if not au.IsSpell(actionType) then return end
   
-  local spellID = self:GetAttribute(spell)
-  if not spellID then return end local checked = false
+  if not spellID then return end
   
+  local checked = false
   local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
   
   local spellDesc = tostring(spellID);
-  if ActionType_IsSpell(actionType) then
+  if au.IsSpell(actionType) then
     comp:IfSpell(spellID, function(sp)
       spellDesc = spellDesc .. '[' .. sp.name .. ']'
     end)
   end
-  local m = ('OnSpellCast[%s] %s::'):format(self:GetID(), event)
   if event == 'UNIT_SPELLCAST_START' then
     local _, evtSpellID = ...
-    p(m, 'evtSpellID=', evtSpellID, 'spell=', spellDesc, 'current=', current)
+    if evtSpellID == spellID then
+      self.__castingSpellID = evtSpellID
+      self:SetChecked(true)
+    end
   end
   
-  if event == 'UNIT_SPELLCAST_STOP' or event == 'UNIT_SPELLCAST_SUCCEEDED' then
+  if event == 'UNIT_SPELLCAST_STOP'
+          or event == 'UNIT_SPELLCAST_INTERRUPTED'
+          or event == 'UNIT_SPELLCAST_SUCCEEDED' then
     current = C_IsCurrentSpell(spellID)
     local _, evtSpellID = ...
-    p(m, 'evtSpellID=', evtSpellID, 'spell=', spellDesc, 'current=', current)
-    if evtSpellID == spellID then
-      self:SetChecked(false)
+    if self.__castingSpellID and self.__castingSpellID == evtSpellID then
+      self.__castingSpellID = nil
+      self:UpdateState()
     end
   end
 end
@@ -143,3 +153,5 @@ end
 --  end
 --end
 ]]
+
+

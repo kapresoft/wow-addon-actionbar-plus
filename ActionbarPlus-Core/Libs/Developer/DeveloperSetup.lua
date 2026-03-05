@@ -2,7 +2,7 @@
 local ns = select(2, ...)
 local s = ns.settings
 s.developer = true
---s.enableTraceUI = true
+s.enableTraceUI = true
 
 --- @class DeveloperSetup_ABP_2_0
 local o = {}
