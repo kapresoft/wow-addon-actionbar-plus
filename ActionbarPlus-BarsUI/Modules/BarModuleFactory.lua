@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
+local unit = cns.O.UnitUtil
 local tbl_IsEmpty = cns.O.Table.IsEmpty
 
 --[[-----------------------------------------------------------------------------
@@ -63,18 +64,18 @@ end
 --[[-------------------------------------------------------------------
 Mixin: BarFrameObjWidgetMixin_2_0
 ---------------------------------------------------------------------]]
---- @class BarFrameObjWidgetMixin_2_0
+--- @class BarFrameObjWidgetMixin_ABP_2_0
 --- @field index Index
---- @field frame ABP_BarFrameObj_ABP_2_0
+--- @field frame BarFrameObj_ABP_2_0
 --- @field buttons table<number, Button_ABP_2_0_X>
 local BarFrameObjWidgetMixin = {}
 
 local function BarFrameWidgetMethods()
   
-  --- @type BarFrameObjWidgetMixin_2_0
+  --- @type BarFrameObjWidgetMixin_ABP_2_0
   local wm = BarFrameObjWidgetMixin
   
-  ---@param frame ABP_BarFrameObj_ABP_2_0
+  ---@param frame BarFrameObj_ABP_2_0
   function wm:Init(frame, index)
     assert(type(frame) == 'table' and strlower(frame:GetObjectType()) == 'frame',
             'BarFrameObjWidgetMixin::Init(frame, index):: Param frame is expected to be a Frame.')
@@ -86,7 +87,7 @@ local function BarFrameWidgetMethods()
   --- @return Index
   function wm:GetIndex() return self.index end
   
-  --- @return ABP_BarFrameObj_ABP_2_0
+  --- @return BarFrameObj_ABP_2_0
   function wm:GetFrame() return self.frame end
   
   function wm:GetDebugName()
@@ -131,7 +132,7 @@ BarModuleProto
 ---------------------------------------------------------------------]]
 --- @class BarModuleProto_2_0
 --- @field index Index
---- @field barFrame FrameObj
+--- @field barFrame BarFrameObj_ABP_2_0
 local BarModuleProto_2_0 = {}
 
 local function BarModuleProtoMethods()
@@ -154,6 +155,38 @@ local function BarModuleProtoMethods()
   function bm:OnDisable()
     --p('OnDisable:: called')
     if self.barFrame then self.barFrame:Hide() end
+  end
+  
+  function bm:ACTIVE_TALENT_GROUP_CHANGED(event, ...)
+    local currentIndex, prevIndex = ...
+    local activeIndex = unit:GetActiveSpecGroupIndex()
+    p('OnEvent::' .. event, 'from=', prevIndex, 'to=', currentIndex, 'activeIndex[detected]=', activeIndex)
+
+    self.pendingSpecUpdate = true
+  end
+  
+  function bm:SPELLS_CHANGED(event, ...)
+    local activeIndex = unit:GetActiveSpecGroupIndex()
+    p('OnEvent::' .. event, 'activeIndex[detected]=', activeIndex)
+    
+    if not self.pendingSpecUpdate then return end
+    self.pendingSpecUpdate = false
+    
+    local w = self.barFrame.widget
+    for i, btn in ipairs(w.buttons) do
+      local bc = btn:GetButtonConfig()
+      if not tbl_IsEmpty(bc) then
+        --pd('event:: button=', btn.__name, 'bc=', fmt(bc))
+        if bc.type and bc.id then
+          btn:SetAttribute('type', bc.type)
+          btn:SetAttribute(bc.type, bc.id)
+        end
+      else
+        btn:SetAttribute('type', nil)
+        btn:SetAttribute('spell', nil)
+        btn:SetAttribute('item', nil)
+      end
+    end
   end
 
 end; BarModuleProtoMethods()
@@ -194,6 +227,10 @@ local function PropsAndMethods()
     
     pd(('New:: %s created; enabled=%s'):format(m:GetName(), tostring(m:IsEnabled())))
     _G[name] = m
+    
+    m:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
+    m:RegisterEvent('SPELLS_CHANGED', 'SPELLS_CHANGED')
+    
     return m
   end
   
@@ -224,7 +261,7 @@ local function PropsAndMethods()
     --local spacing = lcfg.spacing
     local spacing = ui.button.spacing
     
-    --- @type ABP_BarFrameObj_ABP_2_0
+    --- @type BarFrameObj_ABP_2_0
     local frame = self:__CreateBarFrame(barConf, barIndex, frameName)
     local buttons = self:__CreateButtons(barConf, frame, barIndex)
     frame.widget.buttons = buttons
@@ -289,21 +326,21 @@ local function PropsAndMethods()
   --- @param barConf ButtonConfig_ABP_2_0 The frame index
   --- @param barIndex Index The frame index
   --- @param frameName Name The frame name
-  --- @return ABP_BarFrameObj_ABP_2_0
+  --- @return BarFrameObj_ABP_2_0
   function o:__CreateBarFrame(barConf, barIndex, frameName)
     assert(barIndex and frameName, 'Frame and index missing.')
-    --- @alias ABP_BarFrameObj_ABP_2_0 ABP_BarFrameObjImpl_ABP_2_0 | FrameObj
+    --- @alias BarFrameObj_ABP_2_0 BarFrameObjImpl_ABP_2_0 | FrameObj
     --
-    --- @class ABP_BarFrameObjImpl_ABP_2_0 : BarFrameMixin_ABP_2_0_1
-    --- @field widget ABP_BarFrameObjWidget_2_0
+    --- @class BarFrameObjImpl_ABP_2_0 : BarFrameMixin_ABP_2_0_1
+    --- @field widget BarFrameObjWidget_ABP_2_0
     local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1")
     
-    --- @type ABP_BarFrameObjImpl_ABP_2_0 | ABP_BarFrameObj_ABP_2_0
+    --- @type BarFrameObjImpl_ABP_2_0 | BarFrameObj_ABP_2_0
     local f = barFrame
     f:SetParentKey(frameName)
     f:SetFrameLevel(barIndex)
     
-    --- @class ABP_BarFrameObjWidget_2_0 : BarFrameObjWidgetMixin_2_0
+    --- @class BarFrameObjWidget_ABP_2_0 : BarFrameObjWidgetMixin_ABP_2_0
     f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex)
     f:Show()
     
@@ -312,7 +349,7 @@ local function PropsAndMethods()
   
   --- @param barConf BarConfig_ABP_2_0 The frame index
   --- @param barIndex Index
-  --- @param barFrame ABP_BarFrameObj_ABP_2_0
+  --- @param barFrame BarFrameObj_ABP_2_0
   --- @return table<number, Button_ABP_2_0_X>
   function o:__CreateButtons(barConf, barFrame, barIndex)
     local ui = barConf.ui
@@ -329,7 +366,7 @@ local function PropsAndMethods()
       btn.widget = CreateAndInitFromMixin(ButtonWidgetMixin, btn, i, barIndex)
       local bc = btn:GetButtonConfig()
       if not tbl_IsEmpty(bc) then
-        pd('CreateButtons:: button=', btnName, 'bc=', fmt(bc))
+        --pd('CreateButtons:: button=', btnName, 'bc=', fmt(bc))
         if bc.type and bc.id then
           btn:SetAttribute('type', bc.type)
           btn:SetAttribute(bc.type, bc.id)

@@ -112,7 +112,7 @@ function o:bar(barIndex)
   local profile = self:p()
   local bars = profile.bars
   local barConf = bars[barKey]
-  p('bar(barIndex):: barConf=', barConf)
+  --p('bar(barIndex):: barConf=', barConf)
   return barConf
 end
 
@@ -141,7 +141,7 @@ function o:buttonOrNew(barConf, btnIndex)
   end
   local btnGroup = barConf.buttons[btnKey]
   local specGroupKey = dsu.specGroupKey(unit:GetActiveSpecGroupIndex())
-  p('buttonOrNew():: btnKey=', btnKey, 'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
+  --p('buttonOrNew():: btnKey=', btnKey, 'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
   if not btnGroup[specGroupKey] then btnGroup[specGroupKey] = {} end
   return btnGroup[specGroupKey]
 end

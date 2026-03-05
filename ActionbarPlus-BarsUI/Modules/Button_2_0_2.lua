@@ -68,7 +68,7 @@ function o:OnLoad()
     
     if self:GetID() ~= 1000 then return end
     
-    --- @type ABP_BarFrameObj_ABP_2_0
+    --- @type BarFrameObj_ABP_2_0
     --local barFrame = self:GetParent()
     --local header = barFrame.Handler
     --local proxy    = barFrame.SecureProxy
@@ -100,7 +100,7 @@ function o:OnLoad()
 end
 
 function o:OnClick(button, down)
-    --- @type ABP_BarFrameObj_ABP_2_0
+    --- @type BarFrameObj_ABP_2_0
     local barFrame = self:GetParent()
     local header, proxy = barFrame.Handler, barFrame.SecureProxy
     header:SetAttribute('spell_abp', 'holy light')

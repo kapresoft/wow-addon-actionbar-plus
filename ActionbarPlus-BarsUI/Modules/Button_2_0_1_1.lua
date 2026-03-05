@@ -42,7 +42,7 @@ New Instance
 local libName = 'ABP_ButtonMixin_2_0_1_1'
 --- @class ABP_ButtonMixin_2_0_1_1
 --- @field icon TextureObj
---- @field GetParent fun(self:ABP_ButtonMixin_2_0_1_1) : ABP_BarFrameObj_ABP_2_0
+--- @field GetParent fun(self:ABP_ButtonMixin_2_0_1_1) : BarFrameObj_ABP_2_0
 local S = ns:cns():NewAceEvent(); ABP_ButtonMixin_2_0_1_1 = S
 local p, pd, t, tf = ns:log(libName)
 
