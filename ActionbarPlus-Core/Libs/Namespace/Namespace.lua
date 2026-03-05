@@ -150,6 +150,9 @@ end
 --- @return Cursor_ABP_2_0
 function ns:cursor() return self.O.CursorProvider:GetCursor() end
 
+--- @return AttributeNames_ABP_2_0, SupportedActionTypes_ABP_2_0
+function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.SupportedActionTypes end
+
 --- @param name Name
 --- @param predicateFn fun():boolean @Optional - The predicate function
 --- @return EventTracePrinter_ABP_2_0

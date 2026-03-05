@@ -13,6 +13,7 @@ Enable by:
 </CheckButton>
 -------------------------------------------------------------------------------]]
 
+local IsModifiedClick = IsModifiedClick
 local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
 local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
 local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
@@ -26,15 +27,13 @@ ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 --- @type Namespace_ABP_2_0 - Core Namespace
 local cns = ns:cns()
 local O = cns.O
+local C = O.Constants
+local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit, dru = O.Compat, O.SpellUtil, O.UnitUtil, O.DruidUtil
 local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
-
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 
---- @type ABP_ButtonStateMixin_2_0_3
-local buttonState = ns.__ButtonState;
-ns.__ButtonState = nil
 
 local seedID = 1000
 --[[-----------------------------------------------------------------------------
@@ -54,31 +53,7 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
 
-local actionType = 'type'
-local player = 'player'
 
-local c = {
-  type = 'type',
-  saved_type = 'abp_saved_type',
-}
-
---- Supported Types
-local t = {
-  spell        = 'spell',
-  item         = 'item',
-  macro        = 'macro',
-  mount        = 'mount',
-  companion    = 'companion',
-  battlepet    = 'battlepet',
-  petaction    = 'petaction',
-  equipmentset = 'equipmentset',
-}
-
-local Btn_UpdateState = buttonState.Btn_UpdateState
-local Btn_OnSpellCast = buttonState.Btn_OnSpellCast
-local Btn_OnTradeSkill = buttonState.Btn_OnTradeSkill
-local Btn_IsDragAllowed = buttonState.Btn_IsDragAllowed
-local Btn_UpdateFlash = buttonState.Btn_UpdateFlash
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
@@ -88,15 +63,12 @@ local function NextSeedID()
   return current
 end
 
---- @param unitTarget UnitID
-local function IsPlayer(unitTarget) return player == unitTarget end
-
 --- @return boolean
 local function IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
 
 --- @param down boolean
 --- @return boolean
-local function ShouldFire(down)
+local function Btn_ActionShouldFire(down)
   if IsActionbarLockedByUser() then return down == true end
   return down ~= true
 end
@@ -116,37 +88,24 @@ end
 local function Btn_RegisterCallbacks(self)
   --self:RegisterEvent('MODIFIER_STATE_CHANGED')
   --self:RegisterEvent("CVAR_UPDATE")
-  local h = function(...) Btn_OnSpellCast(self, ...) end
-  self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', h)
-  self:RegisterEvent('UNIT_SPELLCAST_SENT', h)
-  self:RegisterEvent('UNIT_SPELLCAST_START', h)
-  self:RegisterEvent('UNIT_SPELLCAST_STOP', h)
-  self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', h)
-  self:RegisterEvent('UNIT_SPELLCAST_FAILED_QUIET', h)
-  
-  self:RegisterEvent('TRADE_SKILL_SHOW', function() Btn_OnTradeSkill(self, true)  end)
-  self:RegisterEvent('TRADE_SKILL_CLOSE', function() Btn_OnTradeSkill(self, false)  end)
+  --local h = function(...) Btn_OnSpellCast(self, ...) end
+  local spellCastHandler, tradeSkillHandler = 'OnSpellCast', 'OnTradeSkill'
+  self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', spellCastHandler)
+  self:RegisterEvent('UNIT_SPELLCAST_SENT', spellCastHandler)
+  self:RegisterEvent('UNIT_SPELLCAST_START', spellCastHandler)
+  self:RegisterEvent('UNIT_SPELLCAST_STOP', spellCastHandler)
+  self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', spellCastHandler)
+  self:RegisterEvent('UNIT_SPELLCAST_FAILED_QUIET', spellCastHandler)
+  self:RegisterEvent('TRADE_SKILL_SHOW', tradeSkillHandler)
+  self:RegisterEvent('TRADE_SKILL_CLOSE', tradeSkillHandler)
   
   -- also potential: CURRENT_SPELL_CAST_CHANGED
-  
-  --self:RegisterEvent('CURRENT_SPELL_CAST_CHANGED', function(evt)
-  --  local spid = self:GetAttribute('spell')
-  --  local current = false
-  --  local name
-  --  if spid then
-  --    local sp = c:GetSpellInfo(spid)
-  --    if sp then name = sp.name end
-  --    current = C_IsCurrentSpell(spid)
-  --  end
-  --  self:SetChecked(current)
-  --  p('xx id=', self:GetID(),'evt=', evt, 'spell=', spid, 'name=', name, 'current=', current, 'is-checked:', self:GetChecked())
-  --end)
 end
 
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3 | ButtonConfigAccessor_ABP_2_0
+--- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3 | ButtonState_ABP_2_0 | ButtonConfigAccessor_ABP_2_0
 local o = S
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
@@ -154,8 +113,7 @@ function o:OnLoad()
   self:SetID(NextSeedID())
   self.__name = ('%s:%s'):format(self:GetName(), self:GetID())
   
-  Mixin(self, ns.O.ButtonConfigAccessorMixin)
-  
+  Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
@@ -167,7 +125,7 @@ function o:OnLoad()
   self:RegisterForDrag("LeftButton", "RightButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
   --self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
-  --Btn_RegisterCallbacks(self)
+  Btn_RegisterCallbacks(self)
   
   --local function RegisterWorldEventsFrame()
   --
@@ -237,7 +195,7 @@ function o:PreClick(button, down)
     return
   end
   
-  if ShouldFire(down) and Btn_IsDragAllowed() then
+  if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
     self:DisableAttributeType()
   end
 end
@@ -249,7 +207,8 @@ function o:PostClick(button, down)
   --p('PostC:: down=', down, 'GetButtonState()=', self:GetButtonState())
   
   --if not down then self:RestoreAttributeType() end
-  Btn_UpdateState(self)
+  --Btn_UpdateState(self)
+  self:UpdateState()
   -- todo move to ButtonStates#Btn_OnSpellCast
 end
 
@@ -267,7 +226,7 @@ function o:OnEnter()
   --- @type FontStringObj
   local right = _G["GameTooltipTextRight1"]
   
-  if type == t.spell then
+  if type == atyp.spell then
     GameTooltip:SetSpellByID(id)
     local rank = spu:GetHighestSpellRank(id)
     if right and rank then
@@ -289,11 +248,12 @@ end
 function o:OnDragStart(button)
   p('OnDragStart...')
   if InCombatLockdown() then return false end
-  if not Btn_IsDragAllowed() then return end
+  if not self:IsDragAllowed() then return end
+  
   Btn_PickupAction(self)
   self:UpdateState()
   self:UpdateCooldown()
-  Btn_UpdateFlash(self)
+  self:UpdateFlash()
   
   self:SetChecked(false)
   self:ClearButtonConf()
@@ -315,26 +275,23 @@ function o:OnReceiveDrag()
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   
-  local barIndex, btnIndex = self.widget.barIndex, self.widget.index
-  local barConf = cns:a():bar(barIndex)
   --- @type ButtonConfig_ABP_2_0
   local btnC = self:GetButtonConfig(true)
-  --local btnC = cns:a():buttonOrNew(barConf, btnIndex)
-  --local btnC = {}
-  self:pd('OnReceiveDrag', 'btnInd=', btnIndex, 'btnC=', btnC)
+  --self:p('OnReceiveDrag', 'btnC=', btnC)
   
   if cursor.type == 'spell' then
     cursor:IfSpell(function(spell)
-      p('OnReceiveDrag:: spell=', spell)
       self:__SetSpell(spell.spellID)
-      btnC.type = t.spell
+      btnC.type = atyp.spell
       btnC.id = spell.spellID
+      local _sp = ('%s(%s)'):format(spell.name, spell.spellID)
+      self:p('OnReceiveDrag:: spell=', _sp, 'btnC=', btnC)
     end)
   end
   
   ClearCursor()
   self:UpdateState()
-  -- Btn_UpdateFlash(self)
+  self:UpdateFlash()
 end
 
 function o:OnAttributeChanged(name, val)
@@ -371,7 +328,7 @@ function o:Update()
     --self:UpdateTypeOverlay()
     --ActionButton_UpdateCooldown(self)
     self:UpdateCooldown()
-    --self:UpdateFlash()
+    self:UpdateFlash()
     --self:UpdateHighlightMark()
     --self:UpdateSpellHighlightMark()
   else
@@ -392,21 +349,19 @@ end
 --- - type is invalid (blank or nil)
 --- - name=spell|item|etc and val is invalid (blank or nil)
 function o:UpdateAction(name, val)
-  if name == c.type then
+  if name == attr.type then
     if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
   end
   
-  if Str_IsAnyOf(name, t.spell, t.item) then
-    if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
-  elseif not Str_IsAnyOf(name, t.spell, t.item) then return end
+  if not Str_IsAnyOf(name, atyp.spell, atyp.item) then return end
+  if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
   
-  if name == t.spell then
+  if name == atyp.spell then
     local info = comp:GetSpellInfo(val)
     self:p('UpdateAction','spell=', val, 'name=', name)
     if not (info and info.iconID) then return end
-    ClearCursor()
     self.icon:SetTexture(info.iconID)
-  elseif name == t.item then
+  elseif name == atyp.item then
     self:p('UpdateAction','item=', val, 'name=', name)
   end
   
@@ -431,7 +386,7 @@ function o:GetActionTexture()
   --end
   local druid = cns.O.DruidUtil
   --self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
-  if type == t.spell then
+  if type == atyp.spell then
     if unit:IsStealthActive() then
       if druid:IsProwl(id) then
         self:DimIcon()
@@ -461,30 +416,30 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
-function o:GetAttributeType() return self:GetAttribute(c.type) end
-function o:GetAttributeSpell() return self:GetAttribute(t.spell) end
-function o:ClearAttributeType() self:SetAttribute(c.type, nil) end
-function o:ClearAttributeSpell() self:SetAttribute(t.spell, nil) end
+function o:GetAttributeType() return self:GetAttribute(attr.type) end
+function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
+function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
+function o:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
 function o:DisableAttributeType()
   if not self:GetAttributeSavedType() then
-    self:SetAttribute(c.saved_type, self:GetAttributeType())
+    self:SetAttribute(attr.saved_type, self:GetAttributeType())
   end
   self:ClearAttributeType()
 end
-function o:GetAttributeSavedType() return self:GetAttribute(c.saved_type) end
+function o:GetAttributeSavedType() return self:GetAttribute(attr.saved_type) end
 function o:ClearAttributeSavedType()
   if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(c.saved_type, nil)
+  self:SetAttribute(attr.saved_type, nil)
 end
 function o:RestoreAttributeType()
   if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(c.type, self:GetAttribute(c.saved_type))
-  self:SetAttribute(c.saved_type, nil)
+  self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
+  self:SetAttribute(attr.saved_type, nil)
 end
 
 function o:IsSpellType()
-  return self:GetAttributeType() == t.spell
-          or self:GetAttributeSavedType() == t.spell
+  return self:GetAttributeType() == atyp.spell
+          or self:GetAttributeSavedType() == atyp.spell
 end
 
 function o:MatchesActiveButtonSpellID(spellID)
@@ -511,7 +466,7 @@ function o:UpdateCooldown()
   local name = ''
   local start, duration, enable, modRate = 0, 0, 0, 1
   
-  if actionType == t.spell then
+  if actionType == atyp.spell then
     name = comp:GetSpellName(id)
     local info = comp:GetSpellCooldown(id)
     --self:p('UpdateCD', 'name=', name, 'info=', tostring(info))
@@ -520,7 +475,7 @@ function o:UpdateCooldown()
       duration = info.duration or 0
       modRate = info.modRate
     end
-  elseif actionType == t.item then
+  elseif actionType == atyp.item then
     start, duration, enable = GetItemCooldown(id)
   else
     cd:Clear()
@@ -540,7 +495,7 @@ end
 
 --- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo()
-  local aType = self:GetAttribute(actionType)
+  local aType = self:GetAttribute(attr.type)
   if not aType then return nil end
   
   --- @type number|string|nil
@@ -560,44 +515,44 @@ end
 
 --- @return boolean
 function o:HasAction()
-  local type = self:GetAttribute(actionType)
+  local type = self:GetAttribute(attr.type)
   if not type then return false end
   local id = self:GetAttribute(type)
   return id ~= nil
 end
 
---- Update the button's checked state
-function o:UpdateState()
-  --p('UpdateState():: called...')
-  local type, id = self:GetActionInfo()
-  if not type or not id then return end local checked = false
-  
-  local current = false
-  if type == t.spell then
-    current = C_IsCurrentSpell(id)
-    --p('btn=', self:GetID(), 'current=', current, 'spellID=', actionID)
-    checked = current or C_IsAutoRepeatSpell(id);
-  end
-  
-  local name = '';
-  if type == t.spell then
-    local sp = comp:GetSpellInfo(id)
-    if sp then name = '[' .. sp.name .. ']' end
-  end
-  
-  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
-  --        :format('UpdateSt', self:GetID(), type, id, name,
-  --        tostring(current), tostring(checked)))
-  self:SetChecked(checked)
-end
+----- Update the button's checked state
+--function o:UpdateState()
+--  --p('UpdateState():: called...')
+--  local type, id = self:GetActionInfo()
+--  if not type or not id then return end local checked = false
+--
+--  local current = false
+--  if type == t.spell then
+--    current = C_IsCurrentSpell(id)
+--    --p('btn=', self:GetID(), 'current=', current, 'spellID=', actionID)
+--    checked = current or C_IsAutoRepeatSpell(id);
+--  end
+--
+--  local name = '';
+--  if type == t.spell then
+--    local sp = comp:GetSpellInfo(id)
+--    if sp then name = '[' .. sp.name .. ']' end
+--  end
+--
+--  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
+--  --        :format('UpdateSt', self:GetID(), type, id, name,
+--  --        tostring(current), tostring(checked)))
+--  self:SetChecked(checked)
+--end
 
 
 --- @param spell SpellIdentifier
 function o:__SetSpell(spell)
   local sp = comp:GetSpellInfo(spell)
   if not sp then return end
-  self:SetAttribute(c.type, t.spell)
-  self:SetAttribute(t.spell, sp.spellID)
+  self:SetAttribute(attr.type, atyp.spell)
+  self:SetAttribute(atyp.spell, sp.spellID)
   self.icon:SetTexture(sp.iconID)
   self:Update()
 end
@@ -626,4 +581,8 @@ end
 
 function o:UpdateTexture()
   self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+end
+
+function o:IsDragAllowed()
+  return not Settings.GetValue('lockActionBars') or IsModifiedClick('PICKUPACTION')
 end

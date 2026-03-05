@@ -1,56 +1,63 @@
+--[[-------------------------------------------------------------------
+Blizzard Vars
+---------------------------------------------------------------------]]
+local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
+local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
+
+--[[-------------------------------------------------------------------
+Local Vars
+---------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
 local comp = cns.O.Compat
-
-local p, pd, t, tf = ns:log('ButtonState')
-
-local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
-local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
-
-ns.__ButtonState = {}
 local type, spell = 'type', 'spell'
 
---- @class ABP_ButtonStateMixin_2_0_3
-local o = ns.__ButtonState
+local attr, atyp = cns:constants()
 
-function o.Btn_IsDragAllowed()
-  return not Settings.GetValue("lockActionBars") or IsModifiedClick("PICKUPACTION")
-end
+--[[-----------------------------------------------------------------------------
+Module::ButtonStateMixin
+-------------------------------------------------------------------------------]]
+--- @see BarsUI_Modules_ABP_2_0
+local libName = ns.M.ButtonStateMixin()
+--- @class ButtonStateMixin_ABP_2_0
+local S = {}; ns:Register(libName, S)
+--
+--- @alias ButtonState_ABP_2_0 ButtonStateMixin_ABP_2_0
+--
+local p, pd, t, tf = ns:log(libName)
+
+--[[-----------------------------------------------------------------------------
+Module::ButtonStateMixin (Methods)
+-------------------------------------------------------------------------------]]
+--- @type ButtonStateMixin_ABP_2_0 | ButtonState_ABP_2_0 | Button_ABP_2_0_3
+local o = S
+
 
 --- Update the button's checked state
---- @param self Button_ABP_2_0_3
-function o.Btn_UpdateState(self)
-  local type = self:GetAttribute('type'); if not type then return end
-  --p('type=', type)
-  local actionID = self:GetAttribute(type)
-  --p('actionID=', actionID);
-  if not actionID then return end local checked = false
-
+function o:UpdateState()
+  --p('UpdateState():: called...')
+  local type, id = self:GetActionInfo()
+  if not type or not id then return end local checked = false
+  
   local current = false
-  if type == spell then
-    current = C_IsCurrentSpell(actionID)
-    --p('btn=', self:GetID(), 'current=', current, 'spellID=', actionID)
-    checked = current or C_IsAutoRepeatSpell(actionID);
+  if type == attr.spell then
+    current = C_IsCurrentSpell(id)
+    checked = current or C_IsAutoRepeatSpell(id);
   end
-  local name = '';
-  if type == 'spell' then
-    local sp = comp:GetSpellInfo(actionID)
-    if sp then name = '[' .. sp.name .. ']' end
-  end
-  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
-  --        :format('UpdateSt', self:GetID(), type, actionID, name,
-  --          tostring(current), tostring(checked)))
+  
   self:SetChecked(checked)
 end
 
---- @param self Button_ABP_2_0_3
+--- @param typeVal string
+--- @return boolean
+local function ActionType_IsSpell(typeVal) return typeVal == atyp.spell end
+
 --- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
-function o.Btn_OnSpellCast(self, event, unitTarget, ...)
+function o:OnSpellCast(event, unitTarget, ...)
   if unitTarget ~= "player" then return end
-  local type = self:GetAttribute('type')
-  if type ~= spell then return end
-  --p(('%s[%s]:: evt=%s'):format('OnSpellCast', self:GetID(), event))
+  local actionType, id = self:GetActionInfo()
+  if not ActionType_IsSpell(actionType) then return end
   
   local spellID = self:GetAttribute(spell)
   if not spellID then return end local checked = false
@@ -58,7 +65,7 @@ function o.Btn_OnSpellCast(self, event, unitTarget, ...)
   local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
   
   local spellDesc = tostring(spellID);
-  if type == 'spell' then
+  if ActionType_IsSpell(actionType) then
     comp:IfSpell(spellID, function(sp)
       spellDesc = spellDesc .. '[' .. sp.name .. ']'
     end)
@@ -79,17 +86,18 @@ function o.Btn_OnSpellCast(self, event, unitTarget, ...)
   end
 end
 
---- @param self Button_ABP_2_0_3
-function o.Btn_UpdateFlash(self)
-
+function o:UpdateFlash()
+  p('UpdateFlash:: called...')
 end
 
---- @param self Button_ABP_2_0_3
----@param show boolean
-function o.Btn_OnTradeSkill(self, show)
+function o:ClearFlash()
+  p('ClearFlash:: called...')
+end
+
+--- @param show boolean
+function o:OnTradeSkill(show)
   p(('%s[%s]:: show=%s'):format('OnTradeSkill', self:GetID(), tostring(show)))
 end
-
 
 --[[
 

@@ -13,43 +13,16 @@ New Instance
 --- @see Namespace_ABP_BarsUI_2_0
 --- @type string
 local libName = ns.M.BarModuleFactory()
---- @class BarModuleFactory_2_0
+--- @class BarModuleFactory_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, pd, t, tf = ns:log(libName)
 
---- @alias BarModule_2_0 BarModuleProto_2_0 | AddonModuleObj_3_0_Type2
+--- @alias BarModule_2_0 BarModuleProto_ABP_2_0 | AddonModuleObj_3_0_Type2
 --[[-------------------------------------------------------------------
 Temporary Config
 ---------------------------------------------------------------------]]
 local barCount = 1
---- todo next: move to bars config
-local lcfg = { spacing = 6, }
 
---- @class Profile_Bar_V2
---- @field buttons table<string, Profile_Button>
---- @field widget Profile_Bar_Widget
---- @field anchor Anchor
-local Profile_Bar_Config = {
-  --- show/hide the actionbar frame
-  ["enabled"]           = false,
-  --- allowed values: {"", "always", "in-combat"}
-  ["locked"]            = "",
-  --- shows the button index
-  ["show_button_index"] = true,
-  --- shows the keybind text TOP
-  ["show_keybind_text"] = true,
-  ["widget"]            = {
-    ["rowSize"]                = 1,
-    ["colSize"]                = 4,
-    ["buttonSize"]             = 40,
-    ["buttonAlpha"]            = 0.1,
-    ["frame_handle_mouseover"] = false,
-    ["frame_handle_alpha"]     = 1.0,
-    ["show_empty_buttons"]     = true
-  },
-  ["anchor"]            = { point = "CENTER", relativeTo = nil, relativePoint = 'CENTER', x = 0.0, y = 0.0 },
-  ["buttons"]           = {}
-}
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
@@ -130,13 +103,13 @@ end; ButtonWidgetMixinMethods()
 --[[-------------------------------------------------------------------
 BarModuleProto
 ---------------------------------------------------------------------]]
---- @class BarModuleProto_2_0
+--- @class BarModuleProto_ABP_2_0
 --- @field index Index
 --- @field barFrame BarFrameObj_ABP_2_0
 local BarModuleProto_2_0 = {}
 
 local function BarModuleProtoMethods()
-  --- @type BarModuleProto_2_0|BarModule_2_0
+  --- @type BarModuleProto_ABP_2_0|BarModule_2_0
   local bm = BarModuleProto_2_0
   
   -- todo: replace with real config
@@ -166,11 +139,12 @@ local function BarModuleProtoMethods()
   end
   
   function bm:SPELLS_CHANGED(event, ...)
-    local activeIndex = unit:GetActiveSpecGroupIndex()
-    p('OnEvent::' .. event, 'activeIndex[detected]=', activeIndex)
-    
     if not self.pendingSpecUpdate then return end
     self.pendingSpecUpdate = false
+    if InCombatLockdown() then return end
+
+    local activeIndex = unit:GetActiveSpecGroupIndex()
+    p('OnEvent:: evt=', event, 'activeIndex[detected]=', activeIndex)
     
     local w = self.barFrame.widget
     for i, btn in ipairs(w.buttons) do
@@ -203,7 +177,7 @@ Dump:
 -------------------------------------------------------------------------------]]
 local function PropsAndMethods()
   
-  --- @type BarModuleFactory_2_0 | AceModuleLifecycleMixin_3_0
+  --- @type BarModuleFactory_ABP_2_0 | AceModuleLifecycleMixin_3_0
   local o = S
   
   --- Create the Ace module dynamically
@@ -230,8 +204,8 @@ local function PropsAndMethods()
     _G[name] = m
     
     m:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
-    m:RegisterEvent('SPELLS_CHANGED', 'SPELLS_CHANGED')
-    
+    --m:RegisterEvent('SPELLS_CHANGED', 'SPELLS_CHANGED')
+    m:RegisterBucketEvent('SPELLS_CHANGED', 0.2)
     return m
   end
   
