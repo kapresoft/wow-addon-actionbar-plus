@@ -250,6 +250,10 @@ end
 function o:GetActiveSpecGroupIndex()
   local ok, result
   
+  if ns:IsRetail() then
+    return C_GetSpecialization()
+  end
+  
   -- Prefer your unified wrapper first
   if C_GetActiveSpecGroup then
     ok, result = pcall(C_GetActiveSpecGroup)
