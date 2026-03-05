@@ -33,8 +33,8 @@ function o:GetButtonConfig()
   if not barConf.buttons[btnGroupKey] then barConf.buttons[btnGroupKey] = {} end
   local btnGroup = barConf.buttons[btnGroupKey]
   local specGroupKey = self:__buttonActiveSpecGroupKey()
-  p('buttonOrNew():: btnGroupKey=', btnGroupKey,
-          'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
+  --p('GetButtonConfig:: btnGroupKey=', btnGroupKey,
+  --        'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
   if not btnGroup[specGroupKey] then btnGroup[specGroupKey] = {} end
   return btnGroup[specGroupKey]
 end

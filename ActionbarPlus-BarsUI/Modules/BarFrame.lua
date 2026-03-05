@@ -24,7 +24,7 @@ Methods
 -------------------------------------------------------------------------------]]
 local function PropsAndMethods()
 
-    --- @type BarFrameMixin_ABP_2_0_1 | ABP_BarFrameObj_ABP_2_0
+    --- @type BarFrameMixin_ABP_2_0_1 | BarFrameObj_ABP_2_0
     local o = S
     
     --[[-----------------------------------------------------------------------------

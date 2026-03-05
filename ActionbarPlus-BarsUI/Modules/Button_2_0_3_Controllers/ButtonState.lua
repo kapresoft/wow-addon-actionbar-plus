@@ -38,9 +38,9 @@ function o.Btn_UpdateState(self)
     local sp = comp:GetSpellInfo(actionID)
     if sp then name = '[' .. sp.name .. ']' end
   end
-  p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
-          :format('UpdateSt', self:GetID(), type, actionID, name,
-            tostring(current), tostring(checked)))
+  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
+  --        :format('UpdateSt', self:GetID(), type, actionID, name,
+  --          tostring(current), tostring(checked)))
   self:SetChecked(checked)
 end
 

@@ -27,7 +27,7 @@ ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 local cns = ns:cns()
 local O = cns.O
 local comp, spu, unit, dru = O.Compat, O.SpellUtil, O.UnitUtil, O.DruidUtil
-local Str_IsAnyOf = cns.Str_IsAnyOf
+local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
 
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
@@ -50,7 +50,7 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
---- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : ABP_BarFrameObj_ABP_2_0
+--- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
 
@@ -388,19 +388,23 @@ function o:Update()
   self.__updating = false
 end
 
+--- If type
 function o:UpdateAction(name, val)
-  if not val then self.icon:SetTexture(nil); return end
-  if not Str_IsAnyOf(name, t.spell, t.item) then return end
-
+  if name == c.type then
+    if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
+  end
+  if Str_IsAnyOf(name, t.spell, t.item) then
+    if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
+  elseif not Str_IsAnyOf(name, t.spell, t.item) then return end
+  
   if name == t.spell then
     local info = comp:GetSpellInfo(val)
-    tf('UpdateAction:: spell=', val, 'info=', info)
+    self:p('UpdateAction','spell=', val, 'name=', name)
     if not (info and info.iconID) then return end
     ClearCursor()
-    -- Retail vs Classic safe
     self.icon:SetTexture(info.iconID)
   elseif name == t.item then
-    p('UpdateAction():: item needs implementation.')
+    self:p('UpdateAction','item=', val, 'name=', name)
   end
   
   self:Update()
