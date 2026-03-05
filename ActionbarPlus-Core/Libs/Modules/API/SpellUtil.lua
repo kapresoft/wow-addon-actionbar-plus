@@ -32,10 +32,7 @@ function o:GetHighestSpellRank(spellID)
   
   -- Check cache first
   local rank = spellRankCache[spellID]
-  if rank ~= nil then
-    p('Cached returned:: spellID=', spellID, 'rank=', rank)
-    return rank
-  end
+  if rank ~= nil then return rank end
   
   local i = 1
   local lastRank
