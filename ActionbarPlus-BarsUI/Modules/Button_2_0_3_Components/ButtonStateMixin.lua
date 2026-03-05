@@ -27,6 +27,13 @@ local S = {}; ns:Register(libName, S)
 --
 local p, pd, t, tf = ns:log(libName)
 
+--[[-------------------------------------------------------------------
+Support Functions
+---------------------------------------------------------------------]]
+--- @param typeVal string
+--- @return boolean
+local function ActionType_IsSpell(typeVal) return typeVal == atyp.spell end
+
 --[[-----------------------------------------------------------------------------
 Module::ButtonStateMixin (Methods)
 -------------------------------------------------------------------------------]]
@@ -48,10 +55,6 @@ function o:UpdateState()
   
   self:SetChecked(checked)
 end
-
---- @param typeVal string
---- @return boolean
-local function ActionType_IsSpell(typeVal) return typeVal == atyp.spell end
 
 --- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
 function o:OnSpellCast(event, unitTarget, ...)
