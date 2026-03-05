@@ -23,9 +23,8 @@ Types
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
-local O, M, comp = ns.O, ns.M, ns.O.Compat
-local UnitClasses = ns.O.APIConstants.UnitClasses
-local tinsert, tconcat = table.insert, table.concat
+local O, M = ns.O, ns.M
+local comp, UnitClasses = O.Compat, O.Constants.UnitClasses
 
 --- For all stealth
 local STEALTHED_ICON = 136047

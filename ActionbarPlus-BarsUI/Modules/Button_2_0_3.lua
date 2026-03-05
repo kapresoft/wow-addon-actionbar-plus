@@ -50,6 +50,7 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
+--- @field __castingSpellID boolean Keeps track of the current spell
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
 
@@ -132,6 +133,19 @@ function o:OnLoad()
   --end
   
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
+  
+  local traceChecked = false
+  if traceChecked then
+    if not self.__SetCheckedWrapped then
+      self.__SetCheckedWrapped = true
+      local orig = self.SetChecked
+      self.SetChecked = function(btn, val)
+        tf('Checked', val, "SetCheckedWrapped:: Button:", btn:GetName(), 'debugstack=', debugstack(2, 5, 5))
+        --tf(debugstack(2, 5, 5))
+        return orig(btn, val)
+      end
+    end
+  end
 end
 
 --- Still needs to be wired
@@ -156,7 +170,8 @@ function o:OnEvent(evt, ...)
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
     self:UpdateTexture()
   elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
-    self:SetChecked(false)
+    self:UpdateTexture()
+    --self:SetChecked(false)
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
   elseif evt == 'SPELL_UPDATE_COOLDOWN'
@@ -205,10 +220,14 @@ end
 function o:PostClick(button, down)
   if InCombatLockdown() then return false end
   --p('PostC:: down=', down, 'GetButtonState()=', self:GetButtonState())
-  
+  local _type, spellID = self:GetActionInfo()
+  local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
+  --tf('Checked(PostClick)', 'spellID=', spellID, 'current=', current)
+  if current then self:SetChecked(true) end
+  --if current then self:UpdateState() end
   --if not down then self:RestoreAttributeType() end
   --Btn_UpdateState(self)
-  self:UpdateState()
+  --self:UpdateState()
   -- todo move to ButtonStates#Btn_OnSpellCast
 end
 
@@ -322,7 +341,7 @@ function o:Update()
     end
     self:UpdateTexture()
     
-    self:UpdateState()
+    --self:UpdateState()
     --self:UpdateUsable()
     --self:UpdateProfessionQuality()
     --self:UpdateTypeOverlay()
@@ -337,7 +356,7 @@ function o:Update()
       self.eventsRegistered = nil;
     end
     --self:ClearFlash()
-    self:SetChecked(false);
+    --self:SetChecked(false);
     --self:ClearProfessionQuality();
     --self:ClearTypeOverlay();
   end
@@ -557,6 +576,9 @@ function o:__SetSpell(spell)
   self:Update()
 end
 
+function o:t(prefix, ...)
+  local a = { ... }; tf(self:pid(prefix), unpack(a))
+end
 function o:p(prefix, ...)
   local a = { ... }; p(self:pid(prefix), unpack(a))
 end

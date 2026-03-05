@@ -37,12 +37,12 @@ local ModuleNames = {
   ----- ActionbarPlus_2_0 Libs ----------
   ---------------------------------------
   
-  --- @type APIConstants_ABP_2_0
-  APIConstants = {},
   --- @type Constants_ABP_2_0
   Constants = {},
   --- @type Compat_ABP_2_0
   Compat = {},
+  --- @type ActionUtil_ABP_2_0
+  ActionUtil = {},
   --- @type SpellUtil_ABP_2_0
   SpellUtil = {},
   --- @type UnitUtil_ABP_2_0
