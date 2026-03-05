@@ -269,15 +269,6 @@ local function PropsAndMethods()
     ----------------------------------------------------
     -- resize bar frame based on cols x rows
     ----------------------------------------------------
-    local paddingLeft = 16
-    local paddingRight = 16
-    local paddingTop = 16
-    local paddingBottom = 16
-    --local pad = ui.padding
-    --
-    --local totalWidth = pad.left + (size + spacing.horizontal) * (cols - 1) + size + pad.right
-    --local totalHeight = pad.top + size * rows + spacing.vertical * (rows - 1) + pad.bottom
-    
     local pad = ui.padding
     local BASE_UI_PADDING = 12
     
