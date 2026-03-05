@@ -175,6 +175,7 @@ local function BarModuleProtoMethods()
     local w = self.barFrame.widget
     for i, btn in ipairs(w.buttons) do
       local bc = btn:GetButtonConfig()
+      -- Create btn:IfButtonConfig(callbackFn)
       if not tbl_IsEmpty(bc) then
         --pd('event:: button=', btn.__name, 'bc=', fmt(bc))
         if bc.type and bc.id then
@@ -183,8 +184,8 @@ local function BarModuleProtoMethods()
         end
       else
         btn:SetAttribute('type', nil)
-        btn:SetAttribute('spell', nil)
-        btn:SetAttribute('item', nil)
+        --btn:SetAttribute('spell', nil)
+        --btn:SetAttribute('item', nil)
       end
     end
   end
