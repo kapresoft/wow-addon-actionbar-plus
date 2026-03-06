@@ -91,7 +91,7 @@
             </AnimationGroup>
         </Animations>
         <Frames>
-            <Cooldown parentKey="cooldown" inherits="CooldownFrameTemplate" setAllPoints="true">
+            <Cooldown parentKey="cooldown" inherits="CooldownFrameTemplate" setAllPoints="true" drawEdge="false">
                 <KeyValues>
                     <KeyValue key="edgeTextureNormal" value="Interface\Cooldown\edge-LoC" type="string"/>
                     <KeyValue key="edgeTextureLOC" value="Interface\Cooldown\edge" type="string"/>

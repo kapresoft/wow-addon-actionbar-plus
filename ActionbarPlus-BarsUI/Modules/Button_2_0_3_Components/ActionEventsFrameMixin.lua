@@ -55,7 +55,7 @@ local o = ActionEventsFrameMixin_ABP_2_0
 
 function o:OnLoad()
   self.frames = {};
-  --self:RegisterEvent("ACTIONBAR_UPDATE_STATE");			not updating state from lua anymore, see SetActionUIButton
+  self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
   --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");		replaced with ACTION_USABLE_CHANGED
   self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_CHARGES");
@@ -136,22 +136,19 @@ function o:OnEvent(evt, ...)
       local unit = ...;
       
       if(evt == "UNIT_SPELLCAST_SENT") then
-        spellID = select(4, ...);
+        spellID = select(4, ...)
       else
-        spellID = select(3, ...);
+        spellID = select(3, ...)
       end
       
       if (unit == "player" and btn:MatchesActiveButtonSpellID(spellID)) then
-        comp:IfSpell(spellID, function(spell)
-          local sp = ('%s(%s)'):format(spellID, spell.name)
-          --p('OnEvent():: matches spellID=', sp, 'evt=', evt)
-        end)
         btn:OnEvent(evt, ...);
+        btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
       end
     end
   else
-    for k, frame in pairs(self.frames) do
-      frame:OnEvent(evt, ...);
+    for k, btn in pairs(self.frames) do
+      btn:OnEvent(evt, ...);
     end
   end
 end
@@ -161,5 +158,3 @@ function o:RegisterFrame(frame) self.frames[frame] = frame; end
 
 --- @param frame Button_ABP_2_0_3
 function o:UnregisterFrame(frame) self.frames[frame] = nil; end
-
-

@@ -21,50 +21,38 @@ Module::ButtonStateMixin
 --- @see BarsUI_Modules_ABP_2_0
 local libName = ns.M.ButtonStateMixin()
 --- @class ButtonStateMixin_ABP_2_0
+--- @field __castingSpellID SpellID Keeps track of the current spell
+--- @field __updateState_IsInstantCast boolean Used in UpdateState() to keep track of instantly casted spells
+--- @field __instantCastSpellID SpellID
 local S = {}; ns:Register(libName, S)
 --
 --- @alias ButtonState_ABP_2_0 ButtonStateMixin_ABP_2_0
 --
 local p, pd, t, tf = ns:log(libName)
 
---[[-------------------------------------------------------------------
-Support Functions
----------------------------------------------------------------------]]
---- @param typeVal string
---- @return boolean
-local function ActionType_IsSpell(typeVal) return typeVal == atyp.spell end
-
 --[[-----------------------------------------------------------------------------
 Module::ButtonStateMixin (Methods)
 -------------------------------------------------------------------------------]]
---- @type ButtonStateMixin_ABP_2_0 | ButtonState_ABP_2_0 | Button_ABP_2_0_3
+--- @type ButtonStateMixin_ABP_2_0 | ButtonState_ABP_2_0 | Button_ABP_2_0_X
 local o = S
-
 
 --- Update the button's checked state
 function o:UpdateState()
-  --p('UpdateState():: called...')
-  local _type, id = self:GetActionInfo()
-  if not _type or not id then return end
+  local typeVal, id = self:GetActionInfo()
+  if not typeVal or not id then return end
   
-  if self.__castingSpellID and self.__castingSpellID == id then
-    self:SetChecked(true)
-    return
+  if au.IsCurrentAction(typeVal, id) then
+    return self:SetChecked(true)
   end
-  
-  local checked = false
-  local current = false
-  if _type == attr.spell then
-    current = C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id);
-  end
-  --self:t('Checked', 'UpdateState:: spellID=', id, 'current=', tostring(current), 'checked=', tostring(checked))
-  self:SetChecked(current)
+
+  self:SetChecked(false)
 end
 
 --- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
 function o:OnSpellCast(event, unitTarget, ...)
   if unitTarget ~= "player" then return end
-  --self:t('OnSpellCast', 'evt=', event)
+  local guid, spid = ...
+  --t('OnSpellCast', 'evt=', event, 'spid=', spid, 'guid=', guid)
   local actionType, spellID = self:GetActionInfo()
   if not au.IsSpell(actionType) then return end
   
@@ -73,43 +61,42 @@ function o:OnSpellCast(event, unitTarget, ...)
   local checked = false
   local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
   
-  local spellDesc = tostring(spellID);
-  if au.IsSpell(actionType) then
-    comp:IfSpell(spellID, function(sp)
-      spellDesc = spellDesc .. '[' .. sp.name .. ']'
-    end)
-  end
-  if event == 'UNIT_SPELLCAST_START' then
+  if event == 'UNIT_SPELLCAST_SENT' then
+    -- instant cast spells
+    self:SetChecked(false)
+    --self.__instantCastSpellID = spellID
+    --return self:UpdateState()
+  elseif event == 'UNIT_SPELLCAST_START' then
     local _, evtSpellID = ...
     if evtSpellID == spellID then
       self.__castingSpellID = evtSpellID
       self:SetChecked(true)
     end
-  end
-  
-  if event == 'UNIT_SPELLCAST_STOP'
+  elseif event == 'UNIT_SPELLCAST_STOP'
           or event == 'UNIT_SPELLCAST_INTERRUPTED'
           or event == 'UNIT_SPELLCAST_SUCCEEDED' then
-    current = C_IsCurrentSpell(spellID)
     local _, evtSpellID = ...
+
+    current = C_IsCurrentSpell(spellID)
     if self.__castingSpellID and self.__castingSpellID == evtSpellID then
       self.__castingSpellID = nil
-      self:UpdateState()
+      return self:UpdateState()
     end
+    self:SetChecked(false)
   end
 end
 
 function o:UpdateFlash()
-  p('UpdateFlash:: called...')
+  --p('UpdateFlash:: called...')
 end
 
 function o:ClearFlash()
-  p('ClearFlash:: called...')
+  --p('ClearFlash:: called...')
 end
 
 --- @param show boolean
 function o:OnTradeSkill(show)
-  p(('%s[%s]:: show=%s'):format('OnTradeSkill', self:GetID(), tostring(show)))
+  --p(('%s[%s]:: show=%s'):format('OnTradeSkill', self:GetID(), tostring(show)))
 end
 
 --[[
