@@ -27,6 +27,7 @@ local o = S
 --- @type BarConfig_ABP_2_0
 function o:GetBarConfig() return cns:a():bar(self.widget.barIndex) end
 
+--- @return ButtonConfig_ABP_2_0
 function o:GetButtonConfig()
   local barConf = self:GetBarConfig()
   local btnGroupKey = self:__buttonGroupKey()

@@ -4,7 +4,8 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
-local unit = cns.O.UnitUtil
+local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
+local attr, atyp = cns:constants()
 local tbl_IsEmpty = cns.O.Table.IsEmpty
 
 --[[-----------------------------------------------------------------------------
@@ -133,7 +134,7 @@ local function BarModuleProtoMethods()
   function bm:ACTIVE_TALENT_GROUP_CHANGED(event, ...)
     local currentIndex, prevIndex = ...
     local activeIndex = unit:GetActiveSpecGroupIndex()
-    p('OnEvent::' .. event, 'from=', prevIndex, 'to=', currentIndex, 'activeIndex[detected]=', activeIndex)
+    tf('ACTIVE_TALENT_GROUP_CHANGED::' .. event, 'from=', prevIndex, 'to=', currentIndex, 'activeIndex[detected]=', activeIndex)
 
     self.pendingSpecUpdate = true
   end
@@ -153,13 +154,11 @@ local function BarModuleProtoMethods()
       if not tbl_IsEmpty(bc) then
         --pd('event:: button=', btn.__name, 'bc=', fmt(bc))
         if bc.type and bc.id then
-          btn:SetAttribute('type', bc.type)
+          btn:SetAttribute(attr.type, bc.type)
           btn:SetAttribute(bc.type, bc.id)
         end
       else
-        btn:SetAttribute('type', nil)
-        --btn:SetAttribute('spell', nil)
-        --btn:SetAttribute('item', nil)
+        btn:ClearActionAttributes()
       end
     end
   end

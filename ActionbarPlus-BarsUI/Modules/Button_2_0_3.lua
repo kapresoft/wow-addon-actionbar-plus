@@ -14,9 +14,6 @@ Enable by:
 -------------------------------------------------------------------------------]]
 
 local IsModifiedClick = IsModifiedClick
-local RegisterFrameForEvents, RegisterFrameForUnitEvents = FrameUtil.RegisterFrameForEvents, FrameUtil.RegisterFrameForUnitEvents
-local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
-local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
 
 --[[-----------------------------------------------------------------------------
 Local Vars
@@ -28,8 +25,10 @@ ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 local cns = ns:cns()
 local O = cns.O
 local C = O.Constants
+local au = O.ActionUtil
 local attr, atyp = C.AttributeNames, C.SupportedActionTypes
-local comp, spu, unit, dru = O.Compat, O.SpellUtil, O.UnitUtil, O.DruidUtil
+local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
+local dru, priest = O.DruidUtil, O.PriestUtil
 local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
@@ -44,13 +43,11 @@ New Instance
 --
 local libName = 'ButtonMixin_ABP_2_0_3'
 --- @class ButtonMixin_ABP_2_0_3
---- @field __name Name The debug name
 --- @field icon TextureObj
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
---- @field __castingSpellID boolean Keeps track of the current spell
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
 local p, pd, t, tf = ns:log(libName)
 
@@ -76,31 +73,17 @@ end
 
 --- @param self Button_ABP_2_0_3
 local function Btn_PickupAction(self)
-  local type = self:GetAttributeType()
-  if self:IsSpellType() then
+  --- The abp_saved_type is saved during PreClick()
+  --- so that the button won't fire on pickup action
+  local typeVal = self:GetAttributeSavedType()
+  if not typeVal then return end
+  if au.IsSpell(typeVal) then
     local spell = self:GetAttributeSpell()
-    self:ClearAttributeType()
-    self:ClearAttributeSpell()
     comp:PickupSpell(spell)
   end
-end
-
---- @param self Button_ABP_2_0_3
-local function Btn_RegisterCallbacks(self)
-  --self:RegisterEvent('MODIFIER_STATE_CHANGED')
-  --self:RegisterEvent("CVAR_UPDATE")
-  --local h = function(...) Btn_OnSpellCast(self, ...) end
-  local spellCastHandler, tradeSkillHandler = 'OnSpellCast', 'OnTradeSkill'
-  self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', spellCastHandler)
-  self:RegisterEvent('UNIT_SPELLCAST_SENT', spellCastHandler)
-  self:RegisterEvent('UNIT_SPELLCAST_START', spellCastHandler)
-  self:RegisterEvent('UNIT_SPELLCAST_STOP', spellCastHandler)
-  self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED', spellCastHandler)
-  self:RegisterEvent('UNIT_SPELLCAST_FAILED_QUIET', spellCastHandler)
-  self:RegisterEvent('TRADE_SKILL_SHOW', tradeSkillHandler)
-  self:RegisterEvent('TRADE_SKILL_CLOSE', tradeSkillHandler)
-  
-  -- also potential: CURRENT_SPELL_CAST_CHANGED
+  self:ClearAttributeType()
+  self:ClearAttributeSavedType()
+  self:ClearAttributeSpell()
 end
 
 --[[-----------------------------------------------------------------------------
@@ -112,7 +95,6 @@ local o = S
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
   self:SetID(NextSeedID())
-  self.__name = ('%s:%s'):format(self:GetName(), self:GetID())
   
   Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
   self:EnableMouse(true)
@@ -125,12 +107,6 @@ function o:OnLoad()
   
   self:RegisterForDrag("LeftButton", "RightButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
-  --self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnInit')
-  Btn_RegisterCallbacks(self)
-  
-  --local function RegisterWorldEventsFrame()
-  --
-  --end
   
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
   
@@ -163,25 +139,36 @@ end
 --- @param evt string Blizzard event name
 --- @param ... any Event payload (unit, castGUID, spellID, etc.)
 function o:OnEvent(evt, ...)
+  
   if evt == 'PLAYER_ENTERING_WORLD' then
     local isInitialLogin, isReloadingUi = ...
     self:OnInit(evt, isInitialLogin, isReloadingUi)
     self:UpdateTexture()
+    self:UpdateState()
+  elseif evt == 'ACTIONBAR_UPDATE_STATE' then
+    self:UpdateState()
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
     self:UpdateTexture()
   elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
     self:UpdateTexture()
-    --self:SetChecked(false)
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
-  elseif evt == 'SPELL_UPDATE_COOLDOWN'
-          or evt == 'SPELL_UPDATE_COOLDOWN'
-          or evt == 'LOSS_OF_CONTROL_ADDED' then
+  elseif evt == 'SPELL_UPDATE_COOLDOWN' or evt == 'LOSS_OF_CONTROL_ADDED' then
+    --if unit:IsPriest() and unit:IsShapeShifted() then return end
     self:UpdateCooldown()
-    --self:p('OnEvent', 'evt=', evt)
   elseif evt == 'UNIT_AURA' then
     --self:UpdateStealthSpells()
   end
+  
+end
+
+--- Events coming here are matching spellcast events
+---@param spellID SpellID The matching spell ID
+function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
+  --self:t('OnPlayerMatchingSpellcastEvent', 'evt=', evt, 'called...')
+  if evt == 'UNIT_SPELLCAST_START' then
+  end
+  self:UpdateState()
 end
 
 -- /dump GetShapeshiftFormInfo(1)
@@ -213,22 +200,21 @@ function o:PreClick(button, down)
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
     self:DisableAttributeType()
   end
+  
+  --local _type, spellID = self:GetActionInfo()
+  --if not _type then return end
+  --
+  --local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
+  --if current then self:SetChecked(true) end
+  --tf('PreClick', 'current=', current)
 end
 
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
   if InCombatLockdown() then return false end
-  --p('PostC:: down=', down, 'GetButtonState()=', self:GetButtonState())
-  local _type, spellID = self:GetActionInfo()
-  local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
-  --tf('Checked(PostClick)', 'spellID=', spellID, 'current=', current)
-  if current then self:SetChecked(true) end
-  --if current then self:UpdateState() end
-  --if not down then self:RestoreAttributeType() end
-  --Btn_UpdateState(self)
-  --self:UpdateState()
-  -- todo move to ButtonStates#Btn_OnSpellCast
+  if down == true then return end
+  self:UpdateState()
 end
 
 function o:OnEnter()
@@ -364,13 +350,10 @@ function o:Update()
   self.__updating = false
 end
 
---- Clear Icon When:
---- - type is invalid (blank or nil)
---- - name=spell|item|etc and val is invalid (blank or nil)
+--- If type is invalid (blank or nil) then return quickly
+--- Clear Icon When: type=spell|item|etc and val is invalid (blank or nil)
 function o:UpdateAction(name, val)
-  if name == attr.type then
-    if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
-  end
+  if name == attr.type and Str_IsBlank(val) then return end
   
   if not Str_IsAnyOf(name, atyp.spell, atyp.item) then return end
   if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
@@ -390,7 +373,7 @@ end
 --- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
 --- @return TextureIcon
 function o:GetActionTexture()
-  local type, id = self:GetActionInfo()
+  local _type, id = self:GetActionInfo()
   if not id then return end
   -- todo next: move prowl logic from UpdateStealthSpells()
   
@@ -405,12 +388,14 @@ function o:GetActionTexture()
   --end
   local druid = cns.O.DruidUtil
   --self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
-  if type == atyp.spell then
+  if _type == atyp.spell then
     if unit:IsStealthActive() then
       if druid:IsProwl(id) then
         self:DimIcon()
         return unit:GetStealthedIcon()
       end
+    elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
+      return priest:GetShadowFormActiveIcon()
     end
     self:SetIconNormalVertex()
   end
@@ -456,19 +441,9 @@ function o:RestoreAttributeType()
   self:SetAttribute(attr.saved_type, nil)
 end
 
-function o:IsSpellType()
-  return self:GetAttributeType() == atyp.spell
-          or self:GetAttributeSavedType() == atyp.spell
-end
-
 function o:MatchesActiveButtonSpellID(spellID)
-  if (not spellID) then return false end
-  
-  local type, id = self:GetActionInfo()
-  if type == "item" then
-    p('MatchesActiveButtonSpellID():: needs implementation...')
-  end
-  return id == spellID;
+  local _type, id = self:GetActionInfo()
+  return id and id == spellID;
 end
 
 function o:UpdateCooldown()
@@ -478,37 +453,30 @@ function o:UpdateCooldown()
   
   if not self:HasAction() then cd:Clear(); return end
   
-  local actionType, id = self:GetActionInfo()
-  if not id then return end
-  if not actionType or not id then cd:Clear(); return end
+  local _type, id = self:GetActionInfo()
+  if not id then cd:Clear(); return end
   
-  local name = ''
   local start, duration, enable, modRate = 0, 0, 0, 1
   
-  if actionType == atyp.spell then
-    name = comp:GetSpellName(id)
-    local info = comp:GetSpellCooldown(id)
-    --self:p('UpdateCD', 'name=', name, 'info=', tostring(info))
-    if info then
+  if au.IsSpell(_type) then
+    -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
+    if cns:IsTBC()
+            and priest:IsPriest()
+            and priest:IsShapeShifted()
+            and priest:IsShadowFormSpell(id) then return end
+    au.IfSpellCooldown(id, function(info)
       start = info.startTime or 0
       duration = info.duration or 0
       modRate = info.modRate
-    end
-  elseif actionType == atyp.item then
+    end)
+  elseif au.IsItem(_type) then
     start, duration, enable = GetItemCooldown(id)
   else
     cd:Clear()
     return
   end
   if not start or not duration then cd:Clear(); return end
-  
-  --local _enable=false
-  --local ok, _valEnable = pcall(function() return enable == true end)
-  --if ok then _enable = _valEnable end
-  --self:p('UpdateCD', 'name=', name, 'ok=', ok, 'isEnabledVal=', _enable)
-  -- not sure if we need currentCooldownType
-  cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
-  --CooldownFrame_Set(cd, start, duration, _enable, false, modRate or 1)
+  --cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
   cd:SetCooldown(start, duration, modRate or 1)
 end
 
@@ -540,32 +508,6 @@ function o:HasAction()
   return id ~= nil
 end
 
------ Update the button's checked state
---function o:UpdateState()
---  --p('UpdateState():: called...')
---  local type, id = self:GetActionInfo()
---  if not type or not id then return end local checked = false
---
---  local current = false
---  if type == t.spell then
---    current = C_IsCurrentSpell(id)
---    --p('btn=', self:GetID(), 'current=', current, 'spellID=', actionID)
---    checked = current or C_IsAutoRepeatSpell(id);
---  end
---
---  local name = '';
---  if type == t.spell then
---    local sp = comp:GetSpellInfo(id)
---    if sp then name = '[' .. sp.name .. ']' end
---  end
---
---  --p(('%s[%s]:: type=%s action=%s%s current=%s checked=%s')
---  --        :format('UpdateSt', self:GetID(), type, id, name,
---  --        tostring(current), tostring(checked)))
---  self:SetChecked(checked)
---end
-
-
 --- @param spell SpellIdentifier
 function o:__SetSpell(spell)
   local sp = comp:GetSpellInfo(spell)
@@ -585,7 +527,7 @@ end
 function o:pd(prefix, ...)
   local a = { ... }; pd(self:pid(prefix), unpack(a))
 end
-function o:pid(prefix) return ("%s(%s)::"):format(prefix, self.__name) end
+function o:pid(prefix) return ("%s(%s)::"):format(prefix, self:GetName()) end
 
 --- @param r RGBColor
 --- @param g RGBColor
@@ -608,3 +550,12 @@ end
 function o:IsDragAllowed()
   return not Settings.GetValue('lockActionBars') or IsModifiedClick('PICKUPACTION')
 end
+
+function o:ClearActionAttributes()
+  self:ClearAttributeType()
+  local _types = { atyp.spell, atyp.item }
+  for _, t in ipairs(_types) do
+    if self:GetAttribute(t) then return self:SetAttribute(t, nil) end
+  end
+end
+

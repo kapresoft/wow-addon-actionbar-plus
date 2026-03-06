@@ -113,7 +113,7 @@ function o:GetShapeshiftFormInfo(index)
 end
 
 --- Retrieves the cooldown information for a spell, compatible with both Retail and Classic WoW.
---- @param spellID SpellName A known spell name for the character class.
+--- @param spellID SpellID A known spell name for the character class.
 --- @return SpellCooldownInfo
 function o:GetSpellCooldown(spellID)
   assert(type(spellID) == 'number', 'GetSpellCooldown(spellID):: spellID should be a number.')
@@ -124,6 +124,33 @@ function o:GetSpellCooldown(spellID)
   local cd = { startTime = startTime, duration = duration,
                isEnabled = isEnabled, modRate = modRate, }
   return startTime and cd
+end
+
+--- @return UnitCastingData
+function o:GetCastingInfo(unit)
+  local _unit = unit or 'player'
+  local name, _, iconID, _, _, _, guid, _, spellID = UnitCastingInfo(_unit)
+  
+  --- @class UnitCastingData
+  local data = {
+    name = name, iconID = iconID, guid=guid, spellID = spellID
+  }
+  return spellID and data
+end
+
+--- The player is casting a spell that matches {matchSpellID}.
+--- @param matchSpellID SpellID The spellID to match
+--- @return boolean
+function o:IsPlayerCastingSpell(matchSpellID)
+  assert(type(matchSpellID) == 'number', 'IsPlayerCastingSpell(matchSpellID):: expected a spellID(number).')
+  local info = self:GetCastingInfo()
+  return (info and info.spellID and info.spellID == matchSpellID) or false
+end
+--- The player is casting a spell (any spell)
+--- @return boolean
+function o:IsPlayerCasting()
+  local info = self:GetCastingInfo()
+  return (info and info.spellID) or false
 end
 
 --- @param itemName Name
@@ -144,3 +171,4 @@ function o:GetItemCooldown(itemName)
   cd = { startTime = startTime, duration = duration, enable = enable }
   return cd
 end
+

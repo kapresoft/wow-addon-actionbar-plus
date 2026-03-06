@@ -26,11 +26,10 @@ o.SHADOW_FORM_SPELL_ID = 15473
 o.SHADOW_FORM_SPELL_ID_RETAIL = 232698
 
 local formActiveIcon = (function()
-  local activeIconClassic = o.ADDON_TEXTURES_DIR_FORMAT:format('spell_shadowform_active')
   return {
     retail  = 136116,
     mop     = 136200,
-    default = activeIconClassic,
+    default = 136130,
   }
 end)()
 
@@ -46,7 +45,7 @@ function o:IsInShadowForm()
 
 function o:GetShadowFormActiveIcon()
   if ns:IsRetail() then return formActiveIcon.retail
-  elseif ns:IsMoP() then return formActiveIcon.mop end
+  elseif ns:IsMists() then return formActiveIcon.mop end
   return formActiveIcon.default
 end
 
