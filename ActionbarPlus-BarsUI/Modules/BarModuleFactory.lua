@@ -157,9 +157,7 @@ local function BarModuleProtoMethods()
           btn:SetAttribute(attr.type, bc.type)
           btn:SetAttribute(bc.type, bc.id)
         end
-      else
-        btn:ClearActionAttributes()
-      end
+      else btn:ClearActionAttributes() end
     end
   end
 
