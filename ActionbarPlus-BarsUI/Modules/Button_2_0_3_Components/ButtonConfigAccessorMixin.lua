@@ -41,9 +41,9 @@ function o:GetButtonConfig()
 end
 
 function o:ClearButtonConf()
-  local barConf = self:GetBarConfig()
-  if not barConf.buttons then return end
-  barConf.buttons[self:__buttonGroupKey()] = nil
+  local bc = self:GetButtonConfig()
+  if not bc then return end
+  bc.type, bc.id = nil, nil
 end
 
 --- @return string
