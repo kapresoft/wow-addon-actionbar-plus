@@ -13,6 +13,8 @@ local ModuleNames = {
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   
+  --- @type ButtonWidgetMixin_ABP_2_0
+  ButtonWidgetMixin = {},
   --- @type BarModuleFactory_ABP_2_0
   BarModuleFactory = {},
   --- @type ButtonConfigAccessorMixin_ABP_2_0
