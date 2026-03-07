@@ -51,9 +51,7 @@ end
 --- @param name Name
 --- @param val string
 function o:UpdateAction(name, val)
-  if name == attr.type and Str_IsBlank(val) then return end
-  
-  if not Str_IsAnyOf(name, atyp.spell, atyp.item) then return end
+  if not au.IsSupportedAction(name) then return end
   if Str_IsBlank(val) then self.button.icon:SetTexture(nil); return end
   
   -- if name == 'abp_clear' then
@@ -83,18 +81,21 @@ function o:ApplyButtonConfig()
   btn:SetButtonStateNormal()
   
   local bc = btn:GetButtonConfig()
-  if not (bc and bc.type and bc.id) then
-    self:ClearAttributeType()
-    self:ResetVisuals()
-    return
-  end
+  if not (bc and bc.type and bc.id) then self:ResetButton(); return end
   
   self:SetAttribute(attr.type, bc.type)
   self:SetAttribute(bc.type, bc.id)
 end
 
+--- @private
+function o:ResetButton()
+  self:__ResetAttributes()
+  self:__ResetVisuals()
+end
+
+--- @private
 --- Reset button UI to original empty state
-function o:ResetVisuals()
+function o:__ResetVisuals()
   local btn = self.button
   -- Clear icon
   if btn.icon then
@@ -118,19 +119,18 @@ function o:ResetVisuals()
   if btn.icon then btn.icon:SetDesaturated(false) end
 end
 
-function o:ResetAttributes()
-  local btn = self.button
+--- @private
+function o:__ResetAttributes()
   self.__suspendAttributeChangeHandler = true
-  pcall(function() self:__ResetAttributes() end)
+  pcall(self.__ClearActionAttributes, self)
   self.__suspendAttributeChangeHandler = false
-  -- This last one is to finally trigger btn:UpdateAction()
-  btn:SetAttribute(atyp.spell, nil)
 end
 
-function o:__ResetAttributes()
-  local btn = self.button
+--- @private
+function o:__ClearActionAttributes()
+  self:SetAttribute(attr.type, nil)
   for _, typeAttribute in ipairs(atyp) do
-    btn:SetAttribute(typeAttribute, nil)
+    self:SetAttribute(typeAttribute, nil)
   end
 end
 
