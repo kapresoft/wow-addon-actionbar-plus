@@ -103,19 +103,30 @@ local o = S
 function o:OnLoad()
   self:SetID(NextSeedID())
   
-  Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
-  
-  self:SetAttribute("checkselfcast", true);
-  self:SetAttribute("checkfocuscast", true);
-  self:SetAttribute("checkmouseovercast", true);
   
   self:RegisterForDrag("LeftButton", "RightButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
   
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
+end
+
+--- @private
+--- @param barIndex Index
+--- @param btnIndex Index
+function o:AfterLoad(btnIndex, barIndex)
+  self:pd('__Init', 'called...')
+  self.widget = CreateFromMixins(ns.O.ButtonWidgetMixin)
+  self.widget:Init(self, btnIndex, barIndex)
+  Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
+
+  self:SetAttribute("checkselfcast", true);
+  self:SetAttribute("checkfocuscast", true);
+  self:SetAttribute("checkmouseovercast", true);
+  
+  self.widget:ApplyButtonConfig()
   
   local traceChecked = false
   if traceChecked then
@@ -315,8 +326,7 @@ function o:OnReceiveDrag()
 end
 
 function o:OnAttributeChanged(name, val)
-  --p(('OnAttributeChanged[%s]: name=%s, val=%s'):format(self:GetID(), tostring(name), tostring(val)))
-  self:UpdateAction(name, val)
+  self.widget:OnAttributeChanged(name, val)
 end
 
 --[[-----------------------------------------------------------------------------
@@ -365,27 +375,6 @@ function o:Update()
   self.__updating = false
 end
 
---- If type is invalid (blank or nil) then return quickly
---- Clear Icon When: type=spell|item|etc and val is invalid (blank or nil)
-function o:UpdateAction(name, val)
-  if name == attr.type and Str_IsBlank(val) then return end
-  
-  if not Str_IsAnyOf(name, atyp.spell, atyp.item) then return end
-  if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
-  
-  -- if name == 'abp_clear' then
-  if name == atyp.spell then
-    local info = comp:GetSpellInfo(val)
-    local _sp = ('%s(%s)'):format(tostring(info.name), tostring(info.spellID))
-    self:t('UpdateAction','spell=', _sp, 'attr-name=', name)
-    if not (info and info.iconID) then return end
-    self.icon:SetTexture(info.iconID)
-  elseif name == atyp.item then
-    self:t('UpdateAction','item=', val, 'attr-name=', name)
-  end
-  
-  self:Update()
-end
 
 --- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
 --- @return TextureIcon
