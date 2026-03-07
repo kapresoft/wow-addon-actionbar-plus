@@ -30,6 +30,8 @@ local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
 local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
+local Tbl_IsEmpty = cns.O.Table.IsEmpty
+
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 
@@ -43,6 +45,11 @@ New Instance
 --
 local libName = 'ButtonMixin_ABP_2_0_3'
 --- @class ButtonMixin_ABP_2_0_3
+--- @field NormalTexture TextureObj
+--- @field HighlightTexture TextureObj
+--- @field PushedTexture TextureObj
+--- @field CheckedTexture TextureObj
+--- @field ClearFlash fun():void
 --- @field icon TextureObj
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
@@ -75,15 +82,15 @@ end
 local function Btn_PickupAction(self)
   --- The abp_saved_type is saved during PreClick()
   --- so that the button won't fire on pickup action
-  local typeVal = self:GetAttributeSavedType()
+  local typeVal = self.widget:GetAttributeSavedType()
   if not typeVal then return end
   if au.IsSpell(typeVal) then
-    local spell = self:GetAttributeSpell()
+    local spell = self.widget:GetAttributeSpell()
     comp:PickupSpell(spell)
   end
-  self:ClearAttributeType()
-  self:ClearAttributeSavedType()
-  self:ClearAttributeSpell()
+  self.widget:ClearAttributeType()
+  self.widget:ClearAttributeSavedType()
+  self.widget:ClearAttributeSpell()
 end
 
 --[[-----------------------------------------------------------------------------
@@ -147,6 +154,7 @@ function o:OnEvent(evt, ...)
     self:UpdateState()
   elseif evt == 'ACTIONBAR_UPDATE_STATE' then
     self:UpdateState()
+    self:RepairRetailPushedState()
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
     self:UpdateTexture()
   elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
@@ -160,6 +168,13 @@ function o:OnEvent(evt, ...)
     --self:UpdateStealthSpells()
   end
   
+end
+
+--- Retail fix for stuck PUSHED state after toggle.
+function o:RepairRetailPushedState()
+  if cns:IsRetail() then
+    self:SetButtonStateNormal()
+  end
 end
 
 --- Events coming here are matching spellcast events
@@ -198,7 +213,7 @@ function o:PreClick(button, down)
   end
   
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
-    self:DisableAttributeType()
+    self.widget:DisableAttributeType()
   end
   
   --local _type, spellID = self:GetActionInfo()
@@ -218,7 +233,7 @@ function o:PostClick(button, down)
 end
 
 function o:OnEnter()
-  self:ClearAttributeSavedType()
+  self.widget:ClearAttributeSavedType()
   
   local type, id = self:GetActionInfo()
   if not id then return end
@@ -244,9 +259,8 @@ function o:OnEnter()
 end
 
 function o:OnLeave()
-  --p('xx OnLeave')
-  self:RestoreAttributeType()
   GameTooltip:Hide()
+  self.widget:RestoreAttributeType()
 end
 
 --- @param button ButtonName
@@ -266,7 +280,8 @@ end
 
 function o:OnDragStop()
   p('OnDragStop...')
-  self:RestoreAttributeType()
+  -- todo: review if these are needed
+  self.widget:RestoreAttributeType()
 end
 
 --function o:__btnConfOrNew()
@@ -358,13 +373,15 @@ function o:UpdateAction(name, val)
   if not Str_IsAnyOf(name, atyp.spell, atyp.item) then return end
   if Str_IsBlank(val) then self.icon:SetTexture(nil); return end
   
+  -- if name == 'abp_clear' then
   if name == atyp.spell then
     local info = comp:GetSpellInfo(val)
-    self:p('UpdateAction','spell=', val, 'name=', name)
+    local _sp = ('%s(%s)'):format(tostring(info.name), tostring(info.spellID))
+    self:t('UpdateAction','spell=', _sp, 'attr-name=', name)
     if not (info and info.iconID) then return end
     self.icon:SetTexture(info.iconID)
   elseif name == atyp.item then
-    self:p('UpdateAction','item=', val, 'name=', name)
+    self:t('UpdateAction','item=', val, 'attr-name=', name)
   end
   
   self:Update()
@@ -420,27 +437,6 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
-function o:GetAttributeType() return self:GetAttribute(attr.type) end
-function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
-function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
-function o:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
-function o:DisableAttributeType()
-  if not self:GetAttributeSavedType() then
-    self:SetAttribute(attr.saved_type, self:GetAttributeType())
-  end
-  self:ClearAttributeType()
-end
-function o:GetAttributeSavedType() return self:GetAttribute(attr.saved_type) end
-function o:ClearAttributeSavedType()
-  if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(attr.saved_type, nil)
-end
-function o:RestoreAttributeType()
-  if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
-  self:SetAttribute(attr.saved_type, nil)
-end
-
 function o:MatchesActiveButtonSpellID(spellID)
   local _type, id = self:GetActionInfo()
   return id and id == spellID;
@@ -551,11 +547,8 @@ function o:IsDragAllowed()
   return not Settings.GetValue('lockActionBars') or IsModifiedClick('PICKUPACTION')
 end
 
-function o:ClearActionAttributes()
-  self:ClearAttributeType()
-  local _types = { atyp.spell, atyp.item }
-  for _, t in ipairs(_types) do
-    if self:GetAttribute(t) then return self:SetAttribute(t, nil) end
-  end
-end
+function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
+function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
+function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
+
 

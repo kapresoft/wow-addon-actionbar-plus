@@ -106,9 +106,9 @@
             </Cooldown>
         </Frames>
         <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus\Core\Assets\Textures\ui-button-empty"/>
-        <PushedTexture file="Interface\Buttons\UI-Quickslot-Depress" alpha="0.6" alphaMode="ADD"/>
-        <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
-        <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+        <PushedTexture parentKey="PushedTexture" file="Interface\Buttons\UI-Quickslot-Depress" alpha="0.6" alphaMode="ADD"/>
+        <HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+        <CheckedTexture parentKey="CheckedTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 	</CheckButton>
 
 </Ui>
