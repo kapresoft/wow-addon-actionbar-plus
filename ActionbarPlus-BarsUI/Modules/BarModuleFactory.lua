@@ -110,6 +110,14 @@ local function ButtonWidgetMixinMethods()
   --- @param value any
   function bw:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
   
+  --- @return boolean
+  function bw:HasAction()
+    local type = self:GetAttribute(attr.type)
+    if not type then return false end
+    local id = self:GetAttribute(type)
+    return id ~= nil
+  end
+  
   function bw:ApplyButtonConfig()
     local btn = self.button
     btn:SetButtonStateNormal()

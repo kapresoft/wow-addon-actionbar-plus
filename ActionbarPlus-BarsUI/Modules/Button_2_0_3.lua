@@ -335,7 +335,7 @@ function o:Update()
   icon:SetDesaturated(false)
   
   local type, id = self:GetActionInfo()
-  if self:HasAction() then
+  if self.widget:HasAction() then
     if ( not self.eventsRegistered ) then
       eventsFrame:RegisterFrame(self);
       self.eventsRegistered = true;
@@ -442,7 +442,7 @@ function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
   
-  if not self:HasAction() then cd:Clear(); return end
+  if not self.widget:HasAction() then cd:Clear(); return end
   
   local _type, id = self:GetActionInfo()
   if not id then cd:Clear(); return end
@@ -489,14 +489,6 @@ function o:GetActionInfo()
   end
   
   return nil
-end
-
---- @return boolean
-function o:HasAction()
-  local type = self:GetAttribute(attr.type)
-  if not type then return false end
-  local id = self:GetAttribute(type)
-  return id ~= nil
 end
 
 --- @param spell SpellIdentifier
