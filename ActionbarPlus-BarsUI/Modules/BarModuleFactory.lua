@@ -175,6 +175,10 @@ local function ButtonWidgetMixinMethods()
   function bw:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
   function bw:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
   
+  function bw:MatchesActiveButtonSpellID(spellID)
+    local _, id = self.button:GetActionInfo()
+    return id and id == spellID;
+  end
   
 end; ButtonWidgetMixinMethods()
 

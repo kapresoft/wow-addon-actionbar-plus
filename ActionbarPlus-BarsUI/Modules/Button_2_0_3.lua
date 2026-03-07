@@ -437,11 +437,6 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
-function o:MatchesActiveButtonSpellID(spellID)
-  local _type, id = self:GetActionInfo()
-  return id and id == spellID;
-end
-
 function o:UpdateCooldown()
   --self:p('UpdateCooldown():: called...')
   local cd = self.cooldown

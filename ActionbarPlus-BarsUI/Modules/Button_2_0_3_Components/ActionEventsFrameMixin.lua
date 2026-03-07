@@ -141,7 +141,7 @@ function o:OnEvent(evt, ...)
         spellID = select(3, ...)
       end
       
-      if (unit == "player" and btn:MatchesActiveButtonSpellID(spellID)) then
+      if (unit == "player" and btn.widget:MatchesActiveButtonSpellID(spellID)) then
         btn:OnEvent(evt, ...);
         btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
       end
