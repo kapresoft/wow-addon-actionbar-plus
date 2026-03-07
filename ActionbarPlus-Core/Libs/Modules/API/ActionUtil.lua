@@ -3,7 +3,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local comp = ns.O.Compat
+local O = ns.O
+local comp, SupportedActionTypeMap = O.Compat, O.Constants.SupportedActionTypesAsMap()
 
 local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
 local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
@@ -33,6 +34,13 @@ function o.IsCurrentAction(typeVal, id)
     return C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id)
   end
   return false
+end
+
+--- @param action Name The action name; i.e. 'spell', 'item', etc..
+--- @return boolean
+function o.IsSupportedAction(action)
+  return type(action) == 'string'
+          and SupportedActionTypeMap[action] == true
 end
 
 --- @param typeVal string The button attribute 'type' value

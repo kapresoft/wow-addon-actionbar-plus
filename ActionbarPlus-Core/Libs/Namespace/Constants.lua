@@ -36,7 +36,11 @@ local SupportedActionTypes = {
   petaction    = 'petaction',
   equipmentset = 'equipmentset',
 }; o.SupportedActionTypes = SupportedActionTypes
-
+o.SupportedActionTypesAsMap = function()
+  local map = {}
+  for _, name in ipairs(SupportedActionTypes) do map[name] = true end
+  return map
+end
 --[[-------------------------------------------------------------------
 UnitClass
 @see FrameXMLBase\Constants.lua#CLASS_SORT_ORDER
