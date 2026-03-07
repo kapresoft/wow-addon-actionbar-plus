@@ -6,7 +6,7 @@ local ns = select(2, ...)
 local cns = ns:cns()
 local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
 local attr, atyp = cns:constants()
-local tbl_IsEmpty = cns.O.Table.IsEmpty
+local Tbl_IsEmpty = cns.O.Table.IsEmpty
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -99,6 +99,83 @@ local function ButtonWidgetMixinMethods()
     return ('%s(Widget):: index=%s frameIndex=%s')
             :format(self.button:GetName(), self.index, self.barIndex)
   end
+  
+  --- @see Frame#GetAttribute
+  --- @param attributeName string
+  --- @return string value
+  function bw:GetAttribute(attributeName) return self.button:GetAttribute(attributeName) end
+  
+  --- @see Frame#SetAttribute(attributeName, value)
+  --- @param attributeName string
+  --- @param value any
+  function bw:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
+  
+  function bw:ApplyButtonConfig()
+    local btn = self.button
+    btn:SetButtonStateNormal()
+    
+    local bc = btn:GetButtonConfig()
+    if not (bc and bc.type and bc.id) then
+      self:ClearAttributeType()
+      self:ResetVisuals()
+      return
+    end
+    
+    self:SetAttribute(attr.type, bc.type)
+    self:SetAttribute(bc.type, bc.id)
+  end
+  
+  --- Reset button UI to original empty state
+  function bw:ResetVisuals()
+    local btn = self.button
+    -- Clear icon
+    if btn.icon then
+      btn.icon:SetTexture(nil)
+      btn:SetIconNormalVertex()
+    end
+    
+    -- Clear cooldown
+    if btn.cooldown then
+      btn.cooldown:Clear()
+    end
+    
+    -- Clear checked state
+    btn:SetChecked(false)
+    btn:SetButtonStateNormal()
+    
+    -- Stop flashing if you use it
+    if btn.ClearFlash then btn:ClearFlash() end
+    
+    -- Remove any desaturation
+    if btn.icon then btn.icon:SetDesaturated(false) end
+  end
+  
+  function bw:ClearAttributeType() self:SetAttribute(attr.type, nil) end
+  function bw:GetAttributeType() return self.button:GetAttribute(attr.type) end
+  function bw:GetAttributeSavedType() return self:GetAttribute(attr.saved_type) end
+  
+  function bw:DisableAttributeType()
+    if not self:GetAttributeSavedType() then
+      self:SetAttribute(attr.saved_type, self:GetAttributeType())
+    end
+    self:ClearAttributeType()
+  end
+  
+  function bw:ClearAttributeSavedType()
+    if not self:GetAttributeSavedType() then return end
+    self:SetAttribute(attr.saved_type, nil)
+  end
+  
+  function bw:RestoreAttributeType()
+    if not self:GetAttributeSavedType() then return end
+    self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
+    self:SetAttribute(attr.saved_type, nil)
+  end
+  
+  function bw:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
+  function bw:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
+  
+  
 end; ButtonWidgetMixinMethods()
 
 --[[-------------------------------------------------------------------
@@ -149,15 +226,7 @@ local function BarModuleProtoMethods()
     
     local w = self.barFrame.widget
     for i, btn in ipairs(w.buttons) do
-      local bc = btn:GetButtonConfig()
-      -- Create btn:IfButtonConfig(callbackFn)
-      if not tbl_IsEmpty(bc) then
-        --pd('event:: button=', btn.__name, 'bc=', fmt(bc))
-        if bc.type and bc.id then
-          btn:SetAttribute(attr.type, bc.type)
-          btn:SetAttribute(bc.type, bc.id)
-        end
-      else btn:ClearActionAttributes() end
+      btn.widget:ApplyButtonConfig()
     end
   end
 
@@ -327,17 +396,7 @@ local function PropsAndMethods()
       local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate)
       btn:SetParentKey(btnKey)
       btn.widget = CreateAndInitFromMixin(ButtonWidgetMixin, btn, i, barIndex)
-      local bc = btn:GetButtonConfig()
-      if not tbl_IsEmpty(bc) then
-        --pd('CreateButtons:: button=', btnName, 'bc=', fmt(bc))
-        if bc.type and bc.id then
-          btn:SetAttribute('type', bc.type)
-          btn:SetAttribute(bc.type, bc.id)
-        end
-      else
-        --ABP_ButtonTestData:AddTestData(btn)
-      end
-      
+      btn.widget:ApplyButtonConfig()
       table.insert(buttons, btn)
     end
     
