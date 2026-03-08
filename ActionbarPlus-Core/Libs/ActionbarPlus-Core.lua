@@ -4,7 +4,7 @@ local ns = select(2, ...)
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
-local p, pd, t, tf = ns:log()
+local p, pd, t, tf = ns:log('Core')
 local AceAddon, DatabaseMixin = ns.O.AceAddon, ns.O.DatabaseMixin
 
 --[[-------------------------------------------------------------------
@@ -29,21 +29,15 @@ function o:OnInitialize()
 end
 
 function o:OnEnable()
-  t('OnEnable::', 'specID=', ns.O.Compat:GetSpecializationID())
-  self:RegisterEvent('SPELLS_CHANGED')
-end
-
-function o:SPELLS_CHANGED()
-  self:UnregisterEvent("SPELLS_CHANGED")
-  C_Timer.After(0.2, function()
-      self:SendMessage('ABP_2_0::SPELLS_CHANGED')
+  C_Timer.After(0.1, function()
+    t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
   end)
 end
 
-function o:PLAYER_ENTERING_WORLD(evt, isInitialLogin, isReloadingUi)
+function o:OnCoreReady(evt, isInitialLogin, isReloadingUi)
   ns.lockActionBars = Settings.GetValue("lockActionBars")
-  p('PLAYER_ENTERING_WORLD:: isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
-  self:SendMessage('ABP_2_0::PLAYER_ENTERING_WORLD', isInitialLogin, isReloadingUi)
-end
-o:RegisterEvent('PLAYER_ENTERING_WORLD')
+  ns:InitTracer()
+  t('OnCoreReady', 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
+  self:SendMessage('ABP_2_0::CORE_READY', isInitialLogin, isReloadingUi)
+end; o:RegisterEvent('PLAYER_ENTERING_WORLD', 'OnCoreReady')
 

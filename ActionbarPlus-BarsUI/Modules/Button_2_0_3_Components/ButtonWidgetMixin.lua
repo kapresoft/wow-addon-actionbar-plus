@@ -39,6 +39,13 @@ function o:Init(btn, btnIndex, parentFrameIndex)
   self.button = btn
   self.index = btnIndex
   self.barIndex = parentFrameIndex
+  --@do-not-package@
+  if cns:IsDev() then
+    --- Needed by DeveloperSetup_ABP_2_0.ButtonLogMixin(o)
+    function self:__logID() return self.button:GetName() end
+    -- todo: DeveloperSetup_ABP_2_0.ButtonLogMixin(self, libName) end
+    DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, pd, t, tf) end
+  --@end-do-not-package@
 end
 
 function o:OnAttributeChanged(name, val)
@@ -179,20 +186,3 @@ function o:GetAttribute(attributeName) return self.button:GetAttribute(attribute
 --- @param value any
 function o:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
 
---[[-------------------------------------------------------------------
-Logger/Trace Methods
----------------------------------------------------------------------]]
---- @param prefix Name
---- @param ... any
-function o:t(prefix, ...) local a = { ... }; tf(self:pid(prefix), unpack(a)) end
-
---- @param prefix Name
---- @param ... any
-function o:p(prefix, ...) local a = { ... }; p(self:pid(prefix), unpack(a)) end
-
---- @param prefix Name
---- @param ... any
-function o:pd(prefix, ...) local a = { ... }; pd(self:pid(prefix), unpack(a)) end
-
---- @param prefix Name
-function o:pid(prefix) return ("%s(%s)::"):format(prefix, self.button:GetName()) end

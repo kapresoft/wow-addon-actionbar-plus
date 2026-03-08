@@ -15,7 +15,8 @@ Type:Namespace
 --- @field private fmt LibPrettyPrint_Formatter
 --- @field private printer LibPrettyPrint_Printer
 --- @field private logBuilder LogBuilderFn
---- @field tracer EventTracePrinter_ABP_2_0
+--- @field EvenTracePrinter EventTracePrinter_ABP_2_0
+--- @field tracer EventTracer_ABP_2_0
 --- @field M Core_Modules_ABP_2_0 The module names
 --- @field O Core_Modules_ABP_2_0 The module objects
 --
@@ -41,7 +42,8 @@ Override in DeveloperSetup to enable
 --- @class Settings_ABP_2_0
 --- @field developer boolean if true: enables developer mode
 --- @field enableTraceUI boolean if true: shows Blizz EventTrace UI on load
-local settings = { developer = false, enableTraceUI = false }; ns.settings = settings
+--- @field traceKeyword string defaults to 'abp2'
+local settings = { developer = false, enableTraceUI = false, traceKeyword='abp2' }; ns.settings = settings
 --- @return boolean
 function ns:IsDev() return ns.settings.developer == true end
 
@@ -49,16 +51,6 @@ function ns:IsDev() return ns.settings.developer == true end
 Support Functions
 ---------------------------------------------------------------------]]
 local function predicateFn() return ns:IsDev() end
-
-local function DelayedCall(delay, fn, ...)
-  assert(type(delay) == 'number' and delay > 0)
-  return function(...)
-    local args = { ... }
-    C_Timer.After(delay, function()
-      fn(unpack(args))
-    end)
-  end
-end
 
 --[[-------------------------------------------------------------------
 Formatter/Printer
@@ -134,19 +126,6 @@ function ns:g() return self:a():g() end
 --- @return BarConfig_ABP_2_0
 function ns:bars(index) return self:p().bars[index] end
 
---- @param tracer EventTracePrinter_ABP_2_0
-function ns:RegisterTracer(tracer)
-  self.tracerMixin = tracer
-  self.tracer = tracer:New(ns.nameShort, predicateFn)
-  C_Timer.After(0.01, function()
-      if not (ns:IsDev() and settings.enableTraceUI) then
-        self.tracer.evt:Hide()
-      elseif not self.tracer.evt:IsShown() then
-          self.tracer.evt:Show()
-      end
-  end)
-end
-
 --- @return Cursor_ABP_2_0
 function ns:cursor() return self.O.CursorProvider:GetCursor() end
 
@@ -155,14 +134,9 @@ function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.S
 
 --- @param name Name
 --- @param predicateFn fun():boolean @Optional - The predicate function
---- @return EventTracePrinter_ABP_2_0
+--- @return EventTracer_ABP_2_0
 function ns:NewTracer(name, predicateFn)
-  if not self.tracerMixin then return end
-  local tr = self.tracerMixin:New(name, predicateFn)
-  if not (ns:IsDev() and settings.enableTraceUI) then
-    tr.evt:Hide()
-  end
-  return tr
+  return self.EvenTracePrinter:New(name, predicateFn)
 end
 
 function ns:MixinGameVersion(gameVersion) Mixin(self, gameVersion) end
@@ -177,60 +151,75 @@ function ns:colorFn(rgbHex)
   end
 end
 
---- @param prefix string|any
---- @return ABP_2_0_TraceFn @Printer function that outputs plain values to Blizzard Trace UI (like print)
-function ns:traceFn(prefix)
-  if not self.tracer then return function()  end end
-  if type(prefix) ~= 'string' then
-    return function(...) return self.tracer:td(...) end
+--[[-------------------------------------------------------------------
+LogBuilder
+---------------------------------------------------------------------]]
+do
+  --- @param prefix string|any
+  --- @return ABP_2_0_TraceFn @Printer function that outputs plain values to Blizzard Trace UI (like print)
+  local function traceFn1(prefix)
+    if type(prefix) ~= 'string' then return function(...) return ns.tracer and ns.tracer:td(...) end end
+    return function(...) return ns.tracer and ns.tracer:t(strtrim(prefix), ...) end
   end
-  return function(...) return self.tracer:t(strtrim(prefix), ...) end
-end
-
---- @param prefix string|nil
---- @return ABP_2_0_TraceFnFormatted @Printer function that outputs formatted values to Blizzard Trace UI (like print)
-function ns:traceFnWithFormatting(prefix)
-  if type(prefix) ~= 'string' then
-    return function(...) return self.tracer:tdf(...) end
-  end
-  return function(...) return self.tracer:tf(strtrim(prefix), ...) end
-end
-
---- Returns the print, delayed-print, tracer, formatted-tracer functions
---- ```
---- local p, pd, t, tf = ns:log('EventHandler')
---- ```
---- @param moduleName Name
---- @return LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
-function ns:log(moduleName)
-  if not self.logBuilder then self.logBuilder = self:__CreateLogBuilder(self.printer) end
-  return self.logBuilder(moduleName)
-end
-
---- @protected
---- @param printer LibPrettyPrint_Printer
---- @return LogBuilderFn
-function ns:__CreateLogBuilder(printer)
-  assert(printer, 'Printer is required.')
   
+  --- With auto formatting of objects
+  --- @param prefix string|nil
+  --- @return ABP_2_0_TraceFnFormatted @Printer function that outputs formatted values to Blizzard Trace UI (like print)
+  local function traceFn2(prefix)
+    if type(prefix) ~= 'string' then return function(...) return ns.tracer and ns.tracer:tdf(...) end end
+    return function(...) return ns.tracer and ns.tracer:tf(strtrim(prefix), ...) end
+  end
+  
+  local function DelayedCall(delay, fn, ...)
+    assert(type(delay) == 'number' and delay > 0)
+    return function(...)
+      local args = { ... }
+      C_Timer.After(delay, function()
+        fn(unpack(args))
+      end)
+    end
+  end
+  
+  --- Returns the print, delayed-print, tracer, formatted-tracer functions
+  --- ```
+  --- local p, pd, t, tf = ns:log('EventHandler')
+  --- ```
   --- @param moduleName Name
-  local function builderFn(moduleName)
-    local m = moduleName
-    local pr = printer
-    if type(m) == 'string' then m = strtrim(m)
-    else m = nil end
-    
-    if m and #m > 0 then pr = printer:WithSubPrefix(m) end
-    
-    local printerDelayed = DelayedCall(1, pr)
-    local tracer1 = self:traceFn(m)
-    local tracer2 = self:traceFnWithFormatting(m)
-    return pr, printerDelayed, tracer1, tracer2
+  --- @return LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
+  function ns:log(moduleName)
+    if not self.logBuilder then self.logBuilder = self:__CreateLogBuilder(self.printer, traceFn1, traceFn2) end
+    return self.logBuilder(moduleName)
   end
   
-  return builderFn
+  --- @protected
+  --- @param printer LibPrettyPrint_Printer
+  --- @return LogBuilderFn
+  --- @param traceFn1 fun(moduleName:Name) : function
+  --- @param traceFn2 fun(moduleName:Name) : function
+  function ns:__CreateLogBuilder(printer, traceFn1, traceFn2)
+    assert(printer, 'Printer is required.')
+    
+    --- @param moduleName Name
+    local function builderFn(moduleName)
+      local m = moduleName
+      local pr = printer
+      if type(m) == 'string' then m = strtrim(m)
+      else m = nil end
+      
+      if m and #m > 0 then pr = printer:WithSubPrefix(m) end
+      
+      local printerDelayed = DelayedCall(1, pr)
+      local tracer1, tracer2 = traceFn1(m), traceFn2(m)
+      return pr, printerDelayed, tracer1, tracer2
+    end
+    
+    return builderFn
+  end
 end
 
+--[[-------------------------------------------------------------------
+Utility Functions
+---------------------------------------------------------------------]]
 function ns.Str_IsBlank(str)
   if type(str) ~= "string" then return str == nil end
   return strtrim(str) == ""
@@ -280,3 +269,17 @@ function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
 
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns
+
+--[[-------------------------------------------------------------------
+Init Tracer
+---------------------------------------------------------------------]]
+function ns:InitTracer()
+  if not predicateFn() then return end
+  
+  self.tracer = self:NewTracer(self.nameShort, predicateFn)
+  if not settings.enableTraceUI then self.tracer:HideUI()
+  else self.tracer:ShowUI() end
+  
+  local _, _, t = ns:log('Namespace')
+  t('InitTracer', 'tracer', self.tracer)
+end

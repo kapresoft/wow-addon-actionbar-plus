@@ -11,9 +11,13 @@ local ns = select(2, ...)
 --[[-----------------------------------------------------------------------------
 Library
 -------------------------------------------------------------------------------]]
---- @class EventTracePrinter_ABP_2_0
-local S = {}; S.__index = S
-
+--- @class EventTracePrinter_ABP_2_0 : AceEvent_3_0
+--- @field keyword string
+local S = ns:NewAceEvent(); ns.EvenTracePrinter = S
+S.__index = S
+--
+--- @class EventTracer_ABP_2_0 : EventTracePrinter_ABP_2_0
+--
 --- @param self EventTracePrinter_ABP_2_0
 S.__call = function(self, ...) self:t(...) end
 
@@ -25,7 +29,7 @@ local o = S
 
 --- @param addon Name
 --- @param predicateFn PredicateFn|nil  | "function() return true end"
---- @return EventTracePrinter_ABP_2_0
+--- @return EventTracer_ABP_2_0
 function o:New(addon, predicateFn)
   --- @type EventTracePrinter_ABP_2_0
   local tracer = setmetatable({}, o)
@@ -47,6 +51,14 @@ function o:__Init(addon, predicateFn)
   self.predicateFn = predicateFn or function() return true  end
   self.evt         = self:LoadEventTrace()
 end
+
+function o:ShowUI()
+  local s = self.evt.Log.Bar.SearchBox
+  if s then s:SetText(ns.settings.traceKeyword or '') end
+  self.evt:Show()
+end
+
+function o:HideUI() self.evt:Hide() end
 
 --- Trace with default prefix as the addon name
 --- @param ... any
@@ -77,6 +89,7 @@ function o:tf(prefix, ...)
   self.evt:LogEvent(self:_EventName(prefix), ns.fmt(...))
 end
 
+
 --- @private
 --- @return EventTraceInstance
 function o:LoadEventTrace()
@@ -89,7 +102,6 @@ function o:LoadEventTrace()
             self.logName, addOnName, reason))
   end
   assert(EventTrace, ('%s:: Failed to load [%s].'):format(self.logName, addOnName))
-  --EventTrace:Hide()
   return EventTrace
 end
 
@@ -99,13 +111,4 @@ function o:_EventName(prefix)
   return ("%s::%s"):format(self.eventBase, upperc(prefix))
 end
 
---[[-------------------------------------------------------------------
-Register
----------------------------------------------------------------------]]
--- todo: register at a later event
---- @see DeveloperSetup_ABP_2_0
-if ns:IsDev() then
-  ns:RegisterTracer(o)
-  local p, pd, t, tf = ns:log('EventTracePrinter')
-  tf('Registered... IsDev=', ns:IsDev())
-end
+
