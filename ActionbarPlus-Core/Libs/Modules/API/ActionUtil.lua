@@ -16,6 +16,7 @@ Module::ActionUtil
 local libName = ns.M.ActionUtil()
 --- @class ActionUtil_ABP_2_0
 local S = {}; ns:Register(libName, S)
+local p, pd, t, tf = ns:log(libName)
 
 local attr, atyp = ns:constants()
 
@@ -39,8 +40,9 @@ end
 --- @param action Name The action name; i.e. 'spell', 'item', etc..
 --- @return boolean
 function o.IsSupportedAction(action)
+  tf('IsSupportedAction:: map=', SupportedActionTypeMap)
   return type(action) == 'string'
-          and SupportedActionTypeMap[action] == true
+          and SupportedActionTypeMap[strlower(action)] == true
 end
 
 --- @param typeVal string The button attribute 'type' value

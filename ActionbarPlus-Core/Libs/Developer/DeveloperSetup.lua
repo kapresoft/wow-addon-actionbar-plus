@@ -3,9 +3,10 @@ local ns = select(2, ...)
 local s = ns.settings
 s.developer = true
 --s.enableTraceUI = true
+--s.traceKeyword = 'barsui'
 
 --- @class DeveloperSetup_ABP_2_0
-local o = {}
+local o = {}; DeveloperSetup_ABP_2_0 = o
 
 print('DeveloperSetup::', 'loaded...')
 
@@ -26,3 +27,28 @@ local function WrapScriptExample()
 
 end
 
+--[[-------------------------------------------------------------------
+Logger/Trace Functions
+---------------------------------------------------------------------]]
+function o.ButtonLogMixin(log, p, pd, t, tf)
+  
+  --- @param prefix Name
+  function log:pid(prefix) return ("%s(%s)"):format(prefix, self:__logID()) end
+  
+  --- @param prefix Name
+  --- @param ... any
+  function log:t(prefix, ...) local a = { ... }; t(self:pid(prefix), unpack(a)) end
+  
+  --- @param prefix Name
+  --- @param ... any
+  function log:tf(prefix, ...) local a = { ... }; tf(self:pid(prefix), unpack(a)) end
+  
+  --- @param prefix Name
+  --- @param ... any
+  function log:p(prefix, ...) local a = { ... }; p(self:pid(prefix), unpack(a)) end
+  
+  --- @param prefix Name
+  --- @param ... any
+  function log:pd(prefix, ...) local a = { ... }; pd(self:pid(prefix), unpack(a)) end
+  
+end

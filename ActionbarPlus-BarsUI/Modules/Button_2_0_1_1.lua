@@ -345,7 +345,7 @@ function o:OnLoad()
     
     self:RegisterForDrag("LeftButton", "RightButton");
     self:RegisterForClicks('AnyDown', 'AnyUp');
-    self:RegisterMessage('ABP_2_0::PLAYER_ENTERING_WORLD', 'OnPlayerEnteringWorld')
+    self:RegisterEvent('PLAYER_ENTERING_WORLD', 'OnPlayerEnteringWorld')
     --RegisterStateDriver(self, "abp_shift", "[mod:shift] shift; [mod:ctrl] ctrl; [mod:alt] alt; none")
 end
 

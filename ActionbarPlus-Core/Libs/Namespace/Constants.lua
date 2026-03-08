@@ -38,7 +38,7 @@ local SupportedActionTypes = {
 }; o.SupportedActionTypes = SupportedActionTypes
 o.SupportedActionTypesAsMap = function()
   local map = {}
-  for _, name in ipairs(SupportedActionTypes) do map[name] = true end
+  for _, name in pairs(SupportedActionTypes) do map[name] = true end
   return map
 end
 --[[-------------------------------------------------------------------

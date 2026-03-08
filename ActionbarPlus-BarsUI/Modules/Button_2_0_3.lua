@@ -103,6 +103,11 @@ local o = S
 function o:OnLoad()
   self:SetID(NextSeedID())
   
+  --@do-not-package@
+  function self:__logID() return self:GetName() end
+  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, pd, t, tf)
+  --@end-do-not-package@
+  
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
@@ -117,7 +122,6 @@ end
 --- @param barIndex Index
 --- @param btnIndex Index
 function o:AfterLoad(btnIndex, barIndex)
-  self:pd('__Init', 'called...')
   self.widget = CreateFromMixins(ns.O.ButtonWidgetMixin)
   self.widget:Init(self, btnIndex, barIndex)
   Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
@@ -276,7 +280,7 @@ end
 
 --- @param button ButtonName
 function o:OnDragStart(button)
-  p('OnDragStart...')
+  t('OnDragStart...')
   if InCombatLockdown() then return false end
   if not self:IsDragAllowed() then return end
   
@@ -489,17 +493,6 @@ function o:__SetSpell(spell)
   self.icon:SetTexture(sp.iconID)
   self:Update()
 end
-
-function o:t(prefix, ...)
-  local a = { ... }; tf(self:pid(prefix), unpack(a))
-end
-function o:p(prefix, ...)
-  local a = { ... }; p(self:pid(prefix), unpack(a))
-end
-function o:pd(prefix, ...)
-  local a = { ... }; pd(self:pid(prefix), unpack(a))
-end
-function o:pid(prefix) return ("%s(%s)::"):format(prefix, self:GetName()) end
 
 --- @param r RGBColor
 --- @param g RGBColor
