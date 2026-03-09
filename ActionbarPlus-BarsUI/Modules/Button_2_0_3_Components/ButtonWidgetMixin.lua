@@ -64,12 +64,12 @@ function o:UpdateAction(name, val)
   -- if name == 'abp_clear' then
   if name == atyp.spell then
     local info = comp:GetSpellInfo(val)
-    local _sp = ('%s(%s)'):format(tostring(info.name), tostring(info.spellID))
-    self:t('UpdateAction','spell=', _sp, 'attr-name=', name)
+    --local _sp = ('%s(%s)'):format(tostring(info.name), tostring(info.spellID))
+    --self:t('UpdateAction','spell=', _sp, 'attr-name=', name)
     if not (info and info.iconID) then return end
     self.button.icon:SetTexture(info.iconID)
   elseif name == atyp.item then
-    self:t('UpdateAction','item=', val, 'attr-name=', name)
+    --self:t('UpdateAction','item=', val, 'attr-name=', name)
   end
   
   self.button:Update()
@@ -92,6 +92,24 @@ function o:ApplyButtonConfig()
   
   self:SetAttribute(attr.type, bc.type)
   self:SetAttribute(bc.type, bc.id)
+end
+
+--- @param cursor Cursor_ABP_2_0
+function o:ApplyCursorAction(cursor)
+  if not cursor then return end
+  --- @type ButtonConfig_ABP_2_0
+  local btnC = self:conf(true)
+  
+  if cursor.type == 'spell' then
+    cursor:IfSpell(function(spell)
+      self:SetActionSpell(spell)
+      btnC.type = atyp.spell
+      btnC.id = spell.spellID
+    end)
+  end
+  
+  self.button:UpdateState()
+  self.button:UpdateFlash()
 end
 
 function o:ResetButton()
@@ -178,6 +196,29 @@ function o:GetDebugName()
           :format(self.button:GetName(), self.index, self.barIndex)
 end
 
+--- If a SpellInfoData table is provided, it is assumed to be the
+--- return value of Compat:GetSpellInfo().
+--- @see Compat#GetSpellInfo(spellIDOrName) : SpellInfoData
+--- @param spell number|SpellInfoData
+function o:SetActionSpell(spell)
+  if type(spell) == 'table' then
+    self:SetAttribute(attr.type, atyp.spell)
+    self:SetAttribute(atyp.spell, spell.spellID)
+    return
+  end
+  if type(spell) ~= 'number' then return end
+  comp:IfSpell(spell, function(sp)
+    self:SetAttribute(attr.type, atyp.spell)
+    self:SetAttribute(atyp.spell, sp.spellID)
+  end)
+end
+
+--[[-------------------------------------------------------------------
+Delegate Functions
+---------------------------------------------------------------------]]
+--- @return ButtonConfig_ABP_2_0
+function o:conf() return self.button:GetButtonConfig() end
+
 --- @see Frame#GetAttribute
 --- @param attributeName string
 --- @return string value
@@ -187,4 +228,3 @@ function o:GetAttribute(attributeName) return self.button:GetAttribute(attribute
 --- @param attributeName string
 --- @param value any
 function o:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
-
