@@ -39,8 +39,9 @@ local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 local seedID = 1000
 --[[-----------------------------------------------------------------------------
 New Instance
+@see ButtonState_ABP_2_0, ButtonConfigAccessor_ABP_2_0
 -------------------------------------------------------------------------------]]
---- @alias Button_ABP_2_0_3 ButtonMixin_ABP_2_0_3 | ButtonConfigAccessor_ABP_2_0 | SecureCheckButtonObj | AceEvent_3_0
+--- @alias Button_ABP_2_0_3 ButtonMixin_ABP_2_0_3 | ButtonState_ABP_2_0 | ButtonConfigAccessor_ABP_2_0 | SecureCheckButtonObj | AceEvent_3_0
 --- @alias Button_ABP_2_0_X Button_ABP_2_0_3 @Use this externally so we don't have to rename if we use a different button
 --
 local libName = 'ButtonMixin_ABP_2_0_3'
@@ -84,7 +85,6 @@ local function Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
   --- so that the button won't fire on pickup action
   local typeVal = self.widget:GetAttributeDraggedType()
-  t('Drag','PickupAction', 'typeVal=', typeVal)
   if not typeVal then return end
   
   if au.IsSpell(typeVal) then
@@ -100,7 +100,7 @@ end
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3 | ButtonState_ABP_2_0 | ButtonConfigAccessor_ABP_2_0
+--- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3
 local o = S
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
@@ -302,24 +302,6 @@ function o:OnDragStop()
   --self.widget:RestoreAttributeType()
 end
 
---- @param cursor Cursor_ABP_2_0
-function o:ApplyCursorAction(cursor)
-  if not cursor then return end
-  --- @type ButtonConfig_ABP_2_0
-  local btnC = self:GetButtonConfig(true)
-  
-  if cursor.type == 'spell' then
-    cursor:IfSpell(function(spell)
-      self:__SetSpell(spell.spellID)
-      btnC.type = atyp.spell
-      btnC.id = spell.spellID
-    end)
-  end
-  
-  self:UpdateState()
-  self:UpdateFlash()
-end
-
 function o:OnReceiveDrag()
   if InCombatLockdown() then return end
   local cursor = cns:cursor()
@@ -332,11 +314,11 @@ function o:OnReceiveDrag()
   if existingType == atyp.spell then
     --t('Drag', 'ORcvDrag', 'existingType=', existingType, 'existingID=', existingID)
     comp:PickupSpell(existingID)
-    self:ApplyCursorAction(cursor)
+    self.widget:ApplyCursorAction(cursor)
     return
   end
   
-  self:ApplyCursorAction(cursor)
+  self.widget:ApplyCursorAction(cursor)
 end
 
 function o:OnAttributeChanged(name, val)
@@ -492,16 +474,6 @@ function o:GetActionInfo()
   end
   
   return nil
-end
-
---- @param spell SpellIdentifier
-function o:__SetSpell(spell)
-  local sp = comp:GetSpellInfo(spell)
-  if not sp then return end
-  self:SetAttribute(attr.type, atyp.spell)
-  self:SetAttribute(atyp.spell, sp.spellID)
-  self.icon:SetTexture(sp.iconID)
-  self:Update()
 end
 
 --- @param r RGBColor
