@@ -2,7 +2,12 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
-    <Include file='Namespace\_Namespace.xml'/>
+    <Script file="Namespace\NamespaceModules.lua" />
+    <Script file='Namespace\Namespace.lua'/>
+    <!--@do-not-package@-->
+    <Script file="Developer\DeveloperNamespace.lua"/>
+
+    <!--@end-do-not-package@-->
     <Include file="ButtonTemplate.xml"/>
     <Include file="BarFrame.xml"/>
 

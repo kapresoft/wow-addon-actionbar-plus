@@ -79,18 +79,22 @@ local function Btn_ActionShouldFire(down)
 end
 
 --- @param self Button_ABP_2_0_3
-local function Btn_PickupAction(self)
+--- @param callbackFn fun() : void
+local function Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
   --- so that the button won't fire on pickup action
-  local typeVal = self.widget:GetAttributeSavedType()
+  local typeVal = self.widget:GetAttributeDraggedType()
+  t('Drag','PickupAction', 'typeVal=', typeVal)
   if not typeVal then return end
+  
   if au.IsSpell(typeVal) then
     local spell = self.widget:GetAttributeSpell()
     comp:PickupSpell(spell)
+    self:ClearButtonConf()
+    self.widget:ResetButton()
   end
-  self.widget:ClearAttributeType()
-  self.widget:ClearAttributeSavedType()
-  self.widget:ClearAttributeSpell()
+
+  if callbackFn then callbackFn() end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -112,7 +116,7 @@ function o:OnLoad()
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
   
-  self:RegisterForDrag("LeftButton", "RightButton");
+  self:RegisterForDrag("LeftButton");
   self:RegisterForClicks('AnyDown', 'AnyUp');
   
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
@@ -228,7 +232,7 @@ function o:PreClick(button, down)
   end
   
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
-    self.widget:DisableAttributeType()
+    self.widget:DisableAction()
   end
   
   --local _type, spellID = self:GetActionInfo()
@@ -248,7 +252,7 @@ function o:PostClick(button, down)
 end
 
 function o:OnEnter()
-  self.widget:ClearAttributeSavedType()
+  --self.widget:ClearAttributeSavedType()
   
   local type, id = self:GetActionInfo()
   if not id then return end
@@ -275,58 +279,64 @@ end
 
 function o:OnLeave()
   GameTooltip:Hide()
-  self.widget:RestoreAttributeType()
+  --self.widget:RestoreAttributeType()
 end
 
 --- @param button ButtonName
 function o:OnDragStart(button)
-  t('OnDragStart...')
   if InCombatLockdown() then return false end
   if not self:IsDragAllowed() then return end
   
-  Btn_PickupAction(self)
-  self:UpdateState()
-  self:UpdateCooldown()
-  self:UpdateFlash()
+  Btn_PickupAction(self, function()
+    self:UpdateState()
+    self:UpdateCooldown()
+    self:UpdateFlash()
+    self:SetChecked(false)
+  end)
   
-  self:SetChecked(false)
-  self:ClearButtonConf()
 end
 
 function o:OnDragStop()
   p('OnDragStop...')
   -- todo: review if these are needed
-  self.widget:RestoreAttributeType()
+  --self.widget:RestoreAttributeType()
 end
 
---function o:__btnConfOrNew()
---  local barIndex, btnIndex = self.widget.barIndex, self.widget.index
---  local barConf = cns:a():bar(barIndex)
---  return cns:a():buttonOrNew(barConf, btnIndex)
---end
-
-function o:OnReceiveDrag()
-  if InCombatLockdown() then return end
-  local cursor = cns:cursor()
-  if not cursor.isValid then return end
-  
+--- @param cursor Cursor_ABP_2_0
+function o:ApplyCursorAction(cursor)
+  if not cursor then return end
   --- @type ButtonConfig_ABP_2_0
   local btnC = self:GetButtonConfig(true)
-  --self:p('OnReceiveDrag', 'btnC=', btnC)
   
   if cursor.type == 'spell' then
     cursor:IfSpell(function(spell)
       self:__SetSpell(spell.spellID)
       btnC.type = atyp.spell
       btnC.id = spell.spellID
-      local _sp = ('%s(%s)'):format(spell.name, spell.spellID)
-      self:p('OnReceiveDrag:: spell=', _sp, 'btnC=', btnC)
     end)
   end
   
-  ClearCursor()
   self:UpdateState()
   self:UpdateFlash()
+end
+
+function o:OnReceiveDrag()
+  if InCombatLockdown() then return end
+  local cursor = cns:cursor()
+  if not cursor.isValid then return end
+  ClearCursor()
+  
+  -- check if button already has action
+  local existingType, existingID = self:GetActionInfo()
+  -- pickup existing action (this places it on cursor)
+  if existingType == atyp.spell then
+    --t('Drag', 'ORcvDrag', 'existingType=', existingType, 'existingID=', existingID)
+    comp:PickupSpell(existingID)
+    self:ApplyCursorAction(cursor)
+    return
+  end
+  
+  self:ApplyCursorAction(cursor)
 end
 
 function o:OnAttributeChanged(name, val)

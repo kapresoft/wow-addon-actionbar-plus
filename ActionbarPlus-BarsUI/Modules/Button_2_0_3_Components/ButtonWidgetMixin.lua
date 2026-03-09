@@ -94,7 +94,6 @@ function o:ApplyButtonConfig()
   self:SetAttribute(bc.type, bc.id)
 end
 
---- @private
 function o:ResetButton()
   self:__ResetAttributes()
   self:__ResetVisuals()
@@ -143,25 +142,28 @@ end
 
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
 function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
-function o:GetAttributeSavedType() return self:GetAttribute(attr.saved_type) end
 
-function o:DisableAttributeType()
-  if not self:GetAttributeSavedType() then
-    self:SetAttribute(attr.saved_type, self:GetAttributeType())
-  end
+--- This is the type of the action being dragged
+function o:GetAttributeDraggedType() return self:GetAttribute(attr.dragged_type) end
+
+--- This is used OnDragStart so that the spell won't fire.
+--- The type value is saved to another attribute and will be restored later
+function o:DisableAction()
+  self:SetAttribute(attr.dragged_type, self:GetAttributeType())
   self:ClearAttributeType()
 end
 
-function o:ClearAttributeSavedType()
-  if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(attr.saved_type, nil)
+--- This is clearing the type of the action being dragged
+function o:ClearAttributeDraggedType()
+  if not self:GetAttributeDraggedType() then return end
+  self:SetAttribute(attr.dragged_type, nil)
 end
 
-function o:RestoreAttributeType()
-  if not self:GetAttributeSavedType() then return end
-  self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
-  self:SetAttribute(attr.saved_type, nil)
-end
+--function o:RestoreAttributeType()
+--  if not self:GetAttributeDraggedType() then return end
+--  self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
+--  self:SetAttribute(attr.saved_type, nil)
+--end
 
 function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
 function o:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
