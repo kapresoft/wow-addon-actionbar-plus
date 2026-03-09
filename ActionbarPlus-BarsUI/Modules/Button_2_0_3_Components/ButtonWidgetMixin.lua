@@ -9,7 +9,7 @@ local dru, priest = cns.O.DruidUtil, cns.O.PriestUtil
 local attr, atyp = cns:constants()
 local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
 local Tbl_IsEmpty = cns.O.Table.IsEmpty
-
+local cursor_type = 'abp_cursor_type'
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
 -------------------------------------------------------------------------------]]
@@ -162,19 +162,20 @@ function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
 function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
 
 --- This is the type of the action being dragged
-function o:GetAttributeDraggedType() return self:GetAttribute(attr.dragged_type) end
+function o:GetAttributeDraggedType() return cns:GetGlobalAttribute(attr.dragged_type) end
 
 --- This is used OnDragStart so that the spell won't fire.
 --- The type value is saved to another attribute and will be restored later
 function o:DisableAction()
-  self:SetAttribute(attr.dragged_type, self:GetAttributeType())
+  cns:SetGlobalAttribute(attr.dragged_type, self:GetAttributeType())
   self:ClearAttributeType()
 end
 
 --- This is clearing the type of the action being dragged
 function o:ClearAttributeDraggedType()
-  if not self:GetAttributeDraggedType() then return end
+  --if not self:GetAttributeDraggedType() then return end
   self:SetAttribute(attr.dragged_type, nil)
+  cns:ClearGlobalAttribute(attr.dragged_type)
 end
 
 --function o:RestoreAttributeType()

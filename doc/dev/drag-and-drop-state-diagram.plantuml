@@ -1,0 +1,30 @@
+@startuml
+
+[*] --> Idle
+
+Idle --> DragStart : OnDragStart\n(IsDragAllowed)
+
+DragStart --> CursorHoldingAction : PickupSpell\nClearButtonConf
+
+CursorHoldingAction --> DropOnButton : OnReceiveDrag
+
+DropOnButton --> ApplyAction : button empty
+DropOnButton --> SwapAction : button has action
+
+SwapAction --> CursorHoldingAction : Pickup existing action
+SwapAction --> ApplyAction : ApplyCursorAction
+
+ApplyAction --> Idle : UpdateState
+
+Idle --> PreClickSuspend : PreClick\n(cursor valid)
+
+PreClickSuspend --> CursorHoldingAction : DisableAction
+
+CursorHoldingAction --> PostClick : PostClick
+
+PostClick --> ApplyAction : ApplyCursorAction
+PostClick --> CursorHoldingAction : swap chain
+
+ApplyAction --> Idle
+
+@enduml

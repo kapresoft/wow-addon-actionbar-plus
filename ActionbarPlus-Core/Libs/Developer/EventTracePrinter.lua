@@ -50,13 +50,15 @@ function o:__Init(addon, predicateFn)
   self.eventBase   = upperc(c_base(addon))
   self.predicateFn = predicateFn or function() return true  end
   self.evt         = self:LoadEventTrace()
+  self:SetInitialDefaultSearchKeyword()
 end
 
-function o:ShowUI()
+function o:SetInitialDefaultSearchKeyword()
   local s = self.evt.Log.Bar.SearchBox
   if s then s:SetText(ns.settings.traceKeyword or '') end
-  self.evt:Show()
 end
+
+function o:ShowUI() self.evt:Show() end
 
 function o:HideUI() self.evt:Hide() end
 

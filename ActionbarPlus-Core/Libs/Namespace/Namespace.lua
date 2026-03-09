@@ -153,6 +153,30 @@ end
 --[[-------------------------------------------------------------------
 Utility Functions
 ---------------------------------------------------------------------]]
+local GLOBAL_ATTRIBUTES = {}
+
+--- @param name Name
+--- @param val any
+function ns:SetGlobalAttribute(name, val)
+  assert(type(name) == "string", "SetGlobalAttribute(name):: Name must be a string")
+  if val then GLOBAL_ATTRIBUTES[name] = val end
+end
+
+--- @generic T
+--- @param name Name
+--- @return T|nil
+function ns:GetGlobalAttribute(name)
+  assert(type(name) == "string", "GetGlobalAttribute(name):: Name must be a string")
+  return GLOBAL_ATTRIBUTES[name]
+end
+--- @param name Name
+function ns:ClearGlobalAttribute(name)
+  assert(type(name) == "string", "ClearGlobalAttribute(name):: Name must be a string")
+  GLOBAL_ATTRIBUTES[name] = nil
+end
+
+--- @param str string The string to test
+--- @return boolean
 function ns.Str_IsBlank(str)
   if type(str) ~= "string" then return str == nil end
   return strtrim(str) == ""

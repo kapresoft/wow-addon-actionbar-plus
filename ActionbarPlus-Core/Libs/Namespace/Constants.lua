@@ -23,6 +23,7 @@ local AttributeNames = {
   type = 'type',
   saved_type = 'abp_saved_type',
   dragged_type = 'abp_dragged_type',
+  cursor_type = 'abp_cursor_type',
 }; o.AttributeNames = AttributeNames
 
 --- @class SupportedActionTypes_ABP_2_0
