@@ -40,7 +40,6 @@ end
 --- @param action Name The action name; i.e. 'spell', 'item', etc..
 --- @return boolean
 function o.IsSupportedAction(action)
-  tf('IsSupportedAction:: map=', SupportedActionTypeMap)
   return type(action) == 'string'
           and SupportedActionTypeMap[strlower(action)] == true
 end

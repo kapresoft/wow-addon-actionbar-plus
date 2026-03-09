@@ -22,6 +22,7 @@ local o = S
 local AttributeNames = {
   type = 'type',
   saved_type = 'abp_saved_type',
+  dragged_type = 'abp_dragged_type',
 }; o.AttributeNames = AttributeNames
 
 --- @class SupportedActionTypes_ABP_2_0

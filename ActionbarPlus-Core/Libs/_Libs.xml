@@ -1,14 +1,33 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-    <Include file='Namespace\_Namespace.xml'/>
+    <Script file="Namespace\NamespaceModules.lua" />
+    <Script file='Namespace\Namespace.lua'/>
+    <Script file="Namespace\Constants.lua" />
 
     <!--@do-not-package@-->
-    <Script file='Libs\Developer\DeveloperSetup.lua'/>
-    <Script file='Libs\Developer\EventTracePrinter.lua'/>
+    <Script file='Developer\DeveloperNamespace.lua'/>
+    <Script file='Developer\DeveloperSetup.lua'/>
+    <Script file='Developer\EventTracePrinter.lua'/>
 
     <!--@end-do-not-package@-->
-    <Include file='Modules\_Modules.xml'/>
+    <Script file="Modules\API\Compat.lua" />
+    <Script file="Modules\API\ActionUtil.lua"/>
+    <Script file="Modules\API\SpellUtil.lua" />
+    <Script file="Modules\API\UnitUtil.lua"/>
+    <Script file="Modules\API\DruidUtil.lua"/>
+    <Script file="Modules\API\PriestUtil.lua"/>
+    <!--
+    TODO: Implement
+    <Script file="Modules\API\ShamanUnitMixin.lua"/>
+    <Script file="Modules\API\RogueUnitMixin.lua"/>
+    -->
+
+    <Script file="Modules\GameVersionMixin.lua" />
+    <Script file="Modules\DatabaseSchema.lua" />
+    <Script file="Modules\DatabaseMixin.lua" />
+    <Script file="Modules\Cursor.lua"/>
+
     <Script file="ActionbarPlus-Core.lua"/>
     <!--@do-not-package@-->
 

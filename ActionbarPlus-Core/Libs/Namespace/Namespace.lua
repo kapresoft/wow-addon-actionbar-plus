@@ -150,73 +150,6 @@ function ns:colorFn(rgbHex)
     return c:WrapTextInColorCode(text)
   end
 end
-
---[[-------------------------------------------------------------------
-LogBuilder
----------------------------------------------------------------------]]
-do
-  --- @param prefix string|any
-  --- @return ABP_2_0_TraceFn @Printer function that outputs plain values to Blizzard Trace UI (like print)
-  local function traceFn1(prefix)
-    if type(prefix) ~= 'string' then return function(...) return ns.tracer and ns.tracer:td(...) end end
-    return function(...) return ns.tracer and ns.tracer:t(strtrim(prefix), ...) end
-  end
-  
-  --- With auto formatting of objects
-  --- @param prefix string|nil
-  --- @return ABP_2_0_TraceFnFormatted @Printer function that outputs formatted values to Blizzard Trace UI (like print)
-  local function traceFn2(prefix)
-    if type(prefix) ~= 'string' then return function(...) return ns.tracer and ns.tracer:tdf(...) end end
-    return function(...) return ns.tracer and ns.tracer:tf(strtrim(prefix), ...) end
-  end
-  
-  local function DelayedCall(delay, fn, ...)
-    assert(type(delay) == 'number' and delay > 0)
-    return function(...)
-      local args = { ... }
-      C_Timer.After(delay, function()
-        fn(unpack(args))
-      end)
-    end
-  end
-  
-  --- Returns the print, delayed-print, tracer, formatted-tracer functions
-  --- ```
-  --- local p, pd, t, tf = ns:log('EventHandler')
-  --- ```
-  --- @param moduleName Name
-  --- @return LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
-  function ns:log(moduleName)
-    if not self.logBuilder then self.logBuilder = self:__CreateLogBuilder(self.printer, traceFn1, traceFn2) end
-    return self.logBuilder(moduleName)
-  end
-  
-  --- @protected
-  --- @param printer LibPrettyPrint_Printer
-  --- @return LogBuilderFn
-  --- @param traceFn1 fun(moduleName:Name) : function
-  --- @param traceFn2 fun(moduleName:Name) : function
-  function ns:__CreateLogBuilder(printer, traceFn1, traceFn2)
-    assert(printer, 'Printer is required.')
-    
-    --- @param moduleName Name
-    local function builderFn(moduleName)
-      local m = moduleName
-      local pr = printer
-      if type(m) == 'string' then m = strtrim(m)
-      else m = nil end
-      
-      if m and #m > 0 then pr = printer:WithSubPrefix(m) end
-      
-      local printerDelayed = DelayedCall(1, pr)
-      local tracer1, tracer2 = traceFn1(m), traceFn2(m)
-      return pr, printerDelayed, tracer1, tracer2
-    end
-    
-    return builderFn
-  end
-end
-
 --[[-------------------------------------------------------------------
 Utility Functions
 ---------------------------------------------------------------------]]
@@ -269,6 +202,14 @@ function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
 
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns
+
+--[[-------------------------------------------------------------------
+Loggers/Tracers:: NoOp in Official Releases
+---------------------------------------------------------------------]]
+--- @see DeveloperNamespace_Core_ABP_2_0#log()
+--- @param moduleName Name
+--- @return NoOpFn, NoOpFn, NoOpFn, NoOpFn
+function ns:log(moduleName) local noop = function() end; return noop, noop, noop, noop end
 
 --[[-------------------------------------------------------------------
 Init Tracer
