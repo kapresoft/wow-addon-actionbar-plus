@@ -227,27 +227,51 @@ function o:PreClick(button, down)
   if InCombatLockdown() then return false end
   
   -- fires on 'up' if not locked by user
-  if not IsActionbarLockedByUser() then
-    return
-  end
+  if not IsActionbarLockedByUser() then return end
   
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
+    --t('DND', 'PreClick', 'Drag allowed')
     self.widget:DisableAction()
   end
   
-  --local _type, spellID = self:GetActionInfo()
-  --if not _type then return end
-  --
-  --local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
-  --if current then self:SetChecked(true) end
-  --tf('PreClick', 'current=', current)
+  local cursor = cns:cursor()
+  if down==true and cursor.isValid then
+    --self.widget:DisableActionTypeCursor()
+    self.widget:DisableAction()
+    local savedType = cns:GetGlobalAttribute(attr.dragged_type)
+    t('DND', 'PreClick', 'down=true; cursorIsValid=', cursor.isValid, '; Action disabled; savedType=', savedType)
+  end
+
 end
 
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
   if InCombatLockdown() then return false end
-  if down == true then return end
+  if down == true then
+    local savedType, existingID = self:GetActionInfoSaved()
+    t('DND', 'PostClick', 'down=true', 'savedType=', savedType, 'existingID=', existingID)
+    
+    return end
+  
+  local cursor = cns:cursor()
+  if cursor.isValid then
+    local existingType, existingID = self:GetActionInfoSaved()
+    t('DND', 'PostClick', 'button=', button, 'cursorIsValid=', cursor.isValid, 'existingID=', existingID)
+    ClearCursor()
+    
+    local savedExistingType = cns:GetGlobalAttribute(attr.dragged_type)
+    --t('DND', 'PostClick', 'existingType=', existingType, 'savedExistingType=', savedExistingType, 'existingID=', existingID)
+    if savedExistingType == atyp.spell then
+      t('DND', 'PostClick', 'savedExistingType=', savedExistingType, 'existingID=', existingID)
+      comp:PickupSpell(existingID)
+      self.widget:ApplyCursorAction(cursor)
+      return
+    end
+    
+    self.widget:ApplyCursorAction(cursor)
+  end
+  
   self:UpdateState()
 end
 
@@ -307,6 +331,7 @@ function o:OnReceiveDrag()
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   ClearCursor()
+  self.widget:ClearAttributeDraggedType()
   
   -- check if button already has action
   local existingType, existingID = self:GetActionInfo()
@@ -474,6 +499,13 @@ function o:GetActionInfo()
   end
   
   return nil
+end
+
+--- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+function o:GetActionInfoSaved()
+  local _type = self.widget:GetAttributeDraggedType()
+  if not _type then return nil, nil end
+  return _type, self:GetAttribute(_type)
 end
 
 --- @param r RGBColor
