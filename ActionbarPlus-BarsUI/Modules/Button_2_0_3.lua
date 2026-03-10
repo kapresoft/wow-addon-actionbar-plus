@@ -84,7 +84,7 @@ end
 local function Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
   --- so that the button won't fire on pickup action
-  local typeVal = self.widget:GetAttributeDraggedType()
+  local typeVal = self.widget:GetAttributeSuspendedActionType()
   if not typeVal then return end
   
   if au.IsSpell(typeVal) then
@@ -229,49 +229,58 @@ function o:PreClick(button, down)
   -- fires on 'up' if not locked by user
   if not IsActionbarLockedByUser() then return end
   
+  -- Prepare for a potential drag operation.
+  -- When the user begins dragging the button, the secure `type` attribute
+  -- must be temporarily suspended so the button does not execute its
+  -- action while the drag / pickup transaction is in progress.
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
-    --t('DND', 'PreClick', 'Drag allowed')
-    self.widget:DisableAction()
+    self.widget:SuspendAction(); return
   end
+ 
+  -- on mouse 'up', return
+  if not down then return end
   
-  local cursor = cns:cursor()
-  if down==true and cursor.isValid then
-    --self.widget:DisableActionTypeCursor()
-    self.widget:DisableAction()
-    local savedType = cns:GetGlobalAttribute(attr.dragged_type)
-    t('DND', 'PreClick', 'down=true; cursorIsValid=', cursor.isValid, '; Action disabled; savedType=', savedType)
-  end
-
+  -- ########################################
+  -- Cursor swap case (no drag event)::
+  -- The user clicked the button while the cursor already holds an action.
+  -- This performs a chain swap:
+  --   cursor action → button
+  --   button action → cursor
+  -- ########################################  local cursor = cns:cursor(); if not cursor.isValid then return end
+  
+  -- on mouse 'down', suspend the current action
+  self.widget:SuspendAction()
+  local suspendedType, actionID = self:GetSuspendedActionInfo()
+  if not suspendedType then return end
+  
+  local savedType = self.widget:GetAttributeSuspendedActionType()
+  -- on mouse 'down'
+  local sp = comp:__debug_SpellInfo(actionID)
+  t('DND', 'PreClick', 'suspended=', sp, 'type=', savedType, 'on-mouse-down=', true)
 end
 
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
   if InCombatLockdown() then return false end
-  if down == true then
-    local savedType, existingID = self:GetActionInfoSaved()
-    t('DND', 'PostClick', 'down=true', 'savedType=', savedType, 'existingID=', existingID)
-    
-    return end
+  if down == true then return end
   
   local cursor = cns:cursor()
-  if cursor.isValid then
-    local existingType, existingID = self:GetActionInfoSaved()
-    t('DND', 'PostClick', 'button=', button, 'cursorIsValid=', cursor.isValid, 'existingID=', existingID)
-    ClearCursor()
-    
-    local savedExistingType = cns:GetGlobalAttribute(attr.dragged_type)
-    --t('DND', 'PostClick', 'existingType=', existingType, 'savedExistingType=', savedExistingType, 'existingID=', existingID)
-    if savedExistingType == atyp.spell then
-      t('DND', 'PostClick', 'savedExistingType=', savedExistingType, 'existingID=', existingID)
-      comp:PickupSpell(existingID)
-      self.widget:ApplyCursorAction(cursor)
-      return
-    end
-    
+  if not cursor.isValid then return end
+  
+  ClearCursor()
+  
+  local suspendedType, actionID = self:GetSuspendedActionInfo()
+  if suspendedType == atyp.spell then
+    comp:PickupSpell(actionID)
+    local sp = comp:__debug_SpellInfo(actionID)
+    t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
+            'on-mouse-up=', down ~= true)
+    self.widget:ClearAttributeSuspendedActionType()
+    self.widget:ApplyCursorAction(cursor)
+  else
     self.widget:ApplyCursorAction(cursor)
   end
-  
   self:UpdateState()
 end
 
@@ -331,7 +340,7 @@ function o:OnReceiveDrag()
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   ClearCursor()
-  self.widget:ClearAttributeDraggedType()
+  self.widget:ClearAttributeSuspendedActionType()
   
   -- check if button already has action
   local existingType, existingID = self:GetActionInfo()
@@ -501,9 +510,9 @@ function o:GetActionInfo()
   return nil
 end
 
---- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
-function o:GetActionInfoSaved()
-  local _type = self.widget:GetAttributeDraggedType()
+--- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID)
+function o:GetSuspendedActionInfo()
+  local _type = self.widget:GetAttributeSuspendedActionType()
   if not _type then return nil, nil end
   return _type, self:GetAttribute(_type)
 end
