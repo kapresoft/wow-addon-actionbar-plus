@@ -77,9 +77,9 @@ end
 
 --- @return boolean
 function o:HasAction()
-  local type = self:GetAttribute(attr.type)
-  if not type then return false end
-  local id = self:GetAttribute(type)
+  local actionType = self:GetAttribute(attr.type)
+  if not actionType then return false end
+  local id = self:GetAttribute(actionType)
   return id ~= nil
 end
 
@@ -172,6 +172,8 @@ function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
 --- This is called from PreClick() and drag handlers before manipulating the
 --- cursor or replacing the button's action.
 function o:SuspendAction()
+  local t = self:GetAttributeType()
+  if not t then return end
   cns:SetGlobalAttribute(attr.suspended_type, self:GetAttributeType())
   self:ClearAttributeType()
 end
