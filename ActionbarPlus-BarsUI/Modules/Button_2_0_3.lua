@@ -29,7 +29,6 @@ local au = O.ActionUtil
 local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
-local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
 local Tbl_IsEmpty = cns.O.Table.IsEmpty
 
 --- @type Color
@@ -255,8 +254,8 @@ function o:PreClick(button, down)
   if not suspendedType then return end
   
   -- on mouse 'down'
-  local sp = comp:__debug_SpellInfo(actionID)
-  t('DND', 'PreClick', 'suspended=', sp, 'type=', suspendedType, 'on-mouse-down=', true)
+  --local sp = comp:__debug_SpellInfo(actionID)
+  --t('DND', 'PreClick', 'suspended=', sp, 'type=', suspendedType, 'on-mouse-down=', true)
 end
 
 --- @param button ButtonName
@@ -274,9 +273,9 @@ function o:PostClick(button, down)
   if suspendedType then
     if suspendedType == atyp.spell then
       comp:PickupSpell(actionID)
-      local sp = comp:__debug_SpellInfo(actionID)
-      t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
-              'on-mouse-up=', down ~= true)
+      --local sp = comp:__debug_SpellInfo(actionID)
+      --t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
+      --        'on-mouse-up=', down ~= true)
     elseif suspendedType == atyp.item then
       --  todo: handle item
     elseif suspendedType == atyp.macro then

@@ -32,6 +32,8 @@ local ModuleNames = {
   
   --- @type Kapresoft_Table_2_0
   Table = {},
+  --- @type Kapresoft_String_2_0
+  String = {},
   
   ---------------------------------------
   ----- ActionbarPlus_2_0 Libs ----------

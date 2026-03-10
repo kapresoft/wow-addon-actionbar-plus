@@ -3,12 +3,9 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local c = ns.O.Compat
-
---[[-------------------------------------------------------------------
-Support Functions
----------------------------------------------------------------------]]
-local Str_IsBlank = ns.Str_IsBlank
+local O = ns.O
+local c = O.Compat
+local Str_IsBlank = O.String.IsBlank
 
 --[[-----------------------------------------------------------------------------
 Module::Cursor

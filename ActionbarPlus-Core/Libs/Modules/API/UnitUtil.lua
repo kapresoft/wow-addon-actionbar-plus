@@ -25,6 +25,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, M = ns.O, ns.M
 local comp, UnitClasses = O.Compat, O.Constants.UnitClasses
+local Str_IsAnyOf = O.String.IsAnyOf
 
 --- For all stealth
 local STEALTHED_ICON = 136047
@@ -126,7 +127,7 @@ function o:GetPlayerUnitClass() return self:GetUnitClass() end
 --- @return boolean
 function o:IsPlayerClassAnyOf(...)
   local unitClass = self:GetUnitClass()
-  return unitClass and ns.Str_IsAnyOfCaseInsensitive(unitClass, ...)
+  return unitClass and Str_IsAnyOf(unitClass, ...)
 end
 
 --- @vararg any list of Unit Class IDs
