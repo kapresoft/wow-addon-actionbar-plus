@@ -147,6 +147,7 @@ end
 function o:__ResetAttributes()
   self.__suspendAttributeChangeHandler = true
   pcall(self.__ClearActionAttributes, self)
+  self:ClearAttributeSuspendedActionType()
   self.__suspendAttributeChangeHandler = false
 end
 
@@ -161,21 +162,36 @@ end
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
 function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
 
---- This is the type of the action being dragged
-function o:GetAttributeDraggedType() return cns:GetGlobalAttribute(attr.dragged_type) end
-
---- This is used OnDragStart so that the spell won't fire.
---- The type value is saved to another attribute and will be restored later
-function o:DisableAction()
-  cns:SetGlobalAttribute(attr.dragged_type, self:GetAttributeType())
+--- Temporarily suspends the button's secure action.
+---
+--- The current `type` attribute is saved to a global ABP attribute and then
+--- cleared from the button. Clearing `type` prevents the SecureActionButton
+--- from executing its action while we perform drag, pickup, or cursor swap
+--- operations.
+---
+--- This is called from PreClick() and drag handlers before manipulating the
+--- cursor or replacing the button's action.
+function o:SuspendAction()
+  cns:SetGlobalAttribute(attr.suspended_type, self:GetAttributeType())
   self:ClearAttributeType()
 end
 
---- This is clearing the type of the action being dragged
-function o:ClearAttributeDraggedType()
-  --if not self:GetAttributeDraggedType() then return end
-  self:SetAttribute(attr.dragged_type, nil)
-  cns:ClearGlobalAttribute(attr.dragged_type)
+--- Returns the action type temporarily suspended during drag/cursor operations.
+--- This value is saved when SuspendAction() clears the button's `type`
+--- so the button does not execute its secure action while we perform
+--- pickup / swap logic. Used by PreClick/PostClick and drag handlers.
+--- @return string
+function o:GetAttributeSuspendedActionType()
+  return cns:GetGlobalAttribute(attr.suspended_type)
+end
+
+--- Clears the globally stored suspended action type.
+--- This value is set by SuspendAction() during PreClick/drag so the button's
+--- `type` attribute can be temporarily removed without losing the original
+--- action. Once the swap/apply operation is complete, this value must be
+--- cleared to avoid leaking stale drag state across buttons.
+function o:ClearAttributeSuspendedActionType()
+  cns:ClearGlobalAttribute(attr.suspended_type)
 end
 
 --function o:RestoreAttributeType()

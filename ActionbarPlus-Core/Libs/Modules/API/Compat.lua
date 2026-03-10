@@ -93,6 +93,14 @@ function o:IfSpell(spell, callbackFn)
   return sp and callbackFn(sp)
 end
 
+--- @param spell SpellIdentifier
+--- @return string debug info for spells
+function o:__debug_SpellInfo(spell)
+  if not spell then return end
+  local sp = self:GetSpellInfo(spell); if not sp then return spell end
+  return ('%s(%s)'):format(sp.name, sp.spellID)
+end
+
 
 --- Picks up the specified spell, compatible with both Retail and Classic WoW.
 --- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
