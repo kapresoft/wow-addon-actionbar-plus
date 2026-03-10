@@ -4,12 +4,10 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
-local comp, au, spu, unit = cns.O.Compat, cns.O.ActionUtil, cns.O.SpellUtil, cns.O.UnitUtil
-local dru, priest = cns.O.DruidUtil, cns.O.PriestUtil
+local comp, au = cns.O.Compat, cns.O.ActionUtil
 local attr, atyp = cns:constants()
-local Str_IsAnyOf, Str_IsBlank = cns.Str_IsAnyOf, cns.Str_IsBlank
-local Tbl_IsEmpty = cns.O.Table.IsEmpty
-local cursor_type = 'abp_cursor_type'
+local Str_IsBlank = cns.Str_IsBlank
+
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
 -------------------------------------------------------------------------------]]
@@ -203,7 +201,6 @@ end
 --end
 
 function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
-function o:ClearAttributeSpell() self:SetAttribute(atyp.spell, nil) end
 
 function o:MatchesActiveButtonSpellID(spellID)
   local _, id = self.button:GetActionInfo()
