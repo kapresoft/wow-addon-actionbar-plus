@@ -120,13 +120,11 @@ local function BarModuleProtoMethods()
   end
   
   function bm:OnEnable()
-    --pd('OnEnable:: called')
     if self.barFrame then self.barFrame:Show() end
     BarModule_EnableEditModeCallback(self)
   end
   
   function bm:OnDisable()
-    --p('OnDisable:: called')
     if self.barFrame then self.barFrame:Hide() end
     BarModule_DisableEditModeCallback(self)
   end
@@ -156,7 +154,7 @@ local function BarModuleProtoMethods()
     if InCombatLockdown() then return end
 
     local activeIndex = unit:GetActiveSpecGroupIndex()
-    p('OnEvent:: evt=', event, 'activeIndex[detected]=', activeIndex)
+    tf('OnEvent:: evt=', event, 'activeIndex[detected]=', activeIndex)
     
     local w = self.barFrame.widget
     for i, btn in ipairs(w.buttons) do
