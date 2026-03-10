@@ -73,7 +73,7 @@
     </Frame>
 
     <!-- Note: Don't inherit from UIParent because it will inherit scale as well -->
-    <Frame name="ABP_BarFrameTemplate_2_0" inherits="BackdropTemplate"
+    <Frame name="ABP_BarFrameTemplate_2_0" inherits="SecureHandlerStateTemplate, BackdropTemplate"
            frameStrata="MEDIUM" virtual="true" movable="true" clampedToScreen="true">
         <Size>
             <AbsDimension x="50" y="50"/>

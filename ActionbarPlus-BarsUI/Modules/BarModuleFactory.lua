@@ -8,6 +8,8 @@ local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns.O.Table.IsEmpty
 
+local VISIBILITY_DEFAULTS = '[vehicleui][petbattle]hide; show'
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -268,6 +270,15 @@ local function PropsAndMethods()
     
     --- @class BarFrameObjWidget_ABP_2_0 : BarFrameObjWidgetMixin_ABP_2_0
     f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex)
+    
+    -- TODO: Can have user-preference override
+    RegisterStateDriver(barFrame, 'visibility', VISIBILITY_DEFAULTS)
+    
+    --barFrame:SetAttribute("_onstate-abp-state", [[
+    --  print('xx barFrame: newState=', newstate)
+    --  self:SetAttribute("abp_state", newstate)
+    --]])
+
     f:Show()
     
     return f
