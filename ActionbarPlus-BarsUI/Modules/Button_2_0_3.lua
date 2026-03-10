@@ -241,7 +241,7 @@ function o:PreClick(button, down)
   if not down then return end
   
   -- ########################################
-  -- Cursor swap case (no drag event)::
+  -- Cursor swap case (no drag event):
   -- The user clicked the button while the cursor already holds an action.
   -- This performs a chain swap:
   --   cursor action → button
@@ -271,16 +271,21 @@ function o:PostClick(button, down)
   ClearCursor()
   
   local suspendedType, actionID = self:GetSuspendedActionInfo()
-  if suspendedType == atyp.spell then
-    comp:PickupSpell(actionID)
-    local sp = comp:__debug_SpellInfo(actionID)
-    t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
-            'on-mouse-up=', down ~= true)
-    self.widget:ClearAttributeSuspendedActionType()
-    self.widget:ApplyCursorAction(cursor)
-  else
-    self.widget:ApplyCursorAction(cursor)
+  if suspendedType then
+    if suspendedType == atyp.spell then
+      comp:PickupSpell(actionID)
+      local sp = comp:__debug_SpellInfo(actionID)
+      t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
+              'on-mouse-up=', down ~= true)
+    elseif suspendedType == atyp.item then
+      --  todo: handle item
+    elseif suspendedType == atyp.macro then
+      --  todo: handle macro
+    end
   end
+  
+  self.widget:ClearAttributeSuspendedActionType()
+  self.widget:ApplyCursorAction(cursor)
   self:UpdateState()
 end
 
@@ -490,24 +495,31 @@ function o:UpdateCooldown()
   cd:SetCooldown(start, duration, modRate or 1)
 end
 
+--- Returns info for a known spell.  An unknown spell will return nil values.
 --- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo()
-  local aType = self:GetAttribute(attr.type)
-  if not aType then return nil end
+  local actionType = self:GetAttribute(attr.type)
+  if not actionType then return nil, nil end
   
   --- @type number|string|nil
-  local val = self:GetAttribute(aType)
-  if not val then return nil end
+  local val = self:GetAttribute(actionType)
+  if not val then return nil, nil end
   
-  if type(val) == "number" then return aType, val end
+  if type(val) == "number" then return actionType, val end
   
   if type(val) == "string" then
-    local sp = comp:GetSpellInfo(val)
-    if not sp then return nil end
-    return aType, sp.spellID
+    if actionType == atyp.spell then
+      local sp = comp:GetSpellInfo(val)
+      if not sp then return nil, nil end
+      return actionType, sp.spellID
+    elseif actionType == atyp.item then
+      error(self:GetName() .. ':: GetActionInfo(): item support not implemented')
+    elseif actionType == atyp.macrotext then
+      error(self:GetName() .. ':: GetActionInfo(): macro support not implemented')
+    end
   end
   
-  return nil
+  return nil, nil
 end
 
 --- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
@@ -516,7 +528,7 @@ function o:GetSuspendedActionInfo()
   if not actionType then return nil, nil end
   
   local id = self:GetAttribute(actionType)
-  if not id then return end
+  if not id then return nil, nil end
   
   return actionType, id
 end
