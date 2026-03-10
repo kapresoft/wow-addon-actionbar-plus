@@ -90,7 +90,7 @@ local function Btn_PickupAction(self, callbackFn)
   if au.IsSpell(typeVal) then
     local spell = self.widget:GetAttributeSpell()
     comp:PickupSpell(spell)
-    self:ClearButtonConf()
+    self:ResetButtonConfig()
     self.widget:ResetButton()
   end
 

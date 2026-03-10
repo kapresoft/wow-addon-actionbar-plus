@@ -40,7 +40,7 @@ function o:GetButtonConfig()
   return btnGroup[specGroupKey]
 end
 
-function o:ClearButtonConf()
+function o:ResetButtonConfig()
   local bc = self:GetButtonConfig()
   if not bc then return end
   bc.type, bc.id = nil, nil
