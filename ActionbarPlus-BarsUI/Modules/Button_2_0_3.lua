@@ -246,7 +246,8 @@ function o:PreClick(button, down)
   -- This performs a chain swap:
   --   cursor action → button
   --   button action → cursor
-  -- ########################################  local cursor = cns:cursor(); if not cursor.isValid then return end
+  -- ########################################
+  local cursor = cns:cursor(); if not cursor.isValid then return end
   
   -- on mouse 'down', suspend the current action
   self.widget:SuspendAction()
