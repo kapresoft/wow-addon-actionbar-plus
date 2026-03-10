@@ -20,8 +20,8 @@ addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
 --- @type BarsUI_Modules_ABP_2_0
 ns.O = ns.O or {}
 
---- @return Namespace_ABP_2_0
-function ns:cns() return ABP_CORE_NS end
+--- @return Namespace_ABP_2_0, Core_Modules_ABP_2_0
+function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O end
 
 --[[-------------------------------------------------------------------
 LibPrettyPrint::Formatter/Printer

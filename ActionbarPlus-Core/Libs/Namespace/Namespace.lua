@@ -94,6 +94,8 @@ do
   local obj = ns.O
   --- @type Kapresoft_Table_2_0
   obj.Table = LibStub('Kapresoft-Table-2-0')
+  --- @type Kapresoft_String_2_0
+  obj.String = LibStub('Kapresoft-String-2-0')
 end
 
 --- Register a Namespace Module
@@ -173,39 +175,6 @@ end
 function ns:ClearGlobalAttribute(name)
   assert(type(name) == "string", "ClearGlobalAttribute(name):: Name must be a string")
   GLOBAL_ATTRIBUTES[name] = nil
-end
-
---- @param str string The string to test
---- @return boolean
-function ns.Str_IsBlank(str)
-  if type(str) ~= "string" then return str == nil end
-  return strtrim(str) == ""
-end
-
---- Match {match} for any occurrence in ...
---- @param toMatch string
---- @param ... string The string values to match
---- @return boolean true if `toMatch` is found in the varargs, false otherwise.
-function ns.Str_IsAnyOf(toMatch, ...)
-  if not toMatch then return false end
-  if type(toMatch) ~= "string" then return false end
-  for i = 1, select('#', ...) do
-    local v = select(i, ...)
-    if type(v) == "string" and v == toMatch then return true end
-  end
-  return false
-end
-
-function ns.Str_IsAnyOfCaseInsensitive(valueToMatch, ...)
-  if not valueToMatch then return false end
-  if type(valueToMatch) ~= "string" then return false end
-  local toMatch = strlower(valueToMatch)
-  for i = 1, select('#', ...) do
-    local val = select(i, ...)
-    if type(val) == "string" and strlower(val) == toMatch then return true
-    end
-  end
-  return false
 end
 
 --- Checks if the first argument matches any of the subsequent arguments.

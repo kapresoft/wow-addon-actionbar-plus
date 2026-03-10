@@ -3,10 +3,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-local cns = ns:cns()
-local comp, au = cns.O.Compat, cns.O.ActionUtil
+local cns, O = ns:cns()
+local comp, au = O.Compat, O.ActionUtil
 local attr, atyp = cns:constants()
-local Str_IsBlank = cns.Str_IsBlank
+local Str_IsBlank = O.String.IsBlank
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin

@@ -2,8 +2,8 @@
 local ns = select(2, ...)
 local s = ns.settings
 s.developer = true
-s.enableTraceUI = true
-s.traceKeyword = 'barsui'
+--s.enableTraceUI = true
+--s.traceKeyword = 'barsui'
 
 --- @class DeveloperSetup_ABP_2_0
 local o = {}; DeveloperSetup_ABP_2_0 = o
