@@ -37,6 +37,31 @@ local function btnName(barIndex, btnIndex)
   local parentKey = ('Button%s'):format(btnIndex)
   return ('ABP_2_0_F%s%s'):format(barIndex, parentKey), parentKey
 end
+
+--- @param self BarFrameObj_ABP_2_0
+local function BarFrame_EnableVisibilityDriver(self)
+  RegisterStateDriver(self, "visibility", VISIBILITY_DEFAULTS)
+end
+
+--- @param self BarFrameObj_ABP_2_0
+local function BarFrame_DisableVisibilityDriver(self)
+  UnregisterStateDriver(self, "visibility")
+end
+
+--- @param self BarModuleProto_ABP_2_0
+local function BarModule_EnableEditModeCallback(self)
+  if not (EventRegistry and EventRegistry.RegisterCallback) then return end
+  EventRegistry:RegisterCallback("EditMode.Enter", self.OnEditModeEnter, self)
+  EventRegistry:RegisterCallback("EditMode.Exit",  self.OnEditModeExit,  self)
+end
+
+--- @param self BarModuleProto_ABP_2_0
+local function BarModule_DisableEditModeCallback(self)
+  if not (EventRegistry and EventRegistry.UnregisterCallback) then return end
+  EventRegistry:UnregisterCallback("EditMode.Enter", self)
+  EventRegistry:UnregisterCallback("EditMode.Exit", self)
+end
+
 --[[-------------------------------------------------------------------
 Mixin: BarFrameObjWidgetMixin_2_0
 ---------------------------------------------------------------------]]
@@ -71,7 +96,6 @@ local function BarFrameWidgetMethods()
             :format(self.frame:GetName(), self.index)
   end
 
-
 end; BarFrameWidgetMethods()
 
 --[[-------------------------------------------------------------------
@@ -83,6 +107,7 @@ BarModuleProto
 local BarModuleProto_2_0 = {}
 
 local function BarModuleProtoMethods()
+  
   --- @type BarModuleProto_ABP_2_0|BarModule_2_0
   local bm = BarModuleProto_2_0
   
@@ -97,11 +122,24 @@ local function BarModuleProtoMethods()
   function bm:OnEnable()
     --pd('OnEnable:: called')
     if self.barFrame then self.barFrame:Show() end
+    BarModule_EnableEditModeCallback(self)
   end
   
   function bm:OnDisable()
     --p('OnDisable:: called')
     if self.barFrame then self.barFrame:Hide() end
+    BarModule_DisableEditModeCallback(self)
+  end
+  
+  function bm:OnEditModeEnter()
+    BarFrame_DisableVisibilityDriver(self.barFrame)
+    self.barFrame:Hide()
+  end
+  
+  -- No need to call barFrame:Hide() here because
+  -- the visibility values will be evaluated.
+  function bm:OnEditModeExit()
+    BarFrame_EnableVisibilityDriver(self.barFrame)
   end
   
   function bm:ACTIVE_TALENT_GROUP_CHANGED(event, ...)
@@ -272,7 +310,8 @@ local function PropsAndMethods()
     f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex)
     
     -- TODO: Can have user-preference override
-    RegisterStateDriver(barFrame, 'visibility', VISIBILITY_DEFAULTS)
+    --RegisterStateDriver(barFrame, 'visibility', VISIBILITY_DEFAULTS)
+    BarFrame_EnableVisibilityDriver(barFrame)
     
     --barFrame:SetAttribute("_onstate-abp-state", [[
     --  print('xx barFrame: newState=', newstate)
