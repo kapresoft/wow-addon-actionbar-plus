@@ -147,13 +147,13 @@ end
 function o:__ResetAttributes()
   self.__suspendAttributeChangeHandler = true
   pcall(self.__ClearActionAttributes, self)
-  self:ClearAttributeSuspendedActionType()
   self.__suspendAttributeChangeHandler = false
 end
 
 --- @private
 function o:__ClearActionAttributes()
   self:SetAttribute(attr.type, nil)
+  self:ClearAttributeSuspendedActionType()
   for _, typeAttribute in ipairs(atyp) do
     self:SetAttribute(typeAttribute, nil)
   end
