@@ -254,10 +254,9 @@ function o:PreClick(button, down)
   local suspendedType, actionID = self:GetSuspendedActionInfo()
   if not suspendedType then return end
   
-  local savedType = self.widget:GetAttributeSuspendedActionType()
   -- on mouse 'down'
   local sp = comp:__debug_SpellInfo(actionID)
-  t('DND', 'PreClick', 'suspended=', sp, 'type=', savedType, 'on-mouse-down=', true)
+  t('DND', 'PreClick', 'suspended=', sp, 'type=', suspendedType, 'on-mouse-down=', true)
 end
 
 --- @param button ButtonName
@@ -511,11 +510,15 @@ function o:GetActionInfo()
   return nil
 end
 
---- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID)
+--- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
 function o:GetSuspendedActionInfo()
-  local _type = self.widget:GetAttributeSuspendedActionType()
-  if not _type then return nil, nil end
-  return _type, self:GetAttribute(_type)
+  local actionType = self.widget:GetAttributeSuspendedActionType()
+  if not actionType then return nil, nil end
+  
+  local id = self:GetAttribute(actionType)
+  if not id then return end
+  
+  return actionType, id
 end
 
 --- @param r RGBColor
