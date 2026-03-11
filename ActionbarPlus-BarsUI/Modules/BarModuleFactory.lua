@@ -19,13 +19,9 @@ local libName = ns.M.BarModuleFactory()
 --- @class BarModuleFactory_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, pd, t, tf = ns:log(libName)
-
+--
 --- @alias BarModule_2_0 BarModuleProto_ABP_2_0 | AddonModuleObj_3_0_Type2
---[[-------------------------------------------------------------------
-Temporary Config
----------------------------------------------------------------------]]
-local barCount = 1
-
+--
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
@@ -207,6 +203,7 @@ local function PropsAndMethods()
     return m
   end
   
+  local barCount = cns:a():p().barCount or 1
   --- barFrame should be hidden by default in xml template
   function o:CreateAddonModules()
     for i = 1, barCount do
