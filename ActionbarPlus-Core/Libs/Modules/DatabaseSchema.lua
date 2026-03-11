@@ -74,6 +74,7 @@ Type Definitions
 --- @field schemaVersion number
 --  ================================================
 --- @class ProfileConfig_ABP_2_0 : RootConfig_ABP_2_0
+--- @field barCount number
 --  ================================================
 --- @class DatabaseObj_ABP_2_0 : AceDBObject_3_0
 --- @field global GlobalConfig_ABP_2_0
@@ -131,11 +132,12 @@ local DEFAULT_DB = {
   global = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {                     -- ProfileConfig_ABP_2_0
-    hideWhenTaxi                  = true,
-    characterSpecificAnchors      = true,
-    actionButtonMouseoverGlow     = true,
-    hideTextOnSmallButtons        = false,
-    hideCountdownNumbers          = false,
+    barCount                        = 1,
+    --hideWhenTaxi                  = true,
+    --characterSpecificAnchors      = true,
+    --actionButtonMouseoverGlow     = true,
+    --hideTextOnSmallButtons        = false,
+    --hideCountdownNumbers          = false,
     tooltip = {                   -- TooltipConfig_ABP_2_0
       visibilityKey               = "SHIFT",
       visibilityCombatOverrideKey = "SHIFT",

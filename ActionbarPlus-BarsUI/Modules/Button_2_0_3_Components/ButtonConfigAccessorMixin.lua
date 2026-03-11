@@ -24,6 +24,9 @@ Module::ButtonConfigMixin (Methods)
 --- @type ButtonConfigAccessorMixin_ABP_2_0 | ButtonConfigAccessor_ABP_2_0 | Button_ABP_2_0_3
 local o = S
 
+--- @return ProfileConfig_ABP_2_0
+function o:GetProfileConfig() return cns:a():p() end
+
 --- @type BarConfig_ABP_2_0
 function o:GetBarConfig() return cns:a():bar(self.widget.barIndex) end
 

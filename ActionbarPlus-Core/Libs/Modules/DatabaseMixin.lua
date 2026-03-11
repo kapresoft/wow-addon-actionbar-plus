@@ -103,7 +103,6 @@ function o:g() return ns:db().global end
 --- @return ProfileConfig_ABP_2_0
 function o:p() return ns:db().profile end
 
-
 --- @param barIndex number
 --- @return BarConfig_ABP_2_0
 function o:bar(barIndex)
