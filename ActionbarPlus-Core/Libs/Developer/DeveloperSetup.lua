@@ -1,17 +1,28 @@
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
+local Str_IsBlank = ns.O.String.IsBlank
+local p, pd, t, tf = ns:log('DeveloperSetup')
+
 local s = ns.settings
 s.developer = true
+s.traceKeyword = 'abpv2'
 --s.enableTraceUI = true
 --s.traceKeyword = 'barsui'
 
+--[[-------------------------------------------------------------------
+DeveloperSetup
+---------------------------------------------------------------------]]
 --- @class DeveloperSetup_ABP_2_0
 local o = {}; DeveloperSetup_ABP_2_0 = o
 
-print('DeveloperSetup::', 'loaded...')
+--- @type DeveloperSetup_ABP_2_0
+ns.DeveloperSetup = o
+
+--[[-------------------------------------------------------------------
+Support Functions
+---------------------------------------------------------------------]]
 
 local function WrapScriptExample()
-  
   --local controller = CreateFrame("Frame", "MySecureEnv", UIParent, "SecureHandlerBaseTemplate")
   local controller = ActionbarPlusF1Button1
   
@@ -25,6 +36,29 @@ local function WrapScriptExample()
   self:SetAttribute("spell", "Kill Command")
   ]])
 
+end
+--[[-------------------------------------------------------------------
+Methods
+---------------------------------------------------------------------]]
+--/console abp_2_0_trace_ui abpv2
+--/console abp_2_0_trace_ui barsui
+--/console abp_2_0_trace_ui all
+--/dump SetCVar('abp_2_0_trace_ui', 'abp')
+--/dump GetCVarBool('abp_2_0_trace_ui')
+function o:ResolveTraceUI()
+  local trace_cvar = 'abp_2_0_trace_ui'; ns.trace_ui_cvar = trace_cvar
+  RegisterCVar(trace_cvar, '0')
+  local traceVal = strtrim(GetCVar(trace_cvar) or '')
+  s.enableTraceUI = not (Str_IsBlank(traceVal) or traceVal == '0' or traceVal == 'false')
+  if s.enableTraceUI then s.traceKeyword = traceVal end
+  
+  C_Timer.After(1.5, function()
+    p('Trace::', {
+      ['ns.enableTraceUI']=s.enableTraceUI,
+      ['ns.traceKeyword'] = s.traceKeyword,
+      ['CVAR::trace_cvar'] = traceVal
+    })
+  end)
 end
 
 --[[-------------------------------------------------------------------
@@ -52,3 +86,5 @@ function o.ButtonLogMixin(log, p, pd, t, tf)
   function log:pd(prefix, ...) local a = { ... }; pd(self:pid(prefix), unpack(a)) end
   
 end
+
+o:ResolveTraceUI()

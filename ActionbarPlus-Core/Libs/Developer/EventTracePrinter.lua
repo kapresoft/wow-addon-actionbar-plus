@@ -51,6 +51,7 @@ function o:__Init(addon, predicateFn)
   self.predicateFn = predicateFn or function() return true  end
   self.evt         = self:LoadEventTrace()
   self:SetInitialDefaultSearchKeyword()
+  if self.evt then self.evt:SetClampedToScreen(true) end
 end
 
 function o:SetInitialDefaultSearchKeyword()
