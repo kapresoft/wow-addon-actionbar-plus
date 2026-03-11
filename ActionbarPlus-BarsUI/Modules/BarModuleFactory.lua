@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local cns = ns:cns()
 local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
+local backdrops = ns.O.Backdrops
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns.O.Table.IsEmpty
 
@@ -79,6 +80,26 @@ local function BarFrameWidgetMethods()
     assert(type(index) == 'number')
     self.frame = frame
     self.index = index
+  end
+  
+  
+  --- @return BarConfig_ABP_2_0
+  function wm:conf() return cns:bar(self.index) end
+  
+  function wm:ApplyBackdrop()
+    local conf = self:conf().ui.border
+    assert(conf, "BarFrameWidget:ApplyBackdrop(): ui.border config missing")    local theme = conf and conf.theme
+
+    if theme == 'none' then self.frame:SetBackdrop(nil); return end
+    
+    local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
+    self.frame:SetBackdrop(borderDef.backdrop)
+    
+    local bgColor = conf.bgColor or borderDef.bgColor
+    local borderColor = conf.borderColor or borderDef.borderColor
+    
+    self.frame:SetBackdropColor(unpack(bgColor))
+    self.frame:SetBackdropBorderColor(unpack(borderColor))
   end
   
   --- @return Index
@@ -290,7 +311,7 @@ local function PropsAndMethods()
   --- @return BarFrameObj_ABP_2_0
   function o:__CreateBarFrame(barConf, barIndex, frameName)
     assert(barIndex and frameName, 'Frame and index missing.')
-    --- @alias BarFrameObj_ABP_2_0 BarFrameObjImpl_ABP_2_0 | FrameObj
+    --- @alias BarFrameObj_ABP_2_0 BarFrameObjImpl_ABP_2_0 | FrameObjWithBackdrop
     --
     --- @class BarFrameObjImpl_ABP_2_0 : BarFrameMixin_ABP_2_0_1
     --- @field widget BarFrameObjWidget_ABP_2_0

@@ -126,7 +126,7 @@ function ns:p() return self:a():p() end
 function ns:g() return self:a():g() end
 --- @param index Index
 --- @return BarConfig_ABP_2_0
-function ns:bars(index) return self:p().bars[index] end
+function ns:bar(index) return self:a():bar(index) end
 
 --- @return Cursor_ABP_2_0
 function ns:cursor() return self.O.CursorProvider:GetCursor() end

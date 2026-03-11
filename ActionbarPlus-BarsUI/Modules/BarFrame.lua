@@ -16,73 +16,39 @@ BarFrame (secure)
 local libName = 'BarFrameMixin_ABP_2_0_1'
 --- @class BarFrameMixin_ABP_2_0_1 : Frame
 --- @field _originalLevel number
-local S = {}; BarFrameMixin_ABP_2_0_1 = S
+local S = {};
+BarFrameMixin_ABP_2_0_1 = S
 local p, pd, t, tf = ns:log(libName)
 
+--- @type BarFrameMixin_ABP_2_0_1 | BarFrameObj_ABP_2_0
+local o = S
+
 --[[-----------------------------------------------------------------------------
-Methods
+Mixin Methods
 -------------------------------------------------------------------------------]]
-local function PropsAndMethods()
+function o:OnLoad()
+  --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
+  self:RegisterForDrag("LeftButton")
+end
 
-    --- @type BarFrameMixin_ABP_2_0_1 | BarFrameObj_ABP_2_0
-    local o = S
-    
-    --[[-----------------------------------------------------------------------------
-    Mixin Methods
-    -------------------------------------------------------------------------------]]
-  function o:OnLoad()
-    --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
-    self:RegisterForDrag("LeftButton")
-    
-    --self:SetScript("OnUpdate", function(frame)
-    --    frame:SetScript("OnUpdate", nil)
-    --    frame:InitSecure()
-    --end)
+function o:OnDragStart()
+  if InCombatLockdown() then return end
+  self._originalLevel = self:GetFrameLevel()
+  self:StartMoving()
+end
+function o:OnDragStop()
+  if InCombatLockdown() then return end
+  self:StopMovingOrSizing()
+  if self._originalLevel then
+    self:SetFrameLevel(self._originalLevel)
+    self._originalLevel = nil
   end
-    
-    function o:InitSecure()
-        p('xx InitSecure')
-        local header = self.Handler
-        local proxy  = self.SecureProxy
-        proxy:SetAttribute("type", "spell")
-        --proxy:SetScript('OnClick', function()
-        --    p('xx proxy clicked...')
-        --    self:SetAttribute("spell", 'holy light')
-        --end)
-        SecureHandlerSetFrameRef(header, "proxy", proxy)
-        
-        SecureHandlerWrapScript(
-                header,
-                "OnAttributeChanged",
-                header,
-                [[
-                    local proxy = self:GetFrameRef("proxy")
-                    local spellName = self:GetAttribute("spell_abp")
-                    if proxy and spellName then
-                        proxy:SetAttribute("spell", spellName)
-                    print('xx proxy=', proxy, 'spellN=', spellName, 'CastSpellByName=', CastSpellByName)
-                    
-                    end
-                    return true, "ok"
-                ]]
-        )
-    end
-  
-  function o:OnDragStart()
-    if InCombatLockdown() then return end
-    self._originalLevel = self:GetFrameLevel()
-    self:StartMoving()
-  end
-  function o:OnDragStop()
-    if InCombatLockdown() then return end
-    self:StopMovingOrSizing()
-    if self._originalLevel then
-      self:SetFrameLevel(self._originalLevel)
-      self._originalLevel = nil
-    end
-  end
-  function o:OnSizeChanged()
-    ns.O.Backdrops:ApplyDefaultBackdrop(self)
-  end
+end
+-- initially OnLoad() the self.widget is not defined
+-- But this method will eventually be called once
+-- BarFrame:SetSize(w, h) is called.
+function o:OnSizeChanged()
+  if not self.widget then return end
+  self.widget:ApplyBackdrop()
+end
 
-end; PropsAndMethods()
