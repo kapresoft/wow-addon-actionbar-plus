@@ -48,6 +48,13 @@ Type Definitions
 --- @field size number
 --- @field spacing SpacingConfig_ABP_2_0
 --  ================================================
+--- @alias RGBA number[]  -- {r,g,b,a} each value 0.0–1.0
+
+--- @class BarBorderConfig_ABP_2_0
+--- @field theme string        -- Border theme key (see BORDER_DEFS in Backdrops.lua)
+--- @field bgColor RGBA        -- Backdrop background color
+--- @field borderColor RGBA    -- Backdrop border color
+--  ================================================
 --- @class BarUIConfig_ABP_2_0
 --- @field rowSize number
 --- @field colSize number
@@ -57,6 +64,7 @@ Type Definitions
 --- @field frameHandleAlpha number
 --- @field padding PaddingConfig_ABP_2_0        -- Bar frame padding
 --- @field button BarButtonUIConfig_ABP_2_0     -- Button spacing configuration
+--- @field border BarBorderConfig_ABP_2_0
 --  ================================================
 --- @class ButtonConfig_ABP_2_0
 --- @field type string
@@ -172,6 +180,21 @@ local DEFAULT_BAR = {
       size = 40,
       spacing = { horizontal = 3, vertical = 3, },
     },
+    -- Deep medium blue: { 0.1, 0.3, 0.7, 0.8 },
+    -- Gray-ish: { 0.9, 0.9, 0.9, 0.9 }
+    -- Pink: { 1.0, 0.2, 0.6, 0.9 }
+    -- Warm Brown/Olive: { 0.5, 0.4, 0.1, 0.8 }
+    -- Theme 1::
+    --  bgColor = { 0.1, 0.3, 0.7, 0.8 }, -- medium blue
+    --  borderColor = { 0.9, 0.9, 0.9, 0.9 }, -- gray-ish
+    -- Theme 2::
+    -- bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
+    -- borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
+    border = {
+      theme = 'stone',
+       bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
+       borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
+    }
   },
   -- Anchor (same as V1)
   anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },

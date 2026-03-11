@@ -1,0 +1,12 @@
+--- @class BorderDef_ABP_2_0
+--- @field backdrop BackdropTemplate
+--- @field bgColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
+--- @field borderColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
+
+--- @class BackdropTemplate
+--- @field bgFile string|nil @Example `'Interface/Buttons/WHITE8x8'`
+--- @field edgeFile string|nil @Example `'Interface/DialogFrame/UI-DialogBox-Border'`
+--- @field tile boolean
+--- @field tileSize number
+--- @field edgeSize number
+--- @field insets table @Example `{ left = 0, right = 0, top = 0, bottom = 0 }`
