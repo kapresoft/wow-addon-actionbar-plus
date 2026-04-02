@@ -36,7 +36,6 @@ end
 
 function o:OnCoreReady(evt, isInitialLogin, isReloadingUi)
   ns.lockActionBars = Settings.GetValue("lockActionBars")
-  ns:InitTracer()
   t('OnCoreReady', 'isInitialLogin=', isInitialLogin, 'isReloadingUi=', isReloadingUi)
   self:SendMessage('ABP_2_0::CORE_READY', isInitialLogin, isReloadingUi)
 end; o:RegisterEvent('PLAYER_ENTERING_WORLD', 'OnCoreReady')

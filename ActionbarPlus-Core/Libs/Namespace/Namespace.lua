@@ -16,7 +16,7 @@ Type:Namespace
 --- @field private printer LibPrettyPrint_Printer
 --- @field private logBuilder LogBuilderFn
 --- @field EvenTracePrinter EventTracePrinter_ABP_2_0
---- @field tracer EventTracer_ABP_2_0
+--- @field tracer EventTracerObj_ABP_2_0
 --- @field M Core_Modules_ABP_2_0 The module names
 --- @field O Core_Modules_ABP_2_0 The module objects
 --
@@ -136,7 +136,7 @@ function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.S
 
 --- @param name Name
 --- @param predicateFn fun():boolean @Optional - The predicate function
---- @return EventTracer_ABP_2_0
+--- @return EventTracerObj_ABP_2_0
 function ns:NewTracer(name, predicateFn)
   return self.EvenTracePrinter:New(name, predicateFn)
 end
@@ -207,13 +207,13 @@ function ns:log(moduleName) local noop = function() end; return noop, noop, noop
 --[[-------------------------------------------------------------------
 Init Tracer
 ---------------------------------------------------------------------]]
-function ns:InitTracer()
+--- @param callbackFn fun() : void
+function ns:InitTracer(callbackFn)
   if not predicateFn() then return end
   
   self.tracer = self:NewTracer(self.nameShort, predicateFn)
   if not settings.enableTraceUI then self.tracer:HideUI()
   else self.tracer:ShowUI() end
   
-  local _, _, t = ns:log('Namespace')
-  t('InitTracer', 'tracer', self.tracer)
+  callbackFn()
 end

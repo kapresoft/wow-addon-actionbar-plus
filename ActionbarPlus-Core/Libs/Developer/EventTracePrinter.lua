@@ -16,7 +16,7 @@ Library
 local S = ns:NewAceEvent(); ns.EvenTracePrinter = S
 S.__index = S
 --
---- @class EventTracer_ABP_2_0 : EventTracePrinter_ABP_2_0
+--- @class EventTracerObj_ABP_2_0 : EventTracePrinter_ABP_2_0
 --
 --- @param self EventTracePrinter_ABP_2_0
 S.__call = function(self, ...) self:t(...) end
@@ -29,7 +29,7 @@ local o = S
 
 --- @param addon Name
 --- @param predicateFn PredicateFn|nil  | "function() return true end"
---- @return EventTracer_ABP_2_0
+--- @return EventTracerObj_ABP_2_0
 function o:New(addon, predicateFn)
   --- @type EventTracePrinter_ABP_2_0
   local tracer = setmetatable({}, o)
@@ -114,4 +114,10 @@ function o:_EventName(prefix)
   return ("%s::%s"):format(self.eventBase, upperc(prefix))
 end
 
-
+--[[-------------------------------------------------------------------
+Initialize Tracer
+---------------------------------------------------------------------]]
+ns:InitTracer(function()
+  local _, _, t = ns:log('EventTracePrinter')
+  t('InitTracer', 'ns.tracer=', ns.tracer)
+end)
