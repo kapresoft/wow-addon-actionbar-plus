@@ -93,7 +93,7 @@ function FontStringWidget:ScaleWithButtonSize(buttonSize)
     else
         fontHeight = defaultFontHeight
     end
-    fs:SetFont(fontName, fontHeight, "OVERLAY")
+    fs:SetFont(fontName, fontHeight, "OUTLINE")
 end
 
 --[[-----------------------------------------------------------------------------
