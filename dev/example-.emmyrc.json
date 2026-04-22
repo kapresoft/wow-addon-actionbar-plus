@@ -65,12 +65,12 @@
       "/Users/tony/sandbox/github/kapresoft/deployer",
       "/Users/tony/sandbox/github/kapresoft/wow/tools/vscode-wow-api-cppcxy/Annotations",
       "/Users/tony/sandbox/github/kapresoft/wow/wow-api-interface-cppcxy/Lib",
-      "${workspace}/ThirdParty/Libs/Kapresoft-LibUtil",
-      "${workspace}/ThirdParty/Libs/LibPrettyPrint/Libs"
+      "ThirdParty/Libs/Kapresoft-LibUtil",
+      "ThirdParty/Libs/LibPrettyPrint/Libs"
     ],
     "ignoreDir": [
-      "ActionbarPlus",
       "Lib", "legacy", "build", "dist", "doc",
+      "ActionbarPlus",
       "dev"
     ],
     "ignoreGlobs": [
