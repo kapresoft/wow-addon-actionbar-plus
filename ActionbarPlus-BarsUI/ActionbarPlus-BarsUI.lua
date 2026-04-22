@@ -2,33 +2,26 @@
 local ns = select(2, ...)
 local cns = ns:cns()
 local AceAddon, MF = cns.O.AceAddon, ns.O.BarModuleFactory
-local EMBEDS = { 'AceEvent-3.0', 'AceBucket-3.0', 'AceConsole-3.0', 'AceHook-3.0'}
-local p, pd, t, tf = ns:log('ABP_BarsUI')
+local EMBEDS = { 'AceEvent-3.0', 'AceBucket-3.0', 'AceConsole-3.0', 'AceHook-3.0' }
+local p, t = ns:log()
 
 --[[-------------------------------------------------------------------
 Addon
 ---------------------------------------------------------------------]]
---- @alias ABP_BarsUI_2_0 ABP_BarsUI_2_0_Impl | Addon_Type2_Libs
---
---
---- @class ABP_BarsUI_2_0_Impl : AceAddonObj_3_0
-local A = AceAddon:NewAddon(ns.name, unpack(EMBEDS)); ABP_BarsUI_2_0 = A
-
---- @type ABP_BarsUI_2_0_Impl | ABP_BarsUI_2_0
-local o = A
+--- @class ABP_BarsUI_2_0 : AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, AceHook-3.0
+local o = cns:AceAddon():NewAddon(ns.name, unpack(EMBEDS)); ABP_BarsUI_2_0 = o
 
 o:SetDefaultModuleLibraries(unpack(EMBEDS))
 o:SetDefaultModuleState(false)
 
-function A:OnEnable()
-  C_Timer.After(0.1, function() t('OnEnable...') end)
+function o:OnEnable()
+  t('OnEnable', 'called...')
+  C_Timer.After(1, function()
+      p('OnDisable', 'called...')
+  end)
   MF:CreateAddonModules()
 end
 
-function A:OnDisable()
-  p('xx OnDisable...')
+function o:OnDisable()
+  t('OnDisable', 'called...')
 end
-
-C_Timer.After(1, function()
-  p('AddOn created. name=', A:GetName())
-end)

@@ -1,7 +1,7 @@
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 
---- @type Kapresoft_ModuleUtil_2_0
+--- @type Kapresoft-ModuleUtil-2-0
 local ModuleUtil = LibStub('Kapresoft-ModuleUtil-2-0')
 
 --[[-----------------------------------------------------------------------------

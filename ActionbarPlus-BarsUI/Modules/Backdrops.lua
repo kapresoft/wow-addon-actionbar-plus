@@ -11,7 +11,7 @@ Module::Backdrops
 local libName = ns.M.Backdrops()
 --- @class Backdrops_ABP_2_0
 local S = {}; ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Vars & Functions
 ---------------------------------------------------------------------]]

@@ -37,20 +37,19 @@ This frame performs no state logic itself; it only routes events.
 local ns = select(2, ...)
 local cns = ns:cns()
 local comp = cns.O.Compat
-local p, pd, t, tf = ns:log('ActionEventsFrame')
+local p, t = ns:log('ActionEventsFrame')
 
 --[[-------------------------------------------------------------------
 Mixin
 ---------------------------------------------------------------------]]
 --- =======================================================
---- @class ActionEventsFrameMixin_ABP_2_0
+--- @class ActionEventsFrameMixin_ABP_2_0 : Frame
 --- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
 ActionEventsFrameMixin_ABP_2_0 = {};
 --
---- @alias ActionEventsFrame_ABP_2_0 ActionEventsFrameMixin_ABP_2_0 | FrameObj
+--- @class ActionEventsFrame_ABP_2_0 : ActionEventsFrameMixin_ABP_2_0
 --- =======================================================
 
---- @type ActionEventsFrameMixin_ABP_2_0 | ActionEventsFrame_ABP_2_0
 local o = ActionEventsFrameMixin_ABP_2_0
 
 function o:OnLoad()

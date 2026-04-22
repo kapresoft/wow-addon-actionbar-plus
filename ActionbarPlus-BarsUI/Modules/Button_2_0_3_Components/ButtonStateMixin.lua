@@ -28,7 +28,7 @@ local S = {}; ns:Register(libName, S)
 --
 --- @alias ButtonState_ABP_2_0 ButtonStateMixin_ABP_2_0
 --
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonStateMixin (Methods)

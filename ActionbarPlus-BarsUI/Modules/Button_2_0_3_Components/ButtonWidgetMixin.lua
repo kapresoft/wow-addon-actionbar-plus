@@ -6,7 +6,7 @@ local ns = select(2, ...)
 local cns, O = ns:cns()
 local comp, au = O.Compat, O.ActionUtil
 local attr, atyp = cns:constants()
-local Str_IsBlank = O.String.IsBlank
+local Str_IsBlank = cns:String().IsBlank
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
@@ -22,7 +22,7 @@ local S = {}; ns:Register(libName, S)
 --
 --- @alias ButtonWidget_ABP_2_0 ButtonWidgetMixin_ABP_2_0
 --
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin (Methods)
@@ -42,7 +42,7 @@ function o:Init(btn, btnIndex, parentFrameIndex)
     --- Needed by DeveloperSetup_ABP_2_0.ButtonLogMixin(o)
     function self:__logID() return self.button:GetName() end
     -- todo: DeveloperSetup_ABP_2_0.ButtonLogMixin(self, libName) end
-    DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, pd, t, tf) end
+    DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t) end
   --@end-do-not-package@
 end
 

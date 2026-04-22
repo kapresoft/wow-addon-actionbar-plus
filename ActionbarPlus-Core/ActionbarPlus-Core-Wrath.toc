@@ -1,4 +1,4 @@
-## Interface: 20505
+## Interface: 30403
 ## Version: @project-version@
 ## Title: |TInterface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x:18:18|tActionbar|cff1784d1Plus|r|cffffffff-Core|r
 
@@ -7,7 +7,7 @@
 
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_CORE_DB
-## OptionalDeps: Ace3
+## OptionalDeps: Ace3, DevSuite
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten

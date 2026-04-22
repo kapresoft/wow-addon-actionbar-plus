@@ -16,7 +16,7 @@ Module::ActionUtil
 local libName = ns.M.ActionUtil()
 --- @class ActionUtil_ABP_2_0
 local S = {}; ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 local attr, atyp = ns:constants()
 

@@ -8,8 +8,12 @@
                 "desktop-dir":"/Users/tony/Desktop",
                 "wow-dir": "/Applications/wow",
                 "wow-classic-dir": "${wow-dir}/_classic_",
+                "wow-classic-anniv-dir": "${wow-dir}/_anniversary_",
+                "wow-classic-era-dir": "${wow-dir}/_classic_era_",
                 "wow-retail-dir": "${wow-dir}/_retail_",
                 "wow-classic-deploy": "${wow-classic-dir}/Interface/AddOns/${addon}",
+                "wow-classic-anniv-deploy": "${wow-classic-anniv-dir}/Interface/AddOns/${addon}",
+                "wow-classic-era-deploy": "${wow-classic-era-dir}/Interface/AddOns/${addon}",
                 "wow-retail-deploy": "${wow-retail-dir}/Interface/AddOns/${addon}",
                 "wow-desktop-deploy": "${desktop-dir}/${addon}"
             }
@@ -18,105 +22,37 @@
             {
                 "deployOnSave": true,
                 "fastCheckOnSave": true,
-                "name": "Desktop",
+                "fastCheckOnSync": true,
+                "alwaysSyncIfNewer": true,
+                "name": "Deploy Addon",
                 "button": {
                     "enabled": true,
-                    "text": "Desktop",
-                    "tooltip": "Deploy to PWD/.deploy",
-                    "targets": [
+                    "text": "Deploy",
+                    "tooltip": "Deploy ActionbarPlus addon",
+                    "targets": [ 
+                        "wow-classic",
+                        "wow-classic-anniv",
+                        "wow-retail",
+                        "wow-classic-era",
                         "desktop"
-                    ]
+                    ],
                 },
                 "exclude": [
+                    "_**/**",
+                    "**/User/*.json",
+                    ".gitignore",
+                    ".gitattributes",
                     ".idea/**",
-                    ".vscode/**",
+                    "**/.vscode/**",
                     ".git/**",
                     ".github/**",
+                    "Dev.toc",
                     "build/**",
                     "dev/**",
                     "doc/**",
-                    ".gitignore",
-                    ".gitattributes",
-                ],
-            },
-            {
-                "name": "ActionbarPlus Classic",
-                "button": {
-                    "enabled": true,
-                    "text": "Deploy Classic",
-                    "tooltip": "Deploy to ${wow-classic-deploy}",
-                    "targets": [
-                        "wow-classic"
-                    ]
-                },
-                "deployOnChange": {
-                    "exclude": [
-                        ".deploy-classic/**",
-                        ".deploy-retail/**",
-                        ".deploy/**",
-                        ".idea/**",
-                        ".vscode/**",
-                        ".github/**",
-                        "build/**",
-                        "dev/**",
-                        "doc/**",
-                        ".gitignore",
-                        ".gitattributes",
-                    ],
-                    "useTargetList": true
-                },
-                "exclude": [
-                    ".deploy-classic/**",
-                    ".deploy-retail/**",
-                    ".deploy/**",
-                    ".idea/**",
-                    ".vscode/**",
-                    ".github/**",
-                    "build/**",
-                    "dev/**",
-                    "doc/**",
-                    ".gitignore",
-                    ".gitattributes",
-                ],
-            },
-            {
-                "name": "ActionbarPlus Retail",
-                "button": {
-                    "enabled": true,
-                    "text": "Deploy Retail",
-                    "tooltip": "Deploy to ${wow-retail-deploy}",
-                    "targets": [
-                        "wow-retail"
-                    ]
-                },
-                "deployOnChange": {
-                    "exclude": [
-                        ".deploy-classic/**",
-                        ".deploy-retail/**",
-                        ".deploy/**",
-                        ".idea/**",
-                        ".vscode/**",
-                        ".github/**",
-                        "build/**",
-                        "dev/**",
-                        "doc/**",
-                        ".gitignore",
-                        ".gitattributes",
-                    ],
-                    "useTargetList": true
-                },
-                "exclude": [
-                    ".deploy-classic/**",
-                    ".deploy-retail/**",
-                    ".deploy/**",
-                    ".idea/**",
-                    ".vscode/**",
-                    ".github/**",
-                    "build/**",
-                    "dev/**",
-                    "doc/**",
-                    ".gitignore",
-                    ".gitattributes",
+                    "out/**",
+                    "**/*.yaml",
+                    "**/*.md",
                 ],
             }
         ],
@@ -124,21 +60,94 @@
             {
                 "name": "wow-classic",
                 "type": "local",
-                "description": "Deploys to project dir ${wow-classic-dir}",
+                "description": "Deploys to wow classic addon folder",
                 "dir": "${wow-classic-deploy}"
+            },
+            {
+                "name": "wow-classic-anniv",
+                "type": "local",
+                "description": "Deploys to wow classic addon folder",
+                "dir": "${wow-classic-anniv-deploy}"
+            },
+            {
+                "name": "wow-classic-era",
+                "type": "local",
+                "description": "Deploys to wow classic addon folder",
+                "dir": "${wow-classic-era-deploy}"
             },
             {
                 "name": "wow-retail",
                 "type": "local",
-                "description": "Deploys to project dir ${wow-retail-dir}",
-                "dir": "${wow-retail-deploy}"
+                "description": "Deploys to wow retail addon folder",
+                "dir": "${wow-retail-deploy}",
             },
-            {
-                "name": "desktop",
-                "type": "local",
-                "description": "Deploys to project dir Desktop",
-                "dir": "${wow-desktop-deploy}"
-            }
+            // {
+            //     "name": "desktop",
+            //     "type": "local",
+            //     "description": "Deploys to desktop ActionbarPlus folder (for testing)",
+            //     "dir": "${wow-desktop-deploy}"
+            // }
         ]
-    }
+    },
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.runtime.builtin": {
+        "basic": "disable",
+        "debug": "disable",
+        "io": "disable",
+        "math": "disable",
+        "os": "disable",
+        "package": "disable",
+        "string": "disable",
+        "table": "disable",
+        "utf8": "disable"
+    },
+    "Lua.workspace.library": [
+        "/Users/tony/sandbox/github/kapresoft/wow/tools/vscode-wow-api/Annotations/Core",
+        "/Users/tony/sandbox/github/kapresoft/wow/wow-api-interface/Lib",
+        "/Users/tony/sandbox/github/kapresoft/wow/wow-lib-util/Lib",
+        "ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs",
+        "~/.vscode/extensions/ketho.wow-api-0.22.3/Annotations/Core"
+    ],
+    "Lua.diagnostics.globals": [
+        "Settings",
+        "RegisterStateDriver",
+        "UnregisterStateDriver",
+        "SecureHandlerWrapScript",
+        "SecureHandlerSetFrameRef",
+        "ActionButton_UpdateCooldownNumberHidden",
+        "UIErrorsFrame",
+        "EventTrace",
+        "CreateColorFromRGBHexString",
+        "ReloadUI",
+        "SOUNDKIT",
+        "SettingsPanel",
+        "GetUnitName",
+        "GetItemInfoFromHyperlink",
+        "PaperDollSidebarTab3",
+        "FrameUtil",
+        "RANGE_INDICATOR",
+        "GameTooltipTextRight1",
+        "GameTooltipTextLeft1",
+        "TooltipDataProcessor",
+        "GameTooltip_AddBlankLinesToTooltip",
+        "NUM_PET_ACTION_SLOTS",
+        "AnchorUtil",
+        "MultiBarBottomRight",
+        "CreateAnchor",
+        "GridLayoutMixin",
+        "HIGHLIGHT_FONT_COLOR_CODE",
+        "FONT_COLOR_CODE_CLOSE",
+        "LOOT_SPECIALIZATION_DEFAULT",
+        "StaticPopup_Show",
+        "PaperDollFrame",
+        "CharacterFrame",
+        "ToggleCharacter",
+        "ProfessionsFrame",
+        "UISpecialFrames",
+        "StaticPopup_Visible",
+        "StaticPopupDialogs"
+    ],
+    "Lua.diagnostics.disable": [
+        "assign-type-mismatch"
+    ]
 }

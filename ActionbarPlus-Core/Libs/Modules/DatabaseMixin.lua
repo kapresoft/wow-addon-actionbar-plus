@@ -8,7 +8,8 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local AceDB = ns.O.AceDB
+
+local AceDB = LibStub('AceDB-3.0')
 local DatabaseSchema, unit = ns.O.DatabaseSchema, ns.O.UnitUtil
 local dsu = DatabaseSchema.Util
 
@@ -17,24 +18,19 @@ local DB_VERSION = 1
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @alias DatabaseMixin_ABP_2_0 DatabaseMixin_ABP_2_0 | AceDB_3_0
---- @alias Database_ABP_2_0 DatabaseMixin_ABP_2_0 | ABP_Core_2_0
---
---
 local libName = ns.M.DatabaseMixin()
 --- @class DatabaseMixin_ABP_2_0
 local S = ns:Register(libName, {})
-local p, pd, t, tf = ns:log(libName)
-
---- @type DatabaseMixin_ABP_2_0 | Database_ABP_2_0
-local o = S
-
+local p, t = ns:log(libName)
+--
+--- @class Database_ABP_2_0 : DatabaseMixin_ABP_2_0
+--
 
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
 --- @param self DatabaseMixin_ABP_2_0
---- @param db AceDBObject_3_0
+--- @param db AceDBObject-3.0
 local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnNewProfile", "OnNewProfile")
     db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -42,15 +38,15 @@ local function DatabaseMixin_RegisterCallbacks(self, db)
     db.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
     db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
 end
---- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
+--- @param self DatabaseMixin_ABP_2_0
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
     db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
-    pd(('Current Profile: %s activeSpecGroup: %s')
+    t(('Current Profile: %s activeSpecGroup: %s')
             :format(db:GetCurrentProfile(), unit:GetActiveSpecGroupIndex()))
 end
 
---- @param self DatabaseMixin_ABP_2_0|Database_ABP_2_0
+--- @param self DatabaseMixin_ABP_2_0
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
     local current = db.global.schemaVersion
@@ -63,6 +59,8 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+local o = S
+
 function o:OnNewProfile(evt, db, profileKey) p('OnNewProfile called...') end
 function o:OnProfileChanged(evt, db, profileKey) p('OnProfileChanged called...') end
 function o:OnProfileDeleted(evt, db, profileKey) p('OnProfileDeleted called...key=' .. profileKey) end
@@ -104,14 +102,12 @@ function o:g() return ns:db().global end
 function o:p() return ns:db().profile end
 
 --- @param barIndex number
---- @return BarConfig_ABP_2_0
+--- @return BarConfig_ABP_2_0?
 function o:bar(barIndex)
   local barKey = dsu.barKey(barIndex)
   local profile = self:p()
   local bars = profile.bars
-  local barConf = bars[barKey]
-  --p('bar(barIndex):: barConf=', barConf)
-  return barConf
+  return bars[barKey]
 end
 
 --- @param barConf BarConfig_ABP_2_0

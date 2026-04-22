@@ -4,7 +4,7 @@ local ns = select(2, ...)
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
---- @type Kapresoft_LibUtil_LibModule
+--- @type Kapresoft-ModuleUtil-2-0
 local ModuleUtil = LibStub('Kapresoft-ModuleUtil-2-0')
 
 --[[-----------------------------------------------------------------------------
@@ -12,28 +12,6 @@ Type: Modules
 -------------------------------------------------------------------------------]]
 --- @class Core_Modules_ABP_2_0
 local ModuleNames = {
-  
-  ---------------------------------------
-  ----- ThirdParty::Ace3 ----------------
-  ---------------------------------------
-  
-  --- @type AceEvent_3_0
-  AceEvent  = {},
-  --- @type AceBucket_3_0
-  AceBucket = {},
-  --- @type AceAddon_3_0
-  AceAddon  = {},
-  --- @type AceDB_3_0
-  AceDB     = {},
-  
-  ---------------------------------------
-  ----- ThirdParty::Kapresoft Libs ------
-  ---------------------------------------
-  
-  --- @type Kapresoft_Table_2_0
-  Table = {},
-  --- @type Kapresoft_String_2_0
-  String = {},
   
   ---------------------------------------
   ----- ActionbarPlus_2_0 Libs ----------

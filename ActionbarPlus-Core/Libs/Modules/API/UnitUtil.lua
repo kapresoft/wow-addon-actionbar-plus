@@ -25,7 +25,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 local O, M = ns.O, ns.M
 local comp, UnitClasses = O.Compat, O.Constants.UnitClasses
-local Str_IsAnyOf = O.String.IsAnyOf
+local Str_IsAnyOf = ns:String().IsAnyOf
 
 --- For all stealth
 local STEALTHED_ICON = 136047
@@ -42,7 +42,7 @@ local S = {}; ns:Register(libName, S)
 S.__index = S
 S.__type = libName
 
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]

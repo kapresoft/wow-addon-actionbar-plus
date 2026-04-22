@@ -36,7 +36,7 @@ Think of it as:
 
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local p, pd, t, tf = ns:log('BarButtonUpdateFrameMixin')
+local p, t = ns:log('BarButtonUpdateFrameMixin')
 
 --- =======================================================
 --- @class ButtonUpdateFrameMixin_ABP_2_0

@@ -34,7 +34,7 @@ Mental model:
 
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local p, pd, t, tf = ns:log('WorldEventsFrame')
+local p, t = ns:log('WorldEventsFrame')
 
 --- =======================================================
 --- Buttons register/unregister here to receive world/environment-level events.

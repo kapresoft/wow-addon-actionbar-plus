@@ -5,7 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local O = ns.O
 local c = O.Compat
-local Str_IsBlank = O.String.IsBlank
+local Str_IsBlank = ns:String().IsBlank
 
 --[[-----------------------------------------------------------------------------
 Module::Cursor
@@ -14,7 +14,7 @@ Module::Cursor
 local libName = ns.M.CursorProvider()
 --- @class CursorProvider_ABP_2_0
 local S = {}; ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --- @class CursorMixin_ABP_2_0
 --- @field type CursorType
