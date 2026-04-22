@@ -29,7 +29,7 @@ local au = O.ActionUtil
 local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
-local Tbl_IsEmpty = cns.O.Table.IsEmpty
+local Tbl_IsEmpty = cns:Table().IsEmpty
 
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
@@ -56,7 +56,7 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 
 --[[-------------------------------------------------------------------
@@ -108,7 +108,7 @@ function o:OnLoad()
   
   --@do-not-package@
   function self:__logID() return self:GetName() end
-  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, pd, t, tf)
+  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t)
   --@end-do-not-package@
   
   self:EnableMouse(true)

@@ -5,7 +5,7 @@ local cns = ns:cns()
 Local Vars
 -------------------------------------------------------------------------------]]
 local unit = cns.O.UnitUtil
-local p, pd, t, tf = ns:log('SpecController')
+local p, t = ns:log('SpecController')
 -- todo: delete me
 --[[-----------------------------------------------------------------------------
 Module::SpecController

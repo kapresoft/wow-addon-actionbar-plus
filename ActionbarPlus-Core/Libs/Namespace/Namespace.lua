@@ -1,31 +1,35 @@
+local AceLib = LibStub('Kapresoft-AceLib-2-0')
+local GVM = LibStub('Kapresoft-GameVersionMixin-2-0')
+local ColorFormatter = LibStub('Kapresoft-ColorFormatter-2-0')
+
 --[[-------------------------------------------------------------------
 Type:Namespace
 ---------------------------------------------------------------------]]
---- @alias Namespace_ABP_2_0 NamespaceImpl_ABP_2_0 | GameVersionMixin_ABP_2_0
---- @alias LogBuilderFn fun(moduleName:string) : LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, ABP_2_0_TraceFn, ABP_2_0_TraceFnFormatted
---- @alias ABP_2_0_TraceFn fun(...: any) : void @Printer function that outputs plain values to Blizzard Trace UI (like print)
---- @alias ABP_2_0_TraceFnFormatted fun(...: any) : void @Printer function that outputs formatted values to Blizzard Trace UI (like print)
---
---
---- @class NamespaceImpl_ABP_2_0
---- @field name Name The addon name
---- @field nameShort Name The short version of the addon name used for logging and tracing.
---- @field gameVersion GameVersion_2_0
---- @field lockActionBars boolean
---- @field private fmt LibPrettyPrint_Formatter
---- @field private printer LibPrettyPrint_Printer
---- @field private logBuilder LogBuilderFn
---- @field EvenTracePrinter EventTracePrinter_ABP_2_0
---- @field tracer EventTracerObj_ABP_2_0
---- @field M Core_Modules_ABP_2_0 The module names
---- @field O Core_Modules_ABP_2_0 The module objects
+--- @alias LogBuilderFn fun(moduleName:string) : LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, TraceFn_ABP_2_0, TraceFnFormatted_ABP_2_0
+--- @alias TraceFn_ABP_2_0 fun(...: any) : void @Printer function that outputs plain values to Blizzard Trace UI (like print)
+--- @alias TraceFnFormatted_ABP_2_0 fun(...: any) : void @Printer function that outputs formatted values to Blizzard Trace UI (like print)
 --
 --
 --- @type string
 local addon
---- @type NamespaceImpl_ABP_2_0 | Namespace_ABP_2_0
+
+--- @class Namespace_ABP_2_0 : Kapresoft-AceLib-2-0, Kapresoft-GameVersionMixin-2-0
+--- @field name Name The addon name
+--- @field nameShort Name The short version of the addon name used for logging and tracing.
+--- @field gameVersion Kapresoft-GameVersion-2-0
+--- @field private fmt LibPrettyPrint_Formatter
+--- @field printer LibPrettyPrint_Printer
+--- @field logHolder LogHolder_ABP_2_0
+--- @field colorDef Kapresoft-ColorDefinition-2-0
+--- @field tracer EventTraceUtilObj_ABP_2_0
+--- @field tr TraceFn_ABP_2_0
+--- @field M Core_Modules_ABP_2_0 The module names
+--- @field O Core_Modules_ABP_2_0 The module objects
 local ns
-addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; ABP_2_0_NS = ns
+
+addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; Mixin(ns, GVM, AceLib)
+ABP_2_0_NS = ns
+
 
 --[[-------------------------------------------------------------------
 Local Vars
@@ -55,58 +59,38 @@ local function predicateFn() return ns:IsDev() end
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
+local prefixColor, subPrefixColor = '466EFF', '9CFF9C'
+ns.colorDef = {
+  primary = CreateColorFromRGBHexString(prefixColor),
+  secondary = CreateColorFromRGBHexString(subPrefixColor),
+}
+
 ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = ns.fmt
 ns.printer = LibPrettyPrint:Printer({
   prefix = ns.nameShort, formatter = ns.fmt,
-  prefix_color = '466EFF', sub_prefix_color = '9CFF9C',
+  prefix_color = prefixColor, sub_prefix_color = secondaryColor,
 }, predicateFn)
 
 --[[-------------------------------------------------------------------
-Ace3 Modules
+External Lib Dependencies
 ---------------------------------------------------------------------]]
-do
-  local obj = ns.O
-  --- @type AceEvent_3_0
-  obj.AceEvent = LibStub("AceEvent-3.0")
-  --- @type AceBucket_3_0
-  obj.AceBucket = LibStub("AceBucket-3.0")
-  --- @type AceAddon_3_0
-  obj.AceAddon = LibStub("AceAddon-3.0")
-  --- @type AceDB_3_0
-  obj.AceDB = LibStub("AceDB-3.0")
-  
-  --- @param targetObj any|nil An optional targetObj for embedding
-  function ns:NewAceEvent(targetObj)
-    if targetObj then return self.O.AceEvent:Embed(targetObj) end
-    return self.O.AceEvent:Embed({})
-  end
-  
-  --- @param targetObj any|nil An optional targetObj for embedding
-  function ns:NewAceBucket(targetObj)
-    if targetObj then return self.O.AceBucket:Embed(targetObj) end
-    return self.O.AceBucket:Embed({})
-  end
-end
---[[-------------------------------------------------------------------
-Kapresoft Modules
----------------------------------------------------------------------]]
-do
-  local obj = ns.O
-  --- @type Kapresoft_Table_2_0
-  obj.Table = LibStub('Kapresoft-Table-2-0')
-  --- @type Kapresoft_String_2_0
-  obj.String = LibStub('Kapresoft-String-2-0')
-end
+function ns:Ace() return LibStub('Kapresoft-AceLib-2-0') end
+function ns:Table() return LibStub('Kapresoft-Table-2-0') end
+function ns:String() return LibStub('Kapresoft-String-2-0') end
+function ns:ColorFormatter() return ColorFormatter end
+--- @return table<string, string>
+function ns:GetLocale() return ns:AceLocale():GetLocale(self.name, true) end
+function ns:AddonUtil() return LibStub('Kapresoft-AddonUtil-2-0') end
 
 --- Register a Namespace Module
 --- @generic T
---- @param obj T The library object instance
+--- @param anyObj T The library object instance
 --- @return T
-function ns:Register(libName, obj)
-  assert(type(libName) == 'string' and type(obj) == 'table',
+function ns:Register(libName, anyObj)
+  assert(type(libName) == 'string' and type(anyObj) == 'table',
           'Register(libName, obj): libName(string) and obj(table) is required.')
-  self.O[libName] = obj
-  return obj
+  self.O[libName] = anyObj
+  return anyObj
 end
 
 --- @param db DatabaseObj_ABP_2_0
@@ -134,23 +118,10 @@ function ns:cursor() return self.O.CursorProvider:GetCursor() end
 --- @return AttributeNames_ABP_2_0, SupportedActionTypes_ABP_2_0
 function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.SupportedActionTypes end
 
---- @param name Name
---- @param predicateFn fun():boolean @Optional - The predicate function
---- @return EventTracerObj_ABP_2_0
-function ns:NewTracer(name, predicateFn)
-  return self.EvenTracePrinter:New(name, predicateFn)
-end
-
-function ns:MixinGameVersion(gameVersion) Mixin(self, gameVersion) end
-
---- @param rgbHex RGBHex|nil    @Optional
+--- @param color colorRGBA|HexRGBA|HexRGB|HexRGBA @ RED_THREAT_COLOR | '565656fc' | '565656' | 'fc565656'
 --- @return fun(key:string) : string The color formatted key
-function ns:colorFn(rgbHex)
-  return function(text)
-    local c = CreateColorFromRGBHexString(rgbHex)
-    assert(c, ('Invalid RGBHex color: %s'):format(rgbHex))
-    return c:WrapTextInColorCode(text)
-  end
+function ns:ColorFn(color)
+  local cfn, _ = ColorFormatter:ColorFn(color); return cfn
 end
 --[[-------------------------------------------------------------------
 Utility Functions
@@ -196,24 +167,27 @@ function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
 --- @type Namespace_ABP_2_0
 ABP_CORE_NS = ns
 
+--- @class LogHolder_ABP_2_0
+--- @field printer fun(moduleName:Name) : LibPrettyPrint_PrintFn A simple printer
+--- @field tracer fun(moduleName:Name) : TraceFn_ABP_2_0 A simple tracer
+
+ns.logHolder = {}; do
+  --- These are noop loggers and tracers for non-dev releases
+  local h = ns.logHolder; local noop = function(moduleName) return function() end end
+  h.printer, h.tracer = noop, noop
+end
+
 --[[-------------------------------------------------------------------
 Loggers/Tracers:: NoOp in Official Releases
 ---------------------------------------------------------------------]]
---- @see DeveloperNamespace_Core_ABP_2_0#log()
+--- Returns the print, delayed-print, tracer, formatted-tracer functions
+--- ```
+--- local p, t = ns:log('EventHandler')
+--- ```
 --- @param moduleName Name
---- @return NoOpFn, NoOpFn, NoOpFn, NoOpFn
-function ns:log(moduleName) local noop = function() end; return noop, noop, noop, noop end
-
---[[-------------------------------------------------------------------
-Init Tracer
----------------------------------------------------------------------]]
---- @param callbackFn fun() : void
-function ns:InitTracer(callbackFn)
-  if not predicateFn() then return end
-  
-  self.tracer = self:NewTracer(self.nameShort, predicateFn)
-  if not settings.enableTraceUI then self.tracer:HideUI()
-  else self.tracer:ShowUI() end
-  
-  callbackFn()
+--- @return LibPrettyPrint_PrintFn, TraceFn_ABP_2_0
+function ns:log(moduleName)
+  local h = self.logHolder
+  return h.printer(moduleName), h.tracer(moduleName)
 end
+

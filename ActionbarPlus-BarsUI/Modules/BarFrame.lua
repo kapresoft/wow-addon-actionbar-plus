@@ -16,16 +16,14 @@ BarFrame (secure)
 local libName = 'BarFrameMixin_ABP_2_0_1'
 --- @class BarFrameMixin_ABP_2_0_1 : Frame
 --- @field _originalLevel number
-local S = {};
-BarFrameMixin_ABP_2_0_1 = S
-local p, pd, t, tf = ns:log(libName)
-
---- @type BarFrameMixin_ABP_2_0_1 | BarFrameObj_ABP_2_0
-local o = S
+local o = {}; BarFrameMixin_ABP_2_0_1 = o
+--
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
+
 function o:OnLoad()
   --if not ns:IsV2() then self:UnregisterAllEvents(); self:Hide(); return; end
   self:RegisterForDrag("LeftButton")

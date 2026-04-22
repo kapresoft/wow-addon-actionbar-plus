@@ -2,6 +2,8 @@
 rel_dir="./.release"
 
 _Main() {
+  local v2="$1"
+
   # clean release with no zip
   if [[ -d "${rel_dir}" ]]; then
     rm -rf "${rel_dir}"
@@ -13,8 +15,17 @@ _Main() {
     echo "  $_ls_out"
     return 1
   fi
-  ./dev/release.sh -dz
+  local cmd
+  if [[ $v2 = "v2" ]]; then
+    cmd="./dev/release.sh -m pkgmeta-v2.yaml -dz"
+  else
+    cmd="./dev/release.sh -dz"
+  fi
+  echo "Executing: ${cmd}" && sleep 1
+  eval "${cmd}"
+  echo "Build Complete: ${cmd}"
+
 }
 
-_Main
+_Main "$@"
 

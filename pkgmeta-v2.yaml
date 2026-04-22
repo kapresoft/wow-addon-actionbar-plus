@@ -1,0 +1,106 @@
+package-as: ActionbarPlus
+# --------------------------
+license-output: LICENSE.txt
+enable-nolib-creation: no
+
+manual-changelog:
+  filename: CHANGELOG.txt
+  markup-type: markdown
+
+embedded-libraries:
+  - LibStub
+  - Ace3
+
+tools-used:
+  - DevSuite
+  - DebugChatFrame
+  - Addon-Usage
+  - Bugsack
+  - Bug-Grabber
+
+# Declaring the following dependencies will make curse forge app install these 3rd-party
+# libraries. Need to figure out which is best (embedded or external).
+# in code, check for each of library global var before using
+#optional-dependencies:
+#  - ace3
+#  - libstub
+#  - callbackhandler
+#  - libsharedmedia-3-0
+
+# Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
+#ignore:
+#  - .git
+#  - .idea
+
+# Resources:
+#  - https://github.com/wowace-mirror
+#  - https://www.wowace.com/projects/ace3
+#  - SVN URLs are still the primary source recommendation
+externals:
+#  ActionbarPlus/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+#  ActionbarPlus/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
+#  ActionbarPlus/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+#  ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
+  ActionbarPlus-Core/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
+  ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+  ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
+  ActionbarPlus-Core/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+
+ignore:
+  - "*.sh"
+  - "*.md"
+  - "*.yaml"
+  - "*.yml"
+  - "*.txt"
+  - dev
+  - doc
+  - scripts
+  - ActionbarPlus-2.0
+#  - ActionbarPlus/Core/Lib/Developer
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/LICENSE
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/External
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/dev
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/doc
+#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.sh
+#  - ActionbarPlus/ThirdParty/Libs/Ace3/*.toc
+#  - ActionbarPlus/ThirdParty/Libs/Ace3/tests
+#  - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
+#  - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
+#  - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
+  - ActionbarPlus-Core/Libs/Developer
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/doc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/ThirdParty
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/LibPrettyPrint.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/*.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/External
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/_Lib.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
+  - ActionbarPlus
+  - ActionbarPlus/*.txt
+  - ActionbarPlus-OptionsUI
+
+# REQUIRED for CurseForge packager (non-obvious):
+# The LEFT side MUST be <repo-folder>/<addon-folder>
+#   - <addon-folder> MUST be the folder that contains the .toc files
+# The RIGHT side MUST be the addon name:
+#   - Must match the .toc filename (AddonName.toc)
+#   - Must match `package-as`
+#
+# NOTE:
+# CurseForge release.sh (poorly) relies on `move-folders` for *addon discovery*,
+# not just post-processing. If this does not exactly match
+# <repo>/<addon>, `toc_root_paths` will be empty and packaging WILL fail.
+#
+# ⚠️ Do not change unless you also change the repo/addon layout.
+move-folders:
+#  ActionbarPlus/ActionbarPlus: ActionbarPlus
+  ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
+  ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
+
+# run with: ./dev/release.sh -m pkgmeta-v2.yaml -dz

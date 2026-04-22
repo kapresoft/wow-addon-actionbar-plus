@@ -44,7 +44,7 @@ local libName = 'ABP_ButtonMixin_2_0_1_1'
 --- @field icon TextureObj
 --- @field GetParent fun(self:ABP_ButtonMixin_2_0_1_1) : BarFrameObj_ABP_2_0
 local S = ns:cns():NewAceEvent(); ABP_ButtonMixin_2_0_1_1 = S
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --- @type boolean
 local lockActionBars

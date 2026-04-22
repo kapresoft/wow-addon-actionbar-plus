@@ -11,62 +11,45 @@ local ns = select(2, ...)
 --[[-----------------------------------------------------------------------------
 Library
 -------------------------------------------------------------------------------]]
---- @class EventTracePrinter_ABP_2_0 : AceEvent_3_0
+--- @class EventTraceUtil_ABP_2_0 : AceEvent-3.0
 --- @field keyword string
-local S = ns:NewAceEvent(); ns.EvenTracePrinter = S
-S.__index = S
---
---- @class EventTracerObj_ABP_2_0 : EventTracePrinter_ABP_2_0
---
---- @param self EventTracePrinter_ABP_2_0
-S.__call = function(self, ...) self:t(...) end
+local S = ns:NewAceEvent()
 
 --[[-----------------------------------------------------------------------------
 Library: Methods
 -------------------------------------------------------------------------------]]
---- @type EventTracePrinter_ABP_2_0
-local o = S
+--- @class EventTraceUtilObj_ABP_2_0
+local o = ns:NewAceEvent()
 
---- @param addon Name
---- @param predicateFn PredicateFn|nil  | "function() return true end"
---- @return EventTracerObj_ABP_2_0
-function o:New(addon, predicateFn)
-  --- @type EventTracePrinter_ABP_2_0
-  local tracer = setmetatable({}, o)
-  tracer:__Init(addon, predicateFn)
-  return tracer
-end
+o.__index = o
+--
+--
+--- @param self EventTraceUtil_ABP_2_0
+o.__call = function(self, ...) self:t(...) end
 
 -- light green
-local c_base = ns:colorFn('88ff88')
+local c_base = ns:ColorFn('88ff88')
 
 --- @private
 --- @param addon Name
 --- @param predicateFn PredicateFn|nil  | "function() return true end"
 function o:__Init(addon, predicateFn)
-  assert(addon, "The param addon is required.")
+  assertsafe(type(addon) == 'string', "__Init(addon, predicateFn): {addon} should be a string")
 
   self.logName     = addon
   self.eventBase   = upperc(c_base(addon))
-  self.predicateFn = predicateFn or function() return true  end
-  self.evt         = self:LoadEventTrace()
-  self:SetInitialDefaultSearchKeyword()
-  if self.evt then self.evt:SetClampedToScreen(true) end
-end
-
-function o:SetInitialDefaultSearchKeyword()
-  local s = self.evt.Log.Bar.SearchBox
-  if s then s:SetText(ns.settings.traceKeyword or '') end
+  self.predicateFn = predicateFn or function() return true end
+  self.evt         = EventTrace
 end
 
 function o:ShowUI() self.evt:Show() end
-
 function o:HideUI() self.evt:Hide() end
 
 --- Trace with default prefix as the addon name
 --- @param ... any
 function o:td(...)
   if not self.predicateFn() then return end
+  if not self.evt then return end
   self.evt:LogEvent(self:_EventName(), ...)
 end
 
@@ -74,6 +57,7 @@ end
 --- @param ... any
 function o:tdf(...)
   if not self.predicateFn() then return end
+  if not self.evt then return end
   self.evt:LogEvent(self:_EventName(), ns.fmt(...))
 end
 
@@ -82,6 +66,7 @@ end
 --- @param ... any
 function o:t(prefix, ...)
   if not self.predicateFn() then return end
+  if not self.evt then return end
   self.evt:LogEvent(self:_EventName(prefix), ...)
 end
 
@@ -89,23 +74,8 @@ end
 --- @param ... any
 function o:tf(prefix, ...)
   if not self.predicateFn() then return end
+  if not self.evt then return end
   self.evt:LogEvent(self:_EventName(prefix), ns.fmt(...))
-end
-
-
---- @private
---- @return EventTraceInstance
-function o:LoadEventTrace()
-  local addOnName = EVENT_TRACE_ADDON
-  if IsAddOnLoaded(addOnName) then return EventTrace end
-
-  local success, reason = LoadAddOn(addOnName)
-  if not success then
-    return print(('%s:: Failed to load [%s], reason=%s'):format(
-            self.logName, addOnName, reason))
-  end
-  assert(EventTrace, ('%s:: Failed to load [%s].'):format(self.logName, addOnName))
-  return EventTrace
 end
 
 --- @param prefix Name|nil
@@ -114,10 +84,19 @@ function o:_EventName(prefix)
   return ("%s::%s"):format(self.eventBase, upperc(prefix))
 end
 
---[[-------------------------------------------------------------------
-Initialize Tracer
----------------------------------------------------------------------]]
-ns:InitTracer(function()
-  local _, _, t = ns:log('EventTracePrinter')
-  t('InitTracer', 'ns.tracer=', ns.tracer)
-end)
+--[[-----------------------------------------------------------------------------
+New Instance:
+
+--- @type EventTraceUtilObj_ABP_2_0
+local tracerObj = EventTraceUtil:New('addonName', function() return true end)
+-------------------------------------------------------------------------------]]
+--- @param addon Name
+--- @param predicateFn PredicateFn|nil  | "function() return true end"
+--- @return EventTraceUtilObj_ABP_2_0
+function S:New(addon, predicateFn)
+  --- @type EventTraceUtilObj_ABP_2_0
+  local tracer = setmetatable({}, o)
+  tracer:__Init(addon, predicateFn)
+  return tracer
+end
+
