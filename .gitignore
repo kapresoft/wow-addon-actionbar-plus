@@ -70,3 +70,6 @@ ActionbarPlus/ThirdParty/Libs
 ActionbarPlus-Core/ThirdParty/Libs
 ActionbarPlus-BarsUI/ThirdParty/Libs
 ActionbarPlus-OptionsUI/ThirdParty/Libs
+
+# ignore
+.emmyrc.json
