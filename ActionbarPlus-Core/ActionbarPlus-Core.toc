@@ -9,7 +9,7 @@
 
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS_CORE_DB
-## OptionalDeps: Ace3
+## OptionalDeps: Ace3, DevSuite
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten

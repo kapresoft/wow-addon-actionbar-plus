@@ -39,7 +39,7 @@ local libName = ns.M.DruidUtil()
 --- @class DruidUtil_ABP_2_0 : UnitUtil_ABP_2_0
 local S = UnitUtil:New('DRUID');
 ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-------------------------------------------------------------------
 Methods

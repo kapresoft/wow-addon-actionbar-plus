@@ -13,7 +13,7 @@ Module::Button_TestData
 local libName = 'Button_TestData'
 --- @class Button_TestData_ABP_2_0 : AceEvent_3_0
 local S = cns:NewAceEvent(); ABP_ButtonTestData = S
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::Button_TestData (Methods)
@@ -47,7 +47,7 @@ local function GetSpellsForTesting()
       [1006] = 'arcane torrent',
     }
   }
-  if cns:IsMainLine() then
+  if cns:IsRetail() then
     spells['PALADIN'] = {
       [1000] = 'judgment',
       [1001] = 'flash of light',

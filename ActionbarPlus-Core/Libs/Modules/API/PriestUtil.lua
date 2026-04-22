@@ -14,7 +14,7 @@ local libName = ns.M.PriestUtil()
 --- @class PriestUtil_ABP_2_0 : UnitUtil_ABP_2_0
 local S = UnitUtil:New('PRIEST');
 ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods

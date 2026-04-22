@@ -6,9 +6,8 @@
     <Script file="Namespace\Constants.lua" />
 
     <!--@do-not-package@-->
-    <Script file='Developer\DeveloperNamespace.lua'/>
     <Script file='Developer\DeveloperSetup.lua'/>
-    <Script file='Developer\EventTracePrinter.lua'/>
+    <Script file='Developer\EventTraceUtil.lua'/>
 
     <!--@end-do-not-package@-->
     <Script file="Modules\API\Compat.lua" />
@@ -23,7 +22,6 @@
     <Script file="Modules\API\RogueUnitMixin.lua"/>
     -->
 
-    <Script file="Modules\GameVersionMixin.lua" />
     <Script file="Modules\DatabaseSchema.lua" />
     <Script file="Modules\DatabaseMixin.lua" />
     <Script file="Modules\Cursor.lua"/>

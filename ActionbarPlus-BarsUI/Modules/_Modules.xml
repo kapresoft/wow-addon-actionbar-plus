@@ -5,7 +5,7 @@
     <Script file="Namespace\NamespaceModules.lua" />
     <Script file='Namespace\Namespace.lua'/>
     <!--@do-not-package@-->
-    <Script file="Developer\DeveloperNamespace.lua"/>
+    <Script file="Developer\DeveloperSetup.lua"/>
 
     <!--@end-do-not-package@-->
     <Include file="ButtonTemplate.xml"/>

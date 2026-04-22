@@ -4,10 +4,7 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local unit = ns.O.UnitUtil
-
---- @type Kapresoft_Table_2_0
-local Table = LibStub('Kapresoft-Table-2-0')
-local tbl_DeepCopy = Table.DeepCopy
+local tbl_DeepCopy = ns:Table().DeepCopy
 
 local MAX_BAR_COUNT = 10
 
@@ -98,7 +95,7 @@ Module::DatabaseSchema
 local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
 local S = {}; ns:Register(libName, S)
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]

@@ -16,7 +16,7 @@ local S = {}; ns:Register(libName, S)
 --
 --- @alias ButtonConfigAccessor_ABP_2_0 ButtonConfigAccessorMixin_ABP_2_0
 --
-local p, pd, t, tf = ns:log(libName)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonConfigMixin (Methods)
@@ -27,7 +27,7 @@ local o = S
 --- @return ProfileConfig_ABP_2_0
 function o:GetProfileConfig() return cns:a():p() end
 
---- @type BarConfig_ABP_2_0
+--- @return BarConfig_ABP_2_0?
 function o:GetBarConfig() return cns:a():bar(self.widget.barIndex) end
 
 --- @return ButtonConfig_ABP_2_0
