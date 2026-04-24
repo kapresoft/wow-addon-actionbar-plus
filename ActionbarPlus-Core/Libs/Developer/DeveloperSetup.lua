@@ -4,11 +4,6 @@ local libName = 'DeveloperSetup'
 local Str_IsBlank = ns:String().IsBlank
 local p, t = ns:log(libName)
 
-local s = ns.settings
-s.developer = true
---s.enableTraceUI = true
---s.traceKeyword = 'barsui'
-
 --[[-----------------------------------------------------------------------------
 Base Tracer
 -------------------------------------------------------------------------------]]

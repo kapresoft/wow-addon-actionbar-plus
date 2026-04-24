@@ -10,20 +10,16 @@ local c = {
       as="ActionbarPlus"
     },
     ["ActionbarPlus-Core"]      = {
-      deploy=true
+      deploy=false
     },
     ["ActionbarPlus-BarsUI"]    = {
-      deploy=true
+      deploy=false
     },
     ["ActionbarPlus-OptionsUI"] = {
       deploy=false
     },
   },
   deployments = {
-    ["test"] = {
-      deploy = false,
-      dir=path("%s/Desktop/deployer/wow/", env.home)
-    },
     ["classic-era"] = {
       deploy = true,
       dir=env.wow.classic_era.addOnDir
@@ -37,9 +33,13 @@ local c = {
       dir=env.wow.classic_anniversary.addOnDir,
     },
     ["retail"] = {
-      deploy = false,
+      deploy = true,
       dir=env.wow.retail.addOnDir,
-    }
+    },
+    ["test"] = {
+      deploy = false,
+      dir=path("%s/Desktop/deployer/wow/", env.home)
+    },
   }
 }
 return c

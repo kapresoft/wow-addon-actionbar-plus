@@ -21,11 +21,9 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
---- @type Namespace_ABP_2_0 - Core Namespace
-local cns = ns:cns()
-local O = cns.O
-local C = O.Constants
-local au = O.ActionUtil
+
+local cns, O = ns:cns(), ns:cns().O
+local C, au = O.Constants, O.ActionUtil
 local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
@@ -40,11 +38,11 @@ local seedID = 1000
 New Instance
 @see ButtonState_ABP_2_0, ButtonConfigAccessor_ABP_2_0
 -------------------------------------------------------------------------------]]
---- @alias Button_ABP_2_0_3 ButtonMixin_ABP_2_0_3 | ButtonState_ABP_2_0 | ButtonConfigAccessor_ABP_2_0 | SecureCheckButtonObj | AceEvent_3_0
+--- @class Button_ABP_2_0_3 : ButtonMixin_ABP_2_0_3
 --- @alias Button_ABP_2_0_X Button_ABP_2_0_3 @Use this externally so we don't have to rename if we use a different button
 --
 local libName = 'ButtonMixin_ABP_2_0_3'
---- @class ButtonMixin_ABP_2_0_3
+--- @class ButtonMixin_ABP_2_0_3 : ButtonState_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
 --- @field NormalTexture TextureObj
 --- @field HighlightTexture TextureObj
 --- @field PushedTexture TextureObj
@@ -56,8 +54,9 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
+--
+--
 local p, t = ns:log(libName)
-
 
 --[[-------------------------------------------------------------------
 Support Functions
@@ -99,7 +98,6 @@ end
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
---- @type ButtonMixin_ABP_2_0_3 | Button_ABP_2_0_3
 local o = S
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
@@ -411,10 +409,10 @@ end
 
 
 --- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
---- @return TextureIcon
+--- @return TextureIcon?
 function o:GetActionTexture()
   local _type, id = self:GetActionInfo()
-  if not id then return end
+  if not id then return nil end
   -- todo next: move prowl logic from UpdateStealthSpells()
   
   -- todo add rogue, priest, shammy
@@ -461,7 +459,6 @@ end
 Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateCooldown()
-  --self:p('UpdateCooldown():: called...')
   local cd = self.cooldown
   if not cd then return end
   
@@ -484,7 +481,7 @@ function o:UpdateCooldown()
       modRate = info.modRate
     end)
   elseif au.IsItem(_type) then
-    start, duration, enable = GetItemCooldown(id)
+    start, duration, enable = c:GetItemCooldown(id)
   else
     cd:Clear()
     return
@@ -531,10 +528,9 @@ function o:GetSuspendedActionInfo()
   
   return actionType, id
 end
-
---- @param r RGBColor
---- @param g RGBColor
---- @param b RGBColor
+--- @param r number
+--- @param g number
+--- @param b number
 function o:SetIconVertex(r, g, b) self.icon:SetVertexColor(r, g, b) end
 function o:SetIconNormalVertex() self:SetIconVertex(1, 1, 1) end
 function o:DimIcon() self:SetIconVertex(0.5, 0.5, 0.5) end
