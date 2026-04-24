@@ -10,10 +10,10 @@ local c = {
       as="ActionbarPlus"
     },
     ["ActionbarPlus-Core"]      = {
-      deploy=true
+      deploy=false
     },
     ["ActionbarPlus-BarsUI"]    = {
-      deploy=true
+      deploy=false
     },
     ["ActionbarPlus-OptionsUI"] = {
       deploy=true

@@ -102,7 +102,7 @@ local o = S
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
   self:SetID(NextSeedID())
-  
+
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
