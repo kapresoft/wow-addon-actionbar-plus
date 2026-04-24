@@ -26,9 +26,6 @@ function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O end
 --[[-------------------------------------------------------------------
 LibPrettyPrint::Formatter/Printer
 ---------------------------------------------------------------------]]
---- @return boolean
-local function predicateFn() return ns:cns():IsDev() end
-
 local prefixColor, subPrefixColor = '466EFF', '9CFF9C'
 ns.colorDef = {
   primary = CreateColorFromRGBHexString(prefixColor),

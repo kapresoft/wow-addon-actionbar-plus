@@ -20,14 +20,13 @@ local libName = ns.M.ButtonWidgetMixin()
 --- @field barIndex Index The owner frame index
 local S = {}; ns:Register(libName, S)
 --
---- @alias ButtonWidget_ABP_2_0 ButtonWidgetMixin_ABP_2_0
+--- @class ButtonWidget_ABP_2_0 : ButtonWidgetMixin_ABP_2_0
 --
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin (Methods)
 -------------------------------------------------------------------------------]]
---- @type ButtonWidgetMixin_ABP_2_0 | ButtonWidget_ABP_2_0
 local o = S
 
 --- @param btn Button_ABP_2_0_X
@@ -38,11 +37,10 @@ function o:Init(btn, btnIndex, parentFrameIndex)
   self.index = btnIndex
   self.barIndex = parentFrameIndex
   --@do-not-package@
-  if cns:IsDev() then
-    --- Needed by DeveloperSetup_ABP_2_0.ButtonLogMixin(o)
-    function self:__logID() return self.button:GetName() end
-    -- todo: DeveloperSetup_ABP_2_0.ButtonLogMixin(self, libName) end
-    DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t) end
+  --- __logID() is needed by DeveloperSetup_ABP_2_0.ButtonLogMixin(o)
+  function self:__logID() return self.button:GetName() end
+  -- todo: DeveloperSetup_ABP_2_0.ButtonLogMixin(self, libName) end
+  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t)
   --@end-do-not-package@
 end
 

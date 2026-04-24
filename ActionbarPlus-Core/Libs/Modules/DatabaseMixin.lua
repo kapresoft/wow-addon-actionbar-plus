@@ -102,7 +102,7 @@ function o:g() return ns:db().global end
 function o:p() return ns:db().profile end
 
 --- @param barIndex number
---- @return BarConfig_ABP_2_0?
+--- @return BarConfig_ABP_2_0
 function o:bar(barIndex)
   local barKey = dsu.barKey(barIndex)
   local profile = self:p()

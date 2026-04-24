@@ -8,6 +8,7 @@ local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
 local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
 local GetSpellInfo, C_GetSpellInfo = GetSpellInfo, C_Spell and C_Spell.GetSpellInfo
 local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
+local C_GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
 
 --- return data has the same structure for C_Item or legacy GetItemCooldown
 local C_GetItemCooldown = C_Item and C_Item.GetItemCooldown or GetItemCooldown
@@ -24,19 +25,18 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Module::Compat (Methods)
 -------------------------------------------------------------------------------]]
---- @type Compat_ABP_2_0
 local o = S
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 --- @return boolean
---- @param o any An object to evaluate
-local function IsFn(o) return 'function' == type(o) end
+--- @param obj any An object to evaluate
+local function IsFn(obj) return 'function' == type(obj) end
 
 --- C_SpecializationInfo.GetSpecialization
 --- 1, 2, 3 retail, 4 for druids ; 1, 2 classic
---- @return number
+--- @return SpecializationIndex|number
 function o:GetSpecializationID()
   if IsFn(GetSpecialization) then return GetSpecialization()
   elseif IsFn(GetActiveTalentGroup) then return GetActiveTalentGroup()
@@ -47,13 +47,13 @@ function o:GetSpecializationID()
 end
 
 --- @param id SpellIdentifier
---- @return SpellInfoData|nil
+--- @return SpellInfo?
 function o:__GetSpellInfoLegacy(id)
   local pt = type(id)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
   
   local name, rank, icon, castTime, minRange,
-      maxRange, id, originalIcon = GetSpellInfo(id)
+      maxRange, spid, originalIcon = GetSpellInfo(id)
   
   --- @type SpellInfo
   local sp = {
@@ -65,7 +65,7 @@ function o:__GetSpellInfoLegacy(id)
 end
 
 --- @param spell SpellIdentifier
---- @return SpellInfoData|nil
+--- @return SpellInfo?
 function o:GetSpellInfo(spell)
   local pt = type(spell)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
@@ -94,9 +94,9 @@ function o:IfSpell(spell, callbackFn)
 end
 
 --- @param spell SpellIdentifier
---- @return string debug info for spells
+--- @return string|SpellIdentifier? @debug info for spells
 function o:__debug_SpellInfo(spell)
-  if not spell then return end
+  if not spell then return nil end
   local sp = self:GetSpellInfo(spell); if not sp then return spell end
   return ('%s(%s)'):format(sp.name, sp.spellID)
 end
@@ -107,7 +107,7 @@ end
 function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end
 
 --- @param index Index
---- @return ShapeshiftFormData
+--- @return ShapeshiftFormData?
 function o:GetShapeshiftFormInfo(index)
   if type(index) ~= 'number' then return nil end
   local shapeshiftIcon, active, castable, spellID = GetShapeshiftFormInfo(index)
@@ -158,11 +158,12 @@ end
 --- @return boolean
 function o:IsPlayerCasting()
   local info = self:GetCastingInfo()
-  return (info and info.spellID) or false
+  if info and info.spellID then return true end
+  return false
 end
 
 --- @param itemName Name
---- @return ItemCooldownData
+--- @return ItemCooldownData?
 function o:GetItemCooldown(itemName)
   -- todo: needs to take name or id
   local startTime, duration, enable
@@ -171,7 +172,8 @@ function o:GetItemCooldown(itemName)
   if C_GetItemCooldown then
     startTime, duration, enable = C_GetItemCooldown(itemName)
   elseif C_Container and C_Container.GetItemCooldown then
-    startTime, duration, enable = C_Container.GetItemCooldown(id)
+    local itemID = C_GetItemInfoInstant(itemName)
+    startTime, duration, enable = C_Container.GetItemCooldown(itemID)
   elseif GetItemCooldown then
     startTime, duration, enable = GetItemCooldown(id)
   end

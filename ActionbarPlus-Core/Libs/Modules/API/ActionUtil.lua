@@ -23,7 +23,6 @@ local attr, atyp = ns:constants()
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil (Methods)
 -------------------------------------------------------------------------------]]
---- @type ActionUtil_ABP_2_0
 local o = S
 
 --- @param typeVal string The button attribute 'type' value
