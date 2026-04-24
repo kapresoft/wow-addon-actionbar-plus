@@ -15,6 +15,7 @@ local addon
 
 --- @class Namespace_ABP_2_0 : Kapresoft-AceLib-2-0, Kapresoft-GameVersionMixin-2-0
 --- @field name Name The addon name
+--- @field settings Settings_ABP_2_0 @Settings
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion Kapresoft-GameVersion-2-0
 --- @field private fmt LibPrettyPrint_Formatter
@@ -44,17 +45,8 @@ Type: Settings
 Override in DeveloperSetup to enable
 -------------------------------------------------------------------------------]]
 --- @class Settings_ABP_2_0
---- @field developer boolean if true: enables developer mode
---- @field enableTraceUI boolean if true: shows Blizz EventTrace UI on load
---- @field traceKeyword string defaults to 'abp2'
-local settings = { developer = false, enableTraceUI = false, traceKeyword='abp2' }; ns.settings = settings
---- @return boolean
-function ns:IsDev() return ns.settings.developer == true end
-
---[[-------------------------------------------------------------------
-Support Functions
----------------------------------------------------------------------]]
-local function predicateFn() return ns:IsDev() end
+--- @field developer boolean @if true: enables developer mode
+ns.settings = { developer = false }
 
 --[[-------------------------------------------------------------------
 Formatter/Printer
@@ -69,7 +61,7 @@ ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = n
 ns.printer = LibPrettyPrint:Printer({
   prefix = ns.nameShort, formatter = ns.fmt,
   prefix_color = prefixColor, sub_prefix_color = secondaryColor,
-}, predicateFn)
+})
 
 --[[-------------------------------------------------------------------
 External Lib Dependencies

@@ -10,7 +10,7 @@ local DatabaseMixin = ns.O.DatabaseMixin
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
 ---------------------------------------------------------------------]]
---- @class ABP_Core_2_0 : AceAddon-3.0, AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, Database_ABP_2_0
+--- @class ABP_Core_2_0 : AceAddon, AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, Database_ABP_2_0
 local o = ns:AceAddon():NewAddon(ns.name, "AceEvent-3.0", "AceBucket-3.0", "AceConsole-3.0")
 ABP_Core_2_0 = o
 

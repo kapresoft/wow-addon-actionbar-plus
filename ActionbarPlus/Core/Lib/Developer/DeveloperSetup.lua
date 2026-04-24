@@ -7,6 +7,14 @@ addon, ns = ...
 --- @class DeveloperSetup
 local S = {}
 
+function trx(prefix, ...)
+  local baseName = RARE_BLUE_COLOR:WrapTextInColorCode('ABP_CORE')
+  if prefix then
+    baseName = baseName .. '::' .. prefix
+  end
+  if not EventTrace then return end; EventTrace:LogEvent(baseName, ...)
+end
+
 --[[-----------------------------------------------------------------------------
 Debugger Vars
 --- @see Interface/SharedXML/Dump.lua

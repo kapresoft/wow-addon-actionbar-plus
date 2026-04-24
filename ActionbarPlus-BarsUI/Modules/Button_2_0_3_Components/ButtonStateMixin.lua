@@ -26,14 +26,13 @@ local libName = ns.M.ButtonStateMixin()
 --- @field __instantCastSpellID SpellID
 local S = {}; ns:Register(libName, S)
 --
---- @alias ButtonState_ABP_2_0 ButtonStateMixin_ABP_2_0
+--- @class ButtonState_ABP_2_0 : ButtonStateMixin_ABP_2_0
 --
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonStateMixin (Methods)
 -------------------------------------------------------------------------------]]
---- @type ButtonStateMixin_ABP_2_0 | ButtonState_ABP_2_0 | Button_ABP_2_0_X
 local o = S
 
 --- Update the button's checked state

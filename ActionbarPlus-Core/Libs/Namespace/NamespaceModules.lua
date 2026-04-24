@@ -31,6 +31,8 @@ local ModuleNames = {
   DruidUtil = {},
   --- @type PriestUtil_ABP_2_0
   PriestUtil = {},
+  --- @type ShamanUtil_ABP_2_0
+  ShamanUtil = {},
   --- @type CursorProvider_ABP_2_0
   CursorProvider = {},
   --- @type Backdrops_ABP_2_0

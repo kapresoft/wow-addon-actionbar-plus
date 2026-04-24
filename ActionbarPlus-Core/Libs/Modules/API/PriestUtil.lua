@@ -12,15 +12,12 @@ New Instance
 --- @type string
 local libName = ns.M.PriestUtil()
 --- @class PriestUtil_ABP_2_0 : UnitUtil_ABP_2_0
-local S = UnitUtil:New('PRIEST');
-ns:Register(libName, S)
+local o = UnitUtil:New('PRIEST'); ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
---- @type PriestUtil_ABP_2_0
-local o = S
 
 o.SHADOW_FORM_SPELL_ID = 15473
 o.SHADOW_FORM_SPELL_ID_RETAIL = 232698
@@ -36,12 +33,14 @@ end)()
 ---@param spellID SpellID
 function o:IsShadowFormSpell(spellID)
   return spellID == self.SHADOW_FORM_SPELL_ID
-          or spellID == self.SHADOW_FORM_SPELL_ID_RETAIL end
+          or spellID == self.SHADOW_FORM_SPELL_ID_RETAIL
+end
 
 --- @return boolean
 function o:IsInShadowForm()
   return self:IsBuffActive(self.SHADOW_FORM_SPELL_ID)
-          or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL) end
+          or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL)
+end
 
 function o:GetShadowFormActiveIcon()
   if ns:IsRetail() then return formActiveIcon.retail

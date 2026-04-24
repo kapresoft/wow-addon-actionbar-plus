@@ -8,7 +8,7 @@ local p, t = ns:log()
 --[[-------------------------------------------------------------------
 Addon
 ---------------------------------------------------------------------]]
---- @class ABP_BarsUI_2_0 : AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, AceHook-3.0
+--- @class ABP_BarsUI_2_0 : AceAddon, AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, AceHook-3.0
 local o = cns:AceAddon():NewAddon(ns.name, unpack(EMBEDS)); ABP_BarsUI_2_0 = o
 
 o:SetDefaultModuleLibraries(unpack(EMBEDS))
@@ -17,7 +17,7 @@ o:SetDefaultModuleState(false)
 function o:OnEnable()
   t('OnEnable', 'called...')
   C_Timer.After(1, function()
-      p('OnDisable', 'called...')
+      p('OnEnable', 'called...')
   end)
   MF:CreateAddonModules()
 end
