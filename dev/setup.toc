@@ -1,4 +1,0 @@
-## Interface: 100002
-## Title: Developer Setup/Bootstrap
-## Author: kapresoft@gmail.com
-

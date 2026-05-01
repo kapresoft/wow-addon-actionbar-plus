@@ -41,6 +41,9 @@ ignore:
   - ThirdParty-Libs/LibPrettyPrint/*.toc
   - ThirdParty-Libs/Kapresoft-LibUtil/dev
   - ThirdParty-Libs/Kapresoft-LibUtil/External
+  - ActionbarPlus-BarsUI
+  - ActionbarPlus-Core
+  - ActionbarPlus-OptionsUI
 
 # Base path is .release/; Moves Libs to the folder above .release and into
 # the project folders

@@ -45,6 +45,9 @@ ignore:
   - ThirdParty-Libs/Kapresoft-LibUtil/External
   - ThirdParty-Libs/Kapresoft-LibUtil/Lib
   - ThirdParty-Libs/Kapresoft-LibUtil/_Lib.xml
+  - ActionbarPlus-BarsUI
+  - ActionbarPlus-Core
+  - ActionbarPlus-OptionsUI
 
 # Base path is .release/; Moves Libs to the folder above .release and into
 # the project folders

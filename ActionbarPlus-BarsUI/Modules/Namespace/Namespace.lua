@@ -7,6 +7,7 @@ local addon
 --- @class Namespace_ABP_BarsUI_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
+--- @field LOG_NAME Name
 --- @field logHolder LogHolder_ABP_2_0
 --- @field colorDef Kapresoft-ColorDefinition-2-0
 --- @field buttonTemplate Name The button template name to use for action buttons (see BarFrame.xml and BarModuleFactory.lua)
@@ -19,6 +20,7 @@ ABP_BARSUI_NS = ns
 
 --- @type BarsUI_Modules_ABP_2_0
 ns.O = ns.O or {}
+ns.LOG_NAME = 'ABP2_BARSUI'
 
 --- @return Namespace_ABP_2_0, Core_Modules_ABP_2_0
 function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O end
