@@ -4,11 +4,8 @@
     <Script file="Namespace\NamespaceModules.lua" />
     <Script file='Namespace\Namespace.lua'/>
     <Script file="Namespace\Constants.lua" />
-
     <!--@do-not-package@-->
     <Script file='Developer\DeveloperSetup.lua'/>
-    <Script file='Developer\EventTraceUtil.lua'/>
-
     <!--@end-do-not-package@-->
     <Script file="Modules\API\Compat.lua" />
     <Script file="Modules\API\ActionUtil.lua"/>
@@ -22,14 +19,11 @@
     <Script file="Modules\API\ShamanUnitMixin.lua"/>
     <Script file="Modules\API\RogueUnitMixin.lua"/>
     -->
-
     <Script file="Modules\DatabaseSchema.lua" />
     <Script file="Modules\DatabaseMixin.lua" />
     <Script file="Modules\Cursor.lua"/>
-
     <Script file="ActionbarPlus-Core.lua"/>
     <!--@do-not-package@-->
-
     <Script file='Libs\Developer\Developer.lua'/>
     <!--@end-do-not-package@-->
 </Ui>

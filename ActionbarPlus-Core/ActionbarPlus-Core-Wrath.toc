@@ -6,7 +6,7 @@
 ## Notes: Actionbars Everywhere, Make you click happy.|n|cff1784d1This addon is provided 'as is' without any warranties. All rights reserved. Redistribution or modification is not permitted.|r
 
 ## DefaultState: enabled
-## SavedVariables: ABP_PLUS_CORE_DB
+## SavedVariables: ABP_PLUS
 ## OptionalDeps: Ace3, DevSuite
 
 ## Category-enUS: Action Bars

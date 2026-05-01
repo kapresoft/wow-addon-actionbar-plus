@@ -14,31 +14,35 @@ Type:Namespace
 local addon
 
 --- @class Namespace_ABP_2_0 : Kapresoft-AceLib-2-0, Kapresoft-GameVersionMixin-2-0
+--- @field private LOG_NAME Name
+--- @field private DB_NAME Name
+--- @field private fmt LibPrettyPrint_Formatter
+--- @field private __trace fun(logName:Name, prefix:string, ...:any)
+--- @field private __CreatePrinterFn fun(printer:LibPrettyPrint_Printer)
 --- @field name Name The addon name
 --- @field settings Settings_ABP_2_0 @Settings
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field gameVersion Kapresoft-GameVersion-2-0
---- @field private fmt LibPrettyPrint_Formatter
 --- @field printer LibPrettyPrint_Printer
 --- @field logHolder LogHolder_ABP_2_0
 --- @field colorDef Kapresoft-ColorDefinition-2-0
---- @field tracer EventTraceUtilObj_ABP_2_0
 --- @field tr TraceFn_ABP_2_0
---- @field M Core_Modules_ABP_2_0 The module names
---- @field O Core_Modules_ABP_2_0 The module objects
+--- @field M Core_Modules_ABP_2_0   @The module names
+--- @field O Core_Modules_ABP_2_0   @The module objects
 local ns
 
-addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'; Mixin(ns, GVM, AceLib)
-ABP_2_0_NS = ns
-
+addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'
+Mixin(ns, GVM, AceLib); ABP_CORE_NS = ns
 
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
-ns.DB_NAME = 'ABP_PLUS_CORE_DB'
 
 --- @type Core_Modules_ABP_2_0
 ns.O = ns.O or {}
+
+ns.DB_NAME = 'ABP_PLUS'
+ns.LOG_NAME = 'ABP2_CORE'
 
 --[[-----------------------------------------------------------------------------
 Type: Settings
@@ -51,7 +55,7 @@ ns.settings = { developer = false }
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
-local prefixColor, subPrefixColor = '466EFF', '9CFF9C'
+local prefixColor, subPrefixColor = 'FFF803', '9CFF9C'
 ns.colorDef = {
   primary = CreateColorFromRGBHexString(prefixColor),
   secondary = CreateColorFromRGBHexString(subPrefixColor),
@@ -156,13 +160,6 @@ end
 --- @return boolean true if table is empty
 function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
 
---- @type Namespace_ABP_2_0
-ABP_CORE_NS = ns
-
---- @class LogHolder_ABP_2_0
---- @field printer fun(moduleName:Name) : LibPrettyPrint_PrintFn A simple printer
---- @field tracer fun(moduleName:Name) : TraceFn_ABP_2_0 A simple tracer
-
 ns.logHolder = {}; do
   --- These are noop loggers and tracers for non-dev releases
   local h = ns.logHolder; local noop = function(moduleName) return function() end end
@@ -170,8 +167,9 @@ ns.logHolder = {}; do
 end
 
 --[[-------------------------------------------------------------------
-Loggers/Tracers:: NoOp in Official Releases
----------------------------------------------------------------------]]
+  Loggers/Tracers:: NoOp in Official Releases
+                    This is overridden in DeveloperSetup
+  ---------------------------------------------------------------------]]
 --- Returns the print, delayed-print, tracer, formatted-tracer functions
 --- ```
 --- local p, t = ns:log('EventHandler')

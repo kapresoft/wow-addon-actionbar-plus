@@ -1,8 +1,9 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
+--- @type Namespace_ABP_2_0
 local ns = select(2, ...)
+local UnitUtil = ns.O.UnitUtil
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -28,5 +29,3 @@ function o:IsInGhostWolfForm() return self:IsBuffActive(o.GHOST_WOLF_SPELL_ID) e
 
 --- @return Icon @The icon if form is active
 function o:GetFormActiveIcon() return o.GHOST_WOLF_FORM_ACTIVE_ICON end
-
-

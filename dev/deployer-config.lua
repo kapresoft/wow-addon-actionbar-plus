@@ -6,17 +6,17 @@ local c = {
   name = "ActionbarPlus",
   addons = {
     ["ActionbarPlus"]           = {
-      deploy=true,
+      deploy=false,
       as="ActionbarPlus"
     },
     ["ActionbarPlus-Core"]      = {
-      deploy=false
+      deploy=true
     },
     ["ActionbarPlus-BarsUI"]    = {
-      deploy=false
+      deploy=true
     },
     ["ActionbarPlus-OptionsUI"] = {
-      deploy=false
+      deploy=true
     },
   },
   deployments = {
@@ -35,10 +35,6 @@ local c = {
     ["retail"] = {
       deploy = true,
       dir=env.wow.retail.addOnDir,
-    },
-    ["test"] = {
-      deploy = false,
-      dir=path("%s/Desktop/deployer/wow/", env.home)
     },
   }
 }

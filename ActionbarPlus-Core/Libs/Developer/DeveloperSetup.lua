@@ -2,20 +2,31 @@
 local ns = select(2, ...)
 local libName = 'DeveloperSetup'
 local Str_IsBlank = ns:String().IsBlank
+
+ns.settings.developer = true
+
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Base Tracer
 -------------------------------------------------------------------------------]]
-local c1 = ns:ColorFn(ns.colorDef.primary)
-function ns:tr(prefix, ...)
-  local _c1 = c1
-  local baseName = _c1('ABP2_CORE')
-  if not Str_IsBlank(prefix) then
-    baseName = baseName .. '::' .. prefix
-  end
-  if not EventTrace then return end; EventTrace:LogEvent(baseName, ...)
+local primaryC = ns:ColorFn(ns.colorDef.primary)
+
+function ns.__trace(logName, prefix, ...)
+  --- @type EventTrace
+  local et = EventTrace; if not (et and et.LogEvent) then return end
+  local c1, logNamePlain = primaryC, logName
+  local n = c1(logNamePlain)
+  if not Str_IsBlank(prefix) then n = n .. '::' .. prefix end
+  et:LogEvent(n, ...)
 end
+
+--- @param prefix Name  @The prefix name
+--- @param ... any      @Print any
+function ns.tr(prefix, ...)
+  local _ns = ns; _ns.__trace(ns.LOG_NAME, prefix, ...)
+end
+
 --[[-------------------------------------------------------------------
 DeveloperSetup
 ---------------------------------------------------------------------]]
@@ -56,24 +67,28 @@ StaticPopupDialogs[RELOAD_CONFIRMATION_DIALOG] = {
 External Dependencies
 -------------------------------------------------------------------------------]]
 local function LoadDevSuite()
-  local AU = ns:AddonUtil()
+  --- @type AceAddon
+  local ds = DevSuite
 
-  --- /dump C_AddOns.IsAddOnEnabled('DevSuite')
-  --- /dump { C_AddOns.GetAddOnEnableState('DevSuite', 'Kawatan') }
+  if type(ds) == 'table' and type(ds.IsEnabled) == 'function' then
+    local dsEnabled = ds:IsEnabled()
+    C_Timer.After(1, function()
+      ns.tr(libName, ('%s is available'):format(ds:GetName()), 'enabled=', dsEnabled)
+    end)
+    if dsEnabled then return end
+  end
+
+  local AU = ns:AddonUtil()
+  assert(type(AU) == 'table', 'Missing dependency: Kapresoft-AddonUtil-2-0')
   local DevSuite_AddOn = 'DevSuite'
   local devSuiteEnabled = AU:IsAddOnEnabled(DevSuite_AddOn)
 
   if not devSuiteEnabled then
     AU:EnableAddOnForCharacter(DevSuite_AddOn)
     devSuiteEnabled = AU:IsAddOnEnabled(DevSuite_AddOn)
-    C_Timer.After(0.1, function()
-      StaticPopup_Show(RELOAD_CONFIRMATION_DIALOG)
-    end)
+    C_Timer.After(0.1, function() StaticPopup_Show(RELOAD_CONFIRMATION_DIALOG) end)
   end
-
-  C_Timer.After(1, function()
-    ns:tr(libName, 'DevSuite is enabled=', devSuiteEnabled == true)
-  end)
+  C_Timer.After(1, function() ns.tr(libName, 'DevSuite is enabled=', devSuiteEnabled == true) end)
 end; LoadDevSuite()
 
 --[[-----------------------------------------------------------------------------
@@ -87,11 +102,23 @@ Log Setup
 --- ```
 --- @param moduleName Name
 local function printerFn(moduleName)
-  local _ns = ns
-  if type(moduleName) ~= 'string' then return _ns.printer end
+  local printer = ns.printer
+  if type(moduleName) ~= 'string' then return printer end
   local m = strtrim(moduleName)
-  if Str_IsBlank(m) then return _ns.printer end
-  return _ns.printer:WithSubPrefix(m)
+  if Str_IsBlank(m) then return printer end
+  return printer:WithSubPrefix(m)
+end
+
+--- @param printer LibPrettyPrint_Printer
+--- @return fun(moduleName:Name)
+function ns.__CreatePrinterFn(printer)
+  assert(type(printer) == 'table', '__CreatePrinterFn(printer): {printer} is missing.')
+  return function(moduleName)
+    if type(moduleName) ~= 'string' then return printer end
+    local m = strtrim(moduleName)
+    if Str_IsBlank(m) then return printer end
+    return printer:WithSubPrefix(m)
+  end
 end
 
 --- Creates a trace function
@@ -103,7 +130,7 @@ end
 --- @param prefix string|any
 --- @return TraceFn_ABP_2_0 @Printer function that outputs plain values to Blizzard Trace UI (like print)
 local function traceFn(prefix)
-  local _ns = ns; return function(...) return _ns:tr(prefix, ...) end
+  return function(...) local trfn = ns.tr; return trfn(prefix, ...) end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -115,20 +142,3 @@ do
   h.tracer = traceFn
 end
 
---[[-------------------------------------------------------------------
-Logger/Trace Functions
----------------------------------------------------------------------]]
-function o.ButtonLogMixin(log, p, t)
-  --- @param prefix Name
-  --- @param ... any
-  function log:p(prefix, ...) local a = { ... }; p(self:pid(prefix), unpack(a)) end
-
-  --- @param prefix Name
-  --- @param ... any
-  function log:t(prefix, ...) local a = { ... }; t(self:pid(prefix), unpack(a)) end
-
-  --- @param prefix Name
-  function log:pid(prefix) return ("%s(%s)"):format(prefix, self:__logID()) end
-end
-
---o:ResolveTraceUI()

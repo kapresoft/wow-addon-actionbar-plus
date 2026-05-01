@@ -54,8 +54,7 @@ local libName = 'ButtonMixin_ABP_2_0_3'
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
 local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
---
---
+
 local p, t = ns:log(libName)
 
 --[[-------------------------------------------------------------------
@@ -104,11 +103,6 @@ local o = S
 function o:OnLoad()
   self:SetID(NextSeedID())
   
-  --@do-not-package@
-  function self:__logID() return self:GetName() end
-  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t)
-  --@end-do-not-package@
-  
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
   self.icon:AddMaskTexture(self.IconMask)
@@ -152,7 +146,7 @@ end
 --- @see ButtonUpdateFrame_ABP_2_0#OnUpdate()
 --- @param elapsed number
 function o:OnUpdate(elapsed)
-  self:p('xxx OnUpdate')
+  p('xxx OnUpdate')
   -- tbd
 end
 
@@ -450,7 +444,6 @@ function o:GetActionTexture()
   
   comp:IfSpell(id, function(spell)
     icon = spell.iconID
-    --self:p('GetActionTexture', 'sp=', spell.name)
   end)
   return icon
 end

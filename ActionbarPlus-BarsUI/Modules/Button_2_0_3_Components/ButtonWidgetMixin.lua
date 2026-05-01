@@ -36,12 +36,6 @@ function o:Init(btn, btnIndex, parentFrameIndex)
   self.button = btn
   self.index = btnIndex
   self.barIndex = parentFrameIndex
-  --@do-not-package@
-  --- __logID() is needed by DeveloperSetup_ABP_2_0.ButtonLogMixin(o)
-  function self:__logID() return self.button:GetName() end
-  -- todo: DeveloperSetup_ABP_2_0.ButtonLogMixin(self, libName) end
-  DeveloperSetup_ABP_2_0.ButtonLogMixin(self, p, t)
-  --@end-do-not-package@
 end
 
 function o:OnAttributeChanged(name, val)
