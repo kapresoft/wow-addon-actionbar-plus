@@ -72,9 +72,9 @@ local function LoadDevSuite()
 
   if type(ds) == 'table' and type(ds.IsEnabled) == 'function' then
     local dsEnabled = ds:IsEnabled()
-    C_Timer.After(1, function()
-      ns.tr(libName, ('%s is available'):format(ds:GetName()), 'enabled=', dsEnabled)
-    end)
+    --C_Timer.After(1, function()
+    --  ns.tr(libName, ('%s is available'):format(ds:GetName()), 'enabled=', dsEnabled)
+    --end)
     if dsEnabled then return end
   end
 

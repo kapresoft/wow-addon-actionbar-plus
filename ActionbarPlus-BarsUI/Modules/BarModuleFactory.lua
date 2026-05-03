@@ -133,7 +133,6 @@ local function BarModuleProtoMethods()
   end
   
   function bm:OnEnable()
-    t('BarModuleProto', 'OnEnable')
     if self.barFrame then
       self.barFrame:Show()
       BarFrame_EnableVisibilityDriver(self.barFrame)

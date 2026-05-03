@@ -70,6 +70,8 @@ function o:OnLoad()
   self:RegisterEvent("UNIT_EXITED_VEHICLE");
   self:RegisterEvent("COMPANION_UPDATE");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
+  self:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
   self:RegisterEvent("UNIT_SPELLCAST_SENT");
   self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTED", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
@@ -141,7 +143,6 @@ function o:OnEvent(evt, ...)
       end
       
       if (unit == "player" and btn.widget:MatchesActiveButtonSpellID(spellID)) then
-        btn:OnEvent(evt, ...);
         btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
       end
     end

@@ -42,8 +42,8 @@ end
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
     db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
-    t(('Current Profile: %s activeSpecGroup: %s')
-            :format(db:GetCurrentProfile(), unit:GetActiveSpecGroupIndex()))
+    --t(('Current Profile: %s activeSpecGroup: %s')
+    --        :format(db:GetCurrentProfile(), unit:GetActiveSpecGroupIndex()))
 end
 
 --- @param self DatabaseMixin_ABP_2_0
