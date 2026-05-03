@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-	<CheckButton name="ABP_ButtonTemplate_2_0" virtual="true">
+    <CheckButton name="ABP_ButtonTemplate_2_0" virtual="true">
         <Size>
             <AbsDimension x="36" y="36"/>
         </Size>
@@ -82,8 +82,8 @@
                     <OnPlay>
                         local btn = self:GetParent()
                         local tex = btn and btn.SpellHighlightTexture; if not tex then return end
-                        -- others: FACTION_GREEN_COLOR, RED_THREAT_COLOR
-                        local c = YELLOW_THREAT_COLOR
+                        -- others: FACTION_GREEN_COLOR, RED_THREAT_COLOR, YELLOW_THREAT_COLOR
+                        local c = RED_THREAT_COLOR
                         tex:SetVertexColor(c.r, c.g, c.b, c.a)
                         tex:Show();
                     </OnPlay>
@@ -101,14 +101,17 @@
                     <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
                 </Anchors>
                 <SwipeTexture>
-                    <Color r="0" g="0" b="0" a="0.6"/>
+                    <Color r="0" g="0" b="0" a="0.9"/>
                 </SwipeTexture>
             </Cooldown>
         </Frames>
         <NormalTexture parentKey="NormalTexture" file="interface\addons\actionbarplus-core\assets\textures\ui-button-empty"/>
-        <PushedTexture parentKey="PushedTexture" file="Interface\Buttons\UI-Quickslot-Depress" alpha="0.6" alphaMode="ADD"/>
-        <HighlightTexture parentKey="HighlightTexture" alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
-        <CheckedTexture parentKey="CheckedTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
-	</CheckButton>
+        <PushedTexture parentKey="PushedTexture" file="Interface\Buttons\CheckButtonHilight"
+                       alpha="0.3" alphaMode="ADD"/>
+        <HighlightTexture parentKey="HighlightTexture" file="Interface\Buttons\ButtonHilight-Square"
+                          alpha="0.99" alphaMode="ADD"/>
+        <CheckedTexture parentKey="CheckedTexture" file="Interface\Buttons\CheckButtonHilight"
+                        alpha="0.8" alphaMode="ADD"/>
+    </CheckButton>
 
 </Ui>

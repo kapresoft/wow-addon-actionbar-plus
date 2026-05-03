@@ -41,19 +41,21 @@ New Instance
 --- @class Button_ABP_2_0_3 : ButtonMixin_ABP_2_0_3
 --- @alias Button_ABP_2_0_X Button_ABP_2_0_3 @Use this externally so we don't have to rename if we use a different button
 --
-local libName = 'ButtonMixin_ABP_2_0_3'
+local libName = 'Button_2_0_3'
+
 --- @class ButtonMixin_ABP_2_0_3 : ButtonState_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
 --- @field NormalTexture TextureObj
 --- @field HighlightTexture TextureObj
 --- @field PushedTexture TextureObj
 --- @field CheckedTexture TextureObj
+--- @field SpellHighlightAnim AnimationGroup
 --- @field ClearFlash fun():void
 --- @field icon TextureObj
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
-local S = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = S
+local o = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = o
 
 local p, t = ns:log(libName)
 
@@ -94,10 +96,19 @@ local function Btn_PickupAction(self, callbackFn)
   if callbackFn then callbackFn() end
 end
 
+--- Spells:
+--- Attack (6603)
+--- @param self Button_ABP_2_0_3
+--- @return boolean
+local function Btn_ActionRequiresAttackAnim(self)
+    local typeVal, spellID = self:GetActionInfo()
+    if not (typeVal and spellID) then return false end
+    return spellID == 6603
+end
+
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
-local o = S
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
@@ -105,6 +116,7 @@ function o:OnLoad()
 
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
+  self:GetPushedTexture():SetVertexColor(0.3, 0.4, 0.8, 1)
   self.icon:AddMaskTexture(self.IconMask)
   
   self:RegisterForDrag("LeftButton");
@@ -133,7 +145,7 @@ function o:AfterLoad(btnIndex, barIndex)
       self.__SetCheckedWrapped = true
       local orig = self.SetChecked
       self.SetChecked = function(btn, val)
-        tf('Checked', val, "SetCheckedWrapped:: Button:", btn:GetName(), 'debugstack=', debugstack(2, 5, 5))
+        t('Checked', val, "SetCheckedWrapped:: Button:", btn:GetName(), 'debugstack=', debugstack(2, 5, 5))
         --tf(debugstack(2, 5, 5))
         return orig(btn, val)
       end
@@ -156,18 +168,24 @@ end
 --- @param evt string Blizzard event name
 --- @param ... any Event payload (unit, castGUID, spellID, etc.)
 function o:OnEvent(evt, ...)
-  
   if evt == 'PLAYER_ENTERING_WORLD' then
     local isInitialLogin, isReloadingUi = ...
     self:OnInit(evt, isInitialLogin, isReloadingUi)
     self:UpdateTexture()
-    self:UpdateState()
+    self:UpdateState(evt)
+  elseif evt == 'PLAYER_LEAVE_COMBAT' then
+    self:UpdateState(evt)
+    self:DisableAttackingAnimation()
+  elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
+    if Btn_ActionRequiresAttackAnim(self) then
+      self:SetChecked(true)
+      self:EnableAttackingAnimation()
+      return
+    end
+    self:UpdateState(evt)
   elseif evt == 'ACTIONBAR_UPDATE_STATE' then
-    self:UpdateState()
     self:RepairRetailPushedState()
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
-    self:UpdateTexture()
-  elseif evt == 'UNIT_SPELLCAST_STOP' or evt == 'UNIT_SPELLCAST_SUCCEEDED' then
     self:UpdateTexture()
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
@@ -180,20 +198,34 @@ function o:OnEvent(evt, ...)
   
 end
 
+--- Note: checked state is only used for non-instant spells
+--- Normal cast:
+--  1. UNIT_SPELLCAST_SENT — client sends cast request to server (instant cast)
+--  2. UNIT_SPELLCAST_START — cast bar begins (non-instant cast)
+--  3. UNIT_SPELLCAST_STOP — cast bar ends (fires regardless of outcome)
+--  4. UNIT_SPELLCAST_SUCCEEDED or UNIT_SPELLCAST_FAILED — spell completed successfully or failed
+--- Events coming here are matching spellcast events
+---@param spellID SpellID The matching spell ID
+function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
+  -- todo: in classic-era, older rank spells are non castable
+  local sp = comp:GetSpellName(spellID)
+  if evt == 'UNIT_SPELLCAST_SENT' then
+      self:SetChecked(true)
+  elseif evt == 'UNIT_SPELLCAST_START' then
+    self:SetChecked(true)
+  elseif evt == 'UNIT_SPELLCAST_STOP'
+      or evt == 'UNIT_SPELLCAST_SUCCEEDED'
+      or evt == 'UNIT_SPELLCAST_INTERRUPTED'
+      or 'UNIT_SPELLCAST_FAILED' then
+    self:SetChecked(false)
+    self:UpdateTexture()
+  end
+end
 --- Retail fix for stuck PUSHED state after toggle.
 function o:RepairRetailPushedState()
   if cns:IsRetail() then
     self:SetButtonStateNormal()
   end
-end
-
---- Events coming here are matching spellcast events
----@param spellID SpellID The matching spell ID
-function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
-  --self:t('OnPlayerMatchingSpellcastEvent', 'evt=', evt, 'called...')
-  if evt == 'UNIT_SPELLCAST_START' then
-  end
-  self:UpdateState()
 end
 
 -- /dump GetShapeshiftFormInfo(1)
@@ -253,9 +285,11 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
-  if InCombatLockdown() then return false end
   if down == true then return end
-  
+  self:UpdateState('PostClick')
+
+  if InCombatLockdown() then return false end
+
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   
@@ -277,7 +311,7 @@ function o:PostClick(button, down)
   
   self.widget:ClearAttributeSuspendedActionType()
   self.widget:ApplyCursorAction(cursor)
-  self:UpdateState()
+  self:UpdateState('PostClick')
 end
 
 function o:OnEnter()
@@ -317,7 +351,7 @@ function o:OnDragStart(button)
   if not self:IsDragAllowed() then return end
   
   Btn_PickupAction(self, function()
-    self:UpdateState()
+    self:UpdateState('OnDragStart')
     self:UpdateCooldown()
     self:UpdateFlash()
     self:SetChecked(false)
@@ -366,15 +400,15 @@ function o:Update()
   
   local eventsFrame = ActionEventsFrame_ABP_2_0
   local icon = self.icon
-  local buttonCooldown = self.cooldown;
+  local buttonCooldown = self.cooldown
   
   icon:SetDesaturated(false)
   
   local type, id = self:GetActionInfo()
   if self.widget:HasAction() then
     if ( not self.eventsRegistered ) then
-      eventsFrame:RegisterFrame(self);
-      self.eventsRegistered = true;
+      eventsFrame:RegisterFrame(self)
+      self.eventsRegistered = true
     end
     self:UpdateTexture()
     
@@ -389,8 +423,8 @@ function o:Update()
     --self:UpdateSpellHighlightMark()
   else
     if ( self.eventsRegistered ) then
-      eventsFrame:UnregisterFrame(self);
-      self.eventsRegistered = nil;
+      eventsFrame:UnregisterFrame(self)
+      self.eventsRegistered = nil
     end
     --self:ClearFlash()
     --self:SetChecked(false);
@@ -547,4 +581,14 @@ function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
 function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
 function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
 
+function o:EnableAttackingAnimation()
+  if self.SpellHighlightAnim:IsPlaying() then return end
+  self.SpellHighlightAnim:Play()
+end
+
+function o:DisableAttackingAnimation()
+  if not self.SpellHighlightAnim:IsPlaying() then return end
+  self.SpellHighlightAnim:Stop()
+  self.SpellHighlightTexture:Hide()
+end
 

@@ -20,14 +20,17 @@ Module::ButtonStateMixin
 -------------------------------------------------------------------------------]]
 --- @see BarsUI_Modules_ABP_2_0
 local libName = ns.M.ButtonStateMixin()
---- @class ButtonStateMixin_ABP_2_0
+
+--- @class ButtonStateMixin_ABP_2_0 : CheckButton
 --- @field __castingSpellID SpellID Keeps track of the current spell
 --- @field __updateState_IsInstantCast boolean Used in UpdateState() to keep track of instantly casted spells
 --- @field __instantCastSpellID SpellID
 local S = {}; ns:Register(libName, S)
+
 --
 --- @class ButtonState_ABP_2_0 : ButtonStateMixin_ABP_2_0
 --
+
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -36,54 +39,24 @@ Module::ButtonStateMixin (Methods)
 local o = S
 
 --- Update the button's checked state
-function o:UpdateState()
-  local typeVal, id = self:GetActionInfo()
-  if not typeVal or not id then return end
-  
-  if au.IsCurrentAction(typeVal, id) then
-    return self:SetChecked(true)
-  end
+--- @param self ButtonMixin_ABP_2_0_3
+local function Btn_UpdateState(self, evt)
+  local typeVal, spellID = self:GetActionInfo()
+  if not (typeVal and spellID) then return end
 
-  self:SetChecked(false)
-end
-
---- @param event string | "'UNIT_SPELLCAST_START'", | "'UNIT_SPELLCAST_STOP'" | "'etc...'"
-function o:OnSpellCast(event, unitTarget, ...)
-  if unitTarget ~= "player" then return end
-  local guid, spid = ...
-  --t('OnSpellCast', 'evt=', event, 'spid=', spid, 'guid=', guid)
-  local actionType, spellID = self:GetActionInfo()
-  if not au.IsSpell(actionType) then return end
-  
-  if not spellID then return end
-  
-  local checked = false
-  local current = C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID);
-  
-  if event == 'UNIT_SPELLCAST_SENT' then
-    -- instant cast spells
-    self:SetChecked(false)
-    --self.__instantCastSpellID = spellID
-    --return self:UpdateState()
-  elseif event == 'UNIT_SPELLCAST_START' then
-    local _, evtSpellID = ...
-    if evtSpellID == spellID then
-      self.__castingSpellID = evtSpellID
-      self:SetChecked(true)
-    end
-  elseif event == 'UNIT_SPELLCAST_STOP'
-          or event == 'UNIT_SPELLCAST_INTERRUPTED'
-          or event == 'UNIT_SPELLCAST_SUCCEEDED' then
-    local _, evtSpellID = ...
-
-    current = C_IsCurrentSpell(spellID)
-    if self.__castingSpellID and self.__castingSpellID == evtSpellID then
-      self.__castingSpellID = nil
-      return self:UpdateState()
-    end
+  local sp = GetSpellInfo(spellID)
+  local isCurrent = au.IsCurrentAction(typeVal, spellID)
+  if isCurrent then
+    --t('Btn_UpdateState', 'evt=', evt, 'isCurrent=', isCurrent, 'spell=', sp)
+    self:SetChecked(true)
+  else
     self:SetChecked(false)
   end
+
 end
+
+--- Update the button's checked state
+function o:UpdateState(evt) Btn_UpdateState(self, evt) end
 
 function o:UpdateFlash()
   --p('UpdateFlash:: called...')
@@ -97,47 +70,4 @@ end
 function o:OnTradeSkill(show)
   --p(('%s[%s]:: show=%s'):format('OnTradeSkill', self:GetID(), tostring(show)))
 end
-
---[[
-
------ @param event '"CVAR_UPDATE"'
------ @param cvarName string
------ @param value string
---function o:CVAR_UPDATE(event, cvarName, value)
---  p(("CVAR_UPDATE cvar=%s value=%s"):format(cvarName, value))
---  if cvarName ~= "ActionButtonUseKeyDown" then return end
---
---  -- value is "1" or "0"
---  local useKeyDown = value == "1"
---
---  p(("ActionButtonUseKeyDown value=%s, changed=%s"):format(value, tostring(useKeyDown)))
---
---  --if useKeyDown then
---  --    self:RegisterForClicks("AnyDown")
---  --else
---  --    self:RegisterForClicks("AnyUp")
---  --end
---end
---
------ @param event '"MODIFIER_STATE_CHANGED"'
------ @param key string "LALT" | "RALT" | "LSHIFT" | "RSHIFT" | "LCTRL" | "RCTRL"
------ @param state number @Values are 1 = pressed, 0 = released
---function o:MODIFIER_STATE_CHANGED(event, key, state)
---  p(('MSC... key=%s, state=%s'):format(key, state))
---  local varn = 'ActionButtonUseKeyDown'
---  if state == 1 and Btn_IsDragAllowed() then
---    -- /dump GetCVar('ActionButtonUseKeyDown')
---    -- /dump SetCVar('ActionButtonUseKeyDown', 0)
---    --p('MSC:: drag allowed... state=', state, 'key=', key)
---    self:RegisterForClicks('AnyUp');
---    --SetCVar(varn, 0)
---    p('MSC:: state=1 cvar updated; useKeyD=', GetCVarBool(varn))
---  elseif state == 0 then
---    self:RegisterForClicks('AnyDown');
---    --        SetCVar(varn, 1)
---    p('MSC:: state=0 cvar updated; useKeyD=', GetCVarBool(varn))
---  end
---end
-]]
-
 

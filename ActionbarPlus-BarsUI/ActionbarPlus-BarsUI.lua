@@ -15,10 +15,7 @@ o:SetDefaultModuleLibraries(unpack(EMBEDS))
 o:SetDefaultModuleState(false)
 
 function o:OnEnable()
-  t('OnEnable', 'called...')
-  C_Timer.After(1, function()
-      p('OnEnable', 'called...')
-  end)
+  --t('OnEnable', 'called...')
   MF:CreateAddonModules()
 end
 

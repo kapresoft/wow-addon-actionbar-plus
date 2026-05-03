@@ -51,10 +51,10 @@ end
 function o:__GetSpellInfoLegacy(id)
   local pt = type(id)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
-  
+
   local name, rank, icon, castTime, minRange,
       maxRange, spid, originalIcon = GetSpellInfo(id)
-  
+
   --- @type SpellInfo
   local sp = {
     id = id, name = name, iconID = icon, castTime = castTime,
@@ -74,7 +74,7 @@ function o:GetSpellInfo(spell)
 end
 
 --- @param id SpellID
---- @return Name|nil
+--- @return Name?
 function o:GetSpellName(id)
   assert(type(id) == 'number', 'GetSpellName(id): id should be a number.')
   local sp = self:GetSpellInfo(id); return sp and sp.name
@@ -82,7 +82,7 @@ end
 
 --- GetSpellInfo('name:string') will return nil if spell is unknown to player
 --- @param id SpellID
---- @boolean true if the player can cast the spell
+--- @boolean @Returns true if the player can cast the spell
 function o:IsOwnSpell(id) return self:GetSpellInfo(self:GetSpellName(id)) ~= nil end
 
 --- @param spell SpellIdentifier
@@ -126,7 +126,7 @@ end
 function o:GetSpellCooldown(spellID)
   assert(type(spellID) == 'number', 'GetSpellCooldown(spellID):: spellID should be a number.')
   if C_GetSpellCooldown then return C_GetSpellCooldown(spellID) end
-  
+
   local startTime, duration, isEnabled, modRate = GetSpellCooldown(spellID)
   --- @type SpellCooldownInfo
   local cd = { startTime = startTime, duration = duration,
@@ -138,7 +138,7 @@ end
 function o:GetCastingInfo(unit)
   local _unit = unit or 'player'
   local name, _, iconID, _, _, _, guid, _, spellID = UnitCastingInfo(_unit)
-  
+
   --- @class UnitCastingData
   local data = {
     name = name, iconID = iconID, guid=guid, spellID = spellID
@@ -160,6 +160,14 @@ function o:IsPlayerCasting()
   local info = self:GetCastingInfo()
   if info and info.spellID then return true end
   return false
+end
+
+--- @param spell SpellIdentifier
+--- @return boolean
+function o:IsInstantCastSpellByID(spell)
+  local sp = self:GetSpellInfo(spell)
+  if not (sp and sp.castTime) then return false end
+  return sp.castTime == 0
 end
 
 --- @param itemName Name

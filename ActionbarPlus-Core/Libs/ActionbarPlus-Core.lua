@@ -23,8 +23,6 @@ function o:OnInitialize()
 end
 --
 function o:OnEnable()
-  C_Timer.After(0.1, function()
-    t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
-  end)
+  --t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
 end
 
