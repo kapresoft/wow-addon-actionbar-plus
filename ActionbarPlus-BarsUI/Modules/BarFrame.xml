@@ -13,8 +13,6 @@
     <Script file="Button_2_0_3_Components/SpecController.lua"/>
     <Script file="BarFrame.lua"/>
 
-    <!--<Script file="Button_2_0_1_1.lua"/>-->
-
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>

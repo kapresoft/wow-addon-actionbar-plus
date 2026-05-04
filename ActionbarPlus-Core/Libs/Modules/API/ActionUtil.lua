@@ -6,8 +6,11 @@ local ns = select(2, ...)
 local O = ns.O
 local comp, SupportedActionTypeMap = O.Compat, O.Constants.SupportedActionTypesAsMap()
 
-local C_IsAutoRepeatSpell = C_Spell and C_Spell.IsAutoRepeatSpell or IsAutoRepeatSpell
-local C_IsCurrentSpell = C_Spell and C_Spell.IsCurrentSpell or IsCurrentSpell
+-- These C_Spell methods exists in classic-era
+local C_IsAutoRepeatSpell = C_Spell.IsAutoRepeatSpell
+local C_IsCurrentSpell    = C_Spell.IsCurrentSpell
+local C_GetSpellPowerCost = C_Spell.GetSpellPowerCost
+local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
 
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil
@@ -24,6 +27,17 @@ local attr, atyp = ns:constants()
 Module::ActionUtil (Methods)
 -------------------------------------------------------------------------------]]
 local o = S
+
+--- @param spellID SpellID
+--- @return boolean, SpellInfo? @If {spellID} is not known, it will try to get the latest spell
+function o.IsSpellKnown(spellID)
+  assert(type(spellID) == 'number', 'IsSpellKnown(spellID): {spellID} should be a number')
+  if C_IsSpellKnown(spellID) then return true end
+  local unknownSp = comp:GetSpellInfo(spellID)
+  -- returns a value if spell is known by name
+  local nextSp = comp:GetSpellInfo(unknownSp.name)
+  return false, nextSp
+end
 
 --- @param typeVal string The button attribute 'type' value
 --- @param id Identifier The context id; 'spell', 'item', etc...
@@ -81,3 +95,24 @@ function o.IfSpellCooldown(spellID, callbackFn)
   local info = comp:GetSpellCooldown(spellID)
   if not info then return end; callbackFn(info)
 end
+
+--- Returns the first elem of spell power cost array
+--- @param spell SpellIdentifier
+--- @return SpellPowerCostInfo?
+function o.GetSpellPowerCost(spell)
+  local costArr = C_GetSpellPowerCost(spell)
+  if costArr and #costArr > 0 then return costArr[1] end
+  return nil
+end
+
+--- @param spell SpellIdentifier
+--- @return boolean
+function o.SpellRequiresMana(spell)
+  local cost = o.GetSpellPowerCost(spell)
+  if cost then return cost.type == Enum.PowerType.Mana end
+  return false
+end
+
+--- @param spell SpellIdentifier
+--- @return boolean
+function o.SpellDoesNotRequireMana(spell) return not o.SpellRequiresMana(spell) end

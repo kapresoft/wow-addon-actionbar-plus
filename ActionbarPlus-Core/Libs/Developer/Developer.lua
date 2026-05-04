@@ -8,6 +8,17 @@ local unit = ns.O.UnitUtil
 --- @class Developer_ABP_2_0 : AceEvent_3_0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 
+--- @param frameIndex Index
+--- @param btnIndex Index
+--- @return ButtonConfig_ABP_2_0?
+function o:btnConf(frameIndex, btnIndex)
+  local n = ('ABP_2_0_F%sButton%s'):format(frameIndex, btnIndex)
+  --- @type Button_ABP_2_0_X
+  local btn = _G[n]
+  if not (btn and btn.widget) then return nil end
+  return btn.widget:conf()
+end
+
 function o:skills()
   for i = 1, GetNumSkillLines() do
     local skillName, isHeader, isExpanded, skillRank, numTempPoints, skillModifier, skillMaxRank = GetSkillLineInfo(i)

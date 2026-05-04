@@ -8,6 +8,8 @@ local comp, au = O.Compat, O.ActionUtil
 local attr, atyp = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 
+local C_IsSpellKnown = C_SpellBook.IsSpellKnown
+
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
 -------------------------------------------------------------------------------]]
@@ -45,6 +47,7 @@ end
 
 --- If type is invalid (blank or nil) then return quickly
 --- Clear Icon When: type=spell|item|etc and val is invalid (blank or nil)
+--- @see ApplyButtonConfig()
 --- @param name Name
 --- @param val string
 function o:UpdateAction(name, val)
@@ -54,12 +57,9 @@ function o:UpdateAction(name, val)
   -- if name == 'abp_clear' then
   if name == atyp.spell then
     local info = comp:GetSpellInfo(val)
-    --local _sp = ('%s(%s)'):format(tostring(info.name), tostring(info.spellID))
-    --self:t('UpdateAction','spell=', _sp, 'attr-name=', name)
     if not (info and info.iconID) then return end
     self.button.icon:SetTexture(info.iconID)
   elseif name == atyp.item then
-    --self:t('UpdateAction','item=', val, 'attr-name=', name)
   end
   
   self.button:Update()
@@ -76,10 +76,21 @@ end
 function o:ApplyButtonConfig()
   local btn = self.button
   btn:SetButtonStateNormal()
-  
+
+  --- @type ButtonConfig_ABP_2_0
   local bc = btn:GetButtonConfig()
   if not (bc and bc.type and bc.id) then self:ResetButton(); return end
-  
+
+  if au.IsSpell(bc.type) then
+    -- if the spell is no longer known (may be true for lower-rank non-mana spells)
+    local known, nextKnownSp = au.IsSpellKnown(bc.id)
+    if not known then
+      if nextKnownSp then bc.id = nextKnownSp.spellID
+      else bc.id = nil
+      end
+    end
+  end
+
   self:SetAttribute(attr.type, bc.type)
   self:SetAttribute(bc.type, bc.id)
 end
@@ -88,7 +99,7 @@ end
 function o:ApplyCursorAction(cursor)
   if not cursor then return end
   --- @type ButtonConfig_ABP_2_0
-  local btnC = self:conf(true)
+  local btnC = self:conf()
   
   if cursor.type == 'spell' then
     cursor:IfSpell(function(spell)

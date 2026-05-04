@@ -43,7 +43,7 @@ New Instance
 --
 local libName = 'Button_2_0_3'
 
---- @class ButtonMixin_ABP_2_0_3 : ButtonState_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
+--- @class ButtonMixin_ABP_2_0_3 : ButtonState_ABP_2_0, ButtonConfigAccessor_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
 --- @field NormalTexture TextureObj
 --- @field HighlightTexture TextureObj
 --- @field PushedTexture TextureObj
