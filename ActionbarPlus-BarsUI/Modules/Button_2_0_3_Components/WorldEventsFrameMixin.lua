@@ -39,28 +39,26 @@ local p, t = ns:log('WorldEventsFrame')
 --- =======================================================
 --- Buttons register/unregister here to receive world/environment-level events.
 --- @see Button_ABP_2_0_3#OnLoad
---- @class ButtonEventsFrameMixin_ABP_2_0
---- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
-WorldEventsFrameMixin_ABP_2_0 = {};
---
---- @alias WorldEventsFrame_ABP_2_0 ButtonEventsFrameMixin_ABP_2_0 | FrameObj
---- =======================================================
+--- @class WorldEventsFrameMixin_ABP_2_0 : Frame
+--- @field buttons table<Button_ABP_2_0_X, Button_ABP_2_0_X>
+local o = {}; WorldEventsFrameMixin_ABP_2_0 = o
 
---- @type ButtonEventsFrameMixin_ABP_2_0 | WorldEventsFrame_ABP_2_0
-local o = WorldEventsFrameMixin_ABP_2_0
+--
+--- @class WorldEventsFrame_ABP_2_0 : WorldEventsFrameMixin_ABP_2_0
+---
 
 function o:OnLoad()
   
-  self.frames = {};
+  self.buttons = {};
   self:RegisterEvent("PLAYER_ENTERING_WORLD");
+  self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
+  self:RegisterUnitEvent("UNIT_AURA", "player");
   --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
   --self:RegisterEvent("UPDATE_BINDINGS");
   --self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
-  self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
   --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
   --self:RegisterEvent("PET_BAR_UPDATE");
   --self:RegisterUnitEvent("UNIT_FLAGS", "pet");
-  self:RegisterUnitEvent("UNIT_AURA", "player");
   --self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
   
   --CVarCallbackRegistry:SetCVarCachable(countdownForCooldownsCVarName);
@@ -69,28 +67,28 @@ end
 
 function o:OnEvent(event, ...)
   -- pass event down to the buttons
-  for k, frame in pairs(self.frames) do
-    frame:OnEvent(event, ...);
+  for k, btn in pairs(self.buttons) do
+    btn:OnEvent(event, ...);
   end
 end
 
 function o:OnCountdownForCooldownsChanged()
-  for k, frame in pairs(self.frames) do
-    ActionButton_UpdateCooldownNumberHidden(frame);
+  for k, btn in pairs(self.buttons) do
+    ActionButton_UpdateCooldownNumberHidden(btn);
   end
 end
 
 --- Unregister when bar modules are enabled
---- @param frame Button_ABP_2_0_3
-function o:RegisterFrame(frame) self.frames[frame] = frame end
+--- @param btn Button_ABP_2_0_3
+function o:RegisterFrame(btn) self.buttons[btn] = btn end
 
 --- Unregister when bar modules are disabled
 --- @param frame Button_ABP_2_0_3
-function o:UnregisterFrame(frame) self.frames[frame] = nil end
+function o:UnregisterFrame(frame) self.buttons[frame] = nil end
 
 --- @param func fun(frame:Button_ABP_2_0_3):void
 function o:ForEachFrame(func)
-  for k, frame in pairs(self.frames) do func(frame); end
+  for k, btn in pairs(self.buttons) do func(btn); end
 end
 
 WorldEventsFrameMixinDerived_ABP_2_0 = CreateFromMixins(o)
