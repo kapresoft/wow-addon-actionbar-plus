@@ -64,7 +64,7 @@ Mixin: BarFrameObjWidgetMixin_2_0
 --- @class BarFrameObjWidgetMixin_ABP_2_0
 --- @field index Index
 --- @field frame BarFrameObj_ABP_2_0
---- @field buttons table<number, Button_ABP_2_0_X>
+--- @field buttons Button_ABP_2_0_X[]
 local BarFrameObjWidgetMixin = {}
 
 local function BarFrameWidgetMethods()
