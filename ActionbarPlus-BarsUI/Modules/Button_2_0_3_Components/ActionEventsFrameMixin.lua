@@ -55,7 +55,8 @@ local o = ActionEventsFrameMixin_ABP_2_0
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
-  --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");		replaced with ACTION_USABLE_CHANGED
+  --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE"); --replaced with ACTION_USABLE_CHANGED
+  self:RegisterEvent("SPELL_UPDATE_USABLE")
   self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_CHARGES");
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");

@@ -79,6 +79,17 @@ local function Btn_ActionShouldFire(down)
 end
 
 --- @param self Button_ABP_2_0_3
+--- @return boolean
+local function Btn_ActionRequiresAttackAnim(self)
+    local typeVal, id = self:GetActionInfo()
+    if not (typeVal and id) then return false end
+    if au.IsSpell(typeVal)  then
+      return au.SpellRequiresAttackAnim(id)
+    end
+    return false
+end
+
+--- @param self Button_ABP_2_0_3
 --- @param callbackFn fun() : void
 local function Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
@@ -94,16 +105,6 @@ local function Btn_PickupAction(self, callbackFn)
   end
 
   if callbackFn then callbackFn() end
-end
-
---- Spells:
---- Attack (6603)
---- @param self Button_ABP_2_0_3
---- @return boolean
-local function Btn_ActionRequiresAttackAnim(self)
-    local typeVal, spellID = self:GetActionInfo()
-    if not (typeVal and spellID) then return false end
-    return spellID == 6603
 end
 
 --[[-----------------------------------------------------------------------------
@@ -144,7 +145,7 @@ function o:AfterLoad(btnIndex, barIndex)
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
 
   self.widget:ApplyButtonConfig()
-  
+
   local traceChecked = false
   if traceChecked then
     if not self.__SetCheckedWrapped then
@@ -178,6 +179,9 @@ function o:OnEvent(evt, ...)
     self:OnInit(evt, isInitialLogin, isReloadingUi)
     self:UpdateTexture()
     self:UpdateState(evt)
+    self:UpdateUsable()
+  elseif evt == 'SPELL_UPDATE_USABLE' then
+    self:UpdateUsable()
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     self:UpdateState(evt)
     self:DisableAttackingAnimation()
@@ -259,7 +263,10 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
-  if InCombatLockdown() then return end
+  if InCombatLockdown()
+    or not (down and IsActionbarLockedByUser()) then
+      return
+  end
   self:PostClickAction(button, down)
 end
 
@@ -267,7 +274,7 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PreClickAction(button, down)
-  if not down or not IsActionbarLockedByUser() then return end
+  if self.widget:IsEmpty() then self:SetChecked(false); return end
   -- Prepare for a potential drag operation.
   -- When the user begins dragging the button, the secure `type` attribute
   -- must be temporarily suspended so the button does not execute its
@@ -464,7 +471,6 @@ function o:GetActionTexture()
     elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
       return priest:GetShadowFormActiveIcon()
     end
-    self:SetIconNormalVertex()
   end
   
   local icon
@@ -486,6 +492,21 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
+function o:UpdateUsable()
+  local icon = self.icon
+  local typeVal, actionID = self:GetActionInfo()
+  if typeVal == nil then return end
+
+  local isUsable, notEnoughMana = au.IsUsableAction(typeVal, actionID)
+  if isUsable then
+    self:SetIconNormalVertex()
+  elseif notEnoughMana then
+    icon:SetVertexColor(0.5, 0.5, 1.0)
+  else
+    icon:SetVertexColor(0.4, 0.4, 0.4);
+  end
+end
+
 function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
@@ -594,4 +615,3 @@ function o:DisableAttackingAnimation()
   self.SpellHighlightAnim:Stop()
   self.SpellHighlightTexture:Hide()
 end
-
