@@ -57,6 +57,12 @@ function ns:Register(libName, obj)
     return obj
 end
 
+--- @generic T
+--- @param libName Name
+--- @param obj? any
+--- @return table|T library
+function ns:NewLib(libName, obj) return ns:Register(libName, obj or {}) end
+
 ns.logHolder = {}; do
   local h = ns.logHolder; local noop = function(moduleName) return function() end end
   h.printer, h.tracer = noop, noop

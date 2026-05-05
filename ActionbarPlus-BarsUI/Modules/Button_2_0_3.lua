@@ -28,6 +28,10 @@ local attr, atyp = C.AttributeNames, C.SupportedActionTypes
 local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
 local Tbl_IsEmpty = cns:Table().IsEmpty
+local Str_IsAnyOf = cns:String().IsAnyOf
+
+--- @type ButtonActionUtil_ABP_2_0
+local u
 
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
@@ -68,51 +72,15 @@ local function NextSeedID()
   return current
 end
 
---- @return boolean
-local function IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
-
---- @param down boolean
---- @return boolean
-local function Btn_ActionShouldFire(down)
-  if IsActionbarLockedByUser() then return down == true end
-  return down ~= true
-end
-
---- @param self Button_ABP_2_0_3
---- @return boolean
-local function Btn_ActionRequiresAttackAnim(self)
-    local typeVal, id = self:GetActionInfo()
-    if not (typeVal and id) then return false end
-    if au.IsSpell(typeVal)  then
-      return au.SpellRequiresAttackAnim(id)
-    end
-    return false
-end
-
---- @param self Button_ABP_2_0_3
---- @param callbackFn fun() : void
-local function Btn_PickupAction(self, callbackFn)
-  --- The abp_saved_type is saved during PreClick()
-  --- so that the button won't fire on pickup action
-  local typeVal = self.widget:GetAttributeSuspendedActionType()
-  if not typeVal then return end
-  
-  if au.IsSpell(typeVal) then
-    local spell = self.widget:GetAttributeSpell()
-    comp:PickupSpell(spell)
-    self:ResetButtonConfig()
-    self.widget:ResetButton()
-  end
-
-  if callbackFn then callbackFn() end
-end
-
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
 
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
+
+  u = ns.O.ButtonActionUtil
+
   self:SetID(NextSeedID())
 
   self:EnableMouse(true)
@@ -186,7 +154,7 @@ function o:OnEvent(evt, ...)
     self:UpdateState(evt)
     self:DisableAttackingAnimation()
   elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
-    if Btn_ActionRequiresAttackAnim(self) then
+    if u.Btn_ActionRequiresAttackAnim(self) then
       self:SetChecked(true)
       self:EnableAttackingAnimation()
       return
@@ -195,15 +163,16 @@ function o:OnEvent(evt, ...)
   elseif evt == 'ACTIONBAR_UPDATE_STATE' then
     self:RepairRetailPushedState()
     self:UpdateState('OnEvent') -- this deselects Cooking, First Aid, Prof Talents
-  elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
+  elseif Str_IsAnyOf(evt, 'UPDATE_SHAPESHIFT_FORM', 'UPDATE_STEALTH') then
     self:UpdateTexture()
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
-  elseif evt == 'SPELL_UPDATE_COOLDOWN' or evt == 'LOSS_OF_CONTROL_ADDED' then
-    --if unit:IsPriest() and unit:IsShapeShifted() then return end
+  elseif Str_IsAnyOf(evt, 'SPELL_UPDATE_COOLDOWN', 'LOSS_OF_CONTROL_ADDED') then
     self:UpdateCooldown()
-  elseif evt == 'UNIT_AURA' then
-    --self:UpdateStealthSpells()
+  elseif Str_IsAnyOf(evt, 'TRADE_SKILL_SHOW', 'TRADE_SKILL_CLOSE')  then
+    self:UpdateState('OnEvent')
+  --elseif evt == 'UNIT_AURA' then
+  --  self:UpdateStealthSpells()
   end
   
 end
@@ -264,7 +233,7 @@ end
 --- @param down ButtonDown
 function o:PostClick(button, down)
   if InCombatLockdown()
-    or not (down and IsActionbarLockedByUser()) then
+    or not (down and u.IsActionbarLockedByUser()) then
       return
   end
   self:PostClickAction(button, down)
@@ -279,7 +248,7 @@ function o:PreClickAction(button, down)
   -- When the user begins dragging the button, the secure `type` attribute
   -- must be temporarily suspended so the button does not execute its
   -- action while the drag / pickup transaction is in progress.
-  if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
+  if u.Btn_ActionShouldFire(down) and self:IsDragAllowed() then
     self:SetChecked(false)
     self.widget:SuspendAction()
     return
@@ -361,7 +330,7 @@ function o:OnDragStart(button)
   if InCombatLockdown() then return false end
   if not self:IsDragAllowed() then return end
   
-  Btn_PickupAction(self, function()
+  u.Btn_PickupAction(self, function()
     self:UpdateState('OnDragStart')
     self:UpdateCooldown()
     self:UpdateFlash()
