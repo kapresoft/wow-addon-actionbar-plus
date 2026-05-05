@@ -55,12 +55,32 @@ local function Btn_UpdateState(self, evt)
 
 end
 
+--- @param self ButtonMixin_ABP_2_0_3
+local function Btn_UpdateFlash(self)
+  -- tbd
+end
+
+--- @param self ButtonMixin_ABP_2_0_3
+local function Btn_UpdateAnimation(self)
+  --- @type ButtonConfig_ABP_2_0
+  local btnC = self.widget:conf()
+  if not btnC then return end
+
+  if au.IsSpell(btnC.type) then
+    local requiresAttackAnim = au.SpellRequiresAttackAnim(btnC.id)
+    if requiresAttackAnim and au.IsCurrentSpell(btnC.id) then
+      self:EnableAttackingAnimation()
+    else
+      self:DisableAttackingAnimation()
+    end
+  end
+
+end
+
 --- Update the button's checked state
 function o:UpdateState(evt) Btn_UpdateState(self, evt) end
-
-function o:UpdateFlash()
-  --p('UpdateFlash:: called...')
-end
+function o:UpdateAnimation() Btn_UpdateAnimation(self) end
+function o:UpdateFlash() Btn_UpdateFlash(self) end
 
 function o:ClearFlash()
   --p('ClearFlash:: called...')

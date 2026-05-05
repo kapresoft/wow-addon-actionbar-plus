@@ -66,6 +66,10 @@ function o:UpdateAction(name, val)
 end
 
 --- @return boolean
+function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
+
+--- Has a valid action
+--- @return boolean
 function o:HasAction()
   local actionType = self:GetAttribute(attr.type)
   if not actionType then return false end
@@ -111,6 +115,8 @@ function o:ApplyCursorAction(cursor)
   
   self.button:UpdateState()
   self.button:UpdateFlash()
+  self.button:UpdateAnimation()
+  self.button:UpdateUsable()
 end
 
 function o:ResetButton()
@@ -139,7 +145,9 @@ function o:__ResetVisuals()
   
   -- Stop flashing if you use it
   if btn.ClearFlash then btn:ClearFlash() end
-  
+
+  btn:DisableAttackingAnimation()
+
   -- Remove any desaturation
   if btn.icon then btn.icon:SetDesaturated(false) end
 end
