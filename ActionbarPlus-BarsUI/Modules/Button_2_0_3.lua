@@ -325,12 +325,9 @@ function o:PostClickAction(button, down)
 end
 
 function o:OnEnter()
-  --self.widget:ClearAttributeSavedType()
-  
   local type, id = self:GetActionInfo()
   if not id then return end
   --todo: GameTooltip owner will be user configurable
-  --GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
   GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
   GameTooltip:ClearAllPoints()
   GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
