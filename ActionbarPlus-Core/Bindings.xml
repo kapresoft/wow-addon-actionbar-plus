@@ -1,0 +1,3 @@
+<Bindings>
+    <Binding name="CLICK ABP_2_0_F1Button1:LeftButton" category="ABPV2_CATEGORY" header="ABP_HEADER_ACTIONBAR1"/>
+</Bindings>

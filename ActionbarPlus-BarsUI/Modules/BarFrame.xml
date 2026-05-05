@@ -56,7 +56,6 @@
             <OnDragStart method="OnDragStart"/>
             <OnDragStop method="OnDragStop"/>
             <OnReceiveDrag method="OnReceiveDrag"/>
-            <OnAttributeChanged method="OnAttributeChanged"/>
         </Scripts>
     </CheckButton>
 

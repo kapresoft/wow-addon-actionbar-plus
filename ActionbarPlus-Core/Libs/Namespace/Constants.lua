@@ -71,3 +71,8 @@ for className, classID in pairs(UnitClassID) do
   setmetatable(entry, { __call = function(self) return self.name end })
   UnitClasses[className] = entry
 end; o.UnitClasses = UnitClasses
+
+-- Temporary Keybind items for Bindings.xml
+ABPV2_CATEGORY           = "AddOns/ActionbarPlus-2.0"
+ABPV2_HEADER_ACTIONBAR1 = "Header"
+_G['BINDING_NAME_CLICK ABP_2_0_F1Button1:LeftButton'] = 'Bar #1: Button 1'

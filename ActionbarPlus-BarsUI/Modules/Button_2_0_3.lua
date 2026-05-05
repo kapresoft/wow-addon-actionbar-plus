@@ -119,9 +119,15 @@ function o:OnLoad()
   self:GetPushedTexture():SetVertexColor(0.3, 0.4, 0.8, 1)
   self.icon:AddMaskTexture(self.IconMask)
   
-  self:RegisterForDrag("LeftButton");
-  self:RegisterForClicks('AnyDown', 'AnyUp');
-  
+  self:RegisterForDrag("LeftButton")
+  self:AnyDown()
+
+  -- retail only (not supported in ABPV2)
+  -- self:SetAttribute("down", true)
+  self:SetAttribute('checkselfcast', true)
+  self:SetAttribute('checkfocuscast', true)
+  self:SetAttribute('checkmouseovercast', true)
+
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
 end
 
@@ -129,14 +135,14 @@ end
 --- @param barIndex Index
 --- @param btnIndex Index
 function o:AfterLoad(btnIndex, barIndex)
+  --- @type ButtonWidget_ABP_2_0
   self.widget = CreateFromMixins(ns.O.ButtonWidgetMixin)
   self.widget:Init(self, btnIndex, barIndex)
   Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
 
-  self:SetAttribute("checkselfcast", true);
-  self:SetAttribute("checkfocuscast", true);
-  self:SetAttribute("checkmouseovercast", true);
-  
+  --- @param btn Button_ABP_2_0_X
+  self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
+
   self.widget:ApplyButtonConfig()
   
   local traceChecked = false
@@ -153,13 +159,12 @@ function o:AfterLoad(btnIndex, barIndex)
   end
 end
 
---- Still needs to be wired
+--- Still needs to be wired: TBD
 --- @see BarFrame.xml#ButtonUpdateFrame_ABP_2_0
 --- @see ButtonUpdateFrame_ABP_2_0#OnUpdate()
 --- @param elapsed number
 function o:OnUpdate(elapsed)
-  p('xxx OnUpdate')
-  -- tbd
+  t('OnUpdate') -- tbd
 end
 
 --- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
@@ -185,6 +190,7 @@ function o:OnEvent(evt, ...)
     self:UpdateState(evt)
   elseif evt == 'ACTIONBAR_UPDATE_STATE' then
     self:RepairRetailPushedState()
+    self:UpdateState('OnEvent') -- this deselects Cooking, First Aid, Prof Talents
   elseif evt == 'UPDATE_SHAPESHIFT_FORM' or evt == 'UPDATE_STEALTH' then
     self:UpdateTexture()
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
@@ -239,30 +245,39 @@ function o:OnInit(evt, isInitialLogin, isReloadingUi)
   --/dump GetCVarBool('ActionButtonUseKeyDown')
   if not GetCVarBool('ActionButtonUseKeyDown') then
     SetCVar('ActionButtonUseKeyDown', 1)
-    p('ActionButtonUseKeyDown=', GetCVarBool('ActionButtonUseKeyDown'))
   end
-  if InCombatLockdown() then return end
 end
 
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PreClick(button, down)
   if InCombatLockdown() then return false end
-  
-  -- fires on 'up' if not locked by user
-  if not IsActionbarLockedByUser() then return end
-  
+  self:PreClickAction(button, down)
+end
+
+--- Responds on up
+--- @param button ButtonName
+--- @param down ButtonDown
+function o:PostClick(button, down)
+  if InCombatLockdown() then return end
+  self:PostClickAction(button, down)
+end
+
+--- Only process mouse down events here
+--- @param button ButtonName
+--- @param down ButtonDown
+function o:PreClickAction(button, down)
+  if not down or not IsActionbarLockedByUser() then return end
   -- Prepare for a potential drag operation.
   -- When the user begins dragging the button, the secure `type` attribute
   -- must be temporarily suspended so the button does not execute its
   -- action while the drag / pickup transaction is in progress.
   if Btn_ActionShouldFire(down) and self:IsDragAllowed() then
-    self.widget:SuspendAction(); return
+    self:SetChecked(false)
+    self.widget:SuspendAction()
+    return
   end
- 
-  -- on mouse 'up', return
-  if not down then return end
-  
+
   -- ########################################
   -- Cursor swap case (no drag event):
   -- The user clicked the button while the cursor already holds an action.
@@ -270,45 +285,40 @@ function o:PreClick(button, down)
   --   cursor action → button
   --   button action → cursor
   -- ########################################
-  local cursor = cns:cursor(); if not cursor.isValid then return end
-  
-  -- on mouse 'down', suspend the current action
-  self.widget:SuspendAction()
-  local suspendedType, actionID = self:GetSuspendedActionInfo()
-  if not suspendedType then return end
-  
-  -- on mouse 'down'
-  --local sp = comp:__debug_SpellInfo(actionID)
-  --t('DND', 'PreClick', 'suspended=', sp, 'type=', suspendedType, 'on-mouse-down=', true)
+  local cursor = cns:cursor()
+
+  -- clicks on a button with a valid cursor
+  -- on mouse 'down', suspend the current action if there is a valid cursor
+  if cursor.isValid then
+    self.widget:SuspendAction(); return
+  end
 end
 
+function o:OnClick() end
+
+--- Only process down events here due to AnyDown() being set
 --- @param button ButtonName
 --- @param down ButtonDown
-function o:PostClick(button, down)
-  if down == true then return end
+function o:PostClickAction(button, down)
   self:UpdateState('PostClick')
 
-  if InCombatLockdown() then return false end
-
+  -- return if nothing on cursor
   local cursor = cns:cursor()
   if not cursor.isValid then return end
-  
+
   ClearCursor()
-  
+
   local suspendedType, actionID = self:GetSuspendedActionInfo()
   if suspendedType then
     if suspendedType == atyp.spell then
       comp:PickupSpell(actionID)
-      --local sp = comp:__debug_SpellInfo(actionID)
-      --t('DND', 'PostClick', 'picked-up=', sp, 'suspended-type=', suspendedType,
-      --        'on-mouse-up=', down ~= true)
     elseif suspendedType == atyp.item then
       --  todo: handle item
     elseif suspendedType == atyp.macro then
       --  todo: handle macro
     end
   end
-  
+
   self.widget:ClearAttributeSuspendedActionType()
   self.widget:ApplyCursorAction(cursor)
   self:UpdateState('PostClick')
@@ -340,10 +350,7 @@ function o:OnEnter()
   end
 end
 
-function o:OnLeave()
-  GameTooltip:Hide()
-  --self.widget:RestoreAttributeType()
-end
+function o:OnLeave() GameTooltip:Hide() end
 
 --- @param button ButtonName
 function o:OnDragStart(button)
@@ -359,11 +366,7 @@ function o:OnDragStart(button)
   
 end
 
-function o:OnDragStop()
-  p('OnDragStop...')
-  -- todo: review if these are needed
-  --self.widget:RestoreAttributeType()
-end
+function o:OnDragStop() end
 
 function o:OnReceiveDrag()
   if InCombatLockdown() then return end
@@ -383,6 +386,7 @@ function o:OnReceiveDrag()
   end
   
   self.widget:ApplyCursorAction(cursor)
+  self:UpdateState('OnReceiveDrag')
 end
 
 function o:OnAttributeChanged(name, val)
@@ -577,6 +581,8 @@ function o:IsDragAllowed()
   return not Settings.GetValue('lockActionBars') or IsModifiedClick('PICKUPACTION')
 end
 
+function o:AnyDown() self:RegisterForClicks('AnyDown') end
+function o:Any() self:RegisterForClicks('AnyDown', 'AnyUp') end
 function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
 function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
 function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
