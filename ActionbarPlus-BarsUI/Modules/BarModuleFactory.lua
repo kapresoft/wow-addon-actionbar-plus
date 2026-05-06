@@ -228,14 +228,14 @@ local barCount = cns:a():p().barCount or 1
 --- barFrame should be hidden by default in xml template
 function o:CreateAddonModules()
   for i = 1, barCount do
-    self:__CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
+    self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
   end
 end
 
 --- @private
 --- @param barIndex Index The bar frame index
 --- @param consumerFn BarFactoryConsumerFn
-function o:__CreateBarGroup(barIndex, consumerFn)
+function o:CreateBarGroup(barIndex, consumerFn)
   assert(type(barIndex) == 'number', 'CreateBarGroup(barIndex):: {barIndex} should be a number')
 
   local frameName = barName(barIndex)
@@ -251,8 +251,8 @@ function o:__CreateBarGroup(barIndex, consumerFn)
   local spacing = ui.button.spacing
 
   --- @type BarFrameObj_ABP_2_0
-  local frame = self:__CreateBarFrame(barConf, barIndex, frameName)
-  local buttons = self:__CreateButtons(barConf, frame, barIndex)
+  local frame = self:CreateBarFrame(barConf, barIndex, frameName)
+  local buttons = self:CreateButtons(barConf, frame, barIndex)
   frame.widget.buttons = buttons
 
   ----------------------------------------------------
@@ -307,7 +307,7 @@ end
 --- @param barIndex Index The frame index
 --- @param frameName Name The frame name
 --- @return BarFrameObj_ABP_2_0
-function o:__CreateBarFrame(barConf, barIndex, frameName)
+function o:CreateBarFrame(barConf, barIndex, frameName)
   assert(type(barIndex) == 'number', '__CreateBarFrame(barConf, barIndex, frameName) {barIndex} should be a number')
   assert(type(frameName) == 'string', '__CreateBarFrame(barConf, barIndex, frameName): {frameName} should be a string')
 
@@ -342,7 +342,7 @@ end
 --- @param barIndex Index
 --- @param barFrame BarFrameObj_ABP_2_0
 --- @return table<number, Button_ABP_2_0_X>
-function o:__CreateButtons(barConf, barFrame, barIndex)
+function o:CreateButtons(barConf, barFrame, barIndex)
   local ui = barConf.ui
   local cols, rows = ui.colSize, ui.rowSize
   local btnCount = rows * cols
@@ -350,11 +350,12 @@ function o:__CreateButtons(barConf, barFrame, barIndex)
   --- @type table<number, Button_ABP_2_0_X>
   local buttons = {}
   for i = 1, btnCount do
+    -- Encode: barIndex in tens place, btnIndex fills the rest
+    local encodedID = au.encodeBarID(barIndex, i)
     local btnName, btnKey = ButtonName(barIndex, i)
     --- @type Button_ABP_2_0_X
-    local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate)
+    local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate, encodedID)
     btn:SetParentKey(btnKey)
-    btn:AfterLoad(i, barIndex)
     table.insert(buttons, btn)
   end
 

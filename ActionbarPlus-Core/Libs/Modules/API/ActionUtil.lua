@@ -31,6 +31,32 @@ Module::ActionUtil (Methods)
 -------------------------------------------------------------------------------]]
 local o = S
 
+-- increase as needed
+local ENCODER_RADIX = 1000
+
+--- Encodes a bar index and button index into a single numeric ID
+--- #### Example Use:
+--- ```
+--- local id = encodeID(2, 1)      -- 2001
+--- local bar, btn = decode(2001)  -- bar=2, btn=1
+--- ```
+--- @param barIndex number The action bar index (higher-order digits)
+--- @param buttonIndex number The button index within the bar (lower-order digits, 0-999)
+--- @return number encodedID Combined ID where barIndex occupies higher digits
+function o.encodeBarID(barIndex, buttonIndex)
+    return barIndex * ENCODER_RADIX + buttonIndex
+end
+
+--- Decodes a numeric ID back into its bar and button indices
+--- @param encodedID number The combined ID from encodeID()
+--- @return number @barIndex The action bar index
+--- @return number @buttonIndex The button index within the bar
+function o.decodeBarID(encodedID)
+    local barIndex = math.floor(encodedID / 1000)
+    local buttonIndex = encodedID % ENCODER_RADIX
+    return barIndex, buttonIndex
+end
+
 --- @param spellID SpellID
 --- @return boolean, SpellInfo? @If {spellID} is not known, it will try to get the latest spell
 function o.IsSpellKnown(spellID)

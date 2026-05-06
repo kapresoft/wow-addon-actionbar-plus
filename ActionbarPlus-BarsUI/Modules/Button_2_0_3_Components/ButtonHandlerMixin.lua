@@ -12,8 +12,8 @@ local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
-local libName = 'ButtonActionUtil'
---- @class ButtonActionUtil_ABP_2_0
+local libName = 'ButtonHandlerMixin'
+--- @class ButtonHandlerMixin_ABP_2_0
 local o = ns:NewLib(libName)
 local p, t = ns:log(libName)
 
@@ -23,9 +23,10 @@ Mixin Methods
 --- @return boolean
 function o.IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
 
+--- @param self Button_ABP_2_0_3
 --- @param down boolean
 --- @return boolean
-function o.Btn_ActionShouldFire(down)
+function o.Btn_ActionShouldFire(self, down)
   if o.IsActionbarLockedByUser() then return down == true end
   return down ~= true
 end
@@ -57,4 +58,43 @@ function o.Btn_PickupAction(self, callbackFn)
   end
 
   if callbackFn then callbackFn() end
+end
+
+--- Update the button's checked state
+--- @param self ButtonMixin_ABP_2_0_3
+--- @param evt Name @The event name
+function o.Btn_UpdateState(self, evt)
+  local typeVal, spellID = self:GetActionInfo()
+  if not (typeVal and spellID) then return end
+
+  local sp = GetSpellInfo(spellID)
+  local isCurrent = au.IsCurrentAction(typeVal, spellID)
+  if isCurrent then
+    self:SetChecked(true)
+  else
+    self:SetChecked(false)
+  end
+
+end
+
+--- @param self ButtonMixin_ABP_2_0_3
+function o.Btn_UpdateFlash(self)
+  -- tbd
+end
+
+--- @param self ButtonMixin_ABP_2_0_3
+function o.Btn_UpdateAnimation(self)
+  --- @type ButtonConfig_ABP_2_0
+  local btnC = self.widget:conf()
+  if not btnC then return end
+
+  if au.IsSpell(btnC.type) then
+    local requiresAttackAnim = au.SpellRequiresAttackAnim(btnC.id)
+    if requiresAttackAnim and au.IsCurrentSpell(btnC.id) then
+      self:EnableAttackingAnimation()
+    else
+      self:DisableAttackingAnimation()
+    end
+  end
+
 end

@@ -30,9 +30,6 @@ local dru, priest = O.DruidUtil, O.PriestUtil
 local Tbl_IsEmpty = cns:Table().IsEmpty
 local Str_IsAnyOf = cns:String().IsAnyOf
 
---- @type ButtonActionUtil_ABP_2_0
-local u
-
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 
@@ -47,19 +44,19 @@ New Instance
 --
 local libName = 'Button_2_0_3'
 
---- @class ButtonMixin_ABP_2_0_3 : ButtonState_ABP_2_0, ButtonConfigAccessor_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
+--- @class ButtonMixin_ABP_2_0_3 : ButtonHandlerMixin_ABP_2_0, ButtonConfigAccessor_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
 --- @field NormalTexture TextureObj
 --- @field HighlightTexture TextureObj
 --- @field PushedTexture TextureObj
 --- @field CheckedTexture TextureObj
 --- @field SpellHighlightAnim AnimationGroup
---- @field ClearFlash fun():void
 --- @field icon TextureObj
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
-local o = cns:NewAceEvent(); ButtonMixin_ABP_2_0_3 = o
+local o = Mixin(cns:NewAceEvent(), ns.O.ButtonHandlerMixin, ns.O.ButtonConfigAccessorMixin)
+ButtonMixin_ABP_2_0_3 = o
 
 local p, t = ns:log(libName)
 
@@ -75,13 +72,19 @@ end
 --[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
-
 -- /dump SetCVar('ActionButtonUseKeyDown', 1)
 function o:OnLoad()
 
-  u = ns.O.ButtonActionUtil
+  local encodedID = self:GetID()
+  assert(type(encodedID) == 'number', 'encodedID is invalid: ' .. tostring(encodedID))
 
-  self:SetID(NextSeedID())
+  local barIndex, btnIndex = au.decodeBarID(encodedID)
+
+  self:SetID(encodedID)
+
+  --- @type ButtonWidget_ABP_2_0
+  self.widget = CreateFromMixins(ns.O.ButtonWidgetMixin)
+  self.widget:Init(self, btnIndex, barIndex)
 
   self:EnableMouse(true)
   self:GetNormalTexture():SetDrawLayer("BACKGROUND", 0)
@@ -98,20 +101,9 @@ function o:OnLoad()
   self:SetAttribute('checkmouseovercast', true)
 
   WorldEventsFrame_ABP_2_0:RegisterFrame(self)
-end
-
---- @private
---- @param barIndex Index
---- @param btnIndex Index
-function o:AfterLoad(btnIndex, barIndex)
-  --- @type ButtonWidget_ABP_2_0
-  self.widget = CreateFromMixins(ns.O.ButtonWidgetMixin)
-  self.widget:Init(self, btnIndex, barIndex)
-  Mixin(self, ns.O.ButtonStateMixin, ns.O.ButtonConfigAccessorMixin)
 
   --- @param btn Button_ABP_2_0_X
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
-
   self.widget:ApplyButtonConfig()
 
   local traceChecked = false
@@ -154,7 +146,7 @@ function o:OnEvent(evt, ...)
     self:UpdateState(evt)
     self:DisableAttackingAnimation()
   elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
-    if u.Btn_ActionRequiresAttackAnim(self) then
+    if o.Btn_ActionRequiresAttackAnim(self) then
       self:SetChecked(true)
       self:EnableAttackingAnimation()
       return
@@ -233,7 +225,7 @@ end
 --- @param down ButtonDown
 function o:PostClick(button, down)
   if InCombatLockdown()
-    or not (down and u.IsActionbarLockedByUser()) then
+    or not (down and o.IsActionbarLockedByUser()) then
       return
   end
   self:PostClickAction(button, down)
@@ -248,7 +240,7 @@ function o:PreClickAction(button, down)
   -- When the user begins dragging the button, the secure `type` attribute
   -- must be temporarily suspended so the button does not execute its
   -- action while the drag / pickup transaction is in progress.
-  if u.Btn_ActionShouldFire(down) and self:IsDragAllowed() then
+  if o.Btn_ActionShouldFire(self, down) and self:IsDragAllowed() then
     self:SetChecked(false)
     self.widget:SuspendAction()
     return
@@ -329,8 +321,8 @@ function o:OnLeave() GameTooltip:Hide() end
 function o:OnDragStart(button)
   if InCombatLockdown() then return false end
   if not self:IsDragAllowed() then return end
-  
-  u.Btn_PickupAction(self, function()
+
+  o.Btn_PickupAction(self, function()
     self:UpdateState('OnDragStart')
     self:UpdateCooldown()
     self:UpdateFlash()
@@ -558,6 +550,13 @@ function o:IfActionTexture(callbackFn)
   local icon = self:GetActionTexture()
   if not icon then return end
   callbackFn(icon)
+end
+
+function o:UpdateState(evt) o.Btn_UpdateState(self, evt) end
+function o:UpdateAnimation() o.Btn_UpdateAnimation(self) end
+function o:UpdateFlash() o.Btn_UpdateFlash(self) end
+function o:ClearFlash()
+  -- tbd
 end
 
 function o:UpdateTexture()
