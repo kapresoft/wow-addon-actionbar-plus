@@ -10,14 +10,13 @@ Module::Constants
 --- @see Core_Modules_ABP_2_0
 local libName = ns.M.Constants()
 --- @class Constants_ABP_2_0
-local S = {}; ns:Register(libName, S)
+--- @field UnitClasses UnitClassesType
+--- @field AttributeNames AttributeNames_ABP_2_0
+local o = {}; ns:Register(libName, o)
 
 --[[-----------------------------------------------------------------------------
 Module::Constants (Methods)
 -------------------------------------------------------------------------------]]
---- @type Constants_ABP_2_0
-local o = S
-
 --- @class AttributeNames_ABP_2_0
 local AttributeNames = {
   type           = 'type',

@@ -13,6 +13,7 @@
     <Script file="Modules\API\UnitUtil.lua"/>
     <Script file="Modules\API\DruidUtil.lua"/>
     <Script file="Modules\API\PriestUtil.lua"/>
+    <Script file="Modules\API\RogueUtil.lua"/>
     <Script file="Modules\API\ShamanUtil.lua"/>
     <!--
     TODO: Implement

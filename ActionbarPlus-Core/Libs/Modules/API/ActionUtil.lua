@@ -12,6 +12,7 @@ local C_IsCurrentSpell    = C_Spell.IsCurrentSpell
 local C_GetSpellPowerCost = C_Spell.GetSpellPowerCost
 local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
 local C_IsSpellUsable     = C_Spell.IsSpellUsable
+local C_IsUsableItem      = C_Item.IsUsableItem
 
 local ATTACK_SPELL_ID = 6603
 
@@ -68,14 +69,24 @@ function o.IsSpellKnown(spellID)
   return false, nextSp
 end
 
+--- @param itemIDAttribute string @The itemID attribute value, i.e. 'item:123'
+function o.GetAttributeItemID(itemIDAttribute)
+  if not itemIDAttribute then return nil end
+  assert(type(itemIDAttribute) == 'string', 'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ', type(itemIDAttribute))
+  return tonumber(itemIDAttribute:match("item:(%d+)"))
+end
+
 --- @param typeVal string The button attribute 'type' value
 --- @param id Identifier The context id; 'spell', 'item', etc...
---- @return boolean, boolean
+--- @return boolean   @true if action is usable
+--- @return boolean   @true if due to not-enough-'energy|mana|rage|etc', false otherwise
 function o.IsUsableAction(typeVal, id)
   if not (typeVal and id) then return false, false end
   if o.IsSpell(typeVal) then
       local isUsable, notEnoughMana = C_IsSpellUsable(id)
       return isUsable, notEnoughMana
+  elseif o.IsItem(typeVal) then
+    return C_IsUsableItem(id), false
   end
   return false, false
 end
@@ -150,6 +161,24 @@ function o.IfSpellCooldown(spellID, callbackFn)
   if not info then return end; callbackFn(info)
 end
 
+--- @param spellID SpellID
+--- @param callbackFn fun(spell: SpellInfo)
+function o.IfSpell(spellID, callbackFn)
+  local spellInfo = comp:GetSpellInfo(spellID)
+  if spellInfo then callbackFn(spellInfo) end
+end
+
+--- @param itemID ItemID
+--- @param callbackFn fun(itemInfo:ItemInfoDetails)
+function o.IfItem(itemID, callbackFn)
+  local it = comp:GetItemInfoInstant(itemID)
+  if not (it and it.id and it.icon) then
+    it = comp:GetItemInfo(itemID)
+  end
+  if not (it and it.icon) then return end
+  callbackFn(it)
+end
+
 --- Returns the first elem of spell power cost array
 --- @param spell SpellIdentifier
 --- @return SpellPowerCostInfo?
@@ -170,3 +199,15 @@ end
 --- @param spell SpellIdentifier
 --- @return boolean
 function o.SpellDoesNotRequireMana(spell) return not o.SpellRequiresMana(spell) end
+
+--- @param spellID SpellID
+--- @return boolean @true if {spellID} is a shapeshift spell
+--- @return boolean @true if active
+function o.IsShapeShiftSpell(spellID)
+  local unit, shaman = O.UnitUtil, O.ShamanUtil
+  local isShapeShiftSpell, active = unit:IsShapeShiftSpell(spellID)
+  if unit:IsShaman() then
+    isShapeShiftSpell, active = shaman:IsGhostWolfSpell(spellID), true
+  end
+  return isShapeShiftSpell, active
+end

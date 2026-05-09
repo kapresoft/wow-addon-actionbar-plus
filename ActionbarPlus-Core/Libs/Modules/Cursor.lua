@@ -15,42 +15,48 @@ local libName = ns.M.CursorProvider()
 --- @class CursorProvider_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, t = ns:log(libName)
+local au = O.ActionUtil
+
+--
+--- @class Cursor_ABP_2_0 : CursorMixin_ABP_2_0
+--
 
 --- @class CursorMixin_ABP_2_0
 --- @field type CursorType
 --- @field info CursorInfo
 --- @field isValid boolean
 local CursorMixin = {}
+
 local function CursorMixinMethods()
 
-  --- @class Cursor_ABP_2_0 : CursorMixin_ABP_2_0
-  
-  --- @type CursorMixin_ABP_2_0
-  local o = CursorMixin
-  
   local spellType = 'spell'
   
   --- @private
   --- @param info CursorInfo
-  function o:Init(info)
+  function CursorMixin:Init(info)
     self.info = info
     self.type = info and info.type
     self.isValid = info and not Str_IsBlank(info.type)
   end
   
-  function o:IsSpell() return self.isValid and self.type == spellType end
-  function o:GetSpell()
-    if self:IsSpell() then return self.info.info3 end
-    return nil
+  function CursorMixin:IsSpell() return self.isValid and au.IsSpell(self.type) end
+  function CursorMixin:IsItem() return self.isValid and au.IsItem(self.type) end
+
+  --- @return SpellID
+  function CursorMixin:GetSpellID()
+    if not self:IsSpell() then return nil end
+    return self.info.info3 --[[@as SpellID]]
   end
-  
-  ---@param callbackFn fun(spell: SpellInfoData) end
-  function o:IfSpell(callbackFn)
-    if not self:IsSpell() then return end
-    local spellInfo = c:GetSpellInfo(self:GetSpell())
-    if spellInfo then callbackFn(spellInfo) end
+
+  --- @return ItemID?, ItemLink?
+  function CursorMixin:GetItem()
+    if not self:IsItem() then return nil, nil end
+    return self.info.info1 --[[@as ItemID]], self.info.info2 --[[@as ItemLink]]
   end
-  
+
+  --- @return ItemID?
+  function CursorMixin:GetItemID() return (self:GetItem()) end
+
   ----- @return CursorInfo
   --function o:GetCursorInfo()
   --  -- actionType string spell, item, macro, mount, etc..
@@ -70,7 +76,7 @@ local function CursorMixinMethods()
   --  return c
   --end
   
-  function o:GetType() return self.info.type end
+  function CursorMixin:GetType() return self.info.type end
   
   
 end; CursorMixinMethods()

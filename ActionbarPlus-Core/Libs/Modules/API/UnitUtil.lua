@@ -153,7 +153,7 @@ end
 function o:IsUs(unitClass)
   local pClass = self:GetPlayerUnitClass()
   if type(unitClass) == 'string' then return pClass == unitClass end
-  assert(self.CLASS_ID, 'CLASS_ID is missing')
+  assert(type(self.CLASS_ID) == 'string', 'CLASS_ID is missing')
   return self.CLASS_ID == pClass
 end
 
@@ -161,21 +161,39 @@ function o:IsDruid() return self:IsUs(UnitClasses.DRUID()) end
 function o:IsPriest() return self:IsUs(UnitClasses.PRIEST()) end
 function o:IsPaladin() return self:IsUs(UnitClasses.PALADIN()) end
 function o:IsRogue() return self:IsUs(UnitClasses.ROGUE()) end
+function o:IsShaman() return self:IsUs(UnitClasses.SHAMAN()) end
 
 --- @return Boolean
 function o:IsStealthActive() return IsStealthed and IsStealthed() end
 --- @return Boolean
-function o:CanShapeShift() return GetNumShapeshiftForms and GetNumShapeshiftForms() > 0 end
+function o:CanShapeShift()
+  if self:IsShaman() then return true end
+  return GetNumShapeshiftForms and GetNumShapeshiftForms() > 0
+end
+
 --- @return boolean
 function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
+
+--- @param spellID SpellID
+--- @return boolean @If {spellID} is a shapeshift spellID
+--- @return boolean @If {spellID} is active
+function o:IsShapeShiftSpell(spellID)
+  if GetNumShapeshiftForms() == 0 then return false, false end
+  for i = 1, GetNumShapeshiftForms() do
+    local icon, active, castable, spid = GetShapeshiftFormInfo(i)
+    if spid == spellID then return true, active == true end
+  end
+  return false, false
+end
+
 --- @return Icon
 function o:GetStealthedIcon() return STEALTHED_ICON end
 --- @return Index|0 The form index if any; 0 if not shapeshifted
 function o:GetShapeshiftForm() return GetShapeshiftForm and GetShapeshiftForm() end
 --shapeshiftIcon, active, castable, spellID
 
---- @return boolean
----@param callbackFn fun(data:ShapeshiftFormData):void
+--- @return boolean?
+--- @param callbackFn fun(data:ShapeshiftFormData):void
 function o:IfShapeShifted(callbackFn)
   local index = self:GetShapeshiftForm()
   if index == 0 then return end
