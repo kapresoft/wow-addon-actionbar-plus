@@ -251,7 +251,7 @@ end
 --- @param spellID SpellID
 function o:SetActionSpell(spellID)
   self:SetAttribute(attr.type, atyp.spell)
-  self:SetAttribute(atyp.spell, sp.spellID)
+  self:SetAttribute(atyp.spell, spellID)
 end
 
 --- @param itemID ItemID
