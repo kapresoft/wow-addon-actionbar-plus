@@ -1,28 +1,24 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace
+--- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local O, GC, M, LibStub = ns.O, ns.GC, ns.M, ns.LibStub
+local UnitUtil = ns.O.UnitUtil
 
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @return RogueUnitMixin, Kapresoft_CategoryLogger
-local function CreateLib()
-    local libName = M.RogueUnitMixin or 'RogueUnitMixin'
-    --- @class RogueUnitMixin_2_0 : UnitMixin
-    local newLib = LibStub:NewLibrary(libName); if not newLib then return nil end
-    local logger = ns:LC().UNIT:NewLogger(libName)
-    O.UnitMixin:New(newLib, 'ROGUE')
-    return newLib, logger
-end; local L, p = CreateLib(); if not L then return end
+
+--- @see Core_Modules_ABP_2_0
+--- @type string
+local libName = ns.M.RogueUtil()
+--- @class RogueUtil_ABP_2_0 : UnitUtil_ABP_2_0
+local o = UnitUtil:New('ROGUE'); ns:Register(libName, o)
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-local o = L
-
 o.STEALTH_SPELL_ID = 1784
 
 function o:IsRogueClass()
@@ -32,5 +28,3 @@ end
 --- @param spellID SpellID
 --- @return Boolean
 function o:IsStealth(spellID) return spellID == self.STEALTH_SPELL_ID end
-
-

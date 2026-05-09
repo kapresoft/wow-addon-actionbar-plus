@@ -23,7 +23,7 @@ Mixin Methods
 --- @return boolean
 function o.IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
 
---- @param self Button_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 --- @param down boolean
 --- @return boolean
 function o.Btn_ActionShouldFire(self, down)
@@ -31,7 +31,7 @@ function o.Btn_ActionShouldFire(self, down)
   return down ~= true
 end
 
---- @param self Button_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 --- @return boolean
 function o.Btn_ActionRequiresAttackAnim(self)
     local typeVal, id = self:GetActionInfo()
@@ -42,7 +42,7 @@ function o.Btn_ActionRequiresAttackAnim(self)
     return false
 end
 
---- @param self Button_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 --- @param callbackFn fun() : void
 function o.Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
@@ -55,13 +55,18 @@ function o.Btn_PickupAction(self, callbackFn)
     comp:PickupSpell(spell)
     self:ResetButtonConfig()
     self.widget:ResetButton()
+  elseif au.IsItem(typeVal) then
+    local itemID = self.widget:GetAttributeItemID()
+    comp:PickupItem(itemID)
+    self:ResetButtonConfig()
+    self.widget:ResetButton()
   end
 
   if callbackFn then callbackFn() end
 end
 
 --- Update the button's checked state
---- @param self ButtonMixin_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 --- @param evt Name @The event name
 function o.Btn_UpdateState(self, evt)
   local typeVal, spellID = self:GetActionInfo()
@@ -74,15 +79,14 @@ function o.Btn_UpdateState(self, evt)
   else
     self:SetChecked(false)
   end
-
 end
 
---- @param self ButtonMixin_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 function o.Btn_UpdateFlash(self)
   -- tbd
 end
 
---- @param self ButtonMixin_ABP_2_0_3
+--- @param self Button_ABP_2_0_X
 function o.Btn_UpdateAnimation(self)
   --- @type ButtonConfig_ABP_2_0
   local btnC = self.widget:conf()
@@ -96,5 +100,4 @@ function o.Btn_UpdateAnimation(self)
       self:DisableAttackingAnimation()
     end
   end
-
 end

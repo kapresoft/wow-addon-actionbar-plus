@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 
 local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
+local C_PickupItem = C_Item.PickupItem
 local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
 local GetSpellInfo, C_GetSpellInfo = GetSpellInfo, C_Spell and C_Spell.GetSpellInfo
 local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
@@ -106,6 +107,9 @@ end
 --- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
 function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end
 
+--- @param itemID ItemID
+function o:PickupItem(itemID) if not itemID then return end; C_PickupItem(itemID) end
+
 --- @param index Index
 --- @return ShapeshiftFormData?
 function o:GetShapeshiftFormInfo(index)
@@ -168,6 +172,41 @@ function o:IsInstantCastSpellByID(spell)
   local sp = self:GetSpellInfo(spell)
   if not (sp and sp.castTime) then return false end
   return sp.castTime == 0
+end
+
+--- @param itemInfo ItemID|ItemLink|ItemName
+--- @return ItemInfoDetails?
+function o:GetItemInfoInstant(itemInfo)
+  local id, type, subType, equipLoc,
+    icon, classID, subclassID = C_Item.GetItemInfoInstant(itemInfo)
+  if not id then return nil end
+  --- @type ItemInfoDetails
+  local item = {
+    id = id, type = type, subType = subType,
+    equipLoc = equipLoc, classID = classID,
+    subclassID = subclassID, icon = icon,
+  }
+  return item
+end
+
+--- @param itemID ItemID
+--- @return ItemInfoDetails?
+function o:GetItemInfo(itemID)
+  local name, link, quality,
+    level, minLevel,
+    type, subType, stackCount,
+    equipLoc, icon, sellPrice,
+    classID, subclassID, bindType,
+    expansionID, setID, isCraftingReagent, desc = C_Item.GetItemInfo(itemID)
+  t('GetItemInfo', 'id=', itemID, 'name=', name, 'icon=', icon)
+  if not name then return nil end
+  --- @type ItemInfoDetails
+  local item = {
+    id = itemID, name=name, link=link, type = type, subType = subType,
+    equipLoc = equipLoc, classID = classID,
+    subclassID = subclassID, icon = icon,
+  }
+  return item
 end
 
 --- @param itemName Name

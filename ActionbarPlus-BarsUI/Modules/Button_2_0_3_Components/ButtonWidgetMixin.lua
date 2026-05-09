@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
-local comp, au = O.Compat, O.ActionUtil
+local comp, au, unit, shaman = O.Compat, O.ActionUtil, O.UnitUtil, O.ShamanUtil
 local attr, atyp = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 
@@ -53,15 +53,6 @@ end
 function o:UpdateAction(name, val)
   if not au.IsSupportedAction(name) then return end
   if Str_IsBlank(val) then self.button.icon:SetTexture(nil); return end
-  
-  -- if name == 'abp_clear' then
-  if name == atyp.spell then
-    local info = comp:GetSpellInfo(val)
-    if not (info and info.iconID) then return end
-    self.button.icon:SetTexture(info.iconID)
-  elseif name == atyp.item then
-  end
-  
   self.button:Update()
 end
 
@@ -69,12 +60,27 @@ end
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
 --- Has a valid action
---- @return boolean
+--- @return boolean @If hasAction
+--- @return string? @If {hasAction} is true -- the action type; 'spell', 'item', etc..
+--- @return number? @The {hasAction} is true -- the ActionID; spellID, itemID, etc
 function o:HasAction()
   local actionType = self:GetAttribute(attr.type)
   if not actionType then return false end
+  --- @type number
   local id = self:GetAttribute(actionType)
-  return id ~= nil
+  return type(id) ~= nil, actionType, id
+end
+
+--- @param callbackFn fun(typeVal:string, id:ActionID) : void
+--- @param callbackElseFn fun(typeVal:string, id:ActionID) : void
+function o:IfAction(callbackFn, callbackElseFn)
+  assert(type(callbackFn) == 'function', 'IfAction(callbackFn): {callbackFn} should be a function')
+  local hasAction, typeVal, id = self.widget:HasAction()
+  if hasAction then
+    callbackFn(typeVal, id)
+  elseif type(callbackElseFn) == 'function' then
+    callbackElseFnFn(typeVal, id)
+  end
 end
 
 function o:ApplyButtonConfig()
@@ -85,18 +91,27 @@ function o:ApplyButtonConfig()
   local bc = btn:GetButtonConfig()
   if not (bc and bc.type and bc.id) then self:ResetButton(); return end
 
+  self:SetAttribute(attr.type, bc.type)
+
   if au.IsSpell(bc.type) then
     -- if the spell is no longer known (may be true for lower-rank non-mana spells)
     local known, nextKnownSp = au.IsSpellKnown(bc.id)
     if not known then
       if nextKnownSp then bc.id = nextKnownSp.spellID
-      else bc.id = nil
+      else bc.id = nil end
+    end
+    if bc.id then
+      local isShapeShiftSpell, active = au.IsShapeShiftSpell(bc.id)
+      if isShapeShiftSpell then
+        local sp = comp:GetSpellName(bc.id)
+        self:SetAttribute(bc.type, sp)
+      else
+        self:SetAttribute(bc.type, bc.id)
       end
     end
+  elseif au.IsItem(bc.type) then
+     self:SetAttribute(bc.type, 'item:' .. bc.id)
   end
-
-  self:SetAttribute(attr.type, bc.type)
-  self:SetAttribute(bc.type, bc.id)
 end
 
 --- @param cursor Cursor_ABP_2_0
@@ -104,16 +119,21 @@ function o:ApplyCursorAction(cursor)
   if not cursor then return end
   --- @type ButtonConfig_ABP_2_0
   local btnC = self:conf()
-  
-  if cursor.type == 'spell' then
-    cursor:IfSpell(function(spell)
-      self:SetActionSpell(spell)
-      btnC.type = atyp.spell
-      btnC.id = spell.spellID
+  btnC.type = cursor.type
+
+  if cursor:IsSpell() then
+    au.IfSpell(cursor:GetSpellID(), function(spell)
+      self:SetActionSpell(spell.spellID)
+      btnC.id =  spell.spellID
+    end)
+  elseif cursor:IsItem() then
+    au.IfItem(cursor:GetItemID(), function(itemInfo)
+      self:SetActionItem(itemInfo.id)
+      btnC.id = itemInfo.id
     end)
   end
   
-  self.button:UpdateState()
+  self.button:UpdateState('ApplyCursorAction')
   self.button:UpdateFlash()
   self.button:UpdateAnimation()
   self.button:UpdateUsable()
@@ -191,10 +211,12 @@ end
 --- This value is saved when SuspendAction() clears the button's `type`
 --- so the button does not execute its secure action while we perform
 --- pickup / swap logic. Used by PreClick/PostClick and drag handlers.
---- @return string
+--- @return string?
 function o:GetAttributeSuspendedActionType()
   return cns:GetGlobalAttribute(attr.suspended_type)
 end
+
+function o:GetAttributeItemID() return au.GetAttributeItemID(self:GetAttribute('item')) end
 
 --- Clears the globally stored suspended action type.
 --- This value is set by SuspendAction() during PreClick/drag so the button's
@@ -226,18 +248,16 @@ end
 --- If a SpellInfoData table is provided, it is assumed to be the
 --- return value of Compat:GetSpellInfo().
 --- @see Compat#GetSpellInfo(spellIDOrName) : SpellInfoData
---- @param spell number|SpellInfoData
-function o:SetActionSpell(spell)
-  if type(spell) == 'table' then
-    self:SetAttribute(attr.type, atyp.spell)
-    self:SetAttribute(atyp.spell, spell.spellID)
-    return
-  end
-  if type(spell) ~= 'number' then return end
-  comp:IfSpell(spell, function(sp)
-    self:SetAttribute(attr.type, atyp.spell)
-    self:SetAttribute(atyp.spell, sp.spellID)
-  end)
+--- @param spellID SpellID
+function o:SetActionSpell(spellID)
+  self:SetAttribute(attr.type, atyp.spell)
+  self:SetAttribute(atyp.spell, sp.spellID)
+end
+
+--- @param itemID ItemID
+function o:SetActionItem(itemID)
+  self:SetAttribute(attr.type, atyp.item)
+  self:SetAttribute(atyp.item, ('%s:%s'):format(atyp.item, itemID))
 end
 
 --[[-------------------------------------------------------------------

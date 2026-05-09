@@ -157,6 +157,7 @@ function o:OnEvent(evt, ...)
     self:UpdateState('OnEvent') -- this deselects Cooking, First Aid, Prof Talents
   elseif Str_IsAnyOf(evt, 'UPDATE_SHAPESHIFT_FORM', 'UPDATE_STEALTH') then
     self:UpdateTexture()
+    self:UpdateState('OnEvent')
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
   elseif Str_IsAnyOf(evt, 'SPELL_UPDATE_COOLDOWN', 'LOSS_OF_CONTROL_ADDED') then
@@ -165,6 +166,8 @@ function o:OnEvent(evt, ...)
     self:UpdateState('OnEvent')
   --elseif evt == 'UNIT_AURA' then
   --  self:UpdateStealthSpells()
+  elseif evt == 'BAG_UPDATE_DELAYED' then
+    self:UpdateUsable()
   end
   
 end
@@ -281,7 +284,7 @@ function o:PostClickAction(button, down)
     if suspendedType == atyp.spell then
       comp:PickupSpell(actionID)
     elseif suspendedType == atyp.item then
-      --  todo: handle item
+      comp:PickupItem(self.widget:GetAttributeItemID())
     elseif suspendedType == atyp.macro then
       --  todo: handle macro
     end
@@ -289,7 +292,6 @@ function o:PostClickAction(button, down)
 
   self.widget:ClearAttributeSuspendedActionType()
   self.widget:ApplyCursorAction(cursor)
-  self:UpdateState('PostClick')
 end
 
 function o:OnEnter()
@@ -343,15 +345,13 @@ function o:OnReceiveDrag()
   -- check if button already has action
   local existingType, existingID = self:GetActionInfo()
   -- pickup existing action (this places it on cursor)
-  if existingType == atyp.spell then
-    --t('Drag', 'ORcvDrag', 'existingType=', existingType, 'existingID=', existingID)
+  if au.IsSpell(existingType) then
     comp:PickupSpell(existingID)
-    self.widget:ApplyCursorAction(cursor)
-    return
+  elseif au.IsItem(existingType) then
+    comp:PickupItem(self.widget:GetAttributeItemID())
   end
   
   self.widget:ApplyCursorAction(cursor)
-  self:UpdateState('OnReceiveDrag')
 end
 
 function o:OnAttributeChanged(name, val)
@@ -380,9 +380,8 @@ function o:Update()
       self.eventsRegistered = true
     end
     self:UpdateTexture()
-    
     --self:UpdateState()
-    --self:UpdateUsable()
+    self:UpdateUsable()
     --self:UpdateProfessionQuality()
     --self:UpdateTypeOverlay()
     --ActionButton_UpdateCooldown(self)
@@ -404,50 +403,49 @@ function o:Update()
   self.__updating = false
 end
 
-
 --- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
 --- @return TextureIcon?
 function o:GetActionTexture()
-  local _type, id = self:GetActionInfo()
+  local typeVal, id = self:GetActionInfo()
+  --t('GetActionTexture', 'typeVal=', typeVal, 'id=', id)
+
   if not id then return nil end
-  -- todo next: move prowl logic from UpdateStealthSpells()
-  
-  -- todo add rogue, priest, shammy
-  -- Prowl active override
-  --if type == t.spell and dru:IsDruidClass() and dru:IsProwl(id) then
-  --  if dru:IsStealthActive() then
-  --    self:DimIcon()
-  --    return unit:GetStealthedIcon()
-  --  end
-  --  self:SetIconNormalVertex()
-  --end
-  local druid = cns.O.DruidUtil
-  --self:pd('GetActionTexture', 'Unit=', unit:GetUnitClass())
-  if _type == atyp.spell then
-    if unit:IsStealthActive() then
-      if druid:IsProwl(id) then
+  if au.IsMount(typeVal) then return end
+
+  local druid, rogue, shammy = cns.O.DruidUtil, cns.O.RogueUtil, cns.O.ShamanUtil
+  local iconID
+  if au.IsSpell(typeVal) then
+    if unit:CanShapeShift() then
+      local formOrStealthActive = false
+      -- some shapeshifts have
+      -- different icons when active
+      if unit:IsStealthActive()
+          and (druid:IsProwl(id) or rogue:IsStealth(id)) then
+        -- Druid and Rogue use the same stealth icon
+        formOrStealthActive = true
+        iconID = unit:GetStealthedIcon()
+      elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
+        formOrStealthActive = true
+        iconID = priest:GetShadowFormActiveIcon()
+      elseif shammy:IsGhostWolfSpell(id) and shammy:IsInGhostWolfForm() then
+        iconID = shammy:GetFormActiveIcon()
+      end
+      if formOrStealthActive then
         self:DimIcon()
-        return unit:GetStealthedIcon()
+      else
+        self:SetIconNormalVertex()
       end
-    elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
-      return priest:GetShadowFormActiveIcon()
     end
-  end
-  
-  local icon
-  if unit:CanShapeShift() then
-    unit:IfShapeShifted(function(data)
-      if data.active and id == data.spellID then
-        icon = data.shapeshiftIcon
-      end
+    if not iconID then
+      local info = comp:GetSpellInfo(id)
+      if info and info.iconID then iconID = info.iconID end
+    end
+  elseif au.IsItem(typeVal) then
+    au.IfItem(self.widget:GetAttributeItemID(), function(itemInfo)
+        iconID = itemInfo.icon
     end)
   end
-  if icon then return icon end
-  
-  comp:IfSpell(id, function(spell)
-    icon = spell.iconID
-  end)
-  return icon
+  return iconID
 end
 
 --[[-------------------------------------------------------------------
@@ -491,7 +489,9 @@ function o:UpdateCooldown()
       modRate = info.modRate
     end)
   elseif au.IsItem(_type) then
-    start, duration, enable = c:GetItemCooldown(id)
+    -- todo next: ItemCooldown
+    --start, duration, enable = comp:GetItemCooldown(id)
+    -- tbd
   else
     cd:Clear()
     return
@@ -502,25 +502,26 @@ function o:UpdateCooldown()
 end
 
 --- Returns info for a known spell.  An unknown spell will return nil values.
---- @return string|nil, number|nil The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+--- @return string?, ActionID? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo()
   local actionType = self:GetAttribute(attr.type)
   if not actionType then return nil, nil end
   
-  --- @type number|string|nil
+  --- @type ActionID
   local val = self:GetAttribute(actionType)
   if not val then return nil, nil end
   
   if type(val) == "number" then return actionType, val end
-  
+
   if type(val) == "string" then
-    if actionType == atyp.spell then
+    if au.IsSpell(actionType) then
       local sp = comp:GetSpellInfo(val)
       if not sp then return nil, nil end
       return actionType, sp.spellID
-    elseif actionType == atyp.item then
-      error(self:GetName() .. ':: GetActionInfo(): item support not implemented')
-    elseif actionType == atyp.macrotext then
+    elseif au.IsItem(actionType) then
+      local itemID = self.widget:GetAttributeItemID()
+      return actionType, itemID
+    elseif au.IsMacro(actionType) then
       error(self:GetName() .. ':: GetActionInfo(): macro support not implemented')
     end
   end

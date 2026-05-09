@@ -37,15 +37,12 @@ New Instance
 --- @type string
 local libName = ns.M.DruidUtil()
 --- @class DruidUtil_ABP_2_0 : UnitUtil_ABP_2_0
-local S = UnitUtil:New('DRUID');
-ns:Register(libName, S)
+local o = UnitUtil:New('DRUID'); ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-------------------------------------------------------------------
 Methods
 ---------------------------------------------------------------------]]
-local o = S
-
 o.DRUID_FORM_ACTIVE_ICON = 136116
 
 o.PROWL_SPELL_ID = 5215

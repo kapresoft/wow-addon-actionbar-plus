@@ -52,6 +52,7 @@ function o:OnLoad()
   self.buttons = {};
   self:RegisterEvent("PLAYER_ENTERING_WORLD");
   self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
+  self:RegisterEvent("BAG_UPDATE_DELAYED");
   self:RegisterUnitEvent("UNIT_AURA", "player");
   --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
   --self:RegisterEvent("UPDATE_BINDINGS");
