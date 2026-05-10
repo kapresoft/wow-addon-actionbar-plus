@@ -4,16 +4,15 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
-local C_PickupSpell = C_Spell and C_Spell.PickupSpell or PickupSpell
-local C_PickupItem = C_Item.PickupItem
-local C_GetSpellCooldown = C_Spell and C_Spell.GetSpellCooldown
-local GetSpellInfo, C_GetSpellInfo = GetSpellInfo, C_Spell and C_Spell.GetSpellInfo
-local C_GetActiveSpecGroup = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup
-local C_GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
+local C_PickupSpell, C_PickupItem = C_Spell.PickupSpell, C_Item.PickupItem
+local C_GetSpellCooldown = C_Spell.GetSpellCooldown
+local C_GetSpellInfo = C_Spell.GetSpellInfo, GetSpellInfo
+local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
+local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
+local C_GetItemCooldown = C_Container.GetItemCooldown
 
---- return data has the same structure for C_Item or legacy GetItemCooldown
-local C_GetItemCooldown = C_Item and C_Item.GetItemCooldown or GetItemCooldown
 
+local Str_IsAnyOf = ns:String().IsAnyOf
 --[[-----------------------------------------------------------------------------
 Module::Compat
 -------------------------------------------------------------------------------]]
@@ -70,24 +69,23 @@ end
 function o:GetSpellInfo(spell)
   local pt = type(spell)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
-  if C_GetSpellInfo then return C_GetSpellInfo(spell) end
-  return self:__GetSpellInfoLegacy(spell)
+  return C_GetSpellInfo(spell)
 end
 
---- @param id SpellID
+--- @param spell SpellIdentifier
 --- @return Name?
-function o:GetSpellName(id)
-  assert(type(id) == 'number', 'GetSpellName(id): id should be a number.')
-  local sp = self:GetSpellInfo(id); return sp and sp.name
+function o:GetSpellName(spell)
+  assert(type(spell) == 'number', 'GetSpellName(id): id should be a number.')
+  local sp = self:GetSpellInfo(spell); return sp and sp.name
 end
 
 --- GetSpellInfo('name:string') will return nil if spell is unknown to player
---- @param id SpellID
+--- @param spell SpellIdentifier
 --- @boolean @Returns true if the player can cast the spell
-function o:IsOwnSpell(id) return self:GetSpellInfo(self:GetSpellName(id)) ~= nil end
+function o:IsOwnSpell(spell) return self:GetSpellInfo(self:GetSpellName(spell)) ~= nil end
 
 --- @param spell SpellIdentifier
---- @param callbackFn fun(spell:SpellInfoData)
+--- @param callbackFn fun(spell:SpellInfo)
 function o:IfSpell(spell, callbackFn)
   if not spell then return end
   local sp = self:GetSpellInfo(spell)
@@ -125,17 +123,12 @@ function o:GetShapeshiftFormInfo(index)
 end
 
 --- Retrieves the cooldown information for a spell, compatible with both Retail and Classic WoW.
---- @param spellID SpellID A known spell name for the character class.
+--- @param spell SpellIdentifier
 --- @return SpellCooldownInfo
-function o:GetSpellCooldown(spellID)
-  assert(type(spellID) == 'number', 'GetSpellCooldown(spellID):: spellID should be a number.')
-  if C_GetSpellCooldown then return C_GetSpellCooldown(spellID) end
-
-  local startTime, duration, isEnabled, modRate = GetSpellCooldown(spellID)
-  --- @type SpellCooldownInfo
-  local cd = { startTime = startTime, duration = duration,
-               isEnabled = isEnabled, modRate = modRate, }
-  return startTime and cd
+function o:GetSpellCooldown(spell)
+  assert(Str_IsAnyOf(type(spell), 'number', 'string'),
+    'GetSpellCooldown(spell):: spell should be a string (Spell Name) or number (Spell ID).')
+  return C_GetSpellCooldown(spell)
 end
 
 --- @return UnitCastingData
@@ -151,7 +144,7 @@ function o:GetCastingInfo(unit)
 end
 
 --- The player is casting a spell that matches {matchSpellID}.
---- @param matchSpellID SpellID The spellID to match
+--- @param matchSpellID SpellID @The spellID to match
 --- @return boolean
 function o:IsPlayerCastingSpell(matchSpellID)
   assert(type(matchSpellID) == 'number', 'IsPlayerCastingSpell(matchSpellID):: expected a spellID(number).')
@@ -174,6 +167,8 @@ function o:IsInstantCastSpellByID(spell)
   return sp.castTime == 0
 end
 
+--- Use for hot paths (cooldown, icon, id)
+--- Fast; from client cache; no server query
 --- @param itemInfo ItemID|ItemLink|ItemName
 --- @return ItemInfoDetails?
 function o:GetItemInfoInstant(itemInfo)
@@ -189,6 +184,7 @@ function o:GetItemInfoInstant(itemInfo)
   return item
 end
 
+--- May trigger a server query if the item isn't cached yet
 --- @param itemID ItemID
 --- @return ItemInfoDetails?
 function o:GetItemInfo(itemID)
@@ -198,7 +194,7 @@ function o:GetItemInfo(itemID)
     equipLoc, icon, sellPrice,
     classID, subclassID, bindType,
     expansionID, setID, isCraftingReagent, desc = C_Item.GetItemInfo(itemID)
-  t('GetItemInfo', 'id=', itemID, 'name=', name, 'icon=', icon)
+
   if not name then return nil end
   --- @type ItemInfoDetails
   local item = {
@@ -209,23 +205,26 @@ function o:GetItemInfo(itemID)
   return item
 end
 
---- @param itemName Name
---- @return ItemCooldownData?
-function o:GetItemCooldown(itemName)
-  -- todo: needs to take name or id
-  local startTime, duration, enable
-  --- @type ItemCooldownData
+--- @see C_Container.GetItemCooldown(itemID)
+--- @param itemInfo ItemID|ItemName|ItemLink
+--- @return ItemCooldownInfo?
+function o:GetItemCooldown(itemInfo)
+  assert(Str_IsAnyOf(type(itemInfo), 'number', 'string'),
+    'GetItemCooldown(itemInfo): {itemInfo} should be an number or a string')
+  --- @type ItemCooldownInfo
   local cd
-  if C_GetItemCooldown then
-    startTime, duration, enable = C_GetItemCooldown(itemName)
-  elseif C_Container and C_Container.GetItemCooldown then
-    local itemID = C_GetItemInfoInstant(itemName)
-    startTime, duration, enable = C_Container.GetItemCooldown(itemID)
-  elseif GetItemCooldown then
-    startTime, duration, enable = GetItemCooldown(id)
+
+  --- @type ItemCooldownData
+  local itemID = itemInfo
+  -- itemInfo can an be a ItemName or ItemLink if not an ItemID
+  if type(itemInfo) == 'string' then itemID = C_GetItemInfoInstant(itemInfo) end
+
+  local startTime, duration, enable = C_GetItemCooldown(itemID)
+  if startTime then
+    local isEnabled = enable == 1 or enable == true
+    cd = { startTime = startTime, duration = duration, isEnabled = isEnabled }
   end
-  if not startTime then return nil end
-  cd = { startTime = startTime, duration = duration, enable = enable }
+
   return cd
 end
 
