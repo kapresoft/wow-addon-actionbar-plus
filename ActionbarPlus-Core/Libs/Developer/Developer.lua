@@ -47,4 +47,9 @@ function o:devMsg(msg)
   UIErrorsFrame:AddMessage('ABP: ' .. msg, 0, 1, 0)
 end
 
+--- @param itemInfo ItemName|ItemID|ItemLink
+--- @return ItemCooldownData?
+function o:GetItemCooldown(itemInfo)
+  return ns.O.Compat:GetItemCooldown(itemInfo)
+end
 

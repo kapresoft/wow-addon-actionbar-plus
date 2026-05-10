@@ -86,6 +86,9 @@ function o.IsUsableAction(typeVal, id)
       local isUsable, notEnoughMana = C_IsSpellUsable(id)
       return isUsable, notEnoughMana
   elseif o.IsItem(typeVal) then
+    --if id == 38233 then
+    --  t('IsUsableAction', 'id=', id, 'usable=', C_IsUsableItem(id))
+    --end
     return C_IsUsableItem(id), false
   end
   return false, false
@@ -154,18 +157,18 @@ function o.IsBattlePet(typeVal) return typeVal == atyp.battlepet end
 --- @return boolean
 function o.IsCompanion(typeVal) return typeVal == atyp.companion end
 
+--- @param spell SpellIdentifier
+--- @param callbackFn fun(spell: SpellInfo)
+function o.IfSpell(spell, callbackFn)
+  local spellInfo = comp:GetSpellInfo(spell)
+  if spellInfo then callbackFn(spellInfo) end
+end
+
 --- Execute callback if a cooldown exists
---- @param callbackFn fun(info:SpellCooldownInfo) : void
+--- @param callbackFn fun(info:SpellCooldownInfo)
 function o.IfSpellCooldown(spellID, callbackFn)
   local info = comp:GetSpellCooldown(spellID)
   if not info then return end; callbackFn(info)
-end
-
---- @param spellID SpellID
---- @param callbackFn fun(spell: SpellInfo)
-function o.IfSpell(spellID, callbackFn)
-  local spellInfo = comp:GetSpellInfo(spellID)
-  if spellInfo then callbackFn(spellInfo) end
 end
 
 --- @param itemID ItemID
@@ -177,6 +180,14 @@ function o.IfItem(itemID, callbackFn)
   end
   if not (it and it.icon) then return end
   callbackFn(it)
+end
+
+--- Execute callback if a cooldown exists
+--- @param itemInfo ItemID|ItemName|ItemLink
+--- @param callbackFn fun(info:ItemCooldownInfo)
+function o.IfItemCooldown(itemInfo, callbackFn)
+  local info = comp:GetItemCooldown(itemInfo)
+  if not info then return end; callbackFn(info)
 end
 
 --- Returns the first elem of spell power cost array

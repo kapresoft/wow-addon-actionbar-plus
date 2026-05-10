@@ -166,6 +166,10 @@ function o:OnEvent(evt, ...)
     self:UpdateState('OnEvent')
   --elseif evt == 'UNIT_AURA' then
   --  self:UpdateStealthSpells()
+  elseif evt == 'BAG_UPDATE_COOLDOWN' then
+    --t('OnEvent', 'evt=', evt)
+    self:UpdateCooldown()
+    self:UpdateUsable()
   elseif evt == 'BAG_UPDATE_DELAYED' then
     self:UpdateUsable()
   end
@@ -179,7 +183,7 @@ end
 --  3. UNIT_SPELLCAST_STOP — cast bar ends (fires regardless of outcome)
 --  4. UNIT_SPELLCAST_SUCCEEDED or UNIT_SPELLCAST_FAILED — spell completed successfully or failed
 --- Events coming here are matching spellcast events
----@param spellID SpellID The matching spell ID
+---@param spellID SpellIdentifier The matching spell ID
 function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
   -- todo: in classic-era, older rank spells are non castable
   local sp = comp:GetSpellName(spellID)
@@ -472,12 +476,12 @@ function o:UpdateCooldown()
   
   if not self.widget:HasAction() then cd:Clear(); return end
   
-  local _type, id = self:GetActionInfo()
+  local typeVal, id = self:GetActionInfo()
   if not id then cd:Clear(); return end
   
-  local start, duration, enable, modRate = 0, 0, 0, 1
+  local start, duration, enabled, modRate = 0, 0, false, 1
   
-  if au.IsSpell(_type) then
+  if au.IsSpell(typeVal) then
     -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
     if cns:IsTBC()
             and priest:IsPriest()
@@ -486,19 +490,21 @@ function o:UpdateCooldown()
     au.IfSpellCooldown(id, function(info)
       start = info.startTime or 0
       duration = info.duration or 0
+      enabled = info.isEnabled == true
       modRate = info.modRate
     end)
-  elseif au.IsItem(_type) then
+  elseif au.IsItem(typeVal) then
     -- todo next: ItemCooldown
-    --start, duration, enable = comp:GetItemCooldown(id)
-    -- tbd
-  else
-    cd:Clear()
+    au.IfItemCooldown(id, function(info)
+      start, duration, enabled = info.startTime, info.duration, info.isEnabled == true
+    end)
+  end
+
+  if enabled == true and duration > 0 then
+    cd:SetCooldown(start, duration, modRate or 1)
     return
   end
-  if not start or not duration then cd:Clear(); return end
-  --cd.currentCooldownType = COOLDOWN_TYPE_NORMAL
-  cd:SetCooldown(start, duration, modRate or 1)
+  cd:Clear()
 end
 
 --- Returns info for a known spell.  An unknown spell will return nil values.
