@@ -85,8 +85,14 @@
                         -- others: FACTION_GREEN_COLOR, RED_THREAT_COLOR, YELLOW_THREAT_COLOR
                         local c = RED_THREAT_COLOR
                         tex:SetVertexColor(c.r, c.g, c.b, c.a)
-                        tex:Show();
+                        tex:Show()
                     </OnPlay>
+                    <OnStop>
+                        local btn = self:GetParent()
+                        local tex = btn and btn.SpellHighlightTexture; if not tex then return end
+                        tex:Hide()
+                        tex:SetVertexColor(1, 1, 1, 1)
+                    </OnStop>
                 </Scripts>
             </AnimationGroup>
         </Animations>

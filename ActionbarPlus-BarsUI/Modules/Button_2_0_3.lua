@@ -143,12 +143,25 @@ function o:OnEvent(evt, ...)
   elseif evt == 'SPELL_UPDATE_USABLE' then
     self:UpdateUsable()
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
+    -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
+    -- attacking (even when player is in combat)
     self:UpdateState(evt)
-    self:DisableAttackingAnimation()
-  elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
-    if o.Btn_ActionRequiresAttackAnim(self) then
+    self:DisableFlashAnimation()
+  elseif evt == 'START_AUTOREPEAT_SPELL' then
+    --t('START_AUTOREPEAT_SPELL', 'attributeSpell=', self.widget:GetAttributeSpell())
+    if self.widget:RequiresShootAnimation() then
       self:SetChecked(true)
-      self:EnableAttackingAnimation()
+      self:EnableFlashAnimation()
+    end
+  elseif evt == 'STOP_AUTOREPEAT_SPELL' then
+    if self.widget:IsShootSpell() then
+      self:SetChecked(false)
+      self:DisableFlashAnimation()
+    end
+  elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
+    if self.widget:RequiresAttackAnimation() then
+      self:SetChecked(true)
+      self:EnableFlashAnimation()
       return
     end
     self:UpdateState(evt)
@@ -187,6 +200,7 @@ end
 function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
   -- todo: in classic-era, older rank spells are non castable
   local sp = comp:GetSpellName(spellID)
+ --t('OnPlayerMatchingSpellcastEvent', 'evt=', evt, 'spellID=', spellID, sp)
   if evt == 'UNIT_SPELLCAST_SENT' then
       self:SetChecked(true)
   elseif evt == 'UNIT_SPELLCAST_START' then
@@ -247,7 +261,7 @@ function o:PreClickAction(button, down)
   -- When the user begins dragging the button, the secure `type` attribute
   -- must be temporarily suspended so the button does not execute its
   -- action while the drag / pickup transaction is in progress.
-  if o.Btn_ActionShouldFire(self, down) and self:IsDragAllowed() then
+  if o.Btn_ActionShouldFire(self, down) and self.widget:IsDragAllowed() then
     self:SetChecked(false)
     self.widget:SuspendAction()
     return
@@ -326,7 +340,7 @@ function o:OnLeave() GameTooltip:Hide() end
 --- @param button ButtonName
 function o:OnDragStart(button)
   if InCombatLockdown() then return false end
-  if not self:IsDragAllowed() then return end
+  if not self.widget:IsDragAllowed() then return end
 
   o.Btn_PickupAction(self, function()
     self:UpdateState('OnDragStart')
@@ -407,10 +421,6 @@ function o:Update()
   self.__updating = false
 end
 
---- @see ButtonHandlerMixin_ABP_2_0.Btn_GetActionTexture
---- @return TextureIcon?
-function o:GetActionTexture() return o.Btn_GetActionTexture(self) end
-
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
@@ -466,33 +476,9 @@ function o:UpdateCooldown()
   cd:Clear()
 end
 
---- Returns info for a known spell.  An unknown spell will return nil values.
+--- @see ButtonWidget_ABP_2_0.GetActionInfo()
 --- @return string?, ActionID? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
-function o:GetActionInfo()
-  local actionType = self:GetAttribute(attr.type)
-  if not actionType then return nil, nil end
-  
-  --- @type ActionID
-  local val = self:GetAttribute(actionType)
-  if not val then return nil, nil end
-  
-  if type(val) == "number" then return actionType, val end
-
-  if type(val) == "string" then
-    if au.IsSpell(actionType) then
-      local sp = comp:GetSpellInfo(val)
-      if not sp then return nil, nil end
-      return actionType, sp.spellID
-    elseif au.IsItem(actionType) then
-      local itemID = self.widget:GetAttributeItemID()
-      return actionType, itemID
-    elseif au.IsMacro(actionType) then
-      error(self:GetName() .. ':: GetActionInfo(): macro support not implemented')
-    end
-  end
-  
-  return nil, nil
-end
+function o:GetActionInfo() return self.widget:GetActionInfo() end
 
 --- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
 function o:GetSuspendedActionInfo()
@@ -510,42 +496,23 @@ end
 function o:SetIconVertex(r, g, b) self.icon:SetVertexColor(r, g, b) end
 function o:SetIconNormalVertex() self:SetIconVertex(1, 1, 1) end
 function o:DimIcon() self:SetIconVertex(0.5, 0.5, 0.5) end
-
----@param callbackFn fun(icon:Icon):void
-function o:IfActionTexture(callbackFn)
-  local icon = self:GetActionTexture()
-  if not icon then return end
-  callbackFn(icon)
-end
-
 function o:UpdateState(evt) o.Btn_UpdateState(self, evt) end
 function o:UpdateAnimation() o.Btn_UpdateAnimation(self) end
 function o:UpdateFlash() o.Btn_UpdateFlash(self) end
+
 function o:ClearFlash()
   -- tbd
 end
 
 function o:UpdateTexture()
-  self:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+  self.widget:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
 end
 
-function o:IsDragAllowed()
-  return not Settings.GetValue('lockActionBars') or IsModifiedClick('PICKUPACTION')
-end
-
+function o:EnableFlashAnimation() self.widget:EnableFlashAnimation() end
+function o:DisableFlashAnimation() self.widget:DisableFlashAnimation() end
 function o:AnyDown() self:RegisterForClicks('AnyDown') end
 function o:Any() self:RegisterForClicks('AnyDown', 'AnyUp') end
 function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
 function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
 function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
 
-function o:EnableAttackingAnimation()
-  if self.SpellHighlightAnim:IsPlaying() then return end
-  self.SpellHighlightAnim:Play()
-end
-
-function o:DisableAttackingAnimation()
-  if not self.SpellHighlightAnim:IsPlaying() then return end
-  self.SpellHighlightAnim:Stop()
-  self.SpellHighlightTexture:Hide()
-end
