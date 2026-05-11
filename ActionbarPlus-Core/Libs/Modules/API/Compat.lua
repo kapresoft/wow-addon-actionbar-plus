@@ -4,15 +4,17 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
-local C_PickupSpell, C_PickupItem = C_Spell.PickupSpell, C_Item.PickupItem
-local C_GetSpellCooldown = C_Spell.GetSpellCooldown
-local C_GetSpellInfo = C_Spell.GetSpellInfo, GetSpellInfo
+local C_PickupSpell        = C_Spell.PickupSpell
+local C_PickupItem         = C_Item.PickupItem
+local C_GetSpellCooldown   = C_Spell.GetSpellCooldown
+local C_GetSpellInfo       = C_Spell.GetSpellInfo, GetSpellInfo
 local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
 local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
-local C_GetItemCooldown = C_Container.GetItemCooldown
-
+local C_GetItemCooldown    = C_Container.GetItemCooldown
+local C_GetItemSpell       = C_Item.GetItemSpell
 
 local Str_IsAnyOf = ns:String().IsAnyOf
+
 --[[-----------------------------------------------------------------------------
 Module::Compat
 -------------------------------------------------------------------------------]]
@@ -173,7 +175,7 @@ end
 --- @return ItemInfoDetails?
 function o:GetItemInfoInstant(itemInfo)
   local id, type, subType, equipLoc,
-    icon, classID, subclassID = C_Item.GetItemInfoInstant(itemInfo)
+    icon, classID, subclassID = C_GetItemInfoInstant(itemInfo)
   if not id then return nil end
   --- @type ItemInfoDetails
   local item = {
@@ -228,3 +230,12 @@ function o:GetItemCooldown(itemInfo)
   return cd
 end
 
+--- @see C_Item.GetItemSpell(itemID)
+--- @param itemInfo ItemID|ItemName|ItemLink
+--- @return number spellID?
+--- @return string spellName?
+function o:GetItemSpell(itemInfo)
+  -- return SpellID first
+  local name, id = C_GetItemSpell(itemInfo)
+  return id, name
+end

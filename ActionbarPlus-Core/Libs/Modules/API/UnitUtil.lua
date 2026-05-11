@@ -167,7 +167,7 @@ function o:IsShaman() return self:IsUs(UnitClasses.SHAMAN()) end
 function o:IsStealthActive() return IsStealthed and IsStealthed() end
 --- @return Boolean
 function o:CanShapeShift()
-  if self:IsShaman() then return true end
+  if self:IsShaman() or self:IsPriest() then return true end
   return GetNumShapeshiftForms and GetNumShapeshiftForms() > 0
 end
 
@@ -175,17 +175,25 @@ end
 function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
 
 --- @param spellID SpellID
---- @return boolean @If {spellID} is a shapeshift spellID
---- @return boolean @If {spellID} is active
+--- @return boolean? @If {spellID} is a shapeshift spellID
+--- @return boolean? @If {spellID} is active
 function o:IsShapeShiftSpell(spellID)
-  if GetNumShapeshiftForms() == 0 then return false, false end
-  for i = 1, GetNumShapeshiftForms() do
-    local icon, active, castable, spid = GetShapeshiftFormInfo(i)
-    if spid == spellID then return true, active == true end
+  local isShapeShiftSpell, active
+  local shaman, priest = O.ShamanUtil, O.PriestUtil
+  if self:IsShaman() then
+    isShapeShiftSpell, active = shaman:IsGhostWolfSpell(spellID), true
+  elseif self:IsPriest() then
+    isShapeShiftSpell, active = priest:IsShadowFormSpell(spellID), priest:IsInShadowForm()
+  else
+    for i = 1, GetNumShapeshiftForms() do
+      local icon, active, castable, spid = GetShapeshiftFormInfo(i)
+      if spid == spellID then return true, active == true end
+    end
+    return false, false
   end
-  return false, false
-end
 
+  return isShapeShiftSpell, active
+end
 --- @return Icon
 function o:GetStealthedIcon() return STEALTHED_ICON end
 --- @return Index|0 The form index if any; 0 if not shapeshifted
