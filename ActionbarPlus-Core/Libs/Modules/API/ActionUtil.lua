@@ -15,7 +15,9 @@ local C_IsSpellUsable     = C_Spell.IsSpellUsable
 local C_IsUsableItem      = C_Item.IsUsableItem
 
 local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
+
 local ATTACK_SPELL_ID = 6603
+local SHOOT_SPELL_ID  = 5019
 
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil
@@ -95,12 +97,18 @@ function o.IsUsableAction(typeVal, id)
   return false, false
 end
 
---- Spells:
---- Attack (6603)
 --- @return boolean
-function o.SpellRequiresAttackAnim(spellID)
-  return spellID == ATTACK_SPELL_ID
-end
+function o.IsAutoAttackInProgress(spellID) return o.IsAutoAttackSpell(spellID) and o.IsCurrentSpell(spellID) end
+--- @return boolean
+function o.IsShootingInProgress(spellID) return o.IsShootSpell(spellID) and o.IsCurrentSpell(spellID) end
+
+--- @return boolean
+function o.IsAutoAttackSpell(spellID) return spellID == ATTACK_SPELL_ID end
+--- @return boolean
+function o.IsShootSpell(spellID) return spellID == SHOOT_SPELL_ID end
+--- @param spellID SpellID
+--- @return boolean
+function o.IsCurrentSpell(spellID) return C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID) end
 
 --- @param typeVal string The button attribute 'type' value
 --- @param id Identifier The context id; 'spell', 'item', etc...
@@ -113,12 +121,6 @@ function o.IsCurrentAction(typeVal, id)
       return C_Item.IsCurrentItem(id)
   end
   return false
-end
-
---- @param spellID SpellID
---- @return boolean
-function o.IsCurrentSpell(spellID)
-  return C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID)
 end
 
 --- @param action Name The action name; i.e. 'spell', 'item', etc..

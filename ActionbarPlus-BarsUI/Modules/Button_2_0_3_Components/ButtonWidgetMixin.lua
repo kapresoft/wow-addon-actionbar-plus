@@ -4,7 +4,9 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
-local comp, au, unit, shaman = O.Compat, O.ActionUtil, O.UnitUtil, O.ShamanUtil
+local comp, au, unit = O.Compat, O.ActionUtil, O.UnitUtil
+local druid, rogue, shammy, priest =
+      O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
 local attr, atyp = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 
@@ -172,7 +174,7 @@ function o:__ResetVisuals()
   -- Stop flashing if you use it
   if btn.ClearFlash then btn:ClearFlash() end
 
-  btn:DisableAttackingAnimation()
+  btn.widget:DisableFlashAnimation()
 
   -- Remove any desaturation
   if btn.icon then btn.icon:SetDesaturated(false) end
@@ -192,6 +194,83 @@ function o:__ClearActionAttributes()
   for _, typeAttribute in ipairs(atyp) do
     self:SetAttribute(typeAttribute, nil)
   end
+end
+
+--- Returns info for a known spell.  An unknown spell will return nil values.
+--- @return string?, ActionID? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+function o:GetActionInfo()
+  local actionType = self:GetAttribute(attr.type)
+  if not actionType then return nil, nil end
+
+  --- @type ActionID
+  local val = self:GetAttribute(actionType)
+  if not val then return nil, nil end
+
+  if type(val) == "number" then return actionType, val end
+
+  if type(val) == "string" then
+    if au.IsSpell(actionType) then
+      local sp = comp:GetSpellInfo(val)
+      if not sp then return nil, nil end
+      return actionType, sp.spellID
+    elseif au.IsItem(actionType) then
+      local itemID = self:GetAttributeItemID()
+      return actionType, itemID
+    elseif au.IsMacro(actionType) then
+      error(self.button:GetName() .. ':: GetActionInfo(): macro support not implemented')
+    end
+  end
+
+  return nil, nil
+end
+
+--- @return TextureIcon?
+function o:GetActionTexture()
+  local btn = self.button
+  local typeVal, id = self:GetActionInfo()
+  if not id then return nil end
+  if au.IsMount(typeVal) then return end
+
+  local iconID
+  if au.IsSpell(typeVal) then
+    if unit:CanShapeShift() then
+      local formOrStealthActive = false
+      -- some shapeshifts have
+      -- different icons when active
+      if unit:IsStealthActive()
+          and (druid:IsProwl(id) or rogue:IsStealth(id)) then
+        -- Druid and Rogue use the same stealth icon
+        formOrStealthActive = true
+        iconID = unit:GetStealthedIcon()
+      elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
+        formOrStealthActive = true
+        iconID = priest:GetShadowFormActiveIcon()
+      elseif shammy:IsGhostWolfSpell(id) and shammy:IsInGhostWolfForm() then
+        iconID = shammy:GetFormActiveIcon()
+      end
+      if formOrStealthActive then
+        btn:DimIcon()
+      else
+        btn:SetIconNormalVertex()
+      end
+    end
+    if not iconID then
+      local info = comp:GetSpellInfo(id)
+      if info and info.iconID then iconID = info.iconID end
+    end
+  elseif au.IsItem(typeVal) then
+    au.IfItem(self:GetAttributeItemID(), function(itemInfo)
+        iconID = itemInfo.icon
+    end)
+  end
+  return iconID
+end
+
+--- @param callbackFn fun(icon:Icon):void
+function o:IfActionTexture(callbackFn)
+  local icon = self:GetActionTexture()
+  if not icon then return end
+  callbackFn(icon)
 end
 
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
@@ -267,6 +346,17 @@ function o:SetActionItem(itemID)
   self.itemSpellID = comp:GetItemSpell(itemID)
 end
 
+--- @return boolean
+function o:IsDragAllowed()
+  return not Settings.GetValue('lockActionBars')
+                or IsModifiedClick('PICKUPACTION')
+end
+
+function o:IsAutoAttacking()
+  local typeVal, id = self:GetActionInfo()
+  return au.IsAutoAttackInProgress(id)
+end
+
 --[[-------------------------------------------------------------------
 Delegate Functions
 ---------------------------------------------------------------------]]
@@ -282,3 +372,33 @@ function o:GetAttribute(attributeName) return self.button:GetAttribute(attribute
 --- @param attributeName string
 --- @param value any
 function o:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
+
+--- @return boolean
+function o:IsShootSpell()
+  local typeVal, id = self:GetActionInfo()
+  if not (typeVal and id) then return false end
+  return au.IsSpell(typeVal) and au.IsShootSpell(id)
+end
+
+--- @return boolean
+function o:RequiresShootAnimation()
+  local typeVal, id = self:GetActionInfo()
+  if not (typeVal and id) then return false end
+  return au.IsSpell(typeVal) and au.IsShootingInProgress(id)
+end
+
+--- @return boolean
+function o:RequiresAttackAnimation()
+  local typeVal, id = self:GetActionInfo()
+  if not (typeVal and id) then return false end
+  return au.IsSpell(typeVal) and au.IsAutoAttackInProgress(id)
+end
+
+function o:EnableFlashAnimation()
+  C_Timer.After(0.3, function() self.button.SpellHighlightAnim:Play() end)
+end
+
+function o:DisableFlashAnimation()
+  if not self.button.SpellHighlightAnim:IsPlaying() then return end
+  self.button.SpellHighlightAnim:Stop()
+end
