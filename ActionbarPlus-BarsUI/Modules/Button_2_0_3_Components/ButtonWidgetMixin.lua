@@ -20,6 +20,7 @@ local libName = ns.M.ButtonWidgetMixin()
 --- @field button Button_ABP_2_0_X
 --- @field index Index The button index
 --- @field barIndex Index The owner frame index
+--- @field itemSpellID SpellID @Used for items with spellIDs
 local S = {}; ns:Register(libName, S)
 --
 --- @class ButtonWidget_ABP_2_0 : ButtonWidgetMixin_ABP_2_0
@@ -83,6 +84,8 @@ function o:IfAction(callbackFn, callbackElseFn)
   end
 end
 
+--- Applies saved button config to secure
+--- attributes and resets visuals if config is invalid.
 function o:ApplyButtonConfig()
   local btn = self.button
   btn:SetButtonStateNormal()
@@ -101,7 +104,7 @@ function o:ApplyButtonConfig()
       else bc.id = nil end
     end
     if bc.id then
-      local isShapeShiftSpell, active = au.IsShapeShiftSpell(bc.id)
+      local isShapeShiftSpell, active = unit:IsShapeShiftSpell(bc.id)
       if isShapeShiftSpell then
         local sp = comp:GetSpellName(bc.id)
         self:SetAttribute(bc.type, sp)
@@ -110,12 +113,14 @@ function o:ApplyButtonConfig()
       end
     end
   elseif au.IsItem(bc.type) then
-     self:SetAttribute(bc.type, 'item:' .. bc.id)
+     self:SetActionItem(bc.id)
   end
 end
 
+--- Converts cursor drag state into button config
+--- and applies secure attributes.
 --- @param cursor Cursor_ABP_2_0
-function o:ApplyCursorAction(cursor)
+function o:SetActionFromCursor(cursor)
   if not cursor then return end
   --- @type ButtonConfig_ABP_2_0
   local btnC = self:conf()
@@ -132,7 +137,7 @@ function o:ApplyCursorAction(cursor)
       btnC.id = itemInfo.id
     end)
   end
-  
+
   self.button:UpdateState('ApplyCursorAction')
   self.button:UpdateFlash()
   self.button:UpdateAnimation()
@@ -140,6 +145,7 @@ function o:ApplyCursorAction(cursor)
 end
 
 function o:ResetButton()
+  self.itemSpellID = nil
   self:__ResetAttributes()
   self:__ResetVisuals()
 end
@@ -237,12 +243,12 @@ function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
 
 function o:MatchesActiveButtonSpellID(spellID)
   local _, id = self.button:GetActionInfo()
-  return id and id == spellID;
+  return spellID == id or spellID == self.itemSpellID
 end
 
 function o:GetDebugName()
   return ('%s(Widget):: index=%s frameIndex=%s')
-          :format(self.button:GetName(), self.index, self.barIndex)
+      :format(self.button:GetName(), self.index, self.barIndex)
 end
 
 --- If a SpellInfoData table is provided, it is assumed to be the
@@ -258,6 +264,7 @@ end
 function o:SetActionItem(itemID)
   self:SetAttribute(attr.type, atyp.item)
   self:SetAttribute(atyp.item, ('%s:%s'):format(atyp.item, itemID))
+  self.itemSpellID = comp:GetItemSpell(itemID)
 end
 
 --[[-------------------------------------------------------------------

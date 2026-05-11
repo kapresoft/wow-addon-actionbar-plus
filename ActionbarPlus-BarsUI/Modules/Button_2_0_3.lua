@@ -190,7 +190,7 @@ function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
   if evt == 'UNIT_SPELLCAST_SENT' then
       self:SetChecked(true)
   elseif evt == 'UNIT_SPELLCAST_START' then
-    self:SetChecked(true)
+    self:UpdateState()
   elseif evt == 'UNIT_SPELLCAST_STOP'
       or evt == 'UNIT_SPELLCAST_SUCCEEDED'
       or evt == 'UNIT_SPELLCAST_INTERRUPTED'
@@ -295,7 +295,7 @@ function o:PostClickAction(button, down)
   end
 
   self.widget:ClearAttributeSuspendedActionType()
-  self.widget:ApplyCursorAction(cursor)
+  self.widget:SetActionFromCursor(cursor)
 end
 
 function o:OnEnter()
@@ -355,7 +355,7 @@ function o:OnReceiveDrag()
     comp:PickupItem(self.widget:GetAttributeItemID())
   end
   
-  self.widget:ApplyCursorAction(cursor)
+  self.widget:SetActionFromCursor(cursor)
 end
 
 function o:OnAttributeChanged(name, val)
@@ -407,50 +407,9 @@ function o:Update()
   self.__updating = false
 end
 
---- [Doc::GetShapeshiftFormInfo](https://warcraft.wiki.gg/wiki/API_GetShapeshiftFormInfo)
+--- @see ButtonHandlerMixin_ABP_2_0.Btn_GetActionTexture
 --- @return TextureIcon?
-function o:GetActionTexture()
-  local typeVal, id = self:GetActionInfo()
-  --t('GetActionTexture', 'typeVal=', typeVal, 'id=', id)
-
-  if not id then return nil end
-  if au.IsMount(typeVal) then return end
-
-  local druid, rogue, shammy = cns.O.DruidUtil, cns.O.RogueUtil, cns.O.ShamanUtil
-  local iconID
-  if au.IsSpell(typeVal) then
-    if unit:CanShapeShift() then
-      local formOrStealthActive = false
-      -- some shapeshifts have
-      -- different icons when active
-      if unit:IsStealthActive()
-          and (druid:IsProwl(id) or rogue:IsStealth(id)) then
-        -- Druid and Rogue use the same stealth icon
-        formOrStealthActive = true
-        iconID = unit:GetStealthedIcon()
-      elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
-        formOrStealthActive = true
-        iconID = priest:GetShadowFormActiveIcon()
-      elseif shammy:IsGhostWolfSpell(id) and shammy:IsInGhostWolfForm() then
-        iconID = shammy:GetFormActiveIcon()
-      end
-      if formOrStealthActive then
-        self:DimIcon()
-      else
-        self:SetIconNormalVertex()
-      end
-    end
-    if not iconID then
-      local info = comp:GetSpellInfo(id)
-      if info and info.iconID then iconID = info.iconID end
-    end
-  elseif au.IsItem(typeVal) then
-    au.IfItem(self.widget:GetAttributeItemID(), function(itemInfo)
-        iconID = itemInfo.icon
-    end)
-  end
-  return iconID
-end
+function o:GetActionTexture() return o.Btn_GetActionTexture(self) end
 
 --[[-------------------------------------------------------------------
 Convenience Methods

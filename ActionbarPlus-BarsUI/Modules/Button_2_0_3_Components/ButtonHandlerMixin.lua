@@ -7,7 +7,10 @@ local ns = select(2, ...)
 local cns = ns:cns()
 local O = cns.O
 local au = O.ActionUtil
-local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
+local comp, spu, unit =
+      O.Compat, O.SpellUtil, O.UnitUtil
+local druid, rogue, shammy, priest =
+      O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -43,6 +46,49 @@ function o.Btn_ActionRequiresAttackAnim(self)
 end
 
 --- @param self Button_ABP_2_0_X
+--- @return TextureIcon?
+function o.Btn_GetActionTexture(self)
+  local typeVal, id = self:GetActionInfo()
+  if not id then return nil end
+  if au.IsMount(typeVal) then return end
+
+  local iconID
+  if au.IsSpell(typeVal) then
+    if unit:CanShapeShift() then
+      local formOrStealthActive = false
+      -- some shapeshifts have
+      -- different icons when active
+      if unit:IsStealthActive()
+          and (druid:IsProwl(id) or rogue:IsStealth(id)) then
+        -- Druid and Rogue use the same stealth icon
+        formOrStealthActive = true
+        iconID = unit:GetStealthedIcon()
+      elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
+        formOrStealthActive = true
+        iconID = priest:GetShadowFormActiveIcon()
+      elseif shammy:IsGhostWolfSpell(id) and shammy:IsInGhostWolfForm() then
+        iconID = shammy:GetFormActiveIcon()
+      end
+      if formOrStealthActive then
+        self:DimIcon()
+      else
+        self:SetIconNormalVertex()
+      end
+    end
+    if not iconID then
+      local info = comp:GetSpellInfo(id)
+      if info and info.iconID then iconID = info.iconID end
+    end
+  elseif au.IsItem(typeVal) then
+    au.IfItem(self.widget:GetAttributeItemID(), function(itemInfo)
+        iconID = itemInfo.icon
+    end)
+  end
+  return iconID
+end
+
+
+--- @param self Button_ABP_2_0_X
 --- @param callbackFn fun() : void
 function o.Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
@@ -72,13 +118,8 @@ function o.Btn_UpdateState(self, evt)
   local typeVal, spellID = self:GetActionInfo()
   if not (typeVal and spellID) then return end
 
-  local sp = GetSpellInfo(spellID)
   local isCurrent = au.IsCurrentAction(typeVal, spellID)
-  if isCurrent then
-    self:SetChecked(true)
-  else
-    self:SetChecked(false)
-  end
+  self:SetChecked(isCurrent == true)
 end
 
 --- @param self Button_ABP_2_0_X

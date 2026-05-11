@@ -14,6 +14,7 @@ local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
 local C_IsSpellUsable     = C_Spell.IsSpellUsable
 local C_IsUsableItem      = C_Item.IsUsableItem
 
+local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 local ATTACK_SPELL_ID = 6603
 
 --[[-----------------------------------------------------------------------------
@@ -108,6 +109,8 @@ function o.IsCurrentAction(typeVal, id)
   if not (typeVal and id) then return false end
   if o.IsSpell(typeVal) then
     return C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id)
+  elseif o.IsItem(typeVal) then
+      return C_Item.IsCurrentItem(id)
   end
   return false
 end
@@ -211,14 +214,3 @@ end
 --- @return boolean
 function o.SpellDoesNotRequireMana(spell) return not o.SpellRequiresMana(spell) end
 
---- @param spellID SpellID
---- @return boolean @true if {spellID} is a shapeshift spell
---- @return boolean @true if active
-function o.IsShapeShiftSpell(spellID)
-  local unit, shaman = O.UnitUtil, O.ShamanUtil
-  local isShapeShiftSpell, active = unit:IsShapeShiftSpell(spellID)
-  if unit:IsShaman() then
-    isShapeShiftSpell, active = shaman:IsGhostWolfSpell(spellID), true
-  end
-  return isShapeShiftSpell, active
-end
