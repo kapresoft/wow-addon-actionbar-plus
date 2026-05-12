@@ -11,6 +11,7 @@ local attr, atyp = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 
 local C_IsSpellKnown = C_SpellBook.IsSpellKnown
+local C_GetItemCount = C_Item.GetItemCount
 
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
@@ -58,6 +59,26 @@ function o:UpdateAction(name, val)
   if Str_IsBlank(val) then self.button.icon:SetTexture(nil); return end
   self.button:Update()
 end
+
+function o:UpdateCount()
+  local btn = self.button
+  local countText = btn.Count
+  if not countText then return end
+
+  local typeVal, id = self:GetActionInfo()
+  if not id then countText:SetText(''); return end
+
+  if au.IsItem(typeVal) then
+    au.IfItem(id, function(itemInfo)
+      -- includeBank=false, includeUses=true (captures charges), includeReagentBank=false
+      local count = C_GetItemCount(id, false, true, false) or 0
+      countText:SetText(count > 1 and count or '')
+    end)
+  else
+    countText:SetText('')
+  end
+end
+
 
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
@@ -171,13 +192,12 @@ function o:__ResetVisuals()
   btn:SetChecked(false)
   btn:SetButtonStateNormal()
   
-  -- Stop flashing if you use it
-  if btn.ClearFlash then btn:ClearFlash() end
-
   btn.widget:DisableFlashAnimation()
 
   -- Remove any desaturation
   if btn.icon then btn.icon:SetDesaturated(false) end
+
+  btn.Count:SetText('')
 end
 
 --- @private
