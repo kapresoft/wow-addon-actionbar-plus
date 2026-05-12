@@ -45,12 +45,13 @@ New Instance
 local libName = 'Button_2_0_3'
 
 --- @class ButtonMixin_ABP_2_0_3 : ButtonHandlerMixin_ABP_2_0, ButtonConfigAccessor_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
---- @field NormalTexture TextureObj
---- @field HighlightTexture TextureObj
---- @field PushedTexture TextureObj
---- @field CheckedTexture TextureObj
+--- @field NormalTexture Texture
+--- @field HighlightTexture Texture
+--- @field PushedTexture Texture
+--- @field CheckedTexture Texture
 --- @field SpellHighlightAnim AnimationGroup
---- @field icon TextureObj
+--- @field Count FontString
+--- @field icon Texture
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
@@ -185,6 +186,7 @@ function o:OnEvent(evt, ...)
     self:UpdateUsable()
   elseif evt == 'BAG_UPDATE_DELAYED' then
     self:UpdateUsable()
+    self:UpdateCount()
   end
   
 end
@@ -405,6 +407,7 @@ function o:Update()
     --ActionButton_UpdateCooldown(self)
     self:UpdateCooldown()
     self:UpdateFlash()
+    self:UpdateCount()
     --self:UpdateHighlightMark()
     --self:UpdateSpellHighlightMark()
   else
@@ -499,10 +502,7 @@ function o:DimIcon() self:SetIconVertex(0.5, 0.5, 0.5) end
 function o:UpdateState(evt) o.Btn_UpdateState(self, evt) end
 function o:UpdateAnimation() o.Btn_UpdateAnimation(self) end
 function o:UpdateFlash() o.Btn_UpdateFlash(self) end
-
-function o:ClearFlash()
-  -- tbd
-end
+function o:UpdateCount() self.widget:UpdateCount() end
 
 function o:UpdateTexture()
   self.widget:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
