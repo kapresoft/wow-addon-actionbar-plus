@@ -28,3 +28,5 @@ end
 --- @param spellID SpellID
 --- @return Boolean
 function o:IsStealth(spellID) return spellID == self.STEALTH_SPELL_ID end
+
+function o:GetActiveShapeshiftFormIcon() return o.STEALTHED_ICON end

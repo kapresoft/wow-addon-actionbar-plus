@@ -8,13 +8,13 @@
     <Script file='Developer\DeveloperSetup.lua'/>
     <!--@end-do-not-package@-->
     <Script file="Modules\API\Compat.lua" />
-    <Script file="Modules\API\ActionUtil.lua"/>
     <Script file="Modules\API\SpellUtil.lua" />
     <Script file="Modules\API\UnitUtil.lua"/>
     <Script file="Modules\API\DruidUtil.lua"/>
     <Script file="Modules\API\PriestUtil.lua"/>
     <Script file="Modules\API\RogueUtil.lua"/>
     <Script file="Modules\API\ShamanUtil.lua"/>
+    <Script file="Modules\API\ActionUtil.lua"/>
     <!--
     TODO: Implement
     <Script file="Modules\API\ShamanUnitMixin.lua"/>

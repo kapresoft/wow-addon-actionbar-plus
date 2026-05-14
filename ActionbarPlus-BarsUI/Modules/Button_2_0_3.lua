@@ -143,6 +143,8 @@ function o:OnEvent(evt, ...)
     self:UpdateUsable()
   elseif evt == 'SPELL_UPDATE_USABLE' then
     self:UpdateUsable()
+  elseif evt == 'SPELL_UPDATE_CHARGES' then
+    self:UpdateCount()
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
     -- attacking (even when player is in combat)
@@ -180,6 +182,12 @@ function o:OnEvent(evt, ...)
     self:UpdateState('OnEvent')
   --elseif evt == 'UNIT_AURA' then
   --  self:UpdateStealthSpells()
+  elseif evt == 'SPELL_ACTIVATION_OVERLAY_GLOW_SHOW' then
+    local spellID = ...
+    if self:MatchesSpellID(spellID) then self.widget:ShowOverlayGlow() end
+  elseif evt == 'SPELL_ACTIVATION_OVERLAY_GLOW_HIDE' then
+    local spellID = ...
+    if self:MatchesSpellID(spellID) then self.widget:HideOverlayGlow() end
   elseif evt == 'BAG_UPDATE_COOLDOWN' then
     --t('OnEvent', 'evt=', evt)
     self:UpdateCooldown()
@@ -515,4 +523,4 @@ function o:Any() self:RegisterForClicks('AnyDown', 'AnyUp') end
 function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
 function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
 function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
-
+function o:MatchesSpellID(spellID) return self.widget:MatchesSpellID(spellID) end

@@ -27,16 +27,13 @@ local O, M = ns.O, ns.M
 local comp, UnitClasses = O.Compat, O.Constants.UnitClasses
 local Str_IsAnyOf = ns:String().IsAnyOf
 
---- For all stealth
-local STEALTHED_ICON = 136047
-
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 --- @see Core_Modules_ABP_2_0
 --- @type string
 local libName = M.UnitUtil()
---- @class UnitUtil_ABP_2_0 : BaseLibraryObject
+--- @class UnitUtil_ABP_2_0
 --- @field protected CLASS_ID UnitClass This is an interface field and must be defined by the specific unit
 local S = {}; ns:Register(libName, S)
 S.__index = S
@@ -46,6 +43,27 @@ local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
+--- @type table<UnitClass, UnitUtil_ABP_2_0>
+local SPECIAL_SHAPESHIFT_SPELL_UNITS
+local SPECIAL_SHAPESHIFT_ICON_UNITS
+
+--- @param playerClass UnitClass
+--- @return UnitUtil_ABP_2_0
+local function GetSpecialShapeshiftUnit(playerClass)
+  if not SPECIAL_SHAPESHIFT_SPELL_UNITS then
+    SPECIAL_SHAPESHIFT_SPELL_UNITS = { ['PRIEST'] = O.PriestUtil, ['SHAMAN'] = O.ShamanUtil }
+  end
+  return SPECIAL_SHAPESHIFT_SPELL_UNITS[playerClass]
+end
+
+local function GetShapeshiftFormIcon(playerClass)
+  if not SPECIAL_SHAPESHIFT_ICON_UNITS then
+    SPECIAL_SHAPESHIFT_ICON_UNITS = { ['PRIEST'] = O.PriestUtil, ['ROGUE'] = O.RogueUtil }
+  end
+  local u = SPECIAL_SHAPESHIFT_ICON_UNITS[playerClass]
+  return u and u:GetActiveShapeshiftFormIcon()
+end
+
 --- @return SpecInfo_ABP_2_0
 local function NewSpecInfo()
   return {
@@ -59,7 +77,7 @@ end
 --- @return boolean True if `toMatch` is found in the varargs, false otherwise.
 local function IsAnyOfBuff(toMatch, ...)
   for i = 1, select('#', ...) do
-    --- @type SpellInfoShort
+    --- @type SpellInfo
     local val = select(i, ...)
     local spellID = val and val.id
     if toMatch == spellID then return true end
@@ -76,7 +94,9 @@ local o = S
 o.C = { UnitClasses = UnitClasses }
 
 o.ADDON_TEXTURES_DIR_FORMAT = 'interface/addons/actionbarplus/Core/Assets/Textures/%s'
-o.stealthedIcon = o.ADDON_TEXTURES_DIR_FORMAT:format('spell_nature_invisibilty_active')
+o.ACTIVE_SHAPE_SHIFT_ICON = 136116
+--- Default Stealthed Icon
+o.STEALTHED_ICON = 136047
 
 --- @overload fun(unitClass:UnitClass) : UnitUtil_ABP_2_0
 --- @param unitClass UnitClass
@@ -102,18 +122,18 @@ function o:ClassID() return self.CLASS_ID end
 ---Example:
 --- @param optionalUnit string
 --- @see Blizzard_UnitId
---- @return UnitClass, UnitClassID One of DRUID, ROGUE, PRIEST, etc... returned with the ID
+--- @return UnitClass, UnitClassID @One of DRUID, ROGUE, PRIEST, etc... returned with the ID
 function o:GetUnitClass(optionalUnit) return UnitClassBase(optionalUnit or 'player') end
+
+--- @see GetUnitClass
+--- @return UnitClass, UnitClassID
+function o:GetPlayerUnitClass() return self:GetUnitClass() end
 
 --- @return UnitClassType
 function o:GetUnitClassX(optionalUnit)
   local name = self:GetUnitClass(optionalUnit)
   return UnitClasses[name]
 end
-
---- @see UnitClasses
---- @return string, number One of DRUID, ROGUE, PRIEST, etc...
-function o:GetPlayerUnitClass() return self:GetUnitClass() end
 
 --- /dump select(2, UnitClass('player'))
 ---Example:
@@ -157,6 +177,8 @@ function o:IsUs(unitClass)
   return self.CLASS_ID == pClass
 end
 
+--- @param unit UnitID
+function o:UnitIsPlayer(unit) return unit == 'player' end
 function o:IsDruid() return self:IsUs(UnitClasses.DRUID()) end
 function o:IsPriest() return self:IsUs(UnitClasses.PRIEST()) end
 function o:IsPaladin() return self:IsUs(UnitClasses.PALADIN()) end
@@ -168,6 +190,7 @@ function o:IsStealthActive() return IsStealthed and IsStealthed() end
 --- @return Boolean
 function o:CanShapeShift()
   if self:IsShaman() or self:IsPriest() then return true end
+  if ns:IsMists() and self:IsPaladin() then return true end
   return GetNumShapeshiftForms and GetNumShapeshiftForms() > 0
 end
 
@@ -177,28 +200,36 @@ function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
 --- @param spellID SpellID
 --- @return boolean? @If {spellID} is a shapeshift spellID
 --- @return boolean? @If {spellID} is active
+--- @return Icon? @The form active icon
 function o:IsShapeShiftSpell(spellID)
-  local isShapeShiftSpell, active
-  local shaman, priest = O.ShamanUtil, O.PriestUtil
-  if self:IsShaman() then
-    isShapeShiftSpell, active = shaman:IsGhostWolfSpell(spellID), true
-  elseif self:IsPriest() then
-    isShapeShiftSpell, active = priest:IsShadowFormSpell(spellID), priest:IsInShadowForm()
-  else
-    for i = 1, GetNumShapeshiftForms() do
-      local icon, active, castable, spid = GetShapeshiftFormInfo(i)
-      if spid == spellID then return true, active == true end
-    end
-    return false, false
-  end
-
-  return isShapeShiftSpell, active
+  local playerClass = self:GetPlayerUnitClass()
+  local specialUnit = GetSpecialShapeshiftUnit(playerClass)
+  if specialUnit then return specialUnit:GetShapeShiftSpellInfo(spellID) end
+  return self:GetShapeShiftSpellInfo(spellID)
 end
+
+--- Meant to be overridden by units to
+--- reflect their current shapeshift state
+--- @protected
+--- @param spellID SpellID
+--- @return boolean? @If {spellID} is a shapeshift spellID
+--- @return boolean? @If {spellID} is active
+--- @return Icon? @The form active icon
+function o:GetShapeShiftSpellInfo(spellID)
+  local index = self:GetShapeshiftForm()
+  if not index or index <= 0 then return false, false, nil end
+  local formActiveIcon = GetShapeshiftFormIcon(self:GetPlayerUnitClass())
+    or self:GetActiveShapeshiftFormIcon()
+  local _, active, _, spid = GetShapeshiftFormInfo(index)
+  return spid == spellID, active, formActiveIcon
+end
+
 --- @return Icon
-function o:GetStealthedIcon() return STEALTHED_ICON end
+function o:GetStealthedIcon() return o.STEALTHED_ICON end
 --- @return Index|0 The form index if any; 0 if not shapeshifted
 function o:GetShapeshiftForm() return GetShapeshiftForm and GetShapeshiftForm() end
---shapeshiftIcon, active, castable, spellID
+--- @return Icon
+function o:GetActiveShapeshiftFormIcon() return o.ACTIVE_SHAPE_SHIFT_ICON end
 
 --- @return boolean?
 --- @param callbackFn fun(data:ShapeshiftFormData):void
@@ -248,7 +279,7 @@ function o:UpdateBuffs(filterFn)
       if filterFn(spellID) and self:IsOwnSpell(spellID) then
         local name = comp:GetSpellName(spellID)
         p:t(function() return "Own spell: id=%s name=%s", spellID, tostring(name) end)
-        --- @type SpellInfoShort
+        --- @type SpellInfo
         local spellInfo = { id = spellID, name = name }
         table.insert(ns.playerBuffs, spellInfo)
       end

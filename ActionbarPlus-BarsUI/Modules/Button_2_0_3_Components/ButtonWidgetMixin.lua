@@ -68,17 +68,21 @@ function o:UpdateCount()
   local typeVal, id = self:GetActionInfo()
   if not id then countText:SetText(''); return end
 
+  local count = ''
   if au.IsItem(typeVal) then
     au.IfItem(id, function(itemInfo)
       -- includeBank=false, includeUses=true (captures charges), includeReagentBank=false
-      local count = C_GetItemCount(id, false, true, false) or 0
-      countText:SetText(count > 1 and count or '')
+      local n = C_GetItemCount(id, false, true, false) or 0
+      if n > 1 then count = n end
     end)
-  else
-    countText:SetText('')
+  elseif au.IsSpell(typeVal) then
+    au.IfSpellCharges(id, function(spId, spc)
+      local current, max = spc.currentCharges, spc.maxCharges
+      if current and max and max > 1 and current > 0 then count = current end
+    end)
   end
+  countText:SetText(count)
 end
-
 
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
@@ -117,8 +121,6 @@ function o:ApplyButtonConfig()
   local bc = btn:GetButtonConfig()
   if not (bc and bc.type and bc.id) then self:ResetButton(); return end
 
-  self:SetAttribute(attr.type, bc.type)
-
   if au.IsSpell(bc.type) then
     -- if the spell is no longer known (may be true for lower-rank non-mana spells)
     local known, nextKnownSp = au.IsSpellKnown(bc.id)
@@ -126,15 +128,7 @@ function o:ApplyButtonConfig()
       if nextKnownSp then bc.id = nextKnownSp.spellID
       else bc.id = nil end
     end
-    if bc.id then
-      local isShapeShiftSpell, active = unit:IsShapeShiftSpell(bc.id)
-      if isShapeShiftSpell then
-        local sp = comp:GetSpellName(bc.id)
-        self:SetAttribute(bc.type, sp)
-      else
-        self:SetAttribute(bc.type, bc.id)
-      end
-    end
+    if bc.id then self:SetActionSpell(bc.id) end
   elseif au.IsItem(bc.type) then
      self:SetActionItem(bc.id)
   end
@@ -152,7 +146,7 @@ function o:SetActionFromCursor(cursor)
   if cursor:IsSpell() then
     au.IfSpell(cursor:GetSpellID(), function(spell)
       self:SetActionSpell(spell.spellID)
-      btnC.id =  spell.spellID
+      btnC.id = spell.spellID
     end)
   elseif cursor:IsItem() then
     au.IfItem(cursor:GetItemID(), function(itemInfo)
@@ -251,39 +245,45 @@ function o:GetActionTexture()
   if not id then return nil end
   if au.IsMount(typeVal) then return end
 
-  local iconID
+  local iconID, shouldDim = nil, false
   if au.IsSpell(typeVal) then
-    if unit:CanShapeShift() then
-      local formOrStealthActive = false
-      -- some shapeshifts have
-      -- different icons when active
-      if unit:IsStealthActive()
-          and (druid:IsProwl(id) or rogue:IsStealth(id)) then
-        -- Druid and Rogue use the same stealth icon
-        formOrStealthActive = true
-        iconID = unit:GetStealthedIcon()
-      elseif priest:IsShadowFormSpell(id) and priest:IsShapeShifted() then
-        formOrStealthActive = true
-        iconID = priest:GetShadowFormActiveIcon()
-      elseif shammy:IsGhostWolfSpell(id) and shammy:IsInGhostWolfForm() then
-        iconID = shammy:GetFormActiveIcon()
-      end
-      if formOrStealthActive then
-        btn:DimIcon()
-      else
-        btn:SetIconNormalVertex()
-      end
-    end
-    if not iconID then
+    local isShapeshiftSpell, active, activeIcon = unit:IsShapeShiftSpell(id)
+    if not (isShapeshiftSpell and active) then
       local info = comp:GetSpellInfo(id)
-      if info and info.iconID then iconID = info.iconID end
+      if info then iconID = info.iconID end
+    else
+      iconID, shouldDim = self:GetShapeshiftSpellActionTexture(active, activeIcon)
     end
   elseif au.IsItem(typeVal) then
     au.IfItem(self:GetAttributeItemID(), function(itemInfo)
-        iconID = itemInfo.icon
+      iconID = itemInfo.icon
     end)
   end
+
+  if shouldDim then btn:DimIcon()
+  else btn:SetIconNormalVertex()
+  end
+
   return iconID
+end
+
+--- @param shapeshiftSpellActive boolean
+--- @param activeIcon Icon
+--- @return Icon, boolean @Icon and whether it should be dimmed
+function o:GetShapeshiftSpellActionTexture(shapeshiftSpellActive, activeIcon)
+  local formOrStealthActive = isShapeshiftSpell == true
+  local iconID, shouldDim = activeIcon, false
+
+  if unit:IsStealthActive()
+      and (druid:IsProwl(id) or rogue:IsStealth(id)) then
+    -- Druid and Rogue use the same stealth icon
+    shouldDim = true
+    iconID = unit:GetStealthedIcon()
+  elseif shapeshiftSpellActive and unit:IsPriest() then
+    iconID = priest:GetActiveShapeshiftFormIcon()
+  end
+
+  return iconID, shouldDim
 end
 
 --- @param callbackFn fun(icon:Icon):void
@@ -306,8 +306,8 @@ function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
 --- This is called from PreClick() and drag handlers before manipulating the
 --- cursor or replacing the button's action.
 function o:SuspendAction()
-  local t = self:GetAttributeType()
-  if not t then return end
+  local at = self:GetAttributeType()
+  if not at then return end
   cns:SetGlobalAttribute(attr.suspended_type, self:GetAttributeType())
   self:ClearAttributeType()
 end
@@ -340,8 +340,8 @@ end
 
 function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
 
-function o:MatchesActiveButtonSpellID(spellID)
-  local _, id = self.button:GetActionInfo()
+function o:MatchesSpellID(spellID)
+  local _, id = self:GetActionInfo()
   return spellID == id or spellID == self.itemSpellID
 end
 
@@ -355,8 +355,16 @@ end
 --- @see Compat#GetSpellInfo(spellIDOrName) : SpellInfoData
 --- @param spellID SpellID
 function o:SetActionSpell(spellID)
+
   self:SetAttribute(attr.type, atyp.spell)
-  self:SetAttribute(atyp.spell, spellID)
+  local isShapeShiftSpell = unit:IsShapeShiftSpell(spellID)
+  if isShapeShiftSpell or (cns:IsMists() and au.IsTalentSpell(spellID)) then
+    au.IfSpell(spellID, function(spell)
+      self:SetAttribute(atyp.spell, spell.name)
+    end)
+  else
+    self:SetAttribute(atyp.spell, spellID)
+  end
 end
 
 --- @param itemID ItemID
@@ -412,6 +420,24 @@ function o:RequiresAttackAnimation()
   local typeVal, id = self:GetActionInfo()
   if not (typeVal and id) then return false end
   return au.IsSpell(typeVal) and au.IsAutoAttackInProgress(id)
+end
+
+function o:ShowOverlayGlow()
+  local btn = self.button
+  if ActionButtonSpellAlertManager then
+    ActionButtonSpellAlertManager:ShowAlert(btn)
+  elseif ActionButton_ShowOverlayGlow then
+    ActionButton_ShowOverlayGlow(btn)
+  end
+end
+
+function o:HideOverlayGlow()
+  local btn = self.button
+  if ActionButtonSpellAlertManager then
+    ActionButtonSpellAlertManager:HideAlert(btn)
+  elseif ActionButton_HideOverlayGlow then
+    ActionButton_HideOverlayGlow(btn)
+  end
 end
 
 function o:EnableFlashAnimation()
