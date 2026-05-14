@@ -129,8 +129,17 @@ end
 --- @return SpellCooldownInfo
 function o:GetSpellCooldown(spell)
   assert(Str_IsAnyOf(type(spell), 'number', 'string'),
-    'GetSpellCooldown(spell):: spell should be a string (Spell Name) or number (Spell ID).')
+    'GetSpellCooldown(spell):: spell should be a string (spell name) or number (spell ID).')
   return C_GetSpellCooldown(spell)
+end
+
+--- @see C_Spell.GetSpellCharges()
+--- @param spell SpellIdentifier
+--- @return SpellChargeInfo chargeInfo
+function o:GetSpellCharges(spell)
+  assert(Str_IsAnyOf(type(spell), 'number', 'string'),
+    'GetSpellCharges(spell):: spell should be a string (spell name) or number (spell ID).')
+  return C_Spell.GetSpellCharges(spell)
 end
 
 --- @return UnitCastingData

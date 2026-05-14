@@ -21,7 +21,7 @@ Behavior:
 - Maintains a registry of button frames (self.frames).
 - For spellcast-related events:
   - Extracts spellID.
-  - Calls frame:MatchesActiveButtonSpellID(spellID).
+  - Calls frame:MatchesSpellID(spellID).
   - Dispatches only to matching buttons.
 - For non-spellcast action events:
   - Broadcasts as needed.
@@ -128,23 +128,23 @@ end
 ---@param ... any
 function o:OnEvent(evt, ...)
   if ( evt == "UNIT_INVENTORY_CHANGED" ) then
-    local unit = ...;
-    if ( unit == "player" and self.tooltipOwner and GameTooltip:GetOwner() == self.tooltipOwner ) then
+    local unitName = ...;
+    if ( unitName == "player" and self.tooltipOwner and GameTooltip:GetOwner() == self.tooltipOwner ) then
       self.tooltipOwner:SetTooltip();
     end
   elseif ( self:IsSpellcastEvent(evt) ) then
     ---@param btn Button_ABP_2_0_3
     for k, btn in pairs(self.frames) do
       local spellID;
-      local unit = ...;
+      local unitName = ...;
       
       if(evt == "UNIT_SPELLCAST_SENT") then
         spellID = select(4, ...)
       else
         spellID = select(3, ...)
       end
-      
-      if (unit == "player" and btn.widget:MatchesActiveButtonSpellID(spellID)) then
+
+      if (unitName == "player" and btn:MatchesSpellID(spellID)) then
         btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
       end
     end

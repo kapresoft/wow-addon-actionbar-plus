@@ -177,11 +177,3 @@ function o:GetCatFormName()
 end
 
 function o:GetFormActiveIcon() return o.DRUID_FORM_ACTIVE_ICON end
-
---- @param spellInfo Profile_Spell
---- @return Icon The shapeshift icon
-function o:GetShapeshiftIcon(spellInfo)
-  if not spellInfo then return nil end
-  if self:IsShapeShiftActive(spellInfo) then return self:GetFormActiveIcon() end
-  return spellInfo.icon
-end

@@ -4,6 +4,7 @@ local trace_cvar = ns.trace_ui_cvar
 local Str_IsBlank = ns:String().IsBlank
 local p, t = ns:log('Developer')
 local unit = ns.O.UnitUtil
+local comp = ns.O.Compat
 
 --- @class Developer_ABP_2_0 : AceEvent_3_0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
@@ -48,8 +49,19 @@ function o:devMsg(msg)
 end
 
 --- @param itemInfo ItemName|ItemID|ItemLink
---- @return ItemCooldownData?
+--- @return ItemCooldownInfo?
 function o:GetItemCooldown(itemInfo)
-  return ns.O.Compat:GetItemCooldown(itemInfo)
+  return comp:GetItemCooldown(itemInfo)
 end
 
+function o:IsSealActive(spellID)
+  if not (spellID and C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) then return false end
+  local index = 1
+  while true do
+    local aura = C_UnitAuras.GetBuffDataByIndex('player', index)
+    if not aura then break end
+    if aura.spellId == spellID then return true end
+    index = index + 1
+  end
+  return false
+end

@@ -42,10 +42,21 @@ function o:IsInShadowForm()
           or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL)
 end
 
-function o:GetShadowFormActiveIcon()
+--- @deprecated
+--- @see GetActiveShapeshiftFormIcon()
+function o:GetShadowFormActiveIcon() return self:GetActiveShapeshiftFormIcon() end
+
+function o:GetActiveShapeshiftFormIcon()
   if ns:IsRetail() then return formActiveIcon.retail
   elseif ns:IsMists() then return formActiveIcon.mop end
   return formActiveIcon.default
 end
 
-
+--- @protected
+--- @see UnitUtil_ABP_2_0.GetShapeShiftSpellInfo
+--- @param spellID SpellID
+--- @return boolean? @If {spellID} is a shapeshift spellID
+--- @return boolean? @If {spellID} is active
+function o:GetShapeShiftSpellInfo(spellID)
+  return self:IsShadowFormSpell(spellID), self:IsShapeShifted()
+end

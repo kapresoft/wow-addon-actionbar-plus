@@ -13,11 +13,14 @@ local C_GetSpellPowerCost = C_Spell.GetSpellPowerCost
 local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
 local C_IsSpellUsable     = C_Spell.IsSpellUsable
 local C_IsUsableItem      = C_Item.IsUsableItem
+local C_GetTalentInfo     = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
 
 local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 
-local ATTACK_SPELL_ID = 6603
-local SHOOT_SPELL_ID  = 5019
+local ATTACK_SPELL_ID     = 6603
+local SHOOT_SPELL_ID      = 5019
+local MOP_TALENT_TIERS    = 6
+local MOP_TALENT_COLUMNS  = 3
 
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil
@@ -162,11 +165,34 @@ function o.IsBattlePet(typeVal) return typeVal == atyp.battlepet end
 --- @return boolean
 function o.IsCompanion(typeVal) return typeVal == atyp.companion end
 
+--- MoP only: 6 tiers x 3 columns (left=1, middle=2, right=3)
+--- @param spellID SpellID
+--- @return boolean
+function o.IsTalentSpell(spellID)
+  if not (spellID and C_GetTalentInfo) then return false end
+  for tier = 1, MOP_TALENT_TIERS do
+    for column = 1, MOP_TALENT_COLUMNS do
+      local info = C_GetTalentInfo({ tier = tier, column = column })
+      if info and info.selected and info.spellID == spellID then return true end
+    end
+  end
+  return false
+end
+
 --- @param spell SpellIdentifier
 --- @param callbackFn fun(spell: SpellInfo)
 function o.IfSpell(spell, callbackFn)
   local spellInfo = comp:GetSpellInfo(spell)
   if spellInfo then callbackFn(spellInfo) end
+end
+
+--- @param spell SpellIdentifier
+--- @param callbackFn fun(spellID:SpellID, charge: SpellChargeInfo)
+function o.IfSpellCharges(spell, callbackFn)
+  o.IfSpell(spell, function(sp)
+    local charge = comp:GetSpellCharges(sp.spellID)
+    if charge then callbackFn(sp.spellID, charge) end
+  end)
 end
 
 --- Execute callback if a cooldown exists
@@ -216,3 +242,14 @@ end
 --- @return boolean
 function o.SpellDoesNotRequireMana(spell) return not o.SpellRequiresMana(spell) end
 
+--- @param spellID SpellID
+--- @return boolean
+function o.IsActiveShapeshiftForm(spellID)
+  if shaman:IsShaman() then
+    return shaman:IsInGhostWolfForm() and shaman:IsGhostWolfSpell(spellID)
+  end
+  local index = unit:GetShapeshiftForm()
+  if not index or index <= 0 then return false end
+  local _, active, _, formSpellID = GetShapeshiftFormInfo(index)
+  return active and formSpellID == spellID
+end
