@@ -155,7 +155,7 @@ function o:SetActionFromCursor(cursor)
     end)
   end
 
-  self.button:UpdateState('ApplyCursorAction')
+  self.button:UpdateState('SetActionFromCursor')
   self.button:UpdateFlash()
   self.button:UpdateAnimation()
   self.button:UpdateUsable()
@@ -238,6 +238,10 @@ function o:GetActionInfo()
   return nil, nil
 end
 
+--- #### NOTES:
+--- - Druid prowl is a normal spell
+--- - Shaman Ghost Wolf form is not a real form, but it does honor GetShapeshiftForm() when active.
+--- - Rogue stealth, warrior stance, pally blessings, etc.. are treated as forms in MoPs+
 --- @return TextureIcon?
 function o:GetActionTexture()
   local btn = self.button
@@ -248,11 +252,13 @@ function o:GetActionTexture()
   local iconID, shouldDim = nil, false
   if au.IsSpell(typeVal) then
     local isShapeshiftSpell, active, activeIcon = unit:IsShapeShiftSpell(id)
-    if not (isShapeshiftSpell and active) then
+    if druid:IsProwl(id) and unit:IsStealthActive() then
+      iconID = unit:GetStealthedIcon()
+    elseif isShapeshiftSpell and active then
+      iconID, shouldDim = self:GetShapeshiftSpellActionTexture(id, active, activeIcon)
+    else
       local info = comp:GetSpellInfo(id)
       if info then iconID = info.iconID end
-    else
-      iconID, shouldDim = self:GetShapeshiftSpellActionTexture(active, activeIcon)
     end
   elseif au.IsItem(typeVal) then
     au.IfItem(self:GetAttributeItemID(), function(itemInfo)
@@ -267,20 +273,26 @@ function o:GetActionTexture()
   return iconID
 end
 
+--- @param spellID SpellID
 --- @param shapeshiftSpellActive boolean
 --- @param activeIcon Icon
 --- @return Icon, boolean @Icon and whether it should be dimmed
-function o:GetShapeshiftSpellActionTexture(shapeshiftSpellActive, activeIcon)
+function o:GetShapeshiftSpellActionTexture(spellID, shapeshiftSpellActive, activeIcon)
   local formOrStealthActive = isShapeshiftSpell == true
   local iconID, shouldDim = activeIcon, false
 
   if unit:IsStealthActive()
-      and (druid:IsProwl(id) or rogue:IsStealth(id)) then
+      and (druid:IsProwl(spellID) or rogue:IsStealth(spellID)) then
     -- Druid and Rogue use the same stealth icon
-    shouldDim = true
-    iconID = unit:GetStealthedIcon()
-  elseif shapeshiftSpellActive and unit:IsPriest() then
-    iconID = priest:GetActiveShapeshiftFormIcon()
+    shouldDim, iconID = true, unit:GetStealthedIcon()
+  elseif shapeshiftSpellActive then
+    if unit:IsPriest() then
+      iconID = priest:GetActiveShapeshiftFormIcon()
+    else
+      -- in MoP, rogue stealth is a shapeshift form
+      -- druid and rogues have the same shapeshift form active icon
+      iconID = unit:GetActiveShapeshiftFormIcon()
+    end
   end
 
   return iconID, shouldDim
@@ -350,21 +362,33 @@ function o:GetDebugName()
       :format(self.button:GetName(), self.index, self.barIndex)
 end
 
---- If a SpellInfoData table is provided, it is assumed to be the
---- return value of Compat:GetSpellInfo().
---- @see Compat#GetSpellInfo(spellIDOrName) : SpellInfoData
 --- @param spellID SpellID
 function o:SetActionSpell(spellID)
-
+  if LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_MISTS_OF_PANDARIA then
+    return self:SetActionSpellByName(spellID)
+  end
   self:SetAttribute(attr.type, atyp.spell)
   local isShapeShiftSpell = unit:IsShapeShiftSpell(spellID)
-  if isShapeShiftSpell or (cns:IsMists() and au.IsTalentSpell(spellID)) then
+  if isShapeShiftSpell or au.IsTalentSpell(spellID) then
     au.IfSpell(spellID, function(spell)
       self:SetAttribute(atyp.spell, spell.name)
     end)
   else
     self:SetAttribute(atyp.spell, spellID)
   end
+end
+
+--- MoP-specific spell attribute setter. In MoP, spells have no ranks, so spell names are
+  --- unambiguous and can always be used safely. Some spells (e.g. Mind Flay, spellID 15407)
+  --- fail to fire when set by ID because the deprecated IsSpellKnown() returns false for them,
+  --- which is what the secure button system uses internally to resolve spells. Setting by name
+  --- bypasses this and works reliably for all MoP spells.
+--- @param spellID SpellID
+function o:SetActionSpellByName(spellID)
+  au.IfSpell(spellID, function(spell)
+    self:SetAttribute(attr.type, atyp.spell)
+    self:SetAttribute(atyp.spell, spell.name)
+  end)
 end
 
 --- @param itemID ItemID

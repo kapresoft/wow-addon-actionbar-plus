@@ -35,8 +35,8 @@ This frame performs no state logic itself; it only routes events.
 ---------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-local cns = ns:cns()
-local comp = cns.O.Compat
+local cns, O = ns:cns()
+local comp, unit = O.Compat, O.UnitUtil
 local p, t = ns:log('ActionEventsFrame')
 
 --[[-------------------------------------------------------------------
@@ -127,9 +127,9 @@ end
 ---@param evt EventName
 ---@param ... any
 function o:OnEvent(evt, ...)
-  if ( evt == "UNIT_INVENTORY_CHANGED" ) then
+  if ( evt == 'UNIT_INVENTORY_CHANGED' ) then
     local unitName = ...;
-    if ( unitName == "player" and self.tooltipOwner and GameTooltip:GetOwner() == self.tooltipOwner ) then
+    if ( unit:IsPlayer(unitName) and self.tooltipOwner and GameTooltip:GetOwner() == self.tooltipOwner ) then
       self.tooltipOwner:SetTooltip();
     end
   elseif ( self:IsSpellcastEvent(evt) ) then
@@ -137,14 +137,13 @@ function o:OnEvent(evt, ...)
     for k, btn in pairs(self.frames) do
       local spellID;
       local unitName = ...;
-      
-      if(evt == "UNIT_SPELLCAST_SENT") then
+
+      if(evt == 'UNIT_SPELLCAST_SENT') then
         spellID = select(4, ...)
       else
         spellID = select(3, ...)
       end
-
-      if (unitName == "player" and btn:MatchesSpellID(spellID)) then
+      if (unit:IsPlayer(unitName) and btn:MatchesSpellID(spellID)) then
         btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
       end
     end

@@ -1,8 +1,7 @@
 --[[-------------------------------------------------------------------
 Namespace_ABP_BarsUI
 ---------------------------------------------------------------------]]
---- @type string
-local addon
+local addon, xns = ...
 
 --- @class Namespace_ABP_BarsUI_2_0
 --- @field name Name The addon name
@@ -13,9 +12,9 @@ local addon
 --- @field buttonTemplate Name The button template name to use for action buttons (see BarFrame.xml and BarModuleFactory.lua)
 --- @field M BarsUI_Modules_ABP_2_0 The module names
 --- @field O BarsUI_Modules_ABP_2_0 The module objects
-local ns
+local ns = xns
 
-addon, ns = ...; ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
+ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
 ABP_BARSUI_NS = ns
 
 --- @type BarsUI_Modules_ABP_2_0
@@ -78,4 +77,3 @@ function ns:log(moduleName)
   local h = self.logHolder
   return h.printer(moduleName), h.tracer(moduleName)
 end
-

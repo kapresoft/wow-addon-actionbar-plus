@@ -25,14 +25,11 @@ o.GHOST_WOLF_FORM_ACTIVE_ICON = 136116
 function o:IsGhostWolfSpell(spellID) return spellID == o.GHOST_WOLF_SPELL_ID end
 
 --- The Ghost Wolf form is not part of GetShapeshiftFormInfo(index),
---- but does return the index of 1 on GetShapeshiftForm() when shifted
+--- Ghost Wolf form is not a real form, but it does honor GetShapeshiftForm() when active.
 --- @return boolean @true if in Ghost Wolf form, false otherwise.
 function o:IsInGhostWolfForm()
   return self:IsShaman() and GetShapeshiftForm() == 1
 end
-
----- @return Icon @The icon if form is active
---function o:GetActiveShapeshiftFormIcon() return o.GHOST_WOLF_FORM_ACTIVE_ICON end
 
 --- @protected
 --- @see UnitUtil_ABP_2_0.GetShapeShiftSpellInfo

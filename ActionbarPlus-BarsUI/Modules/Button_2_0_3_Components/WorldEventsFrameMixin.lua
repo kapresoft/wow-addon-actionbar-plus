@@ -32,7 +32,7 @@ Mental model:
 > The world changed. All buttons re-evaluate.
 ---------------------------------------------------------------------]]
 
---- @type Namespace_ABP_2_0
+--- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local p, t = ns:log('WorldEventsFrame')
 
