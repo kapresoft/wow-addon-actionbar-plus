@@ -178,7 +178,8 @@ function o:IsUs(unitClass)
 end
 
 --- @param unit UnitID
-function o:UnitIsPlayer(unit) return unit == 'player' end
+--- @return boolean
+function o:IsPlayer(unit) return unit == 'player' end
 function o:IsDruid() return self:IsUs(UnitClasses.DRUID()) end
 function o:IsPriest() return self:IsUs(UnitClasses.PRIEST()) end
 function o:IsPaladin() return self:IsUs(UnitClasses.PALADIN()) end

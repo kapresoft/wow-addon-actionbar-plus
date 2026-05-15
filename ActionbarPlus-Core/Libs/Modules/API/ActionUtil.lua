@@ -169,6 +169,7 @@ function o.IsCompanion(typeVal) return typeVal == atyp.companion end
 --- @param spellID SpellID
 --- @return boolean
 function o.IsTalentSpell(spellID)
+  if LE_EXPANSION_LEVEL_CURRENT < LE_EXPANSION_MISTS_OF_PANDARIA then return false end
   if not (spellID and C_GetTalentInfo) then return false end
   for tier = 1, MOP_TALENT_TIERS do
     for column = 1, MOP_TALENT_COLUMNS do

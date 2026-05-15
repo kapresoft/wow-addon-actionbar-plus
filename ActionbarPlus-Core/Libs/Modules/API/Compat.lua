@@ -70,7 +70,7 @@ end
 --- @return SpellInfo?
 function o:GetSpellInfo(spell)
   local pt = type(spell)
-  assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
+  assert(Str_IsAnyOf(type(spell), 'string', 'number'), 'GetSpellInfo::SpellID should be a number or a string.')
   return C_GetSpellInfo(spell)
 end
 

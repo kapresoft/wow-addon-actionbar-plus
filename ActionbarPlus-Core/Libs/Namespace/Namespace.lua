@@ -9,9 +9,8 @@ Type:Namespace
 --- @alias TraceFn_ABP_2_0 fun(...: any) : void @Printer function that outputs plain values to Blizzard Trace UI (like print)
 --- @alias TraceFnFormatted_ABP_2_0 fun(...: any) : void @Printer function that outputs formatted values to Blizzard Trace UI (like print)
 --
---
---- @type string
-local addon
+
+local addon, xns = ...
 
 --- @class Namespace_ABP_2_0 : Kapresoft-AceLib-2-0, Kapresoft-GameVersionMixin-2-0
 --- @field private LOG_NAME Name
@@ -29,9 +28,9 @@ local addon
 --- @field tr TraceFn_ABP_2_0
 --- @field M Core_Modules_ABP_2_0   @The module names
 --- @field O Core_Modules_ABP_2_0   @The module objects
-local ns
+local ns = xns
 
-addon, ns = ...; ns.name = addon; ns.nameShort='ABP2'
+ns.name = addon; ns.nameShort='ABP2'
 Mixin(ns, GVM, AceLib); ABP_CORE_NS = ns
 
 --[[-------------------------------------------------------------------

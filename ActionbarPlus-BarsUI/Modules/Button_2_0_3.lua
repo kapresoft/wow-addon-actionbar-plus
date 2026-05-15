@@ -317,7 +317,6 @@ function o:PostClickAction(button, down)
       --  todo: handle macro
     end
   end
-
   self.widget:ClearAttributeSuspendedActionType()
   self.widget:SetActionFromCursor(cursor)
 end
