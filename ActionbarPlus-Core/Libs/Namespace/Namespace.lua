@@ -180,3 +180,24 @@ function ns:log(moduleName)
   return h.printer(moduleName), h.tracer(moduleName)
 end
 
+--- @class Chain_ABP_2_0
+--- @field OrElse fun(fn: fun())
+
+--- Fluent chain helper; use OrElse() to handle the unmatched case.
+--- ### Usage:
+--- ```lua
+--- ns:Chain(someCondition)
+---   .OrElse(function()
+---     -- fallback logic
+---   end)
+--- ```
+--- @param matched boolean
+--- @return Chain_ABP_2_0
+function ns:Chain(matched)
+  --- @type Chain_ABP_2_0
+  local chain = {}
+  function chain.OrElse(fn)
+    if not matched and type(fn) == 'function' then fn() end
+  end
+  return chain
+end

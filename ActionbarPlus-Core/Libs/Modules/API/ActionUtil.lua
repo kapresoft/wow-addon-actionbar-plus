@@ -183,6 +183,7 @@ end
 --- @param spell SpellIdentifier
 --- @param callbackFn fun(spell: SpellInfo)
 function o.IfSpell(spell, callbackFn)
+  if not spell then return end
   local spellInfo = comp:GetSpellInfo(spell)
   if spellInfo then callbackFn(spellInfo) end
 end
@@ -212,6 +213,21 @@ function o.IfItem(itemID, callbackFn)
   end
   if not (it and it.icon) then return end
   callbackFn(it)
+end
+
+--- @param mount MountID|MountInfo
+--- @param callbackFn fun(mountInfo:MountInfo)
+function o.IfMount(mount, callbackFn)
+  local info
+  if type(mount) == 'table' and mount.spellID then
+    info = mount
+  elseif type(mount) == 'number' then
+    info = comp:GetMountInfo(mount)
+  else
+    error('IfMount(mount, callbackFn): {mount} is expected to be a number or MountInfo')
+  end
+  if not (info and info.spellID) then return end
+  callbackFn(info)
 end
 
 --- Execute callback if a cooldown exists

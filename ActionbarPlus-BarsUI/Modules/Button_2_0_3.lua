@@ -161,7 +161,7 @@ function o:OnEvent(evt, ...)
       self:SetChecked(false)
       self:DisableFlashAnimation()
     end
-  elseif evt == 'PLAYER_TARGET_SET_ATTACKING' then
+  elseif Str_IsAnyOf(evt, 'PLAYER_TARGET_SET_ATTACKING', 'PLAYER_ENTER_COMBAT') then
     if self.widget:RequiresAttackAnimation() then
       self:SetChecked(true)
       self:EnableFlashAnimation()
@@ -286,8 +286,8 @@ function o:PreClickAction(button, down)
   -- ########################################
   local cursor = cns:cursor()
 
-  -- clicks on a button with a valid cursor
-  -- on mouse 'down', suspend the current action if there is a valid cursor
+  -- On mouse 'down' with a valid cursor, suspend the current action
+  -- to prevent it from firing during a drag-drop operation.
   if cursor.isValid then
     self.widget:SuspendAction(); return
   end
@@ -309,8 +309,9 @@ function o:PostClickAction(button, down)
 
   local suspendedType, actionID = self:GetSuspendedActionInfo()
   if suspendedType then
+    -- Chain-clicking between buttons with a valid cursor; not a drag event.
     if suspendedType == atyp.spell then
-      comp:PickupSpell(actionID)
+      o.Btn_PickupSpellOrMount(self, actionID)
     elseif suspendedType == atyp.item then
       comp:PickupItem(self.widget:GetAttributeItemID())
     elseif suspendedType == atyp.macro then
@@ -331,8 +332,7 @@ function o:OnEnter()
   
   --- @type FontStringObj
   local right = _G["GameTooltipTextRight1"]
-  
-  if type == atyp.spell then
+  if au.IsSpell(type) then
     GameTooltip:SetSpellByID(id)
     local rank = spu:GetHighestSpellRank(id)
     if right and rank then
@@ -373,7 +373,7 @@ function o:OnReceiveDrag()
   local existingType, existingID = self:GetActionInfo()
   -- pickup existing action (this places it on cursor)
   if au.IsSpell(existingType) then
-    comp:PickupSpell(existingID)
+    o.Btn_PickupSpellOrMount(self, existingID)
   elseif au.IsItem(existingType) then
     comp:PickupItem(self.widget:GetAttributeItemID())
   end

@@ -120,13 +120,14 @@ function o:ApplyButtonConfig()
   --- @type ButtonConfig_ABP_2_0
   local bc = btn:GetButtonConfig()
   if not (bc and bc.type and bc.id) then self:ResetButton(); return end
-
   if au.IsSpell(bc.type) then
-    -- if the spell is no longer known (may be true for lower-rank non-mana spells)
-    local known, nextKnownSp = au.IsSpellKnown(bc.id)
-    if not known then
-      if nextKnownSp then bc.id = nextKnownSp.spellID
-      else bc.id = nil end
+    -- mainline mounts are also spells
+    if type(bc.id) == 'number' then
+      local known, nextKnownSp = au.IsSpellKnown(bc.id)
+      if not known then
+        if nextKnownSp then bc.id = nextKnownSp.spellID
+        else bc.id = nil end
+      end
     end
     if bc.id then self:SetActionSpell(bc.id) end
   elseif au.IsItem(bc.type) then
@@ -152,6 +153,13 @@ function o:SetActionFromCursor(cursor)
     au.IfItem(cursor:GetItemID(), function(itemInfo)
       self:SetActionItem(itemInfo.id)
       btnC.id = itemInfo.id
+    end)
+  elseif cursor:IsMount() then
+    local mountID = cursor:GetMountID()
+    comp:IfMount(mountID, function(mount)
+      btnC.type = atyp.spell
+      btnC.id = mount.spellID
+      self:SetActionSpell(btnC.id)
     end)
   end
 
@@ -396,6 +404,11 @@ function o:SetActionItem(itemID)
   self:SetAttribute(attr.type, atyp.item)
   self:SetAttribute(atyp.item, ('%s:%s'):format(atyp.item, itemID))
   self.itemSpellID = comp:GetItemSpell(itemID)
+end
+
+--- @param mountInfo MountInfo
+function o:SetActionMountRetail(mountInfo)
+  self:SetActionSpellByName(mountInfo.spellID)
 end
 
 --- @return boolean

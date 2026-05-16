@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local O = ns.O
-local c = O.Compat
+local au = O.ActionUtil
 local Str_IsBlank = ns:String().IsBlank
 
 --[[-----------------------------------------------------------------------------
@@ -15,7 +15,6 @@ local libName = ns.M.CursorProvider()
 --- @class CursorProvider_ABP_2_0
 local S = {}; ns:Register(libName, S)
 local p, t = ns:log(libName)
-local au = O.ActionUtil
 
 --
 --- @class Cursor_ABP_2_0 : CursorMixin_ABP_2_0
@@ -29,8 +28,6 @@ local CursorMixin = {}
 
 local function CursorMixinMethods()
 
-  local spellType = 'spell'
-  
   --- @private
   --- @param info CursorInfo
   function CursorMixin:Init(info)
@@ -39,13 +36,23 @@ local function CursorMixinMethods()
     self.isValid = info and not Str_IsBlank(info.type)
   end
   
+  --- @return boolean
   function CursorMixin:IsSpell() return self.isValid and au.IsSpell(self.type) end
+  --- @return boolean
   function CursorMixin:IsItem() return self.isValid and au.IsItem(self.type) end
+  --- @return boolean
+  function CursorMixin:IsMount() return self.isValid and au.IsMount(self.type) end
 
   --- @return SpellID
   function CursorMixin:GetSpellID()
     if not self:IsSpell() then return nil end
     return self.info.info3 --[[@as SpellID]]
+  end
+
+  --- @return MountID
+  function CursorMixin:GetMountID()
+    if not self:IsMount() then return nil end
+    return self.info.info1 --[[@as MountID]]
   end
 
   --- @return ItemID?, ItemLink?
@@ -56,29 +63,8 @@ local function CursorMixinMethods()
 
   --- @return ItemID?
   function CursorMixin:GetItemID() return (self:GetItem()) end
-
-  ----- @return CursorInfo
-  --function o:GetCursorInfo()
-  --  -- actionType string spell, item, macro, mount, etc..
-  --  local actionType, info1, info2, info3 = GetCursorInfo()
-  --  if Str_IsBlank(actionType) then return nil end
-  --
-  --  --- @type CursorInfo
-  --  local c = { type = actionType or '', info1 = info1, info2 = info2, info3 = info3 }
-  --
-  --  local info2Lc = strlower(c.info2 or '')
-  --  if c.type == 'companion' and 'mount' == info2Lc then
-  --    c.info2 = info2Lc
-  --    c.originalCursor = { type = c.type, info1 = c.info1, info2 = info2 }
-  --    c.type = c.info2
-  --  end
-  --
-  --  return c
-  --end
-  
   function CursorMixin:GetType() return self.info.type end
-  
-  
+
 end; CursorMixinMethods()
 
 --[[-----------------------------------------------------------------------------
@@ -88,7 +74,7 @@ Module::Cursor (Methods)
 --- @return Cursor_ABP_2_0
 function S:GetCursor()
   local type, info1, info2, info3, info4 = GetCursorInfo()
-  --p('GetCursorInfo:: ', type, 'extra=', fmt{ info1, info2, info3, info4 })
+  --- @type CursorInfo
   local info = {
     type  = type,
     info1 = info1, info2 = info2, info3 = info3, info4 = info4
