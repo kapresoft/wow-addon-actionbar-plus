@@ -125,7 +125,6 @@ function o:__debug_SpellInfo(spell)
   return ('%s(%s)'):format(sp.name, sp.spellID)
 end
 
-
 --- Picks up the specified spell, compatible with both Retail and Classic WoW.
 --- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
 function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end
