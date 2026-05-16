@@ -44,7 +44,7 @@ function o.Btn_PickupAction(self, callbackFn)
 
   if au.IsSpell(typeVal) then
     local spell = self.widget:GetAttributeSpell()
-    comp:PickupSpell(spell)
+    o.Btn_PickupSpellOrMount(self, spell)
     self:ResetButtonConfig()
     self.widget:ResetButton()
   elseif au.IsItem(typeVal) then
@@ -55,6 +55,16 @@ function o.Btn_PickupAction(self, callbackFn)
   end
 
   if callbackFn then callbackFn() end
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param spellID SpellID
+function o.Btn_PickupSpellOrMount(self, spellID)
+  comp:IfMountSpell(spellID, function(mount)
+    comp:PickupMount(mount.mountID)
+  end).OrElse(function ()
+    comp:PickupSpell(spellID)
+  end)
 end
 
 --- Update the button's checked state

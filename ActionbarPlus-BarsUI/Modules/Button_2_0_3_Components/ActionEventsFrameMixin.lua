@@ -73,7 +73,9 @@ function o:OnLoad()
   self:RegisterEvent("COMPANION_UPDATE");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
   self:RegisterEvent("PLAYER_LEAVE_COMBAT");
-  self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
+  if cns:IsMistsOrEarlier() then
+    self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
+  end
   self:RegisterEvent("UNIT_SPELLCAST_SENT");
   self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTED", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");

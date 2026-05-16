@@ -13,6 +13,11 @@ local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
 local C_GetItemCooldown    = C_Container.GetItemCooldown
 local C_GetItemSpell       = C_Item.GetItemSpell
 
+local _cmj = C_MountJournal
+local C_GetDisplayedMountID   = _cmj and _cmj.GetDisplayedMountID
+local C_GetNumDisplayedMounts = _cmj and _cmj.GetNumDisplayedMounts
+local C_PickupMount           = _cmj and _cmj.Pickup
+
 local Str_IsAnyOf = ns:String().IsAnyOf
 
 --[[-----------------------------------------------------------------------------
@@ -94,6 +99,24 @@ function o:IfSpell(spell, callbackFn)
   return sp and callbackFn(sp)
 end
 
+--- @param mountID MountID
+--- @param callbackFn fun(mount:MountInfo)
+function o:IfMount(mountID, callbackFn)
+  if not mountID then return end
+  local m = self:GetMountInfo(mountID)
+  return m and callbackFn(m)
+end
+
+--- @param spellID SpellID
+--- @param callbackFn fun(mount:MountInfo)
+--- @return Chain_ABP_2_0
+function o:IfMountSpell(spellID, callbackFn)
+  if not spellID then return ns:Chain(false) end
+  local m = self:GetMountInfoBySpell(spellID)
+  if m then callbackFn(m) end
+  return ns:Chain(m ~= nil)
+end
+
 --- @param spell SpellIdentifier
 --- @return string|SpellIdentifier? @debug info for spells
 function o:__debug_SpellInfo(spell)
@@ -109,6 +132,13 @@ function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell)
 
 --- @param itemID ItemID
 function o:PickupItem(itemID) if not itemID then return end; C_PickupItem(itemID) end
+
+--- @param mountID MountID
+function o:PickupMount(mountID)
+  local mountIndex = self:GetMountIndexByMountID(mountID)
+  if not mountIndex then return end
+  C_PickupMount(mountIndex)
+end
 
 --- @param index Index
 --- @return ShapeshiftFormData?
@@ -247,4 +277,66 @@ function o:GetItemSpell(itemInfo)
   -- return SpellID first
   local name, id = C_GetItemSpell(itemInfo)
   return id, name
+end
+
+--- @param spellID SpellID
+--- @return MountInfo?
+function o:GetMountInfoBySpell(spellID)
+  if not spellID then return nil end
+  local mountID = C_MountJournal.GetMountFromSpell(spellID)
+  if not mountID then return end
+  return self:GetMountInfo(mountID)
+end
+
+--- @param mountID number
+--- @return MountInfo?
+function o:GetMountInfo(mountID)
+  local name, spellID, icon, isActive, isUsable, sourceType,
+        isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, _mountID, isSteadyFlight
+          = C_MountJournal.GetMountInfoByID(mountID)
+
+  if not (name and spellID and _mountID) then return nil end
+
+  --- @type MountInfo
+  local mountInfo = {
+    name = name, spellID = spellID, icon = icon,
+    isActive = isActive, isUsable = isUsable, sourceType = sourceType,
+    isFavorite = isFavorite, isFactionSpecific = isFactionSpecific, faction = faction,
+    shouldHideOnChar = shouldHideOnChar, isCollected = isCollected,
+    mountID = _mountID, isSteadyFlight = isSteadyFlight,
+  }
+  return mountInfo
+end
+
+
+--- @param mountIndex Index
+--- @return MountInfo?
+function o:GetMountInfoIndex(mountIndex)
+  local name, spellID, icon, isActive, isUsable, sourceType,
+      isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, mountID, isSteadyFlight
+        = C_MountJournal.GetDisplayedMountInfo(mountIndex)
+
+  if not (name and spellID and mountID) then return nil end
+
+  --- @type MountInfo
+  local mountInfo = {
+    name = name, spellID = spellID, icon = icon,
+    isActive = isActive, isUsable = isUsable, sourceType = sourceType,
+    isFavorite = isFavorite, isFactionSpecific = isFactionSpecific, faction = faction,
+    shouldHideOnChar = shouldHideOnChar, isCollected = isCollected,
+    mountID = mountID, isSteadyFlight = isSteadyFlight,
+  }
+  return mountInfo
+end
+
+--- @param id number @The mountID
+function o:GetMountIndexByMountID(id)
+  C_MountJournal.SetDefaultFilters()
+  local count = C_GetNumDisplayedMounts()
+  for mountIndex = 1, count do
+    local mountIDByIndex = C_GetDisplayedMountID(mountIndex)
+    if id == mountIDByIndex then
+      return mountIndex
+    end
+  end
 end
