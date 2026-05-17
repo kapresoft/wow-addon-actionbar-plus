@@ -479,11 +479,15 @@ function o:UpdateCooldown()
     end)
   end
 
-  if enabled == true and duration > 0 then
-    cd:SetCooldown(start, duration, modRate or 1)
-    return
-  end
-  cd:Clear()
+  local ok = pcall(function()
+    -- retail: duration is 'secret' and will throw error
+    if enabled == true and duration > 0 then
+      cd:SetCooldown(start, duration, modRate or 1)
+    else
+      cd:Clear()
+    end
+  end)
+  if not ok then cd:Clear() end
 end
 
 --- @see ButtonWidget_ABP_2_0.GetActionInfo()
