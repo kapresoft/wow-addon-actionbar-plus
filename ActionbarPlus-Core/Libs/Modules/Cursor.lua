@@ -6,6 +6,7 @@ local ns = select(2, ...)
 local O = ns.O
 local au = O.ActionUtil
 local Str_IsBlank = ns:String().IsBlank
+local COMPANION_TYPE_MOUNT = 'MOUNT'
 
 --[[-----------------------------------------------------------------------------
 Module::Cursor
@@ -24,6 +25,10 @@ local p, t = ns:log(libName)
 --- @field type CursorType
 --- @field info CursorInfo
 --- @field isValid boolean
+--- @field mountID MountID
+--- @field spellID SpellID
+--- @field itemID ItemID
+--- @field itemLink ItemLink
 local CursorMixin = {}
 
 local function CursorMixinMethods()
@@ -34,36 +39,48 @@ local function CursorMixinMethods()
     self.info = info
     self.type = info and info.type
     self.isValid = info and not Str_IsBlank(info.type)
+
+    self:InitIdentifiers()
   end
-  
+
+  function CursorMixin:InitIdentifiers()
+    local i = self.info
+    if self:IsSpell() then
+      self.spellID = i.info3
+    elseif self:IsItem() then
+      self.itemID, self.itemLink = i.info1, i.info2
+    elseif self:IsMount() then
+      self.mountID = ns.mountID or i.info1
+    end
+  end
+
+  function CursorMixin:GetType() return self.info.type end
+
   --- @return boolean
   function CursorMixin:IsSpell() return self.isValid and au.IsSpell(self.type) end
   --- @return boolean
   function CursorMixin:IsItem() return self.isValid and au.IsItem(self.type) end
+
   --- @return boolean
-  function CursorMixin:IsMount() return self.isValid and au.IsMount(self.type) end
+  function CursorMixin:IsMount()
+    local i = self.info
+    if au.IsCompanion(self.type) and i.info2 == COMPANION_TYPE_MOUNT then
+      return self.isValid and true -- legacy: MoP
+    end
+    return self.isValid and au.IsMount(self.type)
+ end
 
-  --- @return SpellID
-  function CursorMixin:GetSpellID()
-    if not self:IsSpell() then return nil end
-    return self.info.info3 --[[@as SpellID]]
-  end
+  --- @return SpellID?
+  function CursorMixin:GetSpellID() return self.spellID end
 
-  --- @return MountID
-  function CursorMixin:GetMountID()
-    if not self:IsMount() then return nil end
-    return self.info.info1 --[[@as MountID]]
-  end
+  --- @return MountID?
+  function CursorMixin:GetMountID() return self.mountID end
 
   --- @return ItemID?, ItemLink?
-  function CursorMixin:GetItem()
-    if not self:IsItem() then return nil, nil end
-    return self.info.info1 --[[@as ItemID]], self.info.info2 --[[@as ItemLink]]
-  end
+  function CursorMixin:GetItem() return self.itemID, self.itemLink end
 
   --- @return ItemID?
-  function CursorMixin:GetItemID() return (self:GetItem()) end
-  function CursorMixin:GetType() return self.info.type end
+  function CursorMixin:GetItemID() return self.itemID end
 
 end; CursorMixinMethods()
 

@@ -155,8 +155,7 @@ function o:SetActionFromCursor(cursor)
       btnC.id = itemInfo.id
     end)
   elseif cursor:IsMount() then
-    local mountID = cursor:GetMountID()
-    comp:IfMount(mountID, function(mount)
+    comp:IfMount(cursor:GetMountID(), function(mount)
       btnC.type = atyp.spell
       btnC.id = mount.spellID
       self:SetActionSpell(btnC.id)
