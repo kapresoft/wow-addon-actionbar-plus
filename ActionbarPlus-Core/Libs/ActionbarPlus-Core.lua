@@ -1,11 +1,12 @@
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
+local O = ns.O
 
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log('Core')
-local DatabaseMixin = ns.O.DatabaseMixin
+local DatabaseMixin, MountJournalHook = O.DatabaseMixin, O.MountJournalHook
 
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
@@ -24,5 +25,6 @@ end
 --
 function o:OnEnable()
   --t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
+  MountJournalHook:Init()
 end
 

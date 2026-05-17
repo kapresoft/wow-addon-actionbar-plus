@@ -58,12 +58,12 @@ function o.Btn_PickupAction(self, callbackFn)
 end
 
 --- @param self Button_ABP_2_0_X
---- @param spellID SpellID
-function o.Btn_PickupSpellOrMount(self, spellID)
-  comp:IfMountSpell(spellID, function(mount)
+--- @param spell SpellIdentifier
+function o.Btn_PickupSpellOrMount(self, spell)
+  comp:IfMountSpell(spell, function(mount)
     comp:PickupMount(mount.mountID)
   end).OrElse(function ()
-    comp:PickupSpell(spellID)
+    comp:PickupSpell(spell)
   end)
 end
 

@@ -28,6 +28,7 @@ local addon, xns = ...
 --- @field tr TraceFn_ABP_2_0
 --- @field M Core_Modules_ABP_2_0   @The module names
 --- @field O Core_Modules_ABP_2_0   @The module objects
+--- @field mountID MountID  @Cached mountID set by MountJournalHook at pickup time; consumed by CursorMixin -- used for handling mounts in MoP+
 local ns = xns
 
 ns.name = addon; ns.nameShort='ABP2'

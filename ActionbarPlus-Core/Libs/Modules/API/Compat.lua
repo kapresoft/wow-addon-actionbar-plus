@@ -74,7 +74,6 @@ end
 --- @param spell SpellIdentifier
 --- @return SpellInfo?
 function o:GetSpellInfo(spell)
-  local pt = type(spell)
   assert(Str_IsAnyOf(type(spell), 'string', 'number'), 'GetSpellInfo::SpellID should be a number or a string.')
   return C_GetSpellInfo(spell)
 end
@@ -107,12 +106,12 @@ function o:IfMount(mountID, callbackFn)
   return m and callbackFn(m)
 end
 
---- @param spellID SpellID
+--- @param spell SpellIdentifier
 --- @param callbackFn fun(mount:MountInfo)
 --- @return Chain_ABP_2_0
-function o:IfMountSpell(spellID, callbackFn)
-  if not spellID then return ns:Chain(false) end
-  local m = self:GetMountInfoBySpell(spellID)
+function o:IfMountSpell(spell, callbackFn)
+  if not spell then return ns:Chain(false) end
+  local m = self:GetMountInfoBySpell(spell)
   if m then callbackFn(m) end
   return ns:Chain(m ~= nil)
 end
@@ -132,9 +131,11 @@ function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell)
 --- @param itemID ItemID
 function o:PickupItem(itemID) if not itemID then return end; C_PickupItem(itemID) end
 
+--- @see MountJournalHook_ABP_2_0
 --- @param mountID MountID
 function o:PickupMount(mountID)
   local mountIndex = self:GetMountIndexByMountID(mountID)
+  ns.mountID = mountID
   if not mountIndex then return end
   C_PickupMount(mountIndex)
 end
@@ -278,9 +279,11 @@ function o:GetItemSpell(itemInfo)
   return id, name
 end
 
---- @param spellID SpellID
+--- @param spellID SpellIdentifier
 --- @return MountInfo?
-function o:GetMountInfoBySpell(spellID)
+function o:GetMountInfoBySpell(spell)
+  local spellID
+  self:IfSpell(spell, function(sp) spellID = sp.spellID end)
   if not spellID then return nil end
   local mountID = C_MountJournal.GetMountFromSpell(spellID)
   if not mountID then return end
