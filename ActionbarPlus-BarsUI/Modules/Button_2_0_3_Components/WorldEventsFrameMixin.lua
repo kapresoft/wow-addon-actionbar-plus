@@ -50,15 +50,17 @@ local o = {}; WorldEventsFrameMixin_ABP_2_0 = o
 function o:OnLoad()
   
   self.buttons = {};
-  self:RegisterEvent("PLAYER_ENTERING_WORLD");
-  self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
-  self:RegisterEvent("BAG_UPDATE_DELAYED");
-  self:RegisterUnitEvent("UNIT_AURA", "player");
+  self:RegisterEvent("PLAYER_ENTERING_WORLD")
+  self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+  self:RegisterEvent("BAG_UPDATE_DELAYED")
+  self:RegisterEvent("COMPANION_UPDATE")
+  self:RegisterUnitEvent("UNIT_AURA", "player")
+
   --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
   --self:RegisterEvent("UPDATE_BINDINGS");
   --self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
   --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-  --self:RegisterEvent("PET_BAR_UPDATE");
+  --self:RegisterEvent("PET_BAR_UPDATE")
   --self:RegisterUnitEvent("UNIT_FLAGS", "pet");
   --self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
   

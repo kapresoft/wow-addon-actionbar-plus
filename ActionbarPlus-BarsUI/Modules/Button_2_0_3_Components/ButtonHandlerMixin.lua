@@ -35,6 +35,12 @@ function o.Btn_ActionShouldFire(self, down)
 end
 
 --- @param self Button_ABP_2_0_X
+function o.Btn_ResetAll(self)
+  self:ResetButtonConfig()
+  self.widget:ResetButton()
+end
+
+--- @param self Button_ABP_2_0_X
 --- @param callbackFn fun() : void
 function o.Btn_PickupAction(self, callbackFn)
   --- The abp_saved_type is saved during PreClick()
@@ -42,18 +48,28 @@ function o.Btn_PickupAction(self, callbackFn)
   local typeVal = self.widget:GetAttributeSuspendedActionType()
   if not typeVal then return end
 
+  local pickedUp = false
+
   if au.IsSpell(typeVal) then
     local spell = self.widget:GetAttributeSpell()
     o.Btn_PickupSpellOrMount(self, spell)
-    self:ResetButtonConfig()
-    self.widget:ResetButton()
+    pickedUp = true
   elseif au.IsItem(typeVal) then
     local itemID = self.widget:GetAttributeItemID()
     comp:PickupItem(itemID)
-    self:ResetButtonConfig()
-    self.widget:ResetButton()
+    pickedUp = true
+  elseif au.IsMacro(typeVal) then
+    local c_actionType, c_val = self.widget:GetActionInfoCustom()
+    if c_actionType and c_val then
+      -- battlepet has macro/macrotext attributes
+      comp:PickupBattlePet(c_val)
+    else
+      -- pickup macro
+      error(self.button:GetName() .. ':: GetActionInfo(): macro support not implemented')
+    end
+    pickedUp = true
   end
-
+  if pickedUp then o.Btn_ResetAll(self) end
   if callbackFn then callbackFn() end
 end
 
@@ -71,10 +87,10 @@ end
 --- @param self Button_ABP_2_0_X
 --- @param evt Name @The event name
 function o.Btn_UpdateState(self, evt)
-  local typeVal, spellID = self:GetActionInfo()
-  if not (typeVal and spellID) then return end
+  local typ, val = self:GetActionInfo()
+  if not (typ and val) then return end
 
-  local isCurrent = au.IsCurrentAction(typeVal, spellID)
+  local isCurrent = au.IsCurrentAction(typ, val)
   self:SetChecked(isCurrent == true)
 end
 

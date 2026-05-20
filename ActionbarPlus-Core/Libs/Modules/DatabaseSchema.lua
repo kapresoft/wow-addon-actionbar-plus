@@ -66,6 +66,7 @@ Type Definitions
 --- @class ButtonConfig_ABP_2_0
 --- @field type string
 --- @field id number
+-- todo next: change 'id' to 'value'
 --  ================================================
 --- @class BarConfig_ABP_2_0
 --- @field enabled boolean                       -- Whether this bar is active
@@ -134,7 +135,7 @@ local DB_VERSION = 1
 --- @type DatabaseObj_ABP_2_0
 local DEFAULT_DB = {
   -- GlobalConfig_ABP_2_0
-  global = { schemaVersion = DB_VERSION, bars = {} },
+  ['global'] = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {                     -- ProfileConfig_ABP_2_0
     barCount                        = 1,
@@ -269,8 +270,8 @@ end
 --- @return number
 function o:GetVersion(db)
   assert(type(db) == "table", "GetVersion:: db is required.")
-  assert(type(db.global) == "table", "GetVersion:: db.global missing.")
-  local v = db.global.schemaVersion
+  assert(type(db['global']) == "table", "GetVersion:: db.global missing.")
+  local v = db['global'].schemaVersion
   if type(v) ~= "number" then return DB_VERSION end
   return v
 end

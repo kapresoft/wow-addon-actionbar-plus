@@ -4,20 +4,24 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
-local C_PickupSpell        = C_Spell.PickupSpell
+local C_GetItemCooldown    = C_Container.GetItemCooldown
+local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
+
+local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
+local C_GetItemSpell       = C_Item.GetItemSpell
 local C_PickupItem         = C_Item.PickupItem
+
+local C_GetPetInfoByPetID  = C_PetJournal and C_PetJournal.GetPetInfoByPetID
+local C_PickupPet          = C_PetJournal and C_PetJournal.PickupPet
+
+local C_PickupSpell        = C_Spell.PickupSpell
 local C_GetSpellCooldown   = C_Spell.GetSpellCooldown
 local C_GetSpellInfo       = C_Spell.GetSpellInfo, GetSpellInfo
-local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
-local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
-local C_GetItemCooldown    = C_Container.GetItemCooldown
-local C_GetItemSpell       = C_Item.GetItemSpell
 
 local _cmj = C_MountJournal
 local C_GetDisplayedMountID   = _cmj and _cmj.GetDisplayedMountID
 local C_GetNumDisplayedMounts = _cmj and _cmj.GetNumDisplayedMounts
 local C_PickupMount           = _cmj and _cmj.Pickup
-
 local Str_IsAnyOf = ns:String().IsAnyOf
 
 --[[-----------------------------------------------------------------------------
@@ -131,6 +135,9 @@ function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell)
 --- @param itemID ItemID
 function o:PickupItem(itemID) if not itemID then return end; C_PickupItem(itemID) end
 
+--- @param macroName Name
+function o:PickupMacro(macroName) if not macroName then return end; PickupMacro(macroName) end
+
 --- @see MountJournalHook_ABP_2_0
 --- @param mountID MountID
 function o:PickupMount(mountID)
@@ -138,6 +145,12 @@ function o:PickupMount(mountID)
   ns.mountID = mountID
   if not mountIndex then return end
   C_PickupMount(mountIndex)
+end
+
+--- @param petID PetGUID
+function o:PickupBattlePet(petID)
+  if type(petID) ~= 'string' then return end
+  C_PickupPet(petID)
 end
 
 --- @param index Index
@@ -341,4 +354,47 @@ function o:GetMountIndexByMountID(id)
       return mountIndex
     end
   end
+end
+
+--- @param petID PetGUID
+--- @param callbackFn fun(pet:PetJournalPetInfo)
+function o:IfPet(petID, callbackFn)
+  if not petID then return end
+  local pet = self:GetPetInfo(petID)
+  return pet and callbackFn(pet)
+end
+
+--- @param petID PetGUID
+--- @return PetJournalPetInfo?
+function o:GetPetInfo(petID)
+  if not (petID and C_GetPetInfoByPetID) then return nil end
+
+  local speciesID, customName, petLevel, xp, maxXP, displayID, isFavorite,
+        name, icon, petType, creatureID, sourceText, description,
+        isWild, canBattle, tradable, unique, obtainable = C_PetJournal.GetPetInfoByPetID(petID)
+
+  if not speciesID then return nil end
+
+  --- @type PetJournalPetInfo
+  local pet = {
+    speciesID   = speciesID,
+    customName  = customName,
+    petLevel    = petLevel,
+    xp          = xp,
+    maxXP       = maxXP,
+    displayID   = displayID,
+    isFavorite  = isFavorite,
+    name        = name,
+    icon        = icon,
+    petType     = petType,
+    creatureID  = creatureID,
+    sourceText  = sourceText,
+    description = description,
+    isWild      = isWild,
+    canBattle   = canBattle,
+    tradable    = tradable,
+    unique      = unique,
+    obtainable  = obtainable,
+  }
+  return pet
 end

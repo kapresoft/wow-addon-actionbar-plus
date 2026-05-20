@@ -29,6 +29,7 @@ local p, t = ns:log(libName)
 --- @field spellID SpellID
 --- @field itemID ItemID
 --- @field itemLink ItemLink
+--- @field battlePetID PetGUID
 local CursorMixin = {}
 
 local function CursorMixinMethods()
@@ -51,6 +52,8 @@ local function CursorMixinMethods()
       self.itemID, self.itemLink = i.info1, i.info2
     elseif self:IsMount() then
       self.mountID = ns.mountID or i.info1
+    elseif self:IsBattlePet() then
+      self.battlePetID = i.info1
     end
   end
 
@@ -68,7 +71,12 @@ local function CursorMixinMethods()
       return self.isValid and true -- legacy: MoP
     end
     return self.isValid and au.IsMount(self.type)
- end
+  end
+
+  --- @return boolean
+  function CursorMixin:IsBattlePet()
+    return self.isValid and au.IsBattlePet(self.type)
+  end
 
   --- @return SpellID?
   function CursorMixin:GetSpellID() return self.spellID end

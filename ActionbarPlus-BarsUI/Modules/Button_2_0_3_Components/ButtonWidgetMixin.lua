@@ -13,6 +13,8 @@ local Str_IsBlank = cns:String().IsBlank
 local C_IsSpellKnown = C_SpellBook.IsSpellKnown
 local C_GetItemCount = C_Item.GetItemCount
 
+local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
+
 --[[-----------------------------------------------------------------------------
 Module::ButtonWidgetMixin
 -------------------------------------------------------------------------------]]
@@ -90,30 +92,30 @@ function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 --- Has a valid action
 --- @return boolean @If hasAction
 --- @return string? @If {hasAction} is true -- the action type; 'spell', 'item', etc..
---- @return number? @The {hasAction} is true -- the ActionID; spellID, itemID, etc
+--- @return ActionValue? @The {hasAction} is true -- the ; spellID, itemID, etc
 function o:HasAction()
   local actionType = self:GetAttribute(attr.type)
   if not actionType then return false end
-  --- @type number
-  local id = self:GetAttribute(actionType)
-  return type(id) ~= nil, actionType, id
+  --- @type ActionValue
+  local val = self:GetActionAttributeTypeValue(actionType)
+  return type(val) ~= nil, actionType, val
 end
 
---- @param callbackFn fun(typeVal:string, id:ActionID) : void
---- @param callbackElseFn fun(typeVal:string, id:ActionID) : void
+--- @param callbackFn fun(typeVal:string, value:ActionValue) : void
+--- @param callbackElseFn fun(typeVal:string, value:ActionValue) : void
 function o:IfAction(callbackFn, callbackElseFn)
   assert(type(callbackFn) == 'function', 'IfAction(callbackFn): {callbackFn} should be a function')
-  local hasAction, typeVal, id = self.widget:HasAction()
+  local hasAction, typ, val = self:HasAction()
   if hasAction then
-    callbackFn(typeVal, id)
+    callbackFn(typ, val)
   elseif type(callbackElseFn) == 'function' then
-    callbackElseFnFn(typeVal, id)
+    callbackElseFnFn(typ, val)
   end
 end
 
---- Applies saved button config to secure
+--- Loads/Applies saved button config to secure
 --- attributes and resets visuals if config is invalid.
-function o:ApplyButtonConfig()
+function o:LoadAction()
   local btn = self.button
   btn:SetButtonStateNormal()
 
@@ -132,34 +134,39 @@ function o:ApplyButtonConfig()
     if bc.id then self:SetActionSpell(bc.id) end
   elseif au.IsItem(bc.type) then
      self:SetActionItem(bc.id)
+  elseif au.IsBattlePet(bc.type) then
+    self:SetActionBattlePet(bc.id)
   end
 end
 
 --- Converts cursor drag state into button config
 --- and applies secure attributes.
 --- @param cursor Cursor_ABP_2_0
-function o:SetActionFromCursor(cursor)
+function o:SaveAction(cursor)
   if not cursor then return end
   --- @type ButtonConfig_ABP_2_0
-  local btnC = self:conf()
-  btnC.type = cursor.type
+  local c = self:conf()
+  c.type = cursor.type
 
   if cursor:IsSpell() then
     au.IfSpell(cursor:GetSpellID(), function(spell)
       self:SetActionSpell(spell.spellID)
-      btnC.id = spell.spellID
+      c.id = spell.spellID
     end)
   elseif cursor:IsItem() then
     au.IfItem(cursor:GetItemID(), function(itemInfo)
       self:SetActionItem(itemInfo.id)
-      btnC.id = itemInfo.id
+      c.id = itemInfo.id
     end)
   elseif cursor:IsMount() then
     comp:IfMount(cursor:GetMountID(), function(mount)
-      btnC.type = atyp.spell
-      btnC.id = mount.spellID
-      self:SetActionSpell(btnC.id)
+      c.type = atyp.spell
+      c.id = mount.spellID
+      self:SetActionSpell(c.id)
     end)
+  elseif cursor:IsBattlePet() then
+    c.id = cursor.battlePetID
+    self:SetActionBattlePet(c.id)
   end
 
   self.button:UpdateState('SetActionFromCursor')
@@ -210,39 +217,56 @@ end
 
 --- @private
 function o:__ClearActionAttributes()
-  self:SetAttribute(attr.type, nil)
-  self:ClearAttributeSuspendedActionType()
-  for _, typeAttribute in ipairs(atyp) do
-    self:SetAttribute(typeAttribute, nil)
+  for _, attrib in pairs(atyp) do self:SetAttribute(attrib, nil) end
+  for _, attrib in pairs(attr) do self:SetAttribute(attrib, nil) end
+end
+
+--- @return string?, ActionValue? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+function o:GetActionInfoCustom()
+  local typ = self:GetAttributeTypeCustom()
+  if not typ then return nil end
+
+  --- @type ActionValue
+  local val = self:GetActionAttributeTypeValue(typ)
+  if not val then return nil end
+
+  if au.IsBattlePet(typ) then
+    return typ, val
   end
+
+  return nil
 end
 
 --- Returns info for a known spell.  An unknown spell will return nil values.
---- @return string?, ActionID? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+--- @return string?, ActionValue? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo()
-  local actionType = self:GetAttribute(attr.type)
-  if not actionType then return nil, nil end
+  local typ = self:GetAttributeType()
+  if not typ then return nil end
 
-  --- @type ActionID
-  local val = self:GetAttribute(actionType)
-  if not val then return nil, nil end
+  local val = self:GetActionAttributeTypeValue(typ)
+  if not val then return nil end
 
-  if type(val) == "number" then return actionType, val end
+  if type(val) == "number" then return typ, val end
 
   if type(val) == "string" then
-    if au.IsSpell(actionType) then
+    if au.IsSpell(typ) then
       local sp = comp:GetSpellInfo(val)
-      if not sp then return nil, nil end
-      return actionType, sp.spellID
-    elseif au.IsItem(actionType) then
+      if not sp then return nil end
+      return typ, sp.spellID
+    elseif au.IsItem(typ) then
       local itemID = self:GetAttributeItemID()
-      return actionType, itemID
-    elseif au.IsMacro(actionType) then
-      error(self.button:GetName() .. ':: GetActionInfo(): macro support not implemented')
+      return typ, itemID
+    elseif au.IsMacro(typ) then
+      local c_actionType, c_val = self:GetActionInfoCustom()
+      if c_actionType and c_val then
+        return c_actionType, c_val
+      else
+        error(self.button:GetName() .. ':: GetActionInfo(): macro support not implemented')
+      end
     end
   end
 
-  return nil, nil
+  return nil
 end
 
 --- #### NOTES:
@@ -252,24 +276,29 @@ end
 --- @return TextureIcon?
 function o:GetActionTexture()
   local btn = self.button
-  local typeVal, id = self:GetActionInfo()
-  if not id then return nil end
-  if au.IsMount(typeVal) then return end
+
+  local typ, val = self:GetActionInfo()
+  if not val then return nil end
 
   local iconID, shouldDim = nil, false
-  if au.IsSpell(typeVal) then
-    local isShapeshiftSpell, active, activeIcon = unit:IsShapeShiftSpell(id)
-    if druid:IsProwl(id) and unit:IsStealthActive() then
+  if au.IsSpell(typ) then
+    local isShapeshiftSpell, active, activeIcon = unit:IsShapeShiftSpell(val)
+    if druid:IsProwl(val) and unit:IsStealthActive() then
       iconID = unit:GetStealthedIcon()
     elseif isShapeshiftSpell and active then
-      iconID, shouldDim = self:GetShapeshiftSpellActionTexture(id, active, activeIcon)
+      iconID, shouldDim = self:GetShapeshiftSpellActionTexture(val, active, activeIcon)
     else
-      local info = comp:GetSpellInfo(id)
+      local info = comp:GetSpellInfo(val)
       if info then iconID = info.iconID end
     end
-  elseif au.IsItem(typeVal) then
+  elseif au.IsItem(typ) then
     au.IfItem(self:GetAttributeItemID(), function(itemInfo)
       iconID = itemInfo.icon
+    end)
+  elseif au.IsBattlePet(typ) then
+    local petID = self:GetAttributeTypeValueCustom()
+    comp:IfPet(petID, function(pet)
+      iconID = pet.icon
     end)
   end
 
@@ -313,7 +342,16 @@ function o:IfActionTexture(callbackFn)
 end
 
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
+--- @return string
 function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
+
+--- @return string
+function o:GetAttributeTypeCustom() return self.button:GetAttribute(attr.abp_type) end
+--- @return string|number?
+function o:GetAttributeTypeValueCustom()
+  local typ = self:GetAttributeTypeCustom()
+  if not typ then return end; return self:GetAttribute(typ)
+end
 
 --- Temporarily suspends the button's secure action.
 ---
@@ -325,9 +363,11 @@ function o:GetAttributeType() return self.button:GetAttribute(attr.type) end
 --- This is called from PreClick() and drag handlers before manipulating the
 --- cursor or replacing the button's action.
 function o:SuspendAction()
-  local at = self:GetAttributeType()
-  if not at then return end
-  cns:SetGlobalAttribute(attr.suspended_type, self:GetAttributeType())
+  local typ = self:GetAttributeType()
+  if not typ then return end
+
+  cns:SetGlobalAttribute(attr.suspended_type, typ)
+  local val = cns:GetGlobalAttribute(attr.suspended_type)
   self:ClearAttributeType()
 end
 
@@ -340,8 +380,6 @@ function o:GetAttributeSuspendedActionType()
   return cns:GetGlobalAttribute(attr.suspended_type)
 end
 
-function o:GetAttributeItemID() return au.GetAttributeItemID(self:GetAttribute('item')) end
-
 --- Clears the globally stored suspended action type.
 --- This value is set by SuspendAction() during PreClick/drag so the button's
 --- `type` attribute can be temporarily removed without losing the original
@@ -351,13 +389,18 @@ function o:ClearAttributeSuspendedActionType()
   cns:ClearGlobalAttribute(attr.suspended_type)
 end
 
---function o:RestoreAttributeType()
---  if not self:GetAttributeDraggedType() then return end
---  self:SetAttribute(attr.type, self:GetAttribute(attr.saved_type))
---  self:SetAttribute(attr.saved_type, nil)
---end
+--- @return ItemID?
+function o:GetAttributeItemID()
+  return au.GetAttributeItemID(self:GetAttribute(atyp.item))
+end
 
+--- @return SpellName|SpellID
 function o:GetAttributeSpell() return self:GetAttribute(atyp.spell) end
+
+--- @return PetGUID?
+function o:GetAttributeBattlePetID()
+  return self:GetAttribute(atyp.battlepet) --[[@as PetGUID]]
+end
 
 function o:MatchesSpellID(spellID)
   local _, id = self:GetActionInfo()
@@ -383,6 +426,19 @@ function o:SetActionSpell(spellID)
   else
     self:SetAttribute(atyp.spell, spellID)
   end
+end
+
+--- BattlePet is a custom action implementation that uses `/summonpet {petGUID}`
+--- @param battlePetID PetGUID
+function o:SetActionBattlePet(battlePetID)
+  assert(type(battlePetID) == 'string', 'SetActionBattlePet(battlePetID): {battlePetID} should be a GUID:String')
+
+  local macroText = BATTLEPET_MACRO_TEMPLATE:format(battlePetID)
+  local typ = atyp.battlepet
+  self:SetAttribute(attr.abp_type, typ)
+  self:SetAttribute(typ, battlePetID)
+  self:SetAttribute(attr.type, atyp.macro)
+  self:SetAttribute(atyp.macrotext, macroText)
 end
 
 --- MoP-specific spell attribute setter. In MoP, spells have no ranks, so spell names are
@@ -432,17 +488,24 @@ function o:conf() return self.button:GetButtonConfig() end
 --- @return string value
 function o:GetAttribute(attributeName) return self.button:GetAttribute(attributeName) end
 
+--- @see Frame#GetAttribute
+--- @param actionType string
+--- @return ActionValue
+function o:GetActionAttributeTypeValue(actionType)
+  --- @type ActionValue
+  local val = self:GetAttribute(actionType)
+  -- macro type value can either be attribute 'macro' or 'macrotext'
+  if not val and actionType == atyp.macro then
+    val = self:GetAttribute(atyp.macrotext)
+  end
+  return val
+end
+
+
 --- @see Frame#SetAttribute(attributeName, value)
 --- @param attributeName string
 --- @param value any
 function o:SetAttribute(attributeName, value) self.button:SetAttribute(attributeName, value) end
-
---- @return boolean
-function o:IsShootSpell()
-  local typeVal, id = self:GetActionInfo()
-  if not (typeVal and id) then return false end
-  return au.IsSpell(typeVal) and au.IsShootSpell(id)
-end
 
 --- @return boolean
 function o:RequiresShootAnimation()
@@ -484,3 +547,49 @@ function o:DisableFlashAnimation()
   if not self.button.SpellHighlightAnim:IsPlaying() then return end
   self.button.SpellHighlightAnim:Stop()
 end
+
+function o:RestoreAction()
+  local at = self:GetAttributeSuspendedActionType()
+  if not at then return end
+  self:SetAttribute(attr.type, at)
+  self:ClearAttributeSuspendedActionType()
+end
+
+--- @private
+--- @param checkFn fun(typeVal:string):boolean
+--- @return boolean
+function o:__IsAT(checkFn)
+  local typeVal, id = self:GetActionInfo()
+  if not (typeVal and id) then return false end
+  return checkFn(typeVal)
+end
+
+--- @return boolean
+function o:IsShootSpell()
+  return self:__IsAT(function(typ)
+    return au.IsSpell(typ) and au.IsShootSpell(self:GetActionInfo())
+  end)
+end
+
+--- @param callbackFn fun(petID:PetGUID)
+--- @return Chain_ABP_2_0
+function o:IfBattlePet(callbackFn)
+  local typ, id = self:GetActionInfo()
+  local match = id and au.IsBattlePet(typ)
+  if match then callbackFn(id) end
+  return cns:Chain(match)
+end
+
+--- @return boolean
+function o:IsSpell() return self:__IsAT(au.IsSpell) end
+--- @return boolean
+function o:IsItem() return self:__IsAT(au.IsItem) end
+--- @return boolean
+function o:IsMount() return self:__IsAT(au.IsMount) end
+--- @return boolean
+function o:IsBattlePet()
+  --return self:__IsAT(au.IsBattlePet)
+  return self:GetAttribute(attr.abp_type) == atyp.battlepet
+end
+
+
