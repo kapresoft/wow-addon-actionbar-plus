@@ -19,9 +19,15 @@ Module::Constants (Methods)
 -------------------------------------------------------------------------------]]
 --- @class AttributeNames_ABP_2_0
 local AttributeNames = {
-  type           = 'type',
+  type              = 'type',
+
+  -- ## addon-based custom attributes ##
   -- used for drag and drop transitional states
-  suspended_type = 'abp_suspended_type',
+  suspended_type    = 'abp_suspended_type',
+  abp_type          = 'abp_type',      -- ABP Custom type
+  -- used for custom implementations
+  abp_battlepet     = 'abp_battlepet', -- ABP Custom Battlepet
+
 }; o.AttributeNames = AttributeNames
 
 --- @class SupportedActionTypes_ABP_2_0

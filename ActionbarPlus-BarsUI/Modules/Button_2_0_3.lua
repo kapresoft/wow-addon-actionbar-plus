@@ -30,11 +30,11 @@ local dru, priest = O.DruidUtil, O.PriestUtil
 local Tbl_IsEmpty = cns:Table().IsEmpty
 local Str_IsAnyOf = cns:String().IsAnyOf
 
+local MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED'
 --- @type Color
 local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
-
-
 local seedID = 1000
+
 --[[-----------------------------------------------------------------------------
 New Instance
 @see ButtonState_ABP_2_0, ButtonConfigAccessor_ABP_2_0
@@ -44,7 +44,7 @@ New Instance
 --
 local libName = 'Button_2_0_3'
 
---- @class ButtonMixin_ABP_2_0_3 : ButtonHandlerMixin_ABP_2_0, ButtonConfigAccessor_ABP_2_0, SecureActionButtonTemplate, CheckButton, AceEvent-3.0
+--- @class ButtonMixin_ABP_2_0_3 : ButtonHandlerMixin_ABP_2_0, ButtonConfigAccessor_ABP_2_0, AceEvent-3.0, SecureActionButtonTemplate, CheckButton
 --- @field NormalTexture Texture
 --- @field HighlightTexture Texture
 --- @field PushedTexture Texture
@@ -105,7 +105,7 @@ function o:OnLoad()
 
   --- @param btn Button_ABP_2_0_X
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
-  self.widget:ApplyButtonConfig()
+  self.widget:LoadAction()
 
   local traceChecked = false
   if traceChecked then
@@ -126,7 +126,7 @@ end
 --- @see ButtonUpdateFrame_ABP_2_0#OnUpdate()
 --- @param elapsed number
 function o:OnUpdate(elapsed)
-  t('OnUpdate') -- tbd
+  --t('OnUpdate') -- tbd
 end
 
 --- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
@@ -141,6 +141,18 @@ function o:OnEvent(evt, ...)
     self:UpdateTexture()
     self:UpdateState(evt)
     self:UpdateUsable()
+    if isInitialLogin or isReloadingUi then
+      self.widget:IfBattlePet(function (petID)
+        C_Timer.After(1, function ()
+          self:UpdateTexture()
+          self:UpdateState(evt)
+        end)
+      end)
+    end
+  elseif evt == 'COMPANION_UPDATE' then
+    self:UpdateState('OnEvent')
+  elseif evt == MODIFIER_STATE_CHANGED then
+    t('OnEvent', 'evt=', evt, 'args=', fmt({...}))
   elseif evt == 'SPELL_UPDATE_USABLE' then
     self:UpdateUsable()
   elseif evt == 'SPELL_UPDATE_CHARGES' then
@@ -189,7 +201,6 @@ function o:OnEvent(evt, ...)
     local spellID = ...
     if self:MatchesSpellID(spellID) then self.widget:HideOverlayGlow() end
   elseif evt == 'BAG_UPDATE_COOLDOWN' then
-    --t('OnEvent', 'evt=', evt)
     self:UpdateCooldown()
     self:UpdateUsable()
   elseif evt == 'BAG_UPDATE_DELAYED' then
@@ -218,7 +229,7 @@ function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
   elseif evt == 'UNIT_SPELLCAST_STOP'
       or evt == 'UNIT_SPELLCAST_SUCCEEDED'
       or evt == 'UNIT_SPELLCAST_INTERRUPTED'
-      or 'UNIT_SPELLCAST_FAILED' then
+      or evt == 'UNIT_SPELLCAST_FAILED' then
     self:SetChecked(false)
     self:UpdateTexture()
   end
@@ -255,11 +266,19 @@ end
 --- @param button ButtonName
 --- @param down ButtonDown
 function o:PostClick(button, down)
+  self:UpdateUsable()
   if InCombatLockdown()
     or not (down and o.IsActionbarLockedByUser()) then
       return
   end
   self:PostClickAction(button, down)
+end
+
+--- For restoring suspended actions
+function o:OnModifierStateChanged(evt, keyPressed, isDown)
+  self:UnregisterEvent(MODIFIER_STATE_CHANGED)
+  if InCombatLockdown() then return end
+  self.widget:RestoreAction()
 end
 
 --- Only process mouse down events here
@@ -274,6 +293,7 @@ function o:PreClickAction(button, down)
   if o.Btn_ActionShouldFire(self, down) and self.widget:IsDragAllowed() then
     self:SetChecked(false)
     self.widget:SuspendAction()
+    self:RegisterEvent(MODIFIER_STATE_CHANGED, 'OnModifierStateChanged')
     return
   end
 
@@ -307,19 +327,14 @@ function o:PostClickAction(button, down)
 
   ClearCursor()
 
-  local suspendedType, actionID = self:GetSuspendedActionInfo()
+  local suspendedType = self:GetSuspendedActionInfo()
   if suspendedType then
     -- Chain-clicking between buttons with a valid cursor; not a drag event.
-    if suspendedType == atyp.spell then
-      o.Btn_PickupSpellOrMount(self, actionID)
-    elseif suspendedType == atyp.item then
-      comp:PickupItem(self.widget:GetAttributeItemID())
-    elseif suspendedType == atyp.macro then
-      --  todo: handle macro
-    end
+    -- Clicking on button with an action
+    o.Btn_PickupAction(self)
   end
   self.widget:ClearAttributeSuspendedActionType()
-  self.widget:SetActionFromCursor(cursor)
+  self.widget:SaveAction(cursor)
 end
 
 function o:OnEnter()
@@ -348,6 +363,7 @@ function o:OnLeave() GameTooltip:Hide() end
 
 --- @param button ButtonName
 function o:OnDragStart(button)
+  self:UnregisterEvent(MODIFIER_STATE_CHANGED)
   if InCombatLockdown() then return false end
   if not self.widget:IsDragAllowed() then return end
 
@@ -376,9 +392,11 @@ function o:OnReceiveDrag()
     o.Btn_PickupSpellOrMount(self, existingID)
   elseif au.IsItem(existingType) then
     comp:PickupItem(self.widget:GetAttributeItemID())
+  elseif au.IsBattlePet(existingType) then
+    comp:PickupBattlePet(self.widget:GetAttributeBattlePetID())
   end
   
-  self.widget:SetActionFromCursor(cursor)
+  self.widget:SaveAction(cursor)
 end
 
 function o:OnAttributeChanged(name, val)
@@ -436,10 +454,10 @@ Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateUsable()
   local icon = self.icon
-  local typeVal, actionID = self:GetActionInfo()
-  if typeVal == nil then return end
+  local typ, val = self:GetActionInfo()
+  if typ == nil then return end
 
-  local isUsable, notEnoughMana = au.IsUsableAction(typeVal, actionID)
+  local isUsable, notEnoughMana = au.IsUsableAction(typ, val)
   if isUsable then
     self:SetIconNormalVertex()
   elseif notEnoughMana then
@@ -491,19 +509,20 @@ function o:UpdateCooldown()
 end
 
 --- @see ButtonWidget_ABP_2_0.GetActionInfo()
---- @return string?, ActionID? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
+--- @return string?, ActionValue? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
 function o:GetActionInfo() return self.widget:GetActionInfo() end
 
---- @return string|nil, number|nil The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
+--- @return string?, ActionValue? @The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
 function o:GetSuspendedActionInfo()
-  local actionType = self.widget:GetAttributeSuspendedActionType()
-  if not actionType then return nil, nil end
+  local typ = self.widget:GetAttributeSuspendedActionType()
+  if not typ then return nil, nil end
+
+  local val = self.widget:GetActionAttributeTypeValue(typ)
+  if not val then return nil end
   
-  local id = self:GetAttribute(actionType)
-  if not id then return nil, nil end
-  
-  return actionType, id
+  return typ, val
 end
+
 --- @param r number
 --- @param g number
 --- @param b number

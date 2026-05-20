@@ -14,6 +14,7 @@ local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
 local C_IsSpellUsable     = C_Spell.IsSpellUsable
 local C_IsUsableItem      = C_Item.IsUsableItem
 local C_GetTalentInfo     = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
+local C_GetSummonedPetGUID = C_PetJournal and C_PetJournal.GetSummonedPetGUID
 
 local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 
@@ -75,29 +76,29 @@ function o.IsSpellKnown(spellID)
   return false, nextSp
 end
 
---- @param itemIDAttribute string @The itemID attribute value, i.e. 'item:123'
-function o.GetAttributeItemID(itemIDAttribute)
-  if not itemIDAttribute then return nil end
-  assert(type(itemIDAttribute) == 'string', 'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ', type(itemIDAttribute))
-  return tonumber(itemIDAttribute:match("item:(%d+)"))
+--- @param itemValue string @The itemID attribute value, i.e. 'item:123'
+--- @return ItemID?         @returns 123 given {itemIDAttribute} of 'item:123'
+function o.GetAttributeItemID(itemValue)
+  if not itemValue then return nil end
+  assert(type(itemValue) == 'string', 'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ', type(itemValue))
+  return tonumber(itemValue:match("item:(%d+)"))
 end
 
 --- @param typeVal string The button attribute 'type' value
 --- @param id Identifier The context id; 'spell', 'item', etc...
 --- @return boolean   @true if action is usable
---- @return boolean   @true if due to not-enough-'energy|mana|rage|etc', false otherwise
+--- @return boolean?   @true if due to not-enough-'energy|mana|rage|etc', false otherwise
 function o.IsUsableAction(typeVal, id)
-  if not (typeVal and id) then return false, false end
+  if not (typeVal and id) then return false end
   if o.IsSpell(typeVal) then
       local isUsable, notEnoughMana = C_IsSpellUsable(id)
       return isUsable, notEnoughMana
   elseif o.IsItem(typeVal) then
-    --if id == 38233 then
-    --  t('IsUsableAction', 'id=', id, 'usable=', C_IsUsableItem(id))
-    --end
-    return C_IsUsableItem(id), false
+    return C_IsUsableItem(id)
+  elseif o.IsBattlePet(typeVal) then
+    return true
   end
-  return false, false
+  return false
 end
 
 --- @return boolean
@@ -122,6 +123,8 @@ function o.IsCurrentAction(typeVal, id)
     return C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id)
   elseif o.IsItem(typeVal) then
       return C_Item.IsCurrentItem(id)
+  elseif C_GetSummonedPetGUID and o.IsBattlePet(typeVal) then
+    return C_GetSummonedPetGUID() == id
   end
   return false
 end
