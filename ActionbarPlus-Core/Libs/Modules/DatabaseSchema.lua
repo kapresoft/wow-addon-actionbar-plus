@@ -1,6 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
+
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local unit = ns.O.UnitUtil
@@ -11,6 +12,7 @@ local MAX_BAR_COUNT = 10
 --[[-------------------------------------------------------------------
 Type Definitions
 ---------------------------------------------------------------------]]
+
 --- @class RootConfig_ABP_2_0
 --- @field characterSpecificAnchors boolean
 --- @field hideWhenTaxi boolean
@@ -20,38 +22,52 @@ Type Definitions
 --- @field tooltip TooltipConfig_ABP_2_0
 --- @field equipmentSet EquipmentSetConfig_ABP_2_0
 --- @field bars table<number, BarConfig_ABP_2_0>
+
 --  ================================================
+
 --- @class EquipmentSetConfig_ABP_2_0
 --- @field openCharacterFrame boolean
 --- @field openEquipmentManager boolean
 --- @field showGlowWhenActive boolean
+
 --  ================================================
+
 --- @class TooltipConfig_ABP_2_0
 --- @field visibilityKey string
 --- @field visibilityCombatOverrideKey string
 --- @field anchorType string
+
 --  ================================================
+
 --- @class PaddingConfig_ABP_2_0
 --- @field left number
 --- @field right number
 --- @field top number
 --- @field bottom number
+
 --  ================================================
+
 --- @class SpacingConfig_ABP_2_0
 --- @field horizontal number
 --- @field vertical number
+
 --  ================================================
+
 --- @class BarButtonUIConfig_ABP_2_0
 --- @field size number
 --- @field spacing SpacingConfig_ABP_2_0
+
 --  ================================================
+
 --- @alias RGBA number[]  -- {r,g,b,a} each value 0.0–1.0
 
 --- @class BarBorderConfig_ABP_2_0
 --- @field theme string        -- Border theme key (see BORDER_DEFS in Backdrops.lua)
 --- @field bgColor RGBA        -- Backdrop background color
 --- @field borderColor RGBA    -- Backdrop border color
+
 --  ================================================
+
 --- @class BarUIConfig_ABP_2_0
 --- @field rowSize number
 --- @field colSize number
@@ -63,25 +79,33 @@ Type Definitions
 --- @field button BarButtonUIConfig_ABP_2_0     -- Button spacing configuration
 --- @field border BarBorderConfig_ABP_2_0
 --  ================================================
+
 --- @class ButtonConfig_ABP_2_0
---- @field type string
---- @field id number
--- todo next: change 'id' to 'value'
+--- @field type string    The button action type e.g. 'spell', 'item', 'mount', 'battlepet'
+--- @field id ActionValue The identifier for the action; a numeric ID for spells/items/mounts or a GUID string for battle pets
+
 --  ================================================
+
 --- @class BarConfig_ABP_2_0
---- @field enabled boolean                       -- Whether this bar is active
---- @field showKeybindText boolean               -- Show keybind text on buttons
---- @field showButtonIndex boolean               -- Show button index overlay
---- @field anchor Anchor                         -- Frame anchor definition
+--- @field enabled boolean                       Whether this bar is active
+--- @field showKeybindText boolean               Show keybind text on buttons
+--- @field showButtonIndex boolean               Show button index overlay
+--- @field anchor Anchor                         Frame anchor definition
 --- @field buttons table<string, table<string, ButtonConfig_ABP_2_0>> -- i.e., buttons['b1']
---- @field ui BarUIConfig_ABP_2_0                -- Visual/layout configuration
+--- @field ui BarUIConfig_ABP_2_0                Visual/layout configuration
+
 --  ================================================
+
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
+
 --  ================================================
+
 --- @class ProfileConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field barCount number
+
 --  ================================================
+
 --- @class DatabaseObj_ABP_2_0 : AceDBObject_3_0
 --- @field global GlobalConfig_ABP_2_0
 --- @field profile ProfileConfig_ABP_2_0
@@ -92,14 +116,17 @@ Type Definitions
 --[[-----------------------------------------------------------------------------
 Module::DatabaseSchema
 -------------------------------------------------------------------------------]]
+
 --- @see Core_Modules_ABP_2_0
 local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
-local S = {}; ns:Register(libName, S)
+local o = {}; ns:Register(libName, o)
 local p, t = ns:log(libName)
+
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
+
 --- @param barIndex Index
 --- @return string
 local function barKey(barIndex)
@@ -121,7 +148,7 @@ local function specGroupKey(specGroupIndex)
   return 'spg_' .. specGroupIndex
 end
 
-S.Util = {
+o.Util = {
   barKey = barKey,
   buttonKey = buttonKey,
   specGroupKey = specGroupKey
@@ -208,12 +235,8 @@ local DEFAULT_BAR = {
 --[[-----------------------------------------------------------------------------
 Module::DatabaseSchema (Methods)
 -------------------------------------------------------------------------------]]
---- @type DatabaseSchema_ABP_2_0
-local o = S
 
---[[-------------------------------------------------------------------
-Default Database
----------------------------------------------------------------------]]
+--- Default Database
 --- @return DatabaseObj_ABP_2_0
 function o:GetDefaultDatabase()
   local db = tbl_DeepCopy(DEFAULT_DB)
