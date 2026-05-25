@@ -203,6 +203,7 @@ function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
 --- @return boolean? @If {spellID} is active
 --- @return Icon? @The form active icon
 function o:IsShapeShiftSpell(spellID)
+  assert(type(spellID) == 'number', 'IsShapeShiftSpell(spellID): {spellID} should be a number')
   local playerClass = self:GetPlayerUnitClass()
   local specialUnit = GetSpecialShapeshiftUnit(playerClass)
   if specialUnit then return specialUnit:GetShapeShiftSpellInfo(spellID) end

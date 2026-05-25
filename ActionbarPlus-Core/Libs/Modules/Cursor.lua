@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 local O = ns.O
-local au = O.ActionUtil
+local au, comp = O.ActionUtil, O.Compat
 local Str_IsBlank = ns:String().IsBlank
 local COMPANION_TYPE_MOUNT = 'MOUNT'
 
@@ -30,6 +30,7 @@ local p, t = ns:log(libName)
 --- @field itemID ItemID
 --- @field itemLink ItemLink
 --- @field battlePetID PetGUID
+--- @field equipmentSetID number
 local CursorMixin = {}
 
 local function CursorMixinMethods()
@@ -54,6 +55,8 @@ local function CursorMixinMethods()
       self.mountID = ns.mountID or i.info1
     elseif self:IsBattlePet() then
       self.battlePetID = i.info1
+    elseif self:IsEquipmentSet() then
+      self.equipmentSetID = comp:GetEquipmentSetID(i.info1)
     end
   end
 
@@ -76,6 +79,11 @@ local function CursorMixinMethods()
   --- @return boolean
   function CursorMixin:IsBattlePet()
     return self.isValid and au.IsBattlePet(self.type)
+  end
+
+  --- @return boolean
+  function CursorMixin:IsEquipmentSet()
+    return self.isValid and au.IsEquipmentSet(self.type)
   end
 
   --- @return SpellID?

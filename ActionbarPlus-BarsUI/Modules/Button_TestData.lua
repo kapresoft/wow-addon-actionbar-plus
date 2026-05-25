@@ -68,8 +68,8 @@ function o:AddTestData(btn)
   local spellName = characterSpells[id]
   if not spellName then return end
   
-  local type, id = btn:GetActionInfo()
-  if id then return end
+  local typ, val = btn.widget:GetActionInfo()
+  if val then return end
   -- Setting attribute will call button:UpdateAction()
   btn:SetAttribute('type', 'spell')
   btn:SetAttribute('spell', spellName)

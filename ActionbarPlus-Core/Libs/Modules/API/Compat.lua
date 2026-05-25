@@ -18,6 +18,10 @@ local C_PickupSpell        = C_Spell.PickupSpell
 local C_GetSpellCooldown   = C_Spell.GetSpellCooldown
 local C_GetSpellInfo       = C_Spell.GetSpellInfo, GetSpellInfo
 
+local _es = C_EquipmentSet
+local C_GetEquipmentSetID     = _es and _es.GetEquipmentSetID
+local C_GetEquipmentSetInfo   = _es and _es.GetEquipmentSetInfo
+
 local _cmj = C_MountJournal
 local C_GetDisplayedMountID   = _cmj and _cmj.GetDisplayedMountID
 local C_GetNumDisplayedMounts = _cmj and _cmj.GetNumDisplayedMounts
@@ -151,6 +155,11 @@ end
 function o:PickupBattlePet(petID)
   if type(petID) ~= 'string' then return end
   C_PickupPet(petID)
+end
+--- @param eqSetID EquipmentSetID
+function o:PickupEquipmentSet(eqSetID)
+  if type(eqSetID) ~= 'number' then return end
+  C_EquipmentSet.PickupEquipmentSet(eqSetID)
 end
 
 --- @param index Index
@@ -397,4 +406,37 @@ function o:GetPetInfo(petID)
     obtainable  = obtainable,
   }
   return pet
+end
+
+--- @param eqSetName string
+--- @return EquipmentSetID?
+function o:GetEquipmentSetID(eqSetName)
+  if not (eqSetName and C_GetEquipmentSetID) then return nil end
+  return C_GetEquipmentSetID(eqSetName)
+end
+
+--- @param id Identifier The equipmentSet ID
+--- @return EquipmentSetDetails?
+function o:GetEquipmentSet(id)
+  assert(type(id) == 'number', "GetEquipmentSet(id): {id} is missing")
+
+  local name, iconFileID, setID, isEquipped,
+  numItems, numEquipped, numInInventory,
+  numLost, numIgnored = C_GetEquipmentSetInfo(id)
+
+  if not name then return nil end
+
+  --- @type EquipmentSetDetails
+  local eq = {
+    name           = name,
+    iconID         = iconFileID,
+    id             = setID,
+    isEquipped     = isEquipped,
+    numItems       = numItems,
+    numEquipped    = numEquipped,
+    numInInventory = numInInventory,
+    numLost        = numLost,
+    numIgnored     = numIgnored,
+  }
+  return eq
 end
