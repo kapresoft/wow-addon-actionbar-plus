@@ -157,17 +157,17 @@ function o:SaveAction(cursor)
   bc.type = cursor.type
 
   if cursor:IsSpell() then
-    au.IfSpell(cursor:GetSpellID(), function(spell)
+    au.IfSpell(cursor.spellID, function(spell)
       self:SetActionSpell(spell.spellID)
       bc.id = spell.spellID
     end)
   elseif cursor:IsItem() then
-    au.IfItem(cursor:GetItemID(), function(itemInfo)
+    au.IfItem(cursor.itemID, function(itemInfo)
       self:SetActionItem(itemInfo.id)
       bc.id = itemInfo.id
     end)
   elseif cursor:IsMount() then
-    comp:IfMount(cursor:GetMountID(), function(mount)
+    comp:IfMount(cursor.mountID, function(mount)
       bc.type = atyp.spell
       bc.id = mount.spellID
       self:SetActionSpell(bc.id)
