@@ -175,10 +175,15 @@ local function BarModuleProtoMethods()
 
     local activeIndex = unit:GetActiveSpecGroupIndex()
     t('SPELLS_CHANGED', 'evt=', event, 'activeIndex[detected]=', activeIndex)
-    
-    local w = self.barFrame.widget
-    for i, btn in ipairs(w.buttons) do
-      btn.widget:ApplyButtonConfig()
+    self:ForEach(function(btn) btn.widget:LoadAction() end)
+  end
+
+  --- @param callbackFn fun(btn: Button_ABP_2_0_X)
+  function bm:ForEach(callbackFn)
+    for _, btn in ipairs(self.barFrame.widget.buttons) do
+      --- @type Button_ABP_2_0_X
+      local b = btn
+      callbackFn(b)
     end
   end
 
