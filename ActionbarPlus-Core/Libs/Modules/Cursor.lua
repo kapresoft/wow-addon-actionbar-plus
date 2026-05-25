@@ -86,18 +86,6 @@ local function CursorMixinMethods()
     return self.isValid and au.IsEquipmentSet(self.type)
   end
 
-  --- @return SpellID?
-  function CursorMixin:GetSpellID() return self.spellID end
-
-  --- @return MountID?
-  function CursorMixin:GetMountID() return self.mountID end
-
-  --- @return ItemID?, ItemLink?
-  function CursorMixin:GetItem() return self.itemID, self.itemLink end
-
-  --- @return ItemID?
-  function CursorMixin:GetItemID() return self.itemID end
-
 end; CursorMixinMethods()
 
 --[[-----------------------------------------------------------------------------
