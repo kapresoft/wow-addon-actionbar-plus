@@ -103,7 +103,7 @@ end
 --- @param typ ActionType The button attribute 'type' value
 --- @param val ActionValue The context id; 'spell', 'item', etc...
 --- @param isCustom boolean?
---- @return boolean   @true if action is usable
+--- @return boolean?   @true if action is usable
 --- @return boolean?   @true if due to not-enough-'energy|mana|rage|etc', false otherwise
 function o.IsUsableAction(typ, val, isCustom)
   if not (typ and val) then return false end
@@ -114,7 +114,11 @@ function o.IsUsableAction(typ, val, isCustom)
   elseif o.IsItem(typ) then
     return C_IsUsableItem(val)
   elseif isCustom then
-    if o.IsEquipmentSet(typ) then
+    if o.IsMount(typ) then
+      local isUsable
+      o.IfMount(val, function(mountInfo) isUsable = C_IsSpellUsable(mountInfo.name) end)
+      return isUsable, false
+    elseif o.IsEquipmentSet(typ) then
       return not InCombatLockdown()
     elseif o.IsBattlePet(typ) then
       return true
@@ -201,6 +205,10 @@ function o.IsMacroText(typ) return typ == atyp.macrotext end
 --- @param typ string The button attribute 'type' value
 --- @return boolean
 function o.IsBattlePet(typ) return typ == atyp.battlepet end
+
+--- @param typ string The button attribute 'type' value
+--- @return boolean
+function o.IsPetAction(typ) return typ == atyp.petaction end
 
 --- @param typ string The button attribute 'type' value
 --- @return boolean

@@ -138,6 +138,8 @@ function o:LoadAction()
     if bc.id then self:SetActionSpell(bc.id) end
   elseif au.IsItem(bc.type) then
      self:SetActionItem(bc.id)
+  elseif au.IsMount(bc.type) then
+    btn.Btn_SetActionMount(btn, bc.id)
   elseif au.IsBattlePet(bc.type) then
     btn.Btn_SetActionBattlePet(btn, bc.id)
   elseif au.IsEquipmentSet(bc.type) then
@@ -167,11 +169,10 @@ function o:SaveAction(cursor)
       bc.id = itemInfo.id
     end)
   elseif cursor:IsMount() then
-    comp:IfMount(cursor.mountID, function(mount)
-      bc.type = atyp.spell
-      bc.id = mount.spellID
-      self:SetActionSpell(bc.id)
-    end)
+  elseif cursor:IsMount() then
+    bc.type = atyp.mount
+    bc.id = cursor.mountID
+    btn.Btn_SetActionMount(btn, bc.id)
   elseif cursor:IsBattlePet() then
     bc.id = cursor.battlePetID
     btn.Btn_SetActionBattlePet(btn, bc.id)
@@ -323,7 +324,11 @@ function o:GetActionTexture()
   else
     --- @type ActionValue
     local val = self:GetActionValueCustom()
-    if au.IsBattlePet(typ) then
+    if au.IsMount(typ) then
+      comp:IfMount(val, function(mount)
+          iconID = mount.icon
+      end)
+    elseif au.IsBattlePet(typ) then
       comp:IfPet(val, function(pet)
         iconID = pet.icon
       end)
@@ -468,8 +473,7 @@ end
 --- @param typ ActionType? @Can be a nil
 --- @param val ActionValue? @Can be a nil
 function o:SetActionAttributeCustom(typ, val)
-  local _type = type(typ)
-  assert(_type == 'string', 'SetActionAttribute(typ, value): {typ} should be a string; spell, item, etc. ')
+  assert(type(typ) == 'string', 'SetActionAttributeCustom(typ, val): {typ} should be a string; spell, item, etc. ')
 
   local typ_custom = 'abp_' .. typ
   self:SetAttribute(attr.abp_type, typ_custom)
