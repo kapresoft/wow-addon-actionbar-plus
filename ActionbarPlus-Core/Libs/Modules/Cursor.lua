@@ -21,6 +21,8 @@ local p, t = ns:log(libName)
 --- @class Cursor_ABP_2_0 : CursorMixin_ABP_2_0
 --
 
+--- @alias PetActionID number
+
 --- @class CursorMixin_ABP_2_0
 --- @field type CursorType
 --- @field info CursorInfo
@@ -30,6 +32,7 @@ local p, t = ns:log(libName)
 --- @field itemID ItemID
 --- @field itemLink ItemLink
 --- @field battlePetID PetGUID
+--- @field petActionID PetActionID
 --- @field equipmentSetID number
 local CursorMixin = {}
 
@@ -55,6 +58,8 @@ local function CursorMixinMethods()
       self.mountID = ns.mountID or i.info1
     elseif self:IsBattlePet() then
       self.battlePetID = i.info1
+    elseif self:IsPetAction() then
+      self.petActionID = i.info1
     elseif self:IsEquipmentSet() then
       self.equipmentSetID = comp:GetEquipmentSetID(i.info1)
     end
@@ -80,7 +85,10 @@ local function CursorMixinMethods()
   function CursorMixin:IsBattlePet()
     return self.isValid and au.IsBattlePet(self.type)
   end
-
+  --- @return boolean
+  function CursorMixin:IsPetAction()
+    return self.isValid and au.IsPetAction(self.type)
+  end
   --- @return boolean
   function CursorMixin:IsEquipmentSet()
     return self.isValid and au.IsEquipmentSet(self.type)

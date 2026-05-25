@@ -43,6 +43,24 @@ function o.Btn_ResetAll(self)
 end
 
 --- @param self Button_ABP_2_0_X
+function o.Btn_UpdateUsable(self)
+  self.widget:IfHasAction(function(typ, val, isCustom)
+    local icon = self.icon
+
+    --- @type boolean, boolean
+    local isUsable, notEnoughMana = au.IsUsableAction(typ, val, isCustom)
+
+    if isUsable then
+      self:SetIconNormalVertex()
+    elseif notEnoughMana then
+      icon:SetVertexColor(0.5, 0.5, 1.0)
+    else
+      icon:SetVertexColor(0.4, 0.4, 0.4);
+    end
+  end)
+end
+
+--- @param self Button_ABP_2_0_X
 --- @param typ ActionType
 --- @param isCustom boolean
 --- @param callbackFn fun() : void
@@ -55,7 +73,7 @@ function o.Btn_DispatchPickupAction(self, typ, isCustom, callbackFn)
   if not isCustom then
     val = self.widget:GetActionValueByType(typ)
     if au.IsSpell(typ) then
-      o.Btn_PickupSpellOrMount(self, val)
+      comp:PickupSpell(val)
     elseif au.IsItem(typ) then
       comp:PickupItem(val)
     elseif au.IsMacro(typ) then
@@ -63,12 +81,15 @@ function o.Btn_DispatchPickupAction(self, typ, isCustom, callbackFn)
     end
   else
     typ, val = self.widget:GetActionInfoCustom()
-    if au.IsBattlePet(typ) then
+    if au.IsMount(typ) then
+      comp:PickupMount(val)
+    elseif au.IsBattlePet(typ) then
       comp:PickupBattlePet(val)
     elseif au.IsEquipmentSet(typ) then
       comp:PickupEquipmentSet(val)
     end
   end
+
   self:IfHasCursor(function(cursor) o.Btn_ResetAll(self) end)
   if callbackFn then callbackFn() end
 end
@@ -87,16 +108,6 @@ function o.Btn_PickupExistingAction(self)
   --- @type ActionType, boolean?
   local typ, isCustom = self.widget:GetActionType()
   o.Btn_DispatchPickupAction(self, typ, isCustom)
-end
-
---- @param self Button_ABP_2_0_X
---- @param spell SpellIdentifier
-function o.Btn_PickupSpellOrMount(self, spell)
-  comp:IfMountSpell(spell, function(mount)
-    comp:PickupMount(mount.mountID)
-  end).OrElse(function ()
-    comp:PickupSpell(spell)
-  end)
 end
 
 --- Update the button's checked state
@@ -130,7 +141,6 @@ function o.Btn_UpdateAnimation(self)
   end
 end
 
---- A Custom Type
 --- BattlePet is a custom action implementation that uses `/summonpet {petGUID}`
 --- @param self Button_ABP_2_0_X
 --- @param battlePetID PetGUID
@@ -145,6 +155,7 @@ function o.Btn_SetActionBattlePet(self, battlePetID)
   w:SetAttribute(atyp.macrotext, macroText)
 end
 
+--- EquipmentSet is a custom action
 --- @param self Button_ABP_2_0_X
 --- @param equipmentSetID EquipmentSetID
 function o.Btn_SetActionEquipmentSet(self, equipmentSetID)
@@ -157,5 +168,21 @@ function o.Btn_SetActionEquipmentSet(self, equipmentSetID)
   w:SetActionAttributeCustom(atyp.equipmentset, equipmentSetID)
   w:SetAttribute(attr.type, atyp.macro)
   w:SetAttribute(atyp.macrotext, macroText)
+end
+
+--- Mount is a a custom action
+--- @param self Button_ABP_2_0_X
+--- @param mountID MountID
+function o.Btn_SetActionMount(self, mountID)
+  comp:IfMount(mountID, function(mount)
+    local w = self.widget
+    w:SetActionAttributeCustom(atyp.mount, mount.mountID)
+    w:SetAttribute(attr.type, atyp.spell)
+    if LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_MISTS_OF_PANDARIA then
+      w:SetActionSpellByName(mount.spellID)
+      return
+    end
+    w:SetAttribute(atyp.spell, mount.spellID)
+  end)
 end
 

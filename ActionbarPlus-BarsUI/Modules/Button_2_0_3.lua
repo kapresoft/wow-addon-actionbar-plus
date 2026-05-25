@@ -459,23 +459,7 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
--- todo next: move to a new Btn_UpdateUsable(self)?
-function o:UpdateUsable()
-  self.widget:IfHasAction(function(typ, val, isCustom)
-    local icon = self.icon
-
-    --- @type boolean, boolean
-    local isUsable, notEnoughMana = au.IsUsableAction(typ, val, isCustom)
-
-    if isUsable then
-      self:SetIconNormalVertex()
-    elseif notEnoughMana then
-      icon:SetVertexColor(0.5, 0.5, 1.0)
-    else
-      icon:SetVertexColor(0.4, 0.4, 0.4);
-    end
-  end)
-end
+function o:UpdateUsable() o.Btn_UpdateUsable(self) end
 
 function o:UpdateCooldown()
   local cd = self.cooldown
