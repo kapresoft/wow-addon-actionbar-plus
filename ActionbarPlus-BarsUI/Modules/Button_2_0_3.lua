@@ -313,8 +313,6 @@ function o:PreClickAction(button, down)
   end
 end
 
-function o:OnClick() end
-
 --- Only process down events here due to AnyDown() being set
 --- @param button ButtonName
 --- @param down ButtonDown
@@ -331,15 +329,18 @@ function o:PostClickAction(button, down)
   if suspendedType then
     -- Chain-clicking between buttons with a valid cursor; not a drag event.
     -- Clicking on button with an action
-    o.Btn_PickupAction(self)
+    o.Btn_PickupAction(self, function()
+        self.widget:ClearAttributeSuspendedActionType()
+    end)
   end
-  self.widget:ClearAttributeSuspendedActionType()
   self.widget:SaveAction(cursor)
 end
 
+-- todo: GameTooltip needs impl
 function o:OnEnter()
-  local type, id = self:GetActionInfo()
-  if not id then return end
+  local typ, val, isCustom = self.widget:GetActionInfo()
+  if not (typ and val) then return end
+
   --todo: GameTooltip owner will be user configurable
   GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
   GameTooltip:ClearAllPoints()
@@ -347,15 +348,22 @@ function o:OnEnter()
   
   --- @type FontStringObj
   local right = _G["GameTooltipTextRight1"]
-  if au.IsSpell(type) then
-    GameTooltip:SetSpellByID(id)
-    local rank = spu:GetHighestSpellRank(id)
-    if right and rank then
-      right:SetText(rank);
-      right:SetTextColor(rankColor:GetRGBA())
-      right:Show()
+
+  if not isCustom then
+    if au.IsSpell(typ) then
+      GameTooltip:SetSpellByID(val)
+      local rank = spu:GetHighestSpellRank(val)
+      if right and rank then
+        right:SetText(rank);
+        right:SetTextColor(rankColor:GetRGBA())
+        right:Show()
+      end
+      GameTooltip:Show()
+    elseif au.IsItem(typ) then
+      GameTooltip:SetInventoryItemByID(self.widget:GetAttributeItemID())
     end
-    GameTooltip:Show()
+  else
+    -- tbd
   end
 end
 
@@ -372,31 +380,29 @@ function o:OnDragStart(button)
     self:UpdateCooldown()
     self:UpdateFlash()
     self:SetChecked(false)
+    self:ClearAttributes()
   end)
   
 end
 
 function o:OnDragStop() end
 
+-- todo next: Move to a new Btn_OnReceiveDrag(self)?
 function o:OnReceiveDrag()
   if InCombatLockdown() then return end
   local cursor = cns:cursor()
   if not cursor.isValid then return end
   ClearCursor()
   self.widget:ClearAttributeSuspendedActionType()
-  
-  -- check if button already has action
-  local existingType, existingID = self:GetActionInfo()
-  -- pickup existing action (this places it on cursor)
-  if au.IsSpell(existingType) then
-    o.Btn_PickupSpellOrMount(self, existingID)
-  elseif au.IsItem(existingType) then
-    comp:PickupItem(self.widget:GetAttributeItemID())
-  elseif au.IsBattlePet(existingType) then
-    comp:PickupBattlePet(self.widget:GetAttributeBattlePetID())
-  end
-  
+
+  o.Btn_PickupExistingAction(self)
   self.widget:SaveAction(cursor)
+end
+
+--- @param callbackFn fun(cursor:Cursor_ABP_2_0):void
+function o:IfHasCursor(callbackFn)
+  local cursor = cns:cursor()
+  if (cursor and cursor.isValid) then callbackFn(cursor) end
 end
 
 function o:OnAttributeChanged(name, val)
@@ -418,8 +424,8 @@ function o:Update()
   
   icon:SetDesaturated(false)
   
-  local type, id = self:GetActionInfo()
-  if self.widget:HasAction() then
+  local type, val = self.widget:GetActionInfo()
+  if type and val then
     if ( not self.eventsRegistered ) then
       eventsFrame:RegisterFrame(self)
       self.eventsRegistered = true
@@ -437,6 +443,7 @@ function o:Update()
     --self:UpdateSpellHighlightMark()
   else
     if ( self.eventsRegistered ) then
+      t('Update::UnRegister', 'type=', type, 'val=', val)
       eventsFrame:UnregisterFrame(self)
       self.eventsRegistered = nil
     end
@@ -452,49 +459,51 @@ end
 --[[-------------------------------------------------------------------
 Convenience Methods
 ---------------------------------------------------------------------]]
+-- todo next: move to a new Btn_UpdateUsable(self)?
 function o:UpdateUsable()
-  local icon = self.icon
-  local typ, val = self:GetActionInfo()
-  if typ == nil then return end
+  self.widget:IfHasAction(function(typ, val, isCustom)
+    local icon = self.icon
 
-  local isUsable, notEnoughMana = au.IsUsableAction(typ, val)
-  if isUsable then
-    self:SetIconNormalVertex()
-  elseif notEnoughMana then
-    icon:SetVertexColor(0.5, 0.5, 1.0)
-  else
-    icon:SetVertexColor(0.4, 0.4, 0.4);
-  end
+    --- @type boolean, boolean
+    local isUsable, notEnoughMana = au.IsUsableAction(typ, val, isCustom)
+
+    if isUsable then
+      self:SetIconNormalVertex()
+    elseif notEnoughMana then
+      icon:SetVertexColor(0.5, 0.5, 1.0)
+    else
+      icon:SetVertexColor(0.4, 0.4, 0.4);
+    end
+  end)
 end
 
 function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
   
-  if not self.widget:HasAction() then cd:Clear(); return end
-  
-  local typeVal, id = self:GetActionInfo()
-  if not id then cd:Clear(); return end
+  local typ, val, isCustom = self.widget:GetActionInfo()
+  if not val then cd:Clear(); return end
   
   local start, duration, enabled, modRate = 0, 0, false, 1
-  
-  if au.IsSpell(typeVal) then
-    -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
-    if cns:IsTBC()
-            and priest:IsPriest()
-            and priest:IsShapeShifted()
-            and priest:IsShadowFormSpell(id) then return end
-    au.IfSpellCooldown(id, function(info)
-      start = info.startTime or 0
-      duration = info.duration or 0
-      enabled = info.isEnabled == true
-      modRate = info.modRate
-    end)
-  elseif au.IsItem(typeVal) then
-    -- todo next: ItemCooldown
-    au.IfItemCooldown(id, function(info)
-      start, duration, enabled = info.startTime, info.duration, info.isEnabled == true
-    end)
+
+  if not isCustom then
+    if au.IsSpell(typ) then
+      -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
+      if cns:IsTBC()
+              and priest:IsPriest()
+              and priest:IsShapeShifted()
+              and priest:IsShadowFormSpell(val) then return end
+      au.IfSpellCooldown(val, function(info)
+        start = info.startTime or 0
+        duration = info.duration or 0
+        enabled = info.isEnabled == true
+        modRate = info.modRate
+      end)
+    elseif au.IsItem(typ) then
+      au.IfItemCooldown(val, function(info)
+        start, duration, enabled = info.startTime, info.duration, info.isEnabled == true
+      end)
+    end
   end
 
   local ok = pcall(function()
@@ -508,17 +517,13 @@ function o:UpdateCooldown()
   if not ok then cd:Clear() end
 end
 
---- @see ButtonWidget_ABP_2_0.GetActionInfo()
---- @return string?, ActionValue? @The type (e.g. spell, item) and resolved typeID (spellID/itemID)
-function o:GetActionInfo() return self.widget:GetActionInfo() end
-
 --- @return string?, ActionValue? @The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
 function o:GetSuspendedActionInfo()
   local typ = self.widget:GetAttributeSuspendedActionType()
   if not typ then return nil, nil end
 
-  local val = self.widget:GetActionAttributeTypeValue(typ)
-  if not val then return nil end
+  local val = self.widget:GetActionValueByType(typ)
+  if not val then return nil, nil end
   
   return typ, val
 end

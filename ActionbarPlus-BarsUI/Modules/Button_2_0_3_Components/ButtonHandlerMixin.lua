@@ -6,11 +6,13 @@ local ns = select(2, ...)
 
 local cns = ns:cns()
 local O = cns.O
+local attr, atyp = cns:constants()
 local au = O.ActionUtil
 local comp, spu, unit =
       O.Compat, O.SpellUtil, O.UnitUtil
-local druid, rogue, shammy, priest =
-      O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
+
+local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
+local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -41,36 +43,50 @@ function o.Btn_ResetAll(self)
 end
 
 --- @param self Button_ABP_2_0_X
+--- @param typ ActionType
+--- @param isCustom boolean
+--- @param callbackFn fun() : void
+function o.Btn_DispatchPickupAction(self, typ, isCustom, callbackFn)
+  if not typ then return end
+
+  --- @type ActionValue
+  local val
+
+  if not isCustom then
+    val = self.widget:GetActionValueByType(typ)
+    if au.IsSpell(typ) then
+      o.Btn_PickupSpellOrMount(self, val)
+    elseif au.IsItem(typ) then
+      comp:PickupItem(val)
+    elseif au.IsMacro(typ) then
+      error(self:GetName() .. ':: GetActionInfo(): macro support not implemented')
+    end
+  else
+    typ, val = self.widget:GetActionInfoCustom()
+    if au.IsBattlePet(typ) then
+      comp:PickupBattlePet(val)
+    elseif au.IsEquipmentSet(typ) then
+      comp:PickupEquipmentSet(val)
+    end
+  end
+  self:IfHasCursor(function(cursor) o.Btn_ResetAll(self) end)
+  if callbackFn then callbackFn() end
+end
+
+--- @param self Button_ABP_2_0_X
 --- @param callbackFn fun() : void
 function o.Btn_PickupAction(self, callbackFn)
-  --- The abp_saved_type is saved during PreClick()
-  --- so that the button won't fire on pickup action
-  local typeVal = self.widget:GetAttributeSuspendedActionType()
-  if not typeVal then return end
+  --- @type ActionType, boolean
+  local typ, isCustom = self.widget:GetAttributeSuspendedActionType()
+  o.Btn_DispatchPickupAction(self, typ, isCustom, callbackFn)
+end
 
-  local pickedUp = false
-
-  if au.IsSpell(typeVal) then
-    local spell = self.widget:GetAttributeSpell()
-    o.Btn_PickupSpellOrMount(self, spell)
-    pickedUp = true
-  elseif au.IsItem(typeVal) then
-    local itemID = self.widget:GetAttributeItemID()
-    comp:PickupItem(itemID)
-    pickedUp = true
-  elseif au.IsMacro(typeVal) then
-    local c_actionType, c_val = self.widget:GetActionInfoCustom()
-    if c_actionType and c_val then
-      -- battlepet has macro/macrotext attributes
-      comp:PickupBattlePet(c_val)
-    else
-      -- pickup macro
-      error(self.button:GetName() .. ':: GetActionInfo(): macro support not implemented')
-    end
-    pickedUp = true
-  end
-  if pickedUp then o.Btn_ResetAll(self) end
-  if callbackFn then callbackFn() end
+--- @see Button_ABP_2_0_3.OnReceiveDrag
+--- @param self Button_ABP_2_0_X
+function o.Btn_PickupExistingAction(self)
+  --- @type ActionType, boolean?
+  local typ, isCustom = self.widget:GetActionType()
+  o.Btn_DispatchPickupAction(self, typ, isCustom)
 end
 
 --- @param self Button_ABP_2_0_X
@@ -87,11 +103,10 @@ end
 --- @param self Button_ABP_2_0_X
 --- @param evt Name @The event name
 function o.Btn_UpdateState(self, evt)
-  local typ, val = self:GetActionInfo()
-  if not (typ and val) then return end
-
-  local isCurrent = au.IsCurrentAction(typ, val)
-  self:SetChecked(isCurrent == true)
+  self.widget:IfHasAction(function(typ, val, isCustom)
+    local isCurrent = au.IsCurrentAction(typ, val)
+    self:SetChecked(isCurrent == true)
+  end)
 end
 
 --- @param self Button_ABP_2_0_X
@@ -114,3 +129,33 @@ function o.Btn_UpdateAnimation(self)
     end
   end
 end
+
+--- A Custom Type
+--- BattlePet is a custom action implementation that uses `/summonpet {petGUID}`
+--- @param self Button_ABP_2_0_X
+--- @param battlePetID PetGUID
+function o.Btn_SetActionBattlePet(self, battlePetID)
+  assert(type(battlePetID) == 'string', 'Btn_SetActionBattlePet(self, battlePetID): {battlePetID} should be a GUID:String')
+
+  local macroText = BATTLEPET_MACRO_TEMPLATE:format(battlePetID)
+  local typ = atyp.battlepet
+  local w = self.widget
+  w:SetActionAttributeCustom(typ, battlePetID)
+  w:SetAttribute(attr.type, atyp.macro)
+  w:SetAttribute(atyp.macrotext, macroText)
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param equipmentSetID EquipmentSetID
+function o.Btn_SetActionEquipmentSet(self, equipmentSetID)
+  local eqSet = comp:GetEquipmentSet(equipmentSetID)
+  assert(eqSet, 'Failed to retrieve EquipmentSet(id): ' .. tostring(equipmentSetID))
+
+  local equipName = eqSet.name
+  local macroText = EQUIPMENT_SET_TEMPLATE:format(equipName)
+  local w = self.widget
+  w:SetActionAttributeCustom(atyp.equipmentset, equipmentSetID)
+  w:SetAttribute(attr.type, atyp.macro)
+  w:SetAttribute(atyp.macrotext, macroText)
+end
+

@@ -7,14 +7,14 @@ local O = ns.O
 local comp, SupportedActionTypeMap = O.Compat, O.Constants.SupportedActionTypesAsMap()
 
 -- These C_Spell methods exists in classic-era
-local C_IsAutoRepeatSpell = C_Spell.IsAutoRepeatSpell
-local C_IsCurrentSpell    = C_Spell.IsCurrentSpell
-local C_GetSpellPowerCost = C_Spell.GetSpellPowerCost
-local C_IsSpellKnown      = C_SpellBook.IsSpellKnown
-local C_IsSpellUsable     = C_Spell.IsSpellUsable
-local C_IsUsableItem      = C_Item.IsUsableItem
-local C_GetTalentInfo     = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
-local C_GetSummonedPetGUID = C_PetJournal and C_PetJournal.GetSummonedPetGUID
+local C_IsAutoRepeatSpell   = C_Spell.IsAutoRepeatSpell
+local C_IsCurrentSpell      = C_Spell.IsCurrentSpell
+local C_GetSpellPowerCost   = C_Spell.GetSpellPowerCost
+local C_IsSpellKnown        = C_SpellBook.IsSpellKnown
+local C_IsSpellUsable       = C_Spell.IsSpellUsable
+local C_IsUsableItem        = C_Item.IsUsableItem
+local C_GetTalentInfo       = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
+local C_GetSummonedPetGUID  = C_PetJournal and C_PetJournal.GetSummonedPetGUID
 
 local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 
@@ -33,6 +33,19 @@ local S = {}; ns:Register(libName, S)
 local p, t = ns:log(libName)
 
 local attr, atyp = ns:constants()
+
+--[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- @param spell SpellIdentifier
+--- @return SpellID?
+local function __SpellID(spell)
+  if type(spell) == 'number' then return spell end
+  --- @type SpellID
+  local spid
+  comp:IfSpell(spell, function(sp) spid = sp.spellID end)
+  return spid
+end
 
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil (Methods)
@@ -70,7 +83,10 @@ end
 function o.IsSpellKnown(spellID)
   assert(type(spellID) == 'number', 'IsSpellKnown(spellID): {spellID} should be a number')
   if C_IsSpellKnown(spellID) then return true end
+
   local unknownSp = comp:GetSpellInfo(spellID)
+  if not (unknownSp and unknownSp.name) then return false end
+
   -- returns a value if spell is known by name
   local nextSp = comp:GetSpellInfo(unknownSp.name)
   return false, nextSp
@@ -84,35 +100,57 @@ function o.GetAttributeItemID(itemValue)
   return tonumber(itemValue:match("item:(%d+)"))
 end
 
---- @param typeVal string The button attribute 'type' value
---- @param id Identifier The context id; 'spell', 'item', etc...
+--- @param typ ActionType The button attribute 'type' value
+--- @param val ActionValue The context id; 'spell', 'item', etc...
+--- @param isCustom boolean?
 --- @return boolean   @true if action is usable
 --- @return boolean?   @true if due to not-enough-'energy|mana|rage|etc', false otherwise
-function o.IsUsableAction(typeVal, id)
-  if not (typeVal and id) then return false end
-  if o.IsSpell(typeVal) then
-      local isUsable, notEnoughMana = C_IsSpellUsable(id)
+function o.IsUsableAction(typ, val, isCustom)
+  if not (typ and val) then return false end
+
+  if o.IsSpell(typ) then
+      local isUsable, notEnoughMana = C_IsSpellUsable(val)
       return isUsable, notEnoughMana
-  elseif o.IsItem(typeVal) then
-    return C_IsUsableItem(id)
-  elseif o.IsBattlePet(typeVal) then
-    return true
+  elseif o.IsItem(typ) then
+    return C_IsUsableItem(val)
+  elseif isCustom then
+    if o.IsEquipmentSet(typ) then
+      return not InCombatLockdown()
+    elseif o.IsBattlePet(typ) then
+      return true
+    end
   end
   return false
 end
 
+--- @param spell SpellIdentifier
 --- @return boolean
-function o.IsAutoAttackInProgress(spellID) return o.IsAutoAttackSpell(spellID) and o.IsCurrentSpell(spellID) end
---- @return boolean
-function o.IsShootingInProgress(spellID) return o.IsShootSpell(spellID) and o.IsCurrentSpell(spellID) end
+function o.IsAutoAttackInProgress(spell)
+  local spellID = __SpellID(spell)
+  return o.IsAutoAttackSpell(spellID) and o.IsCurrentSpell(spellID)
+end
 
+--- @param spell SpellIdentifier
 --- @return boolean
-function o.IsAutoAttackSpell(spellID) return spellID == ATTACK_SPELL_ID end
+function o.IsShootingInProgress(spell)
+  local spellID = __SpellID(spell)
+  return o.IsShootSpell(spellID) and o.IsCurrentSpell(spellID)
+end
+
+--- @param spell SpellIdentifier
 --- @return boolean
-function o.IsShootSpell(spellID) return spellID == SHOOT_SPELL_ID end
---- @param spellID SpellID
+function o.IsAutoAttackSpell(spell) return __SpellID(spell) == ATTACK_SPELL_ID end
+
+--- @param spell SpellIdentifier
 --- @return boolean
-function o.IsCurrentSpell(spellID) return C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID) end
+function o.IsShootSpell(spell) return __SpellID(spell) == SHOOT_SPELL_ID end
+
+--- @param spell SpellIdentifier
+--- @return boolean
+function o.IsCurrentSpell(spell)
+  local spellID = __SpellID(spell)
+  return C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID)
+end
 
 --- @param typeVal string The button attribute 'type' value
 --- @param id Identifier The context id; 'spell', 'item', etc...
@@ -136,37 +174,37 @@ function o.IsSupportedAction(action)
           and SupportedActionTypeMap[strlower(action)] == true
 end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsSpell(typeVal) return typeVal == atyp.spell end
+function o.IsSpell(typ) return typ == atyp.spell end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsItem(typeVal) return typeVal == atyp.item end
+function o.IsItem(typ) return typ == atyp.item end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsMount(typeVal) return typeVal == atyp.mount end
+function o.IsMount(typ) return typ == atyp.mount end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsEquipmentSet(typeVal) return typeVal == atyp.equipmentset end
+function o.IsEquipmentSet(typ) return typ == atyp.equipmentset end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsMacro(typeVal) return typeVal == atyp.macro end
+function o.IsMacro(typ) return typ == atyp.macro end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsMacroText(typeVal) return typeVal == atyp.macrotext end
+function o.IsMacroText(typ) return typ == atyp.macrotext end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsBattlePet(typeVal) return typeVal == atyp.battlepet end
+function o.IsBattlePet(typ) return typ == atyp.battlepet end
 
---- @param typeVal string The button attribute 'type' value
+--- @param typ string The button attribute 'type' value
 --- @return boolean
-function o.IsCompanion(typeVal) return typeVal == atyp.companion end
+function o.IsCompanion(typ) return typ == atyp.companion end
 
 --- MoP only: 6 tiers x 3 columns (left=1, middle=2, right=3)
 --- @param spellID SpellID

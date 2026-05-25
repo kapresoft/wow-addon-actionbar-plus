@@ -182,7 +182,7 @@ function ns:log(moduleName)
 end
 
 --- @class Chain_ABP_2_0
---- @field OrElse fun(fn: fun())
+--- @field OrElse fun(fn: fun(...:any))
 
 --- Fluent chain helper; use OrElse() to handle the unmatched case.
 --- ### Usage:
@@ -193,12 +193,14 @@ end
 ---   end)
 --- ```
 --- @param matched boolean
+--- @param ... any
 --- @return Chain_ABP_2_0
-function ns:Chain(matched)
+function ns:Chain(matched, ...)
+  local args = {...}
   --- @type Chain_ABP_2_0
   local chain = {}
   function chain.OrElse(fn)
-    if not matched and type(fn) == 'function' then fn() end
+    if not matched and type(fn) == 'function' then fn(unpack(args)) end
   end
   return chain
 end
