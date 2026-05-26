@@ -171,7 +171,6 @@ function o:SaveAction(cursor)
       bc.id = itemInfo.id
     end)
   elseif cursor:IsMount() then
-  elseif cursor:IsMount() then
     bc.type = atyp.mount
     bc.id = cursor.mountID
     btn.Btn_SetActionMount(btn, bc.id)
