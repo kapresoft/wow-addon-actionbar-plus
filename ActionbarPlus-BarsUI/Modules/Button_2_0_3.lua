@@ -269,7 +269,7 @@ function o:PostClick(button, down)
   self:UpdateUsable()
   if InCombatLockdown()
     or not (down and o.IsActionbarLockedByUser()) then
-      return
+      self:SetChecked(false); return
   end
   self:PostClickAction(button, down)
 end
