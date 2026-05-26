@@ -37,8 +37,8 @@ local ModuleNames = {
   ShamanUtil = {},
   --- @type CursorProvider_ABP_2_0
   CursorProvider = {},
-  --- @type MountJournalHook_ABP_2_0
-  MountJournalHook = {},
+  --- @type PickupHooks_ABP_2_0
+  PickupHooks = {},
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
   --- @type DatabaseMixin_ABP_2_0

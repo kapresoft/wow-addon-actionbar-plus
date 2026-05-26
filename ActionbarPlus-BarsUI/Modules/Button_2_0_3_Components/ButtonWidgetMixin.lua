@@ -84,12 +84,14 @@ function o:UpdateCount()
     elseif au.IsSpell(typ) then
       au.IfSpellCharges(val, function(spId, spc)
         local current, max = spc.currentCharges, spc.maxCharges
-        if current and max and max > 1 and current > 0 then count = current end
+        -- we always want to show spell charges here even when zero
+        -- otherwise it'll be a blank or nil
+        count = current
       end)
     end
   end
 
-  countText:SetText(count)
+  countText:SetText(count or '')
 end
 
 --- @return boolean
@@ -312,8 +314,10 @@ function o:GetActionTexture()
         elseif isShapeshiftSpell and active then
           iconID, shouldDim = self:GetShapeshiftSpellActionTexture(spid, active, activeIcon)
         else
-          local info = comp:GetSpellInfo(spid)
-          if info then iconID = info.iconID end
+          -- todo next: use sp.iconID?
+          --local info = comp:GetSpellInfo(spid)
+          --if info then iconID = info.iconID end
+          iconID = sp.iconID
         end
       end)
     elseif au.IsItem(typ) then

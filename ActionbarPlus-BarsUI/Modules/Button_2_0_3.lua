@@ -490,15 +490,14 @@ function o:UpdateCooldown()
     end
   end
 
-  local ok = pcall(function()
-    -- retail: duration is 'secret' and will throw error
-    if enabled == true and duration > 0 then
-      cd:SetCooldown(start, duration, modRate or 1)
-    else
-      cd:Clear()
-    end
-  end)
-  if not ok then cd:Clear() end
+  -- issecretvalue() is a retail function
+  if not issecretvalue then return end
+
+  if enabled == true and duration > 0 then
+    cd:SetCooldown(start, duration, modRate or 1)
+  else
+    cd:Clear()
+  end
 end
 
 --- @return string?, ActionValue? @The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.

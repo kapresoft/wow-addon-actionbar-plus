@@ -21,8 +21,6 @@ local p, t = ns:log(libName)
 --- @class Cursor_ABP_2_0 : CursorMixin_ABP_2_0
 --
 
---- @alias PetActionID number
-
 --- @class CursorMixin_ABP_2_0
 --- @field type CursorType
 --- @field info CursorInfo

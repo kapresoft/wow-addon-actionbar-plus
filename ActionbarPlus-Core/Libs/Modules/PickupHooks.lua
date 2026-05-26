@@ -4,19 +4,21 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
-local C_GetDisplayedMountID = C_MountJournal and C_MountJournal.GetDisplayedMountID
+local comp = ns.O.Compat
 
+local C_GetDisplayedMountID = C_MountJournal and C_MountJournal.GetDisplayedMountID
+local C_GetSpellBookItemInfo = C_SpellBook.GetSpellBookItemInfo or GetSpellBookItemInfo
 --[[-----------------------------------------------------------------------------
-Module::MountJournalHook
+Module::
 -------------------------------------------------------------------------------]]
 --- @see Core_Modules_ABP_2_0
-local libName = ns.M.MountJournalHook()
---- @class MountJournalHook_ABP_2_0
+local libName = ns.M.PickupHooks()
+--- @class PickupHooks_ABP_2_0
 local o = {}; ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
-Module::MountJournalHook (Methods)
+Module::(Methods)
 -------------------------------------------------------------------------------]]
 
 --- Hooks C_MountJournal.Pickup to capture the real mountID before the cursor
