@@ -491,7 +491,7 @@ function o:UpdateCooldown()
   end
 
   -- issecretvalue() is a retail function
-  if not issecretvalue then return end
+  if issecretvalue and issecretvalue(duration) then return end
 
   if enabled == true and duration > 0 then
     cd:SetCooldown(start, duration, modRate or 1)
