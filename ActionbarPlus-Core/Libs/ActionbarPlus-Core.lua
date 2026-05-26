@@ -6,7 +6,7 @@ local O = ns.O
 Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log('Core')
-local DatabaseMixin, MountJournalHook = O.DatabaseMixin, O.MountJournalHook
+local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
 
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
@@ -25,6 +25,6 @@ end
 --
 function o:OnEnable()
   --t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
-  MountJournalHook:Init()
+  PickupHooks:Init()
 end
 

@@ -22,7 +22,7 @@
     -->
     <Script file="Modules\DatabaseSchema.lua" />
     <Script file="Modules\DatabaseMixin.lua" />
-    <Script file="Modules\MountJournalHook.lua" />
+    <Script file="Modules\PickupHooks.lua" />
     <Script file="Modules\Cursor.lua"/>
     <Script file="ActionbarPlus-Core.lua"/>
     <!--@do-not-package@-->

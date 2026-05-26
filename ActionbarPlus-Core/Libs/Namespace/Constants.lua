@@ -30,6 +30,8 @@ local AttributeNames = {
 
 }; o.AttributeNames = AttributeNames
 
+--- The following are not supported:
+--- - petaction
 --- @class SupportedActionTypes_ABP_2_0
 local SupportedActionTypes = {
   spell        = 'spell',
@@ -39,7 +41,6 @@ local SupportedActionTypes = {
   mount        = 'mount',
   companion    = 'companion',
   battlepet    = 'battlepet',
-  petaction    = 'petaction',
   equipmentset = 'equipmentset',
 }; o.SupportedActionTypes = SupportedActionTypes
 o.SupportedActionTypesAsMap = function()
