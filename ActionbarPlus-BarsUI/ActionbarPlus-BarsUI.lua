@@ -22,3 +22,13 @@ end
 function o:OnDisable()
   t('OnDisable', 'called...')
 end
+
+--- @param callbackFn fun(module:BarModule_2_0):void
+function o:ForEach(callbackFn)
+  assert(type(callbackFn) == 'function', "ForEach(callbackFn): callbackFn should be a function")
+  for name, module in ns:a():IterateModules() do
+    --- @type BarModule_2_0
+    local barModule = module
+    callbackFn(barModule)
+  end
+end

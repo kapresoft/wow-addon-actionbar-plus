@@ -1,0 +1,2 @@
+-- /run PickupMacro('#MountFireHawk')
+-- /run C_MountJournal.Pickup(2)

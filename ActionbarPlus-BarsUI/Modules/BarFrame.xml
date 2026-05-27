@@ -12,6 +12,7 @@
 
     <Script file="Button_2_0_3.lua"/>
     <Script file="Button_2_0_3_Components/SpecController.lua"/>
+    <Script file="Button_2_0_3_Components/MacroChangeController.lua"/>
     <Script file="BarFrame.lua"/>
 
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">

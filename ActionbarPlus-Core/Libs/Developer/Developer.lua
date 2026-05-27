@@ -1,13 +1,16 @@
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
+local O = ns.O
 local trace_cvar = ns.trace_ui_cvar
 local Str_IsBlank = ns:String().IsBlank
 local p, t = ns:log('Developer')
-local unit = ns.O.UnitUtil
-local comp = ns.O.Compat
+local unit, comp, hu = O.UnitUtil, O.Compat, O.HashUtil
 
 --- @class Developer_ABP_2_0 : AceEvent_3_0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
+
+function o:macroInfo(macroIdentifier) return comp:GetMacroInfo(macroIdentifier) end
+function o:hash(str) return hu.string(str) end
 
 --- @param frameIndex Index
 --- @param btnIndex Index
