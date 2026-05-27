@@ -192,7 +192,7 @@ end
 ---     -- fallback logic
 ---   end)
 --- ```
---- @param matched boolean
+--- @param matched boolean @If true, the chain is matched; OrElse will not fire. If false, OrElse will fire.
 --- @param ... any
 --- @return Chain_ABP_2_0
 function ns:Chain(matched, ...)

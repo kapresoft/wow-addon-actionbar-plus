@@ -101,9 +101,17 @@ function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 --- @return Chain_ABP_2_0
 function o:IfHasAction(callbackFn)
   assert(type(callbackFn) == 'function', 'IfHasAction(callbackFn): {callbackFn} should be a function')
-  local typ, val, isCustom = self:GetActionInfo()
-  local typValMatched = (typ ~= nil and val ~= nil)
-  if typValMatched then callbackFn(typ, val, isCustom == true) end
+  local typ, isCustom = self:GetActionType()
+  if not typ then return cns:Chain(false) end
+
+  local val
+  if not isCustom then
+    val = self:GetActionValueByType(typ)
+  else
+    val = self:GetActionValueCustom()
+  end
+  local typValMatched = val ~= nil
+  if typValMatched then callbackFn(typ, val, isCustom) end
   return cns:Chain(typValMatched)
 end
 
@@ -263,38 +271,23 @@ function o:GetActionType()
   return self:GetAttributeType()
 end
 
---- Returns info for a known spell.  An unknown spell will return nil values.
+--- Use this method instead of GetActionType() if value of type is needed
 --- @return ActionType?
 --- @return ActionValue?
 --- @return boolean?
 function o:GetActionInfo()
-  -- todo next: Cleanup GetActionInfo() or remove?
 
-  --- @type ActionType, ActionValue
-  local typ, val = self:GetActionInfoCustom()
-  if typ and val then return typ, val, true end
-
-  typ = self:GetAttributeType()
+  local typ, isCustom = self:GetActionType()
   if not typ then return nil end
 
-  val = self:GetActionValueByType(typ)
-  if not val then return nil end
-
-  if type(val) == "number" then return typ, val end
-
-  if type(val) == "string" then
-    if au.IsSpell(typ) then
-      local sp = comp:GetSpellInfo(val)
-      if not sp then return nil end
-      return typ, sp.spellID
-    elseif au.IsItem(typ) then
-      local itemID = self:GetAttributeItemID()
-      return typ, itemID
-    --tbd elseif au.IsMacro(typ) then
-    end
+  local val
+  if isCustom then
+    val = self:GetActionValueCustom()
+    return typ, val, true
   end
+  val = self:GetActionValueByType(typ)
 
-  return nil
+  return typ, val, false
 end
 
 --- #### NOTES:
