@@ -4,7 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
-local comp, au, unit = O.Compat, O.ActionUtil, O.UnitUtil
+local comp, au, unit, hash = O.Compat, O.ActionUtil, O.UnitUtil, O.HashUtil
 local druid, rogue, shammy, priest =
       O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
 local attr, atyp = cns:constants()
@@ -140,6 +140,8 @@ function o:LoadAction()
     if bc.id then self:SetActionSpell(bc.id) end
   elseif au.IsItem(bc.type) then
      self:SetActionItem(bc.id)
+  elseif au.IsMacro(bc.type) then
+    btn.Btn_SetActionMacro(btn, bc.id)
   elseif au.IsMount(bc.type) then
     btn.Btn_SetActionMount(btn, bc.id)
   elseif au.IsBattlePet(bc.type) then
@@ -169,6 +171,14 @@ function o:SaveAction(cursor)
     au.IfItem(cursor.itemID, function(itemInfo)
       self:SetActionItem(itemInfo.id)
       bc.id = itemInfo.id
+    end)
+  elseif cursor:IsMacro() then
+    comp:IfMacro(cursor.macroIndex, function(name, icon, body)
+      --- @type MacroButtonConfig_ABP_2_0
+      local mbc = bc
+      mbc.id = name
+      mbc.hash = hash.string(body)
+      btn.Btn_SetActionMacro(btn, bc.id)
     end)
   elseif cursor:IsMount() then
     bc.type = atyp.mount
@@ -318,6 +328,10 @@ function o:GetActionTexture()
           --if info then iconID = info.iconID end
           iconID = sp.iconID
         end
+      end)
+    elseif au.IsMacro(typ) then
+      comp:IfMacro(val, function(name, icon, body)
+        iconID = icon
       end)
     elseif au.IsItem(typ) then
       au.IfItem(self:GetAttributeItemID(), function(itemInfo)

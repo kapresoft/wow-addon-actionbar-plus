@@ -424,8 +424,8 @@ function o:Update()
   
   icon:SetDesaturated(false)
   
-  local type, val = self.widget:GetActionInfo()
-  if type and val then
+  local type = self.widget:GetActionType()
+  if type then
     if ( not self.eventsRegistered ) then
       eventsFrame:RegisterFrame(self)
       self.eventsRegistered = true
@@ -443,7 +443,7 @@ function o:Update()
     --self:UpdateSpellHighlightMark()
   else
     if ( self.eventsRegistered ) then
-      t('Update::UnRegister', 'type=', type, 'val=', val)
+      t('Update::UnRegister', 'type=', type)
       eventsFrame:UnregisterFrame(self)
       self.eventsRegistered = nil
     end

@@ -187,6 +187,23 @@ local function BarModuleProtoMethods()
     end
   end
 
+  --- @param callbackFn fun(btn: Button_ABP_2_0_X, w: ButtonWidget_ABP_2_0, conf:ButtonConfig_ABP_2_0)
+  function bm:ForEachNonEmpty(callbackFn)
+    for _, btn in ipairs(self.barFrame.widget.buttons) do
+      --- @type Button_ABP_2_0_X
+      local b = btn
+      local conf = b.widget:conf()
+      if not b.widget:IsEmpty() and conf then callbackFn(b, b.widget, conf) end
+    end
+  end
+
+  --- @param callbackFn fun(btn: Button_ABP_2_0_X, w: ButtonWidget_ABP_2_0, conf:MacroButtonConfig_ABP_2_0)
+  function bm:ForEachMacro(callbackFn)
+    self:ForEachNonEmpty(function(btn, w, conf)
+      if au.IsMacro(conf.type) then callbackFn(btn, w, conf) end
+    end)
+  end
+
 end; BarModuleProtoMethods()
 
 --[[-----------------------------------------------------------------------------

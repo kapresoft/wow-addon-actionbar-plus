@@ -43,9 +43,10 @@ function o:GetButtonConfig()
 end
 
 function o:ResetButtonConfig()
+  --- @type ButtonConfig_ABP_2_0 | MacroButtonConfig_ABP_2_0
   local bc = self:GetButtonConfig()
   if not bc then return end
-  bc.type, bc.id = nil, nil
+  bc.type, bc.id, bc.hash = nil, nil, nil
 end
 
 --- @return string

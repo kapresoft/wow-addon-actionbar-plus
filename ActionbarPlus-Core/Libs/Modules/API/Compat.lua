@@ -4,6 +4,8 @@ Local Vars
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
+local hu = ns.O.HashUtil
+
 local C_GetItemCooldown    = C_Container.GetItemCooldown
 local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
 
@@ -104,6 +106,33 @@ function o:IfSpell(spell, callbackFn)
   if not spell then return end
   local sp = self:GetSpellInfo(spell)
   return sp and callbackFn(sp)
+end
+
+--- @param macroIdentifier MacroIdentifier
+--- @param callbackFn fun(name:MacroName, icon:IconIDOrPath, body:MacroBody) : void
+--- @return Chain_ABP_2_0
+function o:IfMacro(macroIdentifier, callbackFn)
+  local m, i, b = self:GetMacroInfo(macroIdentifier)
+  if m then callbackFn(m, i, b) end
+  return ns:Chain(m ~= nil)
+end
+
+--- Scans all global and character macros and fires callbackFn on the first one whose body hash matches.
+--- @param hashedBody number The hashed body of the macro body to search for
+--- @param callbackFn fun(name:MacroName, icon:IconIDOrPath, body:MacroBody) : void
+--- @return Chain_ABP_2_0
+function o:IfMacroByBodyHash(hashedBody, callbackFn)
+  if not hashedBody then return ns:Chain(false) end
+
+  local numGlobal, numChar = GetNumMacros()
+  for i = 1, numGlobal + numChar do
+    local name, icon, body = GetMacroInfo(i)
+    local bodyH = hu.string(body)
+    if name and bodyH == hashedBody then
+      callbackFn(name, icon, body); return ns:Chain(true)
+    end
+  end
+  return ns:Chain(false)
 end
 
 --- @param mountID MountID
@@ -310,6 +339,20 @@ function o:GetMountInfoBySpell(spell)
   local mountID = C_MountJournal.GetMountFromSpell(spellID)
   if not mountID then return end
   return self:GetMountInfo(mountID)
+end
+
+--- @param macroIdentifier MacroIdentifier
+--- @return string?       @Macro name
+--- @return IconIDOrPath? @Macro icon
+--- @return string? body  @Macro body
+function o:GetMacroInfo(macroIdentifier)
+  assert(Str_IsAnyOf(type(macroIdentifier), 'string', 'number'),
+    'GetMacroInfo(macroIdentifier): {identifier} should be a string(macro-name) or number(macro-index)')
+
+  local name, icon, body = GetMacroInfo(macroIdentifier)
+  if not name then return nil end
+
+  return name, icon, body
 end
 
 --- @param mountID number

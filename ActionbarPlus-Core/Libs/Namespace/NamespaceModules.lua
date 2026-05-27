@@ -23,6 +23,8 @@ local ModuleNames = {
   Compat = {},
   --- @type ActionUtil_ABP_2_0
   ActionUtil = {},
+  --- @type HashUtil_ABP_2_0
+  HashUtil = {},
   --- @type SpellUtil_ABP_2_0
   SpellUtil = {},
   --- @type UnitUtil_ABP_2_0

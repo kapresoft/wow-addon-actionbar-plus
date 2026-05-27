@@ -8,8 +8,7 @@ local cns = ns:cns()
 local O = cns.O
 local attr, atyp = cns:constants()
 local au = O.ActionUtil
-local comp, spu, unit =
-      O.Compat, O.SpellUtil, O.UnitUtil
+local comp, spu, unit, hu = O.Compat, O.SpellUtil, O.UnitUtil, O.HashUtil
 
 local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
 local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
@@ -77,7 +76,7 @@ function o.Btn_DispatchPickupAction(self, typ, isCustom, callbackFn)
     elseif au.IsItem(typ) then
       comp:PickupItem(val)
     elseif au.IsMacro(typ) then
-      error(self:GetName() .. ':: GetActionInfo(): macro support not implemented')
+      comp:PickupMacro(val)
     end
   else
     typ, val = self.widget:GetActionInfoCustom()
@@ -139,6 +138,25 @@ function o.Btn_UpdateAnimation(self)
       self:DisableFlashAnimation()
     end
   end
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param macroIdentifier MacroIdentifier
+function o.Btn_SetActionMacro(self, macroIdentifier)
+  local w, typ = self.widget, atyp.macro
+  comp:IfMacro(macroIdentifier, function(name, icon, body)
+    w:SetActionAttribute(typ, name)
+  end).OrElse(function()
+    local conf = w:conf() --[[@as MacroButtonConfig_ABP_2_0]]
+    -- try and find macro by body hash
+    comp:IfMacroByBodyHash(conf.hash, function(name, icon, body)
+        conf.id = name
+        w:SetActionAttribute(typ, name)
+        self:UpdateTexture()
+    end).OrElse(function()
+      o.Btn_ResetAll(self)
+    end)
+  end)
 end
 
 --- BattlePet is a custom action implementation that uses `/summonpet {petGUID}`

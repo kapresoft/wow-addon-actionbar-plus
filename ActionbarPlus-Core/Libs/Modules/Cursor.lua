@@ -25,13 +25,13 @@ local p, t = ns:log(libName)
 --- @field type CursorType
 --- @field info CursorInfo
 --- @field isValid boolean
---- @field mountID MountID
---- @field spellID SpellID
+--- @field macroIndex number
+--- @field battlePetID PetGUID
+--- @field equipmentSetID number
 --- @field itemID ItemID
 --- @field itemLink ItemLink
---- @field battlePetID PetGUID
---- @field petActionID PetActionID
---- @field equipmentSetID number
+--- @field mountID MountID
+--- @field spellID SpellID
 local CursorMixin = {}
 
 local function CursorMixinMethods()
@@ -52,6 +52,8 @@ local function CursorMixinMethods()
       self.spellID = i.info3
     elseif self:IsItem() then
       self.itemID, self.itemLink = i.info1, i.info2
+    elseif self:IsMacro() then
+      self.macroIndex = i.info1
     elseif self:IsMount() then
       self.mountID = ns.mountID or i.info1
     elseif self:IsBattlePet() then
@@ -63,20 +65,22 @@ local function CursorMixinMethods()
     end
   end
 
-  function CursorMixin:GetType() return self.info.type end
-
   --- @return boolean
   function CursorMixin:IsSpell() return self.isValid and au.IsSpell(self.type) end
   --- @return boolean
   function CursorMixin:IsItem() return self.isValid and au.IsItem(self.type) end
+  --- @return boolean
+  function CursorMixin:IsMacro() return self.isValid and au.IsMacro(self.type) end
 
   --- @return boolean
   function CursorMixin:IsMount()
+    if not self.isValid then return false end
+
     local i = self.info
     if au.IsCompanion(self.type) and i.info2 == COMPANION_TYPE_MOUNT then
-      return self.isValid and true -- legacy: MoP
+      return true -- legacy: MoP
     end
-    return self.isValid and au.IsMount(self.type)
+    return au.IsMount(self.type)
   end
 
   --- @return boolean

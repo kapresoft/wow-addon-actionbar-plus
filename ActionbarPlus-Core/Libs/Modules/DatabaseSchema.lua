@@ -84,6 +84,9 @@ Type Definitions
 --- @field type string    The button action type e.g. 'spell', 'item', 'mount', 'battlepet'
 --- @field id ActionValue The identifier for the action; a numeric ID for spells/items/mounts or a GUID string for battle pets
 
+--- @class MacroButtonConfig_ABP_2_0 : ButtonConfig_ABP_2_0
+--- @field hash number    The hash to identify the macro; typically the hash of the macro body
+
 --  ================================================
 
 --- @class BarConfig_ABP_2_0
