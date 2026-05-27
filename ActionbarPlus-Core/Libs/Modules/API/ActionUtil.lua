@@ -113,6 +113,13 @@ function o.IsUsableAction(typ, val, isCustom)
       return isUsable, notEnoughMana
   elseif o.IsItem(typ) then
     return C_IsUsableItem(val)
+  elseif o.IsMacro(typ) then
+    local sp = GetMacroSpell(val)
+    if sp then
+      local isUsable, notEnoughMana = C_IsSpellUsable(sp)
+      return isUsable, notEnoughMana
+    end
+    return true
   elseif isCustom then
     if o.IsMount(typ) then
       local isUsable
