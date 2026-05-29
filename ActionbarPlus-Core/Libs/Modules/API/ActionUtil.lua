@@ -92,10 +92,11 @@ function o.IsSpellKnown(spellID)
   return false, nextSp
 end
 
---- @param itemValue string @The itemID attribute value, i.e. 'item:123'
+--- @param itemValue string|number @The itemID attribute value, i.e. 'item:123'
 --- @return ItemID?         @returns 123 given {itemIDAttribute} of 'item:123'
-function o.GetAttributeItemID(itemValue)
+function o.ExtractItemID(itemValue)
   if not itemValue then return nil end
+  if type(itemValue) == 'number' then return itemValue end
   assert(type(itemValue) == 'string', 'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ', type(itemValue))
   return tonumber(itemValue:match("item:(%d+)"))
 end
@@ -301,6 +302,21 @@ function o.GetSpellPowerCost(spell)
   local costArr = C_GetSpellPowerCost(spell)
   if costArr and #costArr > 0 then return costArr[1] end
   return nil
+end
+
+--- @param macroIdentifier MacroIdentifier
+--- @return SpellID?, ItemID?
+function o.GetMacroAction(macroIdentifier)
+  local spellID = GetMacroSpell(macroIdentifier)
+  if spellID then return spellID, nil end
+
+  local _, itemLink = GetMacroItem(macroIdentifier)
+  if itemLink then
+    local item = comp:GetItemInfoInstant(itemLink)
+    if item and item.id then return nil, item.id end
+  end
+
+  return nil, nil
 end
 
 --- @param spell SpellIdentifier
