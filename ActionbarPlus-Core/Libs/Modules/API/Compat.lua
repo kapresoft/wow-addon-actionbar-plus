@@ -259,6 +259,19 @@ function o:IsInstantCastSpellByID(spell)
   return sp.castTime == 0
 end
 
+--- @param itemInfo ItemInfo
+--- @param callbackFn fun(item:ItemInfoDetails) : void
+--- @return Chain_ABP_2_0
+function o:IfItem(itemInfo, callbackFn)
+  local item = self:GetItemInfoInstant(itemInfo)
+  if not (item and item.id and item.icon) then
+    item = self:GetItemInfo(itemInfo)
+  end
+  local matched = item ~= nil and item.icon ~= nil
+  if matched then callbackFn(item) end
+  return ns:Chain(matched)
+end
+
 --- Use for hot paths (cooldown, icon, id)
 --- Fast; from client cache; no server query
 --- @param itemInfo ItemID|ItemLink|ItemName

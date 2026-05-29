@@ -444,7 +444,7 @@ end
 
 --- @return ItemID?
 function o:GetAttributeItemID()
-  return au.GetAttributeItemID(self:GetAttribute(atyp.item))
+  return au.ExtractItemID(self:GetAttribute(atyp.item))
 end
 
 --- @return SpellName|SpellID
@@ -628,16 +628,16 @@ end
 --- @param checkFn fun(typ:ActionType, val:ActionValue):boolean
 --- @return boolean
 function o:__IsAT(checkFn)
-  local typ, val = self:GetActionInfo()
-  if not (typ and val) then return false end
-  return checkFn(typ, val)
+  local typ = self:GetActionType()
+  if not typ then return false end
+  return checkFn(typ)
 end
 
 --- @return boolean
 function o:IsShootSpell()
-  return self:__IsAT(function(typ, val)
-    return au.IsSpell(typ) and au.IsShootSpell(val)
-  end)
+  local typ, val = self:GetActionInfo()
+  if not (typ and val) then return false end
+  return au.IsSpell(typ) and au.IsShootSpell(val)
 end
 
 --- @param callbackFn fun(petID:PetGUID)
@@ -653,6 +653,8 @@ end
 function o:IsSpell() return self:__IsAT(au.IsSpell) end
 --- @return boolean
 function o:IsItem() return self:__IsAT(au.IsItem) end
+--- @return boolean
+function o:IsMacro() return self:__IsAT(au.IsMacro) end
 --- @return boolean
 function o:IsMount() return self:__IsAT(au.IsMount) end
 --- @return boolean

@@ -157,6 +157,10 @@ function o:OnEvent(evt, ...)
     self:UpdateUsable()
   elseif evt == 'SPELL_UPDATE_CHARGES' then
     self:UpdateCount()
+  elseif evt == 'PLAYER_TARGET_CHANGED' then
+    if self.widget:IsMacro() then
+      o.Btn_UpdateTextureMacro(self, evt, 1)
+    end
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
     -- attacking (even when player is in combat)
@@ -338,33 +342,7 @@ end
 
 -- todo: GameTooltip needs impl
 function o:OnEnter()
-  local typ, val, isCustom = self.widget:GetActionInfo()
-  if not (typ and val) then return end
-
-  --todo: GameTooltip owner will be user configurable
-  GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-  GameTooltip:ClearAllPoints()
-  GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
-  
-  --- @type FontStringObj
-  local right = _G["GameTooltipTextRight1"]
-
-  if not isCustom then
-    if au.IsSpell(typ) then
-      GameTooltip:SetSpellByID(val)
-      local rank = spu:GetHighestSpellRank(val)
-      if right and rank then
-        right:SetText(rank);
-        right:SetTextColor(rankColor:GetRGBA())
-        right:Show()
-      end
-      GameTooltip:Show()
-    elseif au.IsItem(typ) then
-      GameTooltip:SetInventoryItemByID(self.widget:GetAttributeItemID())
-    end
-  else
-    -- tbd
-  end
+  o.Btn_OnEnterGameTooltip(self)
 end
 
 function o:OnLeave() GameTooltip:Hide() end

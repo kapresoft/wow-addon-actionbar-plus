@@ -16,6 +16,7 @@ local o = cns:NewAceEvent()
 local p, t = ns:log(libName)
 
 local function Init()
+  -- todo next: add handling on MODIFIER_STATE_CHANGED for macros that depend on mod keys
   o:RegisterEvent('UPDATE_MACROS')
 end
 

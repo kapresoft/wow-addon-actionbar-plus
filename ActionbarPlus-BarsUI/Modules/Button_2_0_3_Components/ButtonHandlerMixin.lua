@@ -119,6 +119,82 @@ function o.Btn_UpdateState(self, evt)
   end)
 end
 
+--- Update the macro button texture repeatedly to catch castsequence icon changes
+--- @param self Button_ABP_2_0_X
+--- @param evt Name             @The event name
+--- @param tickerCount? number  @The number of iterations (optional)
+function o.Btn_UpdateTextureMacro(self, evt, tickerCount)
+  local count = 0
+  local loopCount = tickerCount or 8
+  C_Timer.NewTicker(0.1, function(ticker)
+      count = count + 1
+      self:UpdateTexture()
+      if count >= loopCount then ticker:Cancel() end
+  end)
+end
+
+--- @param self Button_ABP_2_0_X
+function o.Btn_OnEnterGameTooltip(self)
+
+  local typ, val, isCustom = self.widget:GetActionInfo()
+  if not (typ and val) then return end
+
+  --todo: GameTooltip owner will be user configurable
+  GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+  GameTooltip:ClearAllPoints()
+  GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
+  o.Btn_OnGameTooltip(self, typ, val, isCustom)
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param typ ActionType
+--- @param val ActionValue
+--- @param isCustom? boolean
+function o.Btn_OnGameTooltip(self, typ, val, isCustom)
+
+  --- @type FontStringObj
+  local right = _G["GameTooltipTextRight1"]
+
+  if not isCustom then
+    if au.IsSpell(typ) then
+      comp:IfSpell(val, function(spell)
+        local spid = spell.spellID
+        GameTooltip:SetSpellByID(spid)
+        local rank = spu:GetHighestSpellRank(spid)
+        if right and rank then
+          right:SetText(rank);
+          right:SetTextColor(rankColor:GetRGBA())
+          right:Show()
+        end
+        GameTooltip:Show()
+      end)
+    elseif au.IsItem(typ) then
+      --- @type number|string @The val param can be 'item:<itemID>', itemID, itemName
+      local itemVal= au.ExtractItemID(val) or val
+      comp:IfItem(itemVal, function(item)
+        GameTooltip:SetInventoryItemByID(item.id)
+      end)
+    elseif au.IsMacro(typ) then
+      comp:IfMacro(val, function(name, icon, body)
+        local mSpellID, mItemID = au.GetMacroAction(name)
+        if mSpellID then
+          o.Btn_OnGameTooltip(self, atyp.spell, mSpellID)
+        elseif mItemID then
+          o.Btn_OnGameTooltip(self, atyp.item, mItemID)
+        end
+      end)
+    end
+  else
+    if au.IsMount(typ) then
+      comp:IfMount(val, function(mount)  -- val as MountID
+        GameTooltip:SetMountBySpellID(mount.spellID)
+      end)
+    elseif au.IsBattlePet(typ) then
+      GameTooltip:SetCompanionPet(val) -- val as petGUID
+    end
+  end
+end
+
 --- @param self Button_ABP_2_0_X
 function o.Btn_UpdateFlash(self)
   -- tbd

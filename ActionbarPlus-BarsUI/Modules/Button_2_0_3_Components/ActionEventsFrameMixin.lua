@@ -145,8 +145,13 @@ function o:OnEvent(evt, ...)
       else
         spellID = select(3, ...)
       end
-      if (unit:IsPlayer(unitName) and btn:MatchesSpellID(spellID)) then
-        btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
+      if unit:IsPlayer(unitName) then
+        if btn.widget:IsMacro() then
+          btn.Btn_UpdateTextureMacro(btn, evt, 1)
+          -- todo next: (1) update spell cooldown for macros, (2) modifier state changed
+        elseif btn:MatchesSpellID(spellID) then
+          btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
+        end
       end
     end
   else

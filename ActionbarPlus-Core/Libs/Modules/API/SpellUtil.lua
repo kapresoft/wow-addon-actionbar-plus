@@ -17,15 +17,15 @@ Module::SpellUtil
 --- @see Core_Modules_ABP_2_0
 local libName = ns.M.SpellUtil()
 --- @class SpellUtil_ABP_2_0
-local S = {}; ns:Register(libName, S)
+local o = {}; ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Module::SpellUtil (Methods)
 -------------------------------------------------------------------------------]]
---- @type SpellUtil_ABP_2_0
-local o = S
 
+--- @param spellID SpellID
+--- @return SpellRank?
 function o:GetHighestSpellRank(spellID)
   if not (GetSpellBookItemName or BOOKTYPE_SPELL) then return nil end
   assert(type(spellID) == 'number', 'GetHighestSpellRank(spellID):: Param spellID should be a number.')
