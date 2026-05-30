@@ -31,8 +31,6 @@ local Tbl_IsEmpty = cns:Table().IsEmpty
 local Str_IsAnyOf = cns:String().IsAnyOf
 
 local MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED'
---- @type Color
-local rankColor = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 local seedID = 1000
 
 --[[-----------------------------------------------------------------------------
