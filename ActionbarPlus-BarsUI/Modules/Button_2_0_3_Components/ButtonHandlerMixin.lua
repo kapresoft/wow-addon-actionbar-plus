@@ -237,7 +237,6 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
     elseif au.IsBattlePet(typ) then
       GameTooltip:SetCompanionPet(val) -- val as petGUID
     elseif au.IsEquipmentSet(typ) then
-      -- todo: We need to list to equipment set modification events so we can update config on change - updates, deletes
       comp:IfEquipmentSet(val --[[@as EquipmentSetID]], function(eqSet)
         GameTooltip:SetEquipmentSet(eqSet.name)
       end)
