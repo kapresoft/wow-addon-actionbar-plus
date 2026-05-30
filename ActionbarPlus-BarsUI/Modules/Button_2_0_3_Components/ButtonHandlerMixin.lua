@@ -129,7 +129,7 @@ end
 function o.Btn_UpdateTextureMacro(self, evt, tickerCount)
   local count = 0
   local loopCount = tickerCount or 8
-  C_Timer.NewTicker(0.1, function(ticker)
+  C_Timer.NewTicker(0.03, function(ticker)
       count = count + 1
       self:UpdateTexture()
       if count >= loopCount then ticker:Cancel() end
