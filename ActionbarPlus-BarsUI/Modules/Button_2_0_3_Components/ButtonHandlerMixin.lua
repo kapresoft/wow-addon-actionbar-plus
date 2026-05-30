@@ -10,6 +10,9 @@ local attr, atyp = cns:constants()
 local au = O.ActionUtil
 local comp, spu, unit, hu = O.Compat, O.SpellUtil, O.UnitUtil, O.HashUtil
 
+--- @type Color
+local ACTION_RANK_COLOR = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
+
 local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
 local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
 
@@ -163,7 +166,7 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
         local rank = spu:GetHighestSpellRank(spid)
         if right and rank then
           right:SetText(rank);
-          right:SetTextColor(rankColor:GetRGBA())
+          right:SetTextColor(ACTION_RANK_COLOR:GetRGBA())
           right:Show()
         end
         GameTooltip:Show()
