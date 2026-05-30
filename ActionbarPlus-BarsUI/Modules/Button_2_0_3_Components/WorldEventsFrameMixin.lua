@@ -56,6 +56,8 @@ function o:OnLoad()
   self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
   self:RegisterEvent("BAG_UPDATE_DELAYED")
   self:RegisterEvent("COMPANION_UPDATE")
+  self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+  self:RegisterEvent("EQUIPMENT_SETS_CHANGED")
   self:RegisterUnitEvent("UNIT_AURA", "player")
 
   --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");

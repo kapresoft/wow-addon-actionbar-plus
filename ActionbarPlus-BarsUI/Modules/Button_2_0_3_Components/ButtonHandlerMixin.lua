@@ -132,7 +132,7 @@ end
 --- @param evt Name @The event name
 function o.Btn_UpdateState(self, evt)
   self.widget:IfHasAction(function(typ, val, isCustom)
-    local isCurrent = au.IsCurrentAction(typ, val)
+    local isCurrent = au.IsCurrentAction(typ, val, isCustom)
     self:SetChecked(isCurrent == true)
   end)
 end
