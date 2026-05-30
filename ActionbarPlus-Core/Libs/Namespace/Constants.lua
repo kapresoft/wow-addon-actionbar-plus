@@ -38,6 +38,7 @@ local SupportedActionTypes = {
   item         = 'item',
   macro        = 'macro',
   macrotext    = 'macrotext',
+  -- custom type handling below this line --
   mount        = 'mount',
   companion    = 'companion',
   battlepet    = 'battlepet',

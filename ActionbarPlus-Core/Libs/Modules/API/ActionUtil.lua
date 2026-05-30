@@ -198,6 +198,7 @@ function o.IsItem(typ) return typ == atyp.item end
 --- @return boolean
 function o.IsMount(typ) return typ == atyp.mount end
 
+--- A custom type
 --- @param typ string The button attribute 'type' value
 --- @return boolean
 function o.IsEquipmentSet(typ) return typ == atyp.equipmentset end
