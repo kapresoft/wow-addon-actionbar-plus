@@ -152,6 +152,30 @@ function o.Btn_UpdateTextureMacro(self, evt, tickerCount)
 end
 
 --- @param self Button_ABP_2_0_X
+--- @param spellID SpellID
+function o.Btn_UpdateSpellCooldown(self, spellID)
+  au.IfSpellCooldown(spellID, function(info)
+    if info.isEnabled and info.duration > 0 then
+      self.cooldown:SetCooldown(info.startTime or 0, info.duration, info.modRate or 1)
+    else
+      self.cooldown:Clear()
+    end
+  end)
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param itemID ItemID
+function o.Btn_UpdateItemCooldown(self, itemID)
+  au.IfItemCooldown(itemID, function(info)
+    if info.isEnabled and info.duration > 0 then
+      self.cooldown:SetCooldown(info.startTime, info.duration, 1)
+    else
+      self.cooldown:Clear()
+    end
+  end)
+end
+
+--- @param self Button_ABP_2_0_X
 function o.Btn_OnEnterGameTooltip(self)
 
   local typ, val, isCustom = self.widget:GetActionInfo()

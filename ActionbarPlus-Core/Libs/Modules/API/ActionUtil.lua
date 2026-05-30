@@ -292,7 +292,10 @@ end
 --- @param callbackFn fun(info:ItemCooldownInfo)
 function o.IfItemCooldown(itemInfo, callbackFn)
   local info = comp:GetItemCooldown(itemInfo)
-  if not info then return end; callbackFn(info)
+  if not info then return end
+  -- issecretvalue() is a retail function
+  if issecretvalue and issecretvalue(info.duration) then return end
+  callbackFn(info)
 end
 
 --- Returns the first elem of spell power cost array
