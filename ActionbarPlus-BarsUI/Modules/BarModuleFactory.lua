@@ -341,7 +341,7 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, template)
   local f = barFrame
   f:SetParentKey(frameName)
-  f:SetFrameLevel(barIndex)
+  f:SetFrameLevel(barCount - barIndex)
 
   --- @class BarFrameObjWidget_ABP_2_0 : BarFrameObjWidgetMixin_ABP_2_0
   f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex)
