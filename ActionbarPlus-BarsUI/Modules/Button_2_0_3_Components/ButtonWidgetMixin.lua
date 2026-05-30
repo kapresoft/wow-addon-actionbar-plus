@@ -78,7 +78,13 @@ function o:UpdateCount()
       val = self:GetAttributeItemID()
       au.IfItem(val, function(itemInfo)
         -- includeBank=false, includeUses=true (captures charges), includeReagentBank=false
+        local ItemClass = Enum.ItemClass
         count = C_GetItemCount(itemInfo.id, false, true, false) or 0
+        if count == 1
+            and (ItemClass.Armor == itemInfo.classID
+                  or ItemClass.Weapon == itemInfo.classID) then
+          count = nil
+        end
       end)
     elseif au.IsSpell(typ) then
       au.IfSpellCharges(val, function(spId, spc)
