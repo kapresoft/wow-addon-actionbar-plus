@@ -97,6 +97,9 @@ end
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
+--- @return boolean
+function o:HasAction() return not self:IsEmpty() end
+
 --- @param callbackFn fun(typ:ActionType, val:ActionValue, isCustom:boolean) : void
 --- @return Chain_ABP_2_0
 function o:IfHasAction(callbackFn)
@@ -237,6 +240,7 @@ function o:__ResetVisuals()
   if btn.icon then btn.icon:SetDesaturated(false) end
 
   btn.Count:SetText('')
+  btn.Name:SetText('')
 end
 
 --- @private

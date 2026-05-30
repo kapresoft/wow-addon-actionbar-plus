@@ -10,9 +10,9 @@ local attr, atyp = cns:constants()
 local au = O.ActionUtil
 local comp, spu, unit, hu = O.Compat, O.SpellUtil, O.UnitUtil, O.HashUtil
 
+local BUTTON_NAME_LABEL_MAX_CHARS = 5
 --- @type Color
 local ACTION_RANK_COLOR = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
-
 local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
 local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
 
@@ -42,6 +42,21 @@ end
 function o.Btn_ResetAll(self)
   self:ResetButtonConfig()
   self.widget:ResetButton()
+end
+
+--- @param self Button_ABP_2_0_X
+function o.Btn_UpdateName(self)
+  self.widget:IfHasAction(function(typ, val, isCustom)
+    if au.IsMacro(typ) then
+      comp:IfMacro(val, function(name, icon, body)
+        local n = name
+        if #n > BUTTON_NAME_LABEL_MAX_CHARS then
+          n = n:sub(1, BUTTON_NAME_LABEL_MAX_CHARS) .. '...'
+        end
+        self.Name:SetText(n)
+      end)
+    end
+  end)
 end
 
 --- @param self Button_ABP_2_0_X
