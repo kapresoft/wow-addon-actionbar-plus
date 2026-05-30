@@ -165,6 +165,10 @@ function o:OnEvent(evt, ...)
     if self.widget:IsMacro() then
       o.Btn_UpdateTextureMacro(self, evt, 1)
     end
+  elseif evt == 'MODIFIER_STATE_CHANGED' then
+    if self.widget:IsMacro() then
+      o.Btn_UpdateTextureMacro(self, evt, 2)
+    end
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
     -- attacking (even when player is in combat)

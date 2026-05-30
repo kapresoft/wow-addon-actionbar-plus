@@ -52,6 +52,7 @@ function o:OnLoad()
   self.buttons = {};
   self:RegisterEvent("PLAYER_ENTERING_WORLD")
   self:RegisterEvent("PLAYER_TARGET_CHANGED")
+  self:RegisterEvent("MODIFIER_STATE_CHANGED")
   self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
   self:RegisterEvent("BAG_UPDATE_DELAYED")
   self:RegisterEvent("COMPANION_UPDATE")
