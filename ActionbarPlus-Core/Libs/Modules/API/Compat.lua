@@ -100,6 +100,14 @@ end
 --- @boolean @Returns true if the player can cast the spell
 function o:IsOwnSpell(spell) return self:GetSpellInfo(self:GetSpellName(spell)) ~= nil end
 
+--- @param equipSetID EquipmentSetID
+--- @param callbackFn fun(eqSet:EquipmentSetDetails) : void
+function o:IfEquipmentSet(equipSetID, callbackFn)
+  local eqSet = self:GetEquipmentSet(equipSetID)
+  if not eqSet then return end
+  callbackFn(eqSet)
+end
+
 --- @param spell SpellIdentifier
 --- @param callbackFn fun(spell:SpellInfo)
 function o:IfSpell(spell, callbackFn)
