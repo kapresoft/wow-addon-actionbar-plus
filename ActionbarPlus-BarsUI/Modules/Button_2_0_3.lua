@@ -169,6 +169,8 @@ function o:OnEvent(evt, ...)
   elseif evt == 'MODIFIER_STATE_CHANGED' then
     if self.widget:IsMacro() then
       o.Btn_UpdateTextureMacro(self, evt, 2)
+      -- Modifier key change may alter the macro's resolved spell; defer cooldown update to next frame
+      C_Timer.After(0.05, function() self:UpdateCooldown() end)
     end
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
@@ -441,43 +443,30 @@ Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateUsable() o.Btn_UpdateUsable(self) end
 function o:UpdateName() o.Btn_UpdateName(self) end
+
 function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
-  
+
   local typ, val, isCustom = self.widget:GetActionInfo()
   if not val then cd:Clear(); return end
-  
-  local start, duration, enabled, modRate = 0, 0, false, 1
+  if isCustom then return end
 
-  if not isCustom then
-    if au.IsSpell(typ) then
-      -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
-      if cns:IsTBC()
-              and priest:IsPriest()
-              and priest:IsShapeShifted()
-              and priest:IsShadowFormSpell(val) then return end
-      au.IfSpellCooldown(val, function(info)
-        start = info.startTime or 0
-        duration = info.duration or 0
-        enabled = info.isEnabled == true
-        modRate = info.modRate
-      end)
-    elseif au.IsItem(typ) then
-      au.IfItemCooldown(val, function(info)
-        start, duration, enabled = info.startTime, info.duration, info.isEnabled == true
-      end)
-    end
+  if au.IsSpell(typ) then
+    -- The shadowform spell triggers a cooldown if we don't do this (weird behavior)
+    if cns:IsTBC()
+            and priest:IsPriest()
+            and priest:IsShapeShifted()
+            and priest:IsShadowFormSpell(val) then return end
+    return o.Btn_UpdateSpellCooldown(self, val)
+  elseif au.IsItem(typ) then
+    return o.Btn_UpdateItemCooldown(self, val)
+  elseif au.IsMacro(typ) then
+    local sp, it = au.GetMacroAction(val)
+    if sp then return o.Btn_UpdateSpellCooldown(self, sp)
+    elseif it then return o.Btn_UpdateItemCooldown(self, it) end
   end
 
-  -- issecretvalue() is a retail function
-  if issecretvalue and issecretvalue(duration) then return end
-
-  if enabled == true and duration > 0 then
-    cd:SetCooldown(start, duration, modRate or 1)
-  else
-    cd:Clear()
-  end
 end
 
 --- @return string?, ActionValue? @The suspended action type (e.g. spell, item) and the suspended action type value (spellID/itemID). If one is nil, both are nil.
@@ -502,6 +491,7 @@ function o:UpdateAnimation() o.Btn_UpdateAnimation(self) end
 function o:UpdateFlash() o.Btn_UpdateFlash(self) end
 function o:UpdateCount() self.widget:UpdateCount() end
 
+--- @see ButtonWidget_ABP_2_0.GetActionTexture()
 function o:UpdateTexture()
   self.widget:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
 end
