@@ -3,14 +3,15 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+local cns, O = ns:cns()
 
-local cns = ns:cns()
-local O = cns.O
 local attr, atyp = cns:constants()
 local au = O.ActionUtil
 local comp, spu, unit, hu = O.Compat, O.SpellUtil, O.UnitUtil, O.HashUtil
+local cLabel, cValue = cns:ColorFn('FEFFEB'), cns:ColorFn('00CCFF')
 
 local BUTTON_NAME_LABEL_MAX_CHARS = 5
+
 --- @type Color
 local ACTION_RANK_COLOR = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
 local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
@@ -186,6 +187,7 @@ function o.Btn_OnEnterGameTooltip(self)
   GameTooltip:ClearAllPoints()
   GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
   o.Btn_OnGameTooltip(self, typ, val, isCustom)
+  GameTooltip:Show()
 end
 
 --- @param self Button_ABP_2_0_X
@@ -208,7 +210,6 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
           right:SetTextColor(ACTION_RANK_COLOR:GetRGBA())
           right:Show()
         end
-        GameTooltip:Show()
       end)
     elseif au.IsItem(typ) then
       --- @type number|string @The val param can be 'item:<itemID>', itemID, itemName
@@ -224,6 +225,8 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
         elseif mItemID then
           o.Btn_OnGameTooltip(self, atyp.item, mItemID)
         end
+        if mSpellID or mItemID then GameTooltip:AddLine(' ') end
+        GameTooltip:AddDoubleLine(cLabel(MACRO .. ':'), cValue(name))
       end)
     end
   else
