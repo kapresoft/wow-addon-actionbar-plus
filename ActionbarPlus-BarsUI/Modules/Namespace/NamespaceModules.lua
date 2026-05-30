@@ -21,6 +21,8 @@ local ModuleNames = {
   BarModuleFactory = {},
   --- @type ButtonConfigAccessorMixin_ABP_2_0
   ButtonConfigAccessorMixin = {},
+  --- @type DragStateController_ABP_2_0
+  DragStateController = {},
 
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 
