@@ -41,7 +41,7 @@
                 <FontString name="$parentName" parentKey="Name" inherits="GameFontHighlightSmallOutline"
                             maxLines="1">
                     <Anchors>
-                        <Anchor point="BOTTOM" x="0" y="2"/>
+                        <Anchor point="BOTTOM" x="0" y="5"/>
                     </Anchors>
                 </FontString>
                 <Texture name="$parentBorder" file="Interface\Buttons\UI-ActionButton-Border" parentKey="Border" hidden="true" alphaMode="ADD">

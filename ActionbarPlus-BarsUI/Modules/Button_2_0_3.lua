@@ -50,6 +50,7 @@ local libName = 'Button_2_0_3'
 --- @field PushedTexture Texture
 --- @field CheckedTexture Texture
 --- @field SpellHighlightAnim AnimationGroup
+--- @field Name FontString
 --- @field Count FontString
 --- @field icon Texture
 --- @field cooldown CooldownObj
@@ -409,6 +410,7 @@ function o:Update()
       self.eventsRegistered = true
     end
     self:UpdateTexture()
+    self:UpdateName()
     --self:UpdateState()
     self:UpdateUsable()
     --self:UpdateProfessionQuality()
@@ -438,7 +440,7 @@ end
 Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateUsable() o.Btn_UpdateUsable(self) end
-
+function o:UpdateName() o.Btn_UpdateName(self) end
 function o:UpdateCooldown()
   local cd = self.cooldown
   if not cd then return end
