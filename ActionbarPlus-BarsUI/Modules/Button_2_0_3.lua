@@ -23,15 +23,17 @@ local ns = select(2, ...)
 ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 
 local cns, O = ns:cns(), ns:cns().O
-local C, au = O.Constants, O.ActionUtil
-local attr, atyp = C.AttributeNames, C.SupportedActionTypes
-local comp, spu, unit = O.Compat, O.SpellUtil, O.UnitUtil
+local attr, atyp = cns:constants()
+local au, comp, spu, unit = O.ActionUtil, O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
 local Tbl_IsEmpty = cns:Table().IsEmpty
 local Str_IsAnyOf = cns:String().IsAnyOf
 
-local MODIFIER_STATE_CHANGED = 'MODIFIER_STATE_CHANGED'
 local seedID = 1000
+
+--- @LazyLoaded
+--- @type DragStateController_ABP_2_0
+local dragStateController
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -66,6 +68,12 @@ local function NextSeedID()
   local current = seedID;
   seedID = seedID + 1;
   return current
+end
+
+--- @return DragStateController_ABP_2_0
+local function dsc()
+  dragStateController = dragStateController or ns.O.DragStateController
+  return dragStateController
 end
 
 --[[-----------------------------------------------------------------------------
@@ -149,8 +157,6 @@ function o:OnEvent(evt, ...)
     end
   elseif evt == 'COMPANION_UPDATE' then
     self:UpdateState('OnEvent')
-  elseif evt == MODIFIER_STATE_CHANGED then
-    t('OnEvent', 'evt=', evt, 'args=', fmt({...}))
   elseif evt == 'SPELL_UPDATE_USABLE' then
     self:UpdateUsable()
   elseif evt == 'SPELL_UPDATE_CHARGES' then
@@ -276,13 +282,6 @@ function o:PostClick(button, down)
   self:PostClickAction(button, down)
 end
 
---- For restoring suspended actions
-function o:OnModifierStateChanged(evt, keyPressed, isDown)
-  self:UnregisterEvent(MODIFIER_STATE_CHANGED)
-  if InCombatLockdown() then return end
-  self.widget:RestoreAction()
-end
-
 --- Only process mouse down events here
 --- @param button ButtonName
 --- @param down ButtonDown
@@ -293,9 +292,7 @@ function o:PreClickAction(button, down)
   -- must be temporarily suspended so the button does not execute its
   -- action while the drag / pickup transaction is in progress.
   if o.Btn_ActionShouldFire(self, down) and self.widget:IsDragAllowed() then
-    self:SetChecked(false)
-    self.widget:SuspendAction()
-    self:RegisterEvent(MODIFIER_STATE_CHANGED, 'OnModifierStateChanged')
+    dsc().Btn_PrepareForDrag(self)
     return
   end
 
@@ -347,7 +344,8 @@ function o:OnLeave() GameTooltip:Hide() end
 
 --- @param button ButtonName
 function o:OnDragStart(button)
-  self:UnregisterEvent(MODIFIER_STATE_CHANGED)
+  dsc().Btn_OnDragStart(self)
+
   if InCombatLockdown() then return false end
   if not self.widget:IsDragAllowed() then return end
 
