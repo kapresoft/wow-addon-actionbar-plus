@@ -205,7 +205,7 @@ function o:OnEvent(evt, ...)
     self:UpdateCooldown()
   elseif Str_IsAnyOf(evt, 'SPELL_UPDATE_COOLDOWN', 'LOSS_OF_CONTROL_ADDED') then
     self:UpdateCooldown()
-  elseif Str_IsAnyOf(evt, 'TRADE_SKILL_SHOW', 'TRADE_SKILL_CLOSE')  then
+  elseif Str_IsAnyOf(evt, 'TRADE_SKILL_SHOW', 'TRADE_SKILL_CLOSE') then
     self:UpdateState('OnEvent')
   --elseif evt == 'UNIT_AURA' then
   --  self:UpdateStealthSpells()
@@ -221,6 +221,8 @@ function o:OnEvent(evt, ...)
   elseif evt == 'BAG_UPDATE_DELAYED' then
     self:UpdateUsable()
     self:UpdateCount()
+  elseif Str_IsAnyOf(evt, 'PLAYER_EQUIPMENT_CHANGED', 'EQUIPMENT_SETS_CHANGED') then
+    self:UpdateState(evt)
   end
   
 end

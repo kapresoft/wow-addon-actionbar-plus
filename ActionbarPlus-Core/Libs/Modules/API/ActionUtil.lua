@@ -47,6 +47,26 @@ local function __SpellID(spell)
   return spid
 end
 
+--- @param equipSetID EquipmentSetID
+--- @return boolean
+local function IsEquipmentSetCurrent(equipSetID)
+  local isEquipped = false
+  comp:IfEquipmentSet(equipSetID, function(eqSet)
+    isEquipped = eqSet.isEquipped
+  end)
+  return isEquipped
+end
+
+--- @param mountID MountID
+--- @return boolean
+local function IsMountCurrent(mountID)
+  local isCurrent = false
+  comp:IfMount(mountID, function(mount)
+    isCurrent = C_IsCurrentSpell(mount.spellID)
+  end)
+  return isCurrent
+end
+
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil (Methods)
 -------------------------------------------------------------------------------]]
@@ -164,17 +184,26 @@ function o.IsCurrentSpell(spell)
   return C_IsCurrentSpell(spellID) or C_IsAutoRepeatSpell(spellID)
 end
 
---- @param typeVal string The button attribute 'type' value
---- @param id Identifier The context id; 'spell', 'item', etc...
+--- @param typ string The button attribute 'type' value
+--- @param val Identifier The context id; 'spell', 'item', etc...
+--- @param isCustom boolean
 --- @return boolean
-function o.IsCurrentAction(typeVal, id)
-  if not (typeVal and id) then return false end
-  if o.IsSpell(typeVal) then
-    return C_IsCurrentSpell(id) or C_IsAutoRepeatSpell(id)
-  elseif o.IsItem(typeVal) then
-      return C_Item.IsCurrentItem(id)
-  elseif C_GetSummonedPetGUID and o.IsBattlePet(typeVal) then
-    return C_GetSummonedPetGUID() == id
+function o.IsCurrentAction(typ, val, isCustom)
+  if not (typ and val) then return false end
+  if not isCustom then
+    if o.IsSpell(typ) then
+      return C_IsCurrentSpell(val) or C_IsAutoRepeatSpell(val)
+    elseif o.IsItem(typ) then
+        return C_Item.IsCurrentItem(val)
+    end
+  else
+    if o.IsMount(typ) then
+      return IsMountCurrent(val --[[@as MountID]])
+    elseif o.IsEquipmentSet(typ) then
+      return IsEquipmentSetCurrent(val --[[@as EquipmentSetID]])
+    elseif C_GetSummonedPetGUID and o.IsBattlePet(typ) then
+      return C_GetSummonedPetGUID() == val
+    end
   end
   return false
 end
