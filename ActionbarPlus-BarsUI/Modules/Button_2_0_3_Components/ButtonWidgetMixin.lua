@@ -78,8 +78,7 @@ function o:UpdateCount()
       val = self:GetAttributeItemID()
       au.IfItem(val, function(itemInfo)
         -- includeBank=false, includeUses=true (captures charges), includeReagentBank=false
-        local n = C_GetItemCount(itemInfo.id, false, true, false) or 0
-        if n > 1 then count = n end
+        count = C_GetItemCount(itemInfo.id, false, true, false) or 0
       end)
     elseif au.IsSpell(typ) then
       au.IfSpellCharges(val, function(spId, spc)
