@@ -293,10 +293,16 @@ end
 
 --- @param itemID ItemID
 --- @param callbackFn fun(itemInfo:ItemInfoDetails)
-function o.IfItem(itemID, callbackFn)
-  local it = comp:GetItemInfoInstant(itemID)
-  if not (it and it.id and it.icon) then
-    it = comp:GetItemInfo(itemID)
+--- @param withDetails boolean? @If non-instant
+function o.IfItem(itemID, callbackFn, withDetails)
+  assert(type(itemID) == 'number', 'IfItem(itemID, callbackFn, withDetails): {itemID} should be a number')
+  local it
+  if withDetails then it = comp:GetItemInfo(itemID)
+  else
+    it = comp:GetItemInfoInstant(itemID)
+    if not (it and it.id and it.icon) then
+      it = comp:GetItemInfo(itemID)
+    end
   end
   if not (it and it.icon) then return end
   callbackFn(it)

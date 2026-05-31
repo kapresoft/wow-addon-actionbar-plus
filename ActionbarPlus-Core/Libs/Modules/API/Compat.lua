@@ -36,13 +36,8 @@ Module::Compat
 --- @see Core_Modules_ABP_2_0
 local libName = ns.M.Compat()
 --- @class Compat_ABP_2_0
-local S = {}; ns:Register(libName, S)
+local o = {}; ns:Register(libName, o)
 local p, t = ns:log(libName)
-
---[[-----------------------------------------------------------------------------
-Module::Compat (Methods)
--------------------------------------------------------------------------------]]
-local o = S
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -80,6 +75,11 @@ function o:__GetSpellInfoLegacy(id)
   }
   return sp
 end
+
+--- @return boolean
+function o:IsPlayerOnTaxi() return UnitOnTaxi('player') end
+--- @return boolean
+function o:IsPlayerGhost() return UnitIsGhost('player') end
 
 --- @param spell SpellIdentifier
 --- @return SpellInfo?
@@ -311,9 +311,13 @@ function o:GetItemInfo(itemID)
   if not name then return nil end
   --- @type ItemInfoDetails
   local item = {
-    id = itemID, name=name, link=link, type = type, subType = subType,
-    equipLoc = equipLoc, classID = classID,
-    subclassID = subclassID, icon = icon,
+    id = itemID, name = name, link = link, icon = icon,
+    quality = quality, level = level, minLevel = minLevel,
+    type = type, subType = subType, stackCount = stackCount,
+    equipLoc = equipLoc, classID = classID, subclassID = subclassID,
+    sellPrice = sellPrice, bindType = bindType,
+    expansionID = expansionID, setID = setID,
+    isCraftingReagent = isCraftingReagent, desc = desc,
   }
   return item
 end

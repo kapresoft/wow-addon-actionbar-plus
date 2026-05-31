@@ -14,13 +14,22 @@ local o = cns:AceAddon():NewAddon(ns.name, unpack(EMBEDS)); ABP_BarsUI_2_0 = o
 o:SetDefaultModuleLibraries(unpack(EMBEDS))
 o:SetDefaultModuleState(false)
 
+--- Called once, after:
+--- - ActionbarPlus-Core is loaded
+--- - SavedVariables are loaded
+--- - All addon Lua/XML files are loaded
+--- - AceDB initialized
+function o:OnInitialize()
+  self:SendMessage(ns:msg('OnAddOnInitialized'))
+end
+
 function o:OnEnable()
-  --t('OnEnable', 'called...')
   MF:CreateAddonModules()
+  self:SendMessage(ns:msg('OnBarsReady'))
 end
 
 function o:OnDisable()
-  t('OnDisable', 'called...')
+  --t('OnDisable', 'called...')
 end
 
 --- @param callbackFn fun(module:BarModule_2_0):void
@@ -31,4 +40,16 @@ function o:ForEach(callbackFn)
     local barModule = module
     callbackFn(barModule)
   end
+end
+
+function o:EnableBars()
+  self:ForEach(function(module)
+    module:Enable()
+  end)
+end
+
+function o:DisableBars()
+  self:ForEach(function(module)
+    module:Disable()
+  end)
 end

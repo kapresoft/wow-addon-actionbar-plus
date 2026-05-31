@@ -78,6 +78,19 @@ function ns:ColorFormatter() return ColorFormatter end
 function ns:GetLocale() return ns:AceLocale():GetLocale(self.name, true) end
 function ns:AddonUtil() return LibStub('Kapresoft-AddonUtil-2-0') end
 
+--- ### Usage
+---  ```
+---  -- @returns 'ActionbarPlus-Core::OnPlayerLogin'
+---  local message = ns:msg('OnPlayerLogin')
+---  ```
+--- @param message Name @The base message name; used for AceEvent messages
+--- @return string
+function ns:msg(message)
+  assert(type(message) == 'string' and #strtrim(message) > 0,
+    'msg(message): {message} should be a string')
+  return ('%s::%s'):format(self.name, message)
+end
+
 --- Register a Namespace Module
 --- @generic T
 --- @param anyObj T The library object instance

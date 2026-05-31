@@ -21,6 +21,8 @@ ABP_BARSUI_NS = ns
 ns.O = ns.O or {}
 ns.LOG_NAME = 'ABP2_BARSUI'
 
+--- Core Namespace and Core modules
+--- #### Usage:  `local cns, O = ns:cns()`
 --- @return Namespace_ABP_2_0, Core_Modules_ABP_2_0
 function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O end
 
@@ -76,4 +78,17 @@ Loggers/Tracers:: NoOp in Official Releases
 function ns:log(moduleName)
   local h = self.logHolder
   return h.printer(moduleName), h.tracer(moduleName)
+end
+
+--- ### Usage
+---  ```
+---  -- @returns 'ActionbarPlus-BarsUI::OnPlayerLogin'
+---  local message = ns:msg('OnPlayerLogin')
+---  ```
+--- @param message Name @The base message name; used for AceEvent messages
+--- @return string
+function ns:msg(message)
+  assert(type(message) == 'string' and #strtrim(message) > 0,
+    'msg(message): {message} should be a string')
+  return ('%s::%s'):format(self.name, message)
 end
