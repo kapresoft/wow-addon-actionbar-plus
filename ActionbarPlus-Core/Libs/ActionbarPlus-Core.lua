@@ -15,12 +15,13 @@ AddOn: ActionbarPlus_Core
 local o = ns:AceAddon():NewAddon(ns.name, "AceEvent-3.0", "AceBucket-3.0", "AceConsole-3.0")
 ABP_Core_2_0 = o
 
------ Called once, after:
------ • SavedVariables are loaded
------ • All addon Lua/XML files are loaded
------ • Init default AceDB
+--- Called once, after:
+--- - SavedVariables are loaded
+--- - All addon Lua/XML files are loaded
+--- - AceDB initialized
 function o:OnInitialize()
   DatabaseMixin:InitDb(self)
+  self:SendMessage(ns:msg('OnAddOnInitialized'))
 end
 --
 function o:OnEnable()

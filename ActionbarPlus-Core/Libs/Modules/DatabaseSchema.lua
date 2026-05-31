@@ -16,6 +16,7 @@ Type Definitions
 --- @class RootConfig_ABP_2_0
 --- @field characterSpecificAnchors boolean
 --- @field hideWhenTaxi boolean
+--- @field hideWhenGhost boolean
 --- @field actionButtonMouseoverGlow boolean
 --- @field hideTextOnSmallButtons boolean
 --- @field hideCountdownNumbers boolean
@@ -168,8 +169,9 @@ local DEFAULT_DB = {
   ['global'] = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {                     -- ProfileConfig_ABP_2_0
-    barCount                        = 1,
-    --hideWhenTaxi                  = true,
+    barCount                      = 2,
+    hideWhenTaxi                  = true,
+    hideWhenGhost                 = true,
     --characterSpecificAnchors      = true,
     --actionButtonMouseoverGlow     = true,
     --hideTextOnSmallButtons        = false,

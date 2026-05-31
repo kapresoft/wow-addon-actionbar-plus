@@ -9,6 +9,21 @@ local unit, comp, hu = O.UnitUtil, O.Compat, O.HashUtil
 --- @class Developer_ABP_2_0 : AceEvent_3_0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 
+--- @return Namespace_ABP_BarsUI_2_0
+local function bar_ns() return ABP_BARSUI_NS end
+
+function o:disable()
+  bar_ns():a():ForEach(function(module)
+    module:Disable()
+  end)
+end
+
+function o:enable()
+  bar_ns():a():ForEach(function(module)
+    module:Enable()
+  end)
+end
+
 function o:macroInfo(macroIdentifier) return comp:GetMacroInfo(macroIdentifier) end
 function o:hash(str) return hu.string(str) end
 

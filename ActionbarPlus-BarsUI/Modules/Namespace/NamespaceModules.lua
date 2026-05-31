@@ -23,6 +23,8 @@ local ModuleNames = {
   ButtonConfigAccessorMixin = {},
   --- @type DragStateController_ABP_2_0
   DragStateController = {},
+  --- @type BarVisibilityController_ABP_2_0
+  BarVisibilityController = {},
 
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

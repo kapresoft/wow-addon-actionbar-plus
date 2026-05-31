@@ -10,7 +10,7 @@ local backdrops = ns.O.Backdrops
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
-local VISIBILITY_DEFAULTS = '[vehicleui][petbattle]hide; show'
+local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -129,7 +129,7 @@ local function BarModuleProtoMethods()
   function bm:c() return cns:bar(self.index) end
   
   function bm:OnInitialize()
-    --pd('OnInitialize:: called')
+    --t('OnInitialize')
   end
   
   function bm:OnEnable()
@@ -141,7 +141,6 @@ local function BarModuleProtoMethods()
   end
 
   function bm:OnDisable()
-    t('BarModuleProto', 'OnDisable')
     if self.barFrame then
       BarFrame_DisableVisibilityDriver(self.barFrame)
       self.barFrame:Hide()
@@ -218,7 +217,7 @@ Dump:
 local o = S
 
 --- Create the Ace module dynamically
---- @param barFrame ActionBarFrame
+--- @param barFrame BarFrameObj_ABP_2_0
 --- @return BarModule_2_0
 function o:New(barFrame)
   assert(type(barFrame) == 'table', 'New(barFrame):: {barFrame} should be a frame.')
@@ -231,7 +230,7 @@ function o:New(barFrame)
   local existingModule = core:GetModule(name, true)
   if existingModule then return existingModule end
 
-  --- @class BarModule_2_0 : BarModuleProto_ABP_2_0, AceConsole-3.0, AceEvent-3.0, AceBucket-3.0, AceHook-3.0
+  --- @class BarModule_2_0 : BarModuleProto_ABP_2_0, AceAddon, AceConsole-3.0, AceEvent-3.0, AceBucket-3.0, AceHook-3.0
   local m = core:NewModule(name, BarModuleProto_2_0)
   m.barFrame = barFrame
   m.index = w.index

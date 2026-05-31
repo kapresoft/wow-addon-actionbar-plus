@@ -11,5 +11,6 @@
     <Include file="BarFrame.xml"/>
     <Script file="Backdrops.lua" />
     <Script file="BarModuleFactory.lua" />
+    <Script file="BarVisibilityController.lua"/>
 
 </Ui>
