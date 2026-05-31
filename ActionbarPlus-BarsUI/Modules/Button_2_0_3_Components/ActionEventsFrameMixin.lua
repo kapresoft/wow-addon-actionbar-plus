@@ -52,6 +52,9 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: handle battlepet barModule state (show/hide)
+-- todo: handle player-in-taxi barModule state (show/hide)
+-- todo: range indicator [big]
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
@@ -148,7 +151,6 @@ function o:OnEvent(evt, ...)
       if unit:IsPlayer(unitName) then
         if btn.widget:IsMacro() then
           btn.Btn_UpdateTextureMacro(btn, evt, 1)
-          -- todo next: (1) update spell cooldown for macros, (2) modifier state changed
         elseif btn:MatchesSpellID(spellID) then
           btn:OnPlayerMatchingSpellcastEvent(evt, spellID);
         end
