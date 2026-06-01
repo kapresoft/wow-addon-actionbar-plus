@@ -238,6 +238,9 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
       GameTooltip:SetCompanionPet(val) -- val as petGUID
     elseif au.IsEquipmentSet(typ) then
       comp:IfEquipmentSet(val --[[@as EquipmentSetID]], function(eqSet)
+        if cns:IsMainline() then
+          GameTooltip:SetEquipmentSet(eqSet.id); return
+        end
         GameTooltip:SetEquipmentSet(eqSet.name)
       end)
     end
