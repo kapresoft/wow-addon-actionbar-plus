@@ -1,1 +1,1 @@
---- @alias BarFactoryConsumerFn fun(barFrame:ActionBarFrame) | "function(barFrame) end"
+--- @alias BarFactoryConsumerFn fun(barFrame:BarFrame_ABP_2_0) | "function(barFrame) end"

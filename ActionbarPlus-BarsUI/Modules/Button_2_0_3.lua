@@ -56,7 +56,7 @@ local libName = 'Button_2_0_3'
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
---- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrameObj_ABP_2_0
+--- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrame_ABP_2_0
 local o = Mixin(cns:NewAceEvent(), ns.O.ButtonHandlerMixin, ns.O.ButtonConfigAccessorMixin)
 ButtonMixin_ABP_2_0_3 = o
 

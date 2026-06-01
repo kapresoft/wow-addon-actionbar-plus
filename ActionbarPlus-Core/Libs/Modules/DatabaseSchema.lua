@@ -22,9 +22,10 @@ Type Definitions
 --- @field hideCountdownNumbers boolean
 --- @field tooltip TooltipConfig_ABP_2_0
 --- @field equipmentSet EquipmentSetConfig_ABP_2_0
---- @field bars table<number, BarConfig_ABP_2_0>
+--- @field bars table<string, BarConfig_ABP_2_0>
 
---  ================================================
+--  ==========================rFrame boolean
+                              ----- @field openEquipmen======================
 
 --- @class EquipmentSetConfig_ABP_2_0
 --- @field openCharacterFrame boolean
@@ -110,7 +111,7 @@ Type Definitions
 
 --  ================================================
 
---- @class DatabaseObj_ABP_2_0 : AceDBObject_3_0
+--- @class DatabaseObj_ABP_2_0 : AceDBObject-3.0
 --- @field global GlobalConfig_ABP_2_0
 --- @field profile ProfileConfig_ABP_2_0
 --- @field char table|nil
@@ -172,7 +173,7 @@ local DEFAULT_DB = {
     barCount                      = 2,
     hideWhenTaxi                  = true,
     hideWhenGhost                 = true,
-    --characterSpecificAnchors      = true,
+    characterSpecificAnchors      = false,
     --actionButtonMouseoverGlow     = true,
     --hideTextOnSmallButtons        = false,
     --hideCountdownNumbers          = false,
@@ -244,11 +245,14 @@ Module::DatabaseSchema (Methods)
 --- Default Database
 --- @return DatabaseObj_ABP_2_0
 function o:GetDefaultDatabase()
-  local db = tbl_DeepCopy(DEFAULT_DB)
+  local db = tbl_DeepCopy(DEFAULT_DB) --[[@as DatabaseObj_ABP_2_0]]
   
   for barIndex = 1, MAX_BAR_COUNT do
     local key = barKey(barIndex)
-    db.profile.bars[key] = self:CreateDefaultBar(barIndex)
+    db['profile'].bars[key] = self:CreateDefaultBar(barIndex)
+    db['global'].bars[key] = {
+      anchor = {}
+    }
   end
   
   return db

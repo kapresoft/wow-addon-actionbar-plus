@@ -12,5 +12,6 @@
     <Script file="Backdrops.lua" />
     <Script file="BarModuleFactory.lua" />
     <Script file="BarVisibilityController.lua"/>
+    <Script file="BarAnchorController.lua"/>
 
 </Ui>
