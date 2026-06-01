@@ -49,10 +49,10 @@ end
 --- @param self DatabaseMixin_ABP_2_0
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
-    local current = db.global.schemaVersion
+    local current = db['global'].schemaVersion
     if current < DB_VERSION then
         self:RunMigrations(current)
-        db.global.schemaVersion = DB_VERSION
+        db['global'].schemaVersion = DB_VERSION
     end
 end
 
@@ -96,18 +96,23 @@ end
 Methods
 ---------------------------------------------------------------------]]
 --- @return GlobalConfig_ABP_2_0
-function o:g() return ns:db().global end
+function o:g() return ns:db()['global'] end
 
 --- @return ProfileConfig_ABP_2_0
-function o:p() return ns:db().profile end
+function o:p() return ns:db()['profile'] end
 
 --- @param barIndex number
 --- @return BarConfig_ABP_2_0
 function o:bar(barIndex)
   local barKey = dsu.barKey(barIndex)
-  local profile = self:p()
-  local bars = profile.bars
-  return bars[barKey]
+  return self:p().bars[barKey]
+end
+
+--- @param barIndex number
+--- @return BarConfig_ABP_2_0
+function o:barGlobal(barIndex)
+  local barKey = dsu.barKey(barIndex)
+  return self:g().bars[barKey]
 end
 
 --- @param barConf BarConfig_ABP_2_0

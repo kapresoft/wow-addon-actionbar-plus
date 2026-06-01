@@ -15,9 +15,9 @@ BarFrame (secure)
 --
 local libName = 'BarFrameMixin_ABP_2_0_1'
 --- @class BarFrameMixin_ABP_2_0_1 : Frame
+--- @field widget BarFrameWidget_ABP_2_0
 --- @field _originalLevel number
 local o = {}; BarFrameMixin_ABP_2_0_1 = o
---
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
@@ -41,6 +41,7 @@ function o:OnDragStop()
     self:SetFrameLevel(self._originalLevel)
     self._originalLevel = nil
   end
+  ns:a():SendMessage(ns:msg('OnBarFrameDragStop'), self)
 end
 -- initially OnLoad() the self.widget is not defined
 -- But this method will eventually be called once

@@ -34,12 +34,12 @@ local function ButtonName(barIndex, btnIndex)
   return ('ABP_2_0_F%s%s'):format(barIndex, parentKey), parentKey
 end
 
---- @param self BarFrameObj_ABP_2_0
+--- @param self BarFrame_ABP_2_0
 local function BarFrame_EnableVisibilityDriver(self)
   RegisterStateDriver(self, "visibility", VISIBILITY_DEFAULTS)
 end
 
---- @param self BarFrameObj_ABP_2_0
+--- @param self BarFrame_ABP_2_0
 local function BarFrame_DisableVisibilityDriver(self)
   UnregisterStateDriver(self, "visibility")
 end
@@ -61,21 +61,24 @@ end
 --[[-------------------------------------------------------------------
 Mixin: BarFrameObjWidgetMixin_2_0
 ---------------------------------------------------------------------]]
---- @class BarFrameObjWidgetMixin_ABP_2_0
+--- @class BarFrameWidgetMixin_ABP_2_0
 --- @field index Index
---- @field frame BarFrameObj_ABP_2_0
+--- @field frame BarFrame_ABP_2_0
 --- @field buttons Button_ABP_2_0_X[]
+--- @field module BarModule_2_0
 local BarFrameObjWidgetMixin = {}
+
+--- @class BarFrameWidget_ABP_2_0 : BarFrameWidgetMixin_ABP_2_0
 
 local function BarFrameWidgetMethods()
   
-  --- @type BarFrameObjWidgetMixin_ABP_2_0
+  --- @type BarFrameWidgetMixin_ABP_2_0
   local wm = BarFrameObjWidgetMixin
   
-  ---@param frame BarFrameObj_ABP_2_0
+  ---@param frame BarFrame_ABP_2_0
   function wm:Init(frame, index)
     assert(type(frame) == 'table' and strlower(frame:GetObjectType()) == 'frame',
-            'BarFrameObjWidgetMixin::Init(frame, index):: Param frame is expected to be a Frame.')
+            'BarFrameWidget::Init(frame, index):: Param frame is expected to be a Frame.')
     assert(type(index) == 'number')
     self.frame = frame
     self.index = index
@@ -103,7 +106,7 @@ local function BarFrameWidgetMethods()
   --- @return Index
   function wm:GetIndex() return self.index end
   
-  --- @return BarFrameObj_ABP_2_0
+  --- @return BarFrame_ABP_2_0
   function wm:GetFrame() return self.frame end
   
   function wm:GetDebugName()
@@ -118,7 +121,7 @@ BarModuleProto
 ---------------------------------------------------------------------]]
 --- @class BarModuleProto_ABP_2_0
 --- @field index Index
---- @field barFrame BarFrameObj_ABP_2_0
+--- @field barFrame BarFrame_ABP_2_0
 local BarModuleProto_2_0 = {}
 
 local function BarModuleProtoMethods()
@@ -217,7 +220,7 @@ Dump:
 local o = S
 
 --- Create the Ace module dynamically
---- @param barFrame BarFrameObj_ABP_2_0
+--- @param barFrame BarFrame_ABP_2_0
 --- @return BarModule_2_0
 function o:New(barFrame)
   assert(type(barFrame) == 'table', 'New(barFrame):: {barFrame} should be a frame.')
@@ -234,6 +237,7 @@ function o:New(barFrame)
   local m = core:NewModule(name, BarModuleProto_2_0)
   m.barFrame = barFrame
   m.index = w.index
+  w.module = m
 
   if m:c().enabled then m:Enable()
   else m:Disable() end
@@ -271,7 +275,7 @@ function o:CreateBarGroup(barIndex, consumerFn)
   local size = ui.button.size
   local spacing = ui.button.spacing
 
-  --- @type BarFrameObj_ABP_2_0
+  --- @type BarFrame_ABP_2_0
   local frame = self:CreateBarFrame(barConf, barIndex, frameName)
   local buttons = self:CreateButtons(barConf, frame, barIndex)
   frame.widget.buttons = buttons
@@ -327,7 +331,7 @@ end
 --- @param barConf ButtonConfig_ABP_2_0 The frame index
 --- @param barIndex Index The frame index
 --- @param frameName Name The frame name
---- @return BarFrameObj_ABP_2_0
+--- @return BarFrame_ABP_2_0
 function o:CreateBarFrame(barConf, barIndex, frameName)
   assert(type(barIndex) == 'number', '__CreateBarFrame(barConf, barIndex, frameName) {barIndex} should be a number')
   assert(type(frameName) == 'string', '__CreateBarFrame(barConf, barIndex, frameName): {frameName} should be a string')
@@ -335,15 +339,12 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   --- @type Template
   local template = "ABP_BarFrameTemplate_2_0_1"
 
-  --- @class BarFrameObj_ABP_2_0 : Frame, BackdropTemplate, BarFrameMixin_ABP_2_0_1
-  --- @field widget BarFrameObjWidget_ABP_2_0
+  --- @class BarFrame_ABP_2_0 : Frame, BackdropTemplate, BarFrameMixin_ABP_2_0_1
   local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, template)
   local f = barFrame
   f:SetParentKey(frameName)
   f:SetFrameLevel(barCount - barIndex)
-
-  --- @class BarFrameObjWidget_ABP_2_0 : BarFrameObjWidgetMixin_ABP_2_0
-  f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex)
+  f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex) --[[@as BarFrameWidget_ABP_2_0]]
 
   -- TODO: Can have user-preference override
   --RegisterStateDriver(barFrame, 'visibility', VISIBILITY_DEFAULTS)
@@ -353,7 +354,7 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   --  print('xx barFrame: newState=', newstate)
   --  self:SetAttribute("abp_state", newstate)
   --]])
-
+  ns.O.BarAnchorController.ApplyAnchor(f, barIndex)
   f:Show()
 
   return f
@@ -361,7 +362,7 @@ end
 
 --- @param barConf BarConfig_ABP_2_0 The frame index
 --- @param barIndex Index
---- @param barFrame BarFrameObj_ABP_2_0
+--- @param barFrame BarFrame_ABP_2_0
 --- @return table<number, Button_ABP_2_0_X>
 function o:CreateButtons(barConf, barFrame, barIndex)
   local ui = barConf.ui
