@@ -43,6 +43,7 @@ function o:Init(btn, btnIndex, parentFrameIndex)
   self.button = btn
   self.index = btnIndex
   self.barIndex = parentFrameIndex
+  self.HotKey = btn.HotKey
 end
 
 function o:OnAttributeChanged(name, val)
@@ -465,6 +466,55 @@ function o:MatchesSpellID(spellID)
   return spellID == id or spellID == self.itemSpellID
 end
 
+--- @return boolean?  @Return a 3-state boolean; true, false, nil (for does not apply)
+function o:IsActionInRange()
+  local typ, val, isCustom = self:GetActionInfo()
+  if isCustom then return nil end
+
+  --- @type UnitToken
+  local target = 'target'
+
+  if typ == atyp.item then
+    val = self:GetAttributeItemID() --[[@as ItemID]]
+    return comp:IsItemInRange(val, target)
+  end
+
+  local spellID = self:GetEffectiveSpellID()
+  if not spellID then return nil end
+
+  return comp:IsSpellInRange(spellID, target)
+end
+
+--- @return SpellID?
+function o:GetEffectiveSpellID()
+  local typ, isCustom = self:GetActionType()
+  if not typ then return nil end
+
+  if not isCustom then
+    local val = self:GetActionValueByType(typ)
+    if not val then return nil end
+
+    if au.IsSpell(typ) then
+      local spid
+      comp:IfSpell(val --[[@as SpellIdentifier]], function(sp)
+        spid = sp.spellID
+      end)
+      return spid
+    elseif au.IsItem(typ) then
+      local itemID = self:GetAttributeItemID()
+      local spid = (comp:GetItemSpell(itemID))
+      local spn = comp:GetSpellName(spid)
+      return spid
+    elseif au.IsMacro(typ) then
+      local spellID, itemID = au.GetMacroAction(val --[[@as MacroIdentifier]])
+      if spellID then return spellID
+      elseif itemID then return (comp:GetItemSpell(itemID)) end
+    end
+  end
+
+  return nil
+end
+
 function o:GetDebugName()
   return ('%s(Widget):: index=%s frameIndex=%s')
       :format(self.button:GetName(), self.index, self.barIndex)
@@ -666,6 +716,20 @@ function o:IsMount() return self:__IsAT(au.IsMount) end
 function o:IsBattlePet() return self:__IsAT(au.IsBattlePet) end
 --- @return boolean
 function o:IsEquipmentSet() return self:__IsAT(au.IsEquipmentSet) end
+
+function o:SetTargetOutOfRangeColor()
+  self.HotKey:SetText(RANGE_INDICATOR)
+  self.HotKey:SetVertexColor(NumberFontNormalRightRed:GetTextColor())
+end
+function o:SetTargetInRangeColor()
+  self.HotKey:SetText(RANGE_INDICATOR)
+  self.HotKey:SetVertexColor(1, 1, 1, 1)
+end
+function o:SetTargetNone() self:ClearRangeIndicator() end
+function o:ClearRangeIndicator()
+  self.HotKey:SetText('')
+  self.HotKey:SetVertexColor(1, 1, 1, 1)
+end
 
 --@debug@
 --- DEBUG ONLY

@@ -52,6 +52,7 @@ local libName = 'Button_2_0_3'
 --- @field SpellHighlightAnim AnimationGroup
 --- @field Name FontString
 --- @field Count FontString
+--- @field HotKey FontString
 --- @field icon Texture
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
@@ -114,6 +115,8 @@ function o:OnLoad()
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
   self.widget:LoadAction()
 
+  self.HotKey:SetFont(self.HotKey:GetFont(), 16, "OUTLINE")
+
   local traceChecked = false
   if traceChecked then
     if not self.__SetCheckedWrapped then
@@ -133,7 +136,10 @@ end
 --- @see ButtonUpdateFrame_ABP_2_0#OnUpdate()
 --- @param elapsed number
 function o:OnUpdate(elapsed)
-  --t('OnUpdate') -- tbd
+   self._rangeElapsed = (self._rangeElapsed or 0) + elapsed
+    if self._rangeElapsed < 0.15 then return end
+    self._rangeElapsed = 0
+    o.Btn_UpdateRangeIndicator(self, 'OnUpdate')
 end
 
 --- Handles spellcast lifecycle events routed from ActionEventsFrame_ABP_2_0.
@@ -165,6 +171,12 @@ function o:OnEvent(evt, ...)
   elseif evt == 'PLAYER_TARGET_CHANGED' then
     if self.widget:IsMacro() then
       o.Btn_UpdateTextureMacro(self, evt, 1)
+    end
+    if UnitExists('target') then -- todo: also mouseover unit
+      ButtonUpdateFrame_ABP_2_0:RegisterFrame(self)
+    else
+      ButtonUpdateFrame_ABP_2_0:UnregisterFrame(self)
+      self.widget:ClearRangeIndicator()
     end
   elseif evt == 'MODIFIER_STATE_CHANGED' then
     if self.widget:IsMacro() then

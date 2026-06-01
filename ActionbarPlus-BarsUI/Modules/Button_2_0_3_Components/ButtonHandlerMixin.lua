@@ -18,6 +18,11 @@ local BATTLEPET_MACRO_TEMPLATE = [[/summonpet %s]]
 local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
 
 --[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local RANGE_INDICATOR = RANGE_INDICATOR
+
+--[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'ButtonHandlerMixin'
@@ -136,6 +141,17 @@ function o.Btn_UpdateState(self, evt)
     local isCurrent = au.IsCurrentAction(typ, val, isCustom)
     self:SetChecked(isCurrent == true)
   end)
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param evt EventName
+function o.Btn_UpdateRangeIndicator(self, evt)
+  local w = self.widget
+  local inRange = w:IsActionInRange()
+  if inRange == nil then w:SetTargetNone()
+  elseif inRange == true then
+    w:SetTargetInRangeColor()
+  else w:SetTargetOutOfRangeColor() end
 end
 
 --- Update the macro button texture repeatedly to catch castsequence icon changes
