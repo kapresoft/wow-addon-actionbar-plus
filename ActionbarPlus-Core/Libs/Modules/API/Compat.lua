@@ -267,6 +267,26 @@ function o:IsInstantCastSpellByID(spell)
   return sp.castTime == 0
 end
 
+--- we can assume C_Spell exists in all wow versions
+local C_IsSpellInRange = C_Spell.IsSpellInRange or IsSpellInRange
+local C_IsItemInRange  = C_Item.IsItemInRange or IsItemInRange
+
+--- Checks if a spell is in range for the specified target, compatible with both Retail and Classic WoW.
+--- @param spell SpellIdentifier  @The ID, name, or index of the spell to check.
+--- @param target UnitID          @The target unit to check range against (e.g., "target", "focus", "player").
+--- @return IsInRange? boolean    @True if the spell is in range, false otherwise, or nil if not found.
+function o:IsSpellInRange(spell, target) return C_IsSpellInRange(spell, target) end
+
+--- @NotCombatSafe
+--- We can just return true when player is in combat
+--- @param item ItemIdentifier @The name or ID of the item to check.
+--- @param target UnitToken    @The unit to check the range against. Defaults to "target" if nil.
+--- @return boolean?           @A return of nil means that the item is not applicable for the target unit. The older API (Non C_Item) returns 1 or 0.
+function o:IsItemInRange(item, target)
+    --if InCombatLockdown() then return nil end; return C_IsItemInRange(item, target)
+    return C_IsItemInRange(item, target)
+end
+
 --- @param itemInfo ItemInfo
 --- @param callbackFn fun(item:ItemInfoDetails) : void
 --- @return Chain_ABP_2_0

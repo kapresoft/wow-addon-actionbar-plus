@@ -52,9 +52,10 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
--- todo: handle battlepet barModule state (show/hide)
--- todo: handle player-in-taxi barModule state (show/hide)
--- todo: range indicator [big]
+-- todo: rangeIndicator - handle mouseover unit
+-- todo: handle barFrame border settings
+-- todo: handle columns settings (row x col)
+-- todo: keybinding implementation using Ace3
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");

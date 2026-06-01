@@ -39,27 +39,30 @@ local ns = select(2, ...)
 local p, t = ns:log('BarButtonUpdateFrameMixin')
 
 --- =======================================================
---- @class ButtonUpdateFrameMixin_ABP_2_0
---- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
-ButtonUpdateFrameMixin_ABP_2_0 = {}
---
---- @alias ButtonUpdateFrame_ABP_2_0 ButtonUpdateFrameMixin_ABP_2_0 | FrameObj
---- =======================================================
 
---- @type ButtonUpdateFrameMixin_ABP_2_0 | ButtonUpdateFrame_ABP_2_0
-local o = ButtonUpdateFrameMixin_ABP_2_0
+--- @class ButtonUpdateFrameMixin_ABP_2_0 : Frame
+--- @field frames table<Button_ABP_2_0_X, Button_ABP_2_0_X>
+local o = {}; ButtonUpdateFrameMixin_ABP_2_0 = o
+
+--- @class ButtonUpdateFrame_ABP_2_0 : ButtonUpdateFrameMixin_ABP_2_0
+
+--- =======================================================
 
 function o:OnLoad() self.frames = {}; end
 
 function o:OnUpdate(elapsed)
   for k, frame in pairs(self.frames) do
-    frame:OnUpdate(elapsed);
+    --- @type Button_ABP_2_0_X
+    local btn = frame; btn:OnUpdate(elapsed);
   end
 end
 
+--- @param frame Button_ABP_2_0_X
 function o:RegisterFrame(frame)
-  self.frames[frame] = frame;
+  self.frames[frame] = frame
 end
 
---- @param frame Button_ABP_2_0_3
-function o:UnregisterFrame(frame) self.frames[frame] = nil; end
+--- @param frame Button_ABP_2_0_X
+function o:UnregisterFrame(frame)
+  self.frames[frame] = nil
+end
