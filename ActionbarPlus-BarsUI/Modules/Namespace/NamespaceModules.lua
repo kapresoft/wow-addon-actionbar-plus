@@ -27,6 +27,8 @@ local ModuleNames = {
   DragStateController = {},
   --- @type BarVisibilityController_ABP_2_0
   BarVisibilityController = {},
+  --- @type BarContextMenu_ABP_2_0
+  BarContextMenu = {},
 
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 

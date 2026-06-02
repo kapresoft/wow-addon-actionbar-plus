@@ -13,5 +13,6 @@
     <Script file="BarModuleFactory.lua" />
     <Script file="BarVisibilityController.lua"/>
     <Script file="BarAnchorController.lua"/>
+    <Script file="BarContextMenu.lua"/>
 
 </Ui>
