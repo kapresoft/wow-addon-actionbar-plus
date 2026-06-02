@@ -92,3 +92,6 @@ function ns:msg(message)
     'msg(message): {message} should be a string')
   return ('%s::%s'):format(self.name, message)
 end
+
+--- @return ButtonUpdateFrame_ABP_2_0
+function ns:GetUpdateFrame() return ButtonUpdateFrame_ABP_2_0 end

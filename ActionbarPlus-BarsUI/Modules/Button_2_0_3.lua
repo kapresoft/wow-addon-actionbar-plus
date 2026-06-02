@@ -169,21 +169,11 @@ function o:OnEvent(evt, ...)
   elseif evt == 'SPELL_UPDATE_CHARGES' then
     self:UpdateCount()
   elseif evt == 'PLAYER_TARGET_CHANGED' then
-    if self.widget:IsMacro() then
-      o.Btn_UpdateTextureMacro(self, evt, 1)
-    end
-    if UnitExists('target') then -- todo: also mouseover unit
-      ButtonUpdateFrame_ABP_2_0:RegisterFrame(self)
-    else
-      ButtonUpdateFrame_ABP_2_0:UnregisterFrame(self)
-      self.widget:ClearRangeIndicator()
-    end
+    o.Btn_OnTargetChanged(self, evt)
+  elseif evt == 'UPDATE_MOUSEOVER_UNIT' then
+    o.Btn_OnMouseoverUnit(self, evt)
   elseif evt == 'MODIFIER_STATE_CHANGED' then
-    if self.widget:IsMacro() then
-      o.Btn_UpdateTextureMacro(self, evt, 2)
-      -- Modifier key change may alter the macro's resolved spell; defer cooldown update to next frame
-      C_Timer.After(0.05, function() self:UpdateCooldown() end)
-    end
+    o.Btn_OnModifierStateChanged(self, evt)
   elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
     -- attacking (even when player is in combat)

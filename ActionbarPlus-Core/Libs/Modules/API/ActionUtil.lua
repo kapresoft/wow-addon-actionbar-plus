@@ -194,7 +194,11 @@ function o.IsCurrentAction(typ, val, isCustom)
     if o.IsSpell(typ) then
       return C_IsCurrentSpell(val) or C_IsAutoRepeatSpell(val)
     elseif o.IsItem(typ) then
-        return C_Item.IsCurrentItem(val)
+      return C_Item.IsCurrentItem(val)
+    elseif o.IsMacro(typ) then
+      local sp, it = o.GetMacroAction(val)
+      if sp then return C_IsCurrentSpell(sp) or C_IsAutoRepeatSpell(sp) end
+      if it then return C_Item.IsCurrentItem(it) end
     end
   else
     if o.IsMount(typ) then

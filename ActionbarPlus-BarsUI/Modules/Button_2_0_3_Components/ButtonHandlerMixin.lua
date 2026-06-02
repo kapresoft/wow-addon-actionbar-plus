@@ -145,6 +145,44 @@ end
 
 --- @param self Button_ABP_2_0_X
 --- @param evt EventName
+function o.Btn_OnTargetChanged(self, evt)
+  if self.widget:IsMacro() then
+    o.Btn_UpdateTextureMacro(self, evt, 1)
+  end
+  local f = ns:GetUpdateFrame()
+  if UnitExists('target') then
+    f:RegisterFrame(self)
+  else
+    f:UnregisterFrame(self)
+    self.widget:ClearRangeIndicator()
+  end
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param evt EventName
+function o.Btn_OnMouseoverUnit(self, evt)
+  if not self.widget:IsMacro() then return end
+  o.Btn_UpdateTextureMacro(self, evt, 1)
+  local f = ns:GetUpdateFrame()
+  if UnitExists('mouseover') then
+    f:RegisterFrame(self)
+  elseif not UnitExists('target') then
+    f:UnregisterFrame(self)
+    self.widget:ClearRangeIndicator()
+  end
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param evt EventName
+function o.Btn_OnModifierStateChanged(self, evt)
+  if not self.widget:IsMacro() then return end
+  o.Btn_UpdateTextureMacro(self, evt, 2)
+  -- Modifier key change may alter the macro's resolved spell; defer cooldown update to next frame
+  C_Timer.After(0.05, function() self:UpdateCooldown() end)
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param evt EventName
 function o.Btn_UpdateRangeIndicator(self, evt)
   local w = self.widget
   local inRange = w:IsActionInRange()
