@@ -89,6 +89,9 @@
             <OnDragStart>self:OnDragStart()</OnDragStart>
             <OnDragStop>self:OnDragStop()</OnDragStop>
             <OnSizeChanged>self:OnSizeChanged()</OnSizeChanged>
+            <OnMouseUp>self:OnMouseUp(button)</OnMouseUp>
+            <OnEnter>self:OnEnter()</OnEnter>
+            <OnLeave>self:OnLeave()</OnLeave>
         </Scripts>
     </Frame>
 
