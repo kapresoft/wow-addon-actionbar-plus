@@ -472,17 +472,20 @@ function o:IsActionInRange()
   if isCustom then return nil end
 
   --- @type UnitToken
-  local target = 'target'
+  local u = UnitExists('target') and 'target'
+            or (au.IsMacro(typ) and UnitExists('mouseover')) and 'mouseover'
+            or nil
+  if not u then return nil end
 
   if typ == atyp.item then
     val = self:GetAttributeItemID() --[[@as ItemID]]
-    return comp:IsItemInRange(val, target)
+    return comp:IsItemInRange(val, u)
   end
 
   local spellID = self:GetEffectiveSpellID()
   if not spellID then return nil end
 
-  return comp:IsSpellInRange(spellID, target)
+  return comp:IsSpellInRange(spellID, u)
 end
 
 --- @return SpellID?
