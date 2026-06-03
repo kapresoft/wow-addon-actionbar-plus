@@ -29,6 +29,8 @@ local ModuleNames = {
   BarVisibilityController = {},
   --- @type BarContextMenu_ABP_2_0
   BarContextMenu = {},
+  --- @type QuickKeybindModeDialog_ABP_2_0
+  QuickKeybindModeDialog = {},
 
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
 
