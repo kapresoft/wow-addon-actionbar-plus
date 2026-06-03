@@ -53,6 +53,7 @@ end
 -- But this method will eventually be called once
 -- BarFrame:SetSize(w, h) is called.
 function o:OnMouseUp(button)
+  if InCombatLockdown() then return end
   if button == 'RightButton' then bcm():Show(self) end
 end
 

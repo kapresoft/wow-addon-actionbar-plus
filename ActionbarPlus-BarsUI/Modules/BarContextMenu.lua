@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-local cns = ns:cns()
+local cns, O = ns:cns()
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -71,6 +71,7 @@ function o:Show(barFrame)
     { text = 'Keybindings', notCheckable = true, func = function()
         t('Show', 'Keybindings clicked')
         -- todo: enter edit mode
+        ns.O.QuickKeybindModeDialog:Open()
       end
     },
     { text = 'Formation', notCheckable = true, func = function()
