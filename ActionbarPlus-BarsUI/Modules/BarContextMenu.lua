@@ -60,7 +60,8 @@ end
 local dropdownFrame
 local function GetDropdownFrame()
   if not dropdownFrame then
-    dropdownFrame = CreateFrame('Frame', 'ABP_BarContextMenuFrame', UIParent, 'UIDropDownMenuTemplate')
+    dropdownFrame = CreateFrame('Frame', 'ABP_BarContextMenuFrame',
+          UIParent, 'UIDropDownMenuTemplate' --[[@as Template ]])
   end
   return dropdownFrame
 end

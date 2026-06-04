@@ -21,6 +21,24 @@ local DIALOG_WIDTH  = 420
 local DIALOG_HEIGHT = 200
 local DIALOG_TITLE  = 'Quick Keybind Mode'
 
+local CONFIRM_GENERAL_BINDINGS = 'ABP_CONFIRM_GENERAL_BINDINGS'
+StaticPopupDialogs[CONFIRM_GENERAL_BINDINGS] = {
+  text = 'Really switch to general key bindings?\nAll key bindings specific to this character will be permanently deleted.',
+  button1 = 'Okay',
+  button2 = 'Cancel',
+  OnAccept = function()
+    o.perChar = false
+    if o.chk then o.chk:SetValue(false) end
+  end,
+  OnCancel = function()
+    -- revert checkbox — find it via the dialog's stored ref
+    if o.chk then o.chk:SetValue(true) end
+  end,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+}
+
 local TEXT_INSTRUCTIONS =
   'You are in Quick Keybind Mode. Mouse over a button and press the\n' ..
   'desired key to set the binding for that button.'
@@ -70,9 +88,16 @@ local function AddCheckbox(frame)
   chk:SetFullWidth(true)
   chk:SetValue(o.perChar)
   chk:SetCallback('OnValueChanged', function(widget, evt, val)
+    if not val and o.perChar then
+      -- switching from char-specific to general — confirm first
+      chk:SetValue(true)  -- revert visually until confirmed
+      StaticPopup_Show(CONFIRM_GENERAL_BINDINGS)
+      return
+    end
     o.perChar = val
   end)
   grp:AddChild(chk)
+  o.chk = chk  -- store ref for StaticPopup OnCancel
 
   grp:AddChild(AceGUI:Create('Label'))  -- right spacer
 
@@ -89,7 +114,7 @@ local function AddButtons(frame, chkCharacterSpecific)
   btnGroup:SetFullWidth(true)
   btnGroup:SetLayout('Table')
   btnGroup:SetUserData('table', {
-    columns = { 0.30, 0.40, 0.30 },
+    columns = { 0.48, 0.04, 0.48 },
     alignH  = 'center',
     alignV  = 'middle',
   })
@@ -102,15 +127,7 @@ local function AddButtons(frame, chkCharacterSpecific)
     o:OnOkayClicked()
   end)
   btnGroup:AddChild(btnOkay)
-
-  local btnReset = AceGUI:Create('Button')
-  btnReset:SetText('Reset To Default')
-  btnReset:SetFullWidth(true)
-  btnReset:SetCallback('OnClick', function()
-    -- todo: remove this button
-    t('ResetToDefault', 'clicked')
-  end)
-  btnGroup:AddChild(btnReset)
+  btnGroup:AddChild(AceGUI:Create('Label'))  -- spacer
 
   local btnCancel = AceGUI:Create('Button')
   btnCancel:SetText('Cancel')
@@ -122,11 +139,11 @@ local function AddButtons(frame, chkCharacterSpecific)
 
   btnGroup.frame:ClearAllPoints()
   btnGroup.frame:SetPoint('BOTTOM', frame.frame, 'BOTTOM', 0, 20)
-  btnGroup.frame:SetWidth(DIALOG_WIDTH - 40)
+  btnGroup.frame:SetWidth(DIALOG_WIDTH - 100)
 
   local checkboxG = chkCharacterSpecific.parent.frame
   checkboxG:ClearAllPoints()
-  checkboxG:SetPoint('BOTTOM', btnReset.frame, 'TOP', 0, 10)
+  checkboxG:SetPoint('BOTTOM', btnGroup.frame, 'TOP', 0, 10)
 end
 
 --- @return AceGUIWindow
@@ -150,8 +167,6 @@ local function CreateFrame()
   --- @type AceGUICheckBox
   local chk = AddCheckbox(frame)
   AddButtons(frame, chk)
-
-  -- todo: key capture logic (GetMouseFoci → identify hovered ABP button)
 
   return frame
 end
@@ -177,6 +192,8 @@ function o:Open()
   f:ClearAllPoints()
   f:SetPoint('CENTER', UIParent, 'CENTER', 0, 100)
   if InCombatLockdown() then return end
+  o.perChar = GetCurrentBindingSet() == 2
+  if o.chk then o.chk:SetValue(o.perChar) end
   dialogFrame:Show()
   self:SendMessage(ns:msg('OnQuickKeybindMode'), true)   -- Open
 end
