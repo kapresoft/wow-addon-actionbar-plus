@@ -67,14 +67,10 @@ function o.Btn_UpdateName(self)
   end)
 end
 
---- @param self Button_ABP_2_0_X
-function o.Btn_UpdateHotKey(self)
-  local hks = self.widget:GetHotKeyTextShort()
-  if self.widget.index == 1 then
-    t('Btn_UpdateHotKey::' .. self:GetName(), 'hotKey=', hks)
-  end
-  self.HotKey:SetText(hks)
-end
+----- @param self Button_ABP_2_0_X
+--function o.Btn_UpdateHotKey(self)
+--  self.HotKey:SetText(self.widget:GetHotKeyTextShort())
+--end
 
 --- @param self Button_ABP_2_0_X
 function o.Btn_UpdateUsable(self)

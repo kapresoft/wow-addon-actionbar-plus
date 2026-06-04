@@ -227,12 +227,7 @@ function o:OnEvent(evt, ...)
   elseif Str_IsAnyOf(evt, 'PLAYER_EQUIPMENT_CHANGED', 'EQUIPMENT_SETS_CHANGED') then
     self:UpdateState(evt)
   elseif evt == 'UPDATE_BINDINGS' then
-    C_Timer.After(0.01, function()
-      if self.widget.index == 1 then
-        t('OnEvent', 'evt=', evt)
-      end
-      self:UpdateHotKey()
-    end)
+    self.widget:UpdateHotKey()
   end
   
 end
@@ -416,7 +411,7 @@ function o:Update()
   local buttonCooldown = self.cooldown
   
   icon:SetDesaturated(false)
-  o.Btn_UpdateHotKey(self)
+  self.widget:UpdateHotKey()
 
   local type = self.widget:GetActionType()
   if type then
@@ -456,7 +451,6 @@ Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateUsable() o.Btn_UpdateUsable(self) end
 function o:UpdateName() o.Btn_UpdateName(self) end
-function o:UpdateHotKey() o.Btn_UpdateHotKey(self) end
 
 function o:UpdateCooldown()
   local cd = self.cooldown

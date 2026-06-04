@@ -96,6 +96,8 @@ function o:UpdateCount()
   countText:SetText(count or '')
 end
 
+function o:UpdateHotKey() self.HotKey:SetText(self:GetHotKeyTextShort()) end
+
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
