@@ -521,7 +521,7 @@ function o:GetModifierBinding(keyPressed)
   if IsShiftKeyDown()   then binding = binding .. 'SHIFT-' end
   if IsMetaKeyDown and IsMetaKeyDown() then binding = binding .. META_KEYWORD end
   local result = binding .. keyPressed
-  if strupper(result):find('ESCAPE') then return nil end
+  if strupper(result) ~= 'ESCAPE' and strupper(result):find('ESCAPE') then return nil end
   return result
 end
 

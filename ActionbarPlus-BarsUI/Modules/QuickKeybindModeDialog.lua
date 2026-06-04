@@ -70,8 +70,6 @@ local function AddCheckbox(frame)
   chk:SetFullWidth(true)
   chk:SetValue(o.perChar)
   chk:SetCallback('OnValueChanged', function(widget, evt, val)
-    -- todo: toggle per-character vs account binding scope
-    --t('CharacterSpecific', tostring(val))
     o.perChar = val
   end)
   grp:AddChild(chk)
@@ -109,6 +107,7 @@ local function AddButtons(frame, chkCharacterSpecific)
   btnReset:SetText('Reset To Default')
   btnReset:SetFullWidth(true)
   btnReset:SetCallback('OnClick', function()
+    -- todo: remove this button
     t('ResetToDefault', 'clicked')
   end)
   btnGroup:AddChild(btnReset)
@@ -184,7 +183,6 @@ end
 
 function o:OnFrameClose()
   closeReason = closeReason or 'x'
-  t('OnFrameClose', 'reason=', closeReason)
 
   if closeReason == 'okay' then
     self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar)

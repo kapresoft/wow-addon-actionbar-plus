@@ -14,8 +14,8 @@ local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 local function bar_ns() return ABP_BARSUI_NS end
 
 function o.OnBarsReady(evt)
-  local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
-  dlg:Open()
+  --local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
+  --dlg:Open()
 end
 
 function o:disable()

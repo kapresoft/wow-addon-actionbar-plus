@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
+local L = cns:GetLocale()
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -12,6 +13,11 @@ local libName = 'BarContextMenu'
 --- @class BarContextMenu_ABP_2_0
 local o = {}; ns:Register(libName, o)
 local p, t = ns:log(libName)
+
+--[[-----------------------------------------------------------------------------
+Blizzard Vars
+-------------------------------------------------------------------------------]]
+local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -62,15 +68,13 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
-
 --- @param barFrame BarFrame_ABP_2_0
 function o:Show(barFrame)
+  local menuTitle = 'Bar #' .. barFrame.widget.index
   local menu = {
-    { text = 'ActionbarPlus', isTitle = true, notCheckable = true },
+    { text = menuTitle, isTitle = true, notCheckable = true },
     { text = ' ', notClickable = true, notCheckable = true },
-    { text = 'Keybindings', notCheckable = true, func = function()
-        t('Show', 'Keybindings clicked')
-        -- todo: enter edit mode
+    { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function()
         ns.O.QuickKeybindModeDialog:Open()
       end
     },
