@@ -62,7 +62,7 @@ function o:OnLoad()
   self:RegisterUnitEvent("UNIT_AURA", "player")
 
   --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
-  --self:RegisterEvent("UPDATE_BINDINGS");
+  self:RegisterEvent("UPDATE_BINDINGS");
   --self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
   --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
   --self:RegisterEvent("PET_BAR_UPDATE")

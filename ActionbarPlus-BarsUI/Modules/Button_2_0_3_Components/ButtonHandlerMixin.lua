@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
+local L = cns:GetLocale()
 
 local attr, atyp = cns:constants()
 local au = O.ActionUtil
@@ -21,6 +22,7 @@ local EQUIPMENT_SET_TEMPLATE = [[/equipset %s]] -- %s is the name without quotes
 Blizzard Vars
 -------------------------------------------------------------------------------]]
 local RANGE_INDICATOR = RANGE_INDICATOR
+local MACRO = MACRO -- the word 'Macro' localized
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -63,6 +65,15 @@ function o.Btn_UpdateName(self)
       end)
     end
   end)
+end
+
+--- @param self Button_ABP_2_0_X
+function o.Btn_UpdateHotKey(self)
+  local hks = self.widget:GetHotKeyTextShort()
+  if self.widget.index == 1 then
+    t('Btn_UpdateHotKey::' .. self:GetName(), 'hotKey=', hks)
+  end
+  self.HotKey:SetText(hks)
 end
 
 --- @param self Button_ABP_2_0_X

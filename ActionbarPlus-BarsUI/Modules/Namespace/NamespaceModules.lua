@@ -29,6 +29,8 @@ local ModuleNames = {
   BarVisibilityController = {},
   --- @type BarContextMenu_ABP_2_0
   BarContextMenu = {},
+  --- @type BarKeybindController_ABP_2_0
+  BarKeybindController = {},
   --- @type QuickKeybindModeDialog_ABP_2_0
   QuickKeybindModeDialog = {},
 

@@ -168,6 +168,7 @@ local closeReason
 
 --- Open (or show) the Quick Keybind Mode dialog
 function o:Open()
+  if InCombatLockdown() then return end
   closeReason = nil
   if not dialogFrame then
     dialogFrame = CreateFrame()
@@ -176,6 +177,7 @@ function o:Open()
   local f = dialogFrame.frame
   f:ClearAllPoints()
   f:SetPoint('CENTER', UIParent, 'CENTER', 0, 100)
+  if InCombatLockdown() then return end
   dialogFrame:Show()
   self:SendMessage(ns:msg('OnQuickKeybindMode'), true)   -- Open
 end
@@ -185,7 +187,9 @@ function o:OnFrameClose()
   t('OnFrameClose', 'reason=', closeReason)
 
   if closeReason == 'okay' then
-    -- todo: save binding
+    self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar)
+    closeReason = nil
+    return
   end
 
   closeReason = nil
