@@ -4,11 +4,12 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
+local L = cns:GetLocale()
 local attr = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 local AceHook = cns:NewAceHook()
 local comp = O.Compat
-
+local cfn = cns:ColorFn("679CEE")
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -57,9 +58,10 @@ function o.Btn_OnEnter(self)
   GameTooltip:ClearLines()
   GameTooltip:AddLine(self:GetNameLocalized(), 1, 1, 1)
   if key then
-    GameTooltip:AddLine(key, 1, 1, 1)
+    local boundText = cfn(L['Bound'] .. ': ')
+    GameTooltip:AddLine(boundText .. key, 1, 1, 1)
   else
-    GameTooltip:AddLine('Not Bound', 1, 0.1, 0.1)
+    GameTooltip:AddLine(L['Not Bound'], 1, 0.1, 0.1)
   end
   GameTooltip:Show()
 end

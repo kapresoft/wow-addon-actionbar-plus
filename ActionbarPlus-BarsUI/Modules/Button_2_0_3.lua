@@ -23,6 +23,7 @@ local ns = select(2, ...)
 ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
 
 local cns, O = ns:cns(), ns:cns().O
+local L = cns:GetLocale()
 local attr, atyp = cns:constants()
 local au, comp, spu, unit = O.ActionUtil, O.Compat, O.SpellUtil, O.UnitUtil
 local dru, priest = O.DruidUtil, O.PriestUtil
@@ -515,6 +516,7 @@ function o:MatchesSpellID(spellID) return self.widget:MatchesSpellID(spellID) en
 
 --- @return string
 function o:GetNameLocalized()
-  -- todo: localize
-  return ('ActionbarPlus Bar %s Button %s'):format(self.widget.barIndex, self.widget.index)
+  local addon, bar, button = L['ActionbarPlus'], L['Bar'], L['Button']
+  -- todo: localize: ActionbarPlus Bar N Button N
+  return ('%s %s %s %s %s'):format(addon, bar, self.widget.barIndex, button, self.widget.index)
 end

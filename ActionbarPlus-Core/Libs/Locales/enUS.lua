@@ -1,3 +1,5 @@
+--- @diagnostic disable: inject-field
+
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
 
@@ -5,4 +7,10 @@ local ns = select(2, ...)
 local L = LibStub("AceLocale-3.0"):NewLocale(ns.name, "enUS", true);
 if not L then return end
 
-L['AddOns'] = true
+L['ActionbarPlus']  = true
+L['AddOns']         = true
+L['Bound']          = true
+L['Not Bound']      = true
+L['Bar']            = true
+L['Button']         = true
+
