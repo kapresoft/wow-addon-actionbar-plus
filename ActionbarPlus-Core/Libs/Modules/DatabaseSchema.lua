@@ -170,7 +170,7 @@ local DEFAULT_DB = {
   ['global'] = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {                     -- ProfileConfig_ABP_2_0
-    barCount                      = 2,
+    barCount                      = 1,
     hideWhenTaxi                  = true,
     hideWhenGhost                 = true,
     characterSpecificAnchors      = false,

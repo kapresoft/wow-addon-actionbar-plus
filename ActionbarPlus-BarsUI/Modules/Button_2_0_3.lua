@@ -58,6 +58,7 @@ local libName = 'Button_2_0_3'
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
 --- @field GetParent fun(self:ButtonMixin_ABP_2_0_3) : BarFrame_ABP_2_0
+--- @field __keyDownHooked boolean? @See BarKeybindController
 local o = Mixin(cns:NewAceEvent(), ns.O.ButtonHandlerMixin, ns.O.ButtonConfigAccessorMixin)
 ButtonMixin_ABP_2_0_3 = o
 
@@ -225,6 +226,13 @@ function o:OnEvent(evt, ...)
     self:UpdateCount()
   elseif Str_IsAnyOf(evt, 'PLAYER_EQUIPMENT_CHANGED', 'EQUIPMENT_SETS_CHANGED') then
     self:UpdateState(evt)
+  elseif evt == 'UPDATE_BINDINGS' then
+    C_Timer.After(0.01, function()
+      if self.widget.index == 1 then
+        t('OnEvent', 'evt=', evt)
+      end
+      self:UpdateHotKey()
+    end)
   end
   
 end
@@ -408,7 +416,8 @@ function o:Update()
   local buttonCooldown = self.cooldown
   
   icon:SetDesaturated(false)
-  
+  o.Btn_UpdateHotKey(self)
+
   local type = self.widget:GetActionType()
   if type then
     if ( not self.eventsRegistered ) then
@@ -447,6 +456,7 @@ Convenience Methods
 ---------------------------------------------------------------------]]
 function o:UpdateUsable() o.Btn_UpdateUsable(self) end
 function o:UpdateName() o.Btn_UpdateName(self) end
+function o:UpdateHotKey() o.Btn_UpdateHotKey(self) end
 
 function o:UpdateCooldown()
   local cd = self.cooldown
@@ -508,3 +518,9 @@ function o:SetButtonStateNormal() self:SetButtonState('NORMAL') end
 function o:SetButtonStatePushed() self:SetButtonState('PUSHED') end
 function o:SetButtonStateDisabled() self:SetButtonState('DISABLED') end
 function o:MatchesSpellID(spellID) return self.widget:MatchesSpellID(spellID) end
+
+--- @return string
+function o:GetNameLocalized()
+  -- todo: localize
+  return ('ActionbarPlus Bar %s Button %s'):format(self.widget.barIndex, self.widget.index)
+end

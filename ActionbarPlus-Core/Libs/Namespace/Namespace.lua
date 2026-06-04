@@ -127,6 +127,10 @@ function ns:barGlobal(index) return self:a():barGlobal(index) end
 --- @return Cursor_ABP_2_0
 function ns:cursor() return self.O.CursorProvider:GetCursor() end
 
+--- #### Usage:
+--- ```
+--- local attr, atyp = cns:constants()
+--- ```
 --- @return AttributeNames_ABP_2_0, SupportedActionTypes_ABP_2_0
 function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.SupportedActionTypes end
 

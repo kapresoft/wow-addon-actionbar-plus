@@ -120,6 +120,16 @@ function o:IfHasAction(callbackFn)
   return cns:Chain(typValMatched)
 end
 
+--- @param callbackFn fun(hotKey:string, hotKeyShort:string) : void
+--- @return Chain_ABP_2_0
+function o:IfHasHotKey(callbackFn)
+  --if self:IsEmpty() then return cns:Chain(false) end
+  local hotKey = self:GetHotKeyText()
+  if Str_IsBlank(hotKey) then return cns:Chain(false) end
+  callbackFn(hotKey, self:GetHotKeyTextShort())
+  return cns:Chain(true)
+end
+
 --- @param callbackFn fun(typ:ActionType, val:ActionValue) : void
 --- @return Chain_ABP_2_0
 function o:IfCustomAction(callbackFn)
@@ -359,6 +369,24 @@ function o:GetActionTexture()
   end
 
   return iconID
+end
+
+--- @return string @The Click binding name
+function o:GetBindingName() return ('CLICK %s:LeftButton'):format(self.button:GetName()) end
+
+--- @return string?
+function o:GetHotKeyText() return GetBindingKey(self:GetBindingName()) end
+
+--- Returns the abbreviated version of the hotkey
+--- @return string?
+function o:GetHotKeyTextShort()
+  local hotKeyLong = self:GetHotKeyText()
+  if not hotKeyLong then return nil end
+  return (hotKeyLong
+        :gsub('ALT%-',   'a-')
+        :gsub('CTRL%-',  'c-')
+        :gsub('SHIFT%-', 's-')
+        :gsub('META%-',  'm-'))
 end
 
 --- @param spellID SpellID
@@ -721,16 +749,19 @@ function o:IsBattlePet() return self:__IsAT(au.IsBattlePet) end
 function o:IsEquipmentSet() return self:__IsAT(au.IsEquipmentSet) end
 
 function o:SetTargetOutOfRangeColor()
-  self.HotKey:SetText(RANGE_INDICATOR)
+  self:IfHasHotKey(function(k, ks) self.HotKey:SetText(ks) end)
+    .OrElse(function() self.HotKey:SetText(RANGE_INDICATOR) end)
   self.HotKey:SetVertexColor(NumberFontNormalRightRed:GetTextColor())
 end
 function o:SetTargetInRangeColor()
-  self.HotKey:SetText(RANGE_INDICATOR)
+  self:IfHasHotKey(function(k, ks) self.HotKey:SetText(ks) end)
+    .OrElse(function() self.HotKey:SetText(RANGE_INDICATOR) end)
   self.HotKey:SetVertexColor(1, 1, 1, 1)
 end
 function o:SetTargetNone() self:ClearRangeIndicator() end
 function o:ClearRangeIndicator()
-  self.HotKey:SetText('')
+  self:IfHasHotKey(function(k, ks) self.HotKey:SetText(ks) end)
+    .OrElse(function() self.HotKey:SetText('') end)
   self.HotKey:SetVertexColor(1, 1, 1, 1)
 end
 

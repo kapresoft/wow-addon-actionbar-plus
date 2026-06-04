@@ -503,6 +503,28 @@ function o:GetEquipmentSetID(eqSetName)
   return C_GetEquipmentSetID(eqSetName)
 end
 
+local MODIFIER_KEYS = {
+  LSHIFT=true, RSHIFT=true,
+  LCTRL=true, RCTRL=true,
+  LMETA=true, RMETA=true,
+  LALT=true, RALT=true
+}
+local META_KEYWORD = IsMacClient() and 'CMD-' or 'WIN-'
+
+--- @param keyPressed string
+--- @return string?
+function o:GetModifierBinding(keyPressed)
+  if MODIFIER_KEYS[keyPressed] then return nil end
+  local binding = ''
+  if IsAltKeyDown()     then binding = binding .. 'ALT-'   end
+  if IsControlKeyDown() then binding = binding .. 'CTRL-'  end
+  if IsShiftKeyDown()   then binding = binding .. 'SHIFT-' end
+  if IsMetaKeyDown and IsMetaKeyDown() then binding = binding .. META_KEYWORD end
+  local result = binding .. keyPressed
+  if strupper(result):find('ESCAPE') then return nil end
+  return result
+end
+
 --- @param id Identifier The equipmentSet ID
 --- @return EquipmentSetDetails?
 function o:GetEquipmentSet(id)
