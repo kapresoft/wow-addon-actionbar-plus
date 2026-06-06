@@ -303,8 +303,15 @@ function o:CreateBarGroup(barIndex, consumerFn)
   local startX = math.floor(padLeft + 0.5)
   local startY = -math.floor(padTop + 0.5)
 
+  local hotKeyFontSize = math.max(8, math.floor(size * 16 / 40))
+  local hotKeyOffsetX = math.floor(size * 5 / 40)
+  local hotKeyOffsetY = math.floor(size * 7 / 40)  -- slightly larger to keep text inside at all sizes
+
   for i, btn in ipairs(buttons) do
     btn:SetSize(size, size)
+    btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
+    btn.HotKey:ClearAllPoints()
+    btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)
     btn:ClearAllPoints()
 
     -- compute row/col based on index
