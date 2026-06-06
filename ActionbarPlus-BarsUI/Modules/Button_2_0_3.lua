@@ -117,7 +117,7 @@ function o:OnLoad()
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
   self.widget:LoadAction()
 
-  self.HotKey:SetFont(self.HotKey:GetFont(), 16, "OUTLINE")
+  self.HotKey:SetFont(self.HotKey:GetFont(), 16, 'OUTLINE')  -- overridden by BarModuleFactory at layout time
 
   local traceChecked = false
   if traceChecked then
