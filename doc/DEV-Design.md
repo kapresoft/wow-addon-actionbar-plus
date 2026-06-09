@@ -18,7 +18,7 @@
 - buttons, buttons state
 - button updates
 
-#### Folder Structure
+### Folder Structure
 
 ActionbarPlus-Core (V2)
  - ActionbarPlus-BarsUI     (Level 2)
