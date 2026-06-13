@@ -28,7 +28,7 @@ end
 --- @param prefix Name  @The prefix name
 --- @param ... any      @Print any
 function ns.tr(prefix, ...)
-  local _ns = ns; _ns.__trace(ns.LOG_NAME, prefix, ...)
+  local _ns = ns; _ns.__trace(ns.LOG_NAME, prefix, nil, ...)
 end
 
 --[[-------------------------------------------------------------------

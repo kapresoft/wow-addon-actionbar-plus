@@ -44,16 +44,22 @@ local p, t = ns:log(libName)
 Support Functions
 ---------------------------------------------------------------------]]
 --- @type table<UnitClass, UnitUtil_ABP_2_0>
-local SPECIAL_SHAPESHIFT_SPELL_UNITS
+local SHAPESHIFT_SPELL_OVERRIDE_UNITS
 local SPECIAL_SHAPESHIFT_ICON_UNITS
 
+-- Units that cannot rely on GetShapeshiftFormInfo() to identify their shapeshift spell.
+-- PRIEST/SHAMAN: forms are auras, not tracked by GetShapeshiftFormInfo.
+-- ROGUE: stealth has multiple ranks in TBC; GetShapeshiftFormInfo returns rank-specific IDs.
 --- @param playerClass UnitClass
 --- @return UnitUtil_ABP_2_0
-local function GetSpecialShapeshiftUnit(playerClass)
-  if not SPECIAL_SHAPESHIFT_SPELL_UNITS then
-    SPECIAL_SHAPESHIFT_SPELL_UNITS = { ['PRIEST'] = O.PriestUtil, ['SHAMAN'] = O.ShamanUtil }
+local function GetShapeshiftOverrideUnit(playerClass)
+  if not SHAPESHIFT_SPELL_OVERRIDE_UNITS then
+    SHAPESHIFT_SPELL_OVERRIDE_UNITS = {
+      ['PRIEST'] = O.PriestUtil, ['SHAMAN'] = O.ShamanUtil,
+      ['ROGUE'] = O.RogueUtil
+    }
   end
-  return SPECIAL_SHAPESHIFT_SPELL_UNITS[playerClass]
+  return SHAPESHIFT_SPELL_OVERRIDE_UNITS[playerClass]
 end
 
 local function GetShapeshiftFormIcon(playerClass)
@@ -186,9 +192,9 @@ function o:IsPaladin() return self:IsUs(UnitClasses.PALADIN()) end
 function o:IsRogue() return self:IsUs(UnitClasses.ROGUE()) end
 function o:IsShaman() return self:IsUs(UnitClasses.SHAMAN()) end
 
---- @return Boolean
+--- @return boolean
 function o:IsStealthActive() return IsStealthed and IsStealthed() end
---- @return Boolean
+--- @return boolean
 function o:CanShapeShift()
   if self:IsShaman() or self:IsPriest() then return true end
   if ns:IsMists() and self:IsPaladin() then return true end
@@ -205,19 +211,20 @@ function o:IsShapeShifted() return self:GetShapeshiftForm() > 0 end
 function o:IsShapeShiftSpell(spellID)
   assert(type(spellID) == 'number', 'IsShapeShiftSpell(spellID): {spellID} should be a number')
   local playerClass = self:GetPlayerUnitClass()
-  local specialUnit = GetSpecialShapeshiftUnit(playerClass)
-  if specialUnit then return specialUnit:GetShapeShiftSpellInfo(spellID) end
-  return self:GetShapeShiftSpellInfo(spellID)
+  local overrideUnit = GetShapeshiftOverrideUnit(playerClass)
+  if overrideUnit then return overrideUnit:GetShapeshiftSpellState(spellID) end
+  return self:GetShapeshiftSpellState(spellID)
 end
 
---- Meant to be overridden by units to
---- reflect their current shapeshift state
+-- Meant to be overridden by units that cannot rely on
+-- GetShapeshiftFormInfo(). Base implementation only detects
+-- the active form; returns false when not shapeshifted.
 --- @protected
 --- @param spellID SpellID
 --- @return boolean? @If {spellID} is a shapeshift spellID
 --- @return boolean? @If {spellID} is active
 --- @return Icon? @The form active icon
-function o:GetShapeShiftSpellInfo(spellID)
+function o:GetShapeshiftSpellState(spellID)
   local index = self:GetShapeshiftForm()
   if not index or index <= 0 then return false, false, nil end
   local formActiveIcon = GetShapeshiftFormIcon(self:GetPlayerUnitClass())

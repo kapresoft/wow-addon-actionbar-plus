@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace_ABP_BarsUI_2_0
+--- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
 local L = cns:GetLocale()
@@ -79,11 +79,11 @@ function o:Show(barFrame)
         ns.O.QuickKeybindModeDialog:Open()
       end
     },
-    { text = 'Formation', notCheckable = true, func = function()
-        t('Show', 'Formation clicked')
-        -- todo: enter edit mode
-      end
-    },
+    --{ text = 'Formation', notCheckable = true, func = function()
+    --    t('Show', 'Formation clicked')
+    --    -- todo: enter edit mode
+    --  end
+    --},
   }
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end

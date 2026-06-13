@@ -53,10 +53,13 @@ function o:GetActiveShapeshiftFormIcon()
 end
 
 --- @protected
---- @see UnitUtil_ABP_2_0.GetShapeShiftSpellInfo
+--- @see UnitUtil_ABP_2_0.GetShapeshiftSpellState
 --- @param spellID SpellID
 --- @return boolean? @If {spellID} is a shapeshift spellID
 --- @return boolean? @If {spellID} is active
-function o:GetShapeShiftSpellInfo(spellID)
-  return self:IsShadowFormSpell(spellID), self:IsShapeShifted()
+--- @return Icon? @The form active icon
+function o:GetShapeshiftSpellState(spellID)
+  local active = self:IsShapeShifted()
+  return self:IsShadowFormSpell(spellID),
+          active, active and self:GetActiveShapeshiftFormIcon() or nil
 end

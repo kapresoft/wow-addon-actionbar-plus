@@ -110,15 +110,16 @@ end
 
 --- @return DatabaseObj_ABP_2_0
 function ns:db() return self.addonDbFn() end
-
 --- @return ABP_Core_2_0
 function ns:a() return ABP_Core_2_0 end
-
 --- @return ABP_BarsUI_2_0
 function ns:BarsUI() return self.O['ActionbarPlus-BarsUI'] end
-
+--- @return Namespace_ABP_BarsUI_2_0
+function ns:BarsNS() return self:BarsUI():ns() end
 --- @return ABP_OptionsUI_2_0
 function ns:OptionsUI() return self.O['ActionbarPlus-OptionsUI'] end
+--- @return Namespace_ABP_OptionsUI_2_0
+function ns:OptionsNS() return self:OptionsUI():ns() end
 
 --- @return ProfileConfig_ABP_2_0
 function ns:p() return self:a():p() end
