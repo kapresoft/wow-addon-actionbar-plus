@@ -251,7 +251,7 @@ function o:GetDefaultDatabase()
     local key = barKey(barIndex)
     db['profile'].bars[key] = self:CreateDefaultBar(barIndex)
     db['global'].bars[key] = {
-      anchor = {}
+      anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil }
     }
   end
   

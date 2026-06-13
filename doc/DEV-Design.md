@@ -19,7 +19,14 @@
 - button updates
 
 ### Folder Structure
+                    
+```text
+ActionbarPlus-Core
+  - ActionbarPlus-BarsUI
+  - ActionbarPlus-OptionsUI
+```
 
+### Loading Sequence
 ActionbarPlus-Core (V2)
  - ActionbarPlus-BarsUI     (Level 2)
    - register to core on module ready

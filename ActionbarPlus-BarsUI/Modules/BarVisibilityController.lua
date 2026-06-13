@@ -61,4 +61,4 @@ end
 --[[-----------------------------------------------------------------------------
 Register Messages
 -------------------------------------------------------------------------------]]
-o:RegisterMessage(ns:msg('OnBarsReady'), o.OnBarsReady)
+o:RegisterMessage(ns:msg('OnEnable'), o.OnBarsReady)

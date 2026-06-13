@@ -13,7 +13,7 @@ local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 --- @return Namespace_ABP_BarsUI_2_0
 local function bar_ns() return ABP_BARSUI_NS end
 
-function o.OnBarsReady(evt)
+function o.OnBarsEnabled(evt)
   --local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
   --dlg:Open()
 end
@@ -94,4 +94,4 @@ end
 --[[-----------------------------------------------------------------------------
 Register Events
 -------------------------------------------------------------------------------]]
-o:RegisterMessage('ActionbarPlus-BarsUI::OnBarsReady', o.OnBarsReady)
+o:RegisterMessage('ActionbarPlus-BarsUI::OnEnable', o.OnBarsEnabled)

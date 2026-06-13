@@ -1,4 +1,4 @@
-## Interface: 20505
+## Interface: 50504
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r|cffffffff-OptionsUI|r
 ## IconTexture: Interface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x
@@ -46,4 +46,5 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
+Modules\_Modules.xml
 ActionbarPlus-OptionsUI.lua

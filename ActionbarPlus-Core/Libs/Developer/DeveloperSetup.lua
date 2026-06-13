@@ -12,10 +12,14 @@ Base Tracer
 -------------------------------------------------------------------------------]]
 local primaryC = ns:ColorFn(ns.colorDef.primary)
 
-function ns.__trace(logName, prefix, ...)
+--- @param logName Name
+--- @param prefix string
+--- @param cfFn? cfFn     @The color formatter function
+function ns.__trace(logName, prefix, cfFn, ...)
   --- @type EventTrace
   local et = EventTrace; if not (et and et.LogEvent) then return end
   local c1, logNamePlain = primaryC, logName
+  if cfFn then c1 = cfFn end
   local n = c1(logNamePlain)
   if not Str_IsBlank(prefix) then n = n .. '::' .. prefix end
   et:LogEvent(n, ...)

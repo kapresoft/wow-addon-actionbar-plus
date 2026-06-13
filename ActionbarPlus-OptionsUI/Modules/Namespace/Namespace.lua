@@ -1,25 +1,24 @@
 --[[-------------------------------------------------------------------
-Namespace_ABP_BarsUI
+Namespace_ABP_OptionsUI
 ---------------------------------------------------------------------]]
 local addon, xns = ...
 
---- @class Namespace_ABP_BarsUI_2_0
+--- @class Namespace_ABP_OptionsUI_2_0
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field LOG_NAME Name
 --- @field logHolder LogHolder_ABP_2_0
 --- @field colorDef Kapresoft-ColorDefinition-2-0
---- @field buttonTemplate Name The button template name to use for action buttons (see BarFrame.xml and BarModuleFactory.lua)
---- @field M BarsUI_Modules_ABP_2_0 The module names
---- @field O BarsUI_Modules_ABP_2_0 The module objects
+--- @field M OptionsUI_Modules_ABP_2_0 The module names
+--- @field O OptionsUI_Modules_ABP_2_0 The module objects
 local ns = xns
 
-ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFBarsUI|r'
-ABP_BARSUI_NS = ns
+ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFOptionsUI|r'
+ABP_OPTIONSUI_NS = ns
 
---- @type BarsUI_Modules_ABP_2_0
+--- @type OptionsUI_Modules_ABP_2_0
 ns.O = ns.O or {}
-ns.LOG_NAME = 'ABP_BARSUI'
+ns.LOG_NAME = 'ABP_OPTIONSUI'
 
 --- Core Namespace and Core modules
 --- #### Usage:  `local cns, O = ns:cns()`
@@ -44,8 +43,10 @@ ns.printer = LibPrettyPrint:Printer({
 --[[-------------------------------------------------------------------
 Namespace Methods
 ---------------------------------------------------------------------]]
---- @return ABP_BarsUI_2_0
-function ns:a() return ABP_BarsUI_2_0 end
+--- @return ABP_Core_2_0
+function ns:core() return ABP_Core_2_0 end
+--- @return ABP_OptionsUI_2_0
+function ns:a() return ABP_OptionsUI_2_0 end
 
 --- Register a Namespace Module
 --- @generic T
@@ -72,7 +73,6 @@ end
 --[[-------------------------------------------------------------------
 Loggers/Tracers:: NoOp in Official Releases
 ---------------------------------------------------------------------]]
---- @see ActionbarPlus-BarsUI/Modules/Developer/DeveloperSetup.lua
 --- @param moduleName Name
 --- @return LibPrettyPrint_PrintFn, TraceFn_ABP_2_0
 function ns:log(moduleName)
@@ -80,11 +80,7 @@ function ns:log(moduleName)
   return h.printer(moduleName), h.tracer(moduleName)
 end
 
---- ### Usage
----  ```
----  -- @returns 'ActionbarPlus-BarsUI::OnPlayerLogin'
----  local message = ns:msg('OnPlayerLogin')
----  ```
+--- Message Format:  ActionbarPlus-OptionsUI::<Message>
 --- @param message Name @The base message name; used for AceEvent messages
 --- @return string
 function ns:msg(message)
@@ -93,5 +89,3 @@ function ns:msg(message)
   return ('%s::%s'):format(self.name, message)
 end
 
---- @return ButtonUpdateFrame_ABP_2_0
-function ns:GetUpdateFrame() return ButtonUpdateFrame_ABP_2_0 end

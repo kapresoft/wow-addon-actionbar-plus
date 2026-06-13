@@ -16,7 +16,11 @@ local ModuleNames = {
   ---------------------------------------
   ----- ActionbarPlus_2_0 Libs ----------
   ---------------------------------------
-  
+  --- @type ABP_BarsUI_2_0
+  ['ActionbarPlus-BarsUI'] = {},
+  --- @type ABP_OptionsUI_2_0
+  ['ActionbarPlus-OptionsUI'] = {},
+
   --- @type Constants_ABP_2_0
   Constants = {},
   --- @type Compat_ABP_2_0

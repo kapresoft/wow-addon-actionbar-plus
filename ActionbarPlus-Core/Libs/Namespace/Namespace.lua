@@ -16,7 +16,7 @@ local addon, xns = ...
 --- @field private LOG_NAME Name
 --- @field private DB_NAME Name
 --- @field private fmt LibPrettyPrint_Formatter
---- @field private __trace fun(logName:Name, prefix:string, ...:any)
+--- @field private __trace fun(logName:Name, prefix:string, cfFn:cfFn, ...:any)
 --- @field private __CreatePrinterFn fun(printer:LibPrettyPrint_Printer)
 --- @field name Name The addon name
 --- @field settings Settings_ABP_2_0 @Settings
@@ -42,7 +42,7 @@ Local Vars
 ns.O = ns.O or {}
 
 ns.DB_NAME = 'ABP_PLUS'
-ns.LOG_NAME = 'ABP2_CORE'
+ns.LOG_NAME = 'ABP_CORE'
 
 --[[-----------------------------------------------------------------------------
 Type: Settings
@@ -113,6 +113,13 @@ function ns:db() return self.addonDbFn() end
 
 --- @return ABP_Core_2_0
 function ns:a() return ABP_Core_2_0 end
+
+--- @return ABP_BarsUI_2_0
+function ns:BarsUI() return self.O['ActionbarPlus-BarsUI'] end
+
+--- @return ABP_OptionsUI_2_0
+function ns:OptionsUI() return self.O['ActionbarPlus-OptionsUI'] end
+
 --- @return ProfileConfig_ABP_2_0
 function ns:p() return self:a():p() end
 --- @return GlobalConfig_ABP_2_0
