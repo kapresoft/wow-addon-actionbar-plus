@@ -1,6 +1,6 @@
-## Interface: 50504
+## Interface: 40402
 ## Version: @project-version@
-## Title: Actionbar|cff1784d1Plus|r|cffffffff-BarsUI|r
+## Title: Actionbar|cff1784d1Plus|r|cffffffff-OptionsUI|r
 ## IconTexture: Interface/AddOns/ActionbarPlus-Core/Assets/Textures/logo-v2-64x
 
 ## Author: Antonio W. Lagnada (kapresoft@gmail.com)
@@ -13,7 +13,7 @@
 ## Category-deDE: Aktionsleisten
 ## Category-esES: Barras de acción
 ## Category-esMX: Barras de acción
-## Category-frFR: Barres d’actions
+## Category-frFR: Barres d'actions
 ## Category-itIT: Barre delle azioni
 ## Category-koKR: 행동 단축바
 ## Category-ptBR: Barras de ação
@@ -47,4 +47,4 @@
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
 Modules\_Modules.xml
-ActionbarPlus-BarsUI.lua
+ActionbarPlus-OptionsUI.lua
