@@ -208,7 +208,7 @@ local DEFAULT_BAR = {
     padding = { left = 5, right = 5, top = 5, bottom = 5, },
     -- BarButtonUIConfig_ABP_2_0
     button = {
-      size = 60,
+      size = 50,
       spacing = { horizontal = 3, vertical = 3, },
     },
     -- Deep medium blue: { 0.1, 0.3, 0.7, 0.8 },

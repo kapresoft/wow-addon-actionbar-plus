@@ -32,10 +32,13 @@ function o:IsInGhostWolfForm()
 end
 
 --- @protected
---- @see UnitUtil_ABP_2_0.GetShapeShiftSpellInfo
+--- @see UnitUtil_ABP_2_0.GetShapeshiftSpellState
 --- @param spellID SpellID
 --- @return boolean? @If {spellID} is a shapeshift spellID
 --- @return boolean? @If {spellID} is active
-function o:GetShapeShiftSpellInfo(spellID)
-  return self:IsGhostWolfSpell(spellID), self:IsInGhostWolfForm()
+--- @return Icon? @The form active icon
+function o:GetShapeshiftSpellState(spellID)
+  local active = self:IsInGhostWolfForm()
+  return self:IsGhostWolfSpell(spellID),
+          active, active and self:GetActiveShapeshiftFormIcon() or nil
 end

@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Local Vars
 -------------------------------------------------------------------------------]]
---- @type Namespace_ABP_BarsUI_2_0
+--- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O = ns:cns()
 local L = cns:GetLocale()
@@ -14,7 +14,7 @@ local cfn = cns:ColorFn("679CEE")
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
---- @see BarsUI_Modules_ABP_2_0
+--- @see OptionsUI_Modules_ABP_2_0
 local libName = 'BarKeybindController'
 
 --- @class BarKeybindController_ABP_2_0 : AceEvent-3.0
@@ -99,6 +99,11 @@ end
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
+function o:Init()
+  self:RegisterMessage(ns:msg('OnQuickKeybindMode'), o.OnQuickKeybindMode, self)
+  self:RegisterMessage(ns:msg('OnQuickKeybindModeCommit'), o.OnQuickKeybindModeCommit, self)
+end
+
 --- @param self Button_ABP_2_0_X
 function o.Btn_OnKeyDown(self, key)
 
@@ -174,20 +179,18 @@ function o:OnQuickKeybindMode(evt, enabled)
 end
 
 function o:DisableButtons()
-  ns:a():ForEach(function(bm)
+  cns:BarsUI():ForEach(function(bm)
     bm:ForEach(Btn_SuspendButton)
   end)
 end
 
 function o:EnableButtons()
-  ns:a():ForEach(function(bm)
+  cns:BarsUI():ForEach(function(bm)
     bm:ForEach(Btn_UnsuspendButton)
   end)
 end
 
 --[[-----------------------------------------------------------------------------
-Register Messages
+Call Init()
 -------------------------------------------------------------------------------]]
-o:RegisterMessage(ns:msg('OnQuickKeybindMode'), 'OnQuickKeybindMode')
-o:RegisterMessage(ns:msg('OnQuickKeybindModeCommit'), 'OnQuickKeybindModeCommit')
-
+o:Init()

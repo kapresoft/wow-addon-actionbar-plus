@@ -23,8 +23,6 @@ local libName = 'BarFrameMixin_ABP_2_0_1'
 local o = {}; BarFrameMixin_ABP_2_0_1 = o
 local p, t = ns:log(libName)
 
---- @return BarContextMenu_ABP_2_0
-local function bcm() return ns.O.BarContextMenu end
 
 --[[-----------------------------------------------------------------------------
 Mixin Methods
@@ -54,7 +52,7 @@ end
 -- BarFrame:SetSize(w, h) is called.
 function o:OnMouseUp(button)
   if InCombatLockdown() then return end
-  if button == 'RightButton' then bcm():Show(self) end
+  if button == 'RightButton' then ns:a():SendMessage(ns:msg('OnBarFrameRightClick'), self) end
 end
 
 function o:OnSizeChanged()

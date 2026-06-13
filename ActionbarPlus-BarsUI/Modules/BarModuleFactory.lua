@@ -135,7 +135,9 @@ local function BarModuleProtoMethods()
     --t('OnInitialize')
   end
   
+  --- @NotCombatSafe
   function bm:OnEnable()
+    if InCombatLockdown() then return end
     if self.barFrame then
       self.barFrame:Show()
       BarFrame_EnableVisibilityDriver(self.barFrame)
@@ -143,7 +145,9 @@ local function BarModuleProtoMethods()
     BarModule_EnableEditModeCallback(self)
   end
 
+  --- @NotCombatSafe
   function bm:OnDisable()
+    if InCombatLockdown() then return end
     if self.barFrame then
       BarFrame_DisableVisibilityDriver(self.barFrame)
       self.barFrame:Hide()
@@ -151,7 +155,9 @@ local function BarModuleProtoMethods()
     BarModule_DisableEditModeCallback(self)
   end
 
+  --- @NotCombatSafe
   function bm:OnEditModeEnter()
+    if InCombatLockdown() then return end
     BarFrame_DisableVisibilityDriver(self.barFrame)
     self.barFrame:Hide()
   end
@@ -159,6 +165,7 @@ local function BarModuleProtoMethods()
   -- No need to call barFrame:Hide() here because
   -- the visibility values will be evaluated.
   function bm:OnEditModeExit()
+    if InCombatLockdown() then return end
     BarFrame_EnableVisibilityDriver(self.barFrame)
   end
   

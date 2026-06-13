@@ -328,16 +328,13 @@ function o:GetActionTexture()
     if au.IsSpell(typ) then
       comp:IfSpell(val, function(sp)
         local spid = sp.spellID
-        local isShapeshiftSpell, active, activeIcon = unit:IsShapeShiftSpell(spid)
+        local isShapeshiftSpell, shapeshiftActive, activeIcon = unit:IsShapeShiftSpell(spid)
         if druid:IsProwl(spid) and unit:IsStealthActive() then
           iconID = unit:GetStealthedIcon()
-        elseif isShapeshiftSpell and active then
-          iconID, shouldDim = self:GetShapeshiftSpellActionTexture(spid, active, activeIcon)
-        else
-          -- todo next: use sp.iconID?
-          --local info = comp:GetSpellInfo(spid)
-          --if info then iconID = info.iconID end
-          iconID = sp.iconID
+        elseif isShapeshiftSpell and shapeshiftActive then
+          iconID, shouldDim = activeIcon, self:ShouldDimIcon(spid, shapeshiftActive)
+          if cns:IsMainline() then shouldDim = false end
+        else iconID = sp.iconID
         end
       end)
     elseif au.IsMacro(typ) then
@@ -366,8 +363,8 @@ function o:GetActionTexture()
     end
   end
 
-  -- todo: check stealth, prowl before checking in
   -- todo: this method is doing 2 things, shouldDiv does not belong
+  -- todo: DimIcon() is not working in mainLine
   if shouldDim then btn:DimIcon() end
 
   return iconID
@@ -413,6 +410,19 @@ function o:GetShapeshiftSpellActionTexture(spellID, shapeshiftSpellActive, activ
   end
 
   return iconID, shouldDim
+end
+
+--- @param spellID SpellID
+--- @param shapeshiftSpellActive boolean
+--- @return boolean @Whether it should be dimmed
+function o:ShouldDimIcon(spellID, shapeshiftSpellActive)
+  if shapeshiftSpellActive == true
+      and (druid:IsProwl(spellID) or rogue:IsStealth(spellID)) then
+    -- Druid and Rogue use the same stealth icon
+    return true
+  end
+
+  return false
 end
 
 --- @param callbackFn fun(icon:Icon):void
