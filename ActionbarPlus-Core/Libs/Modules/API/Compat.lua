@@ -91,7 +91,7 @@ end
 --- @param spell SpellIdentifier
 --- @return Name?
 function o:GetSpellName(spell)
-  assert(type(spell) == 'number', 'GetSpellName(id): id should be a number.')
+  assert(Str_IsAnyOf(type(spell), 'string', 'number'), 'GetSpellInfo::SpellID should be a number or a string.')
   local sp = self:GetSpellInfo(spell); return sp and sp.name
 end
 
@@ -283,8 +283,9 @@ function o:IsSpellInRange(spell, target) return C_IsSpellInRange(spell, target) 
 --- @param target UnitToken    @The unit to check the range against. Defaults to "target" if nil.
 --- @return boolean?           @A return of nil means that the item is not applicable for the target unit. The older API (Non C_Item) returns 1 or 0.
 function o:IsItemInRange(item, target)
-    --if InCombatLockdown() then return nil end; return C_IsItemInRange(item, target)
-    return C_IsItemInRange(item, target)
+  local ok, result = pcall(C_IsItemInRange, item, target)
+  if not ok then return nil end
+  return result --[[@as boolean ]]
 end
 
 --- @param itemInfo ItemInfo

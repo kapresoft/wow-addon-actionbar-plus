@@ -62,6 +62,6 @@ function o.ApplyAnchor(barFrame) RestoreAnchor(barFrame) end
 --[[-----------------------------------------------------------------------------
 Register Messages
 -------------------------------------------------------------------------------]]
-o:RegisterMessage(ns:msg('OnBarsReady'), function()
+o:RegisterMessage(ns:msg('OnEnable'), function()
   o:RegisterMessage(ns:msg('OnBarFrameDragStop'), o.OnBarFrameDragStop)
 end)

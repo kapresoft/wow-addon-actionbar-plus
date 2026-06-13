@@ -347,9 +347,6 @@ function _B:Create(dragFrameWidget, rowNum, colNum, btnIndex)
     cooldown:SetCountdownFont(GameFontHighlightSmallOutline:GetFont())
     cooldown:SetHideCountdownNumbers(false)
     cooldown:SetEdgeScale(1.0)
-    -- todo next: DrawBling, DrawEdge as UI Option
-    cooldown:SetDrawEdge(false)
-    cooldown:SetDrawBling(true)
 
     self:CreateCheckedTexture(button)
 

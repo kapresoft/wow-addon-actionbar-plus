@@ -366,9 +366,9 @@ function o:GetActionTexture()
     end
   end
 
-  if shouldDim then btn:DimIcon()
-  else btn:SetIconNormalVertex()
-  end
+  -- todo: check stealth, prowl before checking in
+  -- todo: this method is doing 2 things, shouldDiv does not belong
+  if shouldDim then btn:DimIcon() end
 
   return iconID
 end

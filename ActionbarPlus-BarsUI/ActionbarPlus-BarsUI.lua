@@ -20,16 +20,16 @@ o:SetDefaultModuleState(false)
 --- - All addon Lua/XML files are loaded
 --- - AceDB initialized
 function o:OnInitialize()
-  self:SendMessage(ns:msg('OnAddOnInitialized'))
+  self:SendMessage(ns:msg('OnInitialize'))
 end
 
 function o:OnEnable()
   MF:CreateAddonModules()
-  self:SendMessage(ns:msg('OnBarsReady'))
+  self:SendMessage(ns:msg('OnEnable'), self)
 end
 
 function o:OnDisable()
-  --t('OnDisable', 'called...')
+  self:SendMessage(ns:msg('OnDisable'))
 end
 
 --- @param callbackFn fun(module:BarModule_2_0):void
@@ -53,3 +53,6 @@ function o:DisableBars()
     module:Disable()
   end)
 end
+
+--- @return Namespace_ABP_BarsUI_2_0
+function o:ns() return ns end

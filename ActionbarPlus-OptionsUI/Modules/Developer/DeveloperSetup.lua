@@ -1,11 +1,11 @@
 --[[-----------------------------------------------------------------------------
 DeveloperSetup
 -------------------------------------------------------------------------------]]
---- @type Namespace_ABP_BarsUI_2_0
+--- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns = ns:cns()
-
 local Str_IsBlank = cns:String().IsBlank
+
 local p, t = ns:log('DeveloperSetup')
 
 --[[-----------------------------------------------------------------------------
@@ -14,7 +14,7 @@ Base Tracer
 --- @param prefix Name  @The prefix name
 --- @param ... any      @Print any
 function ns.tr(prefix, ...)
-  local cfn = cns:ColorFn('FFE146')
+  local cfn = cns:ColorFn('B4FF44')
   local _ns = cns; _ns.__trace(ns.LOG_NAME, prefix, cfn, ...)
 end
 
@@ -34,7 +34,7 @@ local function traceFn(prefix)
 end
 
 --[[-----------------------------------------------------------------------------
-BarsUI:: Namespace Overrides for Dev Namespace
+OptionsUI:: Namespace Overrides for Dev Namespace
 -------------------------------------------------------------------------------]]
 
 do
