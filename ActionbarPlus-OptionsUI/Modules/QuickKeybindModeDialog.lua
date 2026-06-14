@@ -9,6 +9,7 @@ local cns = ns:cns()
 New Instance
 -------------------------------------------------------------------------------]]
 local libName = 'QuickKeybindModeDialog'
+local globalVarName = 'ABP_QUICK_KEYBIND_DIALOG'
 --- @class QuickKeybindModeDialog_ABP_2_0 : AceEvent-3.0
 local o = cns:NewAceEvent(); ns:Register(libName, o)
 o.perChar = false
@@ -147,11 +148,11 @@ local function AddButtons(frame, chkCharacterSpecific)
 end
 
 --- @return AceGUIWindow
-local function CreateFrame()
+local function CreateDialogFrame()
   local AceGUI = cns:AceGUI()
 
   --- @type AceGUIWindow
-  local frame = AceGUI:Create('Window')
+  local frame = AceGUI:Create('Window'); _G[globalVarName] = frame.frame
   frame:SetTitle(DIALOG_TITLE)
   frame:SetWidth(DIALOG_WIDTH)
   frame:SetHeight(DIALOG_HEIGHT)
@@ -167,6 +168,8 @@ local function CreateFrame()
   --- @type AceGUICheckBox
   local chk = AddCheckbox(frame)
   AddButtons(frame, chk)
+
+  tinsert(UISpecialFrames, globalVarName)
 
   return frame
 end
@@ -185,7 +188,7 @@ function o:Open()
   if InCombatLockdown() then return end
   closeReason = nil
   if not dialogFrame then
-    dialogFrame = CreateFrame()
+    dialogFrame = CreateDialogFrame()
     dialogFrame.frame:SetClampedToScreen(true)
   end
   local f = dialogFrame.frame
@@ -228,5 +231,6 @@ function o:Reset()
   if dialogFrame then
     dialogFrame:Hide()
     dialogFrame = nil
+    _G[globalVarName] = nil
   end
 end
