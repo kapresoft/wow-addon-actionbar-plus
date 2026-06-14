@@ -283,9 +283,8 @@ function o:IsSpellInRange(spell, target) return C_IsSpellInRange(spell, target) 
 --- @param target UnitToken    @The unit to check the range against. Defaults to "target" if nil.
 --- @return boolean?           @A return of nil means that the item is not applicable for the target unit. The older API (Non C_Item) returns 1 or 0.
 function o:IsItemInRange(item, target)
-  local ok, result = pcall(C_IsItemInRange, item, target)
-  if not ok then return nil end
-  return result --[[@as boolean ]]
+  if InCombatLockdown() then return nil end
+  return C_IsItemInRange(item, target)
 end
 
 --- @param itemInfo ItemInfo
