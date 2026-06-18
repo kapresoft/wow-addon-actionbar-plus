@@ -316,6 +316,7 @@ function o:ApplyLayout(frame, barConf)
   local ui = barConf.ui
   local layout = ui.layout or 'grid' -- todo: add layout to database
   if layout == 'grid' then ApplyGridLayout(frame, ui) end
+  frame:SetAlpha(ui.alpha)
 end
 
 --- Re-layout an existing bar in place from the current config.
