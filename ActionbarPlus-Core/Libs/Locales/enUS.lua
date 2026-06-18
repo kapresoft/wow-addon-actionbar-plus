@@ -22,3 +22,4 @@ L['Options']              = true
 L['Rows']                 = true
 L['Settings']             = true
 L['Show Empty Buttons']   = true
+L['Version']              = true

@@ -77,6 +77,9 @@ local function optDialog() return ns.O.BarOptionsDialog end
 --- @return QuickKeybindModeDialog_ABP_2_0
 local function kbDialog() return ns.O.QuickKeybindModeDialog end
 
+--- @return GeneralSettingsDialog_ABP_2_0
+local function settingsDialog() return ns.O.GeneralSettingsDialog end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -85,7 +88,7 @@ function o:Show(barFrame)
   local menu = {
     { text = OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
-    { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function()  end },
+    { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function() settingsDialog():Open() end },
   }
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end
