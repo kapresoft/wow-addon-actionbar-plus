@@ -12,6 +12,8 @@ local ModuleNames = {
 
   --- @type BarContextMenu_ABP_2_0
   BarContextMenu = {},
+  --- @type BarOptionsDialog_ABP_2_0
+  BarOptionsDialog = {},
   --- @type BarKeybindController_ABP_2_0
   BarKeybindController = {},
   --- @type QuickKeybindModeDialog_ABP_2_0

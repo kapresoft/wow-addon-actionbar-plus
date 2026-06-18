@@ -7,10 +7,18 @@ local ns = select(2, ...)
 local L = LibStub("AceLocale-3.0"):NewLocale(ns.name, "enUS", true);
 if not L then return end
 
-L['ActionbarPlus']  = true
-L['AddOns']         = true
-L['Bound']          = true
-L['Not Bound']      = true
-L['Bar']            = true
-L['Button']         = true
-
+L['ActionbarPlus']        = true
+L['AddOns']               = true
+L['Alpha']                = true
+L['Bar']                  = true
+L['Bound']                = true
+L['Button']               = true
+L['Button Size']          = true
+L['Columns']              = true
+L['Enabled']              = true
+L['General']              = true
+L['Not Bound']            = true
+L['Options']              = true
+L['Rows']                 = true
+L['Settings']             = true
+L['Show Empty Buttons']   = true

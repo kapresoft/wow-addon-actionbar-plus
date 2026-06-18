@@ -264,6 +264,85 @@ function o:CreateAddonModules()
   end
 end
 
+--- @param frame BarFrame_ABP_2_0
+--- @param ui BarUIConfig_ABP_2_0
+local function ApplyGridLayout(frame, ui)
+  local cols = ui.colSize
+  local rows = ui.rowSize
+  local size = ui.button.size
+  local spacing = ui.button.spacing
+  local pad = ui.padding
+  local BASE_UI_PADDING = 12
+
+  local padLeft   = pad.left   + BASE_UI_PADDING
+  local padRight  = pad.right  + BASE_UI_PADDING
+  local padTop    = pad.top    + BASE_UI_PADDING
+  local padBottom = pad.bottom + BASE_UI_PADDING
+
+  local totalWidth  = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
+  local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom
+  frame:SetSize(totalWidth, totalHeight)
+
+  local hotKeyFontSize = math.max(8, math.floor(size * 16 / 40))
+  local hotKeyOffsetX  = math.floor(size * 5 / 40)
+  local hotKeyOffsetY  = math.floor(size * 7 / 40)
+  local startX = math.floor(padLeft + 0.5)
+  local startY = -math.floor(padTop + 0.5)
+  local visible = cols * rows
+
+  for i, btn in ipairs(frame.widget.buttons) do
+    btn:ClearAllPoints()
+    if i <= visible then
+      btn:SetSize(size, size)
+      btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
+      btn.HotKey:ClearAllPoints()
+      btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)
+      local idx = i - 1
+      local c = (idx % cols) + 1
+      local r = math.floor(idx / cols) + 1
+      local x = startX + (size + spacing.horizontal) * (c - 1)
+      local y = startY - (size + spacing.vertical)   * (r - 1)
+      btn:SetPoint('TOPLEFT', frame, 'TOPLEFT', x, y)
+      btn:Show()
+    else
+      btn:Hide()
+    end
+  end
+end
+
+--- @param frame BarFrame_ABP_2_0
+--- @param barConf BarConfig_ABP_2_0
+function o:ApplyLayout(frame, barConf)
+  local ui = barConf.ui
+  local layout = ui.layout or 'grid' -- todo: add layout to database
+  if layout == 'grid' then ApplyGridLayout(frame, ui) end
+end
+
+--- Re-layout an existing bar in place from the current config.
+--- Named WoW frames cannot be destroyed and recreated, so this mutates in place.
+--- Creates any additional buttons if rows/cols increased beyond what was originally built.
+--- @param barIndex Index
+function o:RebuildLayout(barIndex)
+  if InCombatLockdown() then return end
+  local frame = _G[barName(barIndex)]
+  if not frame then return end
+
+  local barConf = cns:a():bar(barIndex)
+  local ui = barConf.ui
+  local needed = ui.colSize * ui.rowSize
+  local buttons = frame.widget.buttons
+
+  for i = #buttons + 1, needed do
+    local encodedID = au.encodeBarID(barIndex, i)
+    local btnName, btnKey = ButtonName(barIndex, i)
+    local btn = CreateFrame("CheckButton", btnName, frame, ns.buttonTemplate, encodedID)
+    btn:SetParentKey(btnKey)
+    table.insert(buttons, btn)
+  end
+
+  self:ApplyLayout(frame, barConf)
+end
+
 --- @private
 --- @param barIndex Index The bar frame index
 --- @param consumerFn BarFactoryConsumerFn
@@ -287,56 +366,7 @@ function o:CreateBarGroup(barIndex, consumerFn)
   local buttons = self:CreateButtons(barConf, frame, barIndex)
   frame.widget.buttons = buttons
 
-  ----------------------------------------------------
-  -- resize bar frame based on cols x rows
-  ----------------------------------------------------
-  local pad = ui.padding
-  local BASE_UI_PADDING = 12
-
-  local padLeft   = pad.left   + BASE_UI_PADDING
-  local padRight  = pad.right  + BASE_UI_PADDING
-  local padTop    = pad.top    + BASE_UI_PADDING
-  local padBottom = pad.bottom + BASE_UI_PADDING
-
-  local totalWidth = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
-  local totalHeight = padTop + size*rows + spacing.vertical*(rows - 1) + padBottom
-
-  frame:SetSize(totalWidth, totalHeight)
-
-  ----------------------------------------------------
-  -- layout buttons using cols x rows
-  ----------------------------------------------------
-  local col, row = 1, 1
-  local startX = math.floor(padLeft + 0.5)
-  local startY = -math.floor(padTop + 0.5)
-
-  local hotKeyFontSize = math.max(8, math.floor(size * 16 / 40))
-  local hotKeyOffsetX = math.floor(size * 5 / 40)
-  local hotKeyOffsetY = math.floor(size * 7 / 40)  -- slightly larger to keep text inside at all sizes
-
-  for i, btn in ipairs(buttons) do
-    btn:SetSize(size, size)
-    btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
-    btn.HotKey:ClearAllPoints()
-    btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)
-    btn:ClearAllPoints()
-
-    -- compute row/col based on index
-    local indexInGrid = i - 1
-    col = (indexInGrid % cols) + 1
-    row = math.floor(indexInGrid / cols) + 1
-
-    -- starting offsets
-    --local startX = pad.left
-    --local startY = -pad.top
-
-    -- compute position
-    local x = startX + (size + spacing.horizontal) * (col - 1)
-    local y = startY - (size + spacing.vertical) * (row - 1)
-
-    -- anchor inside the frame
-    btn:SetPoint("TOPLEFT", frame, "TOPLEFT", x, y)
-  end
+  self:ApplyLayout(frame, barConf)
 
   return consumerFn and consumerFn(frame)
 end

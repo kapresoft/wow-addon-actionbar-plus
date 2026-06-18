@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-local cns, O = ns:cns()
+local cns, O, L = ns:cns()
 
 local seedID = 4999
 local hc = cns:ColorFn("539AFA")
@@ -62,13 +62,16 @@ end
 
 function o:OnEnter()
   if not self.widget then return end
+
   local w = self.widget
+  local barTitle = ('%s — %s %s'):format(cns.name, L['Bar'], w.index)
+
   --todo: GameTooltip owner will be user configurable
   GameTooltip:SetOwner(UIParent, 'ANCHOR_NONE')
   GameTooltip:ClearAllPoints()
   GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
   GameTooltip:ClearLines()
-  GameTooltip:AddLine('ActionbarPlus — Bar ' .. w.index)
+  GameTooltip:AddLine(barTitle)
   if w.buttons then
     GameTooltip:AddLine(#w.buttons .. ' buttons', 0.8, 0.8, 0.8)
   end

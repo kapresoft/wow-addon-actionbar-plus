@@ -22,9 +22,9 @@ ns.O = ns.O or {}
 ns.LOG_NAME = 'ABP_BARSUI'
 
 --- Core Namespace and Core modules
---- #### Usage:  `local cns, O = ns:cns()`
---- @return Namespace_ABP_2_0, Core_Modules_ABP_2_0
-function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O end
+--- #### Usage:  `local cns, O, L = ns:cns()`
+--- @return Namespace_ABP_2_0, Core_Modules_ABP_2_0, table<string, string>
+function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O, ABP_CORE_NS:GetLocale() end
 
 --[[-------------------------------------------------------------------
 LibPrettyPrint::Formatter/Printer
