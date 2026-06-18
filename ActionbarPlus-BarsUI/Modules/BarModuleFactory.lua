@@ -290,7 +290,10 @@ local function ApplyGridLayout(frame, ui)
   local startY = -math.floor(padTop + 0.5)
   local visible = cols * rows
 
-  for i, btn in ipairs(frame.widget.buttons) do
+  for i, _btn in ipairs(frame.widget.buttons) do
+    --- @type Button_ABP_2_0_X
+    local btn = _btn
+
     btn:ClearAllPoints()
     if i <= visible then
       btn:SetSize(size, size)
@@ -304,6 +307,7 @@ local function ApplyGridLayout(frame, ui)
       local y = startY - (size + spacing.vertical)   * (r - 1)
       btn:SetPoint('TOPLEFT', frame, 'TOPLEFT', x, y)
       btn:Show()
+      btn.widget:UpdateEmptyState(ui.showEmptyButtons)
     else
       btn:Hide()
     end

@@ -61,14 +61,9 @@ function o:OnLoad()
   self:RegisterEvent("EQUIPMENT_SETS_CHANGED")
   self:RegisterUnitEvent("UNIT_AURA", "player")
   self:RegisterEvent("UPDATE_BINDINGS");
+  self:RegisterEvent("ACTIONBAR_SHOWGRID");
+  self:RegisterEvent("ACTIONBAR_HIDEGRID");
 
-  --self:RegisterEvent("ACTIONBAR_SLOT_CHANGED");
-  --self:RegisterEvent("GAME_PAD_ACTIVE_CHANGED");
-  --self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-  --self:RegisterEvent("PET_BAR_UPDATE")
-  --self:RegisterUnitEvent("UNIT_FLAGS", "pet");
-  --self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED");
-  
   --CVarCallbackRegistry:SetCVarCachable(countdownForCooldownsCVarName);
   --CVarCallbackRegistry:RegisterCallback(countdownForCooldownsCVarName, self.OnCountdownForCooldownsChanged, self);
 end

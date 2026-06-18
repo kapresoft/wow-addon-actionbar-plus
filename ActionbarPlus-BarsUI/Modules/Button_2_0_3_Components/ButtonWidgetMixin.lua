@@ -58,8 +58,14 @@ end
 --- @param val string
 function o:UpdateAction(name, val)
   if not au.IsSupportedAction(name) then return end
-  if Str_IsBlank(val) then self.button.icon:SetTexture(nil); return end
-  self.button:Update()
+  if Str_IsBlank(val) then
+    self.button.icon:SetTexture(nil)
+  else
+    self.button:Update()
+  end
+  if not InCombatLockdown() then
+    self:UpdateEmptyState(cns:bar(self.barIndex).ui.showEmptyButtons)
+  end
 end
 
 function o:UpdateCount()
@@ -103,6 +109,15 @@ function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
 --- @return boolean
 function o:HasAction() return not self:IsEmpty() end
+
+--- Shows/hides the empty-slot border + toggles click-through for empty buttons.
+--- A hidden empty button must not block clicks to whatever is behind it on screen.
+--- @param showEmptyButtons boolean
+function o:UpdateEmptyState(showEmptyButtons)
+  local visible = showEmptyButtons or self:HasAction()
+  self.button.NormalTexture:SetShown(visible)
+  self.button:EnableMouse(visible)
+end
 
 --- @param callbackFn fun(typ:ActionType, val:ActionValue, isCustom:boolean) : void
 --- @return Chain_ABP_2_0
