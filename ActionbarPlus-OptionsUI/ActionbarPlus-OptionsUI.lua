@@ -14,11 +14,18 @@ local o = cns:AceAddon():NewAddon(ns.name, unpack(EMBEDS)); ABP_OptionsUI_2_0 = 
 
 function o.Init()
   o:RegisterMessage(cns:BarsNS():msg('OnBarFrameRightClick'), o.OnBarFrameRightClick)
+  o:RegisterMessage(ns:msg('OnBarOptionsChanged'), o.OnBarOptionsChanged)
 end
 
 --- @param evt EventName
 --- @param barFrame BarFrame_ABP_2_0
 function o.OnBarFrameRightClick(evt, barFrame) BarContextMenu:Show(barFrame) end
+
+--- @param evt EventName
+--- @param barIndex Index
+function o.OnBarOptionsChanged(evt, barIndex)
+  cns:BarsUI():ns().O.BarModuleFactory:RebuildLayout(barIndex)
+end
 
 function o:OnInitialize()
   self:SendMessage(ns:msg('OnInitialize'))

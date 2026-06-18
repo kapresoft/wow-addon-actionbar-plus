@@ -8,6 +8,7 @@
     <Script file="Developer\DeveloperSetup.lua"/>
     <!--@end-do-not-package@-->
     <Script file="BarContextMenu.lua"/>
+    <Script file="BarOptionsDialog.lua"/>
     <Script file="QuickKeybindModeDialog.lua"/>
     <Script file="BarKeybindController.lua"/>
 
