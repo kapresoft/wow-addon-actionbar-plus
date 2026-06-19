@@ -63,7 +63,7 @@ Type Definitions
 
 --- @alias RGBA number[]  -- {r,g,b,a} each value 0.0–1.0
 
---- @class BarBorderConfig_ABP_2_0
+--- @class BarBackdropConfig_ABP_2_0
 --- @field theme string        -- Border theme key (see BORDER_DEFS in Backdrops.lua)
 --- @field bgColor RGBA        -- Backdrop background color
 --- @field borderColor RGBA    -- Backdrop border color
@@ -79,7 +79,7 @@ Type Definitions
 --- @field frameHandleAlpha number
 --- @field padding PaddingConfig_ABP_2_0        -- Bar frame padding
 --- @field button BarButtonUIConfig_ABP_2_0     -- Button spacing configuration
---- @field border BarBorderConfig_ABP_2_0
+--- @field backdrop BarBackdropConfig_ABP_2_0
 --  ================================================
 
 --- @class ButtonConfig_ABP_2_0
@@ -221,10 +221,10 @@ local DEFAULT_BAR = {
     -- Theme 2::
     -- bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
     -- borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
-    border = {
+    backdrop = {
       theme = 'stone',
-       bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
-       borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
+      bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
+      borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
     }
   },
   -- Anchor (same as V1)
