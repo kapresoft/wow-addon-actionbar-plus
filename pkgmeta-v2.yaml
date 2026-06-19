@@ -55,19 +55,7 @@ ignore:
   - dev
   - doc
   - scripts
-  - ActionbarPlus-2.0
-#  - ActionbarPlus/Core/Lib/Developer
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/LICENSE
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/External
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/dev
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/doc
-#  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.sh
-#  - ActionbarPlus/ThirdParty/Libs/Ace3/*.toc
-#  - ActionbarPlus/ThirdParty/Libs/Ace3/tests
-#  - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
-#  - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
-#  - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
+  - ActionbarPlus
   - ActionbarPlus-Core/Libs/Developer
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/doc
@@ -83,7 +71,6 @@ ignore:
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
   - ActionbarPlus
   - ActionbarPlus/*.txt
-  - ActionbarPlus-OptionsUI
 
 # REQUIRED for CurseForge packager (non-obvious):
 # The LEFT side MUST be <repo-folder>/<addon-folder>
@@ -102,5 +89,6 @@ move-folders:
 #  ActionbarPlus/ActionbarPlus: ActionbarPlus
   ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
   ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
+  ActionbarPlus/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI
 
 # run with: ./dev/release.sh -m pkgmeta-v2.yaml -dz
