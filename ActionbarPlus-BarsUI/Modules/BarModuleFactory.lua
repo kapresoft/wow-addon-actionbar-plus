@@ -73,7 +73,6 @@ local BarFrameObjWidgetMixin = {}
 
 local function BarFrameWidgetMethods()
   
-  --- @type BarFrameWidgetMixin_ABP_2_0
   local wm = BarFrameObjWidgetMixin
   
   ---@param frame BarFrame_ABP_2_0
@@ -90,8 +89,7 @@ local function BarFrameWidgetMethods()
   
   function wm:ApplyBackdrop()
     local conf = self:conf().ui.border
-    assert(conf, "BarFrameWidget:ApplyBackdrop(): ui.border config missing")    local theme = conf and conf.theme
-
+    local theme = conf and conf.theme
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
     
     local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
@@ -406,11 +404,8 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   assert(type(barIndex) == 'number', '__CreateBarFrame(barConf, barIndex, frameName) {barIndex} should be a number')
   assert(type(frameName) == 'string', '__CreateBarFrame(barConf, barIndex, frameName): {frameName} should be a string')
 
-  --- @type Template
-  local template = "ABP_BarFrameTemplate_2_0_1"
-
   --- @class BarFrame_ABP_2_0 : Frame, BackdropTemplate, BarFrameMixin_ABP_2_0_1
-  local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, template)
+  local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1" --[[@as Template ]])
   local f = barFrame
   f:SetParentKey(frameName)
   f:SetFrameLevel(MAX_BAR_COUNT - barIndex)
