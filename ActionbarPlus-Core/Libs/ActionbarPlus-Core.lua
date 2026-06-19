@@ -26,6 +26,15 @@ function o:OnReadyDependentAddOn(evt, addon)
   end
 end
 
+--- @param input string
+function o:OnSlashCommand(input)
+  local cmd = input:match('^(%S*)')
+  if cmd == 'options' then
+    if not ns:OptionsUI() then return end
+    ns:OptionsNS().O.GeneralSettingsDialog:Open()
+  end
+end
+
 --- Called once, after:
 --- - SavedVariables are loaded
 --- - All addon Lua/XML files are loaded
@@ -35,6 +44,7 @@ function o:OnInitialize()
   for _, a in ipairs(dependentAddOns) do
     self:RegisterMessage(a .. '::OnEnable', 'OnReadyDependentAddOn')
   end
+  self:RegisterChatCommand('abpv2', 'OnSlashCommand')
   self:SendMessage(ns:msg('OnAddOnInitialized'))
 end
 

@@ -11,6 +11,7 @@ local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
+local MAX_BAR_COUNT = 10
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -233,7 +234,7 @@ function o:New(barFrame)
   assert(type(barFrame) == 'table', 'New(barFrame):: {barFrame} should be a frame.')
 
   local core = ns:a()
-  local w = barFrame.widget
+  local w = barFrame.widget --[[@as BarFrameWidget_ABP_2_0 ]]
   local name = moduleName(w.index)
 
   --- @type BarModule_2_0
@@ -246,14 +247,34 @@ function o:New(barFrame)
   m.index = w.index
   w.module = m
 
-  if m:c().enabled then m:Enable()
-  else m:Disable() end
+  self:ApplyBarEnabledState(w.index)
   _G[name] = m
 
   m:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
-  --m:RegisterEvent('SPELLS_CHANGED', 'SPELLS_CHANGED')
   m:RegisterBucketEvent('SPELLS_CHANGED', 0.2)
   return m
+end
+
+--- @param barIndex Index
+--- @param callbackFn fun(m:BarModule_2_0):void
+function o:IfBar(barIndex, callbackFn)
+  local frame = _G[barName(barIndex)]
+  local m = frame and frame.widget and frame.widget.module
+  if m then callbackFn(m) end
+end
+
+--- Directly drives the bar's show/hide logic instead of going through Ace3's
+--- Enable()/Disable(), since modules created via NewModule are queued for
+--- Ace3's init process and may not have settled their internal enabled
+--- status yet, causing Disable() to silently no-op right after creation.
+--- @param barIndex Index
+function o:ApplyBarEnabledState(barIndex)
+  if InCombatLockdown() then return end
+  self:IfBar(barIndex, function(m)
+    local enabled = m:c().enabled
+    m:SetEnabledState(enabled)
+    if enabled then m:OnEnable() else m:OnDisable() end
+  end)
 end
 
 local barCount = cns:a():p().barCount or 1
@@ -392,7 +413,7 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, template)
   local f = barFrame
   f:SetParentKey(frameName)
-  f:SetFrameLevel(barCount - barIndex)
+  f:SetFrameLevel(MAX_BAR_COUNT - barIndex)
   f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex) --[[@as BarFrameWidget_ABP_2_0]]
 
   -- TODO: Can have user-preference override
