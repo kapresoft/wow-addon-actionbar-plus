@@ -120,7 +120,8 @@ function o:OnLoad()
   self.HotKey:SetFont(self.HotKey:GetFont(), 16, 'OUTLINE')  -- overridden by BarModuleFactory at layout time
   self.cooldown:SetDrawBling(false)
   self.cooldown:SetDrawEdge(false)
-
+  self.cooldown:SetDrawSwipe(true)
+  self.cooldown:SetAlpha(0.4)
   local traceChecked = false
   if traceChecked then
     if not self.__SetCheckedWrapped then

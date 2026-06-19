@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
 local OPTIONS = OPTIONS or L['Options']
+local SETTINGS = SETTINGS or L['Settings']
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -24,6 +25,41 @@ local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 320
 Support Functions
 -------------------------------------------------------------------------------]]
 
+--- Adds a centered 'Settings' button below the bar widgets, opening GeneralSettingsDialog.
+--- Uses a SimpleGroup with its own Flow layout (relative-width spacer/button/spacer)
+--- so the centering doesn't depend on sibling-widget frame sizes or render timing.
+--- @param frame AceGUIWindow
+--- @param refs table @refs to widgets for refresh
+local function AddSettingsButton(frame, refs)
+  local AceGUI = cns:AceGUI()
+
+  --- @type AceGUISimpleGroup
+  local group = AceGUI:Create('SimpleGroup')
+  group:SetLayout('Flow')
+  frame:AddChild(group)
+
+  --- @type AceGUILabel
+  local leftLabel = AceGUI:Create('Label')
+  leftLabel:SetText(' ')
+  leftLabel:SetWidth(38)
+  group:AddChild(leftLabel)
+
+  --- @type AceGUIButton
+  local btnSettings = AceGUI:Create('Button')
+  btnSettings:SetText(SETTINGS)
+  btnSettings:SetWidth(150)
+  btnSettings:SetCallback('OnClick', function() ns.O.GeneralSettingsDialog:Open() end)
+  group:AddChild(btnSettings)
+  refs.btnSettings = btnSettings
+
+  --- @type AceGUILabel
+  local rightLabel = AceGUI:Create('Label')
+  rightLabel:SetText(' ')
+  rightLabel:SetWidth(5)
+  group:AddChild(rightLabel)
+
+end
+
 --- @param frame AceGUIWindow
 --- @param conf BarConfig_ABP_2_0
 --- @return table @refs to widgets for refresh
@@ -42,6 +78,22 @@ local function AddWidgets(frame, conf)
   end)
   frame:AddChild(chkEnabled)
   refs.chkEnabled = chkEnabled
+
+  --- @type Frame
+  local enabledHelp = CreateFrame('Frame', nil, chkEnabled.frame)
+  enabledHelp:SetSize(24, 24)
+  enabledHelp:SetPoint('LEFT', chkEnabled.text, 'LEFT', chkEnabled.text:GetStringWidth() + 4, 0)
+  enabledHelp:EnableMouse(true)
+  local enabledHelpIcon = enabledHelp:CreateTexture(nil, 'ARTWORK')
+  enabledHelpIcon:SetAllPoints()
+  enabledHelpIcon:SetTexture('Interface\\Common\\help-i')
+  enabledHelp:SetScript('OnEnter', function(self)
+    GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+    GameTooltip:SetText(L['Re-enable from General Settings > General > Bars.'], nil, nil, nil, nil, true)
+    GameTooltip:Show()
+  end)
+  enabledHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
+  refs.enabledHelp = enabledHelp
 
   --- @type AceGUISlider
   local slRows = AceGUI:Create('Slider')
@@ -108,6 +160,8 @@ local function AddWidgets(frame, conf)
   frame:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
 
+  AddSettingsButton(frame, refs)
+
   return refs
 end
 
@@ -122,6 +176,10 @@ local function CreateDialogFrame()
   frame:SetLayout('Flow')
   frame:SetCallback('OnClose', function()
     o:OnFrameClose()
+  end)
+  frame:SetCallback("OnShow", function ()
+    frame.frame:SetSize(DIALOG_WIDTH, DIALOG_HEIGHT)
+    frame:DoLayout()
   end)
 
   -- dialogbg is the 2nd texture (tooltip bg); AceGUI sets it to 0.75 alpha — override to fully opaque

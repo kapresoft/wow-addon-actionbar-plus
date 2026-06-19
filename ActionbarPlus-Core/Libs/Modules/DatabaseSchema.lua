@@ -170,7 +170,7 @@ local DEFAULT_DB = {
   ['global'] = { schemaVersion = DB_VERSION, bars = {} },
   
   profile = {                     -- ProfileConfig_ABP_2_0
-    barCount                      = 1,
+    barCount                      = 10,
     hideWhenTaxi                  = true,
     hideWhenGhost                 = true,
     characterSpecificAnchors      = false,
@@ -193,7 +193,7 @@ local DEFAULT_DB = {
 
 --- @type BarConfig_ABP_2_0
 local DEFAULT_BAR = {
-  enabled                   = true,
+  enabled                   = false,
   showKeybindText           = true,
   showButtonIndex           = false,
   -- BarUIConfig_ABP_2_0
@@ -268,6 +268,7 @@ function o:CreateDefaultBar(barIndex)
 
   --- @type BarConfig_ABP_2_0
   local bar = tbl_DeepCopy(DEFAULT_BAR)
+  bar.enabled = barIndex == 1
 
   -- Clear buttons to avoid copying seeded defaults
   

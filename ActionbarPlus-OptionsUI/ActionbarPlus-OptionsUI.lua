@@ -24,7 +24,10 @@ function o.OnBarFrameRightClick(evt, barFrame) BarContextMenu:Show(barFrame) end
 --- @param evt EventName
 --- @param barIndex Index
 function o.OnBarOptionsChanged(evt, barIndex)
-  cns:BarsUI():ns().O.BarModuleFactory:RebuildLayout(barIndex)
+  local BarModuleFactory = cns:BarsUI():ns().O.BarModuleFactory
+  BarModuleFactory:CreateBarGroup(barIndex, function(barFrame) BarModuleFactory:New(barFrame) end)
+  BarModuleFactory:ApplyBarEnabledState(barIndex)
+  BarModuleFactory:RebuildLayout(barIndex)
 end
 
 function o:OnInitialize()
