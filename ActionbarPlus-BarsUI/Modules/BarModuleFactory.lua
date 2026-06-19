@@ -88,15 +88,15 @@ local function BarFrameWidgetMethods()
   function wm:conf() return cns:bar(self.index) end
   
   function wm:ApplyBackdrop()
-    local conf = self:conf().ui.border
-    local theme = conf and conf.theme
+    local bc = self:conf().ui.backdrop
+    local theme = bc and bc.theme
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
     
     local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
     self.frame:SetBackdrop(borderDef.backdrop)
     
-    local bgColor = conf.bgColor or borderDef.bgColor
-    local borderColor = conf.borderColor or borderDef.borderColor
+    local bgColor = bc.bgColor or borderDef.bgColor
+    local borderColor = bc.borderColor or borderDef.borderColor
     
     self.frame:SetBackdropColor(unpack(bgColor))
     self.frame:SetBackdropBorderColor(unpack(borderColor))
@@ -340,6 +340,7 @@ function o:ApplyLayout(frame, barConf)
   local layout = ui.layout or 'grid' -- todo: add layout to database
   if layout == 'grid' then ApplyGridLayout(frame, ui) end
   frame:SetAlpha(ui.alpha)
+  frame.widget:ApplyBackdrop()
 end
 
 --- Re-layout an existing bar in place from the current config.
