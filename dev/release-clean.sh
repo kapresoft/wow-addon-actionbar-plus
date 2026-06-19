@@ -18,7 +18,8 @@ usage() {
   print -- "Usage:"
   print -- "  release-clean.sh [options]"
   print -- "Options:"
-  print -- "  -h, --help              Show this help and exit"
+  print -- "  -v 2, --version 2   Build for version 2"
+  print -- "  -h, --help          Show this help and exit"
   print
 }
 
