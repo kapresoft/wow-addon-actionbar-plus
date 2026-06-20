@@ -90,16 +90,71 @@ local function BarFrameWidgetMethods()
   function wm:ApplyBackdrop()
     local bc = self:conf().ui.backdrop
     local theme = bc and bc.theme
+    self:ApplyDragHandle(theme == 'none')
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
-    
+
     local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
     self.frame:SetBackdrop(borderDef.backdrop)
-    
+
     local bgColor = bc.bgColor or borderDef.bgColor
     local borderColor = bc.borderColor or borderDef.borderColor
-    
+
     self.frame:SetBackdropColor(unpack(bgColor))
     self.frame:SetBackdropBorderColor(unpack(borderColor))
+  end
+
+  --- Marks the drag handle eligible (square above button 1, TOPLEFT of the bar).
+  --- Only relevant when the backdrop theme is 'none' since there's no border to grab.
+  --- The handle frame itself stays shown+mouse-enabled the whole time it's eligible
+  --- (so it can detect its own hover even when the bar frame is click-through);
+  --- only its visible texture is toggled by ShowDragHandle/HideDragHandle.
+  --- @param enabled boolean
+  function wm:ApplyDragHandle(enabled)
+    self.dragHandleEnabled = enabled
+    if enabled then
+      self:GetOrCreateDragHandle():Show()
+    elseif self.dragHandle then
+      self.dragHandle:Hide()
+    end
+  end
+
+  --- @return Frame? @lazily creates the handle on first use
+  function wm:GetOrCreateDragHandle()
+    if not self.dragHandle then
+      local handle = CreateFrame('Frame', nil, self.frame, 'ABP_BarDragHandleTemplate_2_0')
+      handle.barFrame = self.frame
+      handle:ClearAllPoints()
+      handle:SetPoint('BOTTOMLEFT', self.frame, 'TOPLEFT', 20, -10)
+      handle.tex:Hide()
+      self.dragHandle = handle
+    end
+    return self.dragHandle
+  end
+
+  function wm:ShowDragHandle()
+    if not self.dragHandleEnabled then return end
+    self:GetOrCreateDragHandle().tex:Show()
+  end
+
+  function wm:HideDragHandle()
+    if self.dragHandle then self.dragHandle.tex:Hide() end
+  end
+
+  --- Pulses the drag handle so it's findable while BarBackdropDialog is open
+  --- (theme 'none' has no visible border to draw the eye to the handle otherwise).
+  function wm:StartHandleGlow()
+    if not self.dragHandleEnabled then return end
+    local handle = self:GetOrCreateDragHandle()
+    handle.tex:Show()
+    handle.glow:Play()
+  end
+
+  function wm:StopHandleGlow()
+    if not self.dragHandle then return end
+    self.dragHandle.glow:Stop()
+    self.dragHandle.tex:SetAlpha(1)
+    -- restore hover-only visibility unless the mouse happens to be over it right now
+    if not self.dragHandle:IsMouseOver() then self.dragHandle.tex:Hide() end
   end
   
   --- @return Index
@@ -261,6 +316,13 @@ function o:IfBar(barIndex, callbackFn)
   if m then callbackFn(m) end
 end
 
+--- @param barIndex Index
+--- @return BarFrameWidget_ABP_2_0?
+function o:GetBarWidget(barIndex)
+  local frame = _G[barName(barIndex)]
+  return frame and frame.widget
+end
+
 --- Directly drives the bar's show/hide logic instead of going through Ace3's
 --- Enable()/Disable(), since modules created via NewModule are queued for
 --- Ace3's init process and may not have settled their internal enabled
@@ -341,6 +403,13 @@ function o:ApplyLayout(frame, barConf)
   if layout == 'grid' then ApplyGridLayout(frame, ui) end
   frame:SetAlpha(ui.alpha)
   frame.widget:ApplyBackdrop()
+  -- empty buttons are individually click-through (UpdateEmptyState); when none are
+  -- shown, the bar frame itself must also stop catching clicks in the gaps behind them.
+  -- Exception: a visible backdrop (theme ~= 'none') needs the bar frame mouse-enabled
+  -- for right-click/tooltip on its own border/background, even with no empty buttons.
+  local bc = barConf.ui.backdrop
+  local hasVisibleBackdrop = bc and bc.theme ~= 'none'
+  frame:EnableMouse(ui.showEmptyButtons == true or hasVisibleBackdrop == true)
 end
 
 --- Re-layout an existing bar in place from the current config.

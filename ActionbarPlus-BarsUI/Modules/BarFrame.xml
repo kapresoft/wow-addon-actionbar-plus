@@ -15,6 +15,7 @@
     <Script file="Button_2_0_3_Components/SpecController.lua"/>
     <Script file="Button_2_0_3_Components/MacroChangeController.lua"/>
     <Script file="BarFrame.lua"/>
+    <Script file="BarDragHandleMixin.lua"/>
 
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>
@@ -93,6 +94,34 @@
             <OnEnter>self:OnEnter()</OnEnter>
             <OnLeave>self:OnLeave()</OnLeave>
         </Scripts>
+    </Frame>
+
+    <!-- Square drag handle, shown above button 1 (TOPLEFT of bar) only when backdrop theme is 'none' -->
+    <Frame name="ABP_BarDragHandleTemplate_2_0" mixin="BarDragHandleMixin_ABP_2_0"
+           frameStrata="MEDIUM" hidden="true" virtual="true" enableMouse="true">
+        <Size>
+            <AbsDimension x="30" y="10"/>
+        </Size>
+        <Scripts>
+            <OnLoad>self:OnLoad()</OnLoad>
+            <OnDragStart>self:OnDragStart()</OnDragStart>
+            <OnDragStop>self:OnDragStop()</OnDragStop>
+            <OnMouseUp>self:OnMouseUp(button)</OnMouseUp>
+            <OnEnter>self:OnEnter()</OnEnter>
+            <OnLeave>self:OnLeave()</OnLeave>
+        </Scripts>
+        <Layers>
+            <Layer level="OVERLAY">
+                <Texture parentKey="tex" setAllPoints="true">
+                    <Color r="1" g="0.82" b="0" a="0.9"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Animations>
+            <AnimationGroup parentKey="glow" looping="BOUNCE">
+                <Alpha childKey="tex" fromAlpha="1" toAlpha="0.25" duration="0.6" smoothing="IN_OUT"/>
+            </AnimationGroup>
+        </Animations>
     </Frame>
 
 </Ui>

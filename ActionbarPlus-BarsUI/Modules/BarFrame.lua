@@ -33,6 +33,9 @@ function o:OnLoad()
   self:RegisterForDrag("LeftButton")
 end
 
+--- Drag-to-move. Triggered directly when the bar frame has a visible backdrop
+--- (theme ~= 'none'), or via the drag handle when theme is 'none' and the bar
+--- frame itself is click-through (see BarDragHandleMixin).
 function o:OnDragStart()
   if InCombatLockdown() then return end
   self._originalLevel = self:GetFrameLevel()
@@ -62,6 +65,7 @@ end
 
 function o:OnEnter()
   if not self.widget then return end
+  self.widget:ShowDragHandle()
 
   local w = self.widget
   local barTitle = ('%s — %s %s'):format(cns.name, L['Bar'], w.index)
@@ -77,9 +81,12 @@ function o:OnEnter()
   end
   GameTooltip:AddLine(hc('\nAvailable Actions:'))
   GameTooltip:AddLine(hct('  • Right-Click ') .. hcd('to show options menu'))
-  GameTooltip:AddLine(hct('  • Left-Drag ') .. hcd('to move to frame'))
+  GameTooltip:AddLine(hct('  • Left-Drag handle ') .. hcd('to move the bar'))
   GameTooltip:Show()
 end
 
-function o:OnLeave() GameTooltip:Hide() end
+function o:OnLeave()
+  GameTooltip:Hide()
+  if self.widget then self.widget:HideDragHandle() end
+end
 
