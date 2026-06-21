@@ -4,6 +4,8 @@
 --- @field bgColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
 --- @field borderColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
 --- @field padding number @Default backdrop padding (uniform, all sides)
+--- @field edgeSizeMin number @Minimum allowed edgeSize for this theme's slider (Blizzard treats edgeSize<=0 as "use default 39")
+--- @field edgeSizeMax number @Maximum allowed edgeSize for this theme's slider
 
 --- @class BackdropTemplate
 --- @field bgFile string|nil @Example `'Interface/Buttons/WHITE8x8'`

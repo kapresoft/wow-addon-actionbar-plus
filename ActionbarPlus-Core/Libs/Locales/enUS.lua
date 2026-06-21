@@ -21,6 +21,7 @@ L['Button Size']          = true
 L['Columns']              = true
 L['Disabled bars are hidden. Re-enable them here.'] = true
 L['Drag the bar by hovering over its top-left corner (above the first button).'] = true
+L['Edge Size']            = true
 L['Enabled']              = true
 L['General']              = true
 L['Minimalist']           = true
