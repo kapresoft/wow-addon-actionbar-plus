@@ -352,13 +352,14 @@ local function ApplyGridLayout(frame, ui)
   local rows = ui.rowSize
   local size = ui.button.size
   local spacing = ui.button.spacing
-  local pad = ui.padding
-  local BASE_UI_PADDING = 12
+  local borderDef = backdrops.BORDER_DEFS[ui.backdrop.theme] or backdrops.DEFAULT_BACKDROP
+  local pad = ui.backdrop.padding or borderDef.padding
+  local BASE_UI_PADDING = 8
 
-  local padLeft   = pad.left   + BASE_UI_PADDING
-  local padRight  = pad.right  + BASE_UI_PADDING
-  local padTop    = pad.top    + BASE_UI_PADDING
-  local padBottom = pad.bottom + BASE_UI_PADDING
+  local padLeft   = pad + BASE_UI_PADDING
+  local padRight  = pad + BASE_UI_PADDING
+  local padTop    = pad + BASE_UI_PADDING
+  local padBottom = pad + BASE_UI_PADDING - 1
 
   local totalWidth  = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
   local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom

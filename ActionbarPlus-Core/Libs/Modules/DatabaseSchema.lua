@@ -41,21 +41,13 @@ Type Definitions
 
 --  ================================================
 
---- @class PaddingConfig_ABP_2_0
---- @field left number
---- @field right number
---- @field top number
---- @field bottom number
-
---  ================================================
-
 --- @class SpacingConfig_ABP_2_0
 --- @field horizontal number
 --- @field vertical number
 
 --  ================================================
 
---- @class BarButtonUIConfig_ABP_2_0
+--- @class BarUIButtonConfig_ABP_2_0
 --- @field size number
 --- @field spacing SpacingConfig_ABP_2_0
 
@@ -63,8 +55,9 @@ Type Definitions
 
 --- @alias RGBA number[]  -- {r,g,b,a} each value 0.0–1.0
 
---- @class BarBackdropConfig_ABP_2_0
+--- @class BarUIBackdropConfig_ABP_2_0
 --- @field theme string        -- Border theme key (see BORDER_DEFS in Backdrops.lua)
+--- @field padding number      -- Backdrop internal padding (uniform, all sides)
 --- @field bgColor RGBA        -- Backdrop background color
 --- @field borderColor RGBA    -- Backdrop border color
 
@@ -77,9 +70,9 @@ Type Definitions
 --- @field showEmptyButtons boolean
 --- @field frameHandleMouseover boolean
 --- @field frameHandleAlpha number
---- @field padding PaddingConfig_ABP_2_0        -- Bar frame padding
---- @field button BarButtonUIConfig_ABP_2_0     -- Button spacing configuration
---- @field backdrop BarBackdropConfig_ABP_2_0
+--- @field padding number                       -- Bar frame padding (uniform, all sides)
+--- @field button BarUIButtonConfig_ABP_2_0     -- Button spacing configuration
+--- @field backdrop BarUIBackdropConfig_ABP_2_0
 --  ================================================
 
 --- @class ButtonConfig_ABP_2_0
@@ -204,8 +197,7 @@ local DEFAULT_BAR = {
     showEmptyButtons        = true,
     frameHandleMouseover    = false,
     frameHandleAlpha        = 1.0,
-    -- PaddingConfig_ABP_2_0
-    padding = { left = 5, right = 5, top = 5, bottom = 5, },
+    padding = 5, -- Button padding (uniform, all sides)
     -- BarButtonUIConfig_ABP_2_0
     button = {
       size = 50,
@@ -221,11 +213,13 @@ local DEFAULT_BAR = {
     -- Theme 2::
     -- bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
     -- borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
-    backdrop = {
-      theme = 'stone',
-      bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
-      borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
-    }
+    --backdrop = {
+    --  theme = 'stone',
+    --  padding = 5, -- backdrop padding
+    --  bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
+    --  borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
+    --}
+    backdrop = {},
   },
   -- Anchor (same as V1)
   anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },

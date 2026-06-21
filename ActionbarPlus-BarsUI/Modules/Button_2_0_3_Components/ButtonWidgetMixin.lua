@@ -112,10 +112,14 @@ function o:HasAction() return not self:IsEmpty() end
 
 --- Shows/hides the empty-slot border + toggles click-through for empty buttons.
 --- A hidden empty button must not block clicks to whatever is behind it on screen.
+--- EnableMouse() is a protected call on secure buttons in combat (e.g. triggered by
+--- ACTIONBAR_SHOWGRID/HIDEGRID while picking up a macro/spell mid-fight) — skip it
+--- in combat and let the next OnEnable/grid event reconcile mouse state afterward.
 --- @param showEmptyButtons boolean
 function o:UpdateEmptyState(showEmptyButtons)
   local visible = showEmptyButtons or self:HasAction()
   self.button.NormalTexture:SetShown(visible)
+  if InCombatLockdown() then return end
   self.button:EnableMouse(visible)
 end
 
