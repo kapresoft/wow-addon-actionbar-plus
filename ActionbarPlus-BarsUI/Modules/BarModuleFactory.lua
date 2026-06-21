@@ -94,7 +94,26 @@ local function BarFrameWidgetMethods()
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
 
     local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
-    self.frame:SetBackdrop(borderDef.backdrop)
+    if bc.edgeSize then
+      local backdropInfo = CopyTable(borderDef.backdrop)
+      local baseEdge = borderDef.backdrop.edgeSize
+      local baseInsets = borderDef.backdrop.insets
+      backdropInfo.edgeSize = bc.edgeSize
+      if baseEdge and baseEdge > 0 and baseInsets then
+        -- scale insets with edgeSize so the background keeps meeting the border
+        -- cleanly as the user drags the slider away from the theme's tuned default
+        local ratio = bc.edgeSize / baseEdge
+        backdropInfo.insets = {
+          left   = baseInsets.left   * ratio,
+          right  = baseInsets.right  * ratio,
+          top    = baseInsets.top    * ratio,
+          bottom = baseInsets.bottom * ratio,
+        }
+      end
+      self.frame:SetBackdrop(backdropInfo)
+    else
+      self.frame:SetBackdrop(borderDef.backdrop)
+    end
 
     local bgColor = bc.bgColor or borderDef.bgColor
     local borderColor = bc.borderColor or borderDef.borderColor

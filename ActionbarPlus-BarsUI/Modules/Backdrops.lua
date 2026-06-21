@@ -16,8 +16,41 @@ local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Vars & Functions
 ---------------------------------------------------------------------]]
+-- edgeSize is border size
 --- @type table<string, BorderDef_ABP_2_0>
 local BORDER_DEFS = {
+  ['gold'] = {
+    label = L['Gold'],
+    backdrop = {
+      bgFile = "Interface/Buttons/WHITE8x8",
+      edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+      tile = true,
+      tileEdge = true,
+      tileSize = 32,
+      edgeSize = 32,  -- borderSize
+      insets = { left = 11, right = 12, top = 12, bottom = 11 },
+    },
+    bgColor     = { 0.18, 0.13, 0.05, 0.99 }, -- dark warm brown/black background
+    --bgColor = {1, 1, 1, 1}, -- dark warm brown/black background
+    borderColor = { 1, 0.85, 0.45, 1 },       -- bright gold tint on the border art
+    padding = 5,
+    edgeSizeMin = 10,
+    edgeSizeMax = 48,
+  },
+  ['minimalist'] = {
+    label = L['Minimalist'],
+    backdrop = {
+      bgFile   = 'Interface/Buttons/WHITE8x8',
+      edgeFile = nil,
+      tile     = false, tileSize = 0, edgeSize = 0,
+      insets   = { left = 2, right = 2, top = 2, bottom = 2 },
+    },
+    bgColor     = { 0, 0, 0, 0.35 },
+    borderColor = { 0, 0, 0, 0 },
+    padding = 0,
+    edgeSizeMin = 0,
+    edgeSizeMax = 48,
+  },
   ['modern-dark'] = {
     label = L['Modern Dark'],
     backdrop = {
@@ -29,6 +62,22 @@ local BORDER_DEFS = {
     bgColor     = { 0.1, 0.1, 0.1, 0.9 },
     borderColor = { 1, 1, 1, 1 },
     padding = 0,
+    edgeSizeMin = 4,
+    edgeSizeMax = 32,
+  },
+  ['stone'] = {
+    label = L['Stone'],
+    backdrop = {
+      bgFile   = 'Interface/Tooltips/UI-Tooltip-Background',
+      edgeFile = 'Interface/DialogFrame/UI-DialogBox-Border',
+      tile     = true, tileSize = 32, edgeSize = 28,
+      insets   = { left = 6, right = 6, top = 6, bottom = 6 },
+    },
+    bgColor     = { 0.15, 0.16, 0.18, 0.85 },  -- cool slate gray background
+    borderColor = { 0.85, 0.85, 0.85, 1 },     -- light neutral gray, matches the stone art
+    padding = 4,
+    edgeSizeMin = 4,
+    edgeSizeMax = 48,
   },
   ['wood'] = {
     label = L['Wood'],
@@ -43,45 +92,8 @@ local BORDER_DEFS = {
     bgColor     = { 0.20, 0.12, 0.06, 0.9 },  -- deep walnut brown background
     borderColor = { 1, 0.95, 0.85, 1 },       -- warm off-white, lets the wood-grain art read true
     padding = 0,
-  },
-  ['gold'] = {
-    label = L['Gold'],
-    backdrop = {
-      bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-      	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
-      	tile = true,
-      	tileEdge = true,
-      	tileSize = 32,
-      	edgeSize = 24,  -- borderSize
-      	insets = { left = 11, right = 12, top = 12, bottom = 11 },
-    },
-    bgColor     = { 0.18, 0.13, 0.05, 0.9 },  -- dark warm brown/black background
-    borderColor = { 1, 0.85, 0.45, 1 },       -- bright gold tint on the border art
-    padding = 3,
-  },
-  ['stone'] = {
-    label = L['Stone'],
-    backdrop = {
-      bgFile   = 'Interface/Tooltips/UI-Tooltip-Background',
-      edgeFile = 'Interface/DialogFrame/UI-DialogBox-Border',
-      tile     = true, tileSize = 32, edgeSize = 32,
-      insets   = { left = 6, right = 6, top = 6, bottom = 6 },
-    },
-    bgColor     = { 0.15, 0.16, 0.18, 0.85 },  -- cool slate gray background
-    borderColor = { 0.85, 0.85, 0.85, 1 },     -- light neutral gray, matches the stone art
-    padding = 4,
-  },
-  ['minimalist'] = {
-    label = L['Minimalist'],
-    backdrop = {
-      bgFile   = 'Interface/Buttons/WHITE8x8',
-      edgeFile = nil,
-      tile     = false, tileSize = 0, edgeSize = 0,
-      insets   = { left = 2, right = 2, top = 2, bottom = 2 },
-    },
-    bgColor     = { 0, 0, 0, 0.35 },
-    borderColor = { 0, 0, 0, 0 },
-    padding = 0,
+    edgeSizeMin = 4,
+    edgeSizeMax = 48,
   },
 }
 

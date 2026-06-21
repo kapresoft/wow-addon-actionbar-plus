@@ -60,7 +60,7 @@ Type Definitions
 --- @field padding number      -- Backdrop internal padding (uniform, all sides)
 --- @field bgColor RGBA        -- Backdrop background color
 --- @field borderColor RGBA    -- Backdrop border color
-
+--- @field edgeSize number     -- Backdrop border size
 --  ================================================
 
 --- @class BarUIConfig_ABP_2_0
@@ -203,22 +203,6 @@ local DEFAULT_BAR = {
       size = 50,
       spacing = { horizontal = 3, vertical = 3, },
     },
-    -- Deep medium blue: { 0.1, 0.3, 0.7, 0.8 },
-    -- Gray-ish: { 0.9, 0.9, 0.9, 0.9 }
-    -- Pink: { 1.0, 0.2, 0.6, 0.9 }
-    -- Warm Brown/Olive: { 0.5, 0.4, 0.1, 0.8 }
-    -- Theme 1::
-    --  bgColor = { 0.1, 0.3, 0.7, 0.8 }, -- medium blue
-    --  borderColor = { 0.9, 0.9, 0.9, 0.9 }, -- gray-ish
-    -- Theme 2::
-    -- bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
-    -- borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
-    --backdrop = {
-    --  theme = 'stone',
-    --  padding = 5, -- backdrop padding
-    --  bgColor = { 0.35, 0.28, 0.10, 0.85 }, -- bronze
-    --  borderColor = { 0.90, 0.75, 0.30, 0.9 }, -- gold
-    --}
     backdrop = {},
   },
   -- Anchor (same as V1)

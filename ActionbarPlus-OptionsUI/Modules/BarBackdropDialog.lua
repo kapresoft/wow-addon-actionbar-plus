@@ -29,11 +29,15 @@ local DIALOG_WIDTH, DIALOG_HEIGHT = 250, 260
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
-
 --- @return BarModuleFactory_ABP_2_0
 local function barModuleFactory() return cns:BarsUI():ns().O.BarModuleFactory end
 
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
+
+--- @return string
+local function barOptionsChangedMessage()
+  return ns:msg('OnBarOptionsChanged')
+end
 
 --- Builds the theme dropdown list/order from Backdrops.lua's BORDER_DEFS keys,
 --- sorted alphabetically (case-insensitive) by label, with 'none' pinned first.
@@ -92,7 +96,7 @@ local function AddWidgets(frame, conf)
   ddTheme:SetValue(bc.theme or 'stone')
   ddTheme:SetCallback('OnValueChanged', function(_, _, val)
     bc.theme = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    o:SendMessage(barOptionsChangedMessage(), o.barIndex)
     o:RebuildDialog()
   end)
   rowTheme:AddChild(ddTheme)
@@ -104,8 +108,8 @@ local function AddWidgets(frame, conf)
     btnResetColors:SetText(RESET)
     btnResetColors:SetWidth(95)
     btnResetColors:SetCallback('OnClick', function()
-      bc.bgColor, bc.borderColor, bc.padding = nil, nil, nil
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+      bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil
+      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
       o:RebuildDialog()
     end)
     rowTheme:AddChild(btnResetColors)
@@ -128,23 +132,6 @@ local function AddWidgets(frame, conf)
     refs.resetHelp = resetHelp
   end
 
-  if not Str_IsAnyOf(bc.theme, 'none') then
-    --- @type AceGUIColorPicker
-    local cpBgColor = AceGUI:Create('ColorPicker')
-    cpBgColor:SetLabel(L['Background Color'])
-    cpBgColor:SetFullWidth(true)
-    cpBgColor:SetHasAlpha(true)
-    cpBgColor:SetColor(unpack(bc.bgColor or borderDef.bgColor))
-    local function OnBgColorChanged(_, _, r, g, b, a)
-      bc.bgColor = { r, g, b, a }
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end
-    cpBgColor:SetCallback('OnValueChanged', OnBgColorChanged)
-    cpBgColor:SetCallback('OnValueConfirmed', OnBgColorChanged)
-    frame:AddChild(cpBgColor)
-    refs.cpBgColor = cpBgColor
-  end
-
   if not Str_IsAnyOf(bc.theme, 'minimalist', 'none') then
     --- @type AceGUIColorPicker
     local cpBorderColor = AceGUI:Create('ColorPicker')
@@ -154,7 +141,7 @@ local function AddWidgets(frame, conf)
     cpBorderColor:SetColor(unpack(bc.borderColor or borderDef.borderColor))
     local function OnBorderColorChanged(_, _, r, g, b, a)
       bc.borderColor = { r, g, b, a }
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
     end
     cpBorderColor:SetCallback('OnValueChanged', OnBorderColorChanged)
     cpBorderColor:SetCallback('OnValueConfirmed', OnBorderColorChanged)
@@ -162,18 +149,54 @@ local function AddWidgets(frame, conf)
     refs.cpBorderColor = cpBorderColor
   end
 
-  --- @type AceGUISlider
-  local slPadding = AceGUI:Create('Slider')
-  slPadding:SetLabel(L['Padding'])
-  slPadding:SetFullWidth(true)
-  slPadding:SetSliderValues(0, 30, 1)
-  slPadding:SetValue(bc.padding or borderDef.padding)
-  slPadding:SetCallback('OnValueChanged', function(_, _, val)
-    conf.ui.backdrop.padding = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  frame:AddChild(slPadding)
-  refs.slPadding = slPadding
+  if not Str_IsAnyOf(bc.theme, 'none') then
+    --- @type AceGUIColorPicker
+    local cpBgColor = AceGUI:Create('ColorPicker')
+    cpBgColor:SetLabel(L['Background Color'])
+    cpBgColor:SetFullWidth(true)
+    cpBgColor:SetHasAlpha(true)
+    cpBgColor:SetColor(unpack(bc.bgColor or borderDef.bgColor))
+    local function OnBgColorChanged(_, _, r, g, b, a)
+      bc.bgColor = { r, g, b, a }
+      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
+    end
+    cpBgColor:SetCallback('OnValueChanged', OnBgColorChanged)
+    cpBgColor:SetCallback('OnValueConfirmed', OnBgColorChanged)
+    frame:AddChild(cpBgColor)
+    refs.cpBgColor = cpBgColor
+  end
+
+  if Str_IsAnyOf(bc.theme, 'none') then
+    conf.ui.backdrop.padding = 8
+  else
+    --- @type AceGUISlider
+    local slPadding = AceGUI:Create('Slider')
+    slPadding:SetLabel(L['Padding'])
+    slPadding:SetFullWidth(true)
+    slPadding:SetSliderValues(0, 30, 1)
+    slPadding:SetValue(bc.padding or borderDef.padding)
+    slPadding:SetCallback('OnValueChanged', function(_, _, val)
+      conf.ui.backdrop.padding = val
+      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
+    end)
+    frame:AddChild(slPadding)
+    refs.slPadding = slPadding
+  end
+
+  if not Str_IsAnyOf(bc.theme, 'none', 'minimalist') then
+    --- @type AceGUISlider
+    local slEdgeSize = AceGUI:Create('Slider')
+    slEdgeSize:SetLabel(L['Edge Size'])
+    slEdgeSize:SetFullWidth(true)
+    slEdgeSize:SetSliderValues(borderDef.edgeSizeMin or 1, borderDef.edgeSizeMax or 48, 1)
+    slEdgeSize:SetValue(bc.edgeSize or borderDef.backdrop.edgeSize)
+    slEdgeSize:SetCallback('OnValueChanged', function(_, _, val)
+      conf.ui.backdrop.edgeSize = val
+      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
+    end)
+    frame:AddChild(slEdgeSize)
+    refs.slEdgeSize = slEdgeSize
+  end
 
   if bc.theme == 'none' then
     --- @type AceGUILabel
