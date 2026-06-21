@@ -19,11 +19,13 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Constants
 -------------------------------------------------------------------------------]]
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 320
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 380
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+
+local function backdrops() return cns:BarsUI():ns().O.Backdrops end
 
 --- Adds a centered 'Settings' button below the bar widgets, opening GeneralSettingsDialog.
 --- Uses a SimpleGroup with its own Flow layout (relative-width spacer/button/spacer)
@@ -66,6 +68,8 @@ end
 local function AddWidgets(frame, conf)
   local AceGUI = cns:AceGUI()
   local refs = {}
+  local bc = conf.ui.backdrop
+  local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
 
   --- @type AceGUICheckBox
   local chkEnabled = AceGUI:Create('CheckBox')
@@ -135,18 +139,6 @@ local function AddWidgets(frame, conf)
   frame:AddChild(slAlpha)
   refs.slAlpha = slAlpha
 
-  --- @type AceGUICheckBox
-  local chkEmpty = AceGUI:Create('CheckBox')
-  chkEmpty:SetLabel(L['Show Empty Buttons'])
-  chkEmpty:SetFullWidth(true)
-  chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
-  chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
-    conf.ui.showEmptyButtons = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  frame:AddChild(chkEmpty)
-  refs.chkEmpty = chkEmpty
-
   --- @type AceGUISlider
   local slBtnSize = AceGUI:Create('Slider')
   slBtnSize:SetLabel(L['Button Size'])
@@ -159,6 +151,31 @@ local function AddWidgets(frame, conf)
   end)
   frame:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
+
+  --- @type AceGUISlider
+  local slPadding = AceGUI:Create('Slider')
+  slPadding:SetLabel(L['Padding'])
+  slPadding:SetFullWidth(true)
+  slPadding:SetSliderValues(0, 30, 1)
+  slPadding:SetValue(bc.padding or borderDef.padding)
+  slPadding:SetCallback('OnValueChanged', function(_, _, val)
+    conf.ui.backdrop.padding = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  frame:AddChild(slPadding)
+  refs.slPadding = slPadding
+
+  --- @type AceGUICheckBox
+  local chkEmpty = AceGUI:Create('CheckBox')
+  chkEmpty:SetLabel(L['Show Empty Buttons'])
+  chkEmpty:SetFullWidth(true)
+  chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
+  chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
+    conf.ui.showEmptyButtons = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  frame:AddChild(chkEmpty)
+  refs.chkEmpty = chkEmpty
 
   AddSettingsButton(frame, refs)
 

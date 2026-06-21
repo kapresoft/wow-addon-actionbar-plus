@@ -6,11 +6,10 @@ local ns = select(2, ...)
 local cns, O, L = ns:cns()
 local Str_IsAnyOf = cns:String().IsAnyOf
 
+local RESET = RESET or L['Reset']
 local BACKDROP = BACKDROP or L['Backdrop']
 local NONE = NONE or L['None']
 
-local THEME_LIST = { none = NONE, modernDark = L['Modern Dark'], stone = L['Stone'], minimalist = L['Minimalist'] }
-local THEME_ORDER = { 'none', 'modernDark', 'stone', 'minimalist' }
 local NONE_THEME_HINT = L['Drag the bar by hovering over its top-left corner (above the first button).']
 
 --[[-----------------------------------------------------------------------------
@@ -34,6 +33,26 @@ Support Functions
 --- @return BarModuleFactory_ABP_2_0
 local function barModuleFactory() return cns:BarsUI():ns().O.BarModuleFactory end
 
+local function backdrops() return cns:BarsUI():ns().O.Backdrops end
+
+--- Builds the theme dropdown list/order from Backdrops.lua's BORDER_DEFS keys,
+--- sorted alphabetically (case-insensitive) by label, with 'none' pinned first.
+--- @return table<string, string>, string[]
+local function buildThemeList()
+  local list = { none = NONE }
+  local order = { 'none' }
+  for key, def in pairs(backdrops().BORDER_DEFS) do
+    list[key] = def.label
+    tinsert(order, key)
+  end
+  table.sort(order, function(a, b)
+    if a == 'none' then return true end
+    if b == 'none' then return false end
+    return strlower(list[a]) < strlower(list[b])
+  end)
+  return list, order
+end
+
 --- @param barIndex Index
 local function stopHandleGlow(barIndex)
   if not barIndex then return end
@@ -56,20 +75,58 @@ local function AddWidgets(frame, conf)
   local AceGUI = cns:AceGUI()
   local refs = {}
   local bc = conf.ui.backdrop
+  local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
+
+  --- @type AceGUISimpleGroup
+  local rowTheme = AceGUI:Create('SimpleGroup')
+  rowTheme:SetLayout('Flow')
+  rowTheme:SetFullWidth(true)
+  frame:AddChild(rowTheme)
 
   --- @type AceGUIDropdown
   local ddTheme = AceGUI:Create('Dropdown')
   ddTheme:SetLabel(L['Theme'])
-  ddTheme:SetFullWidth(true)
-  ddTheme:SetList(THEME_LIST, THEME_ORDER)
+  ddTheme:SetWidth(Str_IsAnyOf(bc.theme, 'none') and DIALOG_WIDTH - 30 or 130)
+  local themeList, themeOrder = buildThemeList()
+  ddTheme:SetList(themeList, themeOrder)
   ddTheme:SetValue(bc.theme or 'stone')
   ddTheme:SetCallback('OnValueChanged', function(_, _, val)
     bc.theme = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
     o:RebuildDialog()
   end)
-  frame:AddChild(ddTheme)
+  rowTheme:AddChild(ddTheme)
   refs.ddTheme = ddTheme
+
+  if not Str_IsAnyOf(bc.theme, 'none') then
+    --- @type AceGUIButton
+    local btnResetColors = AceGUI:Create('Button')
+    btnResetColors:SetText(RESET)
+    btnResetColors:SetWidth(95)
+    btnResetColors:SetCallback('OnClick', function()
+      bc.bgColor, bc.borderColor, bc.padding = nil, nil, nil
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+      o:RebuildDialog()
+    end)
+    rowTheme:AddChild(btnResetColors)
+    refs.btnResetColors = btnResetColors
+
+    --- @type Frame
+    local resetHelp = CreateFrame('Frame', nil, btnResetColors.frame)
+    resetHelp:SetSize(20, 20)
+    resetHelp:SetPoint('LEFT', btnResetColors.text, 'RIGHT', -8, 0)
+    resetHelp:EnableMouse(true)
+    local resetHelpIcon = resetHelp:CreateTexture(nil, 'ARTWORK')
+    resetHelpIcon:SetAllPoints()
+    resetHelpIcon:SetTexture('Interface\\Common\\help-i')
+    resetHelp:SetScript('OnEnter', function(self)
+      GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+      GameTooltip:SetText(L["Reset to default theme settings."], nil, nil, nil, nil, true)
+      GameTooltip:Show()
+    end)
+    resetHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
+    refs.resetHelp = resetHelp
+  end
 
   if not Str_IsAnyOf(bc.theme, 'none') then
     --- @type AceGUIColorPicker
@@ -77,7 +134,7 @@ local function AddWidgets(frame, conf)
     cpBgColor:SetLabel(L['Background Color'])
     cpBgColor:SetFullWidth(true)
     cpBgColor:SetHasAlpha(true)
-    cpBgColor:SetColor(unpack(bc.bgColor))
+    cpBgColor:SetColor(unpack(bc.bgColor or borderDef.bgColor))
     local function OnBgColorChanged(_, _, r, g, b, a)
       bc.bgColor = { r, g, b, a }
       o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
@@ -94,7 +151,7 @@ local function AddWidgets(frame, conf)
     cpBorderColor:SetLabel(L['Border Color'])
     cpBorderColor:SetFullWidth(true)
     cpBorderColor:SetHasAlpha(true)
-    cpBorderColor:SetColor(unpack(bc.borderColor))
+    cpBorderColor:SetColor(unpack(bc.borderColor or borderDef.borderColor))
     local function OnBorderColorChanged(_, _, r, g, b, a)
       bc.borderColor = { r, g, b, a }
       o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
@@ -104,6 +161,19 @@ local function AddWidgets(frame, conf)
     frame:AddChild(cpBorderColor)
     refs.cpBorderColor = cpBorderColor
   end
+
+  --- @type AceGUISlider
+  local slPadding = AceGUI:Create('Slider')
+  slPadding:SetLabel(L['Padding'])
+  slPadding:SetFullWidth(true)
+  slPadding:SetSliderValues(0, 30, 1)
+  slPadding:SetValue(bc.padding or borderDef.padding)
+  slPadding:SetCallback('OnValueChanged', function(_, _, val)
+    conf.ui.backdrop.padding = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  frame:AddChild(slPadding)
+  refs.slPadding = slPadding
 
   if bc.theme == 'none' then
     --- @type AceGUILabel

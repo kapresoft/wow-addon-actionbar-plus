@@ -28,10 +28,14 @@ L['Modern Dark']          = true
 L['None']                 = true
 L['Not Bound']            = true
 L['Options']              = true
-L['Re-enable from General Settings > General > Bars.'] = true
+L['Padding']              = true
+L['Reset']                = true
 L['Rows']                 = true
 L['Settings']             = true
 L['Show Empty Buttons']   = true
 L['Stone']                = true
 L['Theme']                = true
 L['Version']              = true
+
+L['Re-enable from General Settings > General > Bars.'] = true
+L['Reset to default theme settings.']                  = true

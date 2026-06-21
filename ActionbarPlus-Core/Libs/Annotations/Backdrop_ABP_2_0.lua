@@ -1,7 +1,9 @@
 --- @class BorderDef_ABP_2_0
+--- @field label string @Display name shown in the theme dropdown
 --- @field backdrop BackdropTemplate
 --- @field bgColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
 --- @field borderColor RGBA @The {r,g,b,a} each value 0.0–1.0, example: `{ 0.1, 0.3, 0.7, 0.8 }`
+--- @field padding number @Default backdrop padding (uniform, all sides)
 
 --- @class BackdropTemplate
 --- @field bgFile string|nil @Example `'Interface/Buttons/WHITE8x8'`
