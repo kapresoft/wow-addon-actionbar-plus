@@ -198,7 +198,7 @@ function o:Open()
   o.perChar = GetCurrentBindingSet() == 2
   if o.chk then o.chk:SetValue(o.perChar) end
   dialogFrame:Show()
-  self:SendMessage(ns:msg('OnQuickKeybindMode'), true)   -- Open
+  self:SendMessage(ns:msg('OnQuickKeybindModeActive'))
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
 
@@ -209,15 +209,11 @@ end
 
 function o:OnFrameClose()
   closeReason = closeReason or 'x'
-
   if closeReason == 'okay' then
     self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar)
-    closeReason = nil
-    return
   end
-
   closeReason = nil
-  self:SendMessage(ns:msg('OnQuickKeybindMode'), false)
+  self:SendMessage(ns:msg('OnQuickKeybindModeNotActive'))
 end
 
 function o:OnCancelClicked()
