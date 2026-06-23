@@ -74,11 +74,11 @@ end
 
 --- @param self Button_ABP_2_0_X
 local function Btn_SuspendButton(self)
-  if self.widget:IsEmpty() then return end
-
-  local typ = self.widget:GetAttributeType()
-  self.widget:ClearAttributeType()
-  self:SetAttribute(SUSPENDED_TYPE, typ)
+  if not self.widget:IsEmpty() then
+    local typ = self.widget:GetAttributeType()
+    self.widget:ClearAttributeType()
+    self:SetAttribute(SUSPENDED_TYPE, typ)
+  end
 
   AceHook:RawHookScript(self, 'OnEnter', o.Btn_OnEnter)
   AceHook:RawHookScript(self, 'OnLeave', o.Btn_OnLeave)
@@ -87,9 +87,10 @@ end
 --- @param self Button_ABP_2_0_X
 local function Btn_UnsuspendButton(self)
   local typ = self:GetAttribute(SUSPENDED_TYPE)
-  if Str_IsBlank(typ) then return end
+  if not Str_IsBlank(typ) then
+    self:SetAttribute(attr.type, typ)
+  end
 
-  self:SetAttribute(attr.type, typ)
   for _, script in ipairs({ 'OnEnter', 'OnLeave', 'OnKeyDown' }) do
     AceHook:Unhook(self, script)
   end
@@ -100,7 +101,8 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 function o:Init()
-  self:RegisterMessage(ns:msg('OnQuickKeybindMode'), o.OnQuickKeybindMode, self)
+  self:RegisterMessage(ns:msg('OnQuickKeybindModeActive'), o.OnQuickKeybindModeActive, self)
+  self:RegisterMessage(ns:msg('OnQuickKeybindModeNotActive'), o.OnQuickKeybindModeNotActive, self)
   self:RegisterMessage(ns:msg('OnQuickKeybindModeCommit'), o.OnQuickKeybindModeCommit, self)
 end
 
@@ -159,23 +161,23 @@ function o:OnQuickKeybindModeCommit(evt, perChar)
 end
 
 --- @param evt EventName
---- @param enabled boolean
-function o:OnQuickKeybindMode(evt, enabled)
-  if enabled then
-    pendingBindings = {}
-    o:DisableButtons()
-  else
-    -- revert any uncommitted bindings
-    for bindingName, entry in pairs(pendingBindings) do
-      if entry.old then
-        ReplaceKey1(bindingName, entry.old, entry.key2)
-      elseif entry.new then
-        SetBinding(entry.new)  -- had no original binding; clear the new key
-      end
+function o:OnQuickKeybindModeActive(evt)
+  pendingBindings = {}
+  o:DisableButtons()
+end
+
+--- @param evt EventName
+function o:OnQuickKeybindModeNotActive(evt)
+  -- revert any uncommitted bindings
+  for bindingName, entry in pairs(pendingBindings) do
+    if entry.old then
+      ReplaceKey1(bindingName, entry.old, entry.key2)
+    elseif entry.new then
+      SetBinding(entry.new)  -- had no original binding; clear the new key
     end
-    pendingBindings = {}
-    o:EnableButtons()
   end
+  pendingBindings = {}
+  o:EnableButtons()
 end
 
 function o:DisableButtons()
