@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
+local AceGUI = cns:AceGUI()
 local Str_IsAnyOf = cns:String().IsAnyOf
 
 local RESET = RESET or L['Reset']
@@ -24,19 +25,27 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Constants
 -------------------------------------------------------------------------------]]
-local DIALOG_WIDTH, DIALOG_HEIGHT = 250, 260
+local DIALOG_WIDTH, DIALOG_HEIGHT = 240, 255
 
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 --- @return BarModuleFactory_ABP_2_0
 local function barModuleFactory() return cns:BarsUI():ns().O.BarModuleFactory end
-
+--- @return Backdrops_ABP_2_0
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
-
+--- @return AceGUILabel
+local function spacer() local s = AceGUI:Create('Label'); s:SetText(' '); return s end
 --- @return string
-local function barOptionsChangedMessage()
-  return ns:msg('OnBarOptionsChanged')
+local function barOptionsChangedMessage() return ns:msg('OnBarOptionsChanged') end
+
+--- @param borderDef BorderDef_ABP_2_0
+--- @param key string
+--- @return boolean @defaults to true when unset
+local function dialogFlag(borderDef, key)
+  local dlg = borderDef.dialog
+  if not dlg or dlg[key] == nil then return true end
+  return dlg[key]
 end
 
 --- Builds the theme dropdown list/order from Backdrops.lua's BORDER_DEFS keys,
@@ -76,21 +85,26 @@ end
 --- @param conf BarConfig_ABP_2_0
 --- @return table @refs to widgets for refresh
 local function AddWidgets(frame, conf)
-  local AceGUI = cns:AceGUI()
   local refs = {}
   local bc = conf.ui.backdrop
   local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
 
+  local function OnResetTheme()
+    bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil
+    o:SendMessage(barOptionsChangedMessage(), o.barIndex)
+    o:RebuildDialog()
+  end
+
   --- @type AceGUISimpleGroup
-  local rowTheme = AceGUI:Create('SimpleGroup')
-  rowTheme:SetLayout('Flow')
-  rowTheme:SetFullWidth(true)
-  frame:AddChild(rowTheme)
+  local group = AceGUI:Create('SimpleGroup')
+  group:SetLayout('Flow')
+  group:SetFullWidth(true)
+  frame:AddChild(group)
 
   --- @type AceGUIDropdown
   local ddTheme = AceGUI:Create('Dropdown')
   ddTheme:SetLabel(L['Theme'])
-  ddTheme:SetWidth(Str_IsAnyOf(bc.theme, 'none') and DIALOG_WIDTH - 30 or 130)
+  ddTheme:SetRelativeWidth(0.85)
   local themeList, themeOrder = buildThemeList()
   ddTheme:SetList(themeList, themeOrder)
   ddTheme:SetValue(bc.theme or 'stone')
@@ -99,40 +113,15 @@ local function AddWidgets(frame, conf)
     o:SendMessage(barOptionsChangedMessage(), o.barIndex)
     o:RebuildDialog()
   end)
-  rowTheme:AddChild(ddTheme)
+  group:AddChild(ddTheme)
   refs.ddTheme = ddTheme
 
-  if not Str_IsAnyOf(bc.theme, 'none') then
-    --- @type AceGUIButton
-    local btnResetColors = AceGUI:Create('Button')
-    btnResetColors:SetText(RESET)
-    btnResetColors:SetWidth(95)
-    btnResetColors:SetCallback('OnClick', function()
-      bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil
-      o:SendMessage(barOptionsChangedMessage(), o.barIndex)
-      o:RebuildDialog()
-    end)
-    rowTheme:AddChild(btnResetColors)
-    refs.btnResetColors = btnResetColors
+  --- @type Button
+  local btn = CreateFrame("Button", nil, frame.frame, "ABP_ResetButtonTemplate_2_0" --[[@as Template ]])
+  btn:SetScript("OnClick", OnResetTheme)
+  btn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 3, -8)
 
-    --- @type Frame
-    local resetHelp = CreateFrame('Frame', nil, btnResetColors.frame)
-    resetHelp:SetSize(20, 20)
-    resetHelp:SetPoint('LEFT', btnResetColors.text, 'RIGHT', -8, 0)
-    resetHelp:EnableMouse(true)
-    local resetHelpIcon = resetHelp:CreateTexture(nil, 'ARTWORK')
-    resetHelpIcon:SetAllPoints()
-    resetHelpIcon:SetTexture('Interface\\Common\\help-i')
-    resetHelp:SetScript('OnEnter', function(self)
-      GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-      GameTooltip:SetText(L["Reset to default theme settings."], nil, nil, nil, nil, true)
-      GameTooltip:Show()
-    end)
-    resetHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
-    refs.resetHelp = resetHelp
-  end
-
-  if not Str_IsAnyOf(bc.theme, 'minimalist', 'none') then
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
     local cpBorderColor = AceGUI:Create('ColorPicker')
     cpBorderColor:SetLabel(L['Border Color'])
@@ -149,7 +138,7 @@ local function AddWidgets(frame, conf)
     refs.cpBorderColor = cpBorderColor
   end
 
-  if not Str_IsAnyOf(bc.theme, 'none') then
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBgColor') then
     --- @type AceGUIColorPicker
     local cpBgColor = AceGUI:Create('ColorPicker')
     cpBgColor:SetLabel(L['Background Color'])
@@ -183,13 +172,14 @@ local function AddWidgets(frame, conf)
     refs.slPadding = slPadding
   end
 
-  if not Str_IsAnyOf(bc.theme, 'none', 'minimalist') then
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderSize') then
     --- @type AceGUISlider
     local slEdgeSize = AceGUI:Create('Slider')
-    slEdgeSize:SetLabel(L['Edge Size'])
+    slEdgeSize:SetLabel(L['Border Size'])
     slEdgeSize:SetFullWidth(true)
-    slEdgeSize:SetSliderValues(borderDef.edgeSizeMin or 1, borderDef.edgeSizeMax or 48, 1)
-    slEdgeSize:SetValue(bc.edgeSize or borderDef.backdrop.edgeSize)
+    local edgeSize = borderDef.edgeSize or {}
+    slEdgeSize:SetSliderValues(edgeSize.min or 1, edgeSize.max or 48, 1)
+    slEdgeSize:SetValue(bc.edgeSize or edgeSize.default or borderDef.backdrop.edgeSize)
     slEdgeSize:SetCallback('OnValueChanged', function(_, _, val)
       conf.ui.backdrop.edgeSize = val
       o:SendMessage(barOptionsChangedMessage(), o.barIndex)
@@ -198,10 +188,9 @@ local function AddWidgets(frame, conf)
     refs.slEdgeSize = slEdgeSize
   end
 
-  if bc.theme == 'none' then
-    --- @type AceGUILabel
-    local lblHintSpacer = AceGUI:Create('Label')
-    frame:AddChild(lblHintSpacer)
+  frame:AddChild(spacer())
+
+  if Str_IsAnyOf(bc.theme, 'none') then
     --- @type AceGUILabel
     local lblHint = AceGUI:Create('Label')
     lblHint:SetText(NONE_THEME_HINT)
