@@ -73,8 +73,9 @@ local BORDER_DEFS = {
     bgColor     = { 0.18, 0.13, 0.05, 0.99 }, -- dark warm brown/black background
     --bgColor = {1, 1, 1, 1}, -- dark warm brown/black background
     borderColor = { 1, 0.85, 0.45, 1 },       -- bright gold tint on the border art
-    padding = 0, basePadding = 9, borderPadBottom = 0,
+    padding = 0, basePadding = 12, borderPadBottom = -1,
     edgeSize = { default = 32, min = 10, max = 48 },
+    dialog = { showBorderColor = false },
   },
   ['minimalist'] = {
     label = L['Minimalist'],

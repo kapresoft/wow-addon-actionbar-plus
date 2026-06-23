@@ -6,12 +6,12 @@ local ns = select(2, ...)
 
 local cns = ns:cns()
 local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
+local DatabaseSchema = cns.O.DatabaseSchema
 local backdrops = ns.O.Backdrops
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
-local MAX_BAR_COUNT = 10
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -459,6 +459,23 @@ function o:RebuildLayout(barIndex)
   self:ApplyLayout(frame, barConf)
 end
 
+--- Reload every bar/button from the current profile — call after a profile
+--- switch/copy/reset, since AceDB swaps the underlying saved-vars table and
+--- buttons/layout must re-read it from scratch.
+--- @NotCombatSafe
+function o:ReloadAll()
+  if InCombatLockdown() then return end
+  for i = 1, DatabaseSchema:GetMaxBarCount() do
+    local barConf = cns:a():bar(i)
+    if barConf then
+      self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
+      self:ApplyBarEnabledState(i)
+      self:RebuildLayout(i)
+      self:IfBar(i, function(m) m:ForEach(function(btn) btn.widget:LoadAction() end) end)
+    end
+  end
+end
+
 --- @private
 --- @param barIndex Index The bar frame index
 --- @param consumerFn BarFactoryConsumerFn
@@ -500,7 +517,7 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   local barFrame = CreateFrame("Frame", frameName, ABP_Parent_2_0, "ABP_BarFrameTemplate_2_0_1" --[[@as Template ]])
   local f = barFrame
   f:SetParentKey(frameName)
-  f:SetFrameLevel(MAX_BAR_COUNT - barIndex)
+  f:SetFrameLevel(DatabaseSchema:GetMaxBarCount() - barIndex)
   f.widget = CreateAndInitFromMixin(BarFrameObjWidgetMixin, f, barIndex) --[[@as BarFrameWidget_ABP_2_0]]
 
   -- TODO: Can have user-preference override

@@ -61,11 +61,19 @@ Methods
 -------------------------------------------------------------------------------]]
 local o = S
 
-function o:OnNewProfile(evt, db, profileKey) p('OnNewProfile called...') end
-function o:OnProfileChanged(evt, db, profileKey) p('OnProfileChanged called...') end
+--- Reload all bars/buttons from the (now-swapped) profile table.
+--- @NotCombatSafe
+local function ReloadAllBars()
+  if InCombatLockdown() then return end
+  local BarModuleFactory = ns:BarsUI() and ns:BarsUI():ns().O.BarModuleFactory
+  if BarModuleFactory then BarModuleFactory:ReloadAll() end
+end
+
+function o:OnNewProfile(evt, db, profileKey) ReloadAllBars() end
+function o:OnProfileChanged(evt, db, profileKey) ReloadAllBars() end
 function o:OnProfileDeleted(evt, db, profileKey) p('OnProfileDeleted called...key=' .. profileKey) end
-function o:OnProfileCopied() p('OnProfileCopied called...') end
-function o:OnProfileReset() p('OnProfileReset called...') end
+function o:OnProfileCopied() ReloadAllBars() end
+function o:OnProfileReset() ReloadAllBars() end
 
 --- @param addon ABP_Core_2_0
 function o:InitDb(addon)

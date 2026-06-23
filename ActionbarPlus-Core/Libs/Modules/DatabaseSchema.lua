@@ -286,3 +286,5 @@ function o:GetVersion(db)
   if type(v) ~= "number" then return DB_VERSION end
   return v
 end
+
+function o:GetMaxBarCount() return MAX_BAR_COUNT end

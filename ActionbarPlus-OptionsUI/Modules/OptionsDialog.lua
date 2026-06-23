@@ -1,22 +1,26 @@
---[[-----------------------------------------------------------------------------
-Local Vars
--------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
 
 --[[-----------------------------------------------------------------------------
-New Instance
+Local Vars
 -------------------------------------------------------------------------------]]
-local libName = 'GeneralSettingsDialog'
-local appName = 'ABP_GeneralSettingsDialog_2_0'
---- @class GeneralSettingsDialog_ABP_2_0
-local o = {}; ns:Register(libName, o)
-local p, t = ns:log(libName)
 
 local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
-local VERSION = VERSION or L['Version']
-local MAX_BAR_COUNT = 10
+local VERSION = L['Version']
+local DatabaseSchema = cns.O.DatabaseSchema
+local DIALOG_WIDTH, DIALOG_HEIGHT = 530, 405
+local TREE_WIDTH = 130
+
+--[[-----------------------------------------------------------------------------
+New Instance
+-------------------------------------------------------------------------------]]
+
+local libName = 'OptionsDialog'
+local appName = 'ABP_OptionsDialog_2_0'
+--- @class OptionsDialog_ABP_2_0 : AceEvent-3.0
+local o = ns:Register(libName, cns:NewAceEvent())
+local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -41,7 +45,7 @@ local function AddBarsArgs(args, order)
     order = order + 1,
     name = L['Disabled bars are hidden. Re-enable them here.'],
   }
-  for i = 1, MAX_BAR_COUNT do
+  for i = 1, DatabaseSchema:GetMaxBarCount() do
     args['bar' .. i] = {
       type = 'toggle',
       width = 'half',
@@ -95,6 +99,14 @@ local function RegisterOptions()
   options.args.profiles.order = 2
 
   AceConfig:RegisterOptionsTable(appName, options)
+  local AceConfigDialog = cns:AceConfigDialog()
+  AceConfigDialog:SetDefaultSize(appName, DIALOG_WIDTH, DIALOG_HEIGHT)
+  -- group tree (General/Profiles) width; no SetDefault* helper for this, so seed the status
+  -- table directly. The root TreeGroup widget reads from status.groups, not status itself
+  -- (AceConfigDialog-3.0.lua:1733-1738 — tree:SetStatusTable(status.groups)).
+  local status = AceConfigDialog:GetStatusTable(appName)
+  status.groups = status.groups or {}
+  status.groups.treewidth = TREE_WIDTH
 end
 
 --[[-----------------------------------------------------------------------------
@@ -103,4 +115,10 @@ Methods
 function o:Open()
   RegisterOptions()
   cns:AceConfigDialog():Open(appName)
+  self:RegisterEvent('PLAYER_REGEN_DISABLED')
+end
+
+function o:PLAYER_REGEN_DISABLED()
+  self:UnregisterEvent('PLAYER_REGEN_DISABLED')
+  cns:AceConfigDialog():Close(appName)
 end
