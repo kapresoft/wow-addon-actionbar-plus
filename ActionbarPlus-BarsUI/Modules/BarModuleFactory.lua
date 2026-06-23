@@ -94,15 +94,17 @@ local function BarFrameWidgetMethods()
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
 
     local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
-    if bc.edgeSize then
+    -- effective edge size: user override > theme's intended slider default > static backdrop.edgeSize
+    local edgeSize = bc.edgeSize or (borderDef.edgeSize and borderDef.edgeSize.default) or borderDef.backdrop.edgeSize
+    local baseEdge = borderDef.backdrop.edgeSize
+    if edgeSize ~= baseEdge then
       local backdropInfo = CopyTable(borderDef.backdrop)
-      local baseEdge = borderDef.backdrop.edgeSize
       local baseInsets = borderDef.backdrop.insets
-      backdropInfo.edgeSize = bc.edgeSize
+      backdropInfo.edgeSize = edgeSize
       if baseEdge and baseEdge > 0 and baseInsets then
         -- scale insets with edgeSize so the background keeps meeting the border
-        -- cleanly as the user drags the slider away from the theme's tuned default
-        local ratio = bc.edgeSize / baseEdge
+        -- cleanly as the effective size diverges from the theme's tuned default
+        local ratio = edgeSize / baseEdge
         backdropInfo.insets = {
           left   = baseInsets.left   * ratio,
           right  = baseInsets.right  * ratio,
@@ -373,12 +375,12 @@ local function ApplyGridLayout(frame, ui)
   local spacing = ui.button.spacing
   local borderDef = backdrops.BORDER_DEFS[ui.backdrop.theme] or backdrops.DEFAULT_BACKDROP
   local pad = ui.backdrop.padding or borderDef.padding
-  local BASE_UI_PADDING = 8
+  local BASE_UI_PADDING = borderDef.basePadding or 8
 
   local padLeft   = pad + BASE_UI_PADDING
   local padRight  = pad + BASE_UI_PADDING
   local padTop    = pad + BASE_UI_PADDING
-  local padBottom = pad + BASE_UI_PADDING - 1
+  local padBottom = pad + BASE_UI_PADDING + (borderDef.borderPadBottom or 0)
 
   local totalWidth  = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
   local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom
