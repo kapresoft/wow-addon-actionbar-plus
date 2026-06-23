@@ -112,15 +112,6 @@ end
 function ns:db() return self.addonDbFn() end
 --- @return ABP_Core_2_0
 function ns:a() return ABP_Core_2_0 end
---- @return ABP_BarsUI_2_0
-function ns:BarsUI() return self.O['ActionbarPlus-BarsUI'] end
---- @return Namespace_ABP_BarsUI_2_0
-function ns:BarsNS() return self:BarsUI():ns() end
---- @return ABP_OptionsUI_2_0
-function ns:OptionsUI() return self.O['ActionbarPlus-OptionsUI'] end
---- @return Namespace_ABP_OptionsUI_2_0
-function ns:OptionsNS() return self:OptionsUI():ns() end
-
 --- @return ProfileConfig_ABP_2_0
 function ns:p() return self:a():p() end
 --- @return GlobalConfig_ABP_2_0
@@ -131,6 +122,16 @@ function ns:bar(index) return self:a():bar(index) end
 --- @param index Index
 --- @return BarConfig_ABP_2_0
 function ns:barGlobal(index) return self:a():barGlobal(index) end
+
+--- @return Namespace_ABP_BarsUI_2_0
+function ns:BarsNS() return self:BarsUI():ns() end
+--- @return Namespace_ABP_OptionsUI_2_0
+function ns:OptionsNS() return self:OptionsUI():ns() end
+
+--- @return ABP_BarsUI_2_0
+function ns:BarsUI() return self.O['ActionbarPlus-BarsUI'] end
+--- @return ABP_OptionsUI_2_0
+function ns:OptionsUI() return self.O['ActionbarPlus-OptionsUI'] end
 
 --- @return Cursor_ABP_2_0
 function ns:cursor() return self.O.CursorProvider:GetCursor() end
@@ -158,6 +159,9 @@ function ns:SetGlobalAttribute(name, val)
   assert(type(name) == "string", "SetGlobalAttribute(name):: Name must be a string")
   if val then GLOBAL_ATTRIBUTES[name] = val end
 end
+
+--- @return AceGUILabel
+function ns:spacer() local s = self:AceGUI():Create('Label'); s:SetText(' '); return s end
 
 --- @generic T
 --- @param name Name

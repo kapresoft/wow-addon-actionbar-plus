@@ -31,7 +31,7 @@ function o:OnSlashCommand(input)
   local cmd = input:match('^(%S*)')
   if cmd == 'options' then
     if not ns:OptionsUI() then return end
-    ns:OptionsNS().O.GeneralSettingsDialog:Open()
+    ns:OptionsNS().O.OptionsDialog:Open()
   end
 end
 

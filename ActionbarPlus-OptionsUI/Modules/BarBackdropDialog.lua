@@ -34,8 +34,6 @@ Support Functions
 local function barModuleFactory() return cns:BarsUI():ns().O.BarModuleFactory end
 --- @return Backdrops_ABP_2_0
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
---- @return AceGUILabel
-local function spacer() local s = AceGUI:Create('Label'); s:SetText(' '); return s end
 --- @return string
 local function barOptionsChangedMessage() return ns:msg('OnBarOptionsChanged') end
 
@@ -119,7 +117,7 @@ local function AddWidgets(frame, conf)
   --- @type Button
   local btn = CreateFrame("Button", nil, frame.frame, "ABP_ResetButtonTemplate_2_0" --[[@as Template ]])
   btn:SetScript("OnClick", OnResetTheme)
-  btn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 3, -8)
+  btn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 3, -7)
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
@@ -188,7 +186,7 @@ local function AddWidgets(frame, conf)
     refs.slEdgeSize = slEdgeSize
   end
 
-  frame:AddChild(spacer())
+  frame:AddChild(cns:spacer())
 
   if Str_IsAnyOf(bc.theme, 'none') then
     --- @type AceGUILabel
@@ -259,6 +257,12 @@ function o:ShowDialog(barIndex)
   dialogFrame.frame:ClearAllPoints()
   dialogFrame.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
   dialogFrame:Show()
+  self:RegisterEvent('PLAYER_REGEN_DISABLED')
+end
+
+function o:PLAYER_REGEN_DISABLED()
+  self:UnregisterEvent('PLAYER_REGEN_DISABLED')
+  if dialogFrame then dialogFrame:Hide() end
 end
 
 --- Rebuilds the widget list in place (e.g. theme hint label appears/disappears)

@@ -27,7 +27,7 @@ Support Functions
 
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
 
---- Adds a centered 'Settings' button below the bar widgets, opening GeneralSettingsDialog.
+--- Adds a centered 'Settings' button below the bar widgets, opening OptionsDialog.
 --- Uses a SimpleGroup with its own Flow layout (relative-width spacer/button/spacer)
 --- so the centering doesn't depend on sibling-widget frame sizes or render timing.
 --- @param frame AceGUIWindow
@@ -41,25 +41,39 @@ local function AddSettingsButton(frame, refs)
   frame:AddChild(group)
 
   --- @type AceGUILabel
-  local leftLabel = AceGUI:Create('Label')
-  leftLabel:SetText(' ')
-  leftLabel:SetWidth(38)
+  local leftLabel = cns:spacer()
+  leftLabel:SetRelativeWidth(0.2)
   group:AddChild(leftLabel)
 
   --- @type AceGUIButton
   local btnSettings = AceGUI:Create('Button')
   btnSettings:SetText(SETTINGS)
-  btnSettings:SetWidth(150)
-  btnSettings:SetCallback('OnClick', function() ns.O.GeneralSettingsDialog:Open() end)
+  btnSettings:SetRelativeWidth(0.6)
+  btnSettings:SetCallback('OnClick', function() ns.O.OptionsDialog:Open() end)
   group:AddChild(btnSettings)
   refs.btnSettings = btnSettings
 
-  --- @type AceGUILabel
-  local rightLabel = AceGUI:Create('Label')
-  rightLabel:SetText(' ')
-  rightLabel:SetWidth(5)
-  group:AddChild(rightLabel)
+  --- @type Frame
+  local settingsHelp = CreateFrame('Frame', nil, btnSettings.frame)
+  settingsHelp:SetSize(20, 20)
+  settingsHelp:SetPoint('RIGHT', btnSettings.text, 'RIGHT', 2, -1)
+  settingsHelp:EnableMouse(true)
+  local settingsHelpIcon = settingsHelp:CreateTexture(nil, 'ARTWORK')
+  settingsHelpIcon:SetAllPoints()
+  settingsHelpIcon:SetTexture('Interface\\Common\\help-i')
+  settingsHelp:SetScript('OnEnter', function(self)
+    GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+    GameTooltip:SetText(L['Open General Settings for all bars and profiles.'], nil, nil, nil, nil, true)
+    GameTooltip:Show()
+  end)
+  settingsHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
+  refs.settingsHelp = settingsHelp
 
+  --- @type AceGUILabel
+  local rightLabel = cns:spacer()
+  rightLabel:SetRelativeWidth(0.2)
+
+  group:AddChild(rightLabel)
 end
 
 --- @param frame AceGUIWindow
@@ -237,6 +251,12 @@ function o:ShowDialog(barIndex)
   dialogFrame.frame:ClearAllPoints()
   dialogFrame.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
   dialogFrame:Show()
+  self:RegisterEvent('PLAYER_REGEN_DISABLED')
+end
+
+function o:PLAYER_REGEN_DISABLED()
+  self:UnregisterEvent('PLAYER_REGEN_DISABLED')
+  if dialogFrame then dialogFrame:Hide() end
 end
 
 function o:OnFrameClose()

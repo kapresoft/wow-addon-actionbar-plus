@@ -199,6 +199,12 @@ function o:Open()
   if o.chk then o.chk:SetValue(o.perChar) end
   dialogFrame:Show()
   self:SendMessage(ns:msg('OnQuickKeybindMode'), true)   -- Open
+  self:RegisterEvent('PLAYER_REGEN_DISABLED')
+end
+
+function o:PLAYER_REGEN_DISABLED()
+  self:UnregisterEvent('PLAYER_REGEN_DISABLED')
+  o:OnCancelClicked()
 end
 
 function o:OnFrameClose()
