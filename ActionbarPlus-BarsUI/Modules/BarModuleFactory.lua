@@ -144,7 +144,14 @@ local function BarFrameWidgetMethods()
   function wm:ApplyDragHandle(enabled)
     self.dragHandleEnabled = enabled
     if enabled then
-      self:GetOrCreateDragHandle():Show()
+      local handle = self:GetOrCreateDragHandle()
+      local btn1 = self.buttons and self.buttons[1]
+      if btn1 then
+        handle:ClearAllPoints()
+        handle:SetWidth(btn1:GetWidth() - 8)
+        handle:SetPoint('BOTTOM', btn1, 'TOP', 0, 3)
+      end
+      handle:Show()
     elseif self.dragHandle then
       self.dragHandle:Hide()
     end
@@ -155,8 +162,6 @@ local function BarFrameWidgetMethods()
     if not self.dragHandle then
       local handle = CreateFrame('Frame', nil, self.frame, 'ABP_BarDragHandleTemplate_2_0')
       handle.barFrame = self.frame
-      handle:ClearAllPoints()
-      handle:SetPoint('BOTTOMLEFT', self.frame, 'TOPLEFT', 20, -10)
       handle.tex:Hide()
       self.dragHandle = handle
     end
