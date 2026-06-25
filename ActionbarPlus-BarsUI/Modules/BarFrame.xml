@@ -124,14 +124,4 @@
         </Animations>
     </Frame>
 
-    <Button name="ABP_ResetButtonTemplate_2_0" inherits="IconButtonTemplate" parentKey="ResetButton"
-            registerForClicks="LeftButtonUp" virtual="true">
-        <KeyValues>
-            <KeyValue key="icon" value="interface\buttons\ui-refreshbutton"/>
-            <KeyValue key="iconSize" value="16" type="number"/>
-            <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
-            <KeyValue key="tooltipText" value="RESET_THEME_TOOLTIP" type="global"/>
-        </KeyValues>
-    </Button>
-
 </Ui>

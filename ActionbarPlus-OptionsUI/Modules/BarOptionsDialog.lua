@@ -7,6 +7,22 @@ local cns, O, L = ns:cns()
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 300
+local HELP_ICON_SIZE = 24
+
+local function syncHandleGlow(barIndex)
+  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
+  if not w then return end
+  local theme = cns:bar(barIndex).ui.backdrop.theme
+  if theme == 'none' then w:StartHandleGlow() else w:StopHandleGlow() end
+end
+
+local function stopHandleGlow(barIndex)
+  if not barIndex then return end
+  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
+  if w then w:StopHandleGlow() end
+end
+
 --[[-----------------------------------------------------------------------------
 New Instance
 -------------------------------------------------------------------------------]]
@@ -17,64 +33,12 @@ local o = cns:NewAceEvent(); ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
-Constants
--------------------------------------------------------------------------------]]
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 380
-
---[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
 
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
-
---- Adds a centered 'Settings' button below the bar widgets, opening OptionsDialog.
---- Uses a SimpleGroup with its own Flow layout (relative-width spacer/button/spacer)
---- so the centering doesn't depend on sibling-widget frame sizes or render timing.
---- @param frame AceGUIWindow
---- @param refs table @refs to widgets for refresh
-local function AddSettingsButton(frame, refs)
-  local AceGUI = cns:AceGUI()
-
-  --- @type AceGUISimpleGroup
-  local group = AceGUI:Create('SimpleGroup')
-  group:SetLayout('Flow')
-  frame:AddChild(group)
-
-  --- @type AceGUILabel
-  local leftLabel = cns:spacer()
-  leftLabel:SetRelativeWidth(0.2)
-  group:AddChild(leftLabel)
-
-  --- @type AceGUIButton
-  local btnSettings = AceGUI:Create('Button')
-  btnSettings:SetText(SETTINGS)
-  btnSettings:SetRelativeWidth(0.6)
-  btnSettings:SetCallback('OnClick', function() ns.O.OptionsDialog:Open() end)
-  group:AddChild(btnSettings)
-  refs.btnSettings = btnSettings
-
-  --- @type Frame
-  local settingsHelp = CreateFrame('Frame', nil, btnSettings.frame)
-  settingsHelp:SetSize(20, 20)
-  settingsHelp:SetPoint('RIGHT', btnSettings.text, 'RIGHT', 2, -1)
-  settingsHelp:EnableMouse(true)
-  local settingsHelpIcon = settingsHelp:CreateTexture(nil, 'ARTWORK')
-  settingsHelpIcon:SetAllPoints()
-  settingsHelpIcon:SetTexture('Interface\\Common\\help-i')
-  settingsHelp:SetScript('OnEnter', function(self)
-    GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-    GameTooltip:SetText(L['Open General Settings for all bars and profiles.'], nil, nil, nil, nil, true)
-    GameTooltip:Show()
-  end)
-  settingsHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
-  refs.settingsHelp = settingsHelp
-
-  --- @type AceGUILabel
-  local rightLabel = cns:spacer()
-  rightLabel:SetRelativeWidth(0.2)
-
-  group:AddChild(rightLabel)
-end
+local function OnSettingsClicked() ns.O.OptionsDialog:Open() end
+local function OnBackdropSettingsClicked() ns.O.BarBackdropDialog:ShowDialog(o.barIndex) end
 
 --- @param frame AceGUIWindow
 --- @param conf BarConfig_ABP_2_0
@@ -88,7 +52,7 @@ local function AddWidgets(frame, conf)
   --- @type AceGUICheckBox
   local chkEnabled = AceGUI:Create('CheckBox')
   chkEnabled:SetLabel(L['Enabled'])
-  chkEnabled:SetFullWidth(true)
+  chkEnabled:SetWidth(100)
   chkEnabled:SetValue(conf.enabled == true)
   chkEnabled:SetCallback('OnValueChanged', function(_, _, val)
     conf.enabled = val
@@ -99,7 +63,7 @@ local function AddWidgets(frame, conf)
 
   --- @type Frame
   local enabledHelp = CreateFrame('Frame', nil, chkEnabled.frame)
-  enabledHelp:SetSize(24, 24)
+  enabledHelp:SetSize(HELP_ICON_SIZE, HELP_ICON_SIZE)
   enabledHelp:SetPoint('LEFT', chkEnabled.text, 'LEFT', chkEnabled.text:GetStringWidth() + 4, 0)
   enabledHelp:EnableMouse(true)
   local enabledHelpIcon = enabledHelp:CreateTexture(nil, 'ARTWORK')
@@ -112,6 +76,23 @@ local function AddWidgets(frame, conf)
   end)
   enabledHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
   refs.enabledHelp = enabledHelp
+
+  if not frame.frame.settingsIconBtn then
+    --- @type IconButton|Button
+    local settingsIconBtn = CreateFrame("Button", nil, frame.frame, "ABP_OptionsUI_SettingsIconButtonTemplate_2_0" --[[@as Template ]] )
+    settingsIconBtn:SetScript("OnClick", OnSettingsClicked)
+    settingsIconBtn:SetPoint('RIGHT', frame.frame, 'TOPRIGHT', -12, -42)
+    settingsIconBtn:SetPoint('CENTER', chkEnabled.frame, 'CENTER', 0, 0)
+    settingsIconBtn:SetFrameLevel(chkEnabled.frame:GetFrameLevel() + 1)
+    frame.frame.settingsIconBtn = settingsIconBtn
+
+    --- @type IconButton|Button
+    local backdropIconBtn = CreateFrame("Button", nil, frame.frame, "ABP_OptionsUI_BackdropIconButtonTemplate_2_0" --[[@as Template ]] )
+    backdropIconBtn:SetScript("OnClick", OnBackdropSettingsClicked)
+    backdropIconBtn:SetPoint('RIGHT', settingsIconBtn, 'LEFT', 2, 0)
+    backdropIconBtn:SetFrameLevel(settingsIconBtn:GetFrameLevel())
+    frame.frame.backdropIconBtn = backdropIconBtn
+  end
 
   --- @type AceGUISlider
   local slRows = AceGUI:Create('Slider')
@@ -166,18 +147,6 @@ local function AddWidgets(frame, conf)
   frame:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
 
-  --- @type AceGUISlider
-  local slPadding = AceGUI:Create('Slider')
-  slPadding:SetLabel(L['Padding'])
-  slPadding:SetFullWidth(true)
-  slPadding:SetSliderValues(0, 30, 1)
-  slPadding:SetValue(bc.padding or borderDef.padding)
-  slPadding:SetCallback('OnValueChanged', function(_, _, val)
-    conf.ui.backdrop.padding = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  frame:AddChild(slPadding)
-  refs.slPadding = slPadding
 
   --- @type AceGUICheckBox
   local chkEmpty = AceGUI:Create('CheckBox')
@@ -190,8 +159,6 @@ local function AddWidgets(frame, conf)
   end)
   frame:AddChild(chkEmpty)
   refs.chkEmpty = chkEmpty
-
-  AddSettingsButton(frame, refs)
 
   return refs
 end
@@ -250,6 +217,7 @@ function o:ShowDialog(barIndex)
   dialogFrame:SetTitle(('%s %s — %s'):format(L['Bar'], barIndex, OPTIONS))
   dialogFrame.frame:ClearAllPoints()
   dialogFrame.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
+  syncHandleGlow(barIndex)
   dialogFrame:Show()
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
@@ -259,8 +227,19 @@ function o:PLAYER_REGEN_DISABLED()
   if dialogFrame then dialogFrame:Hide() end
 end
 
+--- @param barIndex Index
+--- @return boolean
+function o:IsShownForBar(barIndex)
+  return self.barIndex == barIndex and dialogFrame ~= nil and dialogFrame.frame:IsShown()
+end
+
+--- @return Frame?
+function o:GetFrame()
+  return dialogFrame and dialogFrame.frame
+end
+
 function o:OnFrameClose()
-  -- no commit needed — changes applied live
+  stopHandleGlow(self.barIndex)
 end
 
 --- Invalidate cached frame (call after layout changes, before next ShowDialog)

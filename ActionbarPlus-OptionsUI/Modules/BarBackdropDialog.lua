@@ -7,8 +7,11 @@ local cns, O, L = ns:cns()
 local AceGUI = cns:AceGUI()
 local Str_IsAnyOf = cns:String().IsAnyOf
 
+--- @type string
 local RESET = RESET or L['Reset']
+--- @type string
 local BACKDROP = BACKDROP or L['Backdrop']
+--- @type string
 local NONE = NONE or L['None']
 
 local NONE_THEME_HINT = L['Drag the bar by hovering over its top-left corner (above the first button).']
@@ -19,13 +22,14 @@ New Instance
 local libName = 'BarBackdropDialog'
 local globalVarName = 'ABP_BAR_BACKDROP_DIALOG'
 --- @class BarBackdropDialog_ABP_2_0 : AceEvent-3.0
-local o = cns:NewAceEvent(); ns:Register(libName, o)
+local o = ns:Register(libName, cns:NewAceEvent())
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
 Constants
 -------------------------------------------------------------------------------]]
 local DIALOG_WIDTH, DIALOG_HEIGHT = 240, 255
+local NONE_THEME_PADDING = 6
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -102,7 +106,7 @@ local function AddWidgets(frame, conf)
   --- @type AceGUIDropdown
   local ddTheme = AceGUI:Create('Dropdown')
   ddTheme:SetLabel(L['Theme'])
-  ddTheme:SetRelativeWidth(0.85)
+  ddTheme:SetRelativeWidth(0.90)
   local themeList, themeOrder = buildThemeList()
   ddTheme:SetList(themeList, themeOrder)
   ddTheme:SetValue(bc.theme or 'stone')
@@ -114,10 +118,11 @@ local function AddWidgets(frame, conf)
   group:AddChild(ddTheme)
   refs.ddTheme = ddTheme
 
-  --- @type Button
-  local btn = CreateFrame("Button", nil, frame.frame, "ABP_ResetButtonTemplate_2_0" --[[@as Template ]])
-  btn:SetScript("OnClick", OnResetTheme)
-  btn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 3, -7)
+  --- @type IconButton|Button
+  local resetBtn = CreateFrame("Button", nil, frame.frame, "ABP_OptionsUI_ResetButtonTemplate_2_0" --[[@as Template ]])
+  resetBtn:SetScript("OnClick", OnResetTheme)
+  resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
+  resetBtn:SetFrameLevel(ddTheme.frame:GetFrameLevel() + 1)
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
@@ -154,7 +159,8 @@ local function AddWidgets(frame, conf)
   end
 
   if Str_IsAnyOf(bc.theme, 'none') then
-    conf.ui.backdrop.padding = 8
+    bc.padding = NONE_THEME_PADDING
+    o:SendMessage(barOptionsChangedMessage(), o.barIndex)
   else
     --- @type AceGUISlider
     local slPadding = AceGUI:Create('Slider')
@@ -163,7 +169,7 @@ local function AddWidgets(frame, conf)
     slPadding:SetSliderValues(0, 30, 1)
     slPadding:SetValue(bc.padding or borderDef.padding)
     slPadding:SetCallback('OnValueChanged', function(_, _, val)
-      conf.ui.backdrop.padding = val
+      bc.padding = val
       o:SendMessage(barOptionsChangedMessage(), o.barIndex)
     end)
     frame:AddChild(slPadding)
@@ -179,7 +185,7 @@ local function AddWidgets(frame, conf)
     slEdgeSize:SetSliderValues(edgeSize.min or 1, edgeSize.max or 48, 1)
     slEdgeSize:SetValue(bc.edgeSize or edgeSize.default or borderDef.backdrop.edgeSize)
     slEdgeSize:SetCallback('OnValueChanged', function(_, _, val)
-      conf.ui.backdrop.edgeSize = val
+      bc.edgeSize = val
       o:SendMessage(barOptionsChangedMessage(), o.barIndex)
     end)
     frame:AddChild(slEdgeSize)
@@ -202,7 +208,6 @@ end
 
 --- @return AceGUIWindow
 local function CreateDialogFrame()
-  local AceGUI = cns:AceGUI()
 
   --- @type AceGUIWindow
   local frame = AceGUI:Create('Window'); _G[globalVarName] = frame.frame
@@ -255,7 +260,12 @@ function o:ShowDialog(barIndex)
 
   dialogFrame:SetTitle(('%s %s — %s'):format(L['Bar'], barIndex, BACKDROP))
   dialogFrame.frame:ClearAllPoints()
-  dialogFrame.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
+  local optDialogFrame = ns.O.BarOptionsDialog:GetFrame()
+  if optDialogFrame and optDialogFrame:IsShown() then
+    dialogFrame.frame:SetPoint('TOPLEFT', optDialogFrame, 'TOPRIGHT', -5, 0)
+  else
+    dialogFrame.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
+  end
   dialogFrame:Show()
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
@@ -273,6 +283,12 @@ function o:RebuildDialog()
   dialogFrame:ReleaseChildren()
   widgetRefs = AddWidgets(dialogFrame, conf)
   syncHandleGlow(self.barIndex, conf.ui.backdrop.theme)
+end
+
+--- @param barIndex Index
+--- @return boolean
+function o:IsShownForBar(barIndex)
+  return self.barIndex == barIndex and dialogFrame ~= nil and dialogFrame.frame:IsShown()
 end
 
 function o:OnFrameClose()
