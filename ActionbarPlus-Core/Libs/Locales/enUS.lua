@@ -52,3 +52,4 @@ L['Drag the bar by hovering over its top-left corner (above the first button).']
 L['Re-enable from General Settings > General > Bars.'] = true
 L['Reset to default theme settings.']                  = true
 L['Open General Settings for all bars and profiles.']  = true
+L['Open Backdrop Settings for the current bar.']  = true

@@ -1,0 +1,32 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <Button name="ABP_OptionsUI_ResetButtonTemplate_2_0" inherits="IconButtonTemplate"
+            parentKey="ResetButton" registerForClicks="LeftButtonUp" virtual="true">
+        <KeyValues>
+            <KeyValue key="icon" value="interface\buttons\ui-refreshbutton"/>
+            <KeyValue key="iconSize" value="16" type="number"/>
+            <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
+            <KeyValue key="tooltipText" value="RESET_THEME_TOOLTIP" type="global"/>
+        </KeyValues>
+    </Button>
+    <Button name="ABP_OptionsUI_SettingsIconButtonTemplate_2_0" inherits="IconButtonTemplate"
+            parentKey="SettingsButton" registerForClicks="LeftButtonUp" virtual="true">
+        <KeyValues>
+            <KeyValue key="icon" value="interface\addons\actionbarplus-core\assets\textures\settings-button-1"/>
+            <KeyValue key="iconSize" value="18" type="number"/>
+            <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
+            <KeyValue key="tooltipText" value="GENERAL_SETTINGS_TOOLTIP" type="global"/>
+        </KeyValues>
+    </Button>
+    <Button name="ABP_OptionsUI_BackdropIconButtonTemplate_2_0" inherits="IconButtonTemplate"
+            parentKey="BackdropButton" registerForClicks="LeftButtonUp" virtual="true">
+        <KeyValues>
+            <KeyValue key="icon" value="interface\addons\actionbarplus-core\assets\textures\backdrop-icon-1"/>
+            <KeyValue key="iconSize" value="16" type="number"/>
+            <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
+            <KeyValue key="tooltipText" value="BACKDROP_SETTINGS_TOOLTIP" type="global"/>
+        </KeyValues>
+    </Button>
+
+</Ui>

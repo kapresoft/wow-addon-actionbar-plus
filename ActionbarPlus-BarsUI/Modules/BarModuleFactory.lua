@@ -11,6 +11,17 @@ local backdrops = ns.O.Backdrops
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
+--- Returns true if BarOptionsDialog or BarBackdropDialog is open for this bar index,
+--- so the drag handle glow is preserved while either dialog is visible.
+--- @param barIndex Index
+--- @return boolean
+local function IsBarDialogShownForBar(barIndex)
+  if not cns:OptionsUI() then return false end
+  local O = cns:OptionsNS().O
+  return O.BarOptionsDialog:IsShownForBar(barIndex)
+      or O.BarBackdropDialog:IsShownForBar(barIndex)
+end
+
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
 
 --[[-----------------------------------------------------------------------------
@@ -158,6 +169,7 @@ local function BarFrameWidgetMethods()
   end
 
   function wm:HideDragHandle()
+    if IsBarDialogShownForBar(self.index) then return end
     if self.dragHandle then self.dragHandle.tex:Hide() end
   end
 
@@ -172,9 +184,9 @@ local function BarFrameWidgetMethods()
 
   function wm:StopHandleGlow()
     if not self.dragHandle then return end
+    if IsBarDialogShownForBar(self.index) then return end
     self.dragHandle.glow:Stop()
     self.dragHandle.tex:SetAlpha(1)
-    -- restore hover-only visibility unless the mouse happens to be over it right now
     if not self.dragHandle:IsMouseOver() then self.dragHandle.tex:Hide() end
   end
   
