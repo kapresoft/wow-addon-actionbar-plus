@@ -7,6 +7,9 @@ local cns, O, L = ns:cns()
 local AceGUI = cns:AceGUI()
 local Str_IsAnyOf = cns:String().IsAnyOf
 
+local DIALOG_WIDTH, DIALOG_HEIGHT = 240, 215
+local NONE_THEME_PADDING = 6
+
 --- @type string
 local RESET = RESET or L['Reset']
 --- @type string
@@ -24,12 +27,6 @@ local globalVarName = 'ABP_BAR_BACKDROP_DIALOG'
 --- @class BarBackdropDialog_ABP_2_0 : AceEvent-3.0
 local o = ns:Register(libName, cns:NewAceEvent())
 local p, t = ns:log(libName)
-
---[[-----------------------------------------------------------------------------
-Constants
--------------------------------------------------------------------------------]]
-local DIALOG_WIDTH, DIALOG_HEIGHT = 240, 255
-local NONE_THEME_PADDING = 6
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -165,7 +162,7 @@ local function AddWidgets(frame, conf)
     --- @type AceGUISlider
     local slPadding = AceGUI:Create('Slider')
     slPadding:SetLabel(L['Padding'])
-    slPadding:SetFullWidth(true)
+    slPadding:SetRelativeWidth(0.5)
     slPadding:SetSliderValues(0, 30, 1)
     slPadding:SetValue(bc.padding or borderDef.padding)
     slPadding:SetCallback('OnValueChanged', function(_, _, val)
@@ -180,7 +177,7 @@ local function AddWidgets(frame, conf)
     --- @type AceGUISlider
     local slEdgeSize = AceGUI:Create('Slider')
     slEdgeSize:SetLabel(L['Border Size'])
-    slEdgeSize:SetFullWidth(true)
+    slEdgeSize:SetRelativeWidth(0.5)
     local edgeSize = borderDef.edgeSize or {}
     slEdgeSize:SetSliderValues(edgeSize.min or 1, edgeSize.max or 48, 1)
     slEdgeSize:SetValue(bc.edgeSize or edgeSize.default or borderDef.backdrop.edgeSize)

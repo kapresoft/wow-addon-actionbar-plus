@@ -7,7 +7,7 @@ local cns, O, L = ns:cns()
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 250, 300
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 300, 215
 local HELP_ICON_SIZE = 24
 
 local function syncHandleGlow(barIndex)
@@ -49,10 +49,11 @@ local function AddWidgets(frame, conf)
   local bc = conf.ui.backdrop
   local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
 
+  -- Row 1: Enabled
   --- @type AceGUICheckBox
   local chkEnabled = AceGUI:Create('CheckBox')
   chkEnabled:SetLabel(L['Enabled'])
-  chkEnabled:SetWidth(100)
+  chkEnabled:SetRelativeWidth(0.5)
   chkEnabled:SetValue(conf.enabled == true)
   chkEnabled:SetCallback('OnValueChanged', function(_, _, val)
     conf.enabled = val
@@ -77,6 +78,18 @@ local function AddWidgets(frame, conf)
   enabledHelp:SetScript('OnLeave', function() GameTooltip:Hide() end)
   refs.enabledHelp = enabledHelp
 
+  --- @type AceGUICheckBox
+  local chkEmpty = AceGUI:Create('CheckBox')
+  chkEmpty:SetLabel(L['Show Empty Buttons'])
+  chkEmpty:SetFullWidth(true)
+  chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
+  chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
+    conf.ui.showEmptyButtons = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  frame:AddChild(chkEmpty)
+  refs.chkEmpty = chkEmpty
+
   if not frame.frame.settingsIconBtn then
     --- @type IconButton|Button
     local settingsIconBtn = CreateFrame("Button", nil, frame.frame, "ABP_OptionsUI_SettingsIconButtonTemplate_2_0" --[[@as Template ]] )
@@ -94,10 +107,11 @@ local function AddWidgets(frame, conf)
     frame.frame.backdropIconBtn = backdropIconBtn
   end
 
+  -- Row 2: Rows | Columns
   --- @type AceGUISlider
   local slRows = AceGUI:Create('Slider')
   slRows:SetLabel(L['Rows'])
-  slRows:SetFullWidth(true)
+  slRows:SetRelativeWidth(0.5)
   slRows:SetSliderValues(1, 5, 1)
   slRows:SetValue(conf.ui.rowSize)
   slRows:SetCallback('OnValueChanged', function(_, _, val)
@@ -111,7 +125,7 @@ local function AddWidgets(frame, conf)
   --- @type AceGUISlider
   local slCols = AceGUI:Create('Slider')
   slCols:SetLabel(L['Columns'])
-  slCols:SetFullWidth(true)
+  slCols:SetRelativeWidth(0.5)
   slCols:SetSliderValues(1, 12, 1)
   slCols:SetValue(conf.ui.colSize)
   slCols:SetCallback('OnValueChanged', function(_, _, val)
@@ -121,10 +135,11 @@ local function AddWidgets(frame, conf)
   frame:AddChild(slCols)
   refs.slCols = slCols
 
+  -- Row 3: Alpha | Button Size
   --- @type AceGUISlider
   local slAlpha = AceGUI:Create('Slider')
   slAlpha:SetLabel(L['Alpha'])
-  slAlpha:SetFullWidth(true)
+  slAlpha:SetRelativeWidth(0.5)
   slAlpha:SetSliderValues(0, 1, 0.05)
   slAlpha:SetValue(conf.ui.alpha)
   slAlpha:SetCallback('OnValueChanged', function(_, _, val)
@@ -137,7 +152,7 @@ local function AddWidgets(frame, conf)
   --- @type AceGUISlider
   local slBtnSize = AceGUI:Create('Slider')
   slBtnSize:SetLabel(L['Button Size'])
-  slBtnSize:SetFullWidth(true)
+  slBtnSize:SetRelativeWidth(0.5)
   slBtnSize:SetSliderValues(20, 120, 1)
   slBtnSize:SetValue(conf.ui.button.size)
   slBtnSize:SetCallback('OnValueChanged', function(_, _, val)
@@ -146,19 +161,6 @@ local function AddWidgets(frame, conf)
   end)
   frame:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
-
-
-  --- @type AceGUICheckBox
-  local chkEmpty = AceGUI:Create('CheckBox')
-  chkEmpty:SetLabel(L['Show Empty Buttons'])
-  chkEmpty:SetFullWidth(true)
-  chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
-  chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
-    conf.ui.showEmptyButtons = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  frame:AddChild(chkEmpty)
-  refs.chkEmpty = chkEmpty
 
   return refs
 end
