@@ -201,7 +201,7 @@ function o:SaveAction(cursor)
 
   local btn = self.button
   --- @type ButtonConfig_ABP_2_0
-  local bc = self:conf()
+  local bc = btn:GetOrCreateButtonConfig()
   bc.type = cursor.type
 
   if cursor:IsSpell() then
@@ -655,7 +655,7 @@ end
 --[[-------------------------------------------------------------------
 Delegate Functions
 ---------------------------------------------------------------------]]
---- @return ButtonConfig_ABP_2_0
+--- @return ButtonConfig_ABP_2_0?
 function o:conf() return self.button:GetButtonConfig() end
 
 --- @see Frame#GetAttribute
