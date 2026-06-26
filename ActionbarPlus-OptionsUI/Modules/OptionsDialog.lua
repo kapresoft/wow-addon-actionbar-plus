@@ -28,7 +28,9 @@ Support Functions
 --- @return string
 local function GetVersionText()
   local version = GetAddOnMetadata('ActionbarPlus-Core', 'Version')
-  if not version or version:sub(1, 1) == '@' then return 'v1.0.0.DEV' end
+  --@debug@
+  version = 'v1.0.0.DEV'
+  --@end-debug@
   return version
 end
 
