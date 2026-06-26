@@ -4,9 +4,11 @@ Local Vars
 
 --- @type Namespace_ABP_2_0
 local ns = select(2, ...)
-local unit = ns.O.UnitUtil
 local tbl_DeepCopy = ns:Table().DeepCopy
 
+-- Wrath/Cata/TBC dual-spec max; classic always 1
+-- todo: revisit for retail because N talents are based off a class, i.e. DRUID has a few spec/talents
+local MAX_SPEC_GROUPS = 2
 local MAX_BAR_COUNT = 10
 
 --[[-------------------------------------------------------------------
@@ -63,6 +65,12 @@ Type Definitions
 --- @field edgeSize number     -- Backdrop border size
 --  ================================================
 
+--- @class ExtraButtonConfig_ABP_2_0
+--- @field enabled boolean
+--- @field anchor string   -- 'TOP' | 'BOTTOM' | 'TOPLEFT' | 'TOPRIGHT' | 'BOTTOMLEFT' | 'BOTTOMRIGHT'
+--- @field colSize number  -- number of buttons in the single row
+--- @field size number     -- button size
+
 --- @class BarUIConfig_ABP_2_0
 --- @field rowSize number
 --- @field colSize number
@@ -73,6 +81,7 @@ Type Definitions
 --- @field padding number                       -- Bar frame padding (uniform, all sides)
 --- @field button BarUIButtonConfig_ABP_2_0     -- Button spacing configuration
 --- @field backdrop BarUIBackdropConfig_ABP_2_0
+--- @field extraButton ExtraButtonConfig_ABP_2_0
 --  ================================================
 
 --- @class ButtonConfig_ABP_2_0
@@ -139,6 +148,13 @@ local function buttonKey(btnIndex)
   return 'btn_' .. btnIndex
 end
 
+--- @param extraBtnIndex Index  @1-based index within the extra button row
+--- @return string              @e.g. 'btn_1e', 'btn_2e'
+local function extraButtonKey(extraBtnIndex)
+  assert(type(extraBtnIndex) == 'number', 'extraButtonKey(extraBtnIndex):: expected a numeric index.')
+  return 'btn_' .. extraBtnIndex .. 'e'
+end
+
 --- @param specGroupIndex Index
 --- @return string
 local function specGroupKey(specGroupIndex)
@@ -149,7 +165,9 @@ end
 o.Util = {
   barKey = barKey,
   buttonKey = buttonKey,
-  specGroupKey = specGroupKey
+  extraButtonKey = extraButtonKey,
+  specGroupKey = specGroupKey,
+  EXTRA_BTN_ENCODED_OFFSET = 900,
 }
 
 --[[-------------------------------------------------------------------
@@ -204,6 +222,12 @@ local DEFAULT_BAR = {
       spacing = { horizontal = 3, vertical = 3, },
     },
     backdrop = {},
+    extraButton = {
+      enabled = false,
+      anchor  = 'TOPRIGHT',
+      colSize = 5,
+      size    = 30,
+    },
   },
   -- Anchor (same as V1)
   anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },
@@ -237,8 +261,8 @@ function o:GetDefaultDatabase()
 end
 
 --- Creates and returns a default BarConfig_ABP_2_0 instance.
---- The returned table is a deep copy of the default bar template (index 1)
---- with an empty buttons table (no spec/button data pre-seeded).
+--- Buttons are pre-seeded for all spec groups so AceDB treats them as defaults
+--- and does not write them to SavedVariables when empty.
 --- @param barIndex number
 --- @return BarConfig_ABP_2_0
 function o:CreateDefaultBar(barIndex)
@@ -248,19 +272,29 @@ function o:CreateDefaultBar(barIndex)
   local bar = tbl_DeepCopy(DEFAULT_BAR)
   bar.enabled = barIndex == 1
 
-  -- Clear buttons to avoid copying seeded defaults
-  
   local cols = bar.ui.colSize or 5
   local rows = bar.ui.rowSize or 1
   local totalButtons = cols * rows
 
+  -- todo: revisit for retail because it has specs > 2 (class-based, i.e. druid has a lot of 4 talent specs)
   bar.buttons = {}
-  local specIndex = unit:GetActiveSpecGroupIndex()
   for btnIndex = 1, totalButtons do
-    local key, specKey = buttonKey(btnIndex), specGroupKey(specIndex)
+    local key = buttonKey(btnIndex)
     bar.buttons[key] = {}
-    bar.buttons[key][specKey] = {}
+    for spg = 1, MAX_SPEC_GROUPS do
+      bar.buttons[key][specGroupKey(spg)] = {}
+    end
   end
+
+  local extraCols = bar.ui.extraButton.colSize or 1
+  for i = 1, extraCols do
+    local key = extraButtonKey(i)
+    bar.buttons[key] = {}
+    for spg = 1, MAX_SPEC_GROUPS do
+      bar.buttons[key][specGroupKey(spg)] = {}
+    end
+  end
+
   return bar
 end
 

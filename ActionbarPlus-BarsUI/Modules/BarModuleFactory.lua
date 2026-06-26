@@ -99,8 +99,11 @@ local function BarFrameWidgetMethods()
   function wm:conf() return cns:bar(self.index) end
   
   function wm:ApplyBackdrop()
-    local bc = self:conf().ui.backdrop
-    local theme = bc and bc.theme
+    local conf = self:conf()
+    if not conf then return end
+    local bc = conf.ui and conf.ui.backdrop
+    if not bc then return end
+    local theme = bc.theme
     self:ApplyDragHandle(theme == 'none')
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
 
@@ -195,12 +198,101 @@ local function BarFrameWidgetMethods()
     if not self.dragHandle:IsMouseOver() then self.dragHandle.tex:Hide() end
   end
   
+  --- Applies the extra button row config — creates buttons lazily, repositions/resizes each call.
+  --- Buttons are laid out as a single horizontal row outside the bar frame edge.
+  function wm:ApplyExtraButton()
+    local eb = self:conf().ui.extraButton
+    if not eb or not eb.enabled then
+      if self.extraButtons then
+        for _, btn in ipairs(self.extraButtons) do btn:Hide() end
+      end
+      return
+    end
+
+    local anchor  = eb.anchor  or 'TOPRIGHT'
+    local size    = eb.size    or 30
+    local cols    = eb.colSize or 1
+    self.extraButtons = self.extraButtons or {}
+
+    -- create any missing buttons
+    for i = 1, cols do
+      if not self.extraButtons[i] then
+        local encodedID = au.encodeBarID(self.index, 900 + i)
+        local btnName = ('ABP_2_0_F%sExtraBtn%s'):format(self.index, i)
+        local btn = CreateFrame('CheckButton', btnName, self.frame, ns.buttonTemplate, encodedID)
+        self.extraButtons[i] = btn
+      end
+    end
+
+    -- hide any buttons beyond the current colSize
+    for i = cols + 1, #self.extraButtons do
+      self.extraButtons[i]:Hide()
+    end
+
+    local isTop   = anchor == 'TOP' or anchor == 'TOPLEFT' or anchor == 'TOPRIGHT'
+    local isLeft  = anchor == 'TOPLEFT'  or anchor == 'BOTTOMLEFT'
+    local isRight = anchor == 'TOPRIGHT' or anchor == 'BOTTOMRIGHT'
+    local offY    = isTop and size or -size
+    local spacing = 2
+    local mainCols = self:conf().ui.colSize or 1
+    local mainRows = self:conf().ui.rowSize or 1
+    -- for TOP*: last button of row 1; for BOTTOM*: last button of the last row
+    local lastBtnTop    = self.buttons and self.buttons[mainCols]
+    local lastBtnBottom = self.buttons and self.buttons[mainCols * mainRows]
+    local lastBtn1 = isTop and lastBtnTop or lastBtnBottom
+    -- for BOTTOM* left anchor: first button of the last row
+    local firstBtnBottom = self.buttons and self.buttons[mainCols * (mainRows - 1) + 1]
+
+    -- use backdrop padding as the Y gap so the extra row clears the border cleanly
+    local ui = self:conf().ui
+    local borderDef = backdrops.BORDER_DEFS[ui.backdrop.theme] or backdrops.DEFAULT_BACKDROP
+    local pad = ui.backdrop.theme == 'none'
+                and 2
+                or (ui.backdrop.padding or borderDef.padding or 0) + 8
+    local gap = isTop and pad or -pad
+
+    for i = 1, cols do
+      local btn = self.extraButtons[i]
+      btn:SetSize(size, size)
+      btn:ClearAllPoints()
+      btn:Show()
+    end
+
+    -- relative point on the grid button to attach to (top edge for TOP*, bottom edge for BOTTOM*)
+    local gridRelPoint = isTop and 'TOPLEFT' or 'BOTTOMLEFT'
+    local gridRelPointR = isTop and 'TOPRIGHT' or 'BOTTOMRIGHT'
+    -- point on the extra button that meets the grid button edge
+    local extraRelPoint = isTop and 'BOTTOMLEFT' or 'TOPLEFT'
+    local extraRelPointR = isTop and 'BOTTOMRIGHT' or 'TOPRIGHT'
+
+    local firstBtn = isTop and (self.buttons and self.buttons[1]) or firstBtnBottom
+    if isLeft and firstBtn then
+      self.extraButtons[1]:SetPoint(extraRelPoint, firstBtn, gridRelPoint, 0, gap)
+      for i = 2, cols do
+        self.extraButtons[i]:SetPoint('LEFT', self.extraButtons[i - 1], 'RIGHT', spacing, 0)
+      end
+    elseif isRight and lastBtn1 then
+      self.extraButtons[cols]:SetPoint(extraRelPointR, lastBtn1, gridRelPointR, 0, gap)
+      for i = cols - 1, 1, -1 do
+        self.extraButtons[i]:SetPoint('RIGHT', self.extraButtons[i + 1], 'LEFT', -spacing, 0)
+      end
+    else
+      -- TOP / BOTTOM: center on bar frame, chain rightward
+      -- anchor is center-top/bottom of both frame and button, so offset by half totalW minus half button width
+      local totalW = cols * size + (cols - 1) * spacing
+      self.extraButtons[1]:SetPoint(anchor, self.frame, anchor, -(totalW / 2) + (size / 2), offY)
+      for i = 2, cols do
+        self.extraButtons[i]:SetPoint('LEFT', self.extraButtons[i - 1], 'RIGHT', spacing, 0)
+      end
+    end
+  end
+
   --- @return Index
   function wm:GetIndex() return self.index end
-  
+
   --- @return BarFrame_ABP_2_0
   function wm:GetFrame() return self.frame end
-  
+
   function wm:GetDebugName()
     return ('%s(Widget):: index=%s')
             :format(self.frame:GetName(), self.index)
@@ -277,6 +369,7 @@ local function BarModuleProtoMethods()
     local activeIndex = unit:GetActiveSpecGroupIndex()
     t('SPELLS_CHANGED', 'evt=', event, 'activeIndex[detected]=', activeIndex)
     self:ForEach(function(btn) btn.widget:LoadAction() end)
+    self:ForEachExtraButton(function(btn) btn.widget:LoadAction() end)
   end
 
   --- @param callbackFn fun(btn: Button_ABP_2_0_X)
@@ -285,6 +378,17 @@ local function BarModuleProtoMethods()
       --- @type Button_ABP_2_0_X
       local b = btn
       callbackFn(b)
+    end
+  end
+
+  --- @param callbackFn fun(btn: Button_ABP_2_0_X)
+  function bm:ForEachExtraButton(callbackFn)
+    local extraButtons = self.barFrame.widget.extraButtons
+    if not extraButtons then return end
+    for _, btn in ipairs(extraButtons) do
+      if btn:IsShown() then
+        callbackFn(btn --[[@as Button_ABP_2_0_X]])
+      end
     end
   end
 
@@ -442,6 +546,7 @@ function o:ApplyLayout(frame, barConf)
   if layout == 'grid' then ApplyGridLayout(frame, ui) end
   frame:SetAlpha(ui.alpha)
   frame.widget:ApplyBackdrop()
+  frame.widget:ApplyExtraButton()
   -- empty buttons are individually click-through (UpdateEmptyState); when none are
   -- shown, the bar frame itself must also stop catching clicks in the gaps behind them.
   -- Exception: a visible backdrop (theme ~= 'none') needs the bar frame mouse-enabled
@@ -488,7 +593,10 @@ function o:ReloadAll()
       self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
       self:ApplyBarEnabledState(i)
       self:RebuildLayout(i)
-      self:IfBar(i, function(m) m:ForEach(function(btn) btn.widget:LoadAction() end) end)
+      self:IfBar(i, function(m)
+        m:ForEach(function(btn) btn.widget:LoadAction() end)
+        m:ForEachExtraButton(function(btn) btn.widget:LoadAction() end)
+      end)
     end
   end
 end
