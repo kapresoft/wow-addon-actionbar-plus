@@ -327,4 +327,5 @@ function o:GetVersion(db)
   return v
 end
 
+--- @return number
 function o:GetMaxBarCount() return MAX_BAR_COUNT end

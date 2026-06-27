@@ -19,14 +19,4 @@
             <KeyValue key="tooltipText" value="GENERAL_SETTINGS_TOOLTIP" type="global"/>
         </KeyValues>
     </Button>
-    <Button name="ABP_OptionsUI_BackdropIconButtonTemplate_2_0" inherits="IconButtonTemplate"
-            parentKey="BackdropButton" registerForClicks="LeftButtonUp" virtual="true">
-        <KeyValues>
-            <KeyValue key="icon" value="interface\addons\actionbarplus-core\assets\textures\backdrop-icon-1"/>
-            <KeyValue key="iconSize" value="16" type="number"/>
-            <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
-            <KeyValue key="tooltipText" value="BACKDROP_SETTINGS_TOOLTIP" type="global"/>
-        </KeyValues>
-    </Button>
-
 </Ui>

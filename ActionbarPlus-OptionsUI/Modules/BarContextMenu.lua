@@ -24,7 +24,6 @@ local GENERAL = GENERAL or L['General']
 local SETTINGS = SETTINGS or L['Settings']
 local OPTIONS = OPTIONS or L['Options']
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
-local BACKDROP = BACKDROP or L['Backdrop']
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -75,9 +74,6 @@ end
 --- @return BarOptionsDialog_ABP_2_0
 local function optDialog() return ns.O.BarOptionsDialog end
 
---- @return BarBackdropDialog_ABP_2_0
-local function backdropDialog() return ns.O.BarBackdropDialog end
-
 --- @return QuickKeybindModeDialog_ABP_2_0
 local function kbDialog() return ns.O.QuickKeybindModeDialog end
 
@@ -91,7 +87,6 @@ Methods
 function o:Show(barFrame)
   local menu = {
     { text = OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
-    { text = BACKDROP, notCheckable = true, func = function() backdropDialog():ShowDialog(barFrame.widget.index) end },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
     { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function() settingsDialog():Open() end },
   }

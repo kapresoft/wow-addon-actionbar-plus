@@ -11,15 +11,14 @@ local backdrops = ns.O.Backdrops
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
---- Returns true if BarOptionsDialog or BarBackdropDialog is open for this bar index,
---- so the drag handle glow is preserved while either dialog is visible.
+--- Returns true if BarOptionsDialog is open for this bar index,
+--- so the drag handle glow is preserved while the dialog is visible.
 --- @param barIndex Index
 --- @return boolean
 local function IsBarDialogShownForBar(barIndex)
   if not cns:OptionsUI() then return false end
   local O = cns:OptionsNS().O
   return O.BarOptionsDialog:IsShownForBar(barIndex)
-      or O.BarBackdropDialog:IsShownForBar(barIndex)
 end
 
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
