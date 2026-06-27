@@ -17,7 +17,10 @@ local BACKDROP = BACKDROP or L['Backdrop']
 --- @type string
 local NONE = NONE or L['None']
 
-local NONE_THEME_HINT = L['Drag the bar by hovering over its top-left corner (above the first button).']
+local DRAG_HINT_BY_ANCHOR = {
+  TOPLEFT  = L['Drag the bar by hovering over the handle to the left of the first button.'],
+  TOPRIGHT = L['Drag the bar by hovering over the handle to the right of the last button.'],
+}
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -192,9 +195,10 @@ local function AddWidgets(frame, conf)
   frame:AddChild(cns:spacer())
 
   if Str_IsAnyOf(bc.theme, 'none') then
+    local dragAnchor = conf.dragFrame and conf.dragFrame.anchor or 'TOPLEFT'
     --- @type AceGUILabel
     local lblHint = AceGUI:Create('Label')
-    lblHint:SetText(NONE_THEME_HINT)
+    lblHint:SetText(DRAG_HINT_BY_ANCHOR[dragAnchor] or DRAG_HINT_BY_ANCHOR['TOPLEFT'])
     lblHint:SetFullWidth(true)
     frame:AddChild(lblHint)
     refs.lblHint = lblHint

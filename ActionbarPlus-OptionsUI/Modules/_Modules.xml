@@ -11,7 +11,7 @@
     <Script file="BarContextMenu.lua"/>
     <Script file="BarOptionsDialog.lua"/>
     <Script file="BarBackdropDialog.lua"/>
-    <Script file="OptionsDialog.lua"/>
+    <Script file="SettingsDialog.lua"/>
     <Script file="QuickKeybindModeDialog.lua"/>
     <Script file="BarKeybindController.lua"/>
 

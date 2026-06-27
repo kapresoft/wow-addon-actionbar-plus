@@ -29,6 +29,8 @@ L['Reset']                = true
 L['Rows']                 = true
 L['Settings']             = true
 L['Show Empty Buttons']   = true
+L['Drag Handle']           = true
+L['Drag Handle Thickness'] = true
 L['Extra Buttons']        = true
 L['Extra Button Size']    = true
 L['Extra Button Columns'] = true
@@ -57,7 +59,8 @@ L['Modern']               = true
 
 -- Long texts
 L['Disabled bars are hidden. Re-enable them here.'] = true
-L['Drag the bar by hovering over its top-left corner (above the first button).'] = true
+L['Drag the bar by hovering over the handle to the left of the first button.']  = true
+L['Drag the bar by hovering over the handle to the right of the last button.']  = true
 
 L['Re-enable from General Settings > General > Bars.'] = true
 L['Extra Buttons Tooltip'] = 'A single row of buttons placed outside the bar border. Useful for consumables, trinkets, or situational items you want nearby but separate from your main bar.'

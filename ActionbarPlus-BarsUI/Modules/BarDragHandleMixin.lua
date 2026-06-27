@@ -26,12 +26,16 @@ end
 
 function o:OnDragStart()
   if InCombatLockdown() then return end
+  self.__dragging = true
+  self.tex:Show()
   self.barFrame:OnDragStart()
 end
 
 function o:OnDragStop()
   if InCombatLockdown() then return end
+  self.__dragging = false
   self.barFrame:OnDragStop()
+  if not self:IsMouseOver() then self.tex:Hide() end
 end
 
 --- Forwards to the bar frame's existing right-click handler since the handle

@@ -7,7 +7,7 @@ local cns, O, L = ns:cns()
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 300, 330
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 300, 400
 local HELP_ICON_SIZE = 24
 
 local function syncHandleGlow(barIndex)
@@ -37,7 +37,7 @@ Support Functions
 -------------------------------------------------------------------------------]]
 
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
-local function OnSettingsClicked() ns.O.OptionsDialog:Open() end
+local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
 local function OnBackdropSettingsClicked() ns.O.BarBackdropDialog:ShowDialog(o.barIndex) end
 
 --- Creates a help icon frame with a GameTooltip on hover.
@@ -68,7 +68,6 @@ local function AddWidgets(window, conf)
   local AceGUI = cns:AceGUI()
   local refs = {}
   local bc, wf = conf.ui.backdrop, window.frame
-  local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
 
   -- Row 1: Enabled
   --- @type AceGUICheckBox
@@ -96,7 +95,7 @@ local function AddWidgets(window, conf)
   --- @type AceGUICheckBox
   local chkEmpty = AceGUI:Create('CheckBox')
   chkEmpty:SetLabel(L['Show Empty Buttons'])
-  chkEmpty:SetFullWidth(true)
+  chkEmpty:SetRelativeWidth(0.6)
   chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
   chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
     conf.ui.showEmptyButtons = val
@@ -104,6 +103,9 @@ local function AddWidgets(window, conf)
   end)
   window:AddChild(chkEmpty)
   refs.chkEmpty = chkEmpty
+  local chkEmptySpacer = cns:spacer()
+  chkEmptySpacer:SetRelativeWidth(0.4)
+  window:AddChild(chkEmptySpacer)
 
   if not wf.settingsIconBtn then
     --- @type IconButton|Button
@@ -183,13 +185,56 @@ local function AddWidgets(window, conf)
   window:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
 
+  -- Drag Handle section
+  local df = conf.dragFrame
+
+  local dfSpacer = cns:spacer()
+  dfSpacer:SetFullWidth(true)
+  do local f, s, fl = GameFontHighlightSmall:GetFont(); dfSpacer:SetFont(f, 1, fl) end
+  window:AddChild(dfSpacer)
+
+  --- @type AceGUIDropdown
+  local ddDragAnchor = AceGUI:Create('Dropdown')
+  ddDragAnchor:SetLabel(L['Drag Handle'])
+  do local f, s, fl = ddDragAnchor.label:GetFont(); ddDragAnchor.label:SetFont(f, s + 1, fl) end
+  ddDragAnchor:SetRelativeWidth(0.5)
+  ddDragAnchor:SetList({
+    TOPLEFT  = L['Top Left'],
+    TOPRIGHT = L['Top Right'],
+  }, { 'TOPLEFT', 'TOPRIGHT' })
+  ddDragAnchor:SetValue(df.anchor or 'TOPLEFT')
+  ddDragAnchor:SetCallback('OnValueChanged', function(_, _, val)
+    df.anchor = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  window:AddChild(ddDragAnchor)
+  refs.ddDragAnchor = ddDragAnchor
+
+  --- @type AceGUISlider
+  local slDragThickness = AceGUI:Create('Slider')
+  slDragThickness:SetLabel(L['Drag Handle Thickness'])
+  slDragThickness:SetRelativeWidth(0.5)
+  slDragThickness:SetSliderValues(4, 20, 1)
+  slDragThickness:SetValue(df.thickness or 8)
+  slDragThickness:SetCallback('OnValueChanged', function(_, _, val)
+    df.thickness = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  window:AddChild(slDragThickness)
+  refs.slDragThickness = slDragThickness
+
+  local exbSpacer = cns:spacer()
+  exbSpacer:SetFullWidth(true)
+  do local f, s, fl = GameFontHighlightSmall:GetFont(); exbSpacer:SetFont(f, 1, fl) end
+  window:AddChild(exbSpacer)
+
   -- Extra Button section
   local eb = conf.ui.extraButton
 
   --- @type AceGUICheckBox
   local chkExtraBtn = AceGUI:Create('CheckBox')
   chkExtraBtn:SetLabel(L['Extra Buttons'])
-  chkExtraBtn:SetFullWidth(true)
+  chkExtraBtn:SetRelativeWidth(0.5)
   chkExtraBtn:SetValue(eb.enabled == true)
   chkExtraBtn:SetCallback('OnValueChanged', function(_, _, val)
     eb.enabled = val
@@ -210,6 +255,7 @@ local function AddWidgets(window, conf)
   --- @type AceGUIDropdown
   local ddAnchor = AceGUI:Create('Dropdown')
   ddAnchor:SetLabel(L['Anchor'])
+  do local f, s, fl = ddAnchor.label:GetFont(); ddAnchor.label:SetFont(f, s + 1, fl) end
   ddAnchor:SetRelativeWidth(0.6)
   ddAnchor:SetList({
     TOPLEFT     = L['Top Left'],
@@ -230,6 +276,11 @@ local function AddWidgets(window, conf)
   local ddAnchorSp = cns:spacer()
   ddAnchorSp:SetRelativeWidth(0.3)
   window:AddChild(ddAnchorSp)
+
+  local ddAnchorSp2 = cns:spacer()
+  ddAnchorSp2:SetFullWidth(true)
+  do local f, s, fl = GameFontHighlightSmall:GetFont(); ddAnchorSp2:SetFont(f, 1, fl) end
+  window:AddChild(ddAnchorSp2)
 
   --- @type AceGUISlider
   local slExtraCols = AceGUI:Create('Slider')
