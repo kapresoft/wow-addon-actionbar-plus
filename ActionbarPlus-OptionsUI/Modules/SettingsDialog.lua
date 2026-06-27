@@ -9,7 +9,7 @@ Local Vars
 local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 local VERSION = L['Version']
 local DatabaseSchema = cns.O.DatabaseSchema
-local DIALOG_WIDTH, DIALOG_HEIGHT = 530, 405
+local DIALOG_WIDTH, DIALOG_HEIGHT = 550, 405
 local TREE_WIDTH = 130
 
 --[[-----------------------------------------------------------------------------
@@ -116,7 +116,13 @@ Methods
 -------------------------------------------------------------------------------]]
 function o:Open()
   RegisterOptions()
-  cns:AceConfigDialog():Open(appName)
+  local AceConfigDialog = cns:AceConfigDialog()
+  AceConfigDialog:Open(appName)
+  local widget = AceConfigDialog.OpenFrames[appName]
+  if widget and widget.frame then
+    widget.frame:SetResizeBounds(DIALOG_WIDTH, DIALOG_HEIGHT)
+    widget.frame:SetClampedToScreen(true)
+  end
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
 

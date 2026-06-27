@@ -7,8 +7,11 @@ local cns, O, L = ns:cns()
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 300, 400
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 320, 280
 local HELP_ICON_SIZE = 24
+local TAB_GENERAL    = 'general'
+local TAB_BACKDROP   = 'backdrop'
+local TAB_EXTRA_BTNS = 'extrabuttons'
 
 local function syncHandleGlow(barIndex)
   local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
@@ -36,15 +39,30 @@ local p, t = ns:log(libName)
 Support Functions
 -------------------------------------------------------------------------------]]
 
+local Str_IsAnyOf = cns:String().IsAnyOf
+local NONE_THEME_PADDING = 6
+local NONE  = NONE  or L['None']
+local RESET = RESET or L['Reset']
+
+local DRAG_HINT = L['Drag the bar by hovering over the handle at the selected location.']
+
 local function backdrops() return cns:BarsUI():ns().O.Backdrops end
 local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
-local function OnBackdropSettingsClicked() ns.O.BarBackdropDialog:ShowDialog(o.barIndex) end
+
+--- @param dropdown AceGUIDropdown
+--- @param size number
+local function SetDropdownLabelFontSize(dropdown, size)
+  local f, _, fl = dropdown.label:GetFont(); dropdown.label:SetFont(f, size, fl)
+end
+
+--- @class HelpIconFrame : Frame
+--- @field tooltipText string
 
 --- Creates a help icon frame with a GameTooltip on hover.
 --- Caller is responsible for anchoring the returned frame.
 --- @param parent Frame
 --- @param tooltipText string
---- @return Frame
+--- @return HelpIconFrame
 local function CreateHelpIcon(parent, tooltipText)
   local f = CreateFrame('Frame', nil, parent)
   f:SetSize(HELP_ICON_SIZE, HELP_ICON_SIZE)
@@ -52,22 +70,29 @@ local function CreateHelpIcon(parent, tooltipText)
   local icon = f:CreateTexture(nil, 'ARTWORK')
   icon:SetAllPoints()
   icon:SetTexture('Interface\\Common\\help-i')
+  f.tooltipText = tooltipText
   f:SetScript('OnEnter', function(self)
     GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-    GameTooltip:SetText(tooltipText, nil, nil, nil, nil, true)
+    GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true)
     GameTooltip:Show()
   end)
   f:SetScript('OnLeave', function() GameTooltip:Hide() end)
   return f
 end
 
+--- @param tab AceGUITabGroup
 --- @param window BarOptionsDialogWindow_ABP_2_0
 --- @param conf BarConfig_ABP_2_0
---- @return table @refs to widgets for refresh
-local function AddWidgets(window, conf)
+--- @return table
+local function AddGeneralTab(tab, window, conf)
   local AceGUI = cns:AceGUI()
   local refs = {}
-  local bc, wf = conf.ui.backdrop, window.frame
+  local wf = window.frame
+
+  -- Count enabled bars to guard against disabling the last one
+  local enabledCount = 0
+  for i = 1, O.DatabaseSchema:GetMaxBarCount() do if cns:bar(i).enabled then enabledCount = enabledCount + 1 end end
+  local isLastEnabled = enabledCount == 1 and conf.enabled == true
 
   -- Row 1: Enabled
   --- @type AceGUICheckBox
@@ -75,60 +100,44 @@ local function AddWidgets(window, conf)
   chkEnabled:SetLabel(L['Enabled'])
   chkEnabled:SetRelativeWidth(0.5)
   chkEnabled:SetValue(conf.enabled == true)
+  chkEnabled:SetDisabled(isLastEnabled)
   chkEnabled:SetCallback('OnValueChanged', function(_, _, val)
     conf.enabled = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(chkEnabled)
+  tab:AddChild(chkEnabled)
   refs.chkEnabled = chkEnabled
 
+  local helpText = isLastEnabled
+      and L['At least one bar must remain enabled.']
+      or  L['Re-enable from General Settings > General > Bars.']
   if not wf.enabledHelp then
-    wf.enabledHelp = CreateHelpIcon(wf, L['Re-enable from General Settings > General > Bars.'])
+    wf.enabledHelp = CreateHelpIcon(wf, helpText)
+  else
+    wf.enabledHelp.tooltipText = helpText
   end
-  -- re-anchor each rebuild to track the current chkEnabled text position
   local enabledHelp = wf.enabledHelp
   enabledHelp:SetFrameLevel(chkEnabled.frame:GetFrameLevel() + 2)
   enabledHelp:ClearAllPoints()
   enabledHelp:SetPoint('LEFT', chkEnabled.text, 'LEFT', chkEnabled.text:GetUnboundedStringWidth() + 4, 0)
+  enabledHelp:Show()
+  if wf.extraBtnHelp then wf.extraBtnHelp:Hide() end
   refs.enabledHelp = enabledHelp
 
   --- @type AceGUICheckBox
   local chkEmpty = AceGUI:Create('CheckBox')
   chkEmpty:SetLabel(L['Show Empty Buttons'])
-  chkEmpty:SetRelativeWidth(0.6)
+  chkEmpty:SetRelativeWidth(0.65)
   chkEmpty:SetValue(conf.ui.showEmptyButtons == true)
   chkEmpty:SetCallback('OnValueChanged', function(_, _, val)
     conf.ui.showEmptyButtons = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(chkEmpty)
+  tab:AddChild(chkEmpty)
   refs.chkEmpty = chkEmpty
   local chkEmptySpacer = cns:spacer()
-  chkEmptySpacer:SetRelativeWidth(0.4)
-  window:AddChild(chkEmptySpacer)
-
-  if not wf.settingsIconBtn then
-    --- @type IconButton|Button
-    local settingsIconBtn = CreateFrame("Button", nil, wf, "ABP_OptionsUI_SettingsIconButtonTemplate_2_0" --[[@as Template ]] )
-    settingsIconBtn:SetScript("OnClick", OnSettingsClicked)
-    settingsIconBtn:SetFrameLevel(chkEnabled.frame:GetFrameLevel() + 1)
-    wf.settingsIconBtn = settingsIconBtn
-
-    --- @type IconButton|Button
-    local backdropIconBtn = CreateFrame("Button", nil, wf, "ABP_OptionsUI_BackdropIconButtonTemplate_2_0" --[[@as Template ]] )
-    backdropIconBtn:SetScript("OnClick", OnBackdropSettingsClicked)
-    backdropIconBtn:SetFrameLevel(settingsIconBtn:GetFrameLevel())
-    wf.backdropIconBtn = backdropIconBtn
-  end
-
-  -- re-anchor icon buttons each rebuild so they track the current chkEnabled frame position
-  local settingsIconBtn = wf.settingsIconBtn
-  local backdropIconBtn = wf.backdropIconBtn
-  settingsIconBtn:ClearAllPoints()
-  settingsIconBtn:SetPoint('RIGHT', wf, 'TOPRIGHT', -12, -42)
-  settingsIconBtn:SetPoint('CENTER', chkEnabled.frame, 'CENTER', 0, 0)
-  backdropIconBtn:ClearAllPoints()
-  backdropIconBtn:SetPoint('RIGHT', settingsIconBtn, 'LEFT', 2, 0)
+  chkEmptySpacer:SetRelativeWidth(0.35)
+  tab:AddChild(chkEmptySpacer)
 
   -- Row 2: Rows | Columns
   --- @type AceGUISlider
@@ -142,7 +151,7 @@ local function AddWidgets(window, conf)
     conf.ui.rowSize = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slRows)
+  tab:AddChild(slRows)
   refs.slRows = slRows
 
   --- @type AceGUISlider
@@ -155,7 +164,7 @@ local function AddWidgets(window, conf)
     conf.ui.colSize = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slCols)
+  tab:AddChild(slCols)
   refs.slCols = slCols
 
   -- Row 3: Alpha | Button Size
@@ -169,7 +178,7 @@ local function AddWidgets(window, conf)
     conf.ui.alpha = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slAlpha)
+  tab:AddChild(slAlpha)
   refs.slAlpha = slAlpha
 
   --- @type AceGUISlider
@@ -182,53 +191,222 @@ local function AddWidgets(window, conf)
     conf.ui.button.size = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slBtnSize)
+  tab:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
 
-  -- Drag Handle section
-  local df = conf.dragFrame
+  return refs
+end
 
-  local dfSpacer = cns:spacer()
-  dfSpacer:SetFullWidth(true)
-  do local f, s, fl = GameFontHighlightSmall:GetFont(); dfSpacer:SetFont(f, 1, fl) end
-  window:AddChild(dfSpacer)
+--- @param borderDef BorderDef_ABP_2_0
+--- @param key string
+--- @return boolean
+local function dialogFlag(borderDef, key)
+  local dlg = borderDef.dialog
+  if not dlg or dlg[key] == nil then return true end
+  return dlg[key]
+end
+
+--- @return table<string, string>, string[]
+local function buildThemeList()
+  --- @type table<string, string>
+  local list = { none = NONE }
+  local order = { 'none' }
+  for key, def in pairs(backdrops().BORDER_DEFS) do
+    list[key] = def.label
+    tinsert(order, key)
+  end
+  table.sort(order, function(a, b)
+    if a == 'none' then return true end
+    if b == 'none' then return false end
+    return strlower(list[a]) < strlower(list[b])
+  end)
+  return list, order
+end
+
+--- @param tab AceGUITabGroup
+--- @param conf BarConfig_ABP_2_0
+--- @return table
+local function AddBackdropTab(tab, conf)
+  local AceGUI = cns:AceGUI()
+  local refs = {}
+  local bc = conf.ui.backdrop
+  local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
+
+  local function RebuildBackdropTab()
+    t('RebuildBackdropTab', 'tab=', tab)
+    C_Timer.After(0, function()
+      tab:ReleaseChildren()
+      AddBackdropTab(tab, conf)
+      tab:DoLayout()
+      syncHandleGlow(o.barIndex)
+    end)
+  end
+
+  local function OnResetTheme()
+    bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    RebuildBackdropTab()
+  end
+
+  --- @type AceGUISimpleGroup
+  local group = AceGUI:Create('SimpleGroup')
+  group:SetLayout('Flow')
+  group:SetFullWidth(true)
+  tab:AddChild(group)
 
   --- @type AceGUIDropdown
-  local ddDragAnchor = AceGUI:Create('Dropdown')
-  ddDragAnchor:SetLabel(L['Drag Handle'])
-  do local f, s, fl = ddDragAnchor.label:GetFont(); ddDragAnchor.label:SetFont(f, s + 1, fl) end
-  ddDragAnchor:SetRelativeWidth(0.5)
-  ddDragAnchor:SetList({
-    TOPLEFT  = L['Top Left'],
-    TOPRIGHT = L['Top Right'],
-  }, { 'TOPLEFT', 'TOPRIGHT' })
-  ddDragAnchor:SetValue(df.anchor or 'TOPLEFT')
-  ddDragAnchor:SetCallback('OnValueChanged', function(_, _, val)
-    df.anchor = val
+  local ddTheme = AceGUI:Create('Dropdown')
+  ddTheme:SetLabel(L['Theme'])
+  SetDropdownLabelFontSize(ddTheme, 12)
+  ddTheme:SetRelativeWidth(0.6)
+  local themeList, themeOrder = buildThemeList()
+  ddTheme:SetList(themeList, themeOrder)
+  ddTheme:SetValue(bc.theme or 'stone')
+  ddTheme:SetCallback('OnValueChanged', function(_, _, val)
+    bc.theme = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    RebuildBackdropTab()
   end)
-  window:AddChild(ddDragAnchor)
-  refs.ddDragAnchor = ddDragAnchor
+  group:AddChild(ddTheme)
+  refs.ddTheme = ddTheme
 
-  --- @type AceGUISlider
-  local slDragThickness = AceGUI:Create('Slider')
-  slDragThickness:SetLabel(L['Drag Handle Thickness'])
-  slDragThickness:SetRelativeWidth(0.5)
-  slDragThickness:SetSliderValues(4, 20, 1)
-  slDragThickness:SetValue(df.thickness or 8)
-  slDragThickness:SetCallback('OnValueChanged', function(_, _, val)
-    df.thickness = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  window:AddChild(slDragThickness)
-  refs.slDragThickness = slDragThickness
+  local ddThemeSp = cns:spacer()
+  ddThemeSp:SetRelativeWidth(0.3)
+  group:AddChild(ddThemeSp)
 
-  local exbSpacer = cns:spacer()
-  exbSpacer:SetFullWidth(true)
-  do local f, s, fl = GameFontHighlightSmall:GetFont(); exbSpacer:SetFont(f, 1, fl) end
-  window:AddChild(exbSpacer)
+  --- @type IconButton|Button
+  local resetBtn = CreateFrame("Button", nil, tab.frame, "ABP_OptionsUI_ResetButtonTemplate_2_0" --[[@as Template ]])
+  resetBtn:SetScript("OnClick", OnResetTheme)
+  resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
+  resetBtn:SetFrameLevel(ddTheme.frame:GetFrameLevel() + 1)
 
-  -- Extra Button section
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
+    --- @type AceGUIColorPicker
+    local cpBorderColor = AceGUI:Create('ColorPicker')
+    cpBorderColor:SetLabel(L['Border Color'])
+    cpBorderColor:SetFullWidth(true)
+    cpBorderColor:SetHasAlpha(true)
+    cpBorderColor:SetColor(unpack(bc.borderColor or borderDef.borderColor))
+    local function OnBorderColorChanged(_, _, r, g, b, a)
+      bc.borderColor = { r, g, b, a }
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end
+    cpBorderColor:SetCallback('OnValueChanged', OnBorderColorChanged)
+    cpBorderColor:SetCallback('OnValueConfirmed', OnBorderColorChanged)
+    tab:AddChild(cpBorderColor)
+    refs.cpBorderColor = cpBorderColor
+  end
+
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBgColor') then
+    --- @type AceGUIColorPicker
+    local cpBgColor = AceGUI:Create('ColorPicker')
+    cpBgColor:SetLabel(L['Background Color'])
+    cpBgColor:SetFullWidth(true)
+    cpBgColor:SetHasAlpha(true)
+    cpBgColor:SetColor(unpack(bc.bgColor or borderDef.bgColor))
+    local function OnBgColorChanged(_, _, r, g, b, a)
+      bc.bgColor = { r, g, b, a }
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end
+    cpBgColor:SetCallback('OnValueChanged', OnBgColorChanged)
+    cpBgColor:SetCallback('OnValueConfirmed', OnBgColorChanged)
+    tab:AddChild(cpBgColor)
+    refs.cpBgColor = cpBgColor
+  end
+
+  if Str_IsAnyOf(bc.theme, 'none') then
+    bc.padding = NONE_THEME_PADDING
+  else
+    --- @type AceGUISlider
+    local slPadding = AceGUI:Create('Slider')
+    slPadding:SetLabel(L['Padding'])
+    slPadding:SetRelativeWidth(0.5)
+    slPadding:SetSliderValues(0, 30, 1)
+    slPadding:SetValue(bc.padding or borderDef.padding)
+    slPadding:SetCallback('OnValueChanged', function(_, _, val)
+      bc.padding = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slPadding)
+    refs.slPadding = slPadding
+  end
+
+  if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderSize') then
+    --- @type AceGUISlider
+    local slEdgeSize = AceGUI:Create('Slider')
+    slEdgeSize:SetLabel(L['Border Size'])
+    slEdgeSize:SetRelativeWidth(0.5)
+    local edgeSize = borderDef.edgeSize or {}
+    slEdgeSize:SetSliderValues(edgeSize.min or 1, edgeSize.max or 48, 1)
+    slEdgeSize:SetValue(bc.edgeSize or edgeSize.default or borderDef.backdrop.edgeSize)
+    slEdgeSize:SetCallback('OnValueChanged', function(_, _, val)
+      bc.edgeSize = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slEdgeSize)
+    refs.slEdgeSize = slEdgeSize
+  end
+
+  tab:AddChild(cns:spacer())
+
+  if Str_IsAnyOf(bc.theme, 'none') then
+    local df = conf.dragFrame
+    local dragAnchor = df and df.anchor or 'TOPLEFT'
+
+    --- @type AceGUIDropdown
+    local ddDragAnchor = AceGUI:Create('Dropdown')
+    ddDragAnchor:SetLabel(L['Drag Handle Location'])
+    SetDropdownLabelFontSize(ddDragAnchor, 12)
+    ddDragAnchor:SetRelativeWidth(0.6)
+    ddDragAnchor:SetList({
+      TOPLEFT  = L['Top Left'],
+      TOPRIGHT = L['Top Right'],
+    }, { 'TOPLEFT', 'TOPRIGHT' })
+    ddDragAnchor:SetValue(dragAnchor)
+    ddDragAnchor:SetCallback('OnValueChanged', function(_, _, val)
+      df.anchor = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(ddDragAnchor)
+    refs.ddDragAnchor = ddDragAnchor
+
+    local ddDragAnchorSp = cns:spacer()
+    ddDragAnchorSp:SetRelativeWidth(0.3)
+    tab:AddChild(ddDragAnchorSp)
+
+    --- @type HelpIconFrame
+    local dragHelp = CreateHelpIcon(tab.frame, DRAG_HINT)
+    dragHelp:SetFrameLevel(ddDragAnchor.frame:GetFrameLevel() + 2)
+    dragHelp:ClearAllPoints()
+    dragHelp:SetPoint('LEFT', ddDragAnchor.frame, 'RIGHT', 4, -7)
+    dragHelp:Show()
+    refs.dragHelp = dragHelp
+
+    --- @type AceGUISlider
+    local slDragThickness = AceGUI:Create('Slider')
+    slDragThickness:SetLabel(L['Thickness'])
+    slDragThickness:SetRelativeWidth(0.5)
+    slDragThickness:SetSliderValues(4, 20, 1)
+    slDragThickness:SetValue(df and df.thickness or 8)
+    slDragThickness:SetCallback('OnValueChanged', function(_, _, val)
+      df.thickness = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slDragThickness)
+    refs.slDragThickness = slDragThickness
+  end
+
+  return refs
+end
+
+--- @param tab AceGUITabGroup
+--- @param window BarOptionsDialogWindow_ABP_2_0
+--- @param conf BarConfig_ABP_2_0
+--- @return table
+local function AddExtraButtonsTab(tab, window, conf)
+  local AceGUI = cns:AceGUI()
+  local refs = {}
+  local wf = window.frame
   local eb = conf.ui.extraButton
 
   --- @type AceGUICheckBox
@@ -240,7 +418,7 @@ local function AddWidgets(window, conf)
     eb.enabled = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(chkExtraBtn)
+  tab:AddChild(chkExtraBtn)
   refs.chkExtraBtn = chkExtraBtn
 
   if not wf.extraBtnHelp then
@@ -250,12 +428,14 @@ local function AddWidgets(window, conf)
   extraBtnHelp:SetFrameLevel(chkExtraBtn.frame:GetFrameLevel() + 2)
   extraBtnHelp:ClearAllPoints()
   extraBtnHelp:SetPoint('LEFT', chkExtraBtn.text, 'LEFT', chkExtraBtn.text:GetUnboundedStringWidth() + 4, 0)
+  extraBtnHelp:Show()
+  if wf.enabledHelp then wf.enabledHelp:Hide() end
   refs.extraBtnHelp = extraBtnHelp
 
   --- @type AceGUIDropdown
   local ddAnchor = AceGUI:Create('Dropdown')
   ddAnchor:SetLabel(L['Anchor'])
-  do local f, s, fl = ddAnchor.label:GetFont(); ddAnchor.label:SetFont(f, s + 1, fl) end
+  SetDropdownLabelFontSize(ddAnchor, 12)
   ddAnchor:SetRelativeWidth(0.6)
   ddAnchor:SetList({
     TOPLEFT     = L['Top Left'],
@@ -270,17 +450,17 @@ local function AddWidgets(window, conf)
     eb.anchor = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(ddAnchor)
+  tab:AddChild(ddAnchor)
   refs.ddAnchor = ddAnchor
 
   local ddAnchorSp = cns:spacer()
   ddAnchorSp:SetRelativeWidth(0.3)
-  window:AddChild(ddAnchorSp)
+  tab:AddChild(ddAnchorSp)
 
   local ddAnchorSp2 = cns:spacer()
   ddAnchorSp2:SetFullWidth(true)
   do local f, s, fl = GameFontHighlightSmall:GetFont(); ddAnchorSp2:SetFont(f, 1, fl) end
-  window:AddChild(ddAnchorSp2)
+  tab:AddChild(ddAnchorSp2)
 
   --- @type AceGUISlider
   local slExtraCols = AceGUI:Create('Slider')
@@ -292,7 +472,7 @@ local function AddWidgets(window, conf)
     eb.colSize = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slExtraCols)
+  tab:AddChild(slExtraCols)
   refs.slExtraCols = slExtraCols
 
   --- @type AceGUISlider
@@ -305,8 +485,62 @@ local function AddWidgets(window, conf)
     eb.size = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
-  window:AddChild(slExtraBtnSize)
+  tab:AddChild(slExtraBtnSize)
   refs.slExtraBtnSize = slExtraBtnSize
+
+  return refs
+end
+
+--- @param tab AceGUITabGroup
+--- @param window BarOptionsDialogWindow_ABP_2_0
+--- @param conf BarConfig_ABP_2_0
+--- @param selectedTab string|nil
+--- @return table @refs to widgets for refresh
+local function AddWidgets(window, conf, selectedTab)
+  local AceGUI = cns:AceGUI()
+  local refs = {}
+
+  --- @type AceGUITabGroup
+  local tabGroup = AceGUI:Create('TabGroup')
+  tabGroup:SetFullWidth(true)
+  tabGroup:SetFullHeight(true)
+  tabGroup:SetLayout('Flow')
+  tabGroup:SetTabs({
+    { text = L['General'],       value = TAB_GENERAL },
+    { text = L['Backdrop'],      value = TAB_BACKDROP },
+    { text = L['Extra Buttons'], value = TAB_EXTRA_BTNS },
+  })
+
+  tabGroup:SetCallback('OnGroupSelected', function(tg, _, tab)
+    tg:ReleaseChildren()
+    if tab == TAB_GENERAL then
+      refs.general = AddGeneralTab(tg, window, conf)
+    elseif tab == TAB_BACKDROP then
+      refs.backdrop = AddBackdropTab(tg, conf)
+      syncHandleGlow(o.barIndex)
+    elseif tab == TAB_EXTRA_BTNS then
+      refs.extraButtons = AddExtraButtonsTab(tg, window, conf)
+    end
+  end)
+
+  window:AddChild(tabGroup)
+  refs.tabGroup = tabGroup
+
+  -- Icon buttons float in the title bar, left of the close button
+  local wf = window.frame
+  if not wf.settingsIconBtn then
+    --- @type IconButton|Button
+    local settingsIconBtn = CreateFrame("Button", nil, wf, "ABP_OptionsUI_SettingsIconButtonTemplate_2_0" --[[@as Template ]] )
+    settingsIconBtn:SetScript("OnClick", OnSettingsClicked)
+    wf.settingsIconBtn = settingsIconBtn
+  end
+  local closeBtn = window.closebutton
+  local settingsIconBtn = wf.settingsIconBtn
+  settingsIconBtn:SetFrameLevel(closeBtn:GetFrameLevel()+1)
+  settingsIconBtn:ClearAllPoints()
+  settingsIconBtn:SetPoint('RIGHT', closeBtn, 'LEFT', 0, 0)
+
+  tabGroup:SelectTab(selectedTab or TAB_GENERAL)
 
   return refs
 end
@@ -316,20 +550,21 @@ local function CreateDialog()
   local AceGUI = cns:AceGUI()
 
   --- @type AceGUIWindow
-  local frame = AceGUI:Create('Window'); _G[globalVarName] = frame.frame
+  local frame = AceGUI:Create('Window')
+  local f = frame.frame; _G[globalVarName] = f
   frame:SetWidth(DIALOG_WIDTH)
   frame:SetHeight(DIALOG_HEIGHT)
-  frame:SetLayout('Flow')
-  frame:SetCallback('OnClose', function()
-    o:OnFrameClose()
-  end)
+  frame:SetLayout('Fill')
+  frame:SetCallback('OnClose', function() o:OnFrameClose() end)
   frame:SetCallback("OnShow", function ()
-    frame.frame:SetSize(DIALOG_WIDTH, DIALOG_HEIGHT)
+    f:SetSize(DIALOG_WIDTH, DIALOG_HEIGHT)
     frame:DoLayout()
   end)
 
+  f:SetResizeBounds(DIALOG_WIDTH, DIALOG_HEIGHT)
+
   -- dialogbg is the 2nd texture (tooltip bg); AceGUI sets it to 0.75 alpha — override to fully opaque
-  local regions = { frame.frame:GetRegions() }
+  local regions = { f:GetRegions() }
   if regions[2] then regions[2]:SetVertexColor(0, 0, 0, 1) end
 
   tinsert(UISpecialFrames, globalVarName)
@@ -342,10 +577,9 @@ Methods
 -------------------------------------------------------------------------------]]
 
 --- @class BarOptionsDialogFrame_ABP_2_0 : Frame
---- @field enabledHelp Frame
+--- @field enabledHelp HelpIconFrame
 --- @field extraBtnHelp Frame
 --- @field settingsIconBtn Button
---- @field backdropIconBtn Button
 
 ABP_BAR_OPTIONS_DIALOG = nil
 --- @class BarOptionsDialogWindow_ABP_2_0 : AceGUIWindow
@@ -353,9 +587,11 @@ ABP_BAR_OPTIONS_DIALOG = nil
 local dialogWindow
 --- @type table
 local widgetRefs
+local lastEnabledCount
 
 --- @param barIndex number
-function o:ShowDialog(barIndex)
+--- @param selectedTab string|nil
+function o:ShowDialog(barIndex, selectedTab)
   if InCombatLockdown() then return end
   self.barIndex = barIndex
   local conf = cns:bar(barIndex)
@@ -365,9 +601,13 @@ function o:ShowDialog(barIndex)
     dialogWindow.frame:SetClampedToScreen(true)
   end
 
+  -- seed the baseline so the first OnBarOptionsChanged doesn't spuriously rebuild
+  lastEnabledCount = 0
+  for i = 1, 10 do if cns:bar(i).enabled then lastEnabledCount = lastEnabledCount + 1 end end
+
   -- rebuild widgets for the new bar's config
   dialogWindow:ReleaseChildren()
-  widgetRefs = AddWidgets(dialogWindow, conf)
+  widgetRefs = AddWidgets(dialogWindow, conf, selectedTab)
 
   dialogWindow:SetTitle(('%s %s — %s'):format(L['Bar'], barIndex, OPTIONS))
   dialogWindow.frame:ClearAllPoints()
@@ -375,11 +615,26 @@ function o:ShowDialog(barIndex)
   syncHandleGlow(barIndex)
   dialogWindow:Show()
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
+  self:RegisterMessage(ns:msg('OnBarOptionsChanged'), 'OnBarOptionsChanged')
 end
 
 function o:PLAYER_REGEN_DISABLED()
   self:UnregisterEvent('PLAYER_REGEN_DISABLED')
   if dialogWindow then dialogWindow:Hide() end
+end
+
+--- Rebuild the General tab only when the enabled bar count changes (bar toggled on/off).
+function o:OnBarOptionsChanged()
+  if not (dialogWindow and dialogWindow.frame:IsShown()) then return end
+  if not (widgetRefs and widgetRefs.tabGroup) then return end
+  local count = 0
+  for i = 1, O.DatabaseSchema:GetMaxBarCount() do if cns:bar(i).enabled then count = count + 1 end end
+  if count == lastEnabledCount then return end
+  lastEnabledCount = count
+  local tg = widgetRefs.tabGroup
+  tg:ReleaseChildren()
+  widgetRefs.general = AddGeneralTab(tg, dialogWindow, cns:bar(self.barIndex))
+  tg:SelectTab(TAB_GENERAL)
 end
 
 --- @param barIndex Index
@@ -395,6 +650,7 @@ end
 
 function o:OnFrameClose()
   stopHandleGlow(self.barIndex)
+  self:UnregisterMessage(ns:msg('OnBarOptionsChanged'))
 end
 
 --- Invalidate cached frame (call after layout changes, before next ShowDialog)
