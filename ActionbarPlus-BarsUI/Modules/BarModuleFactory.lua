@@ -78,6 +78,7 @@ Mixin: BarFrameObjWidgetMixin_2_0
 --- @field frame BarFrame_ABP_2_0
 --- @field buttons Button_ABP_2_0_X[]
 --- @field module BarModule_2_0
+--- @field dragHandle ABP_BarDragHandle_2_0
 local BarFrameObjWidgetMixin = {}
 
 --- @class BarFrameWidget_ABP_2_0 : BarFrameWidgetMixin_ABP_2_0
@@ -176,10 +177,12 @@ local function BarFrameWidgetMethods()
     end
   end
 
-  --- @return Frame? @lazily creates the handle on first use
+  --- @return ABP_BarDragHandle_2_0 @lazily creates the handle on first use
   function wm:GetOrCreateDragHandle()
     if not self.dragHandle then
-      local handle = CreateFrame('Frame', nil, self.frame, 'ABP_BarDragHandleTemplate_2_0')
+      --- @class ABP_BarDragHandle_2_0 : BarDragHandleMixin_ABP_2_0
+      --- @field barFrame Frame
+      local handle = CreateFrame('Frame', nil, self.frame, 'ABP_BarDragHandleTemplate_2_0' --[[@as Template ]])
       handle.barFrame = self.frame
       handle.tex:Hide()
       self.dragHandle = handle
