@@ -81,8 +81,8 @@ local function backdropDialog() return ns.O.BarBackdropDialog end
 --- @return QuickKeybindModeDialog_ABP_2_0
 local function kbDialog() return ns.O.QuickKeybindModeDialog end
 
---- @return OptionsDialog_ABP_2_0
-local function optionsDialog() return ns.O.OptionsDialog end
+--- @return SettingsDialog_ABP_2_0
+local function settingsDialog() return ns.O.SettingsDialog end
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -93,7 +93,7 @@ function o:Show(barFrame)
     { text = OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
     { text = BACKDROP, notCheckable = true, func = function() backdropDialog():ShowDialog(barFrame.widget.index) end },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
-    { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function() optionsDialog():Open() end },
+    { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function() settingsDialog():Open() end },
   }
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end

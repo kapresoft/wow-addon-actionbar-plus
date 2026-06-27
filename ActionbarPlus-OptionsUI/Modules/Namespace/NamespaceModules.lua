@@ -16,8 +16,8 @@ local ModuleNames = {
   BarOptionsDialog = {},
   --- @type BarBackdropDialog_ABP_2_0
   BarBackdropDialog = {},
-  --- @type OptionsDialog_ABP_2_0
-  OptionsDialog = {},
+  --- @type SettingsDialog_ABP_2_0
+  SettingsDialog = {},
   --- @type BarKeybindController_ABP_2_0
   BarKeybindController = {},
   --- @type QuickKeybindModeDialog_ABP_2_0

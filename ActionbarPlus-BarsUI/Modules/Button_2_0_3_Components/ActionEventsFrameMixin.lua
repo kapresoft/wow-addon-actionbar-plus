@@ -52,6 +52,7 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: include extra button in macro renames
 -- todo: handle barFrame border settings
 -- todo: handle columns settings (row x col)
 -- todo: keybinding implementation using Ace3

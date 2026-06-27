@@ -16,9 +16,9 @@ local TREE_WIDTH = 130
 New Instance
 -------------------------------------------------------------------------------]]
 
-local libName = 'OptionsDialog'
-local appName = 'ABP_OptionsDialog_2_0'
---- @class OptionsDialog_ABP_2_0 : AceEvent-3.0
+local libName = 'SettingsDialog'
+local appName = 'ABP_SettingsDialog_2_0'
+--- @class SettingsDialog_ABP_2_0 : AceEvent-3.0
 local o = ns:Register(libName, cns:NewAceEvent())
 local p, t = ns:log(libName)
 

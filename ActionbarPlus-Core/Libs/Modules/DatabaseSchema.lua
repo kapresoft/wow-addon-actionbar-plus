@@ -93,6 +93,10 @@ Type Definitions
 
 --  ================================================
 
+--- @class DragFrameConfig_ABP_2_0
+--- @field anchor string    -- 'TOPLEFT' | 'TOPRIGHT'
+--- @field thickness number
+
 --- @class BarConfig_ABP_2_0
 --- @field enabled boolean                       Whether this bar is active
 --- @field showKeybindText boolean               Show keybind text on buttons
@@ -100,6 +104,7 @@ Type Definitions
 --- @field anchor Anchor                         Frame anchor definition
 --- @field buttons table<string, table<string, ButtonConfig_ABP_2_0>> -- i.e., buttons['b1']
 --- @field ui BarUIConfig_ABP_2_0                Visual/layout configuration
+--- @field dragFrame DragFrameConfig_ABP_2_0
 
 --  ================================================
 
@@ -229,6 +234,7 @@ local DEFAULT_BAR = {
       size    = 30,
     },
   },
+  dragFrame = { anchor = 'TOPLEFT', thickness = 14 },
   -- Anchor (same as V1)
   anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },
   

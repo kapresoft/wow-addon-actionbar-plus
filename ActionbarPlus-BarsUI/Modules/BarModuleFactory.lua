@@ -138,11 +138,10 @@ local function BarFrameWidgetMethods()
     self.frame:SetBackdropBorderColor(unpack(borderColor))
   end
 
-  --- Marks the drag handle eligible (square above button 1, TOPLEFT of the bar).
+  --- Marks the drag handle eligible.
   --- Only relevant when the backdrop theme is 'none' since there's no border to grab.
-  --- The handle frame itself stays shown+mouse-enabled the whole time it's eligible
-  --- (so it can detect its own hover even when the bar frame is click-through);
-  --- only its visible texture is toggled by ShowDragHandle/HideDragHandle.
+  --- Normally horizontal above button 1; when extra buttons occupy TOPLEFT or TOPRIGHT,
+  --- switches to a vertical strip on the opposite side to avoid overlap.
   --- @param enabled boolean
   function wm:ApplyDragHandle(enabled)
     self.dragHandleEnabled = enabled
@@ -151,8 +150,25 @@ local function BarFrameWidgetMethods()
       local btn1 = self.buttons and self.buttons[1]
       if btn1 then
         handle:ClearAllPoints()
-        handle:SetWidth(btn1:GetWidth() - 8)
-        handle:SetPoint('BOTTOM', btn1, 'TOP', 0, 3)
+        local conf       = self:conf()
+        local dragFrame  = conf.dragFrame or {}
+        local dragAnchor = dragFrame.anchor or 'TOPLEFT'
+        local thickness  = dragFrame.thickness or 8
+        local btnSize    = btn1:GetHeight()
+        local heightPad = 6
+        if dragAnchor == 'TOPRIGHT' then
+          local cols = conf.ui.colSize or 1
+          local lastBtn1 = self.buttons[cols]
+          handle:SetHeight(btnSize - heightPad)
+          handle:SetWidth(thickness)
+          handle:SetPoint('LEFT', lastBtn1, 'RIGHT', 3, 0)
+          handle:SetPoint('CENTER', lastBtn1, 'CENTER', thickness, 0)
+        else
+          handle:SetHeight(btnSize - heightPad)
+          handle:SetWidth(thickness)
+          handle:SetPoint('RIGHT', btn1, 'LEFT', -3, 0)
+          handle:SetPoint('CENTER', btn1, 'CENTER', -thickness, 0)
+        end
       end
       handle:Show()
     elseif self.dragHandle then
@@ -178,6 +194,7 @@ local function BarFrameWidgetMethods()
 
   function wm:HideDragHandle()
     if IsBarDialogShownForBar(self.index) then return end
+    if self.dragHandle and self.dragHandle.__dragging then return end
     if self.dragHandle then self.dragHandle.tex:Hide() end
   end
 
@@ -267,7 +284,7 @@ local function BarFrameWidgetMethods()
 
     local firstBtn = isTop and (self.buttons and self.buttons[1]) or firstBtnBottom
     if isLeft and firstBtn then
-      self.extraButtons[1]:SetPoint(extraRelPoint, firstBtn, gridRelPoint, 0, gap)
+      self.extraButtons[1]:SetPoint(extraRelPoint, firstBtn, gridRelPoint, 1, gap)
       for i = 2, cols do
         self.extraButtons[i]:SetPoint('LEFT', self.extraButtons[i - 1], 'RIGHT', spacing, 0)
       end
