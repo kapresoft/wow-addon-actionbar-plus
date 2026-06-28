@@ -45,6 +45,14 @@ local function ButtonName(barIndex, btnIndex)
   return ('ABP_2_0_F%s%s'):format(barIndex, parentKey), parentKey
 end
 
+--- @param name string
+--- @param parent Frame
+--- @param encodedID number
+--- @return Button_ABP_2_0_X
+local function CreateButton(name, parent, encodedID)
+  return CreateFrame("CheckButton", name, parent, ns.buttonTemplate, encodedID)
+end
+
 --- @param self BarFrame_ABP_2_0
 local function BarFrame_EnableVisibilityDriver(self)
   RegisterStateDriver(self, "visibility", VISIBILITY_DEFAULTS)
@@ -238,7 +246,8 @@ local function BarFrameWidgetMethods()
       if not self.extraButtons[i] then
         local encodedID = au.encodeBarID(self.index, 900 + i)
         local btnName = ('ABP_2_0_F%sExtraBtn%s'):format(self.index, i)
-        local btn = CreateFrame('CheckButton', btnName, self.frame, ns.buttonTemplate, encodedID)
+        local btn = CreateButton(btnName, self.frame, encodedID)
+        btn.widget.isExtraButton = true
         self.extraButtons[i] = btn
       end
     end
@@ -270,11 +279,13 @@ local function BarFrameWidgetMethods()
                 or (ui.backdrop.padding or borderDef.padding or 0) + 8
     local gap = isTop and pad or -pad
 
+    local showEmpty = eb.showEmptyButtons ~= false
     for i = 1, cols do
       local btn = self.extraButtons[i]
       btn:SetSize(size, size)
       btn:ClearAllPoints()
       btn:Show()
+      if btn.widget then btn.widget:UpdateEmptyState(showEmpty) end
     end
 
     -- relative point on the grid button to attach to (top edge for TOP*, bottom edge for BOTTOM*)
@@ -401,11 +412,12 @@ local function BarModuleProtoMethods()
   end
 
   --- @param callbackFn fun(btn: Button_ABP_2_0_X)
-  function bm:ForEachExtraButton(callbackFn)
+  --- @param includeHidden boolean|nil
+  function bm:ForEachExtraButton(callbackFn, includeHidden)
     local extraButtons = self.barFrame.widget.extraButtons
     if not extraButtons then return end
     for _, btn in ipairs(extraButtons) do
-      if btn:IsShown() then
+      if includeHidden or btn:IsShown() then
         callbackFn(btn --[[@as Button_ABP_2_0_X]])
       end
     end
@@ -592,7 +604,7 @@ function o:RebuildLayout(barIndex)
   for i = #buttons + 1, needed do
     local encodedID = au.encodeBarID(barIndex, i)
     local btnName, btnKey = ButtonName(barIndex, i)
-    local btn = CreateFrame("CheckButton", btnName, frame, ns.buttonTemplate, encodedID)
+    local btn = CreateButton(btnName, frame, encodedID)
     btn:SetParentKey(btnKey)
     table.insert(buttons, btn)
   end
@@ -611,6 +623,12 @@ function o:ReloadAll()
     if barConf then
       self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
       self:ApplyBarEnabledState(i)
+      -- hide and clear stale extra buttons so ApplyExtraButton rebuilds from the new profile
+      local w = self:GetBarWidget(i)
+      if w and w.extraButtons then
+        for _, btn in ipairs(w.extraButtons) do btn:Hide() end
+        w.extraButtons = nil
+      end
       self:RebuildLayout(i)
       self:IfBar(i, function(m)
         m:ForEach(function(btn) btn.widget:LoadAction() end)
@@ -693,8 +711,7 @@ function o:CreateButtons(barConf, barFrame, barIndex)
     -- Encode: barIndex in tens place, btnIndex fills the rest
     local encodedID = au.encodeBarID(barIndex, i)
     local btnName, btnKey = ButtonName(barIndex, i)
-    --- @type Button_ABP_2_0_X
-    local btn = CreateFrame("CheckButton", btnName, barFrame, ns.buttonTemplate, encodedID)
+    local btn = CreateButton(btnName, barFrame, encodedID)
     btn:SetParentKey(btnKey)
     table.insert(buttons, btn)
   end

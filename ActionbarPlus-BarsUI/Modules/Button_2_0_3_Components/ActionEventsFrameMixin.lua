@@ -52,7 +52,9 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: refactor BarModuleFactory.lua#ApplyExtraButton
 -- todo: include extra button in macro renames
+-- todo: wand attacks/shoot sometimes gets stuck in shoot mode after combat
 -- todo: handle barFrame border settings
 -- todo: handle columns settings (row x col)
 -- todo: keybinding implementation using Ace3
