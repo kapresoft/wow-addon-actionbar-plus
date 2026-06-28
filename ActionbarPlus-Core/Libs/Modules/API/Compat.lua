@@ -133,7 +133,12 @@ function o:IfMacroByBodyHash(hashedBody, callbackFn)
   if not hashedBody then return ns:Chain(false) end
 
   local numGlobal, numChar = GetNumMacros()
-  for i = 1, numGlobal + numChar do
+  local MAX_GLOBAL = MAX_ACCOUNT_MACROS or 120
+  local indices = {}
+  for i = 1, numGlobal do indices[#indices+1] = i end
+  for i = MAX_GLOBAL + 1, MAX_GLOBAL + numChar do indices[#indices+1] = i end
+
+  for _, i in ipairs(indices) do
     local name, icon, body = GetMacroInfo(i)
     local bodyH = hu.string(body)
     if name and bodyH == hashedBody then
