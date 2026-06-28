@@ -63,6 +63,7 @@ L['Drag the bar by hovering over the handle at the selected location.'] = true
 
 L['Re-enable from General Settings > General > Bars.'] = true
 L['At least one bar must remain enabled.']             = true
+L['Profiles']                                         = true
 L['Extra Buttons Tooltip'] = 'A single row of buttons placed outside the bar border. Useful for consumables, trinkets, or situational items you want nearby but separate from your main bar.'
 L['Reset to default theme settings.']                  = true
 L['Open General Settings for all bars and profiles.']  = true

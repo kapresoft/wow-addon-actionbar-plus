@@ -23,9 +23,22 @@ Support Functions
 -------------------------------------------------------------------------------]]
 
 local function ResyncAllButtonsEmptyState()
+  local isQKB = ns:a():IsQuickKeybindModeActive()
   ns:a():ForEach(function(bm)
-    local showEmptyButtons = bm:c().ui.showEmptyButtons
-    bm:ForEach(function(btn) btn.widget:UpdateEmptyState(showEmptyButtons) end)
+    local ui = bm:c().ui
+    bm:ForEach(function(btn) btn.widget:UpdateEmptyState(ui.showEmptyButtons) end)
+    -- hide extra buttons during QKB mode, restore after
+    local eb = ui.extraButton
+    if eb and eb.enabled then
+      bm:ForEachExtraButton(function(btn)
+        if isQKB then
+          btn:Hide()
+        else
+          btn:Show()
+          btn.widget:UpdateEmptyState(eb.showEmptyButtons ~= false)
+        end
+      end, true)
+    end
   end)
 end
 

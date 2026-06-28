@@ -20,10 +20,12 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local GENERAL = GENERAL or L['General']
 local SETTINGS = SETTINGS or L['Settings']
 local OPTIONS = OPTIONS or L['Options']
+local BAR = L['Bar']
+local BAR_OPTIONS = BAR .. ' ' .. OPTIONS
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
+local PROFILES = PROFILES or L['Profiles']
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -86,9 +88,10 @@ Methods
 --- @param barFrame BarFrame_ABP_2_0
 function o:Show(barFrame)
   local menu = {
-    { text = OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
+    { text = BAR_OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
-    { text = ('%s %s'):format(GENERAL, SETTINGS), notCheckable = true, func = function() settingsDialog():Open() end },
+    { text = SETTINGS, notCheckable = true, func = function() settingsDialog():OpenGeneral() end },
+    { text = PROFILES, notCheckable = true, func = function() settingsDialog():OpenProfiles() end },
   }
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end

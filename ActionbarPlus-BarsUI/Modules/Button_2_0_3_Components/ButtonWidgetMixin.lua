@@ -25,6 +25,7 @@ local libName = ns.M.ButtonWidgetMixin()
 --- @field index Index The button index
 --- @field barIndex Index The owner frame index
 --- @field itemSpellID SpellID @Used for items with spellIDs
+--- @field isExtraButton boolean
 local S = {}; ns:Register(libName, S)
 --
 --- @class ButtonWidget_ABP_2_0 : ButtonWidgetMixin_ABP_2_0
@@ -64,7 +65,19 @@ function o:UpdateAction(name, val)
     self.button:Update()
   end
   if not InCombatLockdown() then
-    self:UpdateEmptyState(cns:bar(self.barIndex).ui.showEmptyButtons)
+    local barUI = cns:bar(self.barIndex).ui
+    if self.isExtraButton then
+      local showEmpty = barUI.extraButton.showEmptyButtons ~= false
+      self:UpdateEmptyState(showEmpty)
+      -- refresh all sibling extra buttons so empty ones stay hidden
+      ns.O.BarModuleFactory:IfBar(self.barIndex, function(m)
+        m:ForEachExtraButton(function(btn)
+          if btn.widget ~= self then btn.widget:UpdateEmptyState(showEmpty) end
+        end)
+      end)
+    else
+      self:UpdateEmptyState(barUI.showEmptyButtons)
+    end
   end
 end
 
@@ -112,13 +125,13 @@ function o:HasAction() return not self:IsEmpty() end
 
 --- @param showEmptyButtons boolean
 function o:UpdateEmptyState(showEmptyButtons)
-  local visible = ns:a():IsQuickKeybindModeActive() or showEmptyButtons or self:HasAction()
+  local visible = ns:a():IsQuickKeybindModeActive() or showEmptyButtons or (not self.isExtraButton and self:HasAction())
   self.button.NormalTexture:SetShown(visible)
   local showHotKey = self:HasAction() or visible
   self.HotKey:SetShown(showHotKey)
   if showHotKey then self:UpdateHotKey() end
   if InCombatLockdown() then return end
-  self.button:EnableMouse(visible)
+  self.button:EnableMouse(visible or self:HasAction())
 end
 
 --- @param callbackFn fun(typ:ActionType, val:ActionValue, isCustom:boolean) : void

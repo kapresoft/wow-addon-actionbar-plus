@@ -462,6 +462,18 @@ local function AddExtraButtonsTab(tab, window, conf)
   do local f, s, fl = GameFontHighlightSmall:GetFont(); ddAnchorSp2:SetFont(f, 1, fl) end
   tab:AddChild(ddAnchorSp2)
 
+  --- @type AceGUICheckBox
+  local chkShowEmpty = AceGUI:Create('CheckBox')
+  chkShowEmpty:SetLabel(L['Show Empty Buttons'])
+  chkShowEmpty:SetFullWidth(true)
+  chkShowEmpty:SetValue(eb.showEmptyButtons ~= false)
+  chkShowEmpty:SetCallback('OnValueChanged', function(_, _, val)
+    eb.showEmptyButtons = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  tab:AddChild(chkShowEmpty)
+  refs.chkShowEmpty = chkShowEmpty
+
   --- @type AceGUISlider
   local slExtraCols = AceGUI:Create('Slider')
   slExtraCols:SetLabel(L['Extra Button Columns'])

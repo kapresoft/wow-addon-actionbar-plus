@@ -67,9 +67,10 @@ Type Definitions
 
 --- @class ExtraButtonConfig_ABP_2_0
 --- @field enabled boolean
---- @field anchor string   -- 'TOP' | 'BOTTOM' | 'TOPLEFT' | 'TOPRIGHT' | 'BOTTOMLEFT' | 'BOTTOMRIGHT'
---- @field colSize number  -- number of buttons in the single row
---- @field size number     -- button size
+--- @field anchor string         -- 'TOP' | 'BOTTOM' | 'TOPLEFT' | 'TOPRIGHT' | 'BOTTOMLEFT' | 'BOTTOMRIGHT'
+--- @field colSize number        -- number of buttons in the single row
+--- @field size number           -- button size
+--- @field showEmptyButtons boolean
 
 --- @class BarUIConfig_ABP_2_0
 --- @field rowSize number
@@ -232,6 +233,7 @@ local DEFAULT_BAR = {
       anchor  = 'TOPRIGHT',
       colSize = 5,
       size    = 30,
+      showEmptyButtons = true,
     },
   },
   dragFrame = { anchor = 'TOPLEFT', thickness = 14 },

@@ -126,6 +126,16 @@ function o:Open()
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
 
+function o:OpenProfiles()
+  self:Open()
+  cns:AceConfigDialog():SelectGroup(appName, 'profiles')
+end
+
+function o:OpenGeneral()
+  self:Open()
+  cns:AceConfigDialog():SelectGroup(appName, 'general')
+end
+
 function o:PLAYER_REGEN_DISABLED()
   self:UnregisterEvent('PLAYER_REGEN_DISABLED')
   cns:AceConfigDialog():Close(appName)
