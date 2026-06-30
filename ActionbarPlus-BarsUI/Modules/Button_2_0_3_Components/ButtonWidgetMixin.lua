@@ -740,15 +740,15 @@ function o:EnableFlashAnimation()
 end
 
 function o:DisableFlashAnimation()
-  if not self:IsShootSpell() then return end
-  t('DisableFA'.. self.button:GetName(), 'IsShootSpell=', self:IsShootSpell())
+  local typ, val = self:GetActionInfo()
+  local isShootOrAttack = au.IsSpell(typ) and (au.IsShootSpell(val) or au.IsAutoAttackSpell(val))
+  if not isShootOrAttack then return end
   local anim = self.button.SpellHighlightAnim
   if anim:IsPlaying() then anim:Stop() end
   C_Timer.NewTicker(0.1, function(cb)
-    t('DisableFA::' .. self.button:GetName(), 'anim:IsPlaying()=', anim:IsPlaying())
     if anim:IsPlaying() then anim:Stop() end
     cb:Cancel()
-  end)
+  end, 3)
 end
 
 function o:RestoreAction()
