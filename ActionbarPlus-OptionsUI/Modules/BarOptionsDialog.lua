@@ -8,17 +8,21 @@ local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 320, 260
+local DIALOG_WIDTH, DIALOG_HEIGHT = 320, 260
 local HELP_ICON_SIZE = 24
-local TAB_GENERAL    = 'general'
-local TAB_BACKDROP   = 'backdrop'
+local TAB_GENERAL = 'general'
+local TAB_BACKDROP = 'backdrop'
 local TAB_EXTRA_BTNS = 'extrabuttons'
 
 local function syncHandleGlow(barIndex)
   local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
   if not w then return end
   local theme = cns:bar(barIndex).ui.backdrop.theme
-  if theme == 'none' then w:StartHandleGlow() else w:StopHandleGlow() end
+  if theme == 'none' then
+    w:StartHandleGlow()
+  else
+    w:StopHandleGlow()
+  end
 end
 
 local function stopHandleGlow(barIndex)
@@ -42,7 +46,7 @@ Support Functions
 
 local Str_IsAnyOf = cns:String().IsAnyOf
 local NONE_THEME_PADDING = 6
-local NONE  = NONE  or L['None']
+local NONE = NONE or L['None']
 local RESET = RESET or L['Reset']
 
 local DRAG_HINT = L['Drag the bar by hovering over the handle at the selected location.']
@@ -53,7 +57,8 @@ local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
 --- @param dropdown AceGUIDropdown
 --- @param size number
 local function SetDropdownLabelFontSize(dropdown, size)
-  local f, _, fl = dropdown.label:GetFont(); dropdown.label:SetFont(f, size, fl)
+  local f, _, fl = dropdown.label:GetFont()
+  dropdown.label:SetFont(f, size, fl)
 end
 
 --- @class HelpIconFrame : Frame
@@ -92,7 +97,9 @@ local function AddGeneralTab(tab, window, conf)
 
   -- Count enabled bars to guard against disabling the last one
   local enabledCount = 0
-  for i = 1, DS:GetMaxBarCount() do if cns:bar(i).enabled then enabledCount = enabledCount + 1 end end
+  for i = 1, DS:GetMaxBarCount() do
+    if cns:bar(i).enabled then enabledCount = enabledCount + 1 end
+  end
   local isLastEnabled = enabledCount == 1 and conf.enabled == true
 
   -- Row 1: Enabled
@@ -109,9 +116,8 @@ local function AddGeneralTab(tab, window, conf)
   tab:AddChild(chkEnabled)
   refs.chkEnabled = chkEnabled
 
-  local helpText = isLastEnabled
-      and L['At least one bar must remain enabled.']
-      or  L['Re-enable from General Settings > General > Bars.']
+  local helpText = isLastEnabled and L['At least one bar must remain enabled.']
+    or L['Re-enable from General Settings > General > Bars.']
   if not wf.enabledHelp then
     wf.enabledHelp = CreateHelpIcon(wf, helpText)
   else
@@ -120,7 +126,13 @@ local function AddGeneralTab(tab, window, conf)
   local enabledHelp = wf.enabledHelp
   enabledHelp:SetFrameLevel(chkEnabled.frame:GetFrameLevel() + 2)
   enabledHelp:ClearAllPoints()
-  enabledHelp:SetPoint('LEFT', chkEnabled.text, 'LEFT', chkEnabled.text:GetUnboundedStringWidth() + 4, 0)
+  enabledHelp:SetPoint(
+    'LEFT',
+    chkEnabled.text,
+    'LEFT',
+    chkEnabled.text:GetUnboundedStringWidth() + 4,
+    0
+  )
   enabledHelp:Show()
   if wf.extraBtnHelp then wf.extraBtnHelp:Hide() end
   refs.enabledHelp = enabledHelp
@@ -276,8 +288,13 @@ local function AddBackdropTab(tab, conf)
   group:AddChild(ddThemeSp)
 
   --- @type IconButton|Button
-  local resetBtn = CreateFrame("Button", nil, tab.frame, "ABP_OptionsUI_ResetButtonTemplate_2_0" --[[@as Template ]])
-  resetBtn:SetScript("OnClick", OnResetTheme)
+  local resetBtn = CreateFrame(
+    'Button',
+    nil,
+    tab.frame,
+    'ABP_OptionsUI_ResetButtonTemplate_2_0' --[[@as Template ]]
+  )
+  resetBtn:SetScript('OnClick', OnResetTheme)
   resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
   resetBtn:SetFrameLevel(ddTheme.frame:GetFrameLevel() + 1)
 
@@ -360,7 +377,7 @@ local function AddBackdropTab(tab, conf)
     SetDropdownLabelFontSize(ddDragAnchor, 12)
     ddDragAnchor:SetRelativeWidth(0.6)
     ddDragAnchor:SetList({
-      TOPLEFT  = L['Top Left'],
+      TOPLEFT = L['Top Left'],
       TOPRIGHT = L['Top Right'],
     }, { 'TOPLEFT', 'TOPRIGHT' })
     ddDragAnchor:SetValue(dragAnchor)
@@ -422,13 +439,17 @@ local function AddExtraButtonsTab(tab, window, conf)
   tab:AddChild(chkExtraBtn)
   refs.chkExtraBtn = chkExtraBtn
 
-  if not wf.extraBtnHelp then
-    wf.extraBtnHelp = CreateHelpIcon(wf, L['Extra Buttons Tooltip'])
-  end
+  if not wf.extraBtnHelp then wf.extraBtnHelp = CreateHelpIcon(wf, L['Extra Buttons Tooltip']) end
   local extraBtnHelp = wf.extraBtnHelp
   extraBtnHelp:SetFrameLevel(chkExtraBtn.frame:GetFrameLevel() + 2)
   extraBtnHelp:ClearAllPoints()
-  extraBtnHelp:SetPoint('LEFT', chkExtraBtn.text, 'LEFT', chkExtraBtn.text:GetUnboundedStringWidth() + 4, 0)
+  extraBtnHelp:SetPoint(
+    'LEFT',
+    chkExtraBtn.text,
+    'LEFT',
+    chkExtraBtn.text:GetUnboundedStringWidth() + 4,
+    0
+  )
   extraBtnHelp:Show()
   if wf.enabledHelp then wf.enabledHelp:Hide() end
   refs.extraBtnHelp = extraBtnHelp
@@ -451,11 +472,11 @@ local function AddExtraButtonsTab(tab, window, conf)
   SetDropdownLabelFontSize(ddAnchor, 12)
   ddAnchor:SetRelativeWidth(0.6)
   ddAnchor:SetList({
-    TOPLEFT     = L['Top Left'],
-    TOP         = L['Top'],
-    TOPRIGHT    = L['Top Right'],
-    BOTTOMLEFT  = L['Bottom Left'],
-    BOTTOM      = L['Bottom'],
+    TOPLEFT = L['Top Left'],
+    TOP = L['Top'],
+    TOPRIGHT = L['Top Right'],
+    BOTTOMLEFT = L['Bottom Left'],
+    BOTTOM = L['Bottom'],
     BOTTOMRIGHT = L['Bottom Right'],
   }, { 'TOPLEFT', 'TOP', 'TOPRIGHT', 'BOTTOMLEFT', 'BOTTOM', 'BOTTOMRIGHT' })
   ddAnchor:SetValue(eb.anchor or 'TOPRIGHT')
@@ -472,7 +493,10 @@ local function AddExtraButtonsTab(tab, window, conf)
 
   local ddAnchorSp2 = cns:spacer()
   ddAnchorSp2:SetFullWidth(true)
-  do local f, s, fl = GameFontHighlightSmall:GetFont(); ddAnchorSp2:SetFont(f, 1, fl) end
+  do
+    local f, s, fl = GameFontHighlightSmall:GetFont()
+    ddAnchorSp2:SetFont(f, 1, fl)
+  end
   tab:AddChild(ddAnchorSp2)
 
   --- @type AceGUISlider
@@ -519,8 +543,8 @@ local function AddWidgets(window, conf, selectedTab)
   tabGroup:SetFullHeight(true)
   tabGroup:SetLayout('Flow')
   tabGroup:SetTabs({
-    { text = L['General'],       value = TAB_GENERAL },
-    { text = L['Backdrop'],      value = TAB_BACKDROP },
+    { text = L['General'], value = TAB_GENERAL },
+    { text = L['Backdrop'], value = TAB_BACKDROP },
     { text = L['Extra Buttons'], value = TAB_EXTRA_BTNS },
   })
 
@@ -543,13 +567,18 @@ local function AddWidgets(window, conf, selectedTab)
   local wf = window.frame
   if not wf.settingsIconBtn then
     --- @type IconButton|Button
-    local settingsIconBtn = CreateFrame("Button", nil, wf, "ABP_OptionsUI_SettingsIconButtonTemplate_2_0" --[[@as Template ]] )
-    settingsIconBtn:SetScript("OnClick", OnSettingsClicked)
+    local settingsIconBtn = CreateFrame(
+      'Button',
+      nil,
+      wf,
+      'ABP_OptionsUI_SettingsIconButtonTemplate_2_0' --[[@as Template ]]
+    )
+    settingsIconBtn:SetScript('OnClick', OnSettingsClicked)
     wf.settingsIconBtn = settingsIconBtn
   end
   local closeBtn = window.closebutton
   local settingsIconBtn = wf.settingsIconBtn
-  settingsIconBtn:SetFrameLevel(closeBtn:GetFrameLevel()+1)
+  settingsIconBtn:SetFrameLevel(closeBtn:GetFrameLevel() + 1)
   settingsIconBtn:ClearAllPoints()
   settingsIconBtn:SetPoint('RIGHT', closeBtn, 'LEFT', 0, 0)
 
@@ -564,12 +593,13 @@ local function CreateDialog()
 
   --- @type AceGUIWindow
   local frame = AceGUI:Create('Window')
-  local f = frame.frame; _G[globalVarName] = f
+  local f = frame.frame
+  _G[globalVarName] = f
   frame:SetWidth(DIALOG_WIDTH)
   frame:SetHeight(DIALOG_HEIGHT)
   frame:SetLayout('Fill')
   frame:SetCallback('OnClose', function() o:OnFrameClose() end)
-  frame:SetCallback("OnShow", function ()
+  frame:SetCallback('OnShow', function()
     f:SetSize(DIALOG_WIDTH, DIALOG_HEIGHT)
     frame:DoLayout()
   end)
@@ -616,7 +646,9 @@ function o:ShowDialog(barIndex, selectedTab)
 
   -- seed the baseline so the first OnBarOptionsChanged doesn't spuriously rebuild
   lastEnabledCount = 0
-  for i = 1, 10 do if cns:bar(i).enabled then lastEnabledCount = lastEnabledCount + 1 end end
+  for i = 1, 10 do
+    if cns:bar(i).enabled then lastEnabledCount = lastEnabledCount + 1 end
+  end
 
   -- rebuild widgets for the new bar's config
   dialogWindow:ReleaseChildren()
@@ -641,7 +673,9 @@ function o:OnBarOptionsChanged()
   if not (dialogWindow and dialogWindow.frame:IsShown()) then return end
   if not (widgetRefs and widgetRefs.tabGroup) then return end
   local count = 0
-  for i = 1, DS:GetMaxBarCount() do if cns:bar(i).enabled then count = count + 1 end end
+  for i = 1, DS:GetMaxBarCount() do
+    if cns:bar(i).enabled then count = count + 1 end
+  end
   if count == lastEnabledCount then return end
   lastEnabledCount = count
   local tg = widgetRefs.tabGroup
@@ -657,9 +691,7 @@ function o:IsShownForBar(barIndex)
 end
 
 --- @return Frame?
-function o:GetFrame()
-  return dialogWindow and dialogWindow.frame
-end
+function o:GetFrame() return dialogWindow and dialogWindow.frame end
 
 function o:OnFrameClose()
   stopHandleGlow(self.barIndex)
