@@ -10,7 +10,7 @@ local tbl_DeepCopy = ns:Table().DeepCopy
 -- todo: revisit for retail because N talents are based off a class, i.e. DRUID has a few spec/talents
 local MAX_SPEC_GROUPS = 2
 local MAX_BAR_COUNT = 10
-local MAX_ROW_SIZE, MAX_COL_SIZE = 12, 21
+local MAX_ROW_SIZE, MAX_COL_SIZE = 18, 36
 local MIN_BTN_SIZE, MAX_BTN_SIZE = 20, 120
 local MIN_EXTRA_BTN_SIZE, MAX_EXTRA_BTN_SIZE = 16, 80
 

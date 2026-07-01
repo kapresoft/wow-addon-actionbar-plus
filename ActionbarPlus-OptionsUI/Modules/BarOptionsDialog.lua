@@ -8,7 +8,7 @@ local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT  = 320, 280
+local DIALOG_WIDTH, DIALOG_HEIGHT  = 320, 260
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL    = 'general'
 local TAB_BACKDROP   = 'backdrop'
