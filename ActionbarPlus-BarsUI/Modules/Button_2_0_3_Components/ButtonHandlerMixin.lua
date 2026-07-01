@@ -36,7 +36,7 @@ local p, t = ns:log(libName)
 Mixin Methods
 -------------------------------------------------------------------------------]]
 --- @return boolean
-function o.IsActionbarLockedByUser() return Settings.GetValue("lockActionBars") end
+function o.IsActionbarLockedByUser() return Settings.GetValue('lockActionBars') end
 
 --- @param self Button_ABP_2_0_X
 --- @param down boolean
@@ -85,7 +85,7 @@ function o.Btn_UpdateUsable(self)
     elseif notEnoughMana then
       icon:SetVertexColor(0.5, 0.5, 1.0)
     else
-      icon:SetVertexColor(0.4, 0.4, 0.4);
+      icon:SetVertexColor(0.4, 0.4, 0.4)
     end
   end)
 end
@@ -153,9 +153,7 @@ end
 --- @param self Button_ABP_2_0_X
 --- @param evt EventName
 function o.Btn_OnTargetChanged(self, evt)
-  if self.widget:IsMacro() then
-    o.Btn_UpdateTextureMacro(self, evt, 1)
-  end
+  if self.widget:IsMacro() then o.Btn_UpdateTextureMacro(self, evt, 1) end
   local f = ns:GetUpdateFrame()
   if UnitExists('target') then
     f:RegisterFrame(self)
@@ -193,10 +191,13 @@ end
 function o.Btn_UpdateRangeIndicator(self, evt)
   local w = self.widget
   local inRange = w:IsActionInRange()
-  if inRange == nil then w:SetTargetNone()
+  if inRange == nil then
+    w:SetTargetNone()
   elseif inRange == true then
     w:SetTargetInRangeColor()
-  else w:SetTargetOutOfRangeColor() end
+  else
+    w:SetTargetOutOfRangeColor()
+  end
 end
 
 --- Update the macro button texture repeatedly to catch castsequence icon changes
@@ -207,9 +208,9 @@ function o.Btn_UpdateTextureMacro(self, evt, tickerCount)
   local count = 0
   local loopCount = tickerCount or 8
   C_Timer.NewTicker(0.03, function(ticker)
-      count = count + 1
-      self:UpdateTexture()
-      if count >= loopCount then ticker:Cancel() end
+    count = count + 1
+    self:UpdateTexture()
+    if count >= loopCount then ticker:Cancel() end
   end)
 end
 
@@ -239,12 +240,11 @@ end
 
 --- @param self Button_ABP_2_0_X
 function o.Btn_OnEnterGameTooltip(self)
-
   local typ, val, isCustom = self.widget:GetActionInfo()
   if not (typ and val) then return end
 
   --todo: GameTooltip owner will be user configurable
-  GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+  GameTooltip:SetOwner(UIParent, 'ANCHOR_NONE')
   GameTooltip:ClearAllPoints()
   GameTooltip:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMRIGHT', -10, 70)
   o.Btn_OnGameTooltip(self, typ, val, isCustom)
@@ -256,9 +256,8 @@ end
 --- @param val ActionValue
 --- @param isCustom? boolean
 function o.Btn_OnGameTooltip(self, typ, val, isCustom)
-
   --- @type FontStringObj
-  local right = _G["GameTooltipTextRight1"]
+  local right = _G['GameTooltipTextRight1']
 
   if not isCustom then
     if au.IsSpell(typ) then
@@ -267,17 +266,15 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
         GameTooltip:SetSpellByID(spid)
         local rank = spu:GetHighestSpellRank(spid)
         if right and rank then
-          right:SetText(rank);
+          right:SetText(rank)
           right:SetTextColor(ACTION_RANK_COLOR:GetRGBA())
           right:Show()
         end
       end)
     elseif au.IsItem(typ) then
       --- @type number|string @The val param can be 'item:<itemID>', itemID, itemName
-      local itemVal= au.ExtractItemID(val) or val
-      comp:IfItem(itemVal, function(item)
-        GameTooltip:SetInventoryItemByID(item.id)
-      end)
+      local itemVal = au.ExtractItemID(val) or val
+      comp:IfItem(itemVal, function(item) GameTooltip:SetInventoryItemByID(item.id) end)
     elseif au.IsMacro(typ) then
       comp:IfMacro(val, function(name, icon, body)
         local mSpellID, mItemID = au.GetMacroAction(name)
@@ -292,7 +289,7 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
     end
   else
     if au.IsMount(typ) then
-      comp:IfMount(val, function(mount)  -- val as MountID
+      comp:IfMount(val, function(mount) -- val as MountID
         GameTooltip:SetMountBySpellID(mount.spellID)
       end)
     elseif au.IsBattlePet(typ) then
@@ -300,7 +297,8 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
     elseif au.IsEquipmentSet(typ) then
       comp:IfEquipmentSet(val --[[@as EquipmentSetID]], function(eqSet)
         if cns:IsMainline() then
-          GameTooltip:SetEquipmentSet(eqSet.id); return
+          GameTooltip:SetEquipmentSet(eqSet.id)
+          return
         end
         GameTooltip:SetEquipmentSet(eqSet.name)
       end)
@@ -320,7 +318,6 @@ function o.Btn_UpdateAnimation(self)
   if not btnC then return end
 
   if au.IsSpell(btnC.type) then
-
     if au.IsAutoAttackInProgress(btnC.id) then
       self:EnableFlashAnimation()
     else
@@ -333,26 +330,29 @@ end
 --- @param macroIdentifier MacroIdentifier
 function o.Btn_SetActionMacro(self, macroIdentifier)
   local w, typ = self.widget, atyp.macro
-  comp:IfMacro(macroIdentifier, function(name, icon, body)
-    w:SetActionAttribute(typ, name)
-  end).OrElse(function()
-    local conf = w:conf() --[[@as MacroButtonConfig_ABP_2_0]]
-    -- try and find macro by body hash
-    comp:IfMacroByBodyHash(conf.hash, function(name, icon, body)
-        conf.id = name
-        w:SetActionAttribute(typ, name)
-        self:UpdateTexture()
-    end).OrElse(function()
-      o.Btn_ResetAll(self)
+  comp
+    :IfMacro(macroIdentifier, function(name, icon, body) w:SetActionAttribute(typ, name) end)
+    .OrElse(function()
+      local conf = w:conf() --[[@as MacroButtonConfig_ABP_2_0]]
+      -- try and find macro by body hash
+      comp
+        :IfMacroByBodyHash(conf.hash, function(name, icon, body)
+          conf.id = name
+          w:SetActionAttribute(typ, name)
+          self:UpdateTexture()
+        end)
+        .OrElse(function() o.Btn_ResetAll(self) end)
     end)
-  end)
 end
 
 --- BattlePet is a custom action implementation that uses `/summonpet {petGUID}`
 --- @param self Button_ABP_2_0_X
 --- @param battlePetID PetGUID
 function o.Btn_SetActionBattlePet(self, battlePetID)
-  assert(type(battlePetID) == 'string', 'Btn_SetActionBattlePet(self, battlePetID): {battlePetID} should be a GUID:String')
+  assert(
+    type(battlePetID) == 'string',
+    'Btn_SetActionBattlePet(self, battlePetID): {battlePetID} should be a GUID:String'
+  )
 
   local macroText = BATTLEPET_MACRO_TEMPLATE:format(battlePetID)
   local typ = atyp.battlepet
@@ -392,4 +392,3 @@ function o.Btn_SetActionMount(self, mountID)
     w:SetAttribute(atyp.spell, mount.spellID)
   end)
 end
-
