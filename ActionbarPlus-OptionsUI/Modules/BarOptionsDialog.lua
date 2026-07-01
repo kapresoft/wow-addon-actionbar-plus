@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
+local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
 local SETTINGS = SETTINGS or L['Settings']
 
@@ -91,7 +92,7 @@ local function AddGeneralTab(tab, window, conf)
 
   -- Count enabled bars to guard against disabling the last one
   local enabledCount = 0
-  for i = 1, O.DatabaseSchema:GetMaxBarCount() do if cns:bar(i).enabled then enabledCount = enabledCount + 1 end end
+  for i = 1, DS:GetMaxBarCount() do if cns:bar(i).enabled then enabledCount = enabledCount + 1 end end
   local isLastEnabled = enabledCount == 1 and conf.enabled == true
 
   -- Row 1: Enabled
@@ -144,7 +145,7 @@ local function AddGeneralTab(tab, window, conf)
   local slRows = AceGUI:Create('Slider')
   slRows:SetLabel(L['Rows'])
   slRows:SetRelativeWidth(0.5)
-  slRows:SetSliderValues(1, 5, 1)
+  slRows:SetSliderValues(1, DS:GetMaxRowSize(), 1)
   slRows:SetValue(conf.ui.rowSize)
   slRows:SetCallback('OnValueChanged', function(_, _, val)
     t('AddWidgets::RowSlider', 'val=', val)
@@ -158,7 +159,7 @@ local function AddGeneralTab(tab, window, conf)
   local slCols = AceGUI:Create('Slider')
   slCols:SetLabel(L['Columns'])
   slCols:SetRelativeWidth(0.5)
-  slCols:SetSliderValues(1, 12, 1)
+  slCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
   slCols:SetValue(conf.ui.colSize)
   slCols:SetCallback('OnValueChanged', function(_, _, val)
     conf.ui.colSize = val
@@ -185,7 +186,7 @@ local function AddGeneralTab(tab, window, conf)
   local slBtnSize = AceGUI:Create('Slider')
   slBtnSize:SetLabel(L['Button Size'])
   slBtnSize:SetRelativeWidth(0.5)
-  slBtnSize:SetSliderValues(20, 120, 1)
+  slBtnSize:SetSliderValues(DS:GetMinBtnSize(), DS:GetMaxBtnSize(), 1)
   slBtnSize:SetValue(conf.ui.button.size)
   slBtnSize:SetCallback('OnValueChanged', function(_, _, val)
     conf.ui.button.size = val
@@ -432,6 +433,18 @@ local function AddExtraButtonsTab(tab, window, conf)
   if wf.enabledHelp then wf.enabledHelp:Hide() end
   refs.extraBtnHelp = extraBtnHelp
 
+  --- @type AceGUICheckBox
+  local chkShowEmpty = AceGUI:Create('CheckBox')
+  chkShowEmpty:SetLabel(L['Show Empty Buttons'])
+  chkShowEmpty:SetFullWidth(true)
+  chkShowEmpty:SetValue(eb.showEmptyButtons ~= false)
+  chkShowEmpty:SetCallback('OnValueChanged', function(_, _, val)
+    eb.showEmptyButtons = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  tab:AddChild(chkShowEmpty)
+  refs.chkShowEmpty = chkShowEmpty
+
   --- @type AceGUIDropdown
   local ddAnchor = AceGUI:Create('Dropdown')
   ddAnchor:SetLabel(L['Anchor'])
@@ -462,23 +475,11 @@ local function AddExtraButtonsTab(tab, window, conf)
   do local f, s, fl = GameFontHighlightSmall:GetFont(); ddAnchorSp2:SetFont(f, 1, fl) end
   tab:AddChild(ddAnchorSp2)
 
-  --- @type AceGUICheckBox
-  local chkShowEmpty = AceGUI:Create('CheckBox')
-  chkShowEmpty:SetLabel(L['Show Empty Buttons'])
-  chkShowEmpty:SetFullWidth(true)
-  chkShowEmpty:SetValue(eb.showEmptyButtons ~= false)
-  chkShowEmpty:SetCallback('OnValueChanged', function(_, _, val)
-    eb.showEmptyButtons = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  tab:AddChild(chkShowEmpty)
-  refs.chkShowEmpty = chkShowEmpty
-
   --- @type AceGUISlider
   local slExtraCols = AceGUI:Create('Slider')
-  slExtraCols:SetLabel(L['Extra Button Columns'])
+  slExtraCols:SetLabel(L['Columns'])
   slExtraCols:SetRelativeWidth(0.5)
-  slExtraCols:SetSliderValues(1, 12, 1)
+  slExtraCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
   slExtraCols:SetValue(eb.colSize or 1)
   slExtraCols:SetCallback('OnValueChanged', function(_, _, val)
     eb.colSize = val
@@ -489,9 +490,9 @@ local function AddExtraButtonsTab(tab, window, conf)
 
   --- @type AceGUISlider
   local slExtraBtnSize = AceGUI:Create('Slider')
-  slExtraBtnSize:SetLabel(L['Extra Button Size'])
+  slExtraBtnSize:SetLabel(L['Button Size'])
   slExtraBtnSize:SetRelativeWidth(0.5)
-  slExtraBtnSize:SetSliderValues(16, 80, 1)
+  slExtraBtnSize:SetSliderValues(DS:GetMinExtraBtnSize(), DS:GetMaxExtraBtnSize(), 1)
   slExtraBtnSize:SetValue(eb.size or 30)
   slExtraBtnSize:SetCallback('OnValueChanged', function(_, _, val)
     eb.size = val
@@ -640,7 +641,7 @@ function o:OnBarOptionsChanged()
   if not (dialogWindow and dialogWindow.frame:IsShown()) then return end
   if not (widgetRefs and widgetRefs.tabGroup) then return end
   local count = 0
-  for i = 1, O.DatabaseSchema:GetMaxBarCount() do if cns:bar(i).enabled then count = count + 1 end end
+  for i = 1, DS:GetMaxBarCount() do if cns:bar(i).enabled then count = count + 1 end end
   if count == lastEnabledCount then return end
   lastEnabledCount = count
   local tg = widgetRefs.tabGroup
