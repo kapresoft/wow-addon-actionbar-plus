@@ -52,10 +52,9 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: wrap extraButtons
+-- todo: complete localization
 -- todo: refactor BarModuleFactory.lua#ApplyExtraButton
--- todo: handle barFrame border settings
--- todo: handle columns settings (row x col)
--- todo: keybinding implementation using Ace3
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");

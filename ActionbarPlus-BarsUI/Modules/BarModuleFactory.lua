@@ -247,6 +247,7 @@ local function BarFrameWidgetMethods()
         local encodedID = au.encodeBarID(self.index, 900 + i)
         local btnName = ('ABP_2_0_F%sExtraBtn%s'):format(self.index, i)
         local btn = CreateButton(btnName, self.frame, encodedID)
+        btn:SetClampedToScreen(true)
         btn.widget.isExtraButton = true
         self.extraButtons[i] = btn
       end
