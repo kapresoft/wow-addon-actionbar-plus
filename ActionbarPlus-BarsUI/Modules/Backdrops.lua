@@ -29,7 +29,7 @@ local BORDER_DEFS = {
     },
     bgColor = { 0.04, 0.08, 0.09, 0.92 },  -- near-black with a cool teal undertone
     borderColor = { 1, 1, 1, 1 },
-    padding = 0, basePadding = 6, borderPadBottom = 0,
+    padding = 3, basePadding = 6, borderPadBottom = 0,
     edgeSize = { default = 26, min = 21, max = 32 },
   },
   ['dark-knight'] = {
