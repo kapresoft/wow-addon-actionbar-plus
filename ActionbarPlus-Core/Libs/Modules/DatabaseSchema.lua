@@ -8,10 +8,10 @@ local tbl_DeepCopy = ns:Table().DeepCopy
 
 -- Wrath/Cata/TBC dual-spec max; classic always 1
 -- todo: revisit for retail because N talents are based off a class, i.e. DRUID has a few spec/talents
-local MAX_SPEC_GROUPS                        = 2
-local MAX_BAR_COUNT                          = 10
-local MAX_ROW_SIZE, MAX_COL_SIZE             = 12, 21
-local MIN_BTN_SIZE, MAX_BTN_SIZE             = 20, 120
+local MAX_SPEC_GROUPS = 2
+local MAX_BAR_COUNT = 10
+local MAX_ROW_SIZE, MAX_COL_SIZE = 12, 21
+local MIN_BTN_SIZE, MAX_BTN_SIZE = 20, 120
 local MIN_EXTRA_BTN_SIZE, MAX_EXTRA_BTN_SIZE = 16, 80
 
 --[[-------------------------------------------------------------------
@@ -30,7 +30,7 @@ Type Definitions
 --- @field bars table<string, BarConfig_ABP_2_0>
 
 --  ==========================rFrame boolean
-                              ----- @field openEquipmen======================
+----- @field openEquipmen======================
 
 --- @class EquipmentSetConfig_ABP_2_0
 --- @field openCharacterFrame boolean
@@ -136,7 +136,8 @@ Module::DatabaseSchema
 --- @see Core_Modules_ABP_2_0
 local libName = ns.M.DatabaseSchema()
 --- @class DatabaseSchema_ABP_2_0
-local o = {}; ns:Register(libName, o)
+local o = {}
+ns:Register(libName, o)
 local p, t = ns:log(libName)
 
 --[[-------------------------------------------------------------------
@@ -160,7 +161,10 @@ end
 --- @param extraBtnIndex Index  @1-based index within the extra button row
 --- @return string              @e.g. 'btn_1e', 'btn_2e'
 local function extraButtonKey(extraBtnIndex)
-  assert(type(extraBtnIndex) == 'number', 'extraButtonKey(extraBtnIndex):: expected a numeric index.')
+  assert(
+    type(extraBtnIndex) == 'number',
+    'extraButtonKey(extraBtnIndex):: expected a numeric index.'
+  )
   return 'btn_' .. extraBtnIndex .. 'e'
 end
 
@@ -188,61 +192,61 @@ local DB_VERSION = 1
 local DEFAULT_DB = {
   -- GlobalConfig_ABP_2_0
   ['global'] = { schemaVersion = DB_VERSION, bars = {} },
-  
-  profile = {                     -- ProfileConfig_ABP_2_0
-    barCount                      = 10,
-    hideWhenTaxi                  = true,
-    hideWhenGhost                 = true,
-    characterSpecificAnchors      = false,
+
+  profile = { -- ProfileConfig_ABP_2_0
+    barCount = 10,
+    hideWhenTaxi = true,
+    hideWhenGhost = true,
+    characterSpecificAnchors = false,
     --actionButtonMouseoverGlow     = true,
     --hideTextOnSmallButtons        = false,
     --hideCountdownNumbers          = false,
-    tooltip = {                   -- TooltipConfig_ABP_2_0
-      visibilityKey               = "SHIFT",
-      visibilityCombatOverrideKey = "SHIFT",
-      anchorType                  = "CURSOR_TOPLEFT",
+    tooltip = { -- TooltipConfig_ABP_2_0
+      visibilityKey = 'SHIFT',
+      visibilityCombatOverrideKey = 'SHIFT',
+      anchorType = 'CURSOR_TOPLEFT',
     },
-    equipmentSet = {              -- EquipmentSetConfig_ABP_2_0
-      openCharacterFrame          = true,
-      openEquipmentManager        = true,
-      showGlowWhenActive          = true,
+    equipmentSet = { -- EquipmentSetConfig_ABP_2_0
+      openCharacterFrame = true,
+      openEquipmentManager = true,
+      showGlowWhenActive = true,
     },
-    bars = {}
-  }
+    bars = {},
+  },
 }
 
 --- @type BarConfig_ABP_2_0
 local DEFAULT_BAR = {
-  enabled                   = false,
-  showKeybindText           = true,
-  showButtonIndex           = false,
+  enabled = false,
+  showKeybindText = true,
+  showButtonIndex = false,
   -- BarUIConfig_ABP_2_0
   ui = {
-    rowSize                 = 2,
-    colSize                 = 5,
-    alpha                   = 1.0,
-    showEmptyButtons        = true,
-    frameHandleMouseover    = false,
-    frameHandleAlpha        = 1.0,
+    rowSize = 2,
+    colSize = 5,
+    alpha = 1.0,
+    showEmptyButtons = true,
+    frameHandleMouseover = false,
+    frameHandleAlpha = 1.0,
     padding = 5, -- Button padding (uniform, all sides)
     -- BarButtonUIConfig_ABP_2_0
     button = {
       size = 50,
-      spacing = { horizontal = 3, vertical = 3, },
+      spacing = { horizontal = 3, vertical = 3 },
     },
     backdrop = {},
     extraButton = {
       enabled = false,
-      anchor  = 'TOPRIGHT',
+      anchor = 'TOPRIGHT',
       colSize = 5,
-      size    = 30,
+      size = 30,
       showEmptyButtons = true,
     },
   },
   dragFrame = { anchor = 'TOPLEFT', thickness = 14 },
   -- Anchor (same as V1)
-  anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil, },
-  
+  anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil },
+
   --buttons = {
   --  ['btn1'] = {
   --    ['spec1'] = {},
@@ -259,15 +263,15 @@ Module::DatabaseSchema (Methods)
 --- @return DatabaseObj_ABP_2_0
 function o:GetDefaultDatabase()
   local db = tbl_DeepCopy(DEFAULT_DB) --[[@as DatabaseObj_ABP_2_0]]
-  
+
   for barIndex = 1, MAX_BAR_COUNT do
     local key = barKey(barIndex)
     db['profile'].bars[key] = self:CreateDefaultBar(barIndex)
     db['global'].bars[key] = {
-      anchor = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0, relativeTo = nil }
+      anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil },
     }
   end
-  
+
   return db
 end
 
@@ -277,7 +281,7 @@ end
 --- @param barIndex number
 --- @return BarConfig_ABP_2_0
 function o:CreateDefaultBar(barIndex)
-  assert(type(barIndex) == "number", "CreateDefaultBar(barIndex):: barIndex must be number")
+  assert(type(barIndex) == 'number', 'CreateDefaultBar(barIndex):: barIndex must be number')
 
   --- @type BarConfig_ABP_2_0
   local bar = tbl_DeepCopy(DEFAULT_BAR)
@@ -325,10 +329,10 @@ end
 --- @param db DatabaseObj_ABP_2_0
 --- @return number
 function o:GetVersion(db)
-  assert(type(db) == "table", "GetVersion:: db is required.")
-  assert(type(db['global']) == "table", "GetVersion:: db.global missing.")
+  assert(type(db) == 'table', 'GetVersion:: db is required.')
+  assert(type(db['global']) == 'table', 'GetVersion:: db.global missing.')
   local v = db['global'].schemaVersion
-  if type(v) ~= "number" then return DB_VERSION end
+  if type(v) ~= 'number' then return DB_VERSION end
   return v
 end
 
