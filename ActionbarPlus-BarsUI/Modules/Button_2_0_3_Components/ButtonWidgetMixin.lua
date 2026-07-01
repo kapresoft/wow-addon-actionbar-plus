@@ -66,18 +66,10 @@ function o:UpdateAction(name, val)
   end
   if not InCombatLockdown() then
     local barUI = cns:bar(self.barIndex).ui
-    if self.isExtraButton then
-      local showEmpty = barUI.extraButton.showEmptyButtons ~= false
-      self:UpdateEmptyState(showEmpty)
-      -- refresh all sibling extra buttons so empty ones stay hidden
-      ns.O.BarModuleFactory:IfBar(self.barIndex, function(m)
-        m:ForEachExtraButton(function(btn)
-          if btn.widget ~= self then btn.widget:UpdateEmptyState(showEmpty) end
-        end)
-      end)
-    else
-      self:UpdateEmptyState(barUI.showEmptyButtons)
-    end
+    local showEmpty = self.isExtraButton
+        and barUI.extraButton and barUI.extraButton.showEmptyButtons ~= false
+        or barUI.showEmptyButtons
+    self:UpdateEmptyState(showEmpty)
   end
 end
 
@@ -125,7 +117,7 @@ function o:HasAction() return not self:IsEmpty() end
 
 --- @param showEmptyButtons boolean
 function o:UpdateEmptyState(showEmptyButtons)
-  local visible = ns:a():IsQuickKeybindModeActive() or showEmptyButtons or (not self.isExtraButton and self:HasAction())
+  local visible = ns:a():IsQuickKeybindModeActive() or showEmptyButtons or self:HasAction()
   self.button.NormalTexture:SetShown(visible)
   local showHotKey = self:HasAction() or visible
   self.HotKey:SetShown(showHotKey)
