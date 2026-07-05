@@ -33,6 +33,7 @@ L['Drag Handle Location'] = true
 L['Thickness']            = true
 L['Extra Buttons']        = true
 L['Button Count']         = true
+L['Toggle Bars']          = true
 L['Gap']                  = true
 L['Gap Tooltip']          = 'Spacing between the bar border and the extra button row.'
 L['Character Specific Frame Positions'] = true
