@@ -21,7 +21,6 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Blizzard Vars
 -------------------------------------------------------------------------------]]
-local SETTINGS = SETTINGS or L['Settings']
 local OPTIONS = OPTIONS or L['Options']
 local BAR = L['Bar']
 local BAR_OPTIONS = BAR .. ' ' .. OPTIONS
@@ -155,7 +154,6 @@ function o:Show(barFrame)
     { text = BAR_EXTRA_BTNS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end },
     { isSeparator = true },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
-    { text = SETTINGS, notCheckable = true, func = function() settingsDialog():OpenGeneral() end },
     { text = PROFILES, notCheckable = true, func = function() settingsDialog():OpenProfiles() end },
     { text = BARS, submenu = function() return BuildBarsSubmenu(barFrame.widget.index) end },
   }
