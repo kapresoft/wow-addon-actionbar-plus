@@ -116,7 +116,7 @@ local function AddGeneralTab(tab, window, conf)
   refs.chkEnabled = chkEnabled
 
   local helpText = isLastEnabled and L['At least one bar must remain enabled.']
-    or L['Re-enable from General Settings > General > Bars.']
+    or L['Toggle bar visibility from the right-click context menu.']
   if not wf.enabledHelp then
     wf.enabledHelp = CreateHelpIcon(wf, helpText)
   else

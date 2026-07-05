@@ -8,7 +8,6 @@ Local Vars
 
 local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 local VERSION = L['Version']
-local DatabaseSchema = cns.O.DatabaseSchema
 local DIALOG_WIDTH, DIALOG_HEIGHT = 550, 405
 local TREE_WIDTH = 130
 
@@ -34,34 +33,6 @@ local function GetVersionText()
   return version
 end
 
---- @param args table
---- @param order number
-local function AddBarsArgs(args, order)
-  args.barsHeader = {
-    type = 'header',
-    order = order,
-    name = L['Bars'],
-  }
-  args.barsDesc = {
-    type = 'description',
-    order = order + 1,
-    name = L['Disabled bars are hidden. Re-enable them here.'],
-  }
-  for i = 1, DatabaseSchema:GetMaxBarCount() do
-    args['bar' .. i] = {
-      type = 'toggle',
-      width = 'half',
-      order = order + 1 + i,
-      name = ('%s %s'):format(L['Bar'], i),
-      get = function() return cns:bar(i).enabled end,
-      set = function(_, val)
-        cns:bar(i).enabled = val
-        cns:OptionsUI():SendMessage(ns:msg('OnBarOptionsChanged'), i)
-      end,
-    }
-  end
-end
-
 --- @return table
 local function CreateOptions()
   local generalArgs = {
@@ -72,7 +43,6 @@ local function CreateOptions()
       fontSize = 'medium',
     },
   }
-  AddBarsArgs(generalArgs, 1)
 
   return {
     type = 'group',
