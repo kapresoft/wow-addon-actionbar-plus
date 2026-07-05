@@ -63,6 +63,8 @@ function o:OnLoad()
   self:RegisterEvent("UPDATE_BINDINGS");
   self:RegisterEvent("ACTIONBAR_SHOWGRID");
   self:RegisterEvent("ACTIONBAR_HIDEGRID");
+  self:RegisterEvent("ITEM_LOCKED");
+  self:RegisterEvent("ITEM_UNLOCKED");
 
   --CVarCallbackRegistry:SetCVarCachable(countdownForCooldownsCVarName);
   --CVarCallbackRegistry:RegisterCallback(countdownForCooldownsCVarName, self.OnCountdownForCooldownsChanged, self);

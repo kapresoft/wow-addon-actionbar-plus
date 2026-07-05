@@ -234,9 +234,9 @@ function o:OnEvent(evt, ...)
     self:UpdateState(evt)
   elseif evt == 'UPDATE_BINDINGS' then
     self.widget:UpdateHotKey()
-  elseif evt == 'ACTIONBAR_SHOWGRID' then
-      self.widget:UpdateEmptyState(true)
-  elseif evt == 'ACTIONBAR_HIDEGRID' then
+  elseif Str_IsAnyOf(evt, 'ACTIONBAR_SHOWGRID', 'ITEM_LOCKED') then
+    self.widget:UpdateEmptyState(true)
+  elseif Str_IsAnyOf(evt, 'ACTIONBAR_HIDEGRID', 'ITEM_UNLOCKED') then
     local uic = cns:bar(self.widget.barIndex).ui
     local showEmptyButtons = uic.showEmptyButtons
     if self.widget.isExtraButton then
