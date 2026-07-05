@@ -237,9 +237,10 @@ local function buildThemeList()
 end
 
 --- @param tab AceGUITabGroup
+--- @param window BarOptionsDialogWindow_ABP_2_0
 --- @param conf BarConfig_ABP_2_0
 --- @return table
-local function AddBackdropTab(tab, conf)
+local function AddBackdropTab(tab, window, conf)
   local AceGUI = cns:AceGUI()
   local refs = {}
   local bc = conf.ui.backdrop
@@ -249,14 +250,14 @@ local function AddBackdropTab(tab, conf)
     t('RebuildBackdropTab', 'tab=', tab)
     C_Timer.After(0, function()
       tab:ReleaseChildren()
-      AddBackdropTab(tab, conf)
+      AddBackdropTab(tab, window, conf)
       tab:DoLayout()
       syncHandleGlow(o.barIndex)
     end)
   end
 
   local function OnResetTheme()
-    bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil
+    bc.theme, bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize = nil, nil, nil, nil, nil
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
     RebuildBackdropTab()
   end
@@ -287,16 +288,23 @@ local function AddBackdropTab(tab, conf)
   ddThemeSp:SetRelativeWidth(0.3)
   group:AddChild(ddThemeSp)
 
-  --- @type IconButton|Button
-  local resetBtn = CreateFrame(
-    'Button',
-    nil,
-    tab.frame,
-    'ABP_OptionsUI_ResetButtonTemplate_2_0' --[[@as Template ]]
-  )
+  --- @type BarOptionsDialogFrame_ABP_2_0
+  local wf = window.frame
+  if not wf.resetBtn then
+    wf.resetBtn = CreateFrame(
+      'Button',
+      nil,
+      tab.frame,
+      'ABP_OptionsUI_ResetButtonTemplate_2_0' --[[@as Template ]]
+    )
+  end
+  local resetBtn = wf.resetBtn
+  resetBtn:SetParent(tab.frame)
   resetBtn:SetScript('OnClick', OnResetTheme)
+  resetBtn:ClearAllPoints()
   resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
   resetBtn:SetFrameLevel(ddTheme.frame:GetFrameLevel() + 1)
+  resetBtn:Show()
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
@@ -501,12 +509,12 @@ local function AddExtraButtonsTab(tab, window, conf)
 
   --- @type AceGUISlider
   local slExtraCols = AceGUI:Create('Slider')
-  slExtraCols:SetLabel(L['Columns'])
+  slExtraCols:SetLabel(L['Button Count'])
   slExtraCols:SetRelativeWidth(0.5)
   slExtraCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
-  slExtraCols:SetValue(eb.colSize or 1)
+  slExtraCols:SetValue(eb.count or 1)
   slExtraCols:SetCallback('OnValueChanged', function(_, _, val)
-    eb.colSize = val
+    eb.count = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
   tab:AddChild(slExtraCols)
@@ -550,10 +558,12 @@ local function AddWidgets(window, conf, selectedTab)
 
   tabGroup:SetCallback('OnGroupSelected', function(tg, _, tab)
     tg:ReleaseChildren()
+    local wf = window.frame
+    if wf.resetBtn then wf.resetBtn:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
     elseif tab == TAB_BACKDROP then
-      refs.backdrop = AddBackdropTab(tg, conf)
+      refs.backdrop = AddBackdropTab(tg, window, conf)
       syncHandleGlow(o.barIndex)
     elseif tab == TAB_EXTRA_BTNS then
       refs.extraButtons = AddExtraButtonsTab(tg, window, conf)
@@ -623,6 +633,7 @@ Methods
 --- @field enabledHelp HelpIconFrame
 --- @field extraBtnHelp Frame
 --- @field settingsIconBtn Button
+--- @field resetBtn Button
 
 ABP_BAR_OPTIONS_DIALOG = nil
 --- @class BarOptionsDialogWindow_ABP_2_0 : AceGUIWindow

@@ -32,6 +32,7 @@ L['Show Empty Buttons']   = true
 L['Drag Handle Location'] = true
 L['Thickness']            = true
 L['Extra Buttons']        = true
+L['Button Count']         = true
 L['Anchor']               = true
 L['Top']                  = true
 L['Top Left']             = true
