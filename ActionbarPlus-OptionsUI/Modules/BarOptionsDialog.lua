@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
 local DS = O.DatabaseSchema
+local tbl_DeepCopy = cns:Table().DeepCopy
 local OPTIONS = OPTIONS or L['Options']
 
 local DIALOG_WIDTH, DIALOG_HEIGHT = 340, 300
@@ -287,6 +288,54 @@ local function buildThemeList()
   return list, order
 end
 
+--- @type UIDropDownMenuFrame
+local backdropMenuFrame
+
+--- @param anchor Frame
+--- @param parent Frame
+--- @param onReset fun():void
+--- @param onCopyFrom fun(sourceIndex:Index):void
+--- @param onApplyToAll fun():void
+local function ShowBackdropMenu(anchor, parent, onReset, onCopyFrom, onApplyToAll)
+  local BAR = L['Bar']
+  local barItems = {}
+  for i = 1, DS:GetMaxBarCount() do
+    if cns:bar(i).enabled then
+      local idx = i
+      tinsert(barItems, { text = BAR .. ' ' .. idx, notCheckable = true, func = function() onCopyFrom(idx) end })
+    end
+  end
+
+  if MenuUtil then
+    MenuUtil.CreateContextMenu(anchor, function(_, rootDescription)
+      rootDescription:CreateButton(L['Reset to Default'], onReset)
+      rootDescription:CreateButton(L['Apply Backdrop to All Bars'], onApplyToAll)
+      local sub = rootDescription:CreateButton(L['Copy Backdrop from Bar'], function() end)
+      for _, si in ipairs(barItems) do sub:CreateButton(si.text, si.func) end
+    end)
+  else
+    if not backdropMenuFrame then
+      backdropMenuFrame = CreateFrame('Frame', 'ABP_BackdropMenuFrame',
+        parent, 'UIDropDownMenuTemplate' --[[@as Template ]])
+      backdropMenuFrame:SetFrameLevel(parent:GetFrameLevel() + 1)
+    end
+    backdropMenuFrame.displayMode = 'MENU'
+    backdropMenuFrame.initialize = function(self, level, subMenuList)
+      if level == 1 then
+        UIDropDownMenu_AddButton({ text = L['Reset to Default'], notCheckable = true, func = onReset }, level)
+        UIDropDownMenu_AddButton({ text = L['Apply Backdrop to All Bars'], notCheckable = true, func = onApplyToAll }, level)
+        UIDropDownMenu_AddButton({
+          text = L['Copy Backdrop from Bar'], notCheckable = true,
+          hasArrow = true, menuList = barItems,
+        }, level)
+      elseif level == 2 and subMenuList then
+        for _, si in ipairs(subMenuList) do UIDropDownMenu_AddButton(si, level) end
+      end
+    end
+    ToggleDropDownMenu(1, nil, backdropMenuFrame, 'cursor', -10, -15)
+  end
+end
+
 --- @param tab AceGUITabGroup
 --- @param window BarOptionsDialogWindow_ABP_2_0
 --- @param conf BarConfig_ABP_2_0
@@ -298,7 +347,6 @@ local function AddBackdropTab(tab, window, conf)
   local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
 
   local function RebuildBackdropTab()
-    t('RebuildBackdropTab', 'tab=', tab)
     C_Timer.After(0, function()
       tab:ReleaseChildren()
       AddBackdropTab(tab, window, conf)
@@ -349,12 +397,40 @@ local function AddBackdropTab(tab, window, conf)
       'ABP_OptionsUI_ResetButtonTemplate_2_0' --[[@as Template ]]
     )
   end
+  local function OnCopyBackdropFrom(sourceIndex)
+    if sourceIndex == o.barIndex then return end
+    local src = tbl_DeepCopy(cns:bar(sourceIndex).ui.backdrop)
+    bc.theme, bc.bgColor, bc.borderColor, bc.padding, bc.edgeSize =
+      src.theme, src.bgColor, src.borderColor, src.padding, src.edgeSize
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    RebuildBackdropTab()
+  end
+
+  local function OnApplyBackdropToAll()
+    local src = tbl_DeepCopy(bc)
+    for i = 1, DS:GetMaxBarCount() do
+      if i ~= o.barIndex and cns:bar(i).enabled then
+        local tgt = cns:bar(i).ui.backdrop
+        tgt.theme, tgt.bgColor, tgt.borderColor, tgt.padding, tgt.edgeSize =
+          src.theme, src.bgColor, src.borderColor, src.padding, src.edgeSize
+        o:SendMessage(ns:msg('OnBarOptionsChanged'), i)
+      end
+    end
+  end
+
   local resetBtn = wf.resetBtn
   resetBtn:SetParent(tab.frame)
-  resetBtn:SetScript('OnClick', OnResetTheme)
+  resetBtn:SetFrameStrata('TOOLTIP')
+  resetBtn:SetScript('OnClick', function(_, btn)
+    if btn == 'LeftButton' then
+      OnResetTheme()
+    elseif btn == 'RightButton' then
+      ShowBackdropMenu(resetBtn, tab.frame, OnResetTheme, OnCopyBackdropFrom, OnApplyBackdropToAll)
+    end
+  end)
+  resetBtn:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
   resetBtn:ClearAllPoints()
   resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
-  resetBtn:SetFrameLevel(ddTheme.frame:GetFrameLevel() + 1)
   resetBtn:Show()
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
