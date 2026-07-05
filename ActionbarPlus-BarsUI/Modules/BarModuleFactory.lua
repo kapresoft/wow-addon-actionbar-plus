@@ -72,6 +72,9 @@ local function BarModule_EnableEditModeCallback(self)
   EventRegistry:RegisterCallback("EditMode.Exit",  self.OnEditModeExit,  self)
 end
 
+--- @param barIndex Index
+local function OnSettingsPanelShown(barIndex) S:ApplyBarEnabledState(barIndex) end
+
 --- @param self BarModuleProto_ABP_2_0
 local function BarModule_DisableEditModeCallback(self)
   if not (EventRegistry and EventRegistry.UnregisterCallback) then return end
@@ -561,6 +564,14 @@ local barCount = cns:a():p().barCount or 1
 function o:CreateAddonModules()
   for i = 1, barCount do
     self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
+  end
+  if SettingsPanel then
+    -- hide bars when SettingsPanel opens (covers Edit Mode → Actionbar Settings transition)
+    hooksecurefunc(SettingsPanel, 'Show', function()
+      for i = 1, DatabaseSchema:GetMaxBarCount() do
+        OnSettingsPanelShown(i)
+      end
+    end)
   end
 end
 
