@@ -13,6 +13,7 @@ local MAX_BAR_COUNT = 10
 local MAX_ROW_SIZE, MAX_COL_SIZE = 18, 36
 local MIN_BTN_SIZE, MAX_BTN_SIZE = 20, 120
 local MIN_EXTRA_BTN_SIZE, MAX_EXTRA_BTN_SIZE = 16, 80
+local MIN_EXTRA_BTN_GAP, MAX_EXTRA_BTN_GAP = 0, 20
 
 --[[-------------------------------------------------------------------
 Type Definitions
@@ -352,3 +353,7 @@ function o:GetMaxBtnSize() return MAX_BTN_SIZE end
 function o:GetMinExtraBtnSize() return MIN_EXTRA_BTN_SIZE end
 --- @return number
 function o:GetMaxExtraBtnSize() return MAX_EXTRA_BTN_SIZE end
+--- @return number
+function o:GetMinExtraBtnGap() return MIN_EXTRA_BTN_GAP end
+--- @return number
+function o:GetMaxExtraBtnGap() return MAX_EXTRA_BTN_GAP end

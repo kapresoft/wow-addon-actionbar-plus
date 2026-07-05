@@ -7,7 +7,7 @@ local cns, O, L = ns:cns()
 local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT = 330, 280
+local DIALOG_WIDTH, DIALOG_HEIGHT = 330, 300
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL = 'general'
 local TAB_BACKDROP = 'backdrop'
@@ -562,6 +562,27 @@ local function AddExtraButtonsTab(tab, window, conf)
   tab:AddChild(slExtraBtnSize)
   refs.slExtraBtnSize = slExtraBtnSize
 
+  --- @type AceGUISlider
+  local slGap = AceGUI:Create('Slider')
+  slGap:SetLabel(L['Gap'])
+  slGap:SetRelativeWidth(0.5)
+  slGap:SetSliderValues(DS:GetMinExtraBtnGap(), DS:GetMaxExtraBtnGap(), 1)
+  slGap:SetValue(eb.gap or 2)
+  slGap:SetCallback('OnValueChanged', function(_, _, val)
+    eb.gap = val
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+  end)
+  tab:AddChild(slGap)
+  refs.slGap = slGap
+
+  if not wf.gapHelp then wf.gapHelp = CreateHelpIcon(wf, L['Gap Tooltip']) end
+  local gapHelp = wf.gapHelp
+  gapHelp:SetFrameLevel(slGap.frame:GetFrameLevel() + 2)
+  gapHelp:ClearAllPoints()
+  gapHelp:SetPoint('LEFT', slGap.frame, 'RIGHT', 4, 0)
+  gapHelp:Show()
+  refs.gapHelp = gapHelp
+
   return refs
 end
 
@@ -590,6 +611,7 @@ local function AddWidgets(window, conf, selectedTab)
     local wf = window.frame
     if wf.resetBtn then wf.resetBtn:Hide() end
     if wf.charPosHelp then wf.charPosHelp:Hide() end
+    if wf.gapHelp then wf.gapHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
     elseif tab == TAB_BACKDROP then
@@ -663,6 +685,7 @@ Methods
 --- @field enabledHelp HelpIconFrame
 --- @field charPosHelp HelpIconFrame
 --- @field extraBtnHelp Frame
+--- @field gapHelp HelpIconFrame
 --- @field settingsIconBtn Button
 --- @field resetBtn Button
 

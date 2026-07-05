@@ -52,8 +52,7 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
--- todo: dragFrame - mouse jumps to another location after drag-start
--- todo: add extra button 'gap' UI slider option
+-- todo: dragFrame mouse jumps to another location after drag start
 -- todo: hideTextOnSmallButtons
 -- todo: in tbc, drag-start from a bag item no longer fires show grid, but ITEM_LOCKED_CHANGED, ITEM_UNLOCKED (in this order), TBC
 -- todo: the cooldown text is too large in extra buttons
