@@ -59,6 +59,10 @@ function o.OnBarFrameDragStop(msg, barFrame) SaveAnchor(barFrame) end
 --- @param barFrame BarFrame_ABP_2_0
 function o.ApplyAnchor(barFrame) RestoreAnchor(barFrame) end
 
+--- Seeds the anchor store from the bar's current screen position.
+--- @param barFrame BarFrame_ABP_2_0
+function o.SeedAnchor(barFrame) SaveAnchor(barFrame) end
+
 --[[-----------------------------------------------------------------------------
 Register Messages
 -------------------------------------------------------------------------------]]

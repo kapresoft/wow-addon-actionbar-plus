@@ -11,6 +11,8 @@ Module::Backdrops
 --- @see BarsUI_Modules_ABP_2_0
 local libName = ns.M.Backdrops()
 --- @class Backdrops_ABP_2_0
+--- @field DEFAULT_BACKDROP BorderDef_ABP_2_0
+--- @field BORDER_DEFS table<string, BorderDef_ABP_2_0>
 local S = {}; ns:Register(libName, S)
 local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------

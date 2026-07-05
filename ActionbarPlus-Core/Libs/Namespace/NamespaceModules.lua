@@ -45,8 +45,6 @@ local ModuleNames = {
   CursorProvider = {},
   --- @type PickupHooks_ABP_2_0
   PickupHooks = {},
-  --- @type Backdrops_ABP_2_0
-  Backdrops = {},
   --- @type DatabaseMixin_ABP_2_0
   DatabaseMixin = {},
   --- @type DatabaseSchema_ABP_2_0

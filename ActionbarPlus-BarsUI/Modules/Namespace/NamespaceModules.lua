@@ -12,7 +12,6 @@ local ModuleNames = {
   
   --- @type Backdrops_ABP_2_0
   Backdrops = {},
-
   --- @type BarAnchorController_ABP_2_0
   BarAnchorController = {},
   --- @type ButtonHandlerMixin_ABP_2_0
