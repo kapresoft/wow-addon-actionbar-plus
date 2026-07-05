@@ -53,7 +53,6 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 local o = ActionEventsFrameMixin_ABP_2_0
 
 -- todo: in tbc, drag-start from a bag item no longer fires show grid, but ITEM_LOCKED_CHANGED, ITEM_UNLOCKED (in this order), TBC
--- todo: the cooldown text is too large in extra buttons
 -- todo: Edit Mode -> Action Bar Settings doesn't restore bars
 -- todo: complete localization
 -- todo: masque integration
