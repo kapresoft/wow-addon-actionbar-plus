@@ -24,8 +24,6 @@ Type Definitions
 --- @field hideWhenTaxi boolean
 --- @field hideWhenGhost boolean
 --- @field mouseoverHighlight boolean
---- @field hideTextOnSmallButtons boolean
---- @field hideCountdownNumbers boolean
 --- @field tooltip TooltipConfig_ABP_2_0
 --- @field equipmentSet EquipmentSetConfig_ABP_2_0
 --- @field bars table<string, BarConfig_ABP_2_0>
@@ -198,7 +196,7 @@ local DEFAULT_DB = {
     bars = {},
   },
 
-  profile = { -- ProfileConfig_ABP_2_0
+  profile = {
     barCount = 10,
     hideWhenTaxi = true,
     hideWhenGhost = true,
