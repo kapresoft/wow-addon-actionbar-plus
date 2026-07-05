@@ -52,7 +52,6 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
--- todo: apply backdrop settings from: [drop-down-list-of-bars]
 -- todo: complete localization
 -- todo: masque integration
 function o:OnLoad()
