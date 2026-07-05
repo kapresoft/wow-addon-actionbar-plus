@@ -6,30 +6,12 @@ local ns = select(2, ...)
 local cns, O, L = ns:cns()
 local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
-local SETTINGS = SETTINGS or L['Settings']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT = 320, 260
+local DIALOG_WIDTH, DIALOG_HEIGHT = 330, 280
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL = 'general'
 local TAB_BACKDROP = 'backdrop'
 local TAB_EXTRA_BTNS = 'extrabuttons'
-
-local function syncHandleGlow(barIndex)
-  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
-  if not w then return end
-  local theme = cns:bar(barIndex).ui.backdrop.theme
-  if theme == 'none' then
-    w:StartHandleGlow()
-  else
-    w:StopHandleGlow()
-  end
-end
-
-local function stopHandleGlow(barIndex)
-  if not barIndex then return end
-  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
-  if w then w:StopHandleGlow() end
-end
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -51,8 +33,25 @@ local RESET = RESET or L['Reset']
 
 local DRAG_HINT = L['Drag the bar by hovering over the handle at the selected location.']
 
-local function backdrops() return cns:BarsUI():ns().O.Backdrops end
+local function backdrops() return cns:BarsNS().O.Backdrops end
 local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
+
+local function syncHandleGlow(barIndex)
+  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
+  if not w then return end
+  local theme = cns:bar(barIndex).ui.backdrop.theme
+  if theme == 'none' then
+    w:StartHandleGlow()
+  else
+    w:StopHandleGlow()
+  end
+end
+
+local function stopHandleGlow(barIndex)
+  if not barIndex then return end
+  local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
+  if w then w:StopHandleGlow() end
+end
 
 --- @param dropdown AceGUIDropdown
 --- @param size number
@@ -136,6 +135,36 @@ local function AddGeneralTab(tab, window, conf)
   enabledHelp:Show()
   if wf.extraBtnHelp then wf.extraBtnHelp:Hide() end
   refs.enabledHelp = enabledHelp
+
+  --- @type AceGUICheckBox
+  local chkCharPos = AceGUI:Create('CheckBox')
+  chkCharPos:SetLabel(L['Character Specific Frame Positions'])
+  chkCharPos:SetRelativeWidth(0.95)
+  chkCharPos:SetValue(cns:p().characterSpecificAnchors == true)
+  chkCharPos:SetCallback('OnValueChanged', function(_, _, val)
+    cns:p().characterSpecificAnchors = val
+    local BMF = cns:BarsUI():ns().O.BarModuleFactory
+    local AC = cns:BarsUI():ns().O.BarAnchorController
+    for i = 1, DS:GetMaxBarCount() do
+      local frame = BMF:GetBarWidget(i) and BMF:GetBarWidget(i).frame
+      if frame then
+        if val then AC.SeedAnchor(frame) end
+        AC.ApplyAnchor(frame)
+      end
+    end
+  end)
+  tab:AddChild(chkCharPos)
+  refs.chkCharPos = chkCharPos
+
+  if not wf.charPosHelp then
+    wf.charPosHelp = CreateHelpIcon(wf, L['Character Specific Frame Positions Tooltip'])
+  end
+  local charPosHelp = wf.charPosHelp
+  charPosHelp:SetFrameLevel(chkCharPos.frame:GetFrameLevel() + 2)
+  charPosHelp:ClearAllPoints()
+  charPosHelp:SetPoint('LEFT', chkCharPos.text, 'LEFT', chkCharPos.text:GetUnboundedStringWidth() + 4, 0)
+  charPosHelp:Show()
+  refs.charPosHelp = charPosHelp
 
   --- @type AceGUICheckBox
   local chkEmpty = AceGUI:Create('CheckBox')
@@ -560,6 +589,7 @@ local function AddWidgets(window, conf, selectedTab)
     tg:ReleaseChildren()
     local wf = window.frame
     if wf.resetBtn then wf.resetBtn:Hide() end
+    if wf.charPosHelp then wf.charPosHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
     elseif tab == TAB_BACKDROP then
@@ -631,6 +661,7 @@ Methods
 
 --- @class BarOptionsDialogFrame_ABP_2_0 : Frame
 --- @field enabledHelp HelpIconFrame
+--- @field charPosHelp HelpIconFrame
 --- @field extraBtnHelp Frame
 --- @field settingsIconBtn Button
 --- @field resetBtn Button

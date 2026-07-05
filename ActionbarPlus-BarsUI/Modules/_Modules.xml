@@ -10,8 +10,8 @@
     <Include file="ButtonTemplate.xml"/>
     <Include file="BarFrame.xml"/>
     <Script file="Backdrops.lua" />
-    <Script file="BarModuleFactory.lua" />
     <Script file="BarVisibilityController.lua"/>
     <Script file="BarAnchorController.lua"/>
+    <Script file="BarModuleFactory.lua" />
 
 </Ui>

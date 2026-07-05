@@ -3,23 +3,14 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
+local BO = ns.O
+local bac, bd = BO.BarAnchorController, BO.Backdrops
 
-local cns = ns:cns()
-local unit, au = cns.O.UnitUtil, cns.O.ActionUtil
-local DatabaseSchema = cns.O.DatabaseSchema
-local backdrops = ns.O.Backdrops
+local cns, O = ns:cns()
+local unit, au = O.UnitUtil, O.ActionUtil
+local DatabaseSchema = O.DatabaseSchema
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
-
---- Returns true if BarOptionsDialog is open for this bar index,
---- so the drag handle glow is preserved while the dialog is visible.
---- @param barIndex Index
---- @return boolean
-local function IsBarDialogShownForBar(barIndex)
-  if not cns:OptionsUI() then return false end
-  local O = cns:OptionsNS().O
-  return O.BarOptionsDialog:IsShownForBar(barIndex)
-end
 
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
 
@@ -36,6 +27,17 @@ local p, t = ns:log(libName)
 --[[-------------------------------------------------------------------
 Support Functions
 ---------------------------------------------------------------------]]
+--- @return OptionsUI_Modules_ABP_2_0
+local function OptionsO() return cns:OptionsNS().O end
+
+--- Returns true if BarOptionsDialog is open for this bar index,
+--- so the drag handle glow is preserved while the dialog is visible.
+--- @param barIndex Index
+--- @return boolean
+local function IsBarDialogShownForBar(barIndex)
+  if not cns:OptionsUI() then return false end
+  return OptionsO().BarOptionsDialog:IsShownForBar(barIndex)
+end
 local function barName(index) return ('ABP_2_0_F%s'):format(index) end
 local function moduleName(index) return ('ABP_2_0_F%sModule'):format(index) end
 --- ABP_2_0_F1Button1, ABP_2_0_F1Button2, etc...
@@ -115,7 +117,7 @@ local function BarFrameWidgetMethods()
     self:ApplyDragHandle(theme == 'none')
     if theme == 'none' then self.frame:SetBackdrop(nil); return end
 
-    local borderDef = backdrops.BORDER_DEFS[theme] or backdrops.DEFAULT_BACKDROP
+    local borderDef = bd.BORDER_DEFS[theme] or bd.DEFAULT_BACKDROP
     -- effective edge size: user override > theme's intended slider default > static backdrop.edgeSize
     local edgeSize = bc.edgeSize or (borderDef.edgeSize and borderDef.edgeSize.default) or borderDef.backdrop.edgeSize
     local baseEdge = borderDef.backdrop.edgeSize
@@ -278,7 +280,7 @@ local function BarFrameWidgetMethods()
     -- for BOTTOM* left anchor: first button of the last row
     local firstBtnBottom = self.buttons and self.buttons[mainCols * (mainRows - 1) + 1]
 
-    local borderDef = backdrops.BORDER_DEFS[uic.backdrop.theme] or backdrops.DEFAULT_BACKDROP
+    local borderDef = bd.BORDER_DEFS[uic.backdrop.theme] or bd.DEFAULT_BACKDROP
     local borderPad = uic.backdrop.theme == 'none'
                       and 0
                       or (uic.backdrop.padding or borderDef.padding or 0) + (borderDef.basePadding or 8)
@@ -569,7 +571,7 @@ local function ApplyGridLayout(frame, ui)
   local rows = ui.rowSize
   local size = ui.button.size
   local spacing = ui.button.spacing
-  local borderDef = backdrops.BORDER_DEFS[ui.backdrop.theme] or backdrops.DEFAULT_BACKDROP
+  local borderDef = bd.BORDER_DEFS[ui.backdrop.theme] or bd.DEFAULT_BACKDROP
   local pad = ui.backdrop.padding or borderDef.padding
   local BASE_UI_PADDING = borderDef.basePadding or 8
 
@@ -674,6 +676,8 @@ function o:ReloadAll()
         w.extraButtons = nil
       end
       self:RebuildLayout(i)
+      local frame = _G[barName(i)]
+      if frame then bac.ApplyAnchor(frame) end
       self:IfBar(i, function(m)
         m:ForEach(function(btn) btn.widget:LoadAction() end)
         m:ForEachExtraButton(function(btn) btn.widget:LoadAction() end)
@@ -734,7 +738,7 @@ function o:CreateBarFrame(barConf, barIndex, frameName)
   --  print('xx barFrame: newState=', newstate)
   --  self:SetAttribute("abp_state", newstate)
   --]])
-  ns.O.BarAnchorController.ApplyAnchor(f, barIndex)
+  bac.ApplyAnchor(f)
   f:Show()
 
   return f
