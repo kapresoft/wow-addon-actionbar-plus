@@ -71,8 +71,9 @@ Type Definitions
 --- @class ExtraButtonConfig_ABP_2_0
 --- @field enabled boolean
 --- @field anchor string         -- 'TOP' | 'BOTTOM' | 'TOPLEFT' | 'TOPRIGHT' | 'BOTTOMLEFT' | 'BOTTOMRIGHT'
---- @field colSize number        -- number of buttons in the single row
+--- @field count number          -- total number of extra buttons
 --- @field size number           -- button size
+--- @field gap number            -- extra clearance beyond border padding between bar and first extra-button row
 --- @field showEmptyButtons boolean
 
 --- @class BarUIConfig_ABP_2_0
@@ -238,8 +239,9 @@ local DEFAULT_BAR = {
     extraButton = {
       enabled = false,
       anchor = 'TOPRIGHT',
-      colSize = 5,
+      count = 5,
       size = 30,
+      gap = 2,
       showEmptyButtons = true,
     },
   },
@@ -301,7 +303,7 @@ function o:CreateDefaultBar(barIndex)
     end
   end
 
-  local extraCols = bar.ui.extraButton.colSize or 1
+  local extraCols = bar.ui.extraButton.count or 1
   for i = 1, extraCols do
     local key = extraButtonKey(i)
     bar.buttons[key] = {}

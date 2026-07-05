@@ -24,6 +24,8 @@ local SETTINGS = SETTINGS or L['Settings']
 local OPTIONS = OPTIONS or L['Options']
 local BAR = L['Bar']
 local BAR_OPTIONS = BAR .. ' ' .. OPTIONS
+local BAR_BACKDROP    = L['Backdrop']
+local BAR_EXTRA_BTNS  = L['Extra Buttons']
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
 local PROFILES = PROFILES or L['Profiles']
 
@@ -56,7 +58,11 @@ local function ShowMenu(menuList, frame, anchor, x, y)
     frame.initialize = function(self, level)
       if level == 1 then
         for _, item in ipairs(menuList) do
-          UIDropDownMenu_AddButton(item, level)
+          if item.isSeparator then
+            UIDropDownMenu_AddButton({ text = '', disabled = true, notCheckable = true, isTitle = true }, level)
+          else
+            UIDropDownMenu_AddButton(item, level)
+          end
         end
       end
     end
@@ -89,6 +95,9 @@ Methods
 function o:Show(barFrame)
   local menu = {
     { text = BAR_OPTIONS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
+    { text = BAR_BACKDROP,   notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'backdrop') end },
+    { text = BAR_EXTRA_BTNS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end },
+    { isSeparator = true },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
     { text = SETTINGS, notCheckable = true, func = function() settingsDialog():OpenGeneral() end },
     { text = PROFILES, notCheckable = true, func = function() settingsDialog():OpenProfiles() end },
