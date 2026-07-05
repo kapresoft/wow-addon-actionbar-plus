@@ -109,6 +109,11 @@ end
 
 function o:UpdateHotKey() self.HotKey:SetText(self:GetHotKeyTextShort()) end
 
+function o:UpdateMouseoverHighlight()
+  local enabled = cns:g().mouseoverHighlight ~= false
+  self.button:GetHighlightTexture():SetShown(enabled and self:HasAction())
+end
+
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
@@ -122,6 +127,7 @@ function o:UpdateEmptyState(showEmptyButtons)
   local showHotKey = self:HasAction() or visible
   self.HotKey:SetShown(showHotKey)
   if showHotKey then self:UpdateHotKey() end
+  self:UpdateMouseoverHighlight()
   if InCombatLockdown() then return end
   self.button:EnableMouse(visible or self:HasAction())
 end
