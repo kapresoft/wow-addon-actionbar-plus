@@ -23,7 +23,7 @@ Type Definitions
 --- @field characterSpecificAnchors boolean
 --- @field hideWhenTaxi boolean
 --- @field hideWhenGhost boolean
---- @field actionButtonMouseoverGlow boolean
+--- @field mouseoverHighlight boolean
 --- @field hideTextOnSmallButtons boolean
 --- @field hideCountdownNumbers boolean
 --- @field tooltip TooltipConfig_ABP_2_0
@@ -192,15 +192,17 @@ local DB_VERSION = 1
 
 --- @type DatabaseObj_ABP_2_0
 local DEFAULT_DB = {
-  -- GlobalConfig_ABP_2_0
-  ['global'] = { schemaVersion = DB_VERSION, bars = {} },
+  ['global'] = {
+    schemaVersion = DB_VERSION,
+    mouseoverHighlight = true,
+    bars = {},
+  },
 
   profile = { -- ProfileConfig_ABP_2_0
     barCount = 10,
     hideWhenTaxi = true,
     hideWhenGhost = true,
     characterSpecificAnchors = false,
-    --actionButtonMouseoverGlow     = true,
     --hideTextOnSmallButtons        = false,
     --hideCountdownNumbers          = false,
     tooltip = { -- TooltipConfig_ABP_2_0

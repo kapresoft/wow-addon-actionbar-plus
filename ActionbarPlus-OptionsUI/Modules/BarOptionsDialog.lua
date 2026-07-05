@@ -7,7 +7,7 @@ local cns, O, L = ns:cns()
 local DS = O.DatabaseSchema
 local OPTIONS = OPTIONS or L['Options']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT = 330, 300
+local DIALOG_WIDTH, DIALOG_HEIGHT = 340, 300
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL = 'general'
 local TAB_BACKDROP = 'backdrop'
@@ -165,6 +165,28 @@ local function AddGeneralTab(tab, window, conf)
   charPosHelp:SetPoint('LEFT', chkCharPos.text, 'LEFT', chkCharPos.text:GetUnboundedStringWidth() + 4, 0)
   charPosHelp:Show()
   refs.charPosHelp = charPosHelp
+
+  --- @type AceGUICheckBox
+  local chkMouseoverHighlight = AceGUI:Create('CheckBox')
+  chkMouseoverHighlight:SetLabel(L['Mouseover Highlight'])
+  chkMouseoverHighlight:SetRelativeWidth(0.95)
+  chkMouseoverHighlight:SetValue(cns:g().mouseoverHighlight ~= false)
+  chkMouseoverHighlight:SetCallback('OnValueChanged', function(_, _, val)
+    cns:g().mouseoverHighlight = val
+    WorldEventsFrame_ABP_2_0:ForEachFrame(function(btn) btn.widget:UpdateMouseoverHighlight() end)
+  end)
+  tab:AddChild(chkMouseoverHighlight)
+  refs.chkMouseoverHighlight = chkMouseoverHighlight
+
+  if not wf.mouseoverHighlightHelp then
+    wf.mouseoverHighlightHelp = CreateHelpIcon(wf, L['Mouseover Highlight Tooltip'] .. ABP_GLOBAL_SUFFIX)
+  end
+  local mouseoverHighlightHelp = wf.mouseoverHighlightHelp
+  mouseoverHighlightHelp:SetFrameLevel(chkMouseoverHighlight.frame:GetFrameLevel() + 2)
+  mouseoverHighlightHelp:ClearAllPoints()
+  mouseoverHighlightHelp:SetPoint('LEFT', chkMouseoverHighlight.text, 'LEFT', chkMouseoverHighlight.text:GetUnboundedStringWidth() + 4, 0)
+  mouseoverHighlightHelp:Show()
+  refs.mouseoverHighlightHelp = mouseoverHighlightHelp
 
   --- @type AceGUICheckBox
   local chkEmpty = AceGUI:Create('CheckBox')
@@ -611,6 +633,7 @@ local function AddWidgets(window, conf, selectedTab)
     local wf = window.frame
     if wf.resetBtn then wf.resetBtn:Hide() end
     if wf.charPosHelp then wf.charPosHelp:Hide() end
+    if wf.mouseoverHighlightHelp then wf.mouseoverHighlightHelp:Hide() end
     if wf.gapHelp then wf.gapHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
@@ -684,6 +707,7 @@ Methods
 --- @class BarOptionsDialogFrame_ABP_2_0 : Frame
 --- @field enabledHelp HelpIconFrame
 --- @field charPosHelp HelpIconFrame
+--- @field mouseoverHighlightHelp HelpIconFrame
 --- @field extraBtnHelp Frame
 --- @field gapHelp HelpIconFrame
 --- @field settingsIconBtn Button
