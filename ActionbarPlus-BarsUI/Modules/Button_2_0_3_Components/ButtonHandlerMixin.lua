@@ -11,7 +11,7 @@ local au = O.ActionUtil
 local comp, spu, unit, hu = O.Compat, O.SpellUtil, O.UnitUtil, O.HashUtil
 local cLabel, cValue = cns:ColorFn('FEFFEB'), cns:ColorFn('00CCFF')
 
-local BUTTON_NAME_LABEL_MAX_CHARS = 5
+local BUTTON_NAME_LABEL_MAX_CHARS = 3
 
 --- @type Color
 local ACTION_RANK_COLOR = GRAY_FONT_COLOR or CreateColor(0.502, 0.502, 0.502, 1.000)
