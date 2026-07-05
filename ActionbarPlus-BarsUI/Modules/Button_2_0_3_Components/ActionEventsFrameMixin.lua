@@ -53,10 +53,8 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 local o = ActionEventsFrameMixin_ABP_2_0
 
 -- todo: in tbc, drag-start from a bag item no longer fires show grid, but ITEM_LOCKED_CHANGED, ITEM_UNLOCKED (in this order), TBC
--- todo: Edit Mode -> Action Bar Settings doesn't restore bars
 -- todo: complete localization
 -- todo: masque integration
--- todo: refactor BarModuleFactory.lua#ApplyExtraButton
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
