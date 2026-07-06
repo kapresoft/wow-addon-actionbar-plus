@@ -316,8 +316,6 @@ function o:CreateDefaultBar(barIndex)
   return bar
 end
 
-function o:GetBar(barIndex) end
-
 --- @param actionType string @spell, item, equipmentset, etc...
 --- @param action number|string @If 'spell', then the spell name or id, etc...
 --- @return ButtonConfig_ABP_2_0
