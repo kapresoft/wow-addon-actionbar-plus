@@ -169,7 +169,7 @@ local function AddGeneralTab(tab, window, conf)
 
   --- @type AceGUICheckBox
   local chkMouseoverHighlight = AceGUI:Create('CheckBox')
-  chkMouseoverHighlight:SetLabel(L['Mouseover Highlight'])
+  chkMouseoverHighlight:SetLabel(L['Mouseover Glow'])
   chkMouseoverHighlight:SetRelativeWidth(0.95)
   chkMouseoverHighlight:SetValue(cns:g().mouseoverHighlight ~= false)
   chkMouseoverHighlight:SetCallback('OnValueChanged', function(_, _, val)
@@ -180,7 +180,7 @@ local function AddGeneralTab(tab, window, conf)
   refs.chkMouseoverHighlight = chkMouseoverHighlight
 
   if not wf.mouseoverHighlightHelp then
-    wf.mouseoverHighlightHelp = CreateHelpIcon(wf, L['Mouseover Highlight Tooltip'] .. ABP_GLOBAL_SUFFIX)
+    wf.mouseoverHighlightHelp = CreateHelpIcon(wf, L['Mouseover Glow Tooltip'] .. ABP_GLOBAL_SUFFIX)
   end
   local mouseoverHighlightHelp = wf.mouseoverHighlightHelp
   mouseoverHighlightHelp:SetFrameLevel(chkMouseoverHighlight.frame:GetFrameLevel() + 2)

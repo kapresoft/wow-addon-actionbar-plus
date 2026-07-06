@@ -367,9 +367,13 @@ end
 -- todo: GameTooltip needs impl
 function o:OnEnter()
   o.Btn_OnEnterGameTooltip(self)
+  self:IfHasCursor(function() self.widget:ShowHighlight() end)
 end
 
-function o:OnLeave() GameTooltip:Hide() end
+function o:OnLeave()
+  GameTooltip:Hide()
+  self.widget:HideHighlight()
+end
 
 --- @param button ButtonName
 function o:OnDragStart(button)

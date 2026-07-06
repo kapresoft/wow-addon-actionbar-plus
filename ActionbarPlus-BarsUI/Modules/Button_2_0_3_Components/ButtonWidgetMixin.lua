@@ -114,6 +114,13 @@ function o:UpdateMouseoverHighlight()
   self.button:GetHighlightTexture():SetShown(enabled and self:HasAction())
 end
 
+--- Force-shows the highlight texture regardless of mouseover-highlight setting
+--- or whether the button has an action.
+function o:ShowHighlight() self.button:GetHighlightTexture():Show() end
+
+--- Restores the highlight texture to its normal mouseover-driven state.
+function o:HideHighlight() self:UpdateMouseoverHighlight() end
+
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 
