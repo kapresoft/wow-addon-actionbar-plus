@@ -8,7 +8,7 @@ local DS = O.DatabaseSchema
 local tbl_DeepCopy = cns:Table().DeepCopy
 local OPTIONS = OPTIONS or L['Options']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT = 340, 300
+local DIALOG_WIDTH, DIALOG_HEIGHT = 340, 310
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL = 'general'
 local TAB_BACKDROP = 'backdrop'
