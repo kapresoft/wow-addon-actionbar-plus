@@ -2,6 +2,7 @@
 ..\..\FrameXML\UI.xsd">
 
     <Script file="enUS.lua"/>
+    <Script file="V2Announcement_enUS.lua"/>
     <!--
     <Script file="esES.lua"/>
     <Script file="esMX.lua"/>

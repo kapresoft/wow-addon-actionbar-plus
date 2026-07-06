@@ -7,6 +7,7 @@ Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log('Core')
 local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
+local function announcementDialog() return O.V2AnnouncementDialog end
 local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
 
 --[[-------------------------------------------------------------------
@@ -52,6 +53,12 @@ end
 function o:OnEnable()
   --t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
   PickupHooks:Init()
+  self:RegisterEvent('PLAYER_ENTERING_WORLD')
+end
+
+function o:PLAYER_ENTERING_WORLD()
+  self:UnregisterEvent('PLAYER_ENTERING_WORLD')
+  announcementDialog():Show()
 end
 
 --- @return Namespace_ABP_2_0
