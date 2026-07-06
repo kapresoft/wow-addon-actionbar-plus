@@ -18,39 +18,38 @@ tools-used:
   - Bugsack
   - Bug-Grabber
 
-# Declaring the following dependencies will make curse forge app install these 3rd-party
-# libraries. Need to figure out which is best (embedded or external).
-# in code, check for each of library global var before using
 #optional-dependencies:
 #  - ace3
 #  - libstub
 #  - callbackhandler
 #  - libsharedmedia-3-0
 
-# Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
-#ignore:
-#  - .git
-#  - .idea
-
 # Resources:
 #  - https://github.com/wowace-mirror
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
+  # V1
   ActionbarPlus/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
   ActionbarPlus/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
   ActionbarPlus/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
   ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
+  # V2
+  ActionbarPlus-Core/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
+  ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+  ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
+  ActionbarPlus-Core/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 
 ignore:
   - "*.sh"
   - "*.md"
   - "*.yaml"
   - "*.yml"
+  - "*.toml"
   - dev
   - doc
   - scripts
-  - ActionbarPlus-2.0
+  # V1 ignores
   - ActionbarPlus/Core/Lib/Developer
   - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/LICENSE
   - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
@@ -63,9 +62,26 @@ ignore:
   - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
   - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
   - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
-  - ActionbarPlus-Core
-  - ActionbarPlus-BarsUI
-  - ActionbarPlus-OptionsUI
+  # Exclude Retail TOCs — V1 and V2 do not load on Retail
+  - ActionbarPlus/ActionbarPlus.toc
+  - ActionbarPlus-Core/ActionbarPlus-Core.toc
+  - ActionbarPlus-BarsUI/ActionbarPlus-BarsUI.toc
+  - ActionbarPlus-OptionsUI/ActionbarPlus-OptionsUI.toc
+  # V2 ignores
+  - ActionbarPlus-Core/Libs/Developer
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/doc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/ThirdParty
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/LibPrettyPrint.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/*.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/External
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/_Lib.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
+
 # REQUIRED for CurseForge packager (non-obvious):
 # The LEFT side MUST be <repo-folder>/<addon-folder>
 #   - <addon-folder> MUST be the folder that contains the .toc files
@@ -81,3 +97,6 @@ ignore:
 # ⚠️ Do not change unless you also change the repo/addon layout.
 move-folders:
   ActionbarPlus/ActionbarPlus: ActionbarPlus
+  ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
+  ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
+  ActionbarPlus/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI

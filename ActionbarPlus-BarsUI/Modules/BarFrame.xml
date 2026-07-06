@@ -12,7 +12,6 @@
 
     <Script file="Button_2_0_3.lua"/>
     <Script file="Button_2_0_3_Components/DragStateController.lua"/>
-    <Script file="Button_2_0_3_Components/SpecController.lua"/>
     <Script file="Button_2_0_3_Components/MacroChangeController.lua"/>
     <Script file="BarFrame.lua"/>
     <Script file="BarDragHandleMixin.lua"/>

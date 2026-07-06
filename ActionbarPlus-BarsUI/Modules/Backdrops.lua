@@ -156,5 +156,5 @@ Module::Backdrops (Methods)
 --- @type Backdrops_ABP_2_0
 local o = S
 
-o.DEFAULT_BACKDROP = BORDER_DEFS.stone
+o.DEFAULT_BACKDROP = BORDER_DEFS.shadowmoon
 o.BORDER_DEFS = BORDER_DEFS
