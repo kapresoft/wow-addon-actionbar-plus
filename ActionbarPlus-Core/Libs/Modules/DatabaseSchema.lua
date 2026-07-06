@@ -114,6 +114,7 @@ Type Definitions
 
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
+--- @field v2AnnouncementShown boolean
 
 --  ================================================
 
@@ -193,6 +194,7 @@ local DEFAULT_DB = {
   ['global'] = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
+    v2AnnouncementShown = false,
     bars = {},
   },
 

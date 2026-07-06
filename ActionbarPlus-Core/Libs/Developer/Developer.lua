@@ -9,9 +9,12 @@ local unit, comp, hu = O.UnitUtil, O.Compat, O.HashUtil
 --- @class Developer_ABP_2_0 : AceEvent-3.0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 
-
 --- @return Namespace_ABP_BarsUI_2_0
 local function bar_ns() return ABP_BARSUI_NS end
+
+function o.resetD()
+  ns:g().v2AnnouncementShown = false
+end
 
 function o.OnBarsEnabled(evt)
   --local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
