@@ -55,7 +55,6 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
--- todo: Mouseover Glow should be true by default
 -- todo: complete localization
 -- todo: masque integration
 function o:OnLoad()
