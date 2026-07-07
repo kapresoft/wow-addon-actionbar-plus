@@ -401,20 +401,27 @@ local function BarModuleProtoMethods()
   --- @NotCombatSafe
   function bm:OnEnable()
     if InCombatLockdown() then return end
-    if self.barFrame then
-      self.barFrame:Show()
-      BarFrame_EnableVisibilityDriver(self.barFrame)
-    end
+    self.barFrame:Show()
+    BarFrame_EnableVisibilityDriver(self.barFrame)
+    self:ForEach(function(btn) btn:Update() end)
+    self:ForEachExtraButton(function(btn) btn:Update() end)
     BarModule_EnableEditModeCallback(self)
   end
 
   --- @NotCombatSafe
   function bm:OnDisable()
     if InCombatLockdown() then return end
-    if self.barFrame then
-      BarFrame_DisableVisibilityDriver(self.barFrame)
-      self.barFrame:Hide()
+    BarFrame_DisableVisibilityDriver(self.barFrame)
+    self.barFrame:Hide()
+    local eventsFrame = ActionEventsFrame_ABP_2_0
+    local function unregister(btn)
+      if btn.eventsRegistered then
+        eventsFrame:UnregisterFrame(btn)
+        btn.eventsRegistered = nil
+      end
     end
+    self:ForEach(unregister)
+    self:ForEachExtraButton(unregister)
     BarModule_DisableEditModeCallback(self)
   end
 
