@@ -56,7 +56,6 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 local o = ActionEventsFrameMixin_ABP_2_0
 
 -- todo: keybind text doesn't scale well
--- todo: right-click doesn't display bar frame menu in retail
 -- todo: complete localization
 -- todo: masque integration
 function o:OnLoad()
