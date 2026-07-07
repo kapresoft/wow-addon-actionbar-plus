@@ -42,16 +42,20 @@ local p, t = ns:log('ActionEventsFrame')
 --[[-------------------------------------------------------------------
 Mixin
 ---------------------------------------------------------------------]]
+
 --- =======================================================
 --- @class ActionEventsFrameMixin_ABP_2_0 : Frame
 --- @field frames table<Button_ABP_2_0_3, Button_ABP_2_0_3>
 ActionEventsFrameMixin_ABP_2_0 = {};
+
 --
 --- @class ActionEventsFrame_ABP_2_0 : ActionEventsFrameMixin_ABP_2_0
+--- @see ActionbarPlus-BarsUI/Modules/BarFrame.xml#ActionEventsFrame_ABP_2_0
 --- =======================================================
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: Mouseover Glow should be true by default
 -- todo: complete localization
 -- todo: masque integration
 function o:OnLoad()
@@ -163,7 +167,7 @@ function o:OnEvent(evt, ...)
 end
 
 --- @param frame Button_ABP_2_0_3
-function o:RegisterFrame(frame) self.frames[frame] = frame; end
+function o:RegisterFrame(frame) self.frames[frame] = frame end
 
 --- @param frame Button_ABP_2_0_3
-function o:UnregisterFrame(frame) self.frames[frame] = nil; end
+function o:UnregisterFrame(frame) self.frames[frame] = nil end
