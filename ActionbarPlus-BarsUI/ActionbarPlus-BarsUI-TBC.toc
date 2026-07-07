@@ -1,4 +1,4 @@
-## Interface: 20505
+## Interface: 20506
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r|cffffffff-BarsUI|r
 # AllowLoadGameType: tbc
