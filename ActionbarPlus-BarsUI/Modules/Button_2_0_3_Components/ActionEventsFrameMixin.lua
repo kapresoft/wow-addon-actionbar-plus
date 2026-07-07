@@ -61,7 +61,6 @@ local o = ActionEventsFrameMixin_ABP_2_0
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
-  --self:RegisterEvent("ACTIONBAR_UPDATE_USABLE"); --replaced with ACTION_USABLE_CHANGED
   self:RegisterEvent("BAG_UPDATE_COOLDOWN")
   self:RegisterEvent("SPELL_UPDATE_USABLE")
   self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
@@ -69,7 +68,6 @@ function o:OnLoad()
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
   self:RegisterEvent("TRADE_SKILL_SHOW");
   self:RegisterEvent("TRADE_SKILL_CLOSE");
-  --self:RegisterEvent("ARCHAEOLOGY_CLOSED");
   self:RegisterEvent("PLAYER_ENTER_COMBAT");
   self:RegisterEvent("PLAYER_LEAVE_COMBAT");
   self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -79,7 +77,6 @@ function o:OnLoad()
   self:RegisterEvent("UNIT_EXITED_VEHICLE");
   self:RegisterEvent("COMPANION_UPDATE");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
-  --self:RegisterEvent("PLAYER_LEAVE_COMBAT");
   self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
   if cns:IsMistsOrEarlier() then
     self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
@@ -92,12 +89,7 @@ function o:OnLoad()
   self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", "player");
-  --self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_TARGET", "player");
-  --self:RegisterUnitEvent("UNIT_SPELLCAST_RETICLE_CLEAR", "player");
-  --self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_START", "player");
-  --self:RegisterUnitEvent("UNIT_SPELLCAST_EMPOWER_STOP", "player");
-  
-  --self:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE");
+
   self:RegisterEvent("PET_STABLE_UPDATE");
   self:RegisterEvent("PET_STABLE_SHOW");
   self:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
@@ -108,10 +100,6 @@ function o:OnLoad()
   self:RegisterEvent("SPELL_UPDATE_ICON");
   self:RegisterEvent("UPDATE_STEALTH");
   
-  --[[EventRegistry:RegisterCallback("AssistedCombatManager.OnSetActionSpell", function(o)
-    -- May not be the best way, but it is a unique string which is what the event system cares about
-    self:OnEvent("AssistedCombatManager.OnSetActionSpell");
-  end);]]
 end
 
 --- @param event EventName
