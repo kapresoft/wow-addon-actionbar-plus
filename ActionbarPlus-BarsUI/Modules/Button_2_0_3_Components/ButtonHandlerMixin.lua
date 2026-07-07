@@ -253,6 +253,18 @@ end
 
 --- @param self Button_ABP_2_0_X
 --- @param typ ActionType
+--- @param isMacroSpellOrItem? boolean
+--- @param macroName? Name
+function o.Btn_OnGameTooltipAdditional(self, typ)
+  local hotKey = self.widget:GetHotKeyText()
+  if hotKey then
+    GameTooltip:AddLine(' ')
+    GameTooltip:AddDoubleLine(cLabel(L['Keybind'] .. ':'), cValue(hotKey))
+  end
+end
+
+--- @param self Button_ABP_2_0_X
+--- @param typ ActionType
 --- @param val ActionValue
 --- @param isCustom? boolean
 function o.Btn_OnGameTooltip(self, typ, val, isCustom)
@@ -270,11 +282,13 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
           right:SetTextColor(ACTION_RANK_COLOR:GetRGBA())
           right:Show()
         end
+        o.Btn_OnGameTooltipAdditional(self, typ)
       end)
     elseif au.IsItem(typ) then
       --- @type number|string @The val param can be 'item:<itemID>', itemID, itemName
       local itemVal = au.ExtractItemID(val) or val
       comp:IfItem(itemVal, function(item) GameTooltip:SetInventoryItemByID(item.id) end)
+      o.Btn_OnGameTooltipAdditional(self, typ)
     elseif au.IsMacro(typ) then
       comp:IfMacro(val, function(name, icon, body)
         local mSpellID, mItemID = au.GetMacroAction(name)
@@ -283,7 +297,7 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
         elseif mItemID then
           o.Btn_OnGameTooltip(self, atyp.item, mItemID)
         end
-        if mSpellID or mItemID then GameTooltip:AddLine(' ') end
+        if not self.widget:GetHotKeyText() then GameTooltip:AddLine(' ') end
         GameTooltip:AddDoubleLine(cLabel(MACRO .. ':'), cValue(name))
       end)
     end
