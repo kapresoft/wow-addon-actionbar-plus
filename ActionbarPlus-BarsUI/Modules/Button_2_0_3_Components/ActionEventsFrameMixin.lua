@@ -55,6 +55,8 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: keybind text doesn't scale well
+-- todo: right-click doesn't display bar frame menu in retail
 -- todo: complete localization
 -- todo: masque integration
 function o:OnLoad()
@@ -71,13 +73,15 @@ function o:OnLoad()
   --self:RegisterEvent("ARCHAEOLOGY_CLOSED");
   self:RegisterEvent("PLAYER_ENTER_COMBAT");
   self:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  self:RegisterEvent("PLAYER_REGEN_ENABLED");
   self:RegisterEvent("START_AUTOREPEAT_SPELL");
   self:RegisterEvent("STOP_AUTOREPEAT_SPELL");
   self:RegisterEvent("UNIT_ENTERED_VEHICLE");
   self:RegisterEvent("UNIT_EXITED_VEHICLE");
   self:RegisterEvent("COMPANION_UPDATE");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
-  self:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  --self:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
   if cns:IsMistsOrEarlier() then
     self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
   end

@@ -181,11 +181,16 @@ function o:OnEvent(evt, ...)
     o.Btn_OnMouseoverUnit(self, evt)
   elseif evt == 'MODIFIER_STATE_CHANGED' then
     o.Btn_OnModifierStateChanged(self, evt)
-  elseif evt == 'PLAYER_LEAVE_COMBAT' then
+  elseif evt == 'PLAYER_IN_COMBAT_CHANGED' then
+    -- class: OK, tbc: OK, mop: ??, retail: OK
+    --- @type boolean
+    local inCombat = ...
+    self:UpdateState(evt)
+    if not inCombat then self:DisableFlashAnimation() end
+  --elseif evt == 'PLAYER_LEAVE_COMBAT' then
     -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
     -- attacking (even when player is in combat)
-    self:UpdateState(evt)
-    self:DisableFlashAnimation()
+    --self:UpdateState(evt)
   elseif evt == 'START_AUTOREPEAT_SPELL' then
     --t('START_AUTOREPEAT_SPELL', 'attributeSpell=', self.widget:GetAttributeSpell())
     if self.widget:RequiresShootAnimation() then
@@ -235,6 +240,8 @@ function o:OnEvent(evt, ...)
   elseif evt == 'UPDATE_BINDINGS' then
     self.widget:UpdateHotKey()
   elseif Str_IsAnyOf(evt, 'ACTIONBAR_SHOWGRID', 'ITEM_LOCKED') then
+    -- when right-clicking to vendor, ITEM_LOCKED still fires but without a cursor
+    if not GetCursorInfo() then return end
     self.widget:UpdateEmptyState(true)
   elseif Str_IsAnyOf(evt, 'ACTIONBAR_HIDEGRID', 'ITEM_UNLOCKED') then
     local uic = cns:bar(self.widget.barIndex).ui
