@@ -187,12 +187,7 @@ function o:OnEvent(evt, ...)
     local inCombat = ...
     self:UpdateState(evt)
     if not inCombat then self:DisableFlashAnimation() end
-  --elseif evt == 'PLAYER_LEAVE_COMBAT' then
-    -- note: PLAYER_LEAVE_COMBAT gets fired when the player stops
-    -- attacking (even when player is in combat)
-    --self:UpdateState(evt)
   elseif evt == 'START_AUTOREPEAT_SPELL' then
-    --t('START_AUTOREPEAT_SPELL', 'attributeSpell=', self.widget:GetAttributeSpell())
     if self.widget:RequiresShootAnimation() then
       self:SetChecked(true)
       self:EnableFlashAnimation()
