@@ -602,7 +602,7 @@ local function ApplyGridLayout(frame, ui)
   local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom
   frame:SetSize(totalWidth, totalHeight)
 
-  local hotKeyFontSize = math.max(8, math.floor(size * 16 / 40))
+  local hotKeyFontSize = math.max(8, math.floor(size * 12 / 40))
   local hotKeyOffsetX  = math.floor(size * 5 / 40)
   local hotKeyOffsetY  = math.floor(size * 7 / 40)
   local startX = math.floor(padLeft + 0.5)

@@ -22,6 +22,7 @@ L['Columns']              = true
 L['Border Size']          = true
 L['Enabled']              = true
 L['General']              = true
+L['Keybind']              = true
 L['Not Bound']            = true
 L['Options']              = true
 L['Padding']              = true
