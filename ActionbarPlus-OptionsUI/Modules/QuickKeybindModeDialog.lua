@@ -3,7 +3,7 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
-local cns = ns:cns()
+local cns, O, L = ns:cns()
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -40,11 +40,16 @@ StaticPopupDialogs[CONFIRM_GENERAL_BINDINGS] = {
   hideOnEscape = true,
 }
 
+local c1 = cns:ColorFn('FFF803')
+
+local PRESS_TXT = c1(L['press the desired key'])
+local ESC = c1(L['ESC'])
+
 local TEXT_INSTRUCTIONS =
-  'You are in Quick Keybind Mode. Mouse over a button and press the\n' ..
-  'desired key to set the binding for that button.'
-local TEXT_CANCEL_NOTICE =
-  '\nCanceling will remove you from Quick Keybind Mode.'
+  '\n' .. L['You are in Quick Keybind Mode'] .. '.' ..
+  '\n' .. L['Mouse over a button and %s to set its binding'] .. ', ' ..
+  '\n' .. L['or press %s to clear it'] .. '.'
+local TEXT_CANCEL_NOTICE = '\n' .. L['Canceling will remove you from Quick Keybind Mode'] .. '.'
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -56,7 +61,7 @@ local function AddBodyText(frame)
 
   --- @type AceGUILabel
   local desc = AceGUI:Create('Label')
-  desc:SetText('\n' .. TEXT_INSTRUCTIONS)
+  desc:SetText(TEXT_INSTRUCTIONS:format(PRESS_TXT, ESC))
   desc:SetFullWidth(true)
   desc.label:SetJustifyH('CENTER')
   frame:AddChild(desc)

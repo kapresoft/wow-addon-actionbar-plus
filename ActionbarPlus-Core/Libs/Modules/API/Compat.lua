@@ -514,8 +514,6 @@ local MODIFIER_KEYS = {
   LMETA=true, RMETA=true,
   LALT=true, RALT=true
 }
-local META_KEYWORD = IsMacClient() and 'CMD-' or 'WIN-'
-
 --- @param keyPressed string
 --- @return string?
 function o:GetModifierBinding(keyPressed)
@@ -524,7 +522,9 @@ function o:GetModifierBinding(keyPressed)
   if IsAltKeyDown()     then binding = binding .. 'ALT-'   end
   if IsControlKeyDown() then binding = binding .. 'CTRL-'  end
   if IsShiftKeyDown()   then binding = binding .. 'SHIFT-' end
-  if IsMetaKeyDown and IsMetaKeyDown() then binding = binding .. META_KEYWORD end
+  if IsMetaKeyDown and IsMetaKeyDown() then
+    binding = binding .. 'META-'
+  end
   local result = binding .. keyPressed
   if strupper(result) ~= 'ESCAPE' and strupper(result):find('ESCAPE') then return nil end
   return result
