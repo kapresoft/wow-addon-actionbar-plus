@@ -62,11 +62,6 @@ ignore:
   - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
   - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
   - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
-  # Exclude Retail TOCs — V1 and V2 do not load on Retail
-  - ActionbarPlus/ActionbarPlus.toc
-  - ActionbarPlus-Core/ActionbarPlus-Core.toc
-  - ActionbarPlus-BarsUI/ActionbarPlus-BarsUI.toc
-  - ActionbarPlus-OptionsUI/ActionbarPlus-OptionsUI.toc
   # V2 ignores
   - ActionbarPlus-Core/Libs/Developer
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev

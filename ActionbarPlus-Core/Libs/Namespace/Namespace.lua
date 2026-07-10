@@ -21,7 +21,6 @@ local addon, xns = ...
 --- @field name Name The addon name
 --- @field settings Settings_ABP_2_0 @Settings
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
---- @field gameVersion Kapresoft-GameVersion-2-0
 --- @field printer LibPrettyPrint_Printer
 --- @field logHolder LogHolder_ABP_2_0
 --- @field colorDef Kapresoft-ColorDefinition-2-0
@@ -235,4 +234,12 @@ function ns:Chain(matched, ...)
     if not matched and type(fn) == 'function' then fn(unpack(args)) end
   end
   return chain
+end
+
+--- @param callbackFn fun(abpMasque:Namespace_ABP_Masque_2_0)
+--- @return Chain_ABP_2_0
+function ns:IfMasque(callbackFn)
+  local hasABPMasque = ABP_MASQUE_NS ~= nil
+  if hasABPMasque and callbackFn then callbackFn(ABP_MASQUE_NS) end
+  return self:Chain(hasABPMasque)
 end

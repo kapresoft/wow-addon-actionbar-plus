@@ -297,6 +297,7 @@ local function BarFrameWidgetMethods()
     for i = 1, cols do
       local btn = self.extraButtons[i]
       btn:SetSize(size, size)
+      cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
       btn:ClearAllPoints()
       btn:Show()
       if btn.widget then btn.widget:UpdateEmptyState(showEmpty) end
@@ -616,6 +617,7 @@ local function ApplyGridLayout(frame, ui)
     btn:ClearAllPoints()
     if i <= visible then
       btn:SetSize(size, size)
+      cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
       btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
       btn.HotKey:ClearAllPoints()
       btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)

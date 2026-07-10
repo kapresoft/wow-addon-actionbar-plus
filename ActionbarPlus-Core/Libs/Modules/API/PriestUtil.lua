@@ -47,7 +47,7 @@ end
 function o:GetShadowFormActiveIcon() return self:GetActiveShapeshiftFormIcon() end
 
 function o:GetActiveShapeshiftFormIcon()
-  if ns:IsRetail() then return formActiveIcon.retail
+  if ns:IsShadowlandsOrLater() then return formActiveIcon.retail
   elseif ns:IsMists() then return formActiveIcon.mop end
   return formActiveIcon.default
 end

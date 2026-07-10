@@ -368,7 +368,7 @@ function o:GetActionTexture()
           iconID = unit:GetStealthedIcon()
         elseif isShapeshiftSpell and shapeshiftActive then
           iconID, shouldDim = activeIcon, self:ShouldDimIcon(spid, shapeshiftActive)
-          if cns:IsMainline() then shouldDim = false end
+          if cns:IsShadowlandsOrLater() then shouldDim = false end
         else iconID = sp.iconID
         end
       end)
@@ -745,10 +745,8 @@ function o:EnableFlashAnimation()
 end
 
 function o:DisableFlashAnimation()
-  local typ, val = self:GetActionInfo()
-  local isShootOrAttack = au.IsSpell(typ) and (au.IsShootSpell(val) or au.IsAutoAttackSpell(val))
-  if not isShootOrAttack then return end
   local anim = self.button.SpellHighlightAnim
+  anim:Stop()
   if anim:IsPlaying() then anim:Stop() end
   C_Timer.NewTicker(0.1, function(cb)
     if anim:IsPlaying() then anim:Stop() end

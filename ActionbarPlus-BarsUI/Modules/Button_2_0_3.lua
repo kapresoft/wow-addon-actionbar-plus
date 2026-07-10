@@ -120,6 +120,7 @@ function o:OnLoad()
   self.widget:LoadAction()
 
   self.HotKey:SetFont(self.HotKey:GetFont(), 16, 'OUTLINE')  -- overridden by BarModuleFactory at layout time
+  cns:IfMasque(function(abpMasque) abpMasque:AddButton(self) end)
   self.cooldown:SetDrawBling(false)
   self.cooldown:SetDrawEdge(false)
   self.cooldown:SetDrawSwipe(true)
@@ -181,12 +182,6 @@ function o:OnEvent(evt, ...)
     o.Btn_OnMouseoverUnit(self, evt)
   elseif evt == 'MODIFIER_STATE_CHANGED' then
     o.Btn_OnModifierStateChanged(self, evt)
-  elseif evt == 'PLAYER_IN_COMBAT_CHANGED' then
-    -- class: OK, tbc: OK, mop: ??, retail: OK
-    --- @type boolean
-    local inCombat = ...
-    self:UpdateState(evt)
-    if not inCombat then self:DisableFlashAnimation() end
   elseif evt == 'START_AUTOREPEAT_SPELL' then
     if self.widget:RequiresShootAnimation() then
       self:SetChecked(true)
@@ -197,13 +192,28 @@ function o:OnEvent(evt, ...)
       self:SetChecked(false)
       self:DisableFlashAnimation()
     end
-  elseif Str_IsAnyOf(evt, 'PLAYER_TARGET_SET_ATTACKING', 'PLAYER_ENTER_COMBAT') then
+  elseif evt == 'PLAYER_IN_COMBAT_CHANGED' then
+    -- PLAYER_IN_COMBAT_CHANGED -> classic: YES, tbc: YES, mop: YES, retail: YES
+    -- only when player actually goes into combat; i.e. InCombatLockdown() is true
+    --- @type boolean
+    local inCombat = ...
+    self:UpdateState(evt)
+    if not inCombat then self:DisableFlashAnimation() end
+  elseif Str_IsAnyOf(evt, 'PLAYER_ENTER_COMBAT') then
+    -- PLAYER_ENTER_COMBAT fires when right-clicks (auto attacks) on a hostile target
+    -- PLAYER_ENTER_COMBAT does not necessarily mean InCombatLockdown() returns true
     if self.widget:RequiresAttackAnimation() then
       self:SetChecked(true)
       self:EnableFlashAnimation()
       return
     end
     self:UpdateState(evt)
+  elseif evt == 'PLAYER_LEAVE_COMBAT' then
+    -- note: PLAYER_ENTER/LEAVE_COMBAT fires when auto-attack starts/stops,
+    -- even if the player isn't actually in combat (e.g. right-clicking a
+    -- hostile target triggers this without ever entering real combat).
+    self:UpdateState(evt)
+    self:DisableFlashAnimation()
   elseif evt == 'ACTIONBAR_UPDATE_STATE' then
     self:RepairRetailPushedState()
     self:UpdateState('OnEvent') -- this deselects Cooking, First Aid, Prof Talents
@@ -275,7 +285,7 @@ function o:OnPlayerMatchingSpellcastEvent(evt, spellID)
 end
 --- Retail fix for stuck PUSHED state after toggle.
 function o:RepairRetailPushedState()
-  if cns:IsRetail() then
+  if cns:IsShadowlandsOrLater() then
     self:SetButtonStateNormal()
   end
 end

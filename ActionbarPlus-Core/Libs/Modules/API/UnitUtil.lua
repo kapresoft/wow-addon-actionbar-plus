@@ -315,7 +315,7 @@ end
 function o:GetActiveSpecGroupIndex()
   local ok, result
   
-  if ns:IsRetail() then
+  if ns:IsShadowlandsOrLater() then
     return C_GetSpecialization()
   end
   
@@ -357,13 +357,12 @@ end
 function o:GetSpecGroupCount()
   local ok, result
   
-  if ns:IsRetail() then
-    -- MoP
+  if ns:IsShadowlandsOrLater() then
     if GetNumSpecializations  then
-      p('retail: GetNumSpecializations')
+      t('retail: GetNumSpecializations')
       ok, result = pcall(GetNumSpecializations)
       if ok and type(result) == "number" then return result end
-      p("GetSpecGroupCount:: C_GetNumSpecializations failed:", result)
+      t("GetSpecGroupCount:: C_GetNumSpecializations failed:", result)
     end
   end
   

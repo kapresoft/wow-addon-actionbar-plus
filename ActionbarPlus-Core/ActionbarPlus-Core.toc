@@ -1,4 +1,4 @@
-## Interface: 120007
+## Interface: 20506, 30403, 40402, 50504, 120007
 ## Version: @project-version@
 ## Title: Actionbar|cff1784d1Plus|r|cffffffff-Core|r
 
@@ -48,9 +48,5 @@
 ## X-PayPal-Donation-ID: AX58YP3GSGXVU
 ## X-PayPal-Donation-URL: https://www.paypal.com/donate/?hosted_button_id=AX58YP3GSGXVU
 
-# To get the Interface/Build Info
-# /dump select(4, GetBuildInfo())
-
 ThirdParty\ThirdParty.xml
-Libs\Flavor\Retail.lua
 Libs\_Libs.xml

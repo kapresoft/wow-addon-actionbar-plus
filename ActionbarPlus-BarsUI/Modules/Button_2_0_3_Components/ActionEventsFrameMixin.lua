@@ -55,8 +55,11 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
+-- todo: Update ABPV2 notice dialog to include ABP-Masque
+-- todo: if theme is none, then disable barFrame mouseOver
+-- todo: barMenu to open Masque Settings
+-- todo: SettingsMenu -> ActionbarPlus v1.0.0
 -- todo: complete localization
--- todo: masque integration
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
@@ -67,19 +70,17 @@ function o:OnLoad()
   self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
   self:RegisterEvent("TRADE_SKILL_SHOW");
   self:RegisterEvent("TRADE_SKILL_CLOSE");
-  self:RegisterEvent("PLAYER_ENTER_COMBAT");
-  self:RegisterEvent("PLAYER_LEAVE_COMBAT");
-  self:RegisterEvent("PLAYER_REGEN_ENABLED");
   self:RegisterEvent("START_AUTOREPEAT_SPELL");
   self:RegisterEvent("STOP_AUTOREPEAT_SPELL");
   self:RegisterEvent("UNIT_ENTERED_VEHICLE");
   self:RegisterEvent("UNIT_EXITED_VEHICLE");
   self:RegisterEvent("COMPANION_UPDATE");
   self:RegisterEvent("UNIT_INVENTORY_CHANGED");
-  self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED");
-  if cns:IsMistsOrEarlier() then
-    self:RegisterEvent("PLAYER_TARGET_SET_ATTACKING");
-  end
+  self:RegisterEvent("PLAYER_REGEN_ENABLED");
+  self:RegisterEvent("PLAYER_ENTER_COMBAT")
+  self:RegisterEvent("PLAYER_LEAVE_COMBAT");
+  self:RegisterEvent("PLAYER_IN_COMBAT_CHANGED")
+
   self:RegisterEvent("UNIT_SPELLCAST_SENT");
   self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTED", "player");
   self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");

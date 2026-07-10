@@ -1,10 +1,7 @@
---- @type string
-local addon
 --- @type Namespace_ABP_2_0
-local ns
-addon, ns = ...
+local ns = select(2, ...)
 
-ns.gameVersion = 'mainline'
+if not ns:IsShadowlandsOrLater() then return end
 
 --- The colors selected here should be available for all versions
 local co = BRIGHTBLUE_FONT_COLOR or BLUE_FONT_COLOR
