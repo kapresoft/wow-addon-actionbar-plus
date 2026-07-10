@@ -65,7 +65,6 @@ end
 
 function o:OnEnter()
   if not self.widget then return end
-  self.widget:ShowDragHandle()
 
   local w = self.widget
   local barTitle = ('%s — %s %s'):format(cns.name, L['Bar'], w.index)
@@ -87,6 +86,5 @@ end
 
 function o:OnLeave()
   GameTooltip:Hide()
-  if self.widget then self.widget:HideDragHandle() end
 end
 
