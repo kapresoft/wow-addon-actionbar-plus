@@ -7,7 +7,6 @@ Local Vars
 -------------------------------------------------------------------------------]]
 
 local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
-local VERSION = L['Version']
 local DIALOG_WIDTH, DIALOG_HEIGHT = 550, 405
 local TREE_WIDTH = 130
 
@@ -35,26 +34,10 @@ end
 
 --- @return table
 local function CreateOptions()
-  local generalArgs = {
-    version = {
-      type = 'description',
-      name = ('%s: %s'):format(VERSION, GetVersionText()),
-      order = 0,
-      fontSize = 'medium',
-    },
-  }
-
   return {
     type = 'group',
-    name = L['ActionbarPlus'],
-    args = {
-      general = {
-        type = 'group',
-        name = L['General'],
-        order = 1,
-        args = generalArgs,
-      },
-    },
+    name = ('%s %s'):format(L['ActionbarPlus'], GetVersionText()),
+    args = {},
   }
 end
 
@@ -68,7 +51,6 @@ local function RegisterOptions()
 
   local options = CreateOptions()
   options.args.profiles = AceDBOptions:GetOptionsTable(cns:db())
-  options.args.profiles.order = 2
 
   AceConfig:RegisterOptionsTable(appName, options)
   local AceConfigDialog = cns:AceConfigDialog()
@@ -99,11 +81,6 @@ end
 function o:OpenProfiles()
   self:Open()
   cns:AceConfigDialog():SelectGroup(appName, 'profiles')
-end
-
-function o:OpenGeneral()
-  self:Open()
-  cns:AceConfigDialog():SelectGroup(appName, 'general')
 end
 
 function o:PLAYER_REGEN_DISABLED()
