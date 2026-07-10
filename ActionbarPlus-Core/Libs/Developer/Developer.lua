@@ -12,6 +12,31 @@ local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 --- @return Namespace_ABP_BarsUI_2_0
 local function bar_ns() return ABP_BARSUI_NS end
 
+
+-- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
+-- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
+-- runs once (triggered by the /msq slash command). There's no exposed global/API
+-- to call ToggleOptions() directly, so fire the slash command first to force the
+-- lazy setup, then close it and reopen targeted at our group.
+function o.ms()
+  local ACD = LibStub('AceConfigDialog-3.0', true)
+  local m = 'Masque'
+
+  if SlashCmdList and SlashCmdList['MASQUE'] then
+    SlashCmdList['MASQUE']('')  -- forces Setup('LoD'), opens to Skins/Global
+    if ACD.OpenFrames[m] then ACD:Close(m) end
+    t('called masq')
+  end
+
+  C_Timer.After(0.01, function()
+      ACD:Open(m)
+      local ok, err = pcall(function()
+        ACD:SelectGroup(m, 'Skins', 'ActionbarPlus', 'ActionbarPlus_Action Bars')
+      end)
+      if not ok then p('ms', 'SelectGroup failed:', err) end
+  end)
+end
+
 function o.resetD()
   ns:g().v2AnnouncementShown = false
 end

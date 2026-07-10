@@ -268,6 +268,10 @@ local function BarFrameWidgetMethods()
     local isTop    = anchor == 'TOP' or anchor == 'TOPLEFT' or anchor == 'TOPRIGHT'
     local isLeft   = anchor == 'TOPLEFT'  or anchor == 'BOTTOMLEFT'
     local isRight  = anchor == 'TOPRIGHT' or anchor == 'BOTTOMRIGHT'
+    local isNoneTheme = uic.backdrop.theme == 'none'
+    -- theme 'none' has no border padding, so it needs a larger base gap to avoid
+    -- extra buttons crowding the main bar
+    local baseExtraButtonGap = isNoneTheme and 4 or 2
     local spacing  = 2
     local mainCols = uic.colSize or 1
     local mainRows = uic.rowSize or 1
@@ -284,10 +288,10 @@ local function BarFrameWidgetMethods()
     local firstBtnBottom = self.buttons and self.buttons[mainCols * (mainRows - 1) + 1]
 
     local borderDef = bd.BORDER_DEFS[uic.backdrop.theme] or bd.DEFAULT_BACKDROP
-    local borderPad = uic.backdrop.theme == 'none'
+    local borderPad = isNoneTheme
                       and 0
                       or (uic.backdrop.padding or borderDef.padding or 0) + (borderDef.basePadding or 8)
-    local barGap = borderPad + (eb.gap or 0)
+    local barGap = baseExtraButtonGap + borderPad + (eb.gap or 0)
     local gap = isTop and barGap or -barGap
 
     -- per-row Y step: rows grow away from the bar (up for TOP*, down for BOTTOM*)
