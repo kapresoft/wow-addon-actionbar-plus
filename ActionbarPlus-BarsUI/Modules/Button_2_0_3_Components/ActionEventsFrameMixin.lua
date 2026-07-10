@@ -54,10 +54,8 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 --- =======================================================
 
 local o = ActionEventsFrameMixin_ABP_2_0
-
 -- todo: Update ABPV2 notice dialog to include ABP-Masque
 -- todo: if theme is none, then disable barFrame mouseOver
--- todo: barMenu to open Masque Settings
 -- todo: SettingsMenu -> ActionbarPlus v1.0.0
 -- todo: complete localization
 function o:OnLoad()

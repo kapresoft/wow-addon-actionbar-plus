@@ -29,6 +29,7 @@ local BAR_EXTRA_BTNS  = L['Extra Buttons']
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
 local PROFILES = PROFILES or L['Profiles']
 local BARS = L['Toggle Bars']
+local MASQUE_SETTINGS = L['Masque Settings']
 
 --[[-----------------------------------------------------------------------------
 Support Functions
@@ -157,5 +158,8 @@ function o:Show(barFrame)
     { text = PROFILES, notCheckable = true, func = function() settingsDialog():OpenProfiles() end },
     { text = BARS, submenu = function() return BuildBarsSubmenu(barFrame.widget.index) end },
   }
+  cns:IfMasque(function(abpMasque)
+    tinsert(menu, { text = MASQUE_SETTINGS, notCheckable = true, func = function() abpMasque:OpenMasqueSettings() end })
+  end)
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end
