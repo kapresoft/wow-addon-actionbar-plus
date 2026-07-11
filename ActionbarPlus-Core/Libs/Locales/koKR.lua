@@ -86,6 +86,9 @@ L['to show options menu'] = '하여 옵션 메뉴 표시'
 L['bar frame or drag frame'] = '바 프레임 또는 드래그 프레임을'
 L['to move the bar'] = '하여 바 이동'
 
+L['Really switch to general key bindings?'] = '정말로 일반 단축키 설정으로 전환하시겠습니까?'
+L['All key bindings specific to this character will be permanently deleted.'] = '이 캐릭터에만 적용된 모든 단축키가 영구적으로 삭제됩니다.'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = '원하는 키를 누르세요'
 L['You are in Quick Keybind Mode']                      = '빠른 단축키 지정 모드입니다'

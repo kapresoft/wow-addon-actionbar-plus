@@ -24,9 +24,9 @@ local DIALOG_TITLE  = 'Quick Keybind Mode'
 
 local CONFIRM_GENERAL_BINDINGS = 'ABP_CONFIRM_GENERAL_BINDINGS'
 StaticPopupDialogs[CONFIRM_GENERAL_BINDINGS] = {
-  text = 'Really switch to general key bindings?\nAll key bindings specific to this character will be permanently deleted.',
-  button1 = 'Okay',
-  button2 = 'Cancel',
+  text = ('%s\n%s'):format(L['Really switch to general key bindings?'], L['All key bindings specific to this character will be permanently deleted.']),
+  button1 = OKAY,
+  button2 = CANCEL,
   OnAccept = function()
     o.perChar = false
     if o.chk then o.chk:SetValue(false) end

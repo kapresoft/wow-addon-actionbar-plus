@@ -86,6 +86,9 @@ L['to show options menu'] = 'para mostrar el menú de opciones'
 L['bar frame or drag frame'] = 'el marco de la barra o el marco de arrastre'
 L['to move the bar'] = 'para mover la barra'
 
+L['Really switch to general key bindings?'] = '¿Seguro que quieres cambiar a los atajos de teclado generales?'
+L['All key bindings specific to this character will be permanently deleted.'] = 'Todos los atajos de teclado específicos de este personaje se eliminarán permanentemente.'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = 'presiona la tecla deseada'
 L['You are in Quick Keybind Mode']                      = 'Estás en el Modo de asignación rápida de teclas'
