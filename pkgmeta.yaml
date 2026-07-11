@@ -10,6 +10,8 @@ manual-changelog:
 embedded-libraries:
   - LibStub
   - Ace3
+  - LibPrettyPrint
+  - LibSharedMedia-3-0
 
 tools-used:
   - DevSuite
