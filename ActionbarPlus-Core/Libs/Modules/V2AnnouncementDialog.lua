@@ -40,6 +40,8 @@ local function CreateDialog()
   local label = AceGUI:Create('Label')
   label:SetFullWidth(true)
   label:SetText(ABP_V2_ANNOUNCEMENT or '')
+  local fontPath, fontSize, fontFlags = label.label:GetFont()
+  label.label:SetFont(fontPath, fontSize + 2, fontFlags)
   scroll:AddChild(label)
 
   local btn = AceGUI:Create('Button')
