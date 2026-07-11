@@ -67,7 +67,7 @@ function o:OnEnter()
   if not self.widget then return end
 
   local w = self.widget
-  local barTitle = ('%s — %s %s'):format(cns.name, L['Bar'], w.index)
+  local barTitle = ('%s — %s %s'):format(L['ActionbarPlus'], L['Bar'], w.index)
 
   --todo: GameTooltip owner will be user configurable
   GameTooltip:SetOwner(UIParent, 'ANCHOR_NONE')
