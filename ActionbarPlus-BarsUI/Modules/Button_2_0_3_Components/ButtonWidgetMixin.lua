@@ -136,7 +136,16 @@ function o:UpdateEmptyState(showEmptyButtons)
   if showHotKey then self:UpdateHotKey() end
   self:UpdateMouseoverHighlight()
   if InCombatLockdown() then return end
-  self.button:EnableMouse(visible or self:HasAction())
+
+  -- theme 'none' has no visible border, so empty buttons stay click-through even
+  -- when showEmptyButtons is on. Exceptions: buttons with an assigned action are
+  -- always clickable, and empty buttons must accept mouse while a drag is in
+  -- progress (valid cursor) so they remain valid drop targets.
+  local barUI = cns:bar(self.barIndex).ui
+  local isNoneTheme = barUI.backdrop and barUI.backdrop.theme == 'none'
+  local hasCursor = cns:cursor().isValid
+  local enableMouse = self:HasAction() or hasCursor or (visible and not isNoneTheme)
+  self.button:EnableMouse(enableMouse)
 end
 
 --- @param callbackFn fun(typ:ActionType, val:ActionValue, isCustom:boolean) : void

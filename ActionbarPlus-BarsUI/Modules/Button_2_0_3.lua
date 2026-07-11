@@ -30,6 +30,8 @@ local dru, priest = O.DruidUtil, O.PriestUtil
 local Tbl_IsEmpty = cns:Table().IsEmpty
 local Str_IsAnyOf = cns:String().IsAnyOf
 
+local WEF = WorldEventsFrame_ABP_2_0
+
 local seedID = 1000
 
 --- @LazyLoaded
@@ -113,7 +115,7 @@ function o:OnLoad()
   self:SetAttribute('checkfocuscast', true)
   self:SetAttribute('checkmouseovercast', true)
 
-  WorldEventsFrame_ABP_2_0:RegisterFrame(self)
+  WEF:RegisterFrame(self)
 
   --- @param btn Button_ABP_2_0_X
   self:SetScript('OnAttributeChanged', function(btn, ...) btn:OnAttributeChanged(...) end)
@@ -374,6 +376,11 @@ function o:PostClickAction(button, down)
     end)
   end
   self.widget:SaveAction(cursor)
+
+  -- Don't rely solely on ACTIONBAR_HIDEGRID to revert the drag-forced empty-button
+  -- state on every button of the bar; re-evaluate immediately now that the cursor
+  -- has been cleared (unless this was a chain-click that left a new action on it).
+  if not cns:cursor().isValid then WEF:OnEvent('ACTIONBAR_HIDEGRID') end
 end
 
 -- todo: GameTooltip needs impl
@@ -416,6 +423,11 @@ function o:OnReceiveDrag()
 
   o.Btn_PickupExistingAction(self)
   self.widget:SaveAction(cursor)
+
+  -- Don't rely solely on ACTIONBAR_HIDEGRID to revert the drag-forced empty-button
+  -- state on every button of the bar; re-evaluate immediately now that the cursor
+  -- has been cleared (unless this was a chain-drag that left a new action on it).
+  if not cns:cursor().isValid then WEF:OnEvent('ACTIONBAR_HIDEGRID') end
 end
 
 --- @param callbackFn fun(cursor:Cursor_ABP_2_0):void
