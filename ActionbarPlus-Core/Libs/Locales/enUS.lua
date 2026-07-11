@@ -80,6 +80,12 @@ L['Reset to default theme settings.']                   = true
 L['Open General Settings for all bars and profiles.']   = true
 L['Open Backdrop Settings for the current bar.']        = true
 
+L['Right-Click'] = true
+L['Left-Click and Drag'] = true
+L['to show options menu'] = true
+L['bar frame or drag frame'] = true
+L['to move the bar'] = true
+
 L['ESC'] = true
 L['press the desired key'] = true
 L['You are in Quick Keybind Mode']                      = true

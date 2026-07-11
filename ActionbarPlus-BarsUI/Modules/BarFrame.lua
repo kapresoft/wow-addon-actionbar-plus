@@ -79,8 +79,8 @@ function o:OnEnter()
     GameTooltip:AddLine(#w.buttons .. ' buttons', 0.8, 0.8, 0.8)
   end
   GameTooltip:AddLine(hc('\nAvailable Actions:'))
-  GameTooltip:AddLine(hct('  • Right-Click ') .. hcd('to show options menu'))
-  GameTooltip:AddLine(hct('  • Left-Drag handle ') .. hcd('to move the bar'))
+  GameTooltip:AddLine(('  • %s %s'):format(hct(L['Right-Click']), hcd(L['to show options menu'])))
+  GameTooltip:AddLine(('  • %s %s %s'):format(hct(L['Left-Click and Drag']), hcd(L['bar frame or drag frame']), hcd(L['to move the bar'])))
   GameTooltip:Show()
 end
 

@@ -80,6 +80,12 @@ L['Reset to default theme settings.']                   = '重設為預設主題
 L['Open General Settings for all bars and profiles.']   = '開啟所有動作條和設定檔的一般設定。'
 L['Open Backdrop Settings for the current bar.']        = '開啟目前動作條的背景設定。'
 
+L['Right-Click'] = '按右鍵'
+L['Left-Click and Drag'] = '按左鍵並拖曳'
+L['to show options menu'] = '以顯示選項選單'
+L['bar frame or drag frame'] = '動作條邊框或拖曳邊框'
+L['to move the bar'] = '以移動動作條'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = '按下想要的按鍵'
 L['You are in Quick Keybind Mode']                      = '您目前處於快捷鍵快速綁定模式'

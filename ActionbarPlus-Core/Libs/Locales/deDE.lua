@@ -80,6 +80,12 @@ L['Reset to default theme settings.']                   = 'Auf die Standard-Desi
 L['Open General Settings for all bars and profiles.']   = 'Allgemeine Einstellungen für alle Leisten und Profile öffnen.'
 L['Open Backdrop Settings for the current bar.']        = 'Hintergrundeinstellungen für die aktuelle Leiste öffnen.'
 
+L['Right-Click'] = 'Rechtsklick'
+L['Left-Click and Drag'] = 'Linksklick und Ziehen'
+L['to show options menu'] = 'um das Optionsmenü anzuzeigen'
+L['bar frame or drag frame'] = 'Leistenrahmen oder Ziehrahmen'
+L['to move the bar'] = 'um die Leiste zu verschieben'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = 'drücke die gewünschte Taste'
 L['You are in Quick Keybind Mode']                      = 'Du befindest dich im Schnellzuweisungsmodus'
