@@ -54,7 +54,8 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 --- =======================================================
 
 local o = ActionEventsFrameMixin_ABP_2_0
--- todo: Update ABPV2 notice dialog to include ABP-Masque
+
+-- todo: V2Announcement_<locale> for remainder of locales
 -- todo: complete localization
 function o:OnLoad()
   self.frames = {};
