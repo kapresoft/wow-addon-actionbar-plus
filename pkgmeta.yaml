@@ -18,11 +18,8 @@ tools-used:
   - Bugsack
   - Bug-Grabber
 
-#optional-dependencies:
-#  - ace3
-#  - libstub
-#  - callbackhandler
-#  - libsharedmedia-3-0
+optional-dependencies:
+  - ActionbarPlus-Masque
 
 # Resources:
 #  - https://github.com/wowace-mirror
