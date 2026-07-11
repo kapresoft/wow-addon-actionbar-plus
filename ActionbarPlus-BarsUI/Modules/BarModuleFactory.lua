@@ -648,13 +648,12 @@ function o:ApplyLayout(frame, barConf)
   frame:SetAlpha(ui.alpha)
   frame.widget:ApplyBackdrop()
   frame.widget:ApplyExtraButton()
-  -- empty buttons are individually click-through (UpdateEmptyState); when none are
-  -- shown, the bar frame itself must also stop catching clicks in the gaps behind them.
-  -- Exception: a visible backdrop (theme ~= 'none') needs the bar frame mouse-enabled
-  -- for right-click/tooltip on its own border/background, even with no empty buttons.
-  local bc = barConf.ui.backdrop
+  -- theme 'none' has no visible border/background to interact with, so the bar frame
+  -- itself is always click-through in that case. Otherwise, keep it mouse-enabled for
+  -- right-click/tooltip on the border/background, regardless of showEmptyButtons.
+  local bc = ui.backdrop
   local hasVisibleBackdrop = bc and bc.theme ~= 'none'
-  frame:EnableMouse(ui.showEmptyButtons == true or hasVisibleBackdrop == true)
+  frame:EnableMouse(hasVisibleBackdrop == true)
 end
 
 --- Re-layout an existing bar in place from the current config.

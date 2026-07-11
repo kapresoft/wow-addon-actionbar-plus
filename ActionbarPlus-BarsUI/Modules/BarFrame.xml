@@ -9,12 +9,6 @@
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
 
-    <Script file="Button_2_0_3.lua"/>
-    <Script file="Button_2_0_3_Components/DragStateController.lua"/>
-    <Script file="Button_2_0_3_Components/MacroChangeController.lua"/>
-    <Script file="BarFrame.lua"/>
-    <Script file="BarDragHandleMixin.lua"/>
-
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>
             <OnLoad method="OnLoad"/>
@@ -34,17 +28,11 @@
         </Scripts>
     </Frame>
 
-
-    <!--<CheckButton name="ABP_ButtonTemplate_2_0_1_1"
-                 inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
-                 mixin="ABP_ButtonMixin_2_0_1_1" virtual="true">
-        <Scripts>
-            <OnLoad method="OnLoad"/>
-            <PostClick method="PostClick"/>
-            <OnDragStop method="OnDragStop"/>
-            <OnAttributeChanged method="OnAttributeChanged"/>
-        </Scripts>
-    </CheckButton>-->
+    <Script file="Button_2_0_3.lua"/>
+    <Script file="Button_2_0_3_Components/DragStateController.lua"/>
+    <Script file="Button_2_0_3_Components/MacroChangeController.lua"/>
+    <Script file="BarFrame.lua"/>
+    <Script file="BarDragHandleMixin.lua"/>
 
     <CheckButton name="ABP_ButtonTemplate_2_0_3"
                  inherits="SecureActionButtonTemplate, ABP_ButtonTemplate_2_0"
