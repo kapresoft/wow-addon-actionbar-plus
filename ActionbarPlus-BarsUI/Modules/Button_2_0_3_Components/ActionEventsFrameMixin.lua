@@ -55,8 +55,6 @@ ActionEventsFrameMixin_ABP_2_0 = {};
 
 local o = ActionEventsFrameMixin_ABP_2_0
 
--- todo: V2Announcement_<locale> for remainder of locales
--- todo: complete localization
 function o:OnLoad()
   self.frames = {};
   self:RegisterEvent("ACTIONBAR_UPDATE_STATE");
