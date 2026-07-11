@@ -80,6 +80,12 @@ L['Reset to default theme settings.']                   = 'Restablecer a la conf
 L['Open General Settings for all bars and profiles.']   = 'Abrir la configuración general para todas las barras y perfiles.'
 L['Open Backdrop Settings for the current bar.']        = 'Abrir la configuración de fondo para la barra actual.'
 
+L['Right-Click'] = 'Clic derecho'
+L['Left-Click and Drag'] = 'Clic izquierdo y arrastrar'
+L['to show options menu'] = 'para mostrar el menú de opciones'
+L['bar frame or drag frame'] = 'el marco de la barra o el marco de arrastre'
+L['to move the bar'] = 'para mover la barra'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = 'presiona la tecla deseada'
 L['You are in Quick Keybind Mode']                      = 'Estás en el Modo de asignación rápida de teclas'

@@ -80,6 +80,12 @@ L['Reset to default theme settings.']                   = 'Сбросить на
 L['Open General Settings for all bars and profiles.']   = 'Открыть общие настройки для всех панелей и профилей.'
 L['Open Backdrop Settings for the current bar.']        = 'Открыть настройки фона для текущей панели.'
 
+L['Right-Click'] = 'ПКМ'
+L['Left-Click and Drag'] = 'ЛКМ и перетащите'
+L['to show options menu'] = 'чтобы открыть меню настроек'
+L['bar frame or drag frame'] = 'рамку панели или рамку перетаскивания'
+L['to move the bar'] = 'чтобы переместить панель'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = 'нажмите нужную клавишу'
 L['You are in Quick Keybind Mode']                      = 'Вы находитесь в режиме быстрой привязки клавиш'
