@@ -86,6 +86,9 @@ L['to show options menu'] = 'чтобы открыть меню настроек
 L['bar frame or drag frame'] = 'рамку панели или рамку перетаскивания'
 L['to move the bar'] = 'чтобы переместить панель'
 
+L['Really switch to general key bindings?'] = 'Действительно переключиться на общие привязки клавиш?'
+L['All key bindings specific to this character will be permanently deleted.'] = 'Все привязки клавиш, характерные для этого персонажа, будут безвозвратно удалены.'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = 'нажмите нужную клавишу'
 L['You are in Quick Keybind Mode']                      = 'Вы находитесь в режиме быстрой привязки клавиш'

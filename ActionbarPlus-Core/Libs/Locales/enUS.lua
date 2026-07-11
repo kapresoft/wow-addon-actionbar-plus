@@ -86,6 +86,9 @@ L['to show options menu'] = true
 L['bar frame or drag frame'] = true
 L['to move the bar'] = true
 
+L['Really switch to general key bindings?'] = true
+L['All key bindings specific to this character will be permanently deleted.'] = true
+
 L['ESC'] = true
 L['press the desired key'] = true
 L['You are in Quick Keybind Mode']                      = true

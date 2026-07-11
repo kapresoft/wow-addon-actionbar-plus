@@ -86,6 +86,9 @@ L['to show options menu'] = '以顯示選項選單'
 L['bar frame or drag frame'] = '動作條邊框或拖曳邊框'
 L['to move the bar'] = '以移動動作條'
 
+L['Really switch to general key bindings?'] = '確定要切換到通用快捷鍵嗎？'
+L['All key bindings specific to this character will be permanently deleted.'] = '此角色專屬的所有快捷鍵都將被永久刪除。'
+
 L['ESC'] = 'ESC'
 L['press the desired key'] = '按下想要的按鍵'
 L['You are in Quick Keybind Mode']                      = '您目前處於快捷鍵快速綁定模式'
