@@ -35,7 +35,7 @@ function o:OnDragStop()
   if InCombatLockdown() then return end
   self.__dragging = false
   self.barFrame:OnDragStop()
-  if not self:IsMouseOver() then self.tex:Hide() end
+  if not self:IsMouseOver() then self.barFrame.widget:HideDragHandle() end
 end
 
 --- Forwards to the bar frame's existing right-click handler since the handle
