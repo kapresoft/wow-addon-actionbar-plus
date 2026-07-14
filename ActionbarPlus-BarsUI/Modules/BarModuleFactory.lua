@@ -198,6 +198,7 @@ local function BarFrameWidgetMethods()
       handle.barFrame = self.frame
       handle.tex:Hide()
       self.dragHandle = handle
+      self.dragHandle:SetClampedToScreen(true)
     end
     return self.dragHandle
   end
@@ -594,14 +595,19 @@ local function ApplyGridLayout(frame, ui)
   local rows = ui.rowSize
   local size = ui.button.size
   local spacing = ui.button.spacing
+  local isNoneTheme = ui.backdrop.theme == 'none'
   local borderDef = bd.BORDER_DEFS[ui.backdrop.theme] or bd.DEFAULT_BACKDROP
-  local pad = ui.backdrop.padding or borderDef.padding
-  local BASE_UI_PADDING = borderDef.basePadding or 8
+  -- theme 'none' has no visible border/background, so it should sit flush with no
+  -- padding, regardless of the saved profile padding value (which stays untouched
+  -- for when the user switches back to a bordered theme)
+  local pad = isNoneTheme and 0 or (ui.backdrop.padding or borderDef.padding)
+  local BASE_UI_PADDING = isNoneTheme and 0 or (borderDef.basePadding or 8)
+  local borderPadBottom = isNoneTheme and 0 or (borderDef.borderPadBottom or 0)
 
   local padLeft   = pad + BASE_UI_PADDING
   local padRight  = pad + BASE_UI_PADDING
   local padTop    = pad + BASE_UI_PADDING
-  local padBottom = pad + BASE_UI_PADDING + (borderDef.borderPadBottom or 0)
+  local padBottom = pad + BASE_UI_PADDING + borderPadBottom
 
   local totalWidth  = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
   local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom

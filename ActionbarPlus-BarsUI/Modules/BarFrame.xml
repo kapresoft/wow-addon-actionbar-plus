@@ -84,7 +84,7 @@
 
     <!-- Square drag handle, shown above button 1 (TOPLEFT of bar) only when backdrop theme is 'none' -->
     <Frame name="ABP_BarDragHandleTemplate_2_0" mixin="BarDragHandleMixin_ABP_2_0"
-           frameStrata="MEDIUM" hidden="true" virtual="true" enableMouse="true">
+           frameStrata="HIGH" hidden="true" virtual="true" enableMouse="true">
         <Size>
             <AbsDimension x="30" y="10"/>
         </Size>
