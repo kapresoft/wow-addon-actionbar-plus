@@ -801,7 +801,9 @@ local lastEnabledCount
 --- @param selectedTab string|nil
 function o:ShowDialog(barIndex, selectedTab)
   if InCombatLockdown() then return end
+  local previousBarIndex = self.barIndex
   self.barIndex = barIndex
+  if previousBarIndex and previousBarIndex ~= barIndex then stopHandleGlow(previousBarIndex) end
   local conf = cns:bar(barIndex)
 
   if not dialogWindow then
