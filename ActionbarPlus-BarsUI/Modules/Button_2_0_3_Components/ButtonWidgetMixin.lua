@@ -139,12 +139,14 @@ function o:UpdateEmptyState(showEmptyButtons)
 
   -- theme 'none' has no visible border, so empty buttons stay click-through even
   -- when showEmptyButtons is on. Exceptions: buttons with an assigned action are
-  -- always clickable, and empty buttons must accept mouse while a drag is in
-  -- progress (valid cursor) so they remain valid drop targets.
+  -- always clickable, empty buttons must accept mouse while a drag is in
+  -- progress (valid cursor) so they remain valid drop targets, and Quick Keybind
+  -- Mode needs every empty button clickable/hoverable to bind keys to it.
   local barUI = cns:bar(self.barIndex).ui
   local isNoneTheme = barUI.backdrop and barUI.backdrop.theme == 'none'
   local hasCursor = cns:cursor().isValid
-  local enableMouse = self:HasAction() or hasCursor or (visible and not isNoneTheme)
+  local isQKB = ns:a():IsQuickKeybindModeActive()
+  local enableMouse = self:HasAction() or hasCursor or isQKB or (visible and not isNoneTheme)
   self.button:EnableMouse(enableMouse)
 end
 
