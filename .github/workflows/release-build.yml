@@ -204,6 +204,7 @@ jobs:
           tag: ${{ env.refName }}
           name: ${{ env.refName }}
           version: ${{ env.refName }}
+          commitish: ${{ github.sha }}
           prerelease: false
           footer: |
             <br><br>
