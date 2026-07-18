@@ -7,8 +7,10 @@ Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log('Core')
 local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local function announcementDialog() return O.V2AnnouncementDialog end
 local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
+local V1_ADDON_NAME = 'ActionbarPlus'
 
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
@@ -58,6 +60,7 @@ end
 
 function o:PLAYER_ENTERING_WORLD()
   self:UnregisterEvent('PLAYER_ENTERING_WORLD')
+  if not IsAddOnLoaded(V1_ADDON_NAME) then return end
   announcementDialog():Show()
 end
 
