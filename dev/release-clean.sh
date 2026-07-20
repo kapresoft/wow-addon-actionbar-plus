@@ -69,9 +69,9 @@ _Main() {
     return 1
   fi
 
-  cmd=(./dev/release.sh -dz)
+  cmd=(release.sh -dz)
 if [[ $build_version == 2 ]]; then
-    cmd=(./dev/release.sh -m pkgmeta-v2.yaml -dz)
+    cmd=(release.sh -m pkgmeta-v2.yaml -dz)
   fi
 
   p "Executing: ${cmd[*]}"
