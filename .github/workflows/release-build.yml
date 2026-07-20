@@ -162,6 +162,10 @@ jobs:
           files: "${{ env.buildArtifact }}"
           fail: true
       ## ------------------------------------------------ ##
+      - name: "Remove main ActionbarPlus folder"
+        run: |
+          zip -d ${{ env.buildArtifact }} "${{ env.addonName }}/CHANGELOG.txt" "${{ env.addonName }}/LICENSE.txt" "${{ env.addonName }}"
+      ## ------------------------------------------------ ##
       - name: "Verify: Supporting Scripts Exists"
         uses: andstor/file-existence-action@v3
         with:
