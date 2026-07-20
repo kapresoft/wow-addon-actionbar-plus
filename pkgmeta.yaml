@@ -5,7 +5,6 @@ enable-nolib-creation: no
 
 manual-changelog:
   filename: CHANGELOG.txt
-  markup-type: markdown
 
 embedded-libraries:
   - LibStub
@@ -28,12 +27,6 @@ optional-dependencies:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  # V1
-  ActionbarPlus/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
-  ActionbarPlus/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
-  ActionbarPlus/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
-  ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
-  # V2
   ActionbarPlus-Core/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
   ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
   ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
@@ -48,20 +41,7 @@ ignore:
   - dev
   - doc
   - scripts
-  # V1 ignores
-  - ActionbarPlus/Core/Lib/Developer
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/LICENSE
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/External
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/dev
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/doc
-  - ActionbarPlus/ThirdParty/Libs/Kapresoft-LibUtil/*.sh
-  - ActionbarPlus/ThirdParty/Libs/Ace3/*.toc
-  - ActionbarPlus/ThirdParty/Libs/Ace3/tests
-  - ActionbarPlus/ThirdParty/Libs/Ace3/Ace3.lua
-  - ActionbarPlus/ThirdParty/Libs/Ace3/Bindings.xml
-  - ActionbarPlus/ThirdParty/Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
-  # V2 ignores
+  - "ActionbarPlus/**"
   - ActionbarPlus-Core/Libs/Developer
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/doc
@@ -90,7 +70,6 @@ ignore:
 #
 # ⚠️ Do not change unless you also change the repo/addon layout.
 move-folders:
-  ActionbarPlus/ActionbarPlus: ActionbarPlus
   ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
   ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
   ActionbarPlus/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI
