@@ -253,7 +253,7 @@ local DEFAULT_BAR = {
     -- when a new layout's config shape is defined, alongside its interface methods.
     layoutConfig = {
       grid = { rowSize = 2, colSize = 5 },
-      arc = { buttonCount = 9, arcDirection = 'up', arcSpan = 90, extraButtonSpacing = 6 },
+      arc = { buttonCount = 7, arcDirection = 'up', arcSpan = 90, extraButtonSpacing = 6 },
     },
     alpha = 1.0,
     showEmptyButtons = true,
