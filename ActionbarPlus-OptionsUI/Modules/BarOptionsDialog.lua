@@ -305,84 +305,8 @@ local function AddLayoutTab(tab, window, conf)
     refs.slSpacingV = slSpacingV
   end
 
-  if layoutType == 'arc' then
-    local arcConf = ui.layoutConfig.arc
-    local maxButtonCount = layout:GetMaxButtonCount()
-    if (arcConf.buttonCount or 9) > maxButtonCount then
-      arcConf.buttonCount = maxButtonCount
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end
-
-    --- @type AceGUISlider
-    local slButtonCount = AceGUI:Create('Slider')
-    slButtonCount:SetLabel(L['Button Count'])
-    slButtonCount:SetRelativeWidth(0.5)
-    slButtonCount:SetSliderValues(1, maxButtonCount, 1)
-    slButtonCount:SetValue(arcConf.buttonCount or 9)
-    slButtonCount:SetCallback('OnValueChanged', function(_, _, val)
-      arcConf.buttonCount = val
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end)
-    tab:AddChild(slButtonCount)
-    refs.slButtonCount = slButtonCount
-
-    --- @type AceGUIDropdown
-    local ddArcDirection = AceGUI:Create('Dropdown')
-    ddArcDirection:SetLabel(L['Arc Direction'])
-    SetDropdownLabelFontSize(ddArcDirection, 12)
-    ddArcDirection:SetRelativeWidth(0.5)
-    ddArcDirection:SetList({
-      up = L['Up'],
-      down = L['Down'],
-    }, { 'up', 'down' })
-    ddArcDirection:SetValue(arcConf.arcDirection or 'up')
-    ddArcDirection:SetCallback('OnValueChanged', function(_, _, val)
-      arcConf.arcDirection = val
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end)
-    tab:AddChild(ddArcDirection)
-    refs.ddArcDirection = ddArcDirection
-
-    --- @type AceGUISlider
-    local slArcSpan = AceGUI:Create('Slider')
-    slArcSpan:SetLabel(L['Arc Span'])
-    slArcSpan:SetRelativeWidth(0.5)
-    slArcSpan:SetSliderValues(layout:GetMinArcSpan(), layout:GetMaxArcSpan(), 1)
-    slArcSpan:SetValue(arcConf.arcSpan or 90)
-    slArcSpan:SetCallback('OnValueChanged', function(_, _, val)
-      arcConf.arcSpan = val
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end)
-    tab:AddChild(slArcSpan)
-    refs.slArcSpan = slArcSpan
-  else
-    local gridConf = ui.layoutConfig.grid
-
-    --- @type AceGUISlider
-    local slRows = AceGUI:Create('Slider')
-    slRows:SetLabel(L['Rows'])
-    slRows:SetRelativeWidth(0.5)
-    slRows:SetSliderValues(1, DS:GetMaxRowSize(), 1)
-    slRows:SetValue(gridConf.rowSize)
-    slRows:SetCallback('OnValueChanged', function(_, _, val)
-      gridConf.rowSize = val
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end)
-    tab:AddChild(slRows)
-    refs.slRows = slRows
-
-    --- @type AceGUISlider
-    local slCols = AceGUI:Create('Slider')
-    slCols:SetLabel(L['Columns'])
-    slCols:SetRelativeWidth(0.5)
-    slCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
-    slCols:SetValue(gridConf.colSize)
-    slCols:SetCallback('OnValueChanged', function(_, _, val)
-      gridConf.colSize = val
-      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-    end)
-    tab:AddChild(slCols)
-    refs.slCols = slCols
+  if layout.ApplyOptionsUI then
+    layout:ApplyOptionsUI(tab, ui, function() o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex) end)
   end
 
   return refs
