@@ -26,6 +26,10 @@ local ModuleNames = {
   DragStateController = {},
   --- @type BarVisibilityController_ABP_2_0
   BarVisibilityController = {},
+  --- @type GridLayout_ABP_2_0
+  GridLayout = {},
+  --- @type ArcLayout_ABP_2_0
+  ArcLayout = {},
 
 
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames

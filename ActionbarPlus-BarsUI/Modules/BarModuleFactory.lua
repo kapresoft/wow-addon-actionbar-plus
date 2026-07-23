@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local BO = ns.O
 local bac, bd = BO.BarAnchorController, BO.Backdrops
+local gridLayout = BO.GridLayout
 
 local cns, O = ns:cns()
 local unit, au = O.UnitUtil, O.ActionUtil
@@ -13,6 +14,17 @@ local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
 local VISIBILITY_DEFAULTS = '[vehicleui][petbattle][possessbar][overridebar]hide; show'
+
+--- GridLayout is BarsUI's static built-in default; any other layout key is
+--- looked up from Core's layout registry, populated by plugin addons
+--- (e.g. ActionbarPlus-ArcLayout) at their own load time.
+--- @param ui BarUIConfig_ABP_2_0
+--- @return BarLayout_ABP_2_0
+local function ResolveLayout(ui)
+  local key = ui.layout or 'grid'
+  if key == 'grid' then return gridLayout end
+  return cns:GetLayout(key) or gridLayout
+end
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -159,31 +171,13 @@ local function BarFrameWidgetMethods()
   function wm:ApplyDragHandle(enabled)
     self.dragHandleEnabled = enabled
     if enabled then
-      local handle = self:GetOrCreateDragHandle()
-      local btn1 = self.buttons and self.buttons[1]
-      if btn1 then
-        handle:ClearAllPoints()
-        local conf       = self:conf()
-        local dragFrame  = conf.dragFrame or {}
-        local dragAnchor = dragFrame.anchor or 'TOPLEFT'
-        local thickness  = dragFrame.thickness or 8
-        local btnSize    = btn1:GetHeight()
-        local heightPad = 6
-        if dragAnchor == 'TOPRIGHT' then
-          local cols = conf.ui.colSize or 1
-          local lastBtn1 = self.buttons[cols]
-          handle:SetHeight(btnSize - heightPad)
-          handle:SetWidth(thickness)
-          handle:SetPoint('LEFT', lastBtn1, 'RIGHT', 3, 0)
-          handle:SetPoint('CENTER', lastBtn1, 'CENTER', thickness, 0)
-        else
-          handle:SetHeight(btnSize - heightPad)
-          handle:SetWidth(thickness)
-          handle:SetPoint('RIGHT', btn1, 'LEFT', -3, 0)
-          handle:SetPoint('CENTER', btn1, 'CENTER', -thickness, 0)
-        end
-      end
-      handle:Show()
+      local conf = self:conf()
+      local dragFrame = conf.dragFrame or {}
+      local dragAnchor = dragFrame.anchor or 'TOPLEFT'
+      local thickness = dragFrame.thickness or 8
+      local layout = ResolveLayout(conf.ui)
+      layout:ApplyDragHandle(self.frame, dragAnchor, thickness)
+      self:GetOrCreateDragHandle():Show()
     elseif self.dragHandle then
       self.dragHandle:Hide()
     end
@@ -231,147 +225,6 @@ local function BarFrameWidgetMethods()
     if not self.dragHandle:IsMouseOver() then self.dragHandle.tex:Hide() end
   end
   
-  --- Applies the extra button row config — creates buttons lazily, repositions/resizes each call.
-  --- Buttons wrap into multiple rows when total count exceeds what fits within the bar's pixel width.
-  --- Row 1 is always closest to the bar; overflow rows grow away from it.
-  function wm:ApplyExtraButton()
-    local uic = self:conf().ui
-    local eb  = uic.extraButton
-    if not eb or not eb.enabled then
-      if self.extraButtons then
-        for _, btn in ipairs(self.extraButtons) do btn:Hide() end
-      end
-      return
-    end
-
-    local anchor   = eb.anchor  or 'TOPRIGHT'
-    local size     = eb.size    or 30
-    local cols     = eb.count or 1
-    self.extraButtons = self.extraButtons or {}
-
-    -- create any missing buttons
-    for i = 1, cols do
-      if not self.extraButtons[i] then
-        local encodedID = au.encodeBarID(self.index, 900 + i)
-        local btnName = ('ABP_2_0_F%sExtraBtn%s'):format(self.index, i)
-        local btn = CreateButton(btnName, self.frame, encodedID)
-        btn:SetClampedToScreen(true)
-        btn.widget.isExtraButton = true
-        self.extraButtons[i] = btn
-      end
-    end
-
-    -- hide any buttons beyond the current count
-    for i = cols + 1, #self.extraButtons do
-      self.extraButtons[i]:Hide()
-    end
-
-    local isTop    = anchor == 'TOP' or anchor == 'TOPLEFT' or anchor == 'TOPRIGHT'
-    local isLeft   = anchor == 'TOPLEFT'  or anchor == 'BOTTOMLEFT'
-    local isRight  = anchor == 'TOPRIGHT' or anchor == 'BOTTOMRIGHT'
-    local isNoneTheme = uic.backdrop.theme == 'none'
-    -- theme 'none' has no border padding, so it needs a larger base gap to avoid
-    -- extra buttons crowding the main bar
-    local baseExtraButtonGap = isNoneTheme and 4 or 2
-    local spacing  = 2
-    local mainCols = uic.colSize or 1
-    local mainRows = uic.rowSize or 1
-    local mainSize = uic.button.size or 36
-    local mainSpacing = uic.button.spacing.horizontal or 3
-    -- wrap extra buttons when their row would exceed the pixel width of the main button grid
-    local gridPixelWidth = mainCols * mainSize + (mainCols - 1) * mainSpacing
-    local wrapCols = math.floor((gridPixelWidth + spacing) / (size + spacing))
-    -- for TOP*: last button of row 1; for BOTTOM*: last button of the last row
-    local lastBtnTop    = self.buttons and self.buttons[mainCols]
-    local lastBtnBottom = self.buttons and self.buttons[mainCols * mainRows]
-    local lastBtn1 = isTop and lastBtnTop or lastBtnBottom
-    -- for BOTTOM* left anchor: first button of the last row
-    local firstBtnBottom = self.buttons and self.buttons[mainCols * (mainRows - 1) + 1]
-
-    local borderDef = bd.BORDER_DEFS[uic.backdrop.theme] or bd.DEFAULT_BACKDROP
-    local borderPad = isNoneTheme
-                      and 0
-                      or (uic.backdrop.padding or borderDef.padding or 0) + (borderDef.basePadding or 8)
-    local barGap = baseExtraButtonGap + borderPad + (eb.gap or 0)
-    local gap = isTop and barGap or -barGap
-
-    -- per-row Y step: rows grow away from the bar (up for TOP*, down for BOTTOM*)
-    local rowStep = isTop and (size + spacing) or -(size + spacing)
-
-    local showEmpty = eb.showEmptyButtons ~= false
-    for i = 1, cols do
-      local btn = self.extraButtons[i]
-      btn:SetSize(size, size)
-      cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
-      btn:ClearAllPoints()
-      btn:Show()
-      if btn.widget then btn.widget:UpdateEmptyState(showEmpty) end
-    end
-
-    -- relative point on the grid button to attach to (top edge for TOP*, bottom edge for BOTTOM*)
-    local gridRelPoint  = isTop and 'TOPLEFT'  or 'BOTTOMLEFT'
-    local gridRelPointR = isTop and 'TOPRIGHT' or 'BOTTOMRIGHT'
-    -- point on the extra button that meets the grid button edge
-    local extraRelPoint  = isTop and 'BOTTOMLEFT'  or 'TOPLEFT'
-    local extraRelPointR = isTop and 'BOTTOMRIGHT' or 'TOPRIGHT'
-
-    local firstBtn = isTop and (self.buttons and self.buttons[1]) or firstBtnBottom
-
-    -- layout index → (extraRow 1-based, col within that row 1-based)
-    -- extraRow 1 is always closest to the bar; overflow rows grow outward
-    local function extraRowCol(i)
-      return math.ceil(i / wrapCols), ((i - 1) % wrapCols) + 1
-    end
-
-    if isLeft and firstBtn then
-      for i = 1, cols do
-        local eRow, eCol = extraRowCol(i)
-        local offY = gap + (eRow - 1) * rowStep
-        if eCol == 1 then
-          self.extraButtons[i]:SetPoint(extraRelPoint, firstBtn, gridRelPoint, 1, offY)
-        else
-          self.extraButtons[i]:SetPoint('LEFT', self.extraButtons[i - 1], 'RIGHT', spacing, 0)
-        end
-      end
-    elseif isRight and lastBtn1 then
-      -- lay out right-to-left within each row so the rightmost button anchors to the bar corner
-      for eRow = 1, math.ceil(cols / wrapCols) do
-        local rowStart = (eRow - 1) * wrapCols + 1
-        local rowEnd   = math.min(eRow * wrapCols, cols)
-        local offY = gap + (eRow - 1) * rowStep
-        -- rightmost button in this extra-row anchors to the bar
-        self.extraButtons[rowEnd]:SetPoint(extraRelPointR, lastBtn1, gridRelPointR, 0, offY)
-        -- chain remaining buttons leftward
-        for i = rowEnd - 1, rowStart, -1 do
-          self.extraButtons[i]:SetPoint('RIGHT', self.extraButtons[i + 1], 'LEFT', -spacing, 0)
-        end
-      end
-    else
-      -- TOP / BOTTOM centered: anchor Y to grid button edge (uniform gap), center X over the frame.
-      -- Use actual frame pixel width so we don't need to recompute padLeft or spacing variants.
-      local centerRefBtn = isTop and (self.buttons and self.buttons[1]) or firstBtnBottom
-      local frameWidth   = self.frame:GetWidth()
-      local rowCount     = math.ceil(cols / wrapCols)
-      for eRow = 1, rowCount do
-        local rowStart = (eRow - 1) * wrapCols + 1
-        local rowEnd   = math.min(eRow * wrapCols, cols)
-        local rowCols  = rowEnd - rowStart + 1
-        local totalW   = rowCols * size + (rowCols - 1) * spacing
-        local offY     = gap + (eRow - 1) * rowStep
-        -- derive padLeft at runtime so we don't have to recompute theme padding math
-        -- offX = frameCenter - rowCenter - padLeft, where padLeft = btnLeft - frameLeft
-        local btnLeft   = centerRefBtn:GetLeft()
-        local frameLeft = self.frame:GetLeft()
-        local padLeft   = (btnLeft and frameLeft) and (btnLeft - frameLeft) or 0
-        local offX      = (frameWidth / 2) - (totalW / 2) - padLeft
-        self.extraButtons[rowStart]:SetPoint(extraRelPoint, centerRefBtn, gridRelPoint, offX, offY)
-        for i = rowStart + 1, rowEnd do
-          self.extraButtons[i]:SetPoint('LEFT', self.extraButtons[i - 1], 'RIGHT', spacing, 0)
-        end
-      end
-    end
-  end
-
   --- @return Index
   function wm:GetIndex() return self.index end
 
@@ -588,78 +441,35 @@ function o:CreateAddonModules()
   end
 end
 
---- @param frame BarFrame_ABP_2_0
 --- @param ui BarUIConfig_ABP_2_0
-local function ApplyGridLayout(frame, ui)
-  local cols = ui.colSize
-  local rows = ui.rowSize
-  local size = ui.button.size
-  local spacing = ui.button.spacing
-  local isNoneTheme = ui.backdrop.theme == 'none'
-  local borderDef = bd.BORDER_DEFS[ui.backdrop.theme] or bd.DEFAULT_BACKDROP
-  -- theme 'none' has no visible border/background, so it should sit flush with no
-  -- padding, regardless of the saved profile padding value (which stays untouched
-  -- for when the user switches back to a bordered theme)
-  local pad = isNoneTheme and 0 or (ui.backdrop.padding or borderDef.padding)
-  local BASE_UI_PADDING = isNoneTheme and 0 or (borderDef.basePadding or 8)
-  local borderPadBottom = isNoneTheme and 0 or (borderDef.borderPadBottom or 0)
-
-  local padLeft   = pad + BASE_UI_PADDING
-  local padRight  = pad + BASE_UI_PADDING
-  local padTop    = pad + BASE_UI_PADDING
-  local padBottom = pad + BASE_UI_PADDING + borderPadBottom
-
-  local totalWidth  = padLeft + size*cols + spacing.horizontal*(cols - 1) + padRight
-  local totalHeight = padTop  + size*rows + spacing.vertical*(rows - 1)   + padBottom
-  frame:SetSize(totalWidth, totalHeight)
-
-  local hotKeyFontSize = math.max(8, math.floor(size * 12 / 40))
-  local hotKeyOffsetX  = math.floor(size * 5 / 40)
-  local hotKeyOffsetY  = math.floor(size * 7 / 40)
-  local startX = math.floor(padLeft + 0.5)
-  local startY = -math.floor(padTop + 0.5)
-  local visible = cols * rows
-
-  for i, _btn in ipairs(frame.widget.buttons) do
-    --- @type Button_ABP_2_0_X
-    local btn = _btn
-
-    btn:ClearAllPoints()
-    if i <= visible then
-      btn:SetSize(size, size)
-      cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
-      btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
-      btn.HotKey:ClearAllPoints()
-      btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)
-      local idx = i - 1
-      local c = (idx % cols) + 1
-      local r = math.floor(idx / cols) + 1
-      local x = startX + (size + spacing.horizontal) * (c - 1)
-      local y = startY - (size + spacing.vertical)   * (r - 1)
-      btn:SetPoint('TOPLEFT', frame, 'TOPLEFT', x, y)
-      btn:Show()
-      btn.widget:UpdateEmptyState(ui.showEmptyButtons)
-    else
-      btn:Hide()
-    end
-  end
-end
+--- @return BarLayout_ABP_2_0
+function o:ResolveLayout(ui) return ResolveLayout(ui) end
 
 --- @param frame BarFrame_ABP_2_0
 --- @param barConf BarConfig_ABP_2_0
 function o:ApplyLayout(frame, barConf)
   local ui = barConf.ui
-  local layout = ui.layout or 'grid' -- todo: add layout to database
-  if layout == 'grid' then ApplyGridLayout(frame, ui) end
+  local layout = ResolveLayout(ui)
+  layout:Apply(frame, ui)
   frame:SetAlpha(ui.alpha)
-  frame.widget:ApplyBackdrop()
-  frame.widget:ApplyExtraButton()
-  -- theme 'none' has no visible border/background to interact with, so the bar frame
-  -- itself is always click-through in that case. Otherwise, keep it mouse-enabled for
-  -- right-click/tooltip on the border/background, regardless of showEmptyButtons.
+  if layout:SupportsBackdrop() then
+    frame.widget:ApplyBackdrop()
+  else
+    frame:SetBackdrop(nil)
+    frame.widget:ApplyDragHandle(true)
+  end
+  layout:ApplyExtraButtons(frame)
+  -- theme 'none' (or a layout without backdrop support) has no visible border/background
+  -- to interact with, so the bar frame itself is always click-through in that case.
+  -- Otherwise, keep it mouse-enabled for right-click/tooltip on the border/background,
+  -- regardless of showEmptyButtons.
   local bc = ui.backdrop
-  local hasVisibleBackdrop = bc and bc.theme ~= 'none'
+  local hasVisibleBackdrop = layout:SupportsBackdrop() and bc and bc.theme ~= 'none'
   frame:EnableMouse(hasVisibleBackdrop == true)
+  -- When the bar frame is click-through, the drag handle is the only grab target and
+  -- the (often larger, e.g. Arc) frame itself is never dragged directly -- clamping it
+  -- to the screen in that state only blocks the handle-driven drag for no benefit.
+  frame:SetClampedToScreen(hasVisibleBackdrop == true)
 end
 
 --- Re-layout an existing bar in place from the current config.
@@ -673,7 +483,8 @@ function o:RebuildLayout(barIndex)
 
   local barConf = cns:a():bar(barIndex)
   local ui = barConf.ui
-  local needed = ui.colSize * ui.rowSize
+  local layout = ResolveLayout(ui)
+  local needed = layout:GetButtonCount(ui)
   local buttons = frame.widget.buttons
 
   for i = #buttons + 1, needed do
@@ -698,7 +509,7 @@ function o:ReloadAll()
     if barConf then
       self:CreateBarGroup(i, function(barFrame) self:New(barFrame) end)
       self:ApplyBarEnabledState(i)
-      -- hide and clear stale extra buttons so ApplyExtraButton rebuilds from the new profile
+      -- hide and clear stale extra buttons so ApplyExtraButtons rebuilds from the new profile
       local w = self:GetBarWidget(i)
       if w and w.extraButtons then
         for _, btn in ipairs(w.extraButtons) do btn:Hide() end
@@ -727,11 +538,6 @@ function o:CreateBarGroup(barIndex, consumerFn)
 
   local barConf = cns:a():bar(barIndex)
   local ui = barConf.ui
-
-  local cols = ui.colSize
-  local rows = ui.rowSize
-  local size = ui.button.size
-  local spacing = ui.button.spacing
 
   --- @type BarFrame_ABP_2_0
   local frame = self:CreateBarFrame(barConf, barIndex, frameName)
@@ -779,8 +585,9 @@ end
 --- @return table<number, Button_ABP_2_0_X>
 function o:CreateButtons(barConf, barFrame, barIndex)
   local ui = barConf.ui
-  local cols, rows = ui.colSize, ui.rowSize
-  local btnCount = rows * cols
+  local layout = ResolveLayout(ui)
+  local grid = ui.layoutConfig.grid
+  local btnCount = math.max(grid.colSize * grid.rowSize, layout:GetButtonCount(ui))
 
   --- @type table<number, Button_ABP_2_0_X>
   local buttons = {}

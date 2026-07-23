@@ -8,6 +8,7 @@
     <Script file="Button_2_0_3_Components/ActionEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/WorldEventsFrameMixin.lua"/>
     <Script file="Button_2_0_3_Components/ButtonUpdateFrameMixin.lua"/>
+    <Script file="Button_2_0_3_Components/GridLayout.lua"/>
 
     <Frame name="ActionEventsFrame_ABP_2_0" mixin="ActionEventsFrameMixin_ABP_2_0">
         <Scripts>

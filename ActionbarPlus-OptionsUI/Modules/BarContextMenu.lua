@@ -24,6 +24,7 @@ Blizzard Vars
 local OPTIONS = OPTIONS or L['Options']
 local BAR = L['Bar']
 local BAR_OPTIONS = BAR .. ' ' .. OPTIONS
+local BAR_LAYOUT      = L['Layout']
 local BAR_BACKDROP    = L['Backdrop']
 local BAR_EXTRA_BTNS  = L['Extra Buttons']
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
@@ -151,6 +152,7 @@ Methods
 function o:Show(barFrame)
   local menu = {
     { text = BAR_OPTIONS,    notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
+    { text = BAR_LAYOUT,     notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'layout') end },
     { text = BAR_BACKDROP,   notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'backdrop') end },
     { text = BAR_EXTRA_BTNS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end },
     { isSeparator = true },
