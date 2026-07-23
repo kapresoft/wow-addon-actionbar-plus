@@ -152,8 +152,8 @@ Methods
 function o:Show(barFrame)
   local menu = {
     { text = BAR_OPTIONS,    notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
-    { text = BAR_LAYOUT,     notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'layout') end },
     { text = BAR_BACKDROP,   notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'backdrop') end },
+    { text = BAR_LAYOUT,     notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'layout') end },
     { text = BAR_EXTRA_BTNS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end },
     { isSeparator = true },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
@@ -161,7 +161,13 @@ function o:Show(barFrame)
     { text = BARS, submenu = function() return BuildBarsSubmenu(barFrame.widget.index) end },
   }
   cns:IfMasque(function(abpMasque)
-    tinsert(menu, { text = MASQUE_SETTINGS, notCheckable = true, func = function() abpMasque:OpenMasqueSettings() end })
+    tinsert(menu, 5, { text = MASQUE_SETTINGS, notCheckable = true, func = function()
+      local BMF = cns:BarsUI():ns().O.BarModuleFactory
+      local barConf = cns:bar(barFrame.widget.index)
+      local layout = BMF:ResolveLayout(barConf.ui)
+      local groupKey = layout.GetMasqueGroupKey and layout:GetMasqueGroupKey()
+      abpMasque:OpenMasqueSettings(groupKey)
+    end })
   end)
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end

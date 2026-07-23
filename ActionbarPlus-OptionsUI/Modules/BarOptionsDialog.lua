@@ -244,6 +244,16 @@ local function AddLayoutTab(tab, window, conf)
   local ui = conf.ui
   local layoutType = ui.layout or 'grid'
   local BMF = cns:BarsUI():ns().O.BarModuleFactory
+
+  -- 'grid' is BarsUI's static built-in and always available; any other layout key
+  -- (e.g. 'arc') only exists if its plugin addon is loaded and self-registered into
+  -- Core's layout registry. Fall back to grid (and correct the saved value) if the
+  -- previously-selected layout isn't available this session.
+  if layoutType ~= 'grid' and not cns:GetLayout(layoutType) then
+    layoutType = 'grid'
+    ui.layout = 'grid'
+  end
+
   local layout = BMF:ResolveLayout(ui)
 
   local function RebuildLayoutTab()
@@ -263,10 +273,15 @@ local function AddLayoutTab(tab, window, conf)
   ddLayout:SetLabel(L['Layout Type'])
   SetDropdownLabelFontSize(ddLayout, 12)
   ddLayout:SetRelativeWidth(0.6)
-  ddLayout:SetList({
-    grid = L['Grid'],
-    arc = L['Arc'],
-  }, { 'grid', 'arc' })
+  -- 'arc' (and any future plugin layout) only appears once its addon has self-registered
+  -- (a saved-but-unavailable value was already reset to 'grid' above).
+  local layoutValues = { 'grid' }
+  local layoutList = { grid = L['Grid'] }
+  if cns:GetLayout('arc') then
+    table.insert(layoutValues, 'arc')
+    layoutList.arc = L['Arc']
+  end
+  ddLayout:SetList(layoutList, layoutValues)
   ddLayout:SetValue(layoutType)
   ddLayout:SetCallback('OnValueChanged', function(_, _, val)
     ui.layout = val
@@ -278,6 +293,15 @@ local function AddLayoutTab(tab, window, conf)
   end)
   tab:AddChild(ddLayout)
   refs.ddLayout = ddLayout
+
+  local wf = window.frame
+  if not wf.layoutTypeHelp then wf.layoutTypeHelp = CreateHelpIcon(wf, L['Layout Type Tooltip']) end
+  local layoutTypeHelp = wf.layoutTypeHelp
+  layoutTypeHelp:SetFrameLevel(ddLayout.frame:GetFrameLevel() + 2)
+  layoutTypeHelp:ClearAllPoints()
+  layoutTypeHelp:SetPoint('LEFT', ddLayout.frame, 'RIGHT', 4, -7)
+  layoutTypeHelp:Show()
+  refs.layoutTypeHelp = layoutTypeHelp
 
   if layout:SupportsHorizontalSpacing() then
     --- @type AceGUISlider
@@ -758,8 +782,8 @@ local function AddWidgets(window, conf, selectedTab)
   tabGroup:SetLayout('Flow')
   tabGroup:SetTabs({
     { text = L['General'], value = TAB_GENERAL },
-    { text = L['Layout'], value = TAB_LAYOUT },
     { text = L['Backdrop'], value = TAB_BACKDROP },
+    { text = L['Layout'], value = TAB_LAYOUT },
     { text = L['Extra Buttons'], value = TAB_EXTRA_BTNS },
   })
 
@@ -771,6 +795,7 @@ local function AddWidgets(window, conf, selectedTab)
     if wf.mouseoverHighlightHelp then wf.mouseoverHighlightHelp:Hide() end
     if wf.gapHelp then wf.gapHelp:Hide() end
     if wf.dragHelp then wf.dragHelp:Hide() end
+    if wf.layoutTypeHelp then wf.layoutTypeHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
     elseif tab == TAB_LAYOUT then

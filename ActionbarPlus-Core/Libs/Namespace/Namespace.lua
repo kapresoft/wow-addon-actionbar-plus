@@ -131,7 +131,14 @@ function ns:GetLayout(key) return layoutRegistry[key] end
 function ns:RegisterDB(db)
   assert(type(db) == 'table', "RegisterDB(db): The param db is required.")
   self.addonDbFn = function() return db end
+  -- Fires the moment cns:db()/cns:g()/cns:p() first become safe to call. Other
+  -- addons (e.g. layout plugins) that need the DB at their own load time should
+  -- wait for this instead of guessing/pcall-ing cns:g() at an arbitrary moment.
+  self:a():SendMessage(self:msg('OnDatabaseReady'))
 end
+
+--- @return boolean true once RegisterDB has run and cns:db()/cns:g()/cns:p() are safe to call
+function ns:IsDatabaseReady() return self.addonDbFn ~= nil end
 
 --- @return DatabaseObj_ABP_2_0
 function ns:db() return self.addonDbFn() end
