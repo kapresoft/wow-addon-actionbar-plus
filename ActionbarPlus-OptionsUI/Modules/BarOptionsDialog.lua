@@ -251,6 +251,10 @@ local function AddLayoutTab(tab, window, conf)
       tab:ReleaseChildren()
       AddLayoutTab(tab, window, conf)
       tab:DoLayout()
+      -- switching to a layout without backdrop support forces theme to 'none' (see
+      -- ddLayout's callback below), the same state change RebuildBackdropTab already
+      -- re-syncs the glow for -- mirror that here so the handle animates immediately
+      syncHandleGlow(o.barIndex)
     end)
   end
 

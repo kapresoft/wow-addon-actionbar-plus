@@ -10,6 +10,8 @@ local cns, O = ns:cns()
 local au = O.ActionUtil
 local DS = O.DatabaseSchema
 
+local MAX_EXTRA_BUTTON_ROWS = 2
+
 --- @param name string
 --- @param parent Frame
 --- @param encodedID number
@@ -164,6 +166,12 @@ function S:ApplyExtraButtons(frame)
   -- wrap extra buttons when their row would exceed the pixel width of the main button grid
   local gridPixelWidth = mainCols * mainSize + (mainCols - 1) * mainSpacing
   local wrapCols = math.floor((gridPixelWidth + spacing) / (size + spacing))
+  -- cap rendering at MAX_EXTRA_BUTTON_ROWS -- once that many rows are full, any
+  -- remaining count is simply not shown (buttons still exist/are created, just hidden)
+  local renderCols = math.min(cols, wrapCols * MAX_EXTRA_BUTTON_ROWS)
+  for i = renderCols + 1, cols do
+    if w.extraButtons[i] then w.extraButtons[i]:Hide() end
+  end
   -- for TOP*: last button of row 1; for BOTTOM*: last button of the last row
   local lastBtnTop    = w.buttons and w.buttons[mainCols]
   local lastBtnBottom = w.buttons and w.buttons[mainCols * mainRows]
@@ -182,7 +190,7 @@ function S:ApplyExtraButtons(frame)
   local rowStep = isTop and (size + spacing) or -(size + spacing)
 
   local showEmpty = eb.showEmptyButtons ~= false
-  for i = 1, cols do
+  for i = 1, renderCols do
     local btn = w.extraButtons[i]
     btn:SetSize(size, size)
     cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
@@ -207,7 +215,7 @@ function S:ApplyExtraButtons(frame)
   end
 
   if isLeft and firstBtn then
-    for i = 1, cols do
+    for i = 1, renderCols do
       local eRow, eCol = extraRowCol(i)
       local offY = gap + (eRow - 1) * rowStep
       if eCol == 1 then
@@ -218,9 +226,9 @@ function S:ApplyExtraButtons(frame)
     end
   elseif isRight and lastBtn1 then
     -- lay out right-to-left within each row so the rightmost button anchors to the bar corner
-    for eRow = 1, math.ceil(cols / wrapCols) do
+    for eRow = 1, math.ceil(renderCols / wrapCols) do
       local rowStart = (eRow - 1) * wrapCols + 1
-      local rowEnd   = math.min(eRow * wrapCols, cols)
+      local rowEnd   = math.min(eRow * wrapCols, renderCols)
       local offY = gap + (eRow - 1) * rowStep
       -- rightmost button in this extra-row anchors to the bar
       w.extraButtons[rowEnd]:SetPoint(extraRelPointR, lastBtn1, gridRelPointR, 0, offY)
@@ -234,10 +242,10 @@ function S:ApplyExtraButtons(frame)
     -- Use actual frame pixel width so we don't need to recompute padLeft or spacing variants.
     local centerRefBtn = isTop and (w.buttons and w.buttons[1]) or firstBtnBottom
     local frameWidth   = w.frame:GetWidth()
-    local rowCount     = math.ceil(cols / wrapCols)
+    local rowCount     = math.ceil(renderCols / wrapCols)
     for eRow = 1, rowCount do
       local rowStart = (eRow - 1) * wrapCols + 1
-      local rowEnd   = math.min(eRow * wrapCols, cols)
+      local rowEnd   = math.min(eRow * wrapCols, renderCols)
       local rowCols  = rowEnd - rowStart + 1
       local totalW   = rowCols * size + (rowCols - 1) * spacing
       local offY     = gap + (eRow - 1) * rowStep
