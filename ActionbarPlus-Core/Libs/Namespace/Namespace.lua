@@ -175,6 +175,13 @@ function ns:cursor() return self.O.CursorProvider:GetCursor() end
 --- @return AttributeNames_ABP_2_0, SupportedActionTypes_ABP_2_0
 function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.SupportedActionTypes end
 
+--- Addon-name namespace used for Masque:Group(Addon, ...) calls -- shared across
+--- ActionbarPlus-Masque's own group and any layout plugin's own dedicated group
+--- (e.g. ActionbarPlus-ArcLayout's 'Buttons (Arc)'), so all ABP Masque groups nest
+--- under one addon entry in Masque's Skins UI instead of each hardcoding the string.
+--- @return string
+function ns:MasqueAddonName() return 'ActionbarPlus' end
+
 --- @param color colorRGBA|HexRGBA|HexRGB|HexRGBA @ RED_THREAT_COLOR | '565656fc' | '565656' | 'fc565656'
 --- @return fun(key:string) : string The color formatted key
 function ns:ColorFn(color)
