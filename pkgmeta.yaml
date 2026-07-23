@@ -15,11 +15,11 @@ embedded-libraries:
 tools-used:
   - DevSuite
   - DebugChatFrame
-  - Addon-Usage
   - Bugsack
   - Bug-Grabber
 
 optional-dependencies:
+  - Masque
   - ActionbarPlus-Masque
 
 # Resources:

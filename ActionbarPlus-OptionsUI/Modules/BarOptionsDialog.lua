@@ -8,9 +8,10 @@ local DS = O.DatabaseSchema
 local tbl_DeepCopy = cns:Table().DeepCopy
 local OPTIONS = OPTIONS or L['Options']
 
-local DIALOG_WIDTH, DIALOG_HEIGHT = 340, 310
+local DIALOG_WIDTH, DIALOG_HEIGHT = 400, 310
 local HELP_ICON_SIZE = 24
 local TAB_GENERAL = 'general'
+local TAB_LAYOUT = 'layout'
 local TAB_BACKDROP = 'backdrop'
 local TAB_EXTRA_BTNS = 'extrabuttons'
 
@@ -40,8 +41,7 @@ local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
 local function syncHandleGlow(barIndex)
   local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
   if not w then return end
-  local theme = cns:bar(barIndex).ui.backdrop.theme
-  if theme == 'none' then
+  if w.dragHandleEnabled then
     w:StartHandleGlow()
   else
     w:StopHandleGlow()
@@ -204,35 +204,7 @@ local function AddGeneralTab(tab, window, conf)
   chkEmptySpacer:SetRelativeWidth(0.35)
   tab:AddChild(chkEmptySpacer)
 
-  -- Row 2: Rows | Columns
-  --- @type AceGUISlider
-  local slRows = AceGUI:Create('Slider')
-  slRows:SetLabel(L['Rows'])
-  slRows:SetRelativeWidth(0.5)
-  slRows:SetSliderValues(1, DS:GetMaxRowSize(), 1)
-  slRows:SetValue(conf.ui.rowSize)
-  slRows:SetCallback('OnValueChanged', function(_, _, val)
-    t('AddWidgets::RowSlider', 'val=', val)
-    conf.ui.rowSize = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  tab:AddChild(slRows)
-  refs.slRows = slRows
-
-  --- @type AceGUISlider
-  local slCols = AceGUI:Create('Slider')
-  slCols:SetLabel(L['Columns'])
-  slCols:SetRelativeWidth(0.5)
-  slCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
-  slCols:SetValue(conf.ui.colSize)
-  slCols:SetCallback('OnValueChanged', function(_, _, val)
-    conf.ui.colSize = val
-    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
-  end)
-  tab:AddChild(slCols)
-  refs.slCols = slCols
-
-  -- Row 3: Alpha | Button Size
+  -- Row 2: Alpha | Button Size
   --- @type AceGUISlider
   local slAlpha = AceGUI:Create('Slider')
   slAlpha:SetLabel(L['Alpha'])
@@ -258,6 +230,160 @@ local function AddGeneralTab(tab, window, conf)
   end)
   tab:AddChild(slBtnSize)
   refs.slBtnSize = slBtnSize
+
+  return refs
+end
+
+--- @param tab AceGUITabGroup
+--- @param window BarOptionsDialogWindow_ABP_2_0
+--- @param conf BarConfig_ABP_2_0
+--- @return table
+local function AddLayoutTab(tab, window, conf)
+  local AceGUI = cns:AceGUI()
+  local refs = {}
+  local ui = conf.ui
+  local layoutType = ui.layout or 'grid'
+  local BMF = cns:BarsUI():ns().O.BarModuleFactory
+  local layout = BMF:ResolveLayout(ui)
+
+  local function RebuildLayoutTab()
+    C_Timer.After(0, function()
+      tab:ReleaseChildren()
+      AddLayoutTab(tab, window, conf)
+      tab:DoLayout()
+    end)
+  end
+
+  --- @type AceGUIDropdown
+  local ddLayout = AceGUI:Create('Dropdown')
+  ddLayout:SetLabel(L['Layout Type'])
+  SetDropdownLabelFontSize(ddLayout, 12)
+  ddLayout:SetRelativeWidth(0.6)
+  ddLayout:SetList({
+    grid = L['Grid'],
+    arc = L['Arc'],
+  }, { 'grid', 'arc' })
+  ddLayout:SetValue(layoutType)
+  ddLayout:SetCallback('OnValueChanged', function(_, _, val)
+    ui.layout = val
+    if not BMF:ResolveLayout(ui):SupportsBackdrop() then
+      ui.backdrop.theme = 'none'
+    end
+    o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    RebuildLayoutTab()
+  end)
+  tab:AddChild(ddLayout)
+  refs.ddLayout = ddLayout
+
+  if layout:SupportsHorizontalSpacing() then
+    --- @type AceGUISlider
+    local slSpacingH = AceGUI:Create('Slider')
+    slSpacingH:SetLabel(L['Horizontal Spacing'])
+    slSpacingH:SetRelativeWidth(0.5)
+    slSpacingH:SetSliderValues(DS:GetMinSpacing(), DS:GetMaxSpacing(), 1)
+    slSpacingH:SetValue(ui.button.spacing.horizontal or 0)
+    slSpacingH:SetCallback('OnValueChanged', function(_, _, val)
+      ui.button.spacing.horizontal = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slSpacingH)
+    refs.slSpacingH = slSpacingH
+  end
+
+  if layout:SupportsVerticalSpacing() then
+    --- @type AceGUISlider
+    local slSpacingV = AceGUI:Create('Slider')
+    slSpacingV:SetLabel(L['Vertical Spacing'])
+    slSpacingV:SetRelativeWidth(0.5)
+    slSpacingV:SetSliderValues(DS:GetMinSpacing(), DS:GetMaxSpacing(), 1)
+    slSpacingV:SetValue(ui.button.spacing.vertical or 0)
+    slSpacingV:SetCallback('OnValueChanged', function(_, _, val)
+      ui.button.spacing.vertical = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slSpacingV)
+    refs.slSpacingV = slSpacingV
+  end
+
+  if layoutType == 'arc' then
+    local arcConf = ui.layoutConfig.arc
+    local maxButtonCount = layout:GetMaxButtonCount()
+    if (arcConf.buttonCount or 9) > maxButtonCount then
+      arcConf.buttonCount = maxButtonCount
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end
+
+    --- @type AceGUISlider
+    local slButtonCount = AceGUI:Create('Slider')
+    slButtonCount:SetLabel(L['Button Count'])
+    slButtonCount:SetRelativeWidth(0.5)
+    slButtonCount:SetSliderValues(1, maxButtonCount, 1)
+    slButtonCount:SetValue(arcConf.buttonCount or 9)
+    slButtonCount:SetCallback('OnValueChanged', function(_, _, val)
+      arcConf.buttonCount = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slButtonCount)
+    refs.slButtonCount = slButtonCount
+
+    --- @type AceGUIDropdown
+    local ddArcDirection = AceGUI:Create('Dropdown')
+    ddArcDirection:SetLabel(L['Arc Direction'])
+    SetDropdownLabelFontSize(ddArcDirection, 12)
+    ddArcDirection:SetRelativeWidth(0.5)
+    ddArcDirection:SetList({
+      up = L['Up'],
+      down = L['Down'],
+    }, { 'up', 'down' })
+    ddArcDirection:SetValue(arcConf.arcDirection or 'up')
+    ddArcDirection:SetCallback('OnValueChanged', function(_, _, val)
+      arcConf.arcDirection = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(ddArcDirection)
+    refs.ddArcDirection = ddArcDirection
+
+    --- @type AceGUISlider
+    local slArcSpan = AceGUI:Create('Slider')
+    slArcSpan:SetLabel(L['Arc Span'])
+    slArcSpan:SetRelativeWidth(0.5)
+    slArcSpan:SetSliderValues(layout:GetMinArcSpan(), layout:GetMaxArcSpan(), 1)
+    slArcSpan:SetValue(arcConf.arcSpan or 90)
+    slArcSpan:SetCallback('OnValueChanged', function(_, _, val)
+      arcConf.arcSpan = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slArcSpan)
+    refs.slArcSpan = slArcSpan
+  else
+    local gridConf = ui.layoutConfig.grid
+
+    --- @type AceGUISlider
+    local slRows = AceGUI:Create('Slider')
+    slRows:SetLabel(L['Rows'])
+    slRows:SetRelativeWidth(0.5)
+    slRows:SetSliderValues(1, DS:GetMaxRowSize(), 1)
+    slRows:SetValue(gridConf.rowSize)
+    slRows:SetCallback('OnValueChanged', function(_, _, val)
+      gridConf.rowSize = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slRows)
+    refs.slRows = slRows
+
+    --- @type AceGUISlider
+    local slCols = AceGUI:Create('Slider')
+    slCols:SetLabel(L['Columns'])
+    slCols:SetRelativeWidth(0.5)
+    slCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
+    slCols:SetValue(gridConf.colSize)
+    slCols:SetCallback('OnValueChanged', function(_, _, val)
+      gridConf.colSize = val
+      o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
+    end)
+    tab:AddChild(slCols)
+    refs.slCols = slCols
+  end
 
   return refs
 end
@@ -345,6 +471,8 @@ local function AddBackdropTab(tab, window, conf)
   local refs = {}
   local bc = conf.ui.backdrop
   local borderDef = backdrops().BORDER_DEFS[bc.theme] or backdrops().DEFAULT_BACKDROP
+  local BMF = cns:BarsUI():ns().O.BarModuleFactory
+  local layoutSupportsBackdrop = BMF:ResolveLayout(conf.ui):SupportsBackdrop()
 
   local function RebuildBackdropTab()
     C_Timer.After(0, function()
@@ -375,6 +503,7 @@ local function AddBackdropTab(tab, window, conf)
   local themeList, themeOrder = buildThemeList()
   ddTheme:SetList(themeList, themeOrder)
   ddTheme:SetValue(bc.theme or 'stone')
+  ddTheme:SetDisabled(not layoutSupportsBackdrop)
   ddTheme:SetCallback('OnValueChanged', function(_, _, val)
     bc.theme = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
@@ -431,7 +560,7 @@ local function AddBackdropTab(tab, window, conf)
   resetBtn:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
   resetBtn:ClearAllPoints()
   resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
-  resetBtn:Show()
+  if layoutSupportsBackdrop then resetBtn:Show() else resetBtn:Hide() end
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
@@ -527,8 +656,9 @@ local function AddBackdropTab(tab, window, conf)
     ddDragAnchorSp:SetRelativeWidth(0.3)
     tab:AddChild(ddDragAnchorSp)
 
-    --- @type HelpIconFrame
-    local dragHelp = CreateHelpIcon(tab.frame, DRAG_HINT)
+    local wf = window.frame
+    if not wf.dragHelp then wf.dragHelp = CreateHelpIcon(wf, DRAG_HINT) end
+    local dragHelp = wf.dragHelp
     dragHelp:SetFrameLevel(ddDragAnchor.frame:GetFrameLevel() + 2)
     dragHelp:ClearAllPoints()
     dragHelp:SetPoint('LEFT', ddDragAnchor.frame, 'RIGHT', 4, -7)
@@ -700,6 +830,7 @@ local function AddWidgets(window, conf, selectedTab)
   tabGroup:SetLayout('Flow')
   tabGroup:SetTabs({
     { text = L['General'], value = TAB_GENERAL },
+    { text = L['Layout'], value = TAB_LAYOUT },
     { text = L['Backdrop'], value = TAB_BACKDROP },
     { text = L['Extra Buttons'], value = TAB_EXTRA_BTNS },
   })
@@ -711,8 +842,11 @@ local function AddWidgets(window, conf, selectedTab)
     if wf.charPosHelp then wf.charPosHelp:Hide() end
     if wf.mouseoverHighlightHelp then wf.mouseoverHighlightHelp:Hide() end
     if wf.gapHelp then wf.gapHelp:Hide() end
+    if wf.dragHelp then wf.dragHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
+    elseif tab == TAB_LAYOUT then
+      refs.layout = AddLayoutTab(tg, window, conf)
     elseif tab == TAB_BACKDROP then
       refs.backdrop = AddBackdropTab(tg, window, conf)
       syncHandleGlow(o.barIndex)

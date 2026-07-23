@@ -14,6 +14,7 @@ local MAX_ROW_SIZE, MAX_COL_SIZE = 18, 36
 local MIN_BTN_SIZE, MAX_BTN_SIZE = 20, 120
 local MIN_EXTRA_BTN_SIZE, MAX_EXTRA_BTN_SIZE = 16, 80
 local MIN_EXTRA_BTN_GAP, MAX_EXTRA_BTN_GAP = 0, 20
+local MIN_SPACING, MAX_SPACING = 0, 20
 
 --[[-------------------------------------------------------------------
 Type Definitions
@@ -75,9 +76,24 @@ Type Definitions
 --- @field gap number            -- extra clearance beyond border padding between bar and first extra-button row
 --- @field showEmptyButtons boolean
 
+--- @class GridLayoutConfig_ABP_2_0
+--- @field rowSize number       -- Button row count
+--- @field colSize number       -- Button column count
+
+--- @class ArcLayoutConfig_ABP_2_0
+--- @field buttonCount number   -- Total number of buttons on the arc
+--- @field arcDirection string  -- 'up' | 'down' -- Arc layout curve direction
+--- @field arcSpan number       -- Degrees the arc spans (0-90); narrower = flatter arc, more even horizontal spacing
+
+--- @class LayoutConfigMap_ABP_2_0
+--- @field grid GridLayoutConfig_ABP_2_0
+--- @field arc ArcLayoutConfig_ABP_2_0
+
+--  ================================================
+
 --- @class BarUIConfig_ABP_2_0
---- @field rowSize number
---- @field colSize number
+--- @field layout string        -- 'grid' | 'arc' -- Active bar layout implementation
+--- @field layoutConfig LayoutConfigMap_ABP_2_0    -- Per-layout config, isolated by layout key
 --- @field alpha number
 --- @field showEmptyButtons boolean
 --- @field frameHandleMouseover boolean
@@ -224,8 +240,13 @@ local DEFAULT_BAR = {
   showButtonIndex = false,
   -- BarUIConfig_ABP_2_0
   ui = {
-    rowSize = 2,
-    colSize = 5,
+    layout = 'grid',
+    -- LayoutConfigMap_ABP_2_0 -- isolated per-layout config; add a new key here
+    -- when a new layout's config shape is defined, alongside its interface methods.
+    layoutConfig = {
+      grid = { rowSize = 2, colSize = 5 },
+      arc = { buttonCount = 9, arcDirection = 'up', arcSpan = 90 },
+    },
     alpha = 1.0,
     showEmptyButtons = true,
     frameHandleMouseover = false,
@@ -290,8 +311,8 @@ function o:CreateDefaultBar(barIndex)
   local bar = tbl_DeepCopy(DEFAULT_BAR)
   bar.enabled = barIndex == 1
 
-  local cols = bar.ui.colSize or 5
-  local rows = bar.ui.rowSize or 1
+  local cols = bar.ui.layoutConfig.grid.colSize or 5
+  local rows = bar.ui.layoutConfig.grid.rowSize or 1
   local totalButtons = cols * rows
 
   -- todo: revisit for retail because it has specs > 2 (class-based, i.e. druid has a lot of 4 talent specs)
@@ -355,3 +376,7 @@ function o:GetMaxExtraBtnSize() return MAX_EXTRA_BTN_SIZE end
 function o:GetMinExtraBtnGap() return MIN_EXTRA_BTN_GAP end
 --- @return number
 function o:GetMaxExtraBtnGap() return MAX_EXTRA_BTN_GAP end
+--- @return number
+function o:GetMinSpacing() return MIN_SPACING end
+--- @return number
+function o:GetMaxSpacing() return MAX_SPACING end

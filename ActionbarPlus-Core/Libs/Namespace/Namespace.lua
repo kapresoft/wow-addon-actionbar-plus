@@ -101,6 +101,32 @@ function ns:Register(libName, anyObj)
   return anyObj
 end
 
+--[[-------------------------------------------------------------------
+Layout Registry
+  Plugin addons (e.g. ActionbarPlus-ArcLayout) declare `OptionalDeps:
+  ActionbarPlus-Core` and self-register at file-load time:
+  ```
+  if not ABP_Core_2_0 then return end
+  ABP_Core_2_0:ns():RegisterLayout('arc', S)
+  ```
+  BarsUI's GridLayout is NOT stored here -- it remains BarsUI's own
+  static built-in default and is not looked up via this registry.
+---------------------------------------------------------------------]]
+--- @type table<string, BarLayout_ABP_2_0>
+local layoutRegistry = {}
+
+--- @param key string @Layout key, e.g. 'arc'; matches BarUIConfig_ABP_2_0.layout
+--- @param layout BarLayout_ABP_2_0
+function ns:RegisterLayout(key, layout)
+  assert(type(key) == 'string' and #strtrim(key) > 0, 'RegisterLayout(key, layout): key must be a non-empty string')
+  assert(type(layout) == 'table', 'RegisterLayout(key, layout): layout must be a table')
+  layoutRegistry[key] = layout
+end
+
+--- @param key string
+--- @return BarLayout_ABP_2_0|nil
+function ns:GetLayout(key) return layoutRegistry[key] end
+
 --- @param db DatabaseObj_ABP_2_0
 function ns:RegisterDB(db)
   assert(type(db) == 'table', "RegisterDB(db): The param db is required.")
