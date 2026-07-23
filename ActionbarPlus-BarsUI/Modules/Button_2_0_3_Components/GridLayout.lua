@@ -8,6 +8,7 @@ local bd = BO.Backdrops
 
 local cns, O = ns:cns()
 local au = O.ActionUtil
+local DS = O.DatabaseSchema
 
 --- @param name string
 --- @param parent Frame
@@ -48,6 +49,41 @@ function S:GetButtonCount(ui) return ui.layoutConfig.grid.colSize * ui.layoutCon
 --- provided only for interface completeness.
 --- @return number
 function S:GetMaxButtonCount() return 36 * 18 end
+
+--- Adds Grid's own controls (Rows, Columns) to the Layout tab, beyond the shared
+--- spacing sliders BarOptionsDialog.lua already builds generically.
+--- @param tab AceGUITabGroup
+--- @param ui BarUIConfig_ABP_2_0
+--- @param onChanged fun()
+function S:ApplyOptionsUI(tab, ui, onChanged)
+  local AceGUI = cns:AceGUI()
+  local L = cns:GetLocale()
+  local gridConf = ui.layoutConfig.grid
+
+  --- @type AceGUISlider
+  local slRows = AceGUI:Create('Slider')
+  slRows:SetLabel(L['Rows'])
+  slRows:SetRelativeWidth(0.5)
+  slRows:SetSliderValues(1, DS:GetMaxRowSize(), 1)
+  slRows:SetValue(gridConf.rowSize)
+  slRows:SetCallback('OnValueChanged', function(_, _, val)
+    gridConf.rowSize = val
+    onChanged()
+  end)
+  tab:AddChild(slRows)
+
+  --- @type AceGUISlider
+  local slCols = AceGUI:Create('Slider')
+  slCols:SetLabel(L['Columns'])
+  slCols:SetRelativeWidth(0.5)
+  slCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
+  slCols:SetValue(gridConf.colSize)
+  slCols:SetCallback('OnValueChanged', function(_, _, val)
+    gridConf.colSize = val
+    onChanged()
+  end)
+  tab:AddChild(slCols)
+end
 
 --- Sizes/positions the drag handle beside the first (TOPLEFT) or last-in-row-1 (TOPRIGHT) button.
 --- @param frame BarFrame_ABP_2_0

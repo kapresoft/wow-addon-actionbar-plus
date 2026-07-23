@@ -18,3 +18,4 @@ Bar Layout
 --- @field Apply fun(self:BarLayout_ABP_2_0, frame:BarFrame_ABP_2_0, ui:BarUIConfig_ABP_2_0) Sizes/positions the bar's buttons per the given config
 --- @field ApplyExtraButtons fun(self:BarLayout_ABP_2_0, frame:BarFrame_ABP_2_0) Creates/positions the extra button row, if supported; no-op otherwise
 --- @field ApplyDragHandle fun(self:BarLayout_ABP_2_0, frame:BarFrame_ABP_2_0, dragAnchor:string, thickness:number) Sizes/positions the drag handle against this layout's buttons; dragAnchor is 'TOPLEFT' | 'TOPRIGHT'
+--- @field ApplyOptionsUI fun(self:BarLayout_ABP_2_0, tab:AceGUITabGroup, ui:BarUIConfig_ABP_2_0, onChanged:fun())|nil Optional: adds this layout's own controls (beyond the shared spacing sliders) to the Layout tab. Owns its own localization -- out-of-tree layouts should not rely on Core's locale table.
