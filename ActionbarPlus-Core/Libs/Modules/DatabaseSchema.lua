@@ -84,6 +84,7 @@ Type Definitions
 --- @field buttonCount number   -- Total number of buttons on the arc
 --- @field arcDirection string  -- 'up' | 'down' -- Arc layout curve direction
 --- @field arcSpan number       -- Degrees the arc spans (0-90); narrower = flatter arc, more even horizontal spacing
+--- @field extraButtonSpacing number -- Static clearance between adjacent extra buttons within a concentric ring; skins with square/bordered art need more than round icons
 
 --- @class LayoutConfigMap_ABP_2_0
 --- @field grid GridLayoutConfig_ABP_2_0
@@ -128,9 +129,13 @@ Type Definitions
 
 --  ================================================
 
+--- @class GlobalLayoutConfig_ABP_2_0
+--- @field initialMasqueSkinApplied boolean  -- one-time: has ABP's default Masque skin been applied for this layout yet? Absent/nil means not yet applied.
+
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
 --- @field v2AnnouncementShown boolean
+--- @field layout table<string, GlobalLayoutConfig_ABP_2_0>  -- per-layout global state, keyed by layout key (e.g. 'arc'); no default entries seeded -- absence of a key/field means false
 
 --  ================================================
 
@@ -211,6 +216,9 @@ local DEFAULT_DB = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
     v2AnnouncementShown = false,
+    -- GlobalLayoutConfig_ABP_2_0, keyed by layout key (e.g. 'arc'); no per-layout
+    -- entries seeded here -- an absent key/field means not-yet-applied/false.
+    layout = {},
     bars = {},
   },
 
@@ -245,7 +253,7 @@ local DEFAULT_BAR = {
     -- when a new layout's config shape is defined, alongside its interface methods.
     layoutConfig = {
       grid = { rowSize = 2, colSize = 5 },
-      arc = { buttonCount = 9, arcDirection = 'up', arcSpan = 90 },
+      arc = { buttonCount = 9, arcDirection = 'up', arcSpan = 90, extraButtonSpacing = 6 },
     },
     alpha = 1.0,
     showEmptyButtons = true,
