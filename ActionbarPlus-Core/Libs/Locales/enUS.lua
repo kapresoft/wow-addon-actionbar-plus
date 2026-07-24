@@ -79,6 +79,8 @@ L['Glow']                 = true
 L['Shadowmoon']           = true
 L['Dark Knight']          = true
 L['Modern']               = true
+L['Gold']                 = true
+L['Wood']                 = true
 -- /Theme Names
 
 

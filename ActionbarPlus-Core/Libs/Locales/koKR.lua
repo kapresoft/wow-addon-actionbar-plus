@@ -67,6 +67,8 @@ L['Glow']                  = '광채'
 L['Shadowmoon']            = 'Shadowmoon'
 L['Dark Knight']           = '어둠의 기사'
 L['Modern']                = '모던'
+L['Gold']                  = '골드'
+L['Wood']                  = '나무'
 -- /Theme Names
 
 
