@@ -67,6 +67,8 @@ L['Glow']                  = 'Свечение'
 L['Shadowmoon']            = 'Shadowmoon'
 L['Dark Knight']           = 'Тёмный рыцарь'
 L['Modern']                = 'Современный'
+L['Gold']                  = 'Золото'
+L['Wood']                  = 'Дерево'
 -- /Theme Names
 
 

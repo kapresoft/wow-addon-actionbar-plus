@@ -67,6 +67,8 @@ L['Glow']                  = '發光'
 L['Shadowmoon']            = 'Shadowmoon'
 L['Dark Knight']           = '黑暗騎士'
 L['Modern']                = '現代'
+L['Gold']                  = '黃金'
+L['Wood']                  = '木質'
 -- /Theme Names
 
 
