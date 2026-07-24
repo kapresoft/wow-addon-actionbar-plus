@@ -219,7 +219,11 @@ local DEFAULT_DB = {
     -- GlobalLayoutConfig_ABP_2_0, keyed by layout key (e.g. 'arc'); no per-layout
     -- entries seeded here -- an absent key/field means not-yet-applied/false.
     layout = {},
-    bars = {},
+    -- Every bar's global entry is identical (same default anchor), so AceDB's
+    -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
+    bars = {
+      ['*'] = { anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil } },
+    },
   },
 
   profile = {
@@ -299,9 +303,6 @@ function o:GetDefaultDatabase()
   for barIndex = 1, MAX_BAR_COUNT do
     local key = barKey(barIndex)
     db['profile'].bars[key] = self:CreateDefaultBar(barIndex)
-    db['global'].bars[key] = {
-      anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil },
-    }
   end
 
   return db
