@@ -18,7 +18,6 @@
 
     <Include file='LibPrettyPrint.xml'/>
 
-    <Include file="Ace3.xml"/>
     <!--@non-debug@
     <Include file="Ace3.xml"/>
     @end-non-debug@-->
