@@ -42,9 +42,12 @@ function S:SupportsHorizontalSpacing() return true end
 --- @return boolean
 function S:SupportsVerticalSpacing() return true end
 
---- @param ui BarUIConfig_ABP_2_0
+--- @param frame BarFrame_ABP_2_0
 --- @return number
-function S:GetButtonCount(ui) return ui.layoutConfig.grid.colSize * ui.layoutConfig.grid.rowSize end
+function S:GetButtonCount(frame)
+  local ui = frame.widget:conf().ui
+  return ui.layoutConfig.grid.colSize * ui.layoutConfig.grid.rowSize
+end
 
 --- Grid drives its button count from separate colSize/rowSize sliders (each with
 --- its own max in DatabaseSchema), so this is not used to bound a UI slider today --
@@ -54,13 +57,13 @@ function S:GetMaxButtonCount() return 36 * 18 end
 
 --- Adds Grid's own controls (Rows, Columns) to the Layout tab, beyond the shared
 --- spacing sliders BarOptionsDialog.lua already builds generically.
+--- @param frame BarFrame_ABP_2_0
 --- @param tab AceGUITabGroup
---- @param ui BarUIConfig_ABP_2_0
 --- @param onChanged fun()
-function S:ApplyOptionsUI(tab, ui, onChanged)
+function S:ApplyOptionsUI(frame, tab, onChanged)
   local AceGUI = cns:AceGUI()
   local L = cns:GetLocale()
-  local gridConf = ui.layoutConfig.grid
+  local gridConf = frame.widget:layoutConf().grid
 
   --- @type AceGUISlider
   local slRows = AceGUI:Create('Slider')
@@ -264,8 +267,8 @@ function S:ApplyExtraButtons(frame)
 end
 
 --- @param frame BarFrame_ABP_2_0
---- @param ui BarUIConfig_ABP_2_0
-function S:Apply(frame, ui)
+function S:ApplyButtons(frame)
+  local ui = frame.widget:conf().ui
   local cols = ui.layoutConfig.grid.colSize
   local rows = ui.layoutConfig.grid.rowSize
   local size = ui.button.size

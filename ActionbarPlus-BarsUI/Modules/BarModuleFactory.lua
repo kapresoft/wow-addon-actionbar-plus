@@ -122,7 +122,10 @@ local function BarFrameWidgetMethods()
 
   --- @return BarConfig_ABP_2_0
   function wm:conf() return cns:bar(self.index) end
-  
+
+  --- @return LayoutConfigMap_ABP_2_0
+  function wm:layoutConf() return self:conf().ui.layoutConfig end
+
   function wm:ApplyBackdrop()
     local conf = self:conf()
     if not conf then return end
@@ -450,7 +453,7 @@ function o:ResolveLayout(ui) return ResolveLayout(ui) end
 function o:ApplyLayout(frame, barConf)
   local ui = barConf.ui
   local layout = ResolveLayout(ui)
-  layout:Apply(frame, ui)
+  layout:ApplyButtons(frame)
   frame:SetAlpha(ui.alpha)
   if layout:SupportsBackdrop() then
     frame.widget:ApplyBackdrop()
@@ -484,7 +487,7 @@ function o:RebuildLayout(barIndex)
   local barConf = cns:a():bar(barIndex)
   local ui = barConf.ui
   local layout = ResolveLayout(ui)
-  local needed = layout:GetButtonCount(ui)
+  local needed = layout:GetButtonCount(frame)
   local buttons = frame.widget.buttons
 
   for i = #buttons + 1, needed do
@@ -587,7 +590,7 @@ function o:CreateButtons(barConf, barFrame, barIndex)
   local ui = barConf.ui
   local layout = ResolveLayout(ui)
   local grid = ui.layoutConfig.grid
-  local btnCount = math.max(grid.colSize * grid.rowSize, layout:GetButtonCount(ui))
+  local btnCount = math.max(grid.colSize * grid.rowSize, layout:GetButtonCount(barFrame))
 
   --- @type table<number, Button_ABP_2_0_X>
   local buttons = {}

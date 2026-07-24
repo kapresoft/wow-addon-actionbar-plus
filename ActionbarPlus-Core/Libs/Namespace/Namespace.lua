@@ -283,3 +283,6 @@ function ns:IfMasque(callbackFn)
   if hasABPMasque and callbackFn then callbackFn(ABP_MASQUE_NS) end
   return self:Chain(hasABPMasque)
 end
+
+--- @return Template
+function ns:GetButtonTemplateName() return 'ABP_ButtonTemplate_2_0_3' --[[@as Template ]] end

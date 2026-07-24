@@ -334,7 +334,8 @@ local function AddLayoutTab(tab, window, conf)
   end
 
   if layout.ApplyOptionsUI then
-    layout:ApplyOptionsUI(tab, ui, function() o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex) end)
+    local barWidget = BMF:GetBarWidget(o.barIndex)
+    layout:ApplyOptionsUI(barWidget.frame, tab, function() o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex) end)
   end
 
   return refs

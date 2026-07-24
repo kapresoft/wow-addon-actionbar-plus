@@ -20,9 +20,10 @@ Local Vars
 -------------------------------------------------------------------------------]]
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
-ns.buttonTemplate = 'ABP_ButtonTemplate_2_0_3'
-
 local cns, O = ns:cns(), ns:cns().O
+
+ns.buttonTemplate = cns:GetButtonTemplateName()
+
 local L = cns:GetLocale()
 local attr, atyp = cns:constants()
 local au, comp, spu, unit = O.ActionUtil, O.Compat, O.SpellUtil, O.UnitUtil
