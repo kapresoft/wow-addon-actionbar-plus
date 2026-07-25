@@ -8,6 +8,7 @@
 
 ## DefaultState: enabled
 ## RequiredDeps: ActionbarPlus-Core
+## Group: ActionbarPlus-Core
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten

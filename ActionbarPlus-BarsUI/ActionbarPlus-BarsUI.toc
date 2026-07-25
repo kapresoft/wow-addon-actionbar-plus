@@ -9,6 +9,7 @@
 ## DefaultState: enabled
 ## RequiredDeps: ActionbarPlus-Core
 ## OptionalDeps: ActionbarPlus-Masque
+## Group: ActionbarPlus-Core
 
 ## Category-enUS: Action Bars
 ## Category-deDE: Aktionsleisten
