@@ -21,6 +21,7 @@ tools-used:
 optional-dependencies:
   - Masque
   - ActionbarPlus-Masque
+  - ActionbarPlus-ArcLayout
 
 # Resources:
 #  - https://github.com/wowace-mirror
