@@ -85,7 +85,7 @@ Type Definitions
 --- @field arcDirection string  -- 'up' | 'down' -- Arc layout curve direction
 --- @field arcSpan number       -- Degrees the arc spans (0-90); narrower = flatter arc, more even horizontal spacing
 --- @field extraButtonSpacing number -- Static clearance between adjacent extra buttons within a concentric ring; skins with square/bordered art need more than round icons
---- @field initialMasqueSkinApplied boolean -- one-time (per-profile): has Arc's default Masque skin been applied yet? Absent/nil means not yet applied.
+--- @field initialMasqueSkinApplied boolean -- one-time (per-bar): has Arc's default Masque skin been applied yet for this bar? Absent/nil means not yet applied.
 
 --- @class LayoutConfigMap_ABP_2_0
 --- @field grid GridLayoutConfig_ABP_2_0

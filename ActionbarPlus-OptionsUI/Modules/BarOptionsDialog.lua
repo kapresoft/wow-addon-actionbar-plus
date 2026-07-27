@@ -285,8 +285,13 @@ local function AddLayoutTab(tab, window, conf)
   ddLayout:SetValue(layoutType)
   ddLayout:SetCallback('OnValueChanged', function(_, _, val)
     ui.layout = val
-    if not BMF:ResolveLayout(ui):SupportsBackdrop() then
+    local newLayout = BMF:ResolveLayout(ui)
+    if not newLayout:SupportsBackdrop() then
       ui.backdrop.theme = 'none'
+    end
+    if newLayout.OnSelected then
+      local barWidget = BMF:GetBarWidget(o.barIndex)
+      newLayout:OnSelected(barWidget.frame)
     end
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
     RebuildLayoutTab()

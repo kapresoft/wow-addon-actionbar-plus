@@ -196,7 +196,7 @@ function S:ApplyExtraButtons(frame)
   for i = 1, renderCols do
     local btn = w.extraButtons[i]
     btn:SetSize(size, size)
-    cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
+    cns:IfMasque(function(abpMasque) abpMasque:AddButton(btn); abpMasque:ReSkin(btn) end)
     btn:ClearAllPoints()
     btn:Show()
     if btn.widget then btn.widget:UpdateEmptyState(showEmpty) end
@@ -305,7 +305,7 @@ function S:ApplyButtons(frame)
     btn:ClearAllPoints()
     if i <= visible then
       btn:SetSize(size, size)
-      cns:IfMasque(function(abpMasque) abpMasque:ReSkin(btn) end)
+      cns:IfMasque(function(abpMasque) abpMasque:AddButton(btn); abpMasque:ReSkin(btn) end)
       btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
       btn.HotKey:ClearAllPoints()
       btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)
