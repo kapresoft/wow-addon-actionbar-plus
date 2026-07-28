@@ -54,6 +54,33 @@ Methods
 function o:OnInitialize()
   self:SendMessage(ns:msg('OnInitialize'))
   self:RegisterMessage(cns:msg('OnCoreDependentsReady'), self.OnCoreDependentsReady, self)
+  -- Masque's own UI can enable/disable a skin group independent of anything ActionbarPlus
+  -- does; that resets/re-applies Masque's textures but leaves ActionbarPlus's own
+  -- per-button visuals (hotkey position, empty-button overlay, etc.) stale until the
+  -- affected bars are re-rendered.
+  self:RegisterMessage(cns:msg('OnMasqueGroupToggled'), self.OnMasqueGroupToggled, self)
+end
+
+-- On group disable, Masque re-skins each button with its own default skin (the classic
+-- UI-Quickslot2 outer border on the button's NormalTexture, plus a leftover FloatingBG
+-- backdrop if one was created) and then stops managing those regions -- so the
+-- template's own visuals have to be re-asserted manually. Only on disable: on enable,
+-- Masque's ReSkin owns these regions again and restoring them would stomp the skin.
+--- @param btn Button_ABP_2_0_X
+local function RestoreButtonVisuals(btn)
+  if btn.FloatingBG then btn.FloatingBG:Hide() end
+  btn.widget:ResetTemplateVisuals()
+end
+
+--- @param disabled boolean true when the Masque group was just disabled
+function o:OnMasqueGroupToggled(_, disabled)
+  self:ForEach(function(bm)
+    MF:ApplyLayout(bm.barFrame, bm:c())
+    if disabled then
+      bm:ForEach(RestoreButtonVisuals)
+      bm:ForEachExtraButton(RestoreButtonVisuals, true)
+    end
+  end)
 end
 
 function o:OnCoreDependentsReady()

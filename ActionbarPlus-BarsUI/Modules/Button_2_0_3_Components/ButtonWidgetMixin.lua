@@ -121,6 +121,57 @@ function o:ShowHighlight() self.button:GetHighlightTexture():Show() end
 --- Restores the highlight texture to its normal mouseover-driven state.
 function o:HideHighlight() self:UpdateMouseoverHighlight() end
 
+--- Re-asserts the template's visual state (see ButtonTemplate.xml) for every region
+--- Masque manages. Called at button creation (Button_2_0_3.lua OnLoad) and again when
+--- a Masque group is disabled: Masque re-skins those regions with its own default skin
+--- (e.g. UI-Quickslot2 at ARTWORK layer, full alpha, skin-sized on Normal) and then
+--- stops managing them, so the template's art has to be restored manually.
+function o:ResetTemplateVisuals()
+  local btn = self.button
+
+  local nt = btn:GetNormalTexture()
+  nt:SetTexture([[interface\addons\actionbarplus-core\assets\textures\ui-button-empty]])
+  nt:SetTexCoord(0, 1, 0, 1)
+  nt:SetVertexColor(1, 1, 1, 1)
+  nt:SetBlendMode('BLEND')
+  nt:SetDrawLayer('BACKGROUND', 0)
+  nt:ClearAllPoints()
+  nt:SetAllPoints(btn)
+  nt:SetAlpha(0.4)
+
+  local pt = btn:GetPushedTexture()
+  pt:SetTexture([[Interface\Buttons\CheckButtonHilight]])
+  pt:SetTexCoord(0, 1, 0, 1)
+  pt:SetVertexColor(0.3, 0.4, 0.8, 1)
+  pt:SetBlendMode('ADD')
+  pt:ClearAllPoints()
+  pt:SetAllPoints(btn)
+  pt:SetAlpha(0.3)
+
+  local ht = btn:GetHighlightTexture()
+  ht:SetTexture([[Interface\Buttons\ButtonHilight-Square]])
+  ht:SetTexCoord(0, 1, 0, 1)
+  ht:SetVertexColor(1, 1, 1, 1)
+  ht:SetBlendMode('ADD')
+  ht:ClearAllPoints()
+  ht:SetAllPoints(btn)
+  ht:SetAlpha(0.99)
+
+  local ct = btn:GetCheckedTexture()
+  ct:SetTexture([[Interface\Buttons\CheckButtonHilight]])
+  ct:SetTexCoord(0, 1, 0, 1)
+  ct:SetVertexColor(1, 1, 1, 1)
+  ct:SetBlendMode('ADD')
+  ct:ClearAllPoints()
+  ct:SetAllPoints(btn)
+  ct:SetAlpha(0.8)
+
+  -- Masque only manages its own icon masks, but re-assert ours to be safe;
+  -- remove-then-add keeps this idempotent across repeated calls.
+  btn.icon:RemoveMaskTexture(btn.IconMask)
+  btn.icon:AddMaskTexture(btn.IconMask)
+end
+
 --- @return boolean
 function o:IsEmpty() return Str_IsBlank(self:GetAttribute(attr.type)) end
 

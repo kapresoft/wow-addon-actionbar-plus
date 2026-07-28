@@ -101,11 +101,7 @@ function o:OnLoad()
   self.widget:Init(self, btnIndex, barIndex)
 
   self:EnableMouse(true)
-  local normalTex = self:GetNormalTexture()
-  normalTex:SetDrawLayer("BACKGROUND", 0)
-  normalTex:SetAlpha(0.4)  -- default alpha, 0–1
-  self:GetPushedTexture():SetVertexColor(0.3, 0.4, 0.8, 1)
-  self.icon:AddMaskTexture(self.IconMask)
+  self.widget:ResetTemplateVisuals()
   
   self:RegisterForDrag("LeftButton")
   self:AnyDown()
