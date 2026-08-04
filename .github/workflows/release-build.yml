@@ -55,7 +55,7 @@ jobs:
       ## ------------------------------------------------ ##
       ## See: https://github.com/actions/github-script
       - name: "Set Env Variable: GITHUB_SHA_SHORT"
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const sha = context.sha.substring(0, 7)
@@ -120,7 +120,7 @@ jobs:
           echo "$(env|sort)"
       ## ------------------------------------------------ ##
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       ## ------------------------------------------------ ##
       - name: "Create AddOn Changelog"
         if: ${{ env.createAddOnChangeLog != 'false' }}
@@ -161,10 +161,6 @@ jobs:
         with:
           files: "${{ env.buildArtifact }}"
           fail: true
-      ## ------------------------------------------------ ##
-      - name: "Remove main ActionbarPlus folder"
-        run: |
-          zip -d ${{ env.buildArtifact }} "${{ env.addonName }}/CHANGELOG.txt" "${{ env.addonName }}/LICENSE.txt" "${{ env.addonName }}"
       ## ------------------------------------------------ ##
       - name: "Verify: Supporting Scripts Exists"
         uses: andstor/file-existence-action@v3
@@ -220,7 +216,7 @@ jobs:
       ## https://github.com/actions/upload-artifact
       - name: Upload Build Artifact File
         if: ${{ env.uploadBuildArtifacts == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.buildArtifactFilename }}
           path: ${{ env.buildArtifact }}

@@ -18,17 +18,18 @@ usage() {
   print -- "Usage:"
   print -- "  release-clean.sh [options]"
   print -- "Options:"
-  print -- "  -v 2, --version 2   Build for version 2"
-  print -- "  -h, --help          Show this help and exit"
+  print -- "  -c, --clean             Clean existing .release/ build dir"
+  print -- "  -h, --help              Show this help and exit"
   print
 }
 
 _Main() {
   emulate -L zsh
   local -a help_opt
+  local -a clean_opt
 
   zparseopts -D -E \
-    v:=version_opt -version:=version_opt \
+    c=clean_opt -clean=clean_opt \
     h=help_opt -help=help_opt || {
       usage; return 1
     }
@@ -37,43 +38,31 @@ _Main() {
     usage; return 0
   fi
 
-  local build_version="${version_opt[2]#=}"
-  if (( ${#version_opt} )); then
-    printf 'Building for version: %s\n' ${build_version}
-    if [[ ${build_version} != 2 ]]; then
-      usage; return 1
-    fi
-  fi
-
-  # ------
-
   local -a cmd
-  if [[ -d $rel_dir ]]; then
-    cmd=(rm -rf -- "$rel_dir")
-    p "Existing .release found."
-    p "Executing: ${cmd[*]}"
-    if "${cmd[@]}"; then
-      p "Done: ${cmd[*]}"
-    else
-      p "Failed: ${cmd[*]}"
-      return 1
+
+  # Check if options were set
+  if (( ${#clean_opt[@]} > 0 )); then
+    p "Clean option detected"
+    if [[ -d $rel_dir ]]; then
+      cmd=(rm -rf -- "$rel_dir")
+      p "Existing .release found."
+      p "Executing: ${cmd[*]}"
+      if "${cmd[@]}"; then
+        p "Done: ${cmd[*]}"
+      else
+        p "Failed: ${cmd[*]}"
+        return 1
+      fi
     fi
   fi
-
-  local ls_out
 
   if [[ -d $rel_dir ]]; then
     p "Failed to remove release dir: $rel_dir"
-    ls_out=$(ls -ld -- "$rel_dir" 2>&1)
-    p "$ls_out"
+    _ls_out=$(ls -ld "$rel_dir" 2>&1)
+    echo "  $_ls_out"
     return 1
   fi
-
-  cmd=(release.sh -dz)
-if [[ $build_version == 2 ]]; then
-    cmd=(release.sh -m pkgmeta-v2.yaml -dz)
-  fi
-
+  cmd=(~/bin/release.sh -dz)
   p "Executing: ${cmd[*]}"
   if "${cmd[@]}"; then
     p "Done: ${cmd[*]}"

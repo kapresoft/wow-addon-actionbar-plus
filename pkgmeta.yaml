@@ -1,4 +1,4 @@
-package-as: ActionbarPlus
+package-as: ActionbarPlus-Core
 # --------------------------
 license-output: LICENSE.txt
 enable-nolib-creation: no
@@ -9,6 +9,7 @@ manual-changelog:
 embedded-libraries:
   - LibStub
   - Ace3
+  - LibUtil
   - LibPrettyPrint
   - LibSharedMedia-3-0
 
@@ -28,10 +29,18 @@ optional-dependencies:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
-  ActionbarPlus-Core/ThirdParty/Libs/Ace3: https://github.com/WoWUIDev/Ace3
-  ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
-  ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
-  ActionbarPlus-Core/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+  ActionbarPlus-Core/ThirdParty/Libs/Ace3:
+    url: https://github.com/WoWUIDev/Ace3
+    tag: latest
+  ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint:
+    url: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+    tag: latest
+  ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil:
+    url: https://github.com/kapresoft/wow-lib-util
+    tag: latest
+  ActionbarPlus-Core/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0:
+    url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+    tag: latest
 
 ignore:
   - "*.sh"
@@ -42,20 +51,34 @@ ignore:
   - dev
   - doc
   - scripts
-  - "ActionbarPlus/**"
   - ActionbarPlus-Core/Libs/Developer
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/changelog.txt
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/Ace3.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/Ace3.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/tests
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/Bindings.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/Ace3/README.md
+  - ActionbarPlus-Core/ThirdParty/Libs/LibSharedMedia/LibSharedMedia-3.0/lib.xml
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/dev
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/doc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Assets
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/ThirdParty
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/LibPrettyPrint.xml
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/*.xml
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Annotations
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/*.toc
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/dev
-  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/External
-  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib
-  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/_Lib.xml
-  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.md
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.yaml
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.sh
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-1-0
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/LibUtil.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/LibUtil.xml
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/Assets
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/ThirdParty
+  - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/Lib-2-0/Annotations
 
 # REQUIRED for CurseForge packager (non-obvious):
 # The LEFT side MUST be <repo-folder>/<addon-folder>
@@ -71,6 +94,6 @@ ignore:
 #
 # ⚠️ Do not change unless you also change the repo/addon layout.
 move-folders:
-  ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
-  ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
-  ActionbarPlus/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI
+  ActionbarPlus-Core/ActionbarPlus-Core: ActionbarPlus-Core
+  ActionbarPlus-Core/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
+  ActionbarPlus-Core/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI
