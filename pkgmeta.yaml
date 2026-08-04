@@ -1,4 +1,4 @@
-package-as: ActionbarPlus-Core
+package-as: ActionbarPlus
 # --------------------------
 license-output: LICENSE.txt
 enable-nolib-creation: no
