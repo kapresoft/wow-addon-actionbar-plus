@@ -13,10 +13,18 @@ manual-changelog: CHANGELOG.txt
 #  - This is faster: https://github.com/WoWUIDev/Ace3
 #  - But this is the official: https://repos.wowace.com/wow/ace3/trunk
 externals:
-  ThirdParty-Libs/Ace3: https://github.com/WoWUIDev/Ace3
-  ThirdParty-Libs/LibPrettyPrint: https://github.com/kapresoft/wow-addon-LibPrettyPrint
-  ThirdParty-Libs/Kapresoft-LibUtil: https://github.com/kapresoft/wow-lib-util
-  ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+  ThirdParty-Libs/Ace3:
+    url: https://github.com/WoWUIDev/Ace3
+    tag: latest
+  ThirdParty-Libs/LibPrettyPrint:
+    url: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+    tag: latest
+  ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0:
+    url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+    tag: latest
+  ThirdParty-Libs/Kapresoft-LibUtil:
+    url: https://github.com/kapresoft/wow-lib-util
+    tag: latest
 
 ignore:
   - "*.sh"
@@ -25,26 +33,32 @@ ignore:
   - "*.yml"
   - "*.toc"
   - "*.txt"
+  - "*.toml"
   - dev
   - doc
   - ActionbarPlus
   - ActionbarPlus-2-0
   - ThirdParty-Libs/Ace3/LibStub/tests
-  - ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0/lib.xml
   - ThirdParty-Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
   - ThirdParty-Libs/Ace3/Ace3.lua
   - ThirdParty-Libs/Ace3/Bindings.xml
   - ThirdParty-Libs/Ace3/changelog.txt
   - ThirdParty-Libs/Ace3/LICENSE.txt
+  - ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0/lib.xml
   - ThirdParty-Libs/LibPrettyPrint/dev
   - ThirdParty-Libs/LibPrettyPrint/doc
+  - ThirdParty-Libs/LibPrettyPrint/Assets
+  - ThirdParty-Libs/LibPrettyPrint/ThirdParty
+  - ThirdParty-Libs/LibPrettyPrint/LICENSE
   - ThirdParty-Libs/LibPrettyPrint/Libs/Developer/*.xml
   - ThirdParty-Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
-  - ThirdParty-Libs/LibPrettyPrint/*.toc
   - ThirdParty-Libs/Kapresoft-LibUtil/dev
-  - ThirdParty-Libs/Kapresoft-LibUtil/External
-  - ThirdParty-Libs/Kapresoft-LibUtil/Lib
-  - ThirdParty-Libs/Kapresoft-LibUtil/_Lib.xml
+  - ThirdParty-Libs/Kapresoft-LibUtil/LICENSE
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib-1-0
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib-2-0/Assets
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib-2-0/ThirdParty
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib-2-0/LibUtil.lua
+  - ThirdParty-Libs/Kapresoft-LibUtil/Lib-2-0/LibUtil.xml
   - ActionbarPlus-BarsUI
   - ActionbarPlus-Core
   - ActionbarPlus-OptionsUI
