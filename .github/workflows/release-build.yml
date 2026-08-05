@@ -162,10 +162,6 @@ jobs:
           files: "${{ env.buildArtifact }}"
           fail: true
       ## ------------------------------------------------ ##
-      - name: "Remove top-level files from zip"
-        run: |
-          zip -d ${{ env.buildArtifact }} "${{ env.addonName }}/*.txt" --exclude "${{ env.addonName }}/*/*.txt"
-      ## ------------------------------------------------ ##
       - name: "Verify: Supporting Scripts Exists"
         uses: andstor/file-existence-action@v3
         with:
