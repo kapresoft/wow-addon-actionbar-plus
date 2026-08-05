@@ -37,22 +37,6 @@ ActionbarPlus is a versatile floating action bar add-on that enables you to crea
 - **Actionbar Frame Specific Options:** Fine-tune individual actionbar frames with specific options, including but not limited to positioning, scaling, and more, for ultimate control over your interface layout.
 - **Profile Management:** Enhanced profile management features allow for more efficient setup and switching between different UI configurations, saving you time and effort in customizing your experience.
 
-#### ABP:SmartMount(...) Dynamic Function
-
-Enhance your World of Warcraft experience with our addon's latest feature. A dynamic function that intelligently selects between your specified flying and ground mounts based on the current area's flyability, ensuring seamless mount selection even in special zones like the city of Dalaran (WOTLK). 
-
-Easily integrate it into your gameplay through macros for an optimized and hassle-free mounting experience.
-
-Syntax: 
-```
-ABP:SmartMount('<flying-mount-name>', '<ground-mount-name>')
-```
-
-Example Macro: 
-```
-/run ABP:SmartMount('Swift Yellow Wind Rider','Black War Raptor')
-```
-
 ## Docs
 - [Wiki](../../wiki)
 - [Getting Started](../../wiki/Getting-Started)
