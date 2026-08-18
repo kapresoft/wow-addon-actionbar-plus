@@ -1,10 +1,9 @@
 package-as: ActionbarPlus
 # --------------------------
-license-output: LICENSE.txt
-enable-nolib-creation: no
 
 manual-changelog:
-  filename: CHANGELOG.txt
+  filename: dev/changelog-release.md
+  markup-type: markdown
 
 embedded-libraries:
   - LibStub

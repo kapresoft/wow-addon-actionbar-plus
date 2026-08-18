@@ -16,11 +16,11 @@ local function InitBlizzardAddonsIfNeeded()
     local professions = 'Blizzard_Professions'
     -- Check for compatibility with both Retail and Classic
     local _IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
-    local _LoadAddOn = IsAddOnLoaded or C_AddOns.LoadAddOn
+    local _LoadAddOn = LoadAddOn or C_AddOns.LoadAddOn
 
     if not _IsAddOnLoaded(professions) then
         _LoadAddOn(professions);
-        local pre = '{{' .. co:WrapTextInColorCode(addon .. '::')
+        local pre = '{{' .. co:WrapTextInColorCode(professions .. '::')
                 .. sco:WrapTextInColorCode('Retail.lua') .. '}}:'
         print(pre, 'Dependent addOn loaded:', professions)
     end
