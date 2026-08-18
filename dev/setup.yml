@@ -41,8 +41,7 @@ ignore:
   - "*.toml"
   - dev
   - doc
-  - ActionbarPlus
-  - ActionbarPlus/License
+  - LICENSE
   - ThirdParty-Libs/Ace3/LibStub/tests
   - ThirdParty-Libs/Ace3/CallbackHandler-1.0/CallbackHandler-1.0.xml
   - ThirdParty-Libs/Ace3/Ace3.lua
