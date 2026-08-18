@@ -8,19 +8,8 @@
 
 ## DefaultState: enabled
 ## RequiredDeps: ActionbarPlus-Core
+## Category: ActionbarPlus
 ## Group: ActionbarPlus-Core
-
-## Category-enUS: Action Bars
-## Category-deDE: Aktionsleisten
-## Category-esES: Barras de acción
-## Category-esMX: Barras de acción
-## Category-frFR: Barres d'actions
-## Category-itIT: Barre delle azioni
-## Category-koKR: 행동 단축바
-## Category-ptBR: Barras de ação
-## Category-ruRU: Панели действий
-## Category-zhCN: 动作条
-## Category-zhTW: 動作條
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: Action Bars
