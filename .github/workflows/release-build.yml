@@ -7,11 +7,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      createAddOnChangeLog:
-        description: 'Create Add-On Changelog'
-        required: false
-        default: false
-        type: boolean
       createDraftRelease:
         description: 'Create Github Release Draft'
         required: true
@@ -34,8 +29,6 @@ env:
   artifact_retentionDays: 7
   releaseDir: ./.release
   refName: ${{ github.ref_name }}
-  repo: wow-addon-actionbar-plus
-  createAddOnChangeLog: true
   ## When Debugging Issues, set the vars below to false
   createDraftRelease: true
   uploadCurseForge: true
@@ -122,34 +115,28 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v7
       ## ------------------------------------------------ ##
-      - name: "Create AddOn Changelog"
-        if: ${{ env.createAddOnChangeLog != 'false' }}
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+      # Dry-run the release notes so the same text can be handed to CurseForge
+      # via pkgmeta.yaml's manual-changelog before the packager uploads.
+      - name: "Draft release notes (dry-run, for CurseForge changelog)"
+        id: draft_notes_dry_run
+        if: ${{ env.uploadCurseForge != 'false' }}
+        uses: release-drafter/release-drafter@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          fetchViaCommits: true
-          configuration: ".github/release-changelog-builder-action.json"
+          tag: ${{ env.refName }}
+          name: ${{ env.refName }}
+          version: ${{ env.refName }}
+          commitish: ${{ github.sha }}
+          prerelease: false
+          dry-run: true
       ## ------------------------------------------------ ##
-      - name: "Create AddOn CHANGELOG.txt"
+      - name: "Write CurseForge changelog file"
+        if: ${{ env.uploadCurseForge != 'false' }}
+        env:
+          RELEASE_BODY: ${{ steps.draft_notes_dry_run.outputs.body }}
         run: |
-          export c_ADDON_NAME="${{ env.addonName }}"
-          export c_REPOSITORY="${{ env.repo }}"
-          export c_RESOLVED_VERSION="${{ env.refName }}"
-          c_changeLog="$(envsubst < ${GITHUB_WORKSPACE}/.github/changelog-custom.md)"
-          CHANGELOG_FILE="${GITHUB_WORKSPACE}/CHANGELOG.txt"
-          
-          # Creates the initial changelog with env substitution
-          cat <<EOF > "$CHANGELOG_FILE"
-          ${c_changeLog}
-          EOF
-          
-          # The single quote on EOF does not eval contents
-          cat <<'EOF' >> "$CHANGELOG_FILE"
-          ${{ steps.build_changelog.outputs.changelog }}
-          EOF
-          
-          echo ":: Final Changelog Contents"
-          cat ${CHANGELOG_FILE}
+          printf '%s\n' "$RELEASE_BODY" > dev/changelog-release.md
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
@@ -208,6 +195,7 @@ jobs:
           prerelease: false
           footer: |
             <br><br>
+            <!-- spacer -->
             #### ${{ env.buildArtifactFilename }}
             ```text
             sha256:${{ env.buildArtifactChecksum }}
