@@ -7,7 +7,7 @@ local addon, xns = ...
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field LOG_NAME Name
---- @field logHolder LogHolder_ABP_2_0
+--- @field logHolder LogHolder
 --- @field colorDef Kapresoft-ColorDefinition-2-0
 --- @field buttonTemplate Name The button template name to use for action buttons (see BarFrame.xml and BarModuleFactory.lua)
 --- @field M BarsUI_Modules_ABP_2_0 The module names
@@ -29,7 +29,7 @@ function ns:cns() return ABP_CORE_NS, ABP_CORE_NS.O, ABP_CORE_NS:GetLocale() end
 --[[-------------------------------------------------------------------
 LibPrettyPrint::Formatter/Printer
 ---------------------------------------------------------------------]]
-local prefixColor, subPrefixColor = '466EFF', '9CFF9C'
+local prefixColor, subPrefixColor = '7086FF', '9CFF9C'
 ns.colorDef = {
   primary = CreateColorFromRGBHexString(prefixColor),
   secondary = CreateColorFromRGBHexString(subPrefixColor),
@@ -74,7 +74,7 @@ Loggers/Tracers:: NoOp in Official Releases
 ---------------------------------------------------------------------]]
 --- @see ActionbarPlus-BarsUI/Modules/Developer/DeveloperSetup.lua
 --- @param moduleName Name
---- @return LibPrettyPrint_PrintFn, TraceFn_ABP_2_0
+--- @return PrintFn, TraceFn
 function ns:log(moduleName)
   local h = self.logHolder
   return h.printer(moduleName), h.tracer(moduleName)

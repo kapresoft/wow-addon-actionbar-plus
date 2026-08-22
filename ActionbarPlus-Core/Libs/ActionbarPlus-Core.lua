@@ -5,7 +5,7 @@ local O = ns.O
 --[[-------------------------------------------------------------------
 Local Vars
 ---------------------------------------------------------------------]]
-local p, t = ns:log('Core')
+local p, t = ns:log()
 local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local function announcementDialog() return O.V2AnnouncementDialog end
@@ -51,9 +51,7 @@ function o:OnInitialize()
   self:SendMessage(ns:msg('OnAddOnInitialized'))
 end
 
---
 function o:OnEnable()
-  --t('OnEnable', 'activeSpecIndex=', ns.O.UnitUtil:GetActiveSpecGroupIndex())
   PickupHooks:Init()
   self:RegisterEvent('PLAYER_ENTERING_WORLD')
 end

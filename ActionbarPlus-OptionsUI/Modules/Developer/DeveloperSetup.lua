@@ -6,31 +6,21 @@ local ns = select(2, ...)
 local cns = ns:cns()
 local Str_IsBlank = cns:String().IsBlank
 
-local p, t = ns:log('DeveloperSetup')
+--- @type LibTraceKit-1.0
+local LibTraceKit = LibStub('LibTraceKit-1.0')
+assertsafe(LibTraceKit ~= nil, 'Failed to reference LibTraceKit-1.0')
 
 --[[-----------------------------------------------------------------------------
 Base Tracer
 -------------------------------------------------------------------------------]]
---- @param prefix Name  @The prefix name
---- @param ... any      @Print any
-function ns.tr(prefix, ...)
-  local cfn = cns:ColorFn('B4FF44')
-  local _ns = cns; _ns.__trace(ns.LOG_NAME, prefix, cfn, ...)
-end
+local colorDef = ns.colorDef
+local TRACE_DELIM = '_'
 
---[[-------------------------------------------------------------------
-Support Functions
----------------------------------------------------------------------]]
---- Creates a trace function
---- ### Example:
---- ```
---- local tr = traceFn('Util')
---- tr('hello world)  -- prints to EventTrace UI
---- ```
 --- @param prefix string|any
---- @return TraceFn_ABP_2_0 @Printer function that outputs plain values to Blizzard Trace UI (like print)
+--- @return TraceFn
 local function traceFn(prefix)
-  return function(...) local trfn = ns.tr; return trfn(prefix, ...) end
+  return LibTraceKit:New(ns.LOG_NAME, prefix, colorDef.primary)
+      :WithDelimiter(TRACE_DELIM) --[[@as TraceFn ]]
 end
 
 --[[-----------------------------------------------------------------------------

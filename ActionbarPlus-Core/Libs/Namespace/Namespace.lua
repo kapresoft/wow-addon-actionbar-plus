@@ -5,10 +5,6 @@ local ColorFormatter = LibStub('Kapresoft-ColorFormatter-2-0')
 --[[-------------------------------------------------------------------
 Type:Namespace
 ---------------------------------------------------------------------]]
---- @alias LogBuilderFn fun(moduleName:string) : LibPrettyPrint_PrintFn, LibPrettyPrint_PrintFn, TraceFn_ABP_2_0, TraceFnFormatted_ABP_2_0
---- @alias TraceFn_ABP_2_0 fun(...: any) : void @Printer function that outputs plain values to Blizzard Trace UI (like print)
---- @alias TraceFnFormatted_ABP_2_0 fun(...: any) : void @Printer function that outputs formatted values to Blizzard Trace UI (like print)
---
 
 local addon, xns = ...
 
@@ -16,15 +12,13 @@ local addon, xns = ...
 --- @field private LOG_NAME Name
 --- @field private DB_NAME Name
 --- @field private fmt LibPrettyPrint_Formatter
---- @field private __trace fun(logName:Name, prefix:string, cfFn:cfFn, ...:any)
 --- @field private __CreatePrinterFn fun(printer:LibPrettyPrint_Printer)
 --- @field name Name The addon name
 --- @field settings Settings_ABP_2_0 @Settings
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field printer LibPrettyPrint_Printer
---- @field logHolder LogHolder_ABP_2_0
+--- @field logHolder LogHolder
 --- @field colorDef Kapresoft-ColorDefinition-2-0
---- @field tr TraceFn_ABP_2_0
 --- @field M Core_Modules_ABP_2_0   @The module names
 --- @field O Core_Modules_ABP_2_0   @The module objects
 --- @field mountID MountID  @Cached mountID set by PickupHooks at pickup time; consumed by CursorMixin -- used for handling mounts in MoP+
@@ -246,7 +240,7 @@ end
 --- local p, t = ns:log('EventHandler')
 --- ```
 --- @param moduleName Name
---- @return LibPrettyPrint_PrintFn, TraceFn_ABP_2_0
+--- @return PrintFn, TraceFn
 function ns:log(moduleName)
   local h = self.logHolder
   return h.printer(moduleName), h.tracer(moduleName)

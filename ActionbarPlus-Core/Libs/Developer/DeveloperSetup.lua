@@ -5,31 +5,20 @@ local Str_IsBlank = ns:String().IsBlank
 
 ns.settings.developer = true
 
-local p, t = ns:log(libName)
+--- @type LibTraceKit-1.0
+local LibTraceKit = LibStub('LibTraceKit-1.0')
+assertsafe(LibTraceKit ~= nil, 'Failed to reference LibTraceKit-1.0')
 
 --[[-----------------------------------------------------------------------------
 Base Tracer
 -------------------------------------------------------------------------------]]
-local primaryC = ns:ColorFn(ns.colorDef.primary)
+local TRACE_DELIM = '_'
 
---- @param logName Name
---- @param prefix string
---- @param cfFn? cfFn     @The color formatter function
-function ns.__trace(logName, prefix, cfFn, ...)
-  --- @type EventTrace
-  local et = EventTrace; if not (et and et.LogEvent) then return end
-  local c1, logNamePlain = primaryC, logName
-  if cfFn then c1 = cfFn end
-  local n = c1(logNamePlain)
-  if not Str_IsBlank(prefix) then n = n .. '::' .. prefix end
-  et:LogEvent(n, ...)
-end
-
---- @param prefix Name  @The prefix name
---- @param ... any      @Print any
-function ns.tr(prefix, ...)
-  local _ns = ns; _ns.__trace(ns.LOG_NAME, prefix, nil, ...)
-end
+--- @param prefix string|any
+--- @return TraceFn
+local function traceFn(prefix)
+  return LibTraceKit:New(ns.LOG_NAME, prefix):WithDelimiter(TRACE_DELIM) --[[@as TraceFn ]]
+end; local t = traceFn(libName)
 
 --[[-------------------------------------------------------------------
 DeveloperSetup
@@ -76,9 +65,6 @@ local function LoadDevSuite()
 
   if type(ds) == 'table' and type(ds.IsEnabled) == 'function' then
     local dsEnabled = ds:IsEnabled()
-    --C_Timer.After(1, function()
-    --  ns.tr(libName, ('%s is available'):format(ds:GetName()), 'enabled=', dsEnabled)
-    --end)
     if dsEnabled then return end
   end
 
@@ -92,25 +78,28 @@ local function LoadDevSuite()
     devSuiteEnabled = AU:IsAddOnEnabled(DevSuite_AddOn)
     C_Timer.After(0.1, function() StaticPopup_Show(RELOAD_CONFIRMATION_DIALOG) end)
   end
-  C_Timer.After(1, function() ns.tr(libName, 'DevSuite is enabled=', devSuiteEnabled == true) end)
+  C_Timer.After(1, function() t('DevSuite is enabled=', devSuiteEnabled == true) end)
 end; LoadDevSuite()
 
 --[[-----------------------------------------------------------------------------
 Log Setup
 -------------------------------------------------------------------------------]]
 --- Creates a print function
+
 --- ### Example:
 --- ```
 --- local pr = traceFn3('Util')
 --- pr('hello world)  -- prints to console
 --- ```
+
 --- @param moduleName Name
+--- @return PrintFn
 local function printerFn(moduleName)
-  local printer = ns.printer
+  local printer = ns.printer --[[@as PrintFn ]]
   if type(moduleName) ~= 'string' then return printer end
   local m = strtrim(moduleName)
   if Str_IsBlank(m) then return printer end
-  return printer:WithSubPrefix(m)
+  return printer:WithSubPrefix(m) --[[@as PrintFn ]]
 end
 
 --- @param printer LibPrettyPrint_Printer
@@ -125,18 +114,6 @@ function ns.__CreatePrinterFn(printer)
   end
 end
 
---- Creates a trace function
---- ### Example:
---- ```
---- local tr = traceFn3('Util')
---- tr('hello world)  -- prints to EventTrace UI
---- ```
---- @param prefix string|any
---- @return TraceFn_ABP_2_0 @Printer function that outputs plain values to Blizzard Trace UI (like print)
-local function traceFn(prefix)
-  return function(...) local trfn = ns.tr; return trfn(prefix, ...) end
-end
-
 --[[-----------------------------------------------------------------------------
 Core:: Namespace Override for Dev Namespace
 -------------------------------------------------------------------------------]]
@@ -145,4 +122,3 @@ do
   h.printer = printerFn
   h.tracer = traceFn
 end
-
