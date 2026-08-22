@@ -10,6 +10,7 @@ embedded-libraries:
   - Ace3
   - LibUtil
   - LibPrettyPrint
+  - LibTraceKit
   - LibSharedMedia-3-0
 
 tools-used:
@@ -33,6 +34,9 @@ externals:
     tag: latest
   ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint:
     url: https://github.com/kapresoft/wow-addon-LibPrettyPrint
+    tag: latest
+  ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit:
+    url: https://github.com/kapresoft/wow-addon-LibTraceKit
     tag: latest
   ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil:
     url: https://github.com/kapresoft/wow-lib-util
@@ -67,6 +71,12 @@ ignore:
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Developer/Developer*.lua
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/Libs/Annotations
   - ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/*.md
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/Libs/Assets
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/Libs/Developer.lua
+  - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/ThirdParty
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/dev
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.md
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.yaml

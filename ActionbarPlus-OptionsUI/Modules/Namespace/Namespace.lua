@@ -7,7 +7,7 @@ local addon, xns = ...
 --- @field name Name The addon name
 --- @field nameShort Name The short version of the addon name used for logging and tracing.
 --- @field LOG_NAME Name
---- @field logHolder LogHolder_ABP_2_0
+--- @field logHolder LogHolder
 --- @field colorDef Kapresoft-ColorDefinition-2-0
 --- @field M OptionsUI_Modules_ABP_2_0 The module names
 --- @field O OptionsUI_Modules_ABP_2_0 The module objects
@@ -74,7 +74,7 @@ end
 Loggers/Tracers:: NoOp in Official Releases
 ---------------------------------------------------------------------]]
 --- @param moduleName Name
---- @return LibPrettyPrint_PrintFn, TraceFn_ABP_2_0
+--- @return PrintFn, TraceFn
 function ns:log(moduleName)
   local h = self.logHolder
   return h.printer(moduleName), h.tracer(moduleName)
