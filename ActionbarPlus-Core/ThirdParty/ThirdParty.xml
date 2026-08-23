@@ -15,8 +15,11 @@
     <Script file="Libs\Ace3\LibStub\LibStub.lua"/>
     <Script file="Libs\Ace3\CallbackHandler-1.0\CallbackHandler-1.0.lua"/>
     <Script file="Libs\LibSharedMedia\LibSharedMedia-3.0\LibSharedMedia-3.0.lua"/>
-
-    <Include file='LibPrettyPrint.xml'/>
+    <Script file="Libs\LibPrettyPrint\Libs\Namespace.lua"/>
+    <Script file="Libs\LibPrettyPrint\Libs\pprint.lua"/>
+    <Script file="Libs\LibPrettyPrint\Libs\Formatter.lua"/>
+    <Script file="Libs\LibPrettyPrint\Libs\Printer.lua"/>
+    <Script file="Libs\LibPrettyPrint\Libs\LibPrettyPrint.lua"/>
     <Script file="Libs\LibTraceKit\LibTraceKit.lua"/>
 
     <!--@non-debug@
