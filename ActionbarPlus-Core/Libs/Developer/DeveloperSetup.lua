@@ -50,7 +50,7 @@ Methods
 local RELOAD_CONFIRMATION_DIALOG = 'RELOAD_CONFIRMATION_DIALOG'
 --- Usage: StaticPopup_Show(RELOAD_CONFIRMATION_DIALOG)
 StaticPopupDialogs[RELOAD_CONFIRMATION_DIALOG] = {
-    text = "ActionbarPlus dev mode requires DevSuite.\nA UI restart is needed to enable it.\n\nRestart now?",
+    text = "DevSuite has been enabled for dev mode.\nA UI restart is required to activate it.\n\nRestart now?",
     button1 = OKAY, button2 = CANCEL,
     timeout = 0, whileDead = true, hideOnEscape = true,
     OnAccept = ReloadUI
