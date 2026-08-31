@@ -55,10 +55,7 @@ end
 --- @param input string
 function o:OnSlashCommand(input)
   local cmd = input:match('^(%S*)')
-  if cmd == 'options' then
-    if not ns:OptionsUI() then return end
-    ns:OptionsNS().O.OptionsDialog:Open()
-  elseif cmd == 'info' then
+  if cmd == 'info' then
     self:Print(addonInfoUtil():GetInfoSlashCommandText())
   else
     self:PrintSlashCommandHelp()
