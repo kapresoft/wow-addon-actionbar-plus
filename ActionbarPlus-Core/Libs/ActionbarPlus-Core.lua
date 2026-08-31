@@ -6,9 +6,25 @@ local O = ns.O
 Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log()
+local L = ns:GetLocale()
 local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local function announcementDialog() return O.V2AnnouncementDialog end
+
+local c1 = ns:ColorFn(ns.colorDef.util1)
+
+local addonInfoUtil__
+--- @return Kapresoft-AddonInfoUtil-2-0
+local function addonInfoUtil()
+  if not addonInfoUtil__ then addonInfoUtil__ = ns:AddonInfoUtil():New(ns.name, ns.colorDef) end
+  return addonInfoUtil__
+end
+
+--- @type { cmd: string, desc: string }[] @Available slash commands, in display order
+local slashCommands = {
+  { cmd = 'info', desc = L['displays the addon info'] },
+}
+
 local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
 local V1_ADDON_NAME = 'ActionbarPlus'
 
@@ -29,12 +45,23 @@ function o:OnReadyDependentAddOn(evt, addon)
   end
 end
 
+function o:PrintSlashCommandHelp()
+  self:Print(L['Available commands:'])
+  for _, c in ipairs(slashCommands) do
+    self:Print(('  %s - %s'):format(c1(c.cmd), c.desc))
+  end
+end
+
 --- @param input string
 function o:OnSlashCommand(input)
   local cmd = input:match('^(%S*)')
   if cmd == 'options' then
     if not ns:OptionsUI() then return end
     ns:OptionsNS().O.OptionsDialog:Open()
+  elseif cmd == 'info' then
+    self:Print(addonInfoUtil():GetInfoSlashCommandText())
+  else
+    self:PrintSlashCommandHelp()
   end
 end
 
@@ -47,7 +74,7 @@ function o:OnInitialize()
   for _, a in ipairs(dependentAddOns) do
     self:RegisterMessage(a .. '::OnEnable', 'OnReadyDependentAddOn')
   end
-  self:RegisterChatCommand('abpv2', 'OnSlashCommand')
+  self:RegisterChatCommand('abp', 'OnSlashCommand')
   self:SendMessage(ns:msg('OnAddOnInitialized'))
 end
 

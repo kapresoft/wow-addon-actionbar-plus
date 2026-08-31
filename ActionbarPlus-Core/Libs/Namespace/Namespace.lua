@@ -48,10 +48,11 @@ ns.settings = { developer = false }
 --[[-------------------------------------------------------------------
 Formatter/Printer
 ---------------------------------------------------------------------]]
-local prefixColor, subPrefixColor = 'FFF803', '9CFF9C'
+local prefixColor, subPrefixColor, util1 = 'FFF803', '9CFF9C', 'FFF29F'
 ns.colorDef = {
   primary = CreateColorFromRGBHexString(prefixColor),
   secondary = CreateColorFromRGBHexString(subPrefixColor),
+  util1 = CreateColorFromRGBHexString(util1),
 }
 
 ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = ns.fmt
@@ -70,6 +71,7 @@ function ns:ColorFormatter() return ColorFormatter end
 --- @return table<string, string>
 function ns:GetLocale() return ns:AceLocale():GetLocale(self.name, true) end
 function ns:AddonUtil() return LibStub('Kapresoft-AddonUtil-2-0') end
+function ns:AddonInfoUtil() return LibStub('Kapresoft-AddonInfoUtil-2-0') end
 
 --- ### Usage
 ---  ```
