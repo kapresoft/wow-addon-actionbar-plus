@@ -28,6 +28,8 @@
 
     <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\AceLib.lua"/>
     <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\AddonUtil.lua"/>
+    <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\ConsoleHelperMixin.lua"/>
+    <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\AddonInfoUtil.lua"/>
     <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\ColorFormatter.lua"/>
     <Script file="Libs\Kapresoft-LibUtil\Lib-2-0\Modules\GameVersionMixin.lua"/>
     <Script file='Libs\Kapresoft-LibUtil\Lib-2-0\Modules\AceLocaleUtil.lua'/>

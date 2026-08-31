@@ -69,6 +69,16 @@ L['Bottom Right']         = true
 L['Stone']                = true
 L['Theme']                = true
 L['Version']              = true
+L['Addon Info']           = true
+L['Author']               = true
+L['Curse-Forge']          = true
+L['Bugs']                 = true
+L['Repo']                 = true
+L['Last-Update']          = true
+L['Locale']               = true
+L['Interface-Version']    = true
+L['Available commands:']  = true
+L['displays the addon info'] = true
 
 -- Theme Names
 L['None']                 = true
