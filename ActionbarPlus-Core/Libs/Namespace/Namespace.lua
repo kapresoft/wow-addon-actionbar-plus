@@ -53,6 +53,7 @@ ns.colorDef = {
   primary = CreateColorFromRGBHexString(prefixColor),
   secondary = CreateColorFromRGBHexString(subPrefixColor),
   util1 = CreateColorFromRGBHexString(util1),
+  error = RED_FONT_COLOR,
 }
 
 ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = ns.fmt

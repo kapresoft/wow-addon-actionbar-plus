@@ -82,6 +82,13 @@ L['displays the addon info'] = true
 L['lists available profiles'] = true
 L['Available profiles:'] = true
 L['No profiles match:'] = true
+L['switches to the named profile'] = true
+L['Usage'] = true
+L['Switches to the named profile. Use /abp profiles to see available profiles.'] = true
+L['Cannot switch profiles while in combat.'] = true
+L['No such profile:'] = true
+L['Switched to profile:'] = true
+L['Already on profile:'] = true
 
 -- Theme Names
 L['None']                 = true
