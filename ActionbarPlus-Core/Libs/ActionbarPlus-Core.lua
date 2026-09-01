@@ -23,6 +23,7 @@ end
 --- @type { cmd: string, desc: string }[] @Available slash commands, in display order
 local slashCommands = {
   { cmd = 'info', desc = L['displays the addon info'] },
+  { cmd = 'profiles [filter]', desc = L['lists available profiles'] },
 }
 
 local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
@@ -52,11 +53,41 @@ function o:PrintSlashCommandHelp()
   end
 end
 
+--- @param filter string? @Case-insensitive substring match against profile names
+function o:PrintProfiles(filter)
+  local db = ns:db()
+  local profiles = db:GetProfiles()
+  table.sort(profiles)
+  local current = db:GetCurrentProfile()
+
+  if filter and filter ~= '' then
+    local needle = filter:lower()
+    local filtered = {}
+    for _, name in ipairs(profiles) do
+      if name:lower():find(needle, 1, true) then filtered[#filtered + 1] = name end
+    end
+    profiles = filtered
+  end
+
+  if #profiles == 0 then
+    self:Print(L['No profiles match:'] .. ' ' .. c1(filter))
+    return
+  end
+
+  self:Print(L['Available profiles:'])
+  for _, name in ipairs(profiles) do
+    local marker = name == current and ' *' or ''
+    self:Print(('  %s%s'):format(c1(name), marker))
+  end
+end
+
 --- @param input string
 function o:OnSlashCommand(input)
-  local cmd = input:match('^(%S*)')
+  local cmd, rest = input:match('^(%S*)%s*(.-)$')
   if cmd == 'info' then
     self:Print(addonInfoUtil():GetInfoSlashCommandText())
+  elseif cmd == 'profiles' then
+    self:PrintProfiles(rest)
   else
     self:PrintSlashCommandHelp()
   end
