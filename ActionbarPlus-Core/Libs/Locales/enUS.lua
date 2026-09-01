@@ -79,6 +79,9 @@ L['Locale']               = true
 L['Interface-Version']    = true
 L['Available commands:']  = true
 L['displays the addon info'] = true
+L['lists available profiles'] = true
+L['Available profiles:'] = true
+L['No profiles match:'] = true
 
 -- Theme Names
 L['None']                 = true
