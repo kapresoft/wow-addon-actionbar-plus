@@ -12,6 +12,7 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local function announcementDialog() return O.V2AnnouncementDialog end
 
 local c1 = ns:ColorFn(ns.colorDef.util1)
+local errFn = ns:ColorFn(ns.colorDef.error)
 
 local addonInfoUtil__
 --- @return Kapresoft-AddonInfoUtil-2-0
@@ -24,6 +25,7 @@ end
 local slashCommands = {
   { cmd = 'info', desc = L['displays the addon info'] },
   { cmd = 'profiles [filter]', desc = L['lists available profiles'] },
+  { cmd = 'profile <name>', desc = L['switches to the named profile'] },
 }
 
 local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
@@ -81,6 +83,46 @@ function o:PrintProfiles(filter)
   end
 end
 
+function o:PrintProfileUsage()
+  self:Print(('%s: %s'):format(L['Usage'], c1('/abp profile <name>')))
+  self:Print(L['Switches to the named profile. Use /abp profiles to see available profiles.'])
+end
+
+--- @param name string
+function o:SwitchProfile(name)
+  if not name or name == '' then
+    self:PrintProfileUsage()
+    return
+  end
+
+  if InCombatLockdown() then
+    self:Print(errFn(L['Cannot switch profiles while in combat.']))
+    return
+  end
+
+  local db = ns:db()
+  local profiles = db:GetProfiles()
+  local needle = name:lower()
+  local match
+  for _, p in ipairs(profiles) do
+    if p:lower() == needle then match = p; break end
+  end
+
+  if not match then
+    self:Print(errFn(('%s: %s'):format(L['No such profile:'], name)))
+    self:PrintProfiles()
+    return
+  end
+
+  if match == db:GetCurrentProfile() then
+    self:Print(('%s %s'):format(L['Already on profile:'], c1(match)))
+    return
+  end
+
+  db:SetProfile(match)
+  self:Print(('%s %s'):format(L['Switched to profile:'], c1(match)))
+end
+
 --- @param input string
 function o:OnSlashCommand(input)
   local cmd, rest = input:match('^(%S*)%s*(.-)$')
@@ -88,6 +130,8 @@ function o:OnSlashCommand(input)
     self:Print(addonInfoUtil():GetInfoSlashCommandText())
   elseif cmd == 'profiles' then
     self:PrintProfiles(rest)
+  elseif cmd == 'profile' then
+    self:SwitchProfile(rest)
   else
     self:PrintSlashCommandHelp()
   end
