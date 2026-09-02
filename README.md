@@ -29,6 +29,16 @@ ActionbarPlus is a versatile floating action bar add-on that enables you to crea
 - [WowAce](https://www.wowace.com/projects/ace3) profile support includes the ability to switch between profiles, copy a profile, and reset a profile.
 - `ABP:SmarMount(..)` A dynamic function that can be utilized in macros for dynamic mounting based on the current area. (More details below)
 
+### Console Commands
+
+Type `/abp` in chat to see the list of available commands:
+
+```
+/abp info                 - displays the addon info
+/abp profiles [filter]    - lists available profiles
+/abp profile <name>       - switches to the named profile
+```
+
 #### Additional Configuration Options
 
 - **Toggle Button Mouseover Glow Feature:** Activate a visual glow effect on action buttons upon mouseover, making it easier to identify active buttons during gameplay.
