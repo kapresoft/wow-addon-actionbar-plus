@@ -89,6 +89,7 @@ L['Cannot switch profiles while in combat.'] = true
 L['No such profile:'] = true
 L['Switched to profile:'] = true
 L['Already on profile:'] = true
+L['current'] = true
 
 -- Theme Names
 L['None']                 = true
