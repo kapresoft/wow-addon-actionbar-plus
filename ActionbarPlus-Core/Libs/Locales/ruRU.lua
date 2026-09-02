@@ -87,7 +87,7 @@ L['Usage'] = 'Использование'
 L['Switches to the named profile. Use /abp profiles to see available profiles.'] = 'Переключается на указанный профиль. Используйте /abp profiles, чтобы увидеть доступные профили.'
 L['Cannot switch profiles while in combat.'] = 'Нельзя переключать профили в бою.'
 L['No such profile:'] = 'Такого профиля нет:'
-L['Switched to profile:'] = 'Выполнено переключение на профиль:'
+L['Switched to profile:'] = 'Профиль переключён на:'
 L['Already on profile:'] = 'Уже используется профиль:'
 L['current'] = 'текущий'
 
