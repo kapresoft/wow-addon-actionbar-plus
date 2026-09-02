@@ -12,6 +12,7 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local function announcementDialog() return O.V2AnnouncementDialog end
 
 local c1 = ns:ColorFn(ns.colorDef.util1)
+local p1 = ns:ColorFn(ns.colorDef.primary)
 local errFn = ns:ColorFn(ns.colorDef.error)
 
 local addonInfoUtil__
@@ -78,8 +79,11 @@ function o:PrintProfiles(filter)
 
   self:Print(L['Available profiles:'])
   for _, name in ipairs(profiles) do
-    local marker = name == current and ' *' or ''
-    self:Print(('  %s%s'):format(c1(name), marker))
+    if name == current then
+      self:Print(('  %s %s'):format(c1(name), p1(('(%s)'):format(L['current']))))
+    else
+      self:Print(('  %s'):format(c1(name)))
+    end
   end
 end
 
