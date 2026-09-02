@@ -76,7 +76,9 @@ function o:OnEnter()
   GameTooltip:ClearLines()
   GameTooltip:AddLine(barTitle)
   if w.buttons then
-    GameTooltip:AddLine(#w.buttons .. ' buttons', 0.8, 0.8, 0.8)
+    local buttonCount = ('%s %s'):format(#w.buttons, L['buttons'])
+    local profileText = ('%s: %s'):format(L['Profile'], cns:db():GetCurrentProfile())
+    GameTooltip:AddLine(('%s, %s'):format(buttonCount, profileText), 0.8, 0.8, 0.8)
   end
   GameTooltip:AddLine(hc('\nAvailable Actions:'))
   GameTooltip:AddLine(('  • %s %s'):format(hct(L['Right-Click']), hcd(L['to show options menu'])))
