@@ -76,6 +76,8 @@ function o:OnEnter()
   GameTooltip:ClearLines()
   GameTooltip:AddLine(barTitle)
   if w.buttons then
+    -- Profile is shown here (not as its own line) so it's visible without
+    -- widening the tooltip beyond the existing button-count row (#653).
     local buttonCount = ('%s %s'):format(#w.buttons, L['buttons'])
     local profileText = ('%s: %s'):format(L['Profile'], cns:db():GetCurrentProfile())
     GameTooltip:AddLine(('%s, %s'):format(buttonCount, profileText), 0.8, 0.8, 0.8)
