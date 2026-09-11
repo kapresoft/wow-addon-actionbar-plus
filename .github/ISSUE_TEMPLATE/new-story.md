@@ -5,22 +5,18 @@ title: 'Story: [Title]'
 labels: ''
 assignees: ''
 
+Don't forget to apply labels:
+  - priority: high / medium / low
+  - Complexity: 1-5
+  - Size: S / M / L / XL
 ---
 
-## Story
-As a World of Warcraft player, I would like to [details]
-so that [fill in the blanks]
+# Story
+>As a World of Warcraft player, I would like to [details]
+>so that [fill in the blanks]
 
 ## Details
 [describe additional items here]
 
-## Story
-As a World of Warcraft player, I would like to [details]
-so that [fill in the blanks]
-
-## Details
-[describe additional items here]
-
-## Others
-- [ ] Trivial
-- [ ] Requires Feedback :+1:  or :-1:  from users
+## Screenshots
+[screenshots if available]     
