@@ -4,11 +4,6 @@ about: New Story Template
 title: 'Story: [Title]'
 labels: ''
 assignees: ''
-
-Don't forget to apply labels:
-  - priority: high / medium / low
-  - Complexity: 1-5
-  - Size: S / M / L / XL
 ---
 
 # Story
@@ -19,4 +14,4 @@ Don't forget to apply labels:
 [describe additional items here]
 
 ## Screenshots
-[screenshots if available]     
+[screenshots if available]
