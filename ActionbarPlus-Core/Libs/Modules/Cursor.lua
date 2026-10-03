@@ -35,7 +35,6 @@ local p, t = ns:log(libName)
 local CursorMixin = {}
 
 local function CursorMixinMethods()
-
   --- @private
   --- @param info CursorInfo
   function CursorMixin:Init(info)
@@ -84,18 +83,11 @@ local function CursorMixinMethods()
   end
 
   --- @return boolean
-  function CursorMixin:IsBattlePet()
-    return self.isValid and au.IsBattlePet(self.type)
-  end
+  function CursorMixin:IsBattlePet() return self.isValid and au.IsBattlePet(self.type) end
   --- @return boolean
-  function CursorMixin:IsPetAction()
-    return self.isValid and au.IsPetAction(self.type)
-  end
+  function CursorMixin:IsPetAction() return self.isValid and au.IsPetAction(self.type) end
   --- @return boolean
-  function CursorMixin:IsEquipmentSet()
-    return self.isValid and au.IsEquipmentSet(self.type)
-  end
-
+  function CursorMixin:IsEquipmentSet() return self.isValid and au.IsEquipmentSet(self.type) end
 end; CursorMixinMethods()
 
 --[[-----------------------------------------------------------------------------
@@ -107,8 +99,11 @@ function S:GetCursor()
   local type, info1, info2, info3, info4 = GetCursorInfo()
   --- @type CursorInfo
   local info = {
-    type  = type,
-    info1 = info1, info2 = info2, info3 = info3, info4 = info4
+    type = type,
+    info1 = info1,
+    info2 = info2,
+    info3 = info3,
+    info4 = info4,
   }
   return CreateAndInitFromMixin(CursorMixin, info)
 end

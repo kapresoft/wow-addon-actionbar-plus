@@ -64,4 +64,3 @@ function o:Show()
   g.v2AnnouncementShown = true
   C_Timer.After(2, function() CreateDialog() end)
 end
-

@@ -28,12 +28,15 @@ Module::SpellUtil (Methods)
 --- @return SpellRank?
 function o:GetHighestSpellRank(spellID)
   if not (GetSpellBookItemName or BOOKTYPE_SPELL) then return nil end
-  assert(type(spellID) == 'number', 'GetHighestSpellRank(spellID):: Param spellID should be a number.')
-  
+  assert(
+    type(spellID) == 'number',
+    'GetHighestSpellRank(spellID):: Param spellID should be a number.'
+  )
+
   -- Check cache first
   local rank = spellRankCache[spellID]
   if rank ~= nil then return rank end
-  
+
   local i = 1
   local lastRank
   while true do
@@ -42,7 +45,7 @@ function o:GetHighestSpellRank(spellID)
     if r and spID == spellID then lastRank = r end
     i = i + 1
   end
-  
+
   spellRankCache[spellID] = lastRank
   return lastRank
 end

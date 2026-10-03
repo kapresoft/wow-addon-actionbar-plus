@@ -216,7 +216,9 @@ local DEFAULT_DB = {
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
     bars = {
-      ['*'] = { anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil } },
+      ['*'] = {
+        anchor = { point = 'CENTER', relativePoint = 'CENTER', x = 0, y = 0, relativeTo = nil },
+      },
     },
   },
 

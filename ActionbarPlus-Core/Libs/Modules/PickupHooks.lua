@@ -32,6 +32,4 @@ end
 
 --- @see Compat_ABP_2_0.PickupMount()
 --- @param displayIndex number @The mount display index
-function o.OnPickupMount(displayIndex)
-  ns.mountID = C_GetDisplayedMountID(displayIndex)
-end
+function o.OnPickupMount(displayIndex) ns.mountID = C_GetDisplayedMountID(displayIndex) end

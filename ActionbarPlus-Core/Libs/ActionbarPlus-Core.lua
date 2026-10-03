@@ -29,14 +29,14 @@ local slashCommands = {
   { cmd = 'profile <name>', desc = L['switches to the named profile'] },
 }
 
-local dependentAddOns = {'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI'}
+local dependentAddOns = { 'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI' }
 local V1_ADDON_NAME = 'ActionbarPlus'
 
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
 ---------------------------------------------------------------------]]
 --- @class ABP_Core_2_0 : AceAddon, AceEvent-3.0, AceBucket-3.0, AceConsole-3.0, Database_ABP_2_0
-local o = ns:AceAddon():NewAddon(ns.name, "AceEvent-3.0", "AceBucket-3.0", "AceConsole-3.0")
+local o = ns:AceAddon():NewAddon(ns.name, 'AceEvent-3.0', 'AceBucket-3.0', 'AceConsole-3.0')
 ABP_Core_2_0 = o
 
 --- @param evt EventName
@@ -44,9 +44,7 @@ ABP_Core_2_0 = o
 function o:OnReadyDependentAddOn(evt, addon)
   ns:Register(addon:GetName(), addon)
   local completelyReady = self:AreCoreDependentsReady()
-  if completelyReady then
-    self:SendMessage(ns:msg('OnCoreDependentsReady'))
-  end
+  if completelyReady then self:SendMessage(ns:msg('OnCoreDependentsReady')) end
 end
 
 function o:PrintSlashCommandHelp()
@@ -109,7 +107,10 @@ function o:SwitchProfile(name)
   local needle = name:lower()
   local match
   for _, p in ipairs(profiles) do
-    if p:lower() == needle then match = p; break end
+    if p:lower() == needle then
+      match = p
+      break
+    end
   end
 
   if not match then
@@ -176,4 +177,3 @@ function o:AreCoreDependentsReady()
   end
   return true
 end
-

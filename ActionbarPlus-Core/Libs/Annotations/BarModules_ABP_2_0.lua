@@ -22,4 +22,3 @@ ActionbarPlusF8Module = {}
 ActionbarPlusF9Module = {}
 --- @type ActionbarPlusModule
 ActionbarPlusF10Module = {}
-

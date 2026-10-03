@@ -9,7 +9,7 @@ local attr = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 local AceHook = cns:NewAceHook()
 local comp = O.Compat
-local cfn = cns:ColorFn("679CEE")
+local cfn = cns:ColorFn('679CEE')
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -37,17 +37,16 @@ Support Functions
 --- @return boolean ok
 local function ReplaceKey1(bindingName, newKey, key2)
   local curKey1 = GetBindingKey(bindingName)
-  if curKey1 then SetBinding(curKey1) end                      -- clear key1; key2 promotes to key1
-  local promoted = key2 and GetBindingKey(bindingName) or nil  -- capture promoted key2
-  if promoted then SetBinding(promoted) end                    -- clear promoted key2
-  local ok = SetBinding(newKey, bindingName)                   -- set new as key1
-  if key2 then SetBinding(key2, bindingName) end               -- always restore key2
+  if curKey1 then SetBinding(curKey1) end -- clear key1; key2 promotes to key1
+  local promoted = key2 and GetBindingKey(bindingName) or nil -- capture promoted key2
+  if promoted then SetBinding(promoted) end -- clear promoted key2
+  local ok = SetBinding(newKey, bindingName) -- set new as key1
+  if key2 then SetBinding(key2, bindingName) end -- always restore key2
   return ok
 end
 
 --- @param self Button_ABP_2_0_X
 function o.Btn_OnEnter(self)
-
   if not self.__keyDownHooked then
     AceHook:RawHookScript(self, 'OnKeyDown', o.Btn_OnKeyDown)
     self.__keyDownHooked = true
@@ -87,9 +86,7 @@ end
 --- @param self Button_ABP_2_0_X
 local function Btn_UnsuspendButton(self)
   local typ = self:GetAttribute(SUSPENDED_TYPE)
-  if not Str_IsBlank(typ) then
-    self:SetAttribute(attr.type, typ)
-  end
+  if not Str_IsBlank(typ) then self:SetAttribute(attr.type, typ) end
 
   for _, script in ipairs({ 'OnEnter', 'OnLeave', 'OnKeyDown' }) do
     AceHook:Unhook(self, script)
@@ -108,7 +105,6 @@ end
 
 --- @param self Button_ABP_2_0_X
 function o.Btn_OnKeyDown(self, key)
-
   local binding, w = comp:GetModifierBinding(key), self.widget
   if not binding then return end
 
@@ -149,7 +145,6 @@ function o.Btn_OnKeyDown(self, key)
   o.Btn_OnEnter(self)
 end
 
-
 --- @param evt EventName
 --- @param perChar boolean
 function o:OnQuickKeybindModeCommit(evt, perChar)
@@ -173,7 +168,7 @@ function o:OnQuickKeybindModeNotActive(evt)
     if entry.old then
       ReplaceKey1(bindingName, entry.old, entry.key2)
     elseif entry.new then
-      SetBinding(entry.new)  -- had no original binding; clear the new key
+      SetBinding(entry.new) -- had no original binding; clear the new key
     end
   end
   pendingBindings = {}
@@ -181,15 +176,11 @@ function o:OnQuickKeybindModeNotActive(evt)
 end
 
 function o:DisableButtons()
-  cns:BarsUI():ForEach(function(bm)
-    bm:ForEach(Btn_SuspendButton)
-  end)
+  cns:BarsUI():ForEach(function(bm) bm:ForEach(Btn_SuspendButton) end)
 end
 
 function o:EnableButtons()
-  cns:BarsUI():ForEach(function(bm)
-    bm:ForEach(Btn_UnsuspendButton)
-  end)
+  cns:BarsUI():ForEach(function(bm) bm:ForEach(Btn_UnsuspendButton) end)
 end
 
 --[[-----------------------------------------------------------------------------

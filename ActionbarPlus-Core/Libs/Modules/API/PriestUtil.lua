@@ -24,22 +24,21 @@ o.SHADOW_FORM_SPELL_ID_RETAIL = 232698
 
 local formActiveIcon = (function()
   return {
-    retail  = 136116,
-    mop     = 136200,
+    retail = 136116,
+    mop = 136200,
     default = 136130,
   }
 end)()
 
 ---@param spellID SpellID
 function o:IsShadowFormSpell(spellID)
-  return spellID == self.SHADOW_FORM_SPELL_ID
-          or spellID == self.SHADOW_FORM_SPELL_ID_RETAIL
+  return spellID == self.SHADOW_FORM_SPELL_ID or spellID == self.SHADOW_FORM_SPELL_ID_RETAIL
 end
 
 --- @return boolean
 function o:IsInShadowForm()
   return self:IsBuffActive(self.SHADOW_FORM_SPELL_ID)
-          or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL)
+    or self:IsBuffActive(self.SHADOW_FORM_SPELL_ID_RETAIL)
 end
 
 --- @deprecated
@@ -47,8 +46,11 @@ end
 function o:GetShadowFormActiveIcon() return self:GetActiveShapeshiftFormIcon() end
 
 function o:GetActiveShapeshiftFormIcon()
-  if ns:IsShadowlandsOrLater() then return formActiveIcon.retail
-  elseif ns:IsMists() then return formActiveIcon.mop end
+  if ns:IsShadowlandsOrLater() then
+    return formActiveIcon.retail
+  elseif ns:IsMists() then
+    return formActiveIcon.mop
+  end
   return formActiveIcon.default
 end
 
@@ -61,5 +63,6 @@ end
 function o:GetShapeshiftSpellState(spellID)
   local active = self:IsShapeShifted()
   return self:IsShadowFormSpell(spellID),
-          active, active and self:GetActiveShapeshiftFormIcon() or nil
+    active,
+    active and self:GetActiveShapeshiftFormIcon() or nil
 end

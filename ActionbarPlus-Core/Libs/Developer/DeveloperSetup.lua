@@ -32,16 +32,20 @@ Support Functions
 local function WrapScriptExample()
   --local controller = CreateFrame("Frame", "MySecureEnv", UIParent, "SecureHandlerBaseTemplate")
   local controller = ActionbarPlusF1Button1
-  
+
   local btn2 = ActionbarPlusF1Button2
-  controller:SetFrameRef("target", btn2)
+  controller:SetFrameRef('target', btn2)
   print('btn2:', btn2.Click)
-  
+
   -- Wrap controller's OnClick to click the target
-  controller:WrapScript(controller, "PreClick", [[
+  controller:WrapScript(
+    controller,
+    'PreClick',
+    [[
   local btn = self:GetFrameRef("target")
   self:SetAttribute("spell", "Kill Command")
-  ]])
+  ]]
+  )
 end
 
 --[[-------------------------------------------------------------------
@@ -50,10 +54,13 @@ Methods
 local RELOAD_CONFIRMATION_DIALOG = 'RELOAD_CONFIRMATION_DIALOG'
 --- Usage: StaticPopup_Show(RELOAD_CONFIRMATION_DIALOG)
 StaticPopupDialogs[RELOAD_CONFIRMATION_DIALOG] = {
-    text = "DevSuite has been enabled for dev mode.\nA UI restart is required to activate it.\n\nRestart now?",
-    button1 = OKAY, button2 = CANCEL,
-    timeout = 0, whileDead = true, hideOnEscape = true,
-    OnAccept = ReloadUI
+  text = 'DevSuite has been enabled for dev mode.\nA UI restart is required to activate it.\n\nRestart now?',
+  button1 = OKAY,
+  button2 = CANCEL,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+  OnAccept = ReloadUI,
 }
 
 --[[-----------------------------------------------------------------------------

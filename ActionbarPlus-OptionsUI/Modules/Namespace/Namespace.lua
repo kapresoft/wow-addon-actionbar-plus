@@ -13,7 +13,8 @@ local addon, xns = ...
 --- @field O OptionsUI_Modules_ABP_2_0 The module objects
 local ns = xns
 
-ns.name = addon; ns.nameShort = 'ABP2|cff8EB9FFOptionsUI|r'
+ns.name = addon
+ns.nameShort = 'ABP2|cff8EB9FFOptionsUI|r'
 ABP_OPTIONSUI_NS = ns
 
 --- @type OptionsUI_Modules_ABP_2_0
@@ -36,8 +37,10 @@ ns.colorDef = {
 
 ns.fmt = ns:cns().fmt
 ns.printer = LibPrettyPrint:Printer({
-    prefix = ns.nameShort, formatter = ns.fmt,
-    prefix_color = prefixColor, sub_prefix_color = subPrefixColor,
+  prefix = ns.nameShort,
+  formatter = ns.fmt,
+  prefix_color = prefixColor,
+  sub_prefix_color = subPrefixColor,
 })
 
 --[[-------------------------------------------------------------------
@@ -53,10 +56,12 @@ function ns:a() return ABP_OptionsUI_2_0 end
 --- @param obj T The library object instance
 --- @return T
 function ns:Register(libName, obj)
-    assert(type(libName) == 'string' and type(obj) == 'table',
-            'Register(libName, obj): libName(string) and obj(table) is required.')
-    self.O[libName] = obj
-    return obj
+  assert(
+    type(libName) == 'string' and type(obj) == 'table',
+    'Register(libName, obj): libName(string) and obj(table) is required.'
+  )
+  self.O[libName] = obj
+  return obj
 end
 
 --- @generic T
@@ -65,8 +70,12 @@ end
 --- @return table|T library
 function ns:NewLib(libName, obj) return ns:Register(libName, obj or {}) end
 
-ns.logHolder = {}; do
-  local h = ns.logHolder; local noop = function(moduleName) return function() end end
+ns.logHolder = {}
+do
+  local h = ns.logHolder
+  local noop = function(moduleName)
+    return function() end
+  end
   h.printer, h.tracer = noop, noop
 end
 
@@ -84,8 +93,9 @@ end
 --- @param message Name @The base message name; used for AceEvent messages
 --- @return string
 function ns:msg(message)
-  assert(type(message) == 'string' and #strtrim(message) > 0,
-    'msg(message): {message} should be a string')
+  assert(
+    type(message) == 'string' and #strtrim(message) > 0,
+    'msg(message): {message} should be a string'
+  )
   return ('%s::%s'):format(self.name, message)
 end
-

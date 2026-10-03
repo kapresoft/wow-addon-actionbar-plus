@@ -6,28 +6,28 @@ local ns = select(2, ...)
 
 local hu = ns.O.HashUtil
 
-local C_GetItemCooldown    = C_Container.GetItemCooldown
+local C_GetItemCooldown = C_Container.GetItemCooldown
 local C_GetActiveSpecGroup = C_SpecializationInfo.GetActiveSpecGroup
 
 local C_GetItemInfoInstant = C_Item.GetItemInfoInstant
-local C_GetItemSpell       = C_Item.GetItemSpell
-local C_PickupItem         = C_Item.PickupItem
+local C_GetItemSpell = C_Item.GetItemSpell
+local C_PickupItem = C_Item.PickupItem
 
-local C_GetPetInfoByPetID  = C_PetJournal and C_PetJournal.GetPetInfoByPetID
-local C_PickupPet          = C_PetJournal and C_PetJournal.PickupPet
+local C_GetPetInfoByPetID = C_PetJournal and C_PetJournal.GetPetInfoByPetID
+local C_PickupPet = C_PetJournal and C_PetJournal.PickupPet
 
-local C_PickupSpell        = C_Spell.PickupSpell
-local C_GetSpellCooldown   = C_Spell.GetSpellCooldown
-local C_GetSpellInfo       = C_Spell.GetSpellInfo, GetSpellInfo
+local C_PickupSpell = C_Spell.PickupSpell
+local C_GetSpellCooldown = C_Spell.GetSpellCooldown
+local C_GetSpellInfo = C_Spell.GetSpellInfo, GetSpellInfo
 
 local _es = C_EquipmentSet
-local C_GetEquipmentSetID     = _es and _es.GetEquipmentSetID
-local C_GetEquipmentSetInfo   = _es and _es.GetEquipmentSetInfo
+local C_GetEquipmentSetID = _es and _es.GetEquipmentSetID
+local C_GetEquipmentSetInfo = _es and _es.GetEquipmentSetInfo
 
 local _cmj = C_MountJournal
-local C_GetDisplayedMountID   = _cmj and _cmj.GetDisplayedMountID
+local C_GetDisplayedMountID = _cmj and _cmj.GetDisplayedMountID
 local C_GetNumDisplayedMounts = _cmj and _cmj.GetNumDisplayedMounts
-local C_PickupMount           = _cmj and _cmj.Pickup
+local C_PickupMount = _cmj and _cmj.Pickup
 local Str_IsAnyOf = ns:String().IsAnyOf
 
 --[[-----------------------------------------------------------------------------
@@ -50,10 +50,13 @@ local function IsFn(obj) return 'function' == type(obj) end
 --- 1, 2, 3 retail, 4 for druids ; 1, 2 classic
 --- @return SpecializationIndex|number
 function o:GetSpecializationID()
-  if IsFn(GetSpecialization) then return GetSpecialization()
-  elseif IsFn(GetActiveTalentGroup) then return GetActiveTalentGroup()
+  if IsFn(GetSpecialization) then
+    return GetSpecialization()
+  elseif IsFn(GetActiveTalentGroup) then
+    return GetActiveTalentGroup()
     -- C_GetActiveSpecGroup: MoP Classic (the active specIndex tab)
-  elseif IsFn(C_GetActiveSpecGroup) then return C_GetActiveSpecGroup()
+  elseif IsFn(C_GetActiveSpecGroup) then
+    return C_GetActiveSpecGroup()
   end
   return 1
 end
@@ -64,14 +67,17 @@ function o:__GetSpellInfoLegacy(id)
   local pt = type(id)
   assert(pt == 'string' or pt == 'number', 'GetSpellInfo::SpellID should be a number or a string.')
 
-  local name, rank, icon, castTime, minRange,
-      maxRange, spid, originalIcon = GetSpellInfo(id)
+  local name, rank, icon, castTime, minRange, maxRange, spid, originalIcon = GetSpellInfo(id)
 
   --- @type SpellInfo
   local sp = {
-    id = id, name = name, iconID = icon, castTime = castTime,
-    minRange = minRange, maxRange = maxRange,
-    originalIconID = originalIcon
+    id = id,
+    name = name,
+    iconID = icon,
+    castTime = castTime,
+    minRange = minRange,
+    maxRange = maxRange,
+    originalIconID = originalIcon,
   }
   return sp
 end
@@ -84,15 +90,22 @@ function o:IsPlayerGhost() return UnitIsGhost('player') end
 --- @param spell SpellIdentifier
 --- @return SpellInfo?
 function o:GetSpellInfo(spell)
-  assert(Str_IsAnyOf(type(spell), 'string', 'number'), 'GetSpellInfo::SpellID should be a number or a string.')
+  assert(
+    Str_IsAnyOf(type(spell), 'string', 'number'),
+    'GetSpellInfo::SpellID should be a number or a string.'
+  )
   return C_GetSpellInfo(spell)
 end
 
 --- @param spell SpellIdentifier
 --- @return Name?
 function o:GetSpellName(spell)
-  assert(Str_IsAnyOf(type(spell), 'string', 'number'), 'GetSpellInfo::SpellID should be a number or a string.')
-  local sp = self:GetSpellInfo(spell); return sp and sp.name
+  assert(
+    Str_IsAnyOf(type(spell), 'string', 'number'),
+    'GetSpellInfo::SpellID should be a number or a string.'
+  )
+  local sp = self:GetSpellInfo(spell)
+  return sp and sp.name
 end
 
 --- GetSpellInfo('name:string') will return nil if spell is unknown to player
@@ -135,14 +148,19 @@ function o:IfMacroByBodyHash(hashedBody, callbackFn)
   local numGlobal, numChar = GetNumMacros()
   local MAX_GLOBAL = MAX_ACCOUNT_MACROS or 120
   local indices = {}
-  for i = 1, numGlobal do indices[#indices+1] = i end
-  for i = MAX_GLOBAL + 1, MAX_GLOBAL + numChar do indices[#indices+1] = i end
+  for i = 1, numGlobal do
+    indices[#indices + 1] = i
+  end
+  for i = MAX_GLOBAL + 1, MAX_GLOBAL + numChar do
+    indices[#indices + 1] = i
+  end
 
   for _, i in ipairs(indices) do
     local name, icon, body = GetMacroInfo(i)
     local bodyH = hu.string(body)
     if name and bodyH == hashedBody then
-      callbackFn(name, icon, body); return ns:Chain(true)
+      callbackFn(name, icon, body)
+      return ns:Chain(true)
     end
   end
   return ns:Chain(false)
@@ -176,13 +194,22 @@ end
 
 --- Picks up the specified spell, compatible with both Retail and Classic WoW.
 --- @param spell SpellIdentifier The ID, name, or index of the spell to pick up.
-function o:PickupSpell(spell) if not spell then return end; C_PickupSpell(spell) end
+function o:PickupSpell(spell)
+  if not spell then return end
+  C_PickupSpell(spell)
+end
 
 --- @param itemID ItemID
-function o:PickupItem(itemID) if not itemID then return end; C_PickupItem(itemID) end
+function o:PickupItem(itemID)
+  if not itemID then return end
+  C_PickupItem(itemID)
+end
 
 --- @param macroName Name
-function o:PickupMacro(macroName) if not macroName then return end; PickupMacro(macroName) end
+function o:PickupMacro(macroName)
+  if not macroName then return end
+  PickupMacro(macroName)
+end
 
 --- @see MountJournalHook_ABP_2_0
 --- @param mountID MountID
@@ -212,8 +239,11 @@ function o:GetShapeshiftFormInfo(index)
   if not (shapeshiftIcon or spellID) then return nil end
   --- @type ShapeshiftFormData
   local c = {
-    index = index, shapeshiftIcon = shapeshiftIcon,
-    spellID = spellID, active = active, castable = castable,
+    index = index,
+    shapeshiftIcon = shapeshiftIcon,
+    spellID = spellID,
+    active = active,
+    castable = castable,
   }
   return c
 end
@@ -222,8 +252,10 @@ end
 --- @param spell SpellIdentifier
 --- @return SpellCooldownInfo
 function o:GetSpellCooldown(spell)
-  assert(Str_IsAnyOf(type(spell), 'number', 'string'),
-    'GetSpellCooldown(spell):: spell should be a string (spell name) or number (spell ID).')
+  assert(
+    Str_IsAnyOf(type(spell), 'number', 'string'),
+    'GetSpellCooldown(spell):: spell should be a string (spell name) or number (spell ID).'
+  )
   return C_GetSpellCooldown(spell)
 end
 
@@ -231,8 +263,10 @@ end
 --- @param spell SpellIdentifier
 --- @return SpellChargeInfo chargeInfo
 function o:GetSpellCharges(spell)
-  assert(Str_IsAnyOf(type(spell), 'number', 'string'),
-    'GetSpellCharges(spell):: spell should be a string (spell name) or number (spell ID).')
+  assert(
+    Str_IsAnyOf(type(spell), 'number', 'string'),
+    'GetSpellCharges(spell):: spell should be a string (spell name) or number (spell ID).'
+  )
   return C_Spell.GetSpellCharges(spell)
 end
 
@@ -243,7 +277,10 @@ function o:GetCastingInfo(unit)
 
   --- @class UnitCastingData
   local data = {
-    name = name, iconID = iconID, guid=guid, spellID = spellID
+    name = name,
+    iconID = iconID,
+    guid = guid,
+    spellID = spellID,
   }
   return spellID and data
 end
@@ -252,7 +289,10 @@ end
 --- @param matchSpellID SpellID @The spellID to match
 --- @return boolean
 function o:IsPlayerCastingSpell(matchSpellID)
-  assert(type(matchSpellID) == 'number', 'IsPlayerCastingSpell(matchSpellID):: expected a spellID(number).')
+  assert(
+    type(matchSpellID) == 'number',
+    'IsPlayerCastingSpell(matchSpellID):: expected a spellID(number).'
+  )
   local info = self:GetCastingInfo()
   return (info and info.spellID and info.spellID == matchSpellID) or false
 end
@@ -274,7 +314,7 @@ end
 
 --- we can assume C_Spell exists in all wow versions
 local C_IsSpellInRange = C_Spell.IsSpellInRange or IsSpellInRange
-local C_IsItemInRange  = C_Item.IsItemInRange or IsItemInRange
+local C_IsItemInRange = C_Item.IsItemInRange or IsItemInRange
 
 --- Checks if a spell is in range for the specified target, compatible with both Retail and Classic WoW.
 --- @param spell SpellIdentifier  @The ID, name, or index of the spell to check.
@@ -297,9 +337,7 @@ end
 --- @return Chain_ABP_2_0
 function o:IfItem(itemInfo, callbackFn)
   local item = self:GetItemInfoInstant(itemInfo)
-  if not (item and item.id and item.icon) then
-    item = self:GetItemInfo(itemInfo)
-  end
+  if not (item and item.id and item.icon) then item = self:GetItemInfo(itemInfo) end
   local matched = item ~= nil and item.icon ~= nil
   if matched then callbackFn(item) end
   return ns:Chain(matched)
@@ -310,14 +348,17 @@ end
 --- @param itemInfo ItemID|ItemLink|ItemName
 --- @return ItemInfoDetails?
 function o:GetItemInfoInstant(itemInfo)
-  local id, type, subType, equipLoc,
-    icon, classID, subclassID = C_GetItemInfoInstant(itemInfo)
+  local id, type, subType, equipLoc, icon, classID, subclassID = C_GetItemInfoInstant(itemInfo)
   if not id then return nil end
   --- @type ItemInfoDetails
   local item = {
-    id = id, type = type, subType = subType,
-    equipLoc = equipLoc, classID = classID,
-    subclassID = subclassID, icon = icon,
+    id = id,
+    type = type,
+    subType = subType,
+    equipLoc = equipLoc,
+    classID = classID,
+    subclassID = subclassID,
+    icon = icon,
   }
   return item
 end
@@ -326,23 +367,31 @@ end
 --- @param itemID ItemID
 --- @return ItemInfoDetails?
 function o:GetItemInfo(itemID)
-  local name, link, quality,
-    level, minLevel,
-    type, subType, stackCount,
-    equipLoc, icon, sellPrice,
-    classID, subclassID, bindType,
-    expansionID, setID, isCraftingReagent, desc = C_Item.GetItemInfo(itemID)
+  local name, link, quality, level, minLevel, type, subType, stackCount, equipLoc, icon, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent, desc =
+    C_Item.GetItemInfo(itemID)
 
   if not name then return nil end
   --- @type ItemInfoDetails
   local item = {
-    id = itemID, name = name, link = link, icon = icon,
-    quality = quality, level = level, minLevel = minLevel,
-    type = type, subType = subType, stackCount = stackCount,
-    equipLoc = equipLoc, classID = classID, subclassID = subclassID,
-    sellPrice = sellPrice, bindType = bindType,
-    expansionID = expansionID, setID = setID,
-    isCraftingReagent = isCraftingReagent, desc = desc,
+    id = itemID,
+    name = name,
+    link = link,
+    icon = icon,
+    quality = quality,
+    level = level,
+    minLevel = minLevel,
+    type = type,
+    subType = subType,
+    stackCount = stackCount,
+    equipLoc = equipLoc,
+    classID = classID,
+    subclassID = subclassID,
+    sellPrice = sellPrice,
+    bindType = bindType,
+    expansionID = expansionID,
+    setID = setID,
+    isCraftingReagent = isCraftingReagent,
+    desc = desc,
   }
   return item
 end
@@ -351,8 +400,10 @@ end
 --- @param itemInfo ItemID|ItemName|ItemLink
 --- @return ItemCooldownInfo?
 function o:GetItemCooldown(itemInfo)
-  assert(Str_IsAnyOf(type(itemInfo), 'number', 'string'),
-    'GetItemCooldown(itemInfo): {itemInfo} should be an number or a string')
+  assert(
+    Str_IsAnyOf(type(itemInfo), 'number', 'string'),
+    'GetItemCooldown(itemInfo): {itemInfo} should be an number or a string'
+  )
   --- @type ItemCooldownInfo
   local cd
 
@@ -396,8 +447,10 @@ end
 --- @return IconIDOrPath? @Macro icon
 --- @return string? body  @Macro body
 function o:GetMacroInfo(macroIdentifier)
-  assert(Str_IsAnyOf(type(macroIdentifier), 'string', 'number'),
-    'GetMacroInfo(macroIdentifier): {identifier} should be a string(macro-name) or number(macro-index)')
+  assert(
+    Str_IsAnyOf(type(macroIdentifier), 'string', 'number'),
+    'GetMacroInfo(macroIdentifier): {identifier} should be a string(macro-name) or number(macro-index)'
+  )
 
   local name, icon, body = GetMacroInfo(macroIdentifier)
   if not name then return nil end
@@ -408,40 +461,53 @@ end
 --- @param mountID number
 --- @return MountInfo?
 function o:GetMountInfo(mountID)
-  local name, spellID, icon, isActive, isUsable, sourceType,
-        isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, _mountID, isSteadyFlight
-          = C_MountJournal.GetMountInfoByID(mountID)
+  local name, spellID, icon, isActive, isUsable, sourceType, isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, _mountID, isSteadyFlight =
+    C_MountJournal.GetMountInfoByID(mountID)
 
   if not (name and spellID and _mountID) then return nil end
 
   --- @type MountInfo
   local mountInfo = {
-    name = name, spellID = spellID, icon = icon,
-    isActive = isActive, isUsable = isUsable, sourceType = sourceType,
-    isFavorite = isFavorite, isFactionSpecific = isFactionSpecific, faction = faction,
-    shouldHideOnChar = shouldHideOnChar, isCollected = isCollected,
-    mountID = _mountID, isSteadyFlight = isSteadyFlight,
+    name = name,
+    spellID = spellID,
+    icon = icon,
+    isActive = isActive,
+    isUsable = isUsable,
+    sourceType = sourceType,
+    isFavorite = isFavorite,
+    isFactionSpecific = isFactionSpecific,
+    faction = faction,
+    shouldHideOnChar = shouldHideOnChar,
+    isCollected = isCollected,
+    mountID = _mountID,
+    isSteadyFlight = isSteadyFlight,
   }
   return mountInfo
 end
 
-
 --- @param mountIndex Index
 --- @return MountInfo?
 function o:GetMountInfoIndex(mountIndex)
-  local name, spellID, icon, isActive, isUsable, sourceType,
-      isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, mountID, isSteadyFlight
-        = C_MountJournal.GetDisplayedMountInfo(mountIndex)
+  local name, spellID, icon, isActive, isUsable, sourceType, isFavorite, isFactionSpecific, faction, shouldHideOnChar, isCollected, mountID, isSteadyFlight =
+    C_MountJournal.GetDisplayedMountInfo(mountIndex)
 
   if not (name and spellID and mountID) then return nil end
 
   --- @type MountInfo
   local mountInfo = {
-    name = name, spellID = spellID, icon = icon,
-    isActive = isActive, isUsable = isUsable, sourceType = sourceType,
-    isFavorite = isFavorite, isFactionSpecific = isFactionSpecific, faction = faction,
-    shouldHideOnChar = shouldHideOnChar, isCollected = isCollected,
-    mountID = mountID, isSteadyFlight = isSteadyFlight,
+    name = name,
+    spellID = spellID,
+    icon = icon,
+    isActive = isActive,
+    isUsable = isUsable,
+    sourceType = sourceType,
+    isFavorite = isFavorite,
+    isFactionSpecific = isFactionSpecific,
+    faction = faction,
+    shouldHideOnChar = shouldHideOnChar,
+    isCollected = isCollected,
+    mountID = mountID,
+    isSteadyFlight = isSteadyFlight,
   }
   return mountInfo
 end
@@ -452,9 +518,7 @@ function o:GetMountIndexByMountID(id)
   local count = C_GetNumDisplayedMounts()
   for mountIndex = 1, count do
     local mountIDByIndex = C_GetDisplayedMountID(mountIndex)
-    if id == mountIDByIndex then
-      return mountIndex
-    end
+    if id == mountIDByIndex then return mountIndex end
   end
 end
 
@@ -471,32 +535,31 @@ end
 function o:GetPetInfo(petID)
   if not (petID and C_GetPetInfoByPetID) then return nil end
 
-  local speciesID, customName, petLevel, xp, maxXP, displayID, isFavorite,
-        name, icon, petType, creatureID, sourceText, description,
-        isWild, canBattle, tradable, unique, obtainable = C_PetJournal.GetPetInfoByPetID(petID)
+  local speciesID, customName, petLevel, xp, maxXP, displayID, isFavorite, name, icon, petType, creatureID, sourceText, description, isWild, canBattle, tradable, unique, obtainable =
+    C_PetJournal.GetPetInfoByPetID(petID)
 
   if not speciesID then return nil end
 
   --- @type PetJournalPetInfo
   local pet = {
-    speciesID   = speciesID,
-    customName  = customName,
-    petLevel    = petLevel,
-    xp          = xp,
-    maxXP       = maxXP,
-    displayID   = displayID,
-    isFavorite  = isFavorite,
-    name        = name,
-    icon        = icon,
-    petType     = petType,
-    creatureID  = creatureID,
-    sourceText  = sourceText,
+    speciesID = speciesID,
+    customName = customName,
+    petLevel = petLevel,
+    xp = xp,
+    maxXP = maxXP,
+    displayID = displayID,
+    isFavorite = isFavorite,
+    name = name,
+    icon = icon,
+    petType = petType,
+    creatureID = creatureID,
+    sourceText = sourceText,
     description = description,
-    isWild      = isWild,
-    canBattle   = canBattle,
-    tradable    = tradable,
-    unique      = unique,
-    obtainable  = obtainable,
+    isWild = isWild,
+    canBattle = canBattle,
+    tradable = tradable,
+    unique = unique,
+    obtainable = obtainable,
   }
   return pet
 end
@@ -509,22 +572,24 @@ function o:GetEquipmentSetID(eqSetName)
 end
 
 local MODIFIER_KEYS = {
-  LSHIFT=true, RSHIFT=true,
-  LCTRL=true, RCTRL=true,
-  LMETA=true, RMETA=true,
-  LALT=true, RALT=true
+  LSHIFT = true,
+  RSHIFT = true,
+  LCTRL = true,
+  RCTRL = true,
+  LMETA = true,
+  RMETA = true,
+  LALT = true,
+  RALT = true,
 }
 --- @param keyPressed string
 --- @return string?
 function o:GetModifierBinding(keyPressed)
   if MODIFIER_KEYS[keyPressed] then return nil end
   local binding = ''
-  if IsAltKeyDown()     then binding = binding .. 'ALT-'   end
-  if IsControlKeyDown() then binding = binding .. 'CTRL-'  end
-  if IsShiftKeyDown()   then binding = binding .. 'SHIFT-' end
-  if IsMetaKeyDown and IsMetaKeyDown() then
-    binding = binding .. 'META-'
-  end
+  if IsAltKeyDown() then binding = binding .. 'ALT-' end
+  if IsControlKeyDown() then binding = binding .. 'CTRL-' end
+  if IsShiftKeyDown() then binding = binding .. 'SHIFT-' end
+  if IsMetaKeyDown and IsMetaKeyDown() then binding = binding .. 'META-' end
   local result = binding .. keyPressed
   if strupper(result) ~= 'ESCAPE' and strupper(result):find('ESCAPE') then return nil end
   return result
@@ -533,25 +598,24 @@ end
 --- @param id Identifier The equipmentSet ID
 --- @return EquipmentSetDetails?
 function o:GetEquipmentSet(id)
-  assert(type(id) == 'number', "GetEquipmentSet(id): {id} is missing")
+  assert(type(id) == 'number', 'GetEquipmentSet(id): {id} is missing')
 
-  local name, iconFileID, setID, isEquipped,
-  numItems, numEquipped, numInInventory,
-  numLost, numIgnored = C_GetEquipmentSetInfo(id)
+  local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored =
+    C_GetEquipmentSetInfo(id)
 
   if not name then return nil end
 
   --- @type EquipmentSetDetails
   local eq = {
-    name           = name,
-    iconID         = iconFileID,
-    id             = setID,
-    isEquipped     = isEquipped,
-    numItems       = numItems,
-    numEquipped    = numEquipped,
+    name = name,
+    iconID = iconFileID,
+    id = setID,
+    isEquipped = isEquipped,
+    numItems = numItems,
+    numEquipped = numEquipped,
     numInInventory = numInInventory,
-    numLost        = numLost,
-    numIgnored     = numIgnored,
+    numLost = numLost,
+    numIgnored = numIgnored,
   }
   return eq
 end

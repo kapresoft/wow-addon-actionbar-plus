@@ -32,28 +32,28 @@ Support Functions
 --- @param self DatabaseMixin_ABP_2_0
 --- @param db AceDBObject-3.0
 local function DatabaseMixin_RegisterCallbacks(self, db)
-    db.RegisterCallback(self, "OnNewProfile", "OnNewProfile")
-    db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
-    db.RegisterCallback(self, "OnProfileCopied", "OnProfileCopied")
-    db.RegisterCallback(self, "OnProfileReset", "OnProfileReset")
-    db.RegisterCallback(self, "OnProfileDeleted", "OnProfileDeleted")
+  db.RegisterCallback(self, 'OnNewProfile', 'OnNewProfile')
+  db.RegisterCallback(self, 'OnProfileChanged', 'OnProfileChanged')
+  db.RegisterCallback(self, 'OnProfileCopied', 'OnProfileCopied')
+  db.RegisterCallback(self, 'OnProfileReset', 'OnProfileReset')
+  db.RegisterCallback(self, 'OnProfileDeleted', 'OnProfileDeleted')
 end
 --- @param self DatabaseMixin_ABP_2_0
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_InitDBDefaults(self, db)
-    db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
-    --t(('Current Profile: %s activeSpecGroup: %s')
-    --        :format(db:GetCurrentProfile(), unit:GetActiveSpecGroupIndex()))
+  db:RegisterDefaults(DatabaseSchema:GetDefaultDatabase())
+  --t(('Current Profile: %s activeSpecGroup: %s')
+  --        :format(db:GetCurrentProfile(), unit:GetActiveSpecGroupIndex()))
 end
 
 --- @param self DatabaseMixin_ABP_2_0
 --- @param db DatabaseObj_ABP_2_0
 local function DatabaseMixin_EnsureSchemaUpToDate(self, db)
-    local current = db['global'].schemaVersion
-    if current < DB_VERSION then
-        self:RunMigrations(current)
-        db['global'].schemaVersion = DB_VERSION
-    end
+  local current = db['global'].schemaVersion
+  if current < DB_VERSION then
+    self:RunMigrations(current)
+    db['global'].schemaVersion = DB_VERSION
+  end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -79,11 +79,11 @@ function o:OnProfileReset() ReloadAllBars() end
 function o:InitDb(addon)
   Mixin(addon, o)
   --- @type DatabaseObj_ABP_2_0
-  local db = AceDB:New(ns.DB_NAME);
+  local db = AceDB:New(ns.DB_NAME)
   DatabaseMixin_InitDBDefaults(addon, db)
   --DatabaseMixin_EnsureSchemaUpToDate(addon, db)
   DatabaseMixin_RegisterCallbacks(addon, db)
-  
+
   ns:RegisterDB(db)
   --xdb = db
   -- /dump xdb:ResetProfile()
@@ -94,7 +94,7 @@ function o:RunMigrations(fromVersion)
   if fromVersion < 1 then
     --self:MigrateToV1()
   end
-  
+
   if fromVersion < 2 then
     --self:MigrateToV2()
   end
@@ -143,9 +143,7 @@ function o:buttonOrNew(barConf, btnIndex)
   local btnKey = dsu.buttonKey(btnIndex)
   -- init the buttonGroup if missing
   -- structure: btnGroup[btnKey][activeSpecKey]
-  if not barConf.buttons[btnKey] then
-    barConf.buttons[btnKey] = {}
-  end
+  if not barConf.buttons[btnKey] then barConf.buttons[btnKey] = {} end
   local btnGroup = barConf.buttons[btnKey]
   local specGroupKey = dsu.specGroupKey(unit:GetActiveSpecGroupIndex())
   --p('buttonOrNew():: btnKey=', btnKey, 'specGroupKey=', specGroupKey, 'btnConf=', btnGroup[specGroupKey])
@@ -158,21 +156,21 @@ end
 --- @param btnIndex number
 --- @return ButtonConfig_ABP_2_0|nil
 function o:c(barIndex, btnIndex)
-  assert(type(barIndex) == "number", "c(): barIndex must be number")
-  assert(type(btnIndex) == "number", "c(): btnIndex must be number")
-  
+  assert(type(barIndex) == 'number', 'c(): barIndex must be number')
+  assert(type(btnIndex) == 'number', 'c(): btnIndex must be number')
+
   local profile = self:p()
   local bars = profile.bars
-  assert(type(bars) == "table", "c(): profile.bars missing")
-  
+  assert(type(bars) == 'table', 'c(): profile.bars missing')
+
   local bar = bars[barIndex]
-  assert(type(bar) == "table", "c(): invalid barIndex " .. barIndex)
-  
+  assert(type(bar) == 'table', 'c(): invalid barIndex ' .. barIndex)
+
   local buttons = bar.buttons
-  assert(type(buttons) == "table", "c(): bar.buttons missing")
-  
+  assert(type(buttons) == 'table', 'c(): bar.buttons missing')
+
   local btnSpecs = buttons[btnIndex]
-  assert(type(btnSpecs) == "table", "c(): invalid btnIndex " .. btnIndex)
+  assert(type(btnSpecs) == 'table', 'c(): invalid btnIndex ' .. btnIndex)
 
   return btnSpecs[unit:GetActiveSpecGroupIndex()]
 end

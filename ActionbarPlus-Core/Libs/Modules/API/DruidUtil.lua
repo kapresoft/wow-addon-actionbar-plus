@@ -8,7 +8,6 @@ local UnitUtil = ns.O.UnitUtil
 local BEAR_SHAPESHIFT_FORM_INDEX = 1
 local CAT_SHAPESHIFT_FORM_INDEX = 3
 
-
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
@@ -17,7 +16,9 @@ Support Functions
 --- @return table<number, boolean> @A lookup table where each spellID is a key with value true.
 local function LT(list)
   local t = {}
-  for _, id in ipairs(list) do t[id] = true end
+  for _, id in ipairs(list) do
+    t[id] = true
+  end
   return t
 end
 
@@ -91,11 +92,11 @@ local CATACLYSM_BEAR_SPELLS = LT({
 
 --- @type table<number, boolean>
 local CATACLYSM_SPECIALIZED_SPELLS = (function()
-  local sp = {};
-  MergeLT(sp, CATACLYSM_CAT_SPELLS);
-  MergeLT(sp, CATACLYSM_BEAR_SPELLS);
+  local sp = {}
+  MergeLT(sp, CATACLYSM_CAT_SPELLS)
+  MergeLT(sp, CATACLYSM_BEAR_SPELLS)
   return sp
-end)();
+end)()
 
 --- @param formSpellId number
 function o:IsActiveForm(formSpellId)
@@ -126,11 +127,11 @@ end
 --- @param spellId SpellID
 function o:IsDruidForm(spellId)
   return spellId == o.CAT_FORM_SPELL_ID
-          or spellId == o.TRAVEL_FORM_SPELL_ID
-          or spellId == o.AQUATIC_FORM_SPELL_ID
-          or spellId == o.BEAR_FORM_SPELL_ID
-          or spellId == o.MOONKIN_FORM_SPELL_ID
-          or spellId == o.SWIFT_FLIGHT_FORM_SPELL_ID
+    or spellId == o.TRAVEL_FORM_SPELL_ID
+    or spellId == o.AQUATIC_FORM_SPELL_ID
+    or spellId == o.BEAR_FORM_SPELL_ID
+    or spellId == o.MOONKIN_FORM_SPELL_ID
+    or spellId == o.SWIFT_FLIGHT_FORM_SPELL_ID
 end
 
 function o:IsCataclysmDruid() return ns:IsCataclysm() and self:IsUs() end
@@ -157,8 +158,7 @@ function o:IsBearSpell(spellID) return CATACLYSM_BEAR_SPELLS[spellID] == true en
 --- @return boolean
 function o:IsCataclysmDruidSwipe(spellID)
   if not ns:IsCataclysm() and not self:IsUs() then return false end
-  return o.CATACLYSM_SWIPE_BEAR_SPELL_ID == spellID
-          or o.CATACLYSM_SWIPE_CAT_SPELL_ID == spellID
+  return o.CATACLYSM_SWIPE_BEAR_SPELL_ID == spellID or o.CATACLYSM_SWIPE_CAT_SPELL_ID == spellID
 end
 
 function o:GetCurrentFormName()

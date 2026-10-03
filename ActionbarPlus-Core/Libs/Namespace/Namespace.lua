@@ -24,7 +24,8 @@ local addon, xns = ...
 --- @field mountID MountID  @Cached mountID set by PickupHooks at pickup time; consumed by CursorMixin -- used for handling mounts in MoP+
 local ns = xns
 
-ns.name = addon; ns.nameShort='ABP2'
+ns.name = addon
+ns.nameShort = 'ABP2'
 Mixin(ns, GVM, AceLib); ABP_CORE_NS = ns
 
 --[[-------------------------------------------------------------------
@@ -56,10 +57,13 @@ ns.colorDef = {
   error = RED_FONT_COLOR,
 }
 
-ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 }); fmt = ns.fmt
+ns.fmt = LibPrettyPrint:Formatter({ show_all = true, depth_limit = 3 })
+fmt = ns.fmt
 ns.printer = LibPrettyPrint:Printer({
-  prefix = ns.nameShort, formatter = ns.fmt,
-  prefix_color = prefixColor, sub_prefix_color = secondaryColor,
+  prefix = ns.nameShort,
+  formatter = ns.fmt,
+  prefix_color = prefixColor,
+  sub_prefix_color = secondaryColor,
 })
 
 --[[-------------------------------------------------------------------
@@ -82,8 +86,10 @@ function ns:AddonInfoUtil() return LibStub('Kapresoft-AddonInfoUtil-2-0') end
 --- @param message Name @The base message name; used for AceEvent messages
 --- @return string
 function ns:msg(message)
-  assert(type(message) == 'string' and #strtrim(message) > 0,
-    'msg(message): {message} should be a string')
+  assert(
+    type(message) == 'string' and #strtrim(message) > 0,
+    'msg(message): {message} should be a string'
+  )
   return ('%s::%s'):format(self.name, message)
 end
 
@@ -92,8 +98,10 @@ end
 --- @param anyObj T The library object instance
 --- @return T
 function ns:Register(libName, anyObj)
-  assert(type(libName) == 'string' and type(anyObj) == 'table',
-          'Register(libName, obj): libName(string) and obj(table) is required.')
+  assert(
+    type(libName) == 'string' and type(anyObj) == 'table',
+    'Register(libName, obj): libName(string) and obj(table) is required.'
+  )
   self.O[libName] = anyObj
   return anyObj
 end
@@ -115,7 +123,10 @@ local layoutRegistry = {}
 --- @param key string @Layout key, e.g. 'arc'; matches BarUIConfig_ABP_2_0.layout
 --- @param layout BarLayout_ABP_2_0
 function ns:RegisterLayout(key, layout)
-  assert(type(key) == 'string' and #strtrim(key) > 0, 'RegisterLayout(key, layout): key must be a non-empty string')
+  assert(
+    type(key) == 'string' and #strtrim(key) > 0,
+    'RegisterLayout(key, layout): key must be a non-empty string'
+  )
   assert(type(layout) == 'table', 'RegisterLayout(key, layout): layout must be a table')
   layoutRegistry[key] = layout
 end
@@ -126,7 +137,7 @@ function ns:GetLayout(key) return layoutRegistry[key] end
 
 --- @param db DatabaseObj_ABP_2_0
 function ns:RegisterDB(db)
-  assert(type(db) == 'table', "RegisterDB(db): The param db is required.")
+  assert(type(db) == 'table', 'RegisterDB(db): The param db is required.')
   self.addonDbFn = function() return db end
   -- Fires the moment cns:db()/cns:g()/cns:p() first become safe to call. Other
   -- addons (e.g. layout plugins) that need the DB at their own load time should
@@ -170,7 +181,10 @@ function ns:cursor() return self.O.CursorProvider:GetCursor() end
 --- local attr, atyp = cns:constants()
 --- ```
 --- @return AttributeNames_ABP_2_0, SupportedActionTypes_ABP_2_0
-function ns:constants() local C = self.O.Constants; return C.AttributeNames, C.SupportedActionTypes end
+function ns:constants()
+  local C = self.O.Constants
+  return C.AttributeNames, C.SupportedActionTypes
+end
 
 --- Addon-name namespace used for Masque:Group(Addon, ...) calls -- shared across
 --- ActionbarPlus-Masque's own group and any layout plugin's own dedicated group
@@ -182,7 +196,8 @@ function ns:MasqueAddonName() return 'ActionbarPlus' end
 --- @param color colorRGBA|HexRGBA|HexRGB|HexRGBA @ RED_THREAT_COLOR | '565656fc' | '565656' | 'fc565656'
 --- @return fun(key:string) : string The color formatted key
 function ns:ColorFn(color)
-  local cfn, _ = ColorFormatter:ColorFn(color); return cfn
+  local cfn, _ = ColorFormatter:ColorFn(color)
+  return cfn
 end
 --[[-------------------------------------------------------------------
 Utility Functions
@@ -192,23 +207,27 @@ local GLOBAL_ATTRIBUTES = {}
 --- @param name Name
 --- @param val any
 function ns:SetGlobalAttribute(name, val)
-  assert(type(name) == "string", "SetGlobalAttribute(name):: Name must be a string")
+  assert(type(name) == 'string', 'SetGlobalAttribute(name):: Name must be a string')
   if val then GLOBAL_ATTRIBUTES[name] = val end
 end
 
 --- @return AceGUILabel
-function ns:spacer() local s = self:AceGUI():Create('Label'); s:SetText(' '); return s end
+function ns:spacer()
+  local s = self:AceGUI():Create('Label')
+  s:SetText(' ')
+  return s
+end
 
 --- @generic T
 --- @param name Name
 --- @return T|nil
 function ns:GetGlobalAttribute(name)
-  assert(type(name) == "string", "GetGlobalAttribute(name):: Name must be a string")
+  assert(type(name) == 'string', 'GetGlobalAttribute(name):: Name must be a string')
   return GLOBAL_ATTRIBUTES[name]
 end
 --- @param name Name
 function ns:ClearGlobalAttribute(name)
-  assert(type(name) == "string", "ClearGlobalAttribute(name):: Name must be a string")
+  assert(type(name) == 'string', 'ClearGlobalAttribute(name):: Name must be a string')
   GLOBAL_ATTRIBUTES[name] = nil
 end
 
@@ -226,11 +245,15 @@ end
 
 --- @param t table
 --- @return boolean true if table is empty
-function ns.Tbl_IsEmpty(t) return type(t) ~= "table" or next(t) == nil end
+function ns.Tbl_IsEmpty(t) return type(t) ~= 'table' or next(t) == nil end
 
-ns.logHolder = {}; do
+ns.logHolder = {}
+do
   --- These are noop loggers and tracers for non-dev releases
-  local h = ns.logHolder; local noop = function(moduleName) return function() end end
+  local h = ns.logHolder
+  local noop = function(moduleName)
+    return function() end
+  end
   h.printer, h.tracer = noop, noop
 end
 
@@ -264,7 +287,7 @@ end
 --- @param ... any
 --- @return Chain_ABP_2_0
 function ns:Chain(matched, ...)
-  local args = {...}
+  local args = { ... }
   --- @type Chain_ABP_2_0
   local chain = {}
   function chain.OrElse(fn)
@@ -282,4 +305,6 @@ function ns:IfMasque(callbackFn)
 end
 
 --- @return Template
-function ns:GetButtonTemplateName() return 'ABP_ButtonTemplate_2_0_3' --[[@as Template ]] end
+function ns:GetButtonTemplateName()
+  return 'ABP_ButtonTemplate_2_0_3' --[[@as Template ]]
+end
