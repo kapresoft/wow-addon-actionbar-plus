@@ -1,8 +1,8 @@
-|  |  |
-|--------|----------|
-|[![Branch Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/dev-build.yml)| [![Release Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml)|
+|  |
+|--------|
+|[![Release Build](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml/badge.svg)](https://github.com/kapresoft/wow-addon-actionbar-plus/actions/workflows/release-build.yml)|
 
-# ActionbarPlus
+# ActionbarPlus :: Actionbars Everywhere, Makes You Click-Happy
 > A [World of Warcraft](https://worldofwarcraft.com/) AddOn
 
 ![download-count](https://cf.way2muchnoise.eu/full_566626_downloads.svg?badge_style=for_the_badge) ![supported-wow-versions](https://cf.way2muchnoise.eu/versions/World%20of%20Warcraft%20Versions_566626_all.svg?badge_style=for_the_badge)
@@ -11,8 +11,6 @@
 [//]: # (See more on badges at: https://support.curseforge.com/en/support/solutions/articles/9000206928-curseforge-badges)
 
 [Releases](../../releases) | [Milestones](../../milestones) | [Known Issues](../../issues) | [Curse Forge](https://legacy.curseforge.com/wow/addons/actionbarplus/files)
-
-## Actionbars Everywhere, Make you click happy
 
 >Available for all of World of Warcraft Versions
 
