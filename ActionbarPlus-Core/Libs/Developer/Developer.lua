@@ -36,8 +36,6 @@ function o.ms()
   end)
 end
 
-function o.resetD() ns:g().v2AnnouncementShown = false end
-
 function o.OnBarsEnabled(evt)
   --local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
   --dlg:Open()

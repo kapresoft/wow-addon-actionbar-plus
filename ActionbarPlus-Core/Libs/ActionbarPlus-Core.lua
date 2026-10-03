@@ -8,8 +8,6 @@ Local Vars
 local p, t = ns:log()
 local L = ns:GetLocale()
 local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
-local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
-local function announcementDialog() return O.V2AnnouncementDialog end
 
 local c1 = ns:ColorFn(ns.colorDef.util1)
 local p1 = ns:ColorFn(ns.colorDef.primary)
@@ -30,7 +28,6 @@ local slashCommands = {
 }
 
 local dependentAddOns = { 'ActionbarPlus-BarsUI', 'ActionbarPlus-OptionsUI' }
-local V1_ADDON_NAME = 'ActionbarPlus'
 
 --[[-------------------------------------------------------------------
 AddOn: ActionbarPlus_Core
@@ -157,13 +154,6 @@ end
 
 function o:OnEnable()
   PickupHooks:Init()
-  self:RegisterEvent('PLAYER_ENTERING_WORLD')
-end
-
-function o:PLAYER_ENTERING_WORLD()
-  self:UnregisterEvent('PLAYER_ENTERING_WORLD')
-  if not IsAddOnLoaded(V1_ADDON_NAME) then return end
-  announcementDialog():Show()
 end
 
 --- @return Namespace_ABP_2_0

@@ -10,7 +10,7 @@
 ## RequiredDeps: ActionbarPlus-Core
 ## OptionalDeps: ActionbarPlus-Masque
 ## Category: ActionbarPlus
-## Group: ActionbarPlus-Core
+## Group: ActionbarPlus
 
 ## X-Credits: Antonio W. Lagnada (kapresoft@gmail.com)
 ## X-Category: Action Bars

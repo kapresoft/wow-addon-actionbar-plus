@@ -81,13 +81,11 @@ jobs:
         run: |
           echo uploadCurseForge="${uploadCurseForge}"
           echo bigWigsUploads="${bigWigsUploads} -p ${curseForgeProjectId}" >> $GITHUB_ENV
-          echo CF_API_KEY="${{ secrets.CF_API_KEY }}" >> $GITHUB_ENV
       - name: "Set ENV Variable: Upload to WowInterface"
         if: ${{ env.uploadWowInterface != 'false' }}
         run: |
           echo uploadWowInterface="${uploadWowInterface}"
           echo bigWigsUploads="${bigWigsUploads} -w ${wowInterfaceProjectId}" >> $GITHUB_ENV
-          echo WOWI_API_TOKEN="${{ secrets.WOWI_API_TOKEN }}" >> $GITHUB_ENV
 
       ## ------------------------------------------------ ##
       - name: Print Environment Variables
@@ -140,6 +138,9 @@ jobs:
       ## ------------------------------------------------ ##
       ## see: https://github.com/marketplace/actions/wow-packager
       - uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
         with:
           args: -r ${releaseDir} ${bigWigsUploads} ${packagerOptions}
       ## ------------------------------------------------ ##
@@ -179,6 +180,7 @@ jobs:
       ## ------------------------------------------------ ##
       - name: Notices
         run: |
+          echo -e "::notice::HOME=${HOME}\n::notice::buildArtifact=${buildArtifact}"
           echo ::notice::Uploads CurseForge=${uploadCurseForge}, WoWInterface=${uploadWowInterface}, BigWigs-UploadOptions=${bigWigsUploads}
           echo ::notice::Build Artifact=${buildArtifactFilename}, SHA256=${buildArtifactChecksum}
 
