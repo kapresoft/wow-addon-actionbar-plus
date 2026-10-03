@@ -13,15 +13,17 @@ local sco = YELLOW_FONT_COLOR
 --- see Retail TOC: ## OptionalDeps: Blizzard_Professions
 --- see Blizzard FrameXML/UIParent.lua
 local function InitBlizzardAddonsIfNeeded()
-    local professions = 'Blizzard_Professions'
-    -- Check for compatibility with both Retail and Classic
-    local _IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
-    local _LoadAddOn = LoadAddOn or C_AddOns.LoadAddOn
+  local professions = 'Blizzard_Professions'
+  -- Check for compatibility with both Retail and Classic
+  local _IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
+  local _LoadAddOn = LoadAddOn or C_AddOns.LoadAddOn
 
-    if not _IsAddOnLoaded(professions) then
-        _LoadAddOn(professions);
-        local pre = '{{' .. co:WrapTextInColorCode(professions .. '::')
-                .. sco:WrapTextInColorCode('Retail.lua') .. '}}:'
-        print(pre, 'Dependent addOn loaded:', professions)
-    end
+  if not _IsAddOnLoaded(professions) then
+    _LoadAddOn(professions)
+    local pre = '{{'
+      .. co:WrapTextInColorCode(professions .. '::')
+      .. sco:WrapTextInColorCode('Retail.lua')
+      .. '}}:'
+    print(pre, 'Dependent addOn loaded:', professions)
+  end
 end; InitBlizzardAddonsIfNeeded()

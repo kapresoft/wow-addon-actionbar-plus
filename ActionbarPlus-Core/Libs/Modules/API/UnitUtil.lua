@@ -55,8 +55,9 @@ local SPECIAL_SHAPESHIFT_ICON_UNITS
 local function GetShapeshiftOverrideUnit(playerClass)
   if not SHAPESHIFT_SPELL_OVERRIDE_UNITS then
     SHAPESHIFT_SPELL_OVERRIDE_UNITS = {
-      ['PRIEST'] = O.PriestUtil, ['SHAMAN'] = O.ShamanUtil,
-      ['ROGUE'] = O.RogueUtil
+      ['PRIEST'] = O.PriestUtil,
+      ['SHAMAN'] = O.ShamanUtil,
+      ['ROGUE'] = O.RogueUtil,
     }
   end
   return SHAPESHIFT_SPELL_OVERRIDE_UNITS[playerClass]
@@ -73,7 +74,9 @@ end
 --- @return SpecInfo_ABP_2_0
 local function NewSpecInfo()
   return {
-    name   = nil, index  = -1, icon   = nil,
+    name = nil,
+    index = -1,
+    icon = nil,
     --names  = {}, points = {},
   }
 end
@@ -90,7 +93,6 @@ local function IsAnyOfBuff(toMatch, ...)
   end
   return false
 end
-
 
 --[[-----------------------------------------------------------------------------
 Methods
@@ -115,7 +117,10 @@ function o:New(obj, unitClass)
   end
   assert(type(_class) == 'string', 'Param UnitClass must be one of @UnitClass')
   _obj.CLASS_ID = strupper(_class)
-  assert(self.C.UnitClasses[_obj.CLASS_ID], ('UnitUtil:New(UNIT_CLASS):: Invalid UNIT_CLASS: "%s"'):format(tostring(_class)))
+  assert(
+    self.C.UnitClasses[_obj.CLASS_ID],
+    ('UnitUtil:New(UNIT_CLASS):: Invalid UNIT_CLASS: "%s"'):format(tostring(_class))
+  )
   return setmetatable(_obj, self)
 end
 
@@ -262,16 +267,16 @@ end
 
 function o:GeTrackedShapeshiftSpells()
   return O.ShamanUnitMixin.GHOST_WOLF_SPELL_ID,
-        O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
-        O.PriestUnitUtil_2_0.SHADOW_FORM_SPELL_ID_RETAIL
+    O.PriestUnitMixin.SHADOW_FORM_SPELL_ID,
+    O.PriestUnitUtil_2_0.SHADOW_FORM_SPELL_ID_RETAIL
 end
 
 function o:UpdateShapeshiftBuffs()
   --- Wrap in pcall for Midnight Fix
   pcall(function()
-    self:UpdateBuffs(function(spellID)
-      return ns.Nbr_IsAnyOf(spellID, self:GeTrackedShapeshiftSpells());
-    end)
+    self:UpdateBuffs(
+      function(spellID) return ns.Nbr_IsAnyOf(spellID, self:GeTrackedShapeshiftSpells()) end
+    )
   end)
 end
 
@@ -287,7 +292,7 @@ function o:UpdateBuffs(filterFn)
     if spellID then
       if filterFn(spellID) and self:IsOwnSpell(spellID) then
         local name = comp:GetSpellName(spellID)
-        p:t(function() return "Own spell: id=%s name=%s", spellID, tostring(name) end)
+        p:t(function() return 'Own spell: id=%s name=%s', spellID, tostring(name) end)
         --- @type SpellInfo
         local spellInfo = { id = spellID, name = name }
         table.insert(ns.playerBuffs, spellInfo)
@@ -314,36 +319,34 @@ end
 --- @return number specGroupIndex 1-based spec group index
 function o:GetActiveSpecGroupIndex()
   local ok, result
-  
-  if ns:IsShadowlandsOrLater() then
-    return C_GetSpecialization()
-  end
-  
+
+  if ns:IsShadowlandsOrLater() then return C_GetSpecialization() end
+
   -- Prefer your unified wrapper first
   if C_GetActiveSpecGroup then
     ok, result = pcall(C_GetActiveSpecGroup)
-    if ok and type(result) == "number" then return result end
-    p("GetActiveSpecGroupIndex:: C_GetActiveSpecGroup failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetActiveSpecGroupIndex:: C_GetActiveSpecGroup failed:', result)
   end
-  
+
   if C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup then
     ok, result = pcall(C_SpecializationInfo.GetActiveSpecGroup)
-    if ok and type(result) == "number" then return result end
-    p("GetActiveSpecGroupIndex:: C_SpecializationInfo.GetActiveSpecGroup failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetActiveSpecGroupIndex:: C_SpecializationInfo.GetActiveSpecGroup failed:', result)
   end
-  
+
   if GetActiveSpecGroup then
     ok, result = pcall(GetActiveSpecGroup)
-    if ok and type(result) == "number" then return result end
-    p("GetActiveSpecGroupIndex:: GetActiveSpecGroup failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetActiveSpecGroupIndex:: GetActiveSpecGroup failed:', result)
   end
-  
+
   if GetActiveTalentGroup then
     ok, result = pcall(GetActiveTalentGroup)
-    if ok and type(result) == "number" then return result end
-    p("GetActiveSpecGroupIndex:: GetActiveTalentGroup failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetActiveSpecGroupIndex:: GetActiveTalentGroup failed:', result)
   end
-  
+
   return 1
 end
 
@@ -356,30 +359,30 @@ end
 --- @return number specGroupCount
 function o:GetSpecGroupCount()
   local ok, result
-  
+
   if ns:IsShadowlandsOrLater() then
-    if GetNumSpecializations  then
+    if GetNumSpecializations then
       t('retail: GetNumSpecializations')
       ok, result = pcall(GetNumSpecializations)
-      if ok and type(result) == "number" then return result end
-      t("GetSpecGroupCount:: C_GetNumSpecializations failed:", result)
+      if ok and type(result) == 'number' then return result end
+      t('GetSpecGroupCount:: C_GetNumSpecializations failed:', result)
     end
   end
-  
+
   -- MoP
   if GetNumSpecGroups then
     ok, result = pcall(GetNumSpecGroups)
-    if ok and type(result) == "number" then return result end
-    p("GetSpecGroupCount:: GetNumSpecGroups failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetSpecGroupCount:: GetNumSpecGroups failed:', result)
   end
-  
+
   -- Wrath / Cata / TBC
   if GetNumTalentGroups then
     ok, result = pcall(GetNumTalentGroups)
-    if ok and type(result) == "number" then return result end
-    p("GetSpecGroupCount:: GetNumTalentGroups failed:", result)
+    if ok and type(result) == 'number' then return result end
+    p('GetSpecGroupCount:: GetNumTalentGroups failed:', result)
   end
-  
+
   -- Retail / Classic fallback
   return 1
 end

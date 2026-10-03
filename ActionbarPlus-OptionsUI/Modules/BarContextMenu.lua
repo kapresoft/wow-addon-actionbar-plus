@@ -24,9 +24,9 @@ Blizzard Vars
 local OPTIONS = OPTIONS or L['Options']
 local BAR = L['Bar']
 local BAR_OPTIONS = BAR .. ' ' .. OPTIONS
-local BAR_LAYOUT      = L['Layout']
-local BAR_BACKDROP    = L['Backdrop']
-local BAR_EXTRA_BTNS  = L['Extra Buttons']
+local BAR_LAYOUT = L['Layout']
+local BAR_BACKDROP = L['Backdrop']
+local BAR_EXTRA_BTNS = L['Extra Buttons']
 local QUICK_KEYBIND_MODE = QUICK_KEYBIND_MODE or L['Quick Keybind Mode']
 local PROFILES = PROFILES or L['Profiles']
 local BARS = L['Toggle Bars']
@@ -68,12 +68,17 @@ local function ShowMenu(menuList, frame, anchor, x, y)
       if level == 1 then
         for _, item in ipairs(menuList) do
           if item.isSeparator then
-            UIDropDownMenu_AddButton({ text = '', disabled = true, notCheckable = true, isTitle = true }, level)
+            UIDropDownMenu_AddButton(
+              { text = '', disabled = true, notCheckable = true, isTitle = true },
+              level
+            )
           elseif item.submenu then
             local items = type(item.submenu) == 'function' and item.submenu() or item.submenu
             UIDropDownMenu_AddButton({
-              text = item.text, notCheckable = true,
-              hasArrow = true, menuList = items,
+              text = item.text,
+              notCheckable = true,
+              hasArrow = true,
+              menuList = items,
             }, level)
           else
             UIDropDownMenu_AddButton(item, level)
@@ -92,8 +97,12 @@ end
 --- @return UIDropDownMenuFrame
 local function GetDropdownFrame()
   if not dropdownFrame then
-    dropdownFrame = CreateFrame('Frame', 'ABP_BarContextMenuFrame',
-          ABP_Parent_2_0, 'UIDropDownMenuTemplate' --[[@as Template ]])
+    dropdownFrame = CreateFrame(
+      'Frame',
+      'ABP_BarContextMenuFrame',
+      ABP_Parent_2_0,
+      'UIDropDownMenuTemplate' --[[@as Template ]]
+    )
   end
   return dropdownFrame
 end
@@ -112,7 +121,9 @@ local function ToggleBarEnabled(barIndex)
   -- guard: don't disable the last enabled bar
   if conf.enabled then
     local count = 0
-    for i = 1, DS:GetMaxBarCount() do if cns:bar(i).enabled then count = count + 1 end end
+    for i = 1, DS:GetMaxBarCount() do
+      if cns:bar(i).enabled then count = count + 1 end
+    end
     if count <= 1 then return end
   end
   conf.enabled = not conf.enabled
@@ -131,7 +142,8 @@ local function BuildBarsSubmenu(currentBarIndex)
   for i = 1, DS:GetMaxBarCount() do
     local enabled = cns:bar(i).enabled == true
     local isLastEnabled = enabled and enabledCount == 1
-    local check = enabled and '|TInterface\\Buttons\\UI-CheckBox-Check:20:20:0:0|t ' or '|TInterface\\Buttons\\UI-CheckBox-Up:20:20:0:0|t '
+    local check = enabled and '|TInterface\\Buttons\\UI-CheckBox-Check:20:20:0:0|t '
+      or '|TInterface\\Buttons\\UI-CheckBox-Up:20:20:0:0|t '
     local label = BAR .. ' ' .. i
     if i == currentBarIndex then label = label .. ' (Current)' end
     local text = isLastEnabled and (check .. '|cFF808080' .. label .. '|r') or (check .. label)
@@ -151,23 +163,43 @@ Methods
 --- @param barFrame BarFrame_ABP_2_0
 function o:Show(barFrame)
   local menu = {
-    { text = BAR_OPTIONS,    notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index) end },
-    { text = BAR_BACKDROP,   notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'backdrop') end },
-    { text = BAR_LAYOUT,     notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'layout') end },
-    { text = BAR_EXTRA_BTNS, notCheckable = true, func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end },
+    {
+      text = BAR_OPTIONS,
+      notCheckable = true,
+      func = function() optDialog():ShowDialog(barFrame.widget.index) end,
+    },
+    {
+      text = BAR_BACKDROP,
+      notCheckable = true,
+      func = function() optDialog():ShowDialog(barFrame.widget.index, 'backdrop') end,
+    },
+    {
+      text = BAR_LAYOUT,
+      notCheckable = true,
+      func = function() optDialog():ShowDialog(barFrame.widget.index, 'layout') end,
+    },
+    {
+      text = BAR_EXTRA_BTNS,
+      notCheckable = true,
+      func = function() optDialog():ShowDialog(barFrame.widget.index, 'extrabuttons') end,
+    },
     { isSeparator = true },
     { text = QUICK_KEYBIND_MODE, notCheckable = true, func = function() kbDialog():Open() end },
     { text = PROFILES, notCheckable = true, func = function() settingsDialog():OpenProfiles() end },
     { text = BARS, submenu = function() return BuildBarsSubmenu(barFrame.widget.index) end },
   }
   cns:IfMasque(function(abpMasque)
-    tinsert(menu, 5, { text = MASQUE_SETTINGS, notCheckable = true, func = function()
-      local BMF = cns:BarsUI():ns().O.BarModuleFactory
-      local barConf = cns:bar(barFrame.widget.index)
-      local layout = BMF:ResolveLayout(barConf.ui)
-      local groupKey = layout.GetMasqueGroupKey and layout:GetMasqueGroupKey()
-      abpMasque:OpenMasqueSettings(groupKey)
-    end })
+    tinsert(menu, 5, {
+      text = MASQUE_SETTINGS,
+      notCheckable = true,
+      func = function()
+        local BMF = cns:BarsUI():ns().O.BarModuleFactory
+        local barConf = cns:bar(barFrame.widget.index)
+        local layout = BMF:ResolveLayout(barConf.ui)
+        local groupKey = layout.GetMasqueGroupKey and layout:GetMasqueGroupKey()
+        abpMasque:OpenMasqueSettings(groupKey)
+      end,
+    })
   end)
   ShowMenu(menu, GetDropdownFrame(), 'cursor', -10, -15)
 end

@@ -27,9 +27,7 @@ function o:IsGhostWolfSpell(spellID) return spellID == o.GHOST_WOLF_SPELL_ID end
 --- The Ghost Wolf form is not part of GetShapeshiftFormInfo(index),
 --- Ghost Wolf form is not a real form, but it does honor GetShapeshiftForm() when active.
 --- @return boolean @true if in Ghost Wolf form, false otherwise.
-function o:IsInGhostWolfForm()
-  return self:IsShaman() and GetShapeshiftForm() == 1
-end
+function o:IsInGhostWolfForm() return self:IsShaman() and GetShapeshiftForm() == 1 end
 
 --- @protected
 --- @see UnitUtil_ABP_2_0.GetShapeshiftSpellState
@@ -40,5 +38,6 @@ end
 function o:GetShapeshiftSpellState(spellID)
   local active = self:IsInGhostWolfForm()
   return self:IsGhostWolfSpell(spellID),
-          active, active and self:GetActiveShapeshiftFormIcon() or nil
+    active,
+    active and self:GetActiveShapeshiftFormIcon() or nil
 end

@@ -30,17 +30,11 @@ function o.OnBarOptionsChanged(evt, barIndex)
   BarModuleFactory:RebuildLayout(barIndex)
 end
 
-function o:OnInitialize()
-  self:SendMessage(ns:msg('OnInitialize'))
-end
+function o:OnInitialize() self:SendMessage(ns:msg('OnInitialize')) end
 
-function o:OnEnable()
-  self:SendMessage(ns:msg('OnEnable'), self)
-end
+function o:OnEnable() self:SendMessage(ns:msg('OnEnable'), self) end
 
-function o:OnDisable()
-  self:SendMessage(ns:msg('OnDisable'))
-end
+function o:OnDisable() self:SendMessage(ns:msg('OnDisable')) end
 
 --- @return Namespace_ABP_OptionsUI_2_0
 function o:ns() return ns end

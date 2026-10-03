@@ -12,7 +12,6 @@ local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 --- @return Namespace_ABP_BarsUI_2_0
 local function bar_ns() return ABP_BARSUI_NS end
 
-
 -- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
 -- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
 -- runs once (triggered by the /msq slash command). There's no exposed global/API
@@ -23,23 +22,21 @@ function o.ms()
   local m = 'Masque'
 
   if SlashCmdList and SlashCmdList['MASQUE'] then
-    SlashCmdList['MASQUE']('')  -- forces Setup('LoD'), opens to Skins/Global
+    SlashCmdList['MASQUE']('') -- forces Setup('LoD'), opens to Skins/Global
     if ACD.OpenFrames[m] then ACD:Close(m) end
     t('called masq')
   end
 
   C_Timer.After(0.01, function()
-      ACD:Open(m)
-      local ok, err = pcall(function()
-        ACD:SelectGroup(m, 'Skins', 'ActionbarPlus', 'ActionbarPlus_Action Bars')
-      end)
-      if not ok then p('ms', 'SelectGroup failed:', err) end
+    ACD:Open(m)
+    local ok, err = pcall(
+      function() ACD:SelectGroup(m, 'Skins', 'ActionbarPlus', 'ActionbarPlus_Action Bars') end
+    )
+    if not ok then p('ms', 'SelectGroup failed:', err) end
   end)
 end
 
-function o.resetD()
-  ns:g().v2AnnouncementShown = false
-end
+function o.resetD() ns:g().v2AnnouncementShown = false end
 
 function o.OnBarsEnabled(evt)
   --local dlg = ABP_BARSUI_NS.O.QuickKeybindModeDialog
@@ -47,15 +44,11 @@ function o.OnBarsEnabled(evt)
 end
 
 function o:disable()
-  bar_ns():a():ForEach(function(module)
-    module:Disable()
-  end)
+  bar_ns():a():ForEach(function(module) module:Disable() end)
 end
 
 function o:enable()
-  bar_ns():a():ForEach(function(module)
-    module:Enable()
-  end)
+  bar_ns():a():ForEach(function(module) module:Enable() end)
 end
 
 function o:macroInfo(macroIdentifier) return comp:GetMacroInfo(macroIdentifier) end
@@ -74,37 +67,30 @@ end
 
 function o:skills()
   for i = 1, GetNumSkillLines() do
-    local skillName, isHeader, isExpanded, skillRank, numTempPoints, skillModifier, skillMaxRank = GetSkillLineInfo(i)
-    if not isHeader then
-      print(skillName .. ": " .. skillRank .. "/" .. skillMaxRank)
-    end
+    local skillName, isHeader, isExpanded, skillRank, numTempPoints, skillModifier, skillMaxRank =
+      GetSkillLineInfo(i)
+    if not isHeader then print(skillName .. ': ' .. skillRank .. '/' .. skillMaxRank) end
   end
 end
 
 --- /dump dd:IsPrimaryProfessionSpell(25230)
 function o:IsPrimaryProfessionSpell(spellID)
   local prof1, prof2 = GetProfessions()
-  for _, prof in ipairs({prof1, prof2}) do
+  for _, prof in ipairs({ prof1, prof2 }) do
     if prof then
       local _, _, _, _, _, _, id = GetProfessionInfo(prof)
-      if id == spellID then
-        return true
-      end
+      if id == spellID then return true end
     end
   end
   return false
 end
 
 --- @param msg string
-function o:devMsg(msg)
-  UIErrorsFrame:AddMessage('ABP: ' .. msg, 0, 1, 0)
-end
+function o:devMsg(msg) UIErrorsFrame:AddMessage('ABP: ' .. msg, 0, 1, 0) end
 
 --- @param itemInfo ItemName|ItemID|ItemLink
 --- @return ItemCooldownInfo?
-function o:GetItemCooldown(itemInfo)
-  return comp:GetItemCooldown(itemInfo)
-end
+function o:GetItemCooldown(itemInfo) return comp:GetItemCooldown(itemInfo) end
 
 function o:IsSealActive(spellID)
   if not (spellID and C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) then return false end
@@ -117,7 +103,6 @@ function o:IsSealActive(spellID)
   end
   return false
 end
-
 
 --[[-----------------------------------------------------------------------------
 Register Events

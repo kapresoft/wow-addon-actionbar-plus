@@ -7,21 +7,21 @@ local O = ns.O
 local comp, SupportedActionTypeMap = O.Compat, O.Constants.SupportedActionTypesAsMap()
 
 -- These C_Spell methods exists in classic-era
-local C_IsAutoRepeatSpell   = C_Spell.IsAutoRepeatSpell
-local C_IsCurrentSpell      = C_Spell.IsCurrentSpell
-local C_GetSpellPowerCost   = C_Spell.GetSpellPowerCost
-local C_IsSpellKnown        = C_SpellBook.IsSpellKnown
-local C_IsSpellUsable       = C_Spell.IsSpellUsable
-local C_IsUsableItem        = C_Item.IsUsableItem
-local C_GetTalentInfo       = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
-local C_GetSummonedPetGUID  = C_PetJournal and C_PetJournal.GetSummonedPetGUID
+local C_IsAutoRepeatSpell = C_Spell.IsAutoRepeatSpell
+local C_IsCurrentSpell = C_Spell.IsCurrentSpell
+local C_GetSpellPowerCost = C_Spell.GetSpellPowerCost
+local C_IsSpellKnown = C_SpellBook.IsSpellKnown
+local C_IsSpellUsable = C_Spell.IsSpellUsable
+local C_IsUsableItem = C_Item.IsUsableItem
+local C_GetTalentInfo = C_SpecializationInfo and C_SpecializationInfo.GetTalentInfo
+local C_GetSummonedPetGUID = C_PetJournal and C_PetJournal.GetSummonedPetGUID
 
 local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 
-local ATTACK_SPELL_ID     = 6603
-local SHOOT_SPELL_ID      = 5019
-local MOP_TALENT_TIERS    = 6
-local MOP_TALENT_COLUMNS  = 3
+local ATTACK_SPELL_ID = 6603
+local SHOOT_SPELL_ID = 5019
+local MOP_TALENT_TIERS = 6
+local MOP_TALENT_COLUMNS = 3
 
 --[[-----------------------------------------------------------------------------
 Module::ActionUtil
@@ -51,9 +51,7 @@ end
 --- @return boolean
 local function IsEquipmentSetCurrent(equipSetID)
   local isEquipped = false
-  comp:IfEquipmentSet(equipSetID, function(eqSet)
-    isEquipped = eqSet.isEquipped
-  end)
+  comp:IfEquipmentSet(equipSetID, function(eqSet) isEquipped = eqSet.isEquipped end)
   return isEquipped
 end
 
@@ -61,9 +59,7 @@ end
 --- @return boolean
 local function IsMountCurrent(mountID)
   local isCurrent = false
-  comp:IfMount(mountID, function(mount)
-    isCurrent = C_IsCurrentSpell(mount.spellID)
-  end)
+  comp:IfMount(mountID, function(mount) isCurrent = C_IsCurrentSpell(mount.spellID) end)
   return isCurrent
 end
 
@@ -84,18 +80,16 @@ local ENCODER_RADIX = 1000
 --- @param barIndex number The action bar index (higher-order digits)
 --- @param buttonIndex number The button index within the bar (lower-order digits, 0-999)
 --- @return number encodedID Combined ID where barIndex occupies higher digits
-function o.encodeBarID(barIndex, buttonIndex)
-    return barIndex * ENCODER_RADIX + buttonIndex
-end
+function o.encodeBarID(barIndex, buttonIndex) return barIndex * ENCODER_RADIX + buttonIndex end
 
 --- Decodes a numeric ID back into its bar and button indices
 --- @param encodedID number The combined ID from encodeID()
 --- @return number @barIndex The action bar index
 --- @return number @buttonIndex The button index within the bar
 function o.decodeBarID(encodedID)
-    local barIndex = math.floor(encodedID / 1000)
-    local buttonIndex = encodedID % ENCODER_RADIX
-    return barIndex, buttonIndex
+  local barIndex = math.floor(encodedID / 1000)
+  local buttonIndex = encodedID % ENCODER_RADIX
+  return barIndex, buttonIndex
 end
 
 --- @param spellID SpellID
@@ -117,8 +111,12 @@ end
 function o.ExtractItemID(itemValue)
   if not itemValue then return nil end
   if type(itemValue) == 'number' then return itemValue end
-  assert(type(itemValue) == 'string', 'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ', type(itemValue))
-  return tonumber(itemValue:match("item:(%d+)"))
+  assert(
+    type(itemValue) == 'string',
+    'GetAttributeItemID(itemIDAttribute): {itemIDAttribute} should be a string but was: ',
+    type(itemValue)
+  )
+  return tonumber(itemValue:match('item:(%d+)'))
 end
 
 --- @param typ ActionType The button attribute 'type' value
@@ -130,8 +128,8 @@ function o.IsUsableAction(typ, val, isCustom)
   if not (typ and val) then return false end
 
   if o.IsSpell(typ) then
-      local isUsable, notEnoughMana = C_IsSpellUsable(val)
-      return isUsable, notEnoughMana
+    local isUsable, notEnoughMana = C_IsSpellUsable(val)
+    return isUsable, notEnoughMana
   elseif o.IsItem(typ) then
     return C_IsUsableItem(val)
   elseif o.IsMacro(typ) then
@@ -215,8 +213,7 @@ end
 --- @param action Name The action name; i.e. 'spell', 'item', etc..
 --- @return boolean
 function o.IsSupportedAction(action)
-  return type(action) == 'string'
-          and SupportedActionTypeMap[strlower(action)] == true
+  return type(action) == 'string' and SupportedActionTypeMap[strlower(action)] == true
 end
 
 --- @param typ string The button attribute 'type' value
@@ -302,14 +299,16 @@ end
 --- @param callbackFn fun(itemInfo:ItemInfoDetails)
 --- @param withDetails boolean? @If non-instant
 function o.IfItem(itemID, callbackFn, withDetails)
-  assert(type(itemID) == 'number', 'IfItem(itemID, callbackFn, withDetails): {itemID} should be a number')
+  assert(
+    type(itemID) == 'number',
+    'IfItem(itemID, callbackFn, withDetails): {itemID} should be a number'
+  )
   local it
-  if withDetails then it = comp:GetItemInfo(itemID)
+  if withDetails then
+    it = comp:GetItemInfo(itemID)
   else
     it = comp:GetItemInfoInstant(itemID)
-    if not (it and it.id and it.icon) then
-      it = comp:GetItemInfo(itemID)
-    end
+    if not (it and it.id and it.icon) then it = comp:GetItemInfo(itemID) end
   end
   if not (it and it.icon) then return end
   callbackFn(it)

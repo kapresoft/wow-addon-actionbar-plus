@@ -18,13 +18,16 @@ local p, t = ns:log(libName)
 --[[-----------------------------------------------------------------------------
 Constants
 -------------------------------------------------------------------------------]]
-local DIALOG_WIDTH  = 420
+local DIALOG_WIDTH = 420
 local DIALOG_HEIGHT = 200
-local DIALOG_TITLE  = 'Quick Keybind Mode'
+local DIALOG_TITLE = 'Quick Keybind Mode'
 
 local CONFIRM_GENERAL_BINDINGS = 'ABP_CONFIRM_GENERAL_BINDINGS'
 StaticPopupDialogs[CONFIRM_GENERAL_BINDINGS] = {
-  text = ('%s\n%s'):format(L['Really switch to general key bindings?'], L['All key bindings specific to this character will be permanently deleted.']),
+  text = ('%s\n%s'):format(
+    L['Really switch to general key bindings?'],
+    L['All key bindings specific to this character will be permanently deleted.']
+  ),
   button1 = OKAY,
   button2 = CANCEL,
   OnAccept = function()
@@ -45,10 +48,15 @@ local c1 = cns:ColorFn('FFF803')
 local PRESS_TXT = c1(L['press the desired key'])
 local ESC = c1(L['ESC'])
 
-local TEXT_INSTRUCTIONS =
-  '\n' .. L['You are in Quick Keybind Mode'] .. '.' ..
-  '\n' .. L['Mouse over a button and %s to set its binding'] .. ', ' ..
-  '\n' .. L['or press %s to clear it'] .. '.'
+local TEXT_INSTRUCTIONS = '\n'
+  .. L['You are in Quick Keybind Mode']
+  .. '.'
+  .. '\n'
+  .. L['Mouse over a button and %s to set its binding']
+  .. ', '
+  .. '\n'
+  .. L['or press %s to clear it']
+  .. '.'
 local TEXT_CANCEL_NOTICE = '\n' .. L['Canceling will remove you from Quick Keybind Mode'] .. '.'
 
 --[[-----------------------------------------------------------------------------
@@ -72,7 +80,6 @@ local function AddBodyText(frame)
   notice:SetFullWidth(true)
   notice.label:SetJustifyH('CENTER')
   frame:AddChild(notice)
-
 end
 
 --- @param frame AceGUIWidget
@@ -86,7 +93,7 @@ local function AddCheckbox(frame)
   grp:SetUserData('table', { columns = { 0.2, 0.6, 0.2 } })
   frame:AddChild(grp)
 
-  grp:AddChild(AceGUI:Create('Label'))  -- left spacer
+  grp:AddChild(AceGUI:Create('Label')) -- left spacer
 
   --- @type AceGUICheckBox
   local chk = AceGUI:Create('CheckBox')
@@ -96,16 +103,16 @@ local function AddCheckbox(frame)
   chk:SetCallback('OnValueChanged', function(widget, evt, val)
     if not val and o.perChar then
       -- switching from char-specific to general — confirm first
-      chk:SetValue(true)  -- revert visually until confirmed
+      chk:SetValue(true) -- revert visually until confirmed
       StaticPopup_Show(CONFIRM_GENERAL_BINDINGS)
       return
     end
     o.perChar = val
   end)
   grp:AddChild(chk)
-  o.chk = chk  -- store ref for StaticPopup OnCancel
+  o.chk = chk -- store ref for StaticPopup OnCancel
 
-  grp:AddChild(AceGUI:Create('Label'))  -- right spacer
+  grp:AddChild(AceGUI:Create('Label')) -- right spacer
 
   return chk
 end
@@ -121,26 +128,22 @@ local function AddButtons(frame, chkCharacterSpecific)
   btnGroup:SetLayout('Table')
   btnGroup:SetUserData('table', {
     columns = { 0.48, 0.04, 0.48 },
-    alignH  = 'center',
-    alignV  = 'middle',
+    alignH = 'center',
+    alignV = 'middle',
   })
   frame:AddChild(btnGroup)
 
   local btnOkay = AceGUI:Create('Button')
   btnOkay:SetText('Okay')
   btnOkay:SetFullWidth(true)
-  btnOkay:SetCallback('OnClick', function()
-    o:OnOkayClicked()
-  end)
+  btnOkay:SetCallback('OnClick', function() o:OnOkayClicked() end)
   btnGroup:AddChild(btnOkay)
-  btnGroup:AddChild(AceGUI:Create('Label'))  -- spacer
+  btnGroup:AddChild(AceGUI:Create('Label')) -- spacer
 
   local btnCancel = AceGUI:Create('Button')
   btnCancel:SetText('Cancel')
   btnCancel:SetFullWidth(true)
-  btnCancel:SetCallback('OnClick', function()
-    o:OnCancelClicked()
-  end)
+  btnCancel:SetCallback('OnClick', function() o:OnCancelClicked() end)
   btnGroup:AddChild(btnCancel)
 
   btnGroup.frame:ClearAllPoints()
@@ -157,7 +160,8 @@ local function CreateDialogFrame()
   local AceGUI = cns:AceGUI()
 
   --- @type AceGUIWindow
-  local frame = AceGUI:Create('Window'); _G[globalVarName] = frame.frame
+  local frame = AceGUI:Create('Window')
+  _G[globalVarName] = frame.frame
   frame:SetTitle(DIALOG_TITLE)
   frame:SetWidth(DIALOG_WIDTH)
   frame:SetHeight(DIALOG_HEIGHT)
@@ -165,9 +169,7 @@ local function CreateDialogFrame()
   frame:SetLayout('Flow')
 
   -- This is the 'X' on Top-Right
-  frame:SetCallback('OnClose', function(widget)
-    o:OnFrameClose()
-  end)
+  frame:SetCallback('OnClose', function(widget) o:OnFrameClose() end)
 
   AddBodyText(frame)
   --- @type AceGUICheckBox
@@ -214,9 +216,7 @@ end
 
 function o:OnFrameClose()
   closeReason = closeReason or 'x'
-  if closeReason == 'okay' then
-    self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar)
-  end
+  if closeReason == 'okay' then self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar) end
   closeReason = nil
   self:SendMessage(ns:msg('OnQuickKeybindModeNotActive'))
 end

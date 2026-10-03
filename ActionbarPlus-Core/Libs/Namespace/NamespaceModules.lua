@@ -12,7 +12,7 @@ Type: Modules
 -------------------------------------------------------------------------------]]
 --- @class Core_Modules_ABP_2_0
 local ModuleNames = {
-  
+
   ---------------------------------------
   ----- ActionbarPlus_2_0 Libs ----------
   ---------------------------------------
@@ -49,6 +49,4 @@ local ModuleNames = {
   DatabaseMixin = {},
   --- @type DatabaseSchema_ABP_2_0
   DatabaseSchema = {},
-  
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames
-

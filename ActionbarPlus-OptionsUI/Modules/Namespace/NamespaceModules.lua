@@ -14,11 +14,10 @@ local ModuleNames = {
   BarContextMenu = {},
   --- @type BarOptionsDialog_ABP_2_0
   BarOptionsDialog = {},
---- @type SettingsDialog_ABP_2_0 
+  --- @type SettingsDialog_ABP_2_0
   SettingsDialog = {},
   --- @type BarKeybindController_ABP_2_0
   BarKeybindController = {},
   --- @type QuickKeybindModeDialog_ABP_2_0
   QuickKeybindModeDialog = {},
-
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames

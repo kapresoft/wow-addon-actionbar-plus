@@ -19,8 +19,7 @@ local TRACE_DELIM = '_'
 --- @param prefix string|any
 --- @return TraceFn
 local function traceFn(prefix)
-  return LibTraceKit:New(ns.LOG_NAME, prefix, colorDef.primary)
-      :WithDelimiter(TRACE_DELIM) --[[@as TraceFn ]]
+  return LibTraceKit:New(ns.LOG_NAME, prefix, colorDef.primary):WithDelimiter(TRACE_DELIM) --[[@as TraceFn ]]
 end
 
 --[[-----------------------------------------------------------------------------

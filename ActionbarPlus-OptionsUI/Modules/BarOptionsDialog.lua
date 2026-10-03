@@ -163,7 +163,13 @@ local function AddGeneralTab(tab, window, conf)
   local charPosHelp = wf.charPosHelp
   charPosHelp:SetFrameLevel(chkCharPos.frame:GetFrameLevel() + 2)
   charPosHelp:ClearAllPoints()
-  charPosHelp:SetPoint('LEFT', chkCharPos.text, 'LEFT', chkCharPos.text:GetUnboundedStringWidth() + 4, 0)
+  charPosHelp:SetPoint(
+    'LEFT',
+    chkCharPos.text,
+    'LEFT',
+    chkCharPos.text:GetUnboundedStringWidth() + 4,
+    0
+  )
   charPosHelp:Show()
   refs.charPosHelp = charPosHelp
 
@@ -185,7 +191,13 @@ local function AddGeneralTab(tab, window, conf)
   local mouseoverHighlightHelp = wf.mouseoverHighlightHelp
   mouseoverHighlightHelp:SetFrameLevel(chkMouseoverHighlight.frame:GetFrameLevel() + 2)
   mouseoverHighlightHelp:ClearAllPoints()
-  mouseoverHighlightHelp:SetPoint('LEFT', chkMouseoverHighlight.text, 'LEFT', chkMouseoverHighlight.text:GetUnboundedStringWidth() + 4, 0)
+  mouseoverHighlightHelp:SetPoint(
+    'LEFT',
+    chkMouseoverHighlight.text,
+    'LEFT',
+    chkMouseoverHighlight.text:GetUnboundedStringWidth() + 4,
+    0
+  )
   mouseoverHighlightHelp:Show()
   refs.mouseoverHighlightHelp = mouseoverHighlightHelp
 
@@ -286,9 +298,7 @@ local function AddLayoutTab(tab, window, conf)
   ddLayout:SetCallback('OnValueChanged', function(_, _, val)
     ui.layout = val
     local newLayout = BMF:ResolveLayout(ui)
-    if not newLayout:SupportsBackdrop() then
-      ui.backdrop.theme = 'none'
-    end
+    if not newLayout:SupportsBackdrop() then ui.backdrop.theme = 'none' end
     if newLayout.OnSelected then
       local barWidget = BMF:GetBarWidget(o.barIndex)
       newLayout:OnSelected(barWidget.frame)
@@ -340,7 +350,11 @@ local function AddLayoutTab(tab, window, conf)
 
   if layout.ApplyOptionsUI then
     local barWidget = BMF:GetBarWidget(o.barIndex)
-    layout:ApplyOptionsUI(barWidget.frame, tab, function() o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex) end)
+    layout:ApplyOptionsUI(
+      barWidget.frame,
+      tab,
+      function() o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex) end
+    )
   end
 
   return refs
@@ -386,7 +400,10 @@ local function ShowBackdropMenu(anchor, parent, onReset, onCopyFrom, onApplyToAl
   for i = 1, DS:GetMaxBarCount() do
     if cns:bar(i).enabled then
       local idx = i
-      tinsert(barItems, { text = BAR .. ' ' .. idx, notCheckable = true, func = function() onCopyFrom(idx) end })
+      tinsert(
+        barItems,
+        { text = BAR .. ' ' .. idx, notCheckable = true, func = function() onCopyFrom(idx) end }
+      )
     end
   end
 
@@ -395,25 +412,41 @@ local function ShowBackdropMenu(anchor, parent, onReset, onCopyFrom, onApplyToAl
       rootDescription:CreateButton(L['Reset to Default'], onReset)
       rootDescription:CreateButton(L['Apply Backdrop to All Bars'], onApplyToAll)
       local sub = rootDescription:CreateButton(L['Copy Backdrop from Bar'], function() end)
-      for _, si in ipairs(barItems) do sub:CreateButton(si.text, si.func) end
+      for _, si in ipairs(barItems) do
+        sub:CreateButton(si.text, si.func)
+      end
     end)
   else
     if not backdropMenuFrame then
-      backdropMenuFrame = CreateFrame('Frame', 'ABP_BackdropMenuFrame',
-        parent, 'UIDropDownMenuTemplate' --[[@as Template ]])
+      backdropMenuFrame = CreateFrame(
+        'Frame',
+        'ABP_BackdropMenuFrame',
+        parent,
+        'UIDropDownMenuTemplate' --[[@as Template ]]
+      )
       backdropMenuFrame:SetFrameLevel(parent:GetFrameLevel() + 1)
     end
     backdropMenuFrame.displayMode = 'MENU'
     backdropMenuFrame.initialize = function(self, level, subMenuList)
       if level == 1 then
-        UIDropDownMenu_AddButton({ text = L['Reset to Default'], notCheckable = true, func = onReset }, level)
-        UIDropDownMenu_AddButton({ text = L['Apply Backdrop to All Bars'], notCheckable = true, func = onApplyToAll }, level)
+        UIDropDownMenu_AddButton(
+          { text = L['Reset to Default'], notCheckable = true, func = onReset },
+          level
+        )
+        UIDropDownMenu_AddButton(
+          { text = L['Apply Backdrop to All Bars'], notCheckable = true, func = onApplyToAll },
+          level
+        )
         UIDropDownMenu_AddButton({
-          text = L['Copy Backdrop from Bar'], notCheckable = true,
-          hasArrow = true, menuList = barItems,
+          text = L['Copy Backdrop from Bar'],
+          notCheckable = true,
+          hasArrow = true,
+          menuList = barItems,
         }, level)
       elseif level == 2 and subMenuList then
-        for _, si in ipairs(subMenuList) do UIDropDownMenu_AddButton(si, level) end
+        for _, si in ipairs(subMenuList) do
+          UIDropDownMenu_AddButton(si, level)
+        end
       end
     end
     ToggleDropDownMenu(1, nil, backdropMenuFrame, 'cursor', -10, -15)
@@ -518,7 +551,11 @@ local function AddBackdropTab(tab, window, conf)
   resetBtn:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
   resetBtn:ClearAllPoints()
   resetBtn:SetPoint('LEFT', ddTheme.frame, 'RIGHT', 1, -7)
-  if layoutSupportsBackdrop then resetBtn:Show() else resetBtn:Hide() end
+  if layoutSupportsBackdrop then
+    resetBtn:Show()
+  else
+    resetBtn:Hide()
+  end
 
   if not Str_IsAnyOf(bc.theme, 'none') and dialogFlag(borderDef, 'showBorderColor') then
     --- @type AceGUIColorPicker
