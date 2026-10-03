@@ -132,7 +132,6 @@ Type Definitions
 
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
---- @field v2AnnouncementShown boolean
 
 --  ================================================
 
@@ -212,7 +211,6 @@ local DEFAULT_DB = {
   ['global'] = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
-    v2AnnouncementShown = false,
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
     bars = {

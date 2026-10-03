@@ -12,17 +12,20 @@ See "Build & Release (WoW addons)" in the global `~/.claude/CLAUDE.md`. `w-sync-
 
 ## Architecture
 
-### Addon modules (each is a separate Ace3 addon)
+### Addon modules
 
 | Module | Role |
 |---|---|
+| `ActionbarPlus/` | Root addon: TOC only, no code. Anchors the CurseForge package and the addon-list group |
 | `ActionbarPlus-Core/` | Shared library: namespace, constants, database, utility mixins |
 | `ActionbarPlus-BarsUI/` | UI: bar frames, button rendering, event routing |
 | `ActionbarPlus-OptionsUI/` | Options dialog UI |
 
-`ActionbarPlus-BarsUI` and `ActionbarPlus-OptionsUI` declare `RequiredDeps: ActionbarPlus-Core`, so Core always loads first. SavedVariables: `ABP_PLUS` (see `ActionbarPlus-Core.toc`).
+Dependency chain: `ActionbarPlus` ← `ActionbarPlus-Core` ← `ActionbarPlus-BarsUI` / `ActionbarPlus-OptionsUI` (each declares `RequiredDeps` on the one to its left). Every TOC sets `## Group: ActionbarPlus`. SavedVariables: `ABP_PLUS` (see `ActionbarPlus-Core.toc`).
 
-The V1 addon (`ActionbarPlus/`) is archived under `dev/legacy/` and frozen; all feature work goes in the modules above.
+The root `ActionbarPlus/` folder must ship a matching `ActionbarPlus.toc`: `package-as: ActionbarPlus` makes the packager emit that folder (it drops `LICENSE` there), and CurseForge rejects a package folder without its `.toc`. It has its own `move-folders` entry in `pkgmeta.yaml` like the other three; a new addon module needs one too.
+
+The V1 addon is archived under `dev/legacy/` and frozen; all feature work goes in the modules above.
 
 ### Namespace & module registry
 

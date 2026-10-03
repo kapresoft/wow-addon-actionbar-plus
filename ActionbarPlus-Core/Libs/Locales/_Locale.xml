@@ -3,18 +3,6 @@
 
     <Script file="enUS.lua"/>
 
-    <Script file="V2Announcement_enUS.lua"/>
-    <Script file="V2Announcement_esES.lua"/>
-    <Script file="V2Announcement_esMX.lua"/>
-    <Script file="V2Announcement_ptBR.lua"/>
-    <Script file="V2Announcement_ruRU.lua"/>
-    <Script file="V2Announcement_deDE.lua"/>
-    <Script file="V2Announcement_frFR.lua"/>
-    <Script file="V2Announcement_itIT.lua"/>
-    <Script file="V2Announcement_koKR.lua"/>
-    <Script file="V2Announcement_zhCN.lua"/>
-    <Script file="V2Announcement_zhTW.lua"/>
-
     <Script file="esES.lua"/>
     <Script file="esMX.lua"/>
     <Script file="ptBR.lua"/>

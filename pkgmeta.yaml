@@ -103,6 +103,7 @@ ignore:
 #
 # ⚠️ Do not change unless you also change the repo/addon layout.
 move-folders:
+  ActionbarPlus/ActionbarPlus: ActionbarPlus
   ActionbarPlus/ActionbarPlus-Core: ActionbarPlus-Core
   ActionbarPlus/ActionbarPlus-BarsUI: ActionbarPlus-BarsUI
   ActionbarPlus/ActionbarPlus-OptionsUI: ActionbarPlus-OptionsUI
