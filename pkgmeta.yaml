@@ -29,9 +29,10 @@ optional-dependencies:
 #  - https://www.wowace.com/projects/ace3
 #  - SVN URLs are still the primary source recommendation
 externals:
+  # r1424-alpha (Release-r1403 + 21), needed for WoW Forever
   ActionbarPlus-Core/ThirdParty/Libs/Ace3:
     url: https://github.com/WoWUIDev/Ace3
-    tag: latest
+    commit: ac3d1225037e0dc74e025a72342c0f7824aae147
   ActionbarPlus-Core/ThirdParty/Libs/LibPrettyPrint:
     url: https://github.com/kapresoft/wow-addon-LibPrettyPrint
     tag: latest
