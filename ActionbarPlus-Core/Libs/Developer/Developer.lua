@@ -21,6 +21,18 @@ function o:ReplayAnnouncements()
   O.Announcements:ShowNextUnseen()
 end
 
+--- Prints which equipment set tooltip path this client takes (#672)
+--- ### Example:
+--- ```lua
+--- dd:EquipmentSetInfo()
+--- ```
+function o:EquipmentSetInfo()
+  local bySetID = C_TooltipInfo and C_TooltipInfo.GetEquipmentSet
+  local numSets = C_EquipmentSet and C_EquipmentSet.GetNumEquipmentSets()
+  print('Tooltip path:', bySetID and 'setID' or 'name')
+  print('Equipment sets:', numSets or 'no C_EquipmentSet')
+end
+
 -- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
 -- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
 -- runs once (triggered by the /msq slash command). There's no exposed global/API
