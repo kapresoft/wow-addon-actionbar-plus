@@ -14,6 +14,40 @@
 
 >Available for all of World of Warcraft Versions
 
+<br/> <hr/>
+
+<span style="color:#E03E2D; font-size: 1.5em;">Compatibility Notice for Retail & Forever Versions:
+<br>ActionbarPlus won't fully work on Retail or Forever realms.</span>
+
+### What's affected
+
+### Cooldowns in combat
+- Cooldown values are now "secret" in combat, which stops the action buttons from displaying cooldown timers correctly.
+### Other secret-value features
+- Any other action that relies on these secret values also won't work properly while in combat.
+
+### What still works
+
+Everything else. ActionbarPlus remains usable and will stay available to download for both Retail and Forever versions.
+
+Thanks for your patience — and for sticking with the addon.
+
+### ⚠️ World of Warcraft Forever (1.6.x) and Midnight (12.x) Support Notice
+
+Due to restrictive changes in modern World of Warcraft, I'm no longer able to support or maintain ActionbarPlus for Midnight (version 12.x and beyond).
+
+What does this means for you?
+
+If you play Midnight (version 12.x or later), ActionbarPlus will not work as expected and will not receive updates or fixes.
+
+The addon remains fully supported for WoW Classic versions (Classic Era, Wrath, Cataclysm, etc.), where it still works great!
+
+I appreciate your understanding and your support over the years. ActionbarPlus was a labor of love, and I wish I could keep it alive on all versions.
+
+Thank you for using ActionbarPlus! If you're on Classic, enjoy the bars. If you're on Midnight or newer, I recommend checking out the built-in UI editing or other actively maintained bar addons.
+
+<hr/>
+
 ## Description
 
 ActionbarPlus is a versatile floating action bar add-on that enables you to create and customize up to 10 supplementary action bars. With the flexibility to place them anywhere within the game, these floating action bars can enhance your gaming experience by providing additional functionality and convenience. Whether you need quick access to frequently used spells, items, or macros, or simply want to streamline your UI, ActionbarPlus offers a powerful solution that can help you achieve your goals.
