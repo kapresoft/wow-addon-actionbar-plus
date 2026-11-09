@@ -33,6 +33,15 @@ function o:EquipmentSetInfo()
   print('Equipment sets:', numSets or 'no C_EquipmentSet')
 end
 
+--- Prints whether this client gets the Retail & Forever notice (#679)
+--- ### Example:
+--- ```lua
+--- dd:SecretRestrictionsInfo()
+--- ```
+function o:SecretRestrictionsInfo()
+  print('HasSecretRestrictions:', ns:HasSecretRestrictions())
+end
+
 -- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
 -- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
 -- runs once (triggered by the /msq slash command). There's no exposed global/API

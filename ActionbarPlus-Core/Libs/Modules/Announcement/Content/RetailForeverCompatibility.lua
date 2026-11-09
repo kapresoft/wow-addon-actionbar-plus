@@ -183,7 +183,7 @@ local def = {
   dbKey = 'retailForeverCompatibility',
   width = 480,
   height = 320,
-  isAvailable = function() return ns:HasSecretValues() end,
+  isAvailable = function() return ns:HasSecretRestrictions() end,
   title = texts.enUS.title,
   content = BuildContent(texts.enUS),
 }
