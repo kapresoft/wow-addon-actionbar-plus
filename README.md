@@ -32,20 +32,6 @@ Everything else. ActionbarPlus remains usable and will stay available to downloa
 
 Thanks for your patience — and for sticking with the addon.
 
-### ⚠️ World of Warcraft Forever (1.6.x) and Midnight (12.x) Support Notice
-
-Due to restrictive changes in modern World of Warcraft, I'm no longer able to support or maintain ActionbarPlus for Midnight (version 12.x and beyond).
-
-What does this means for you?
-
-If you play Midnight (version 12.x or later), ActionbarPlus will not work as expected and will not receive updates or fixes.
-
-The addon remains fully supported for WoW Classic versions (Classic Era, Wrath, Cataclysm, etc.), where it still works great!
-
-I appreciate your understanding and your support over the years. ActionbarPlus was a labor of love, and I wish I could keep it alive on all versions.
-
-Thank you for using ActionbarPlus! If you're on Classic, enjoy the bars. If you're on Midnight or newer, I recommend checking out the built-in UI editing or other actively maintained bar addons.
-
 <hr/>
 
 ## Description
