@@ -12,6 +12,15 @@ local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
 --- @return Namespace_ABP_BarsUI_2_0
 local function bar_ns() return ABP_BARSUI_NS end
 
+--- ### Example:
+--- ```lua
+--- dd:ReplayAnnouncements()
+--- ```
+function o:ReplayAnnouncements()
+  ns:g().announcementsShown = {}
+  O.Announcements:ShowNextUnseen()
+end
+
 -- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
 -- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
 -- runs once (triggered by the /msq slash command). There's no exposed global/API

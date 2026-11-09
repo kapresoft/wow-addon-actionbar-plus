@@ -193,6 +193,12 @@ end
 --- @return string
 function ns:MasqueAddonName() return 'ActionbarPlus' end
 
+--- Version agnostic: checks the secret-value APIs exist
+--- @return boolean @true on clients with secret values (Retail, Forever)
+function ns:HasSecretValues()
+  return (issecretvalue and canaccessvalue and canaccesstable) ~= nil
+end
+
 --- @param color colorRGBA|HexRGBA|HexRGB|HexRGBA @ RED_THREAT_COLOR | '565656fc' | '565656' | 'fc565656'
 --- @return fun(key:string) : string The color formatted key
 function ns:ColorFn(color)

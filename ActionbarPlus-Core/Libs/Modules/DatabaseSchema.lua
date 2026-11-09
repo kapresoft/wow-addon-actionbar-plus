@@ -132,6 +132,7 @@ Type Definitions
 
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
+--- @field announcementsShown table<string, boolean> @Announcement dbKey to true once shown
 
 --  ================================================
 
@@ -211,6 +212,7 @@ local DEFAULT_DB = {
   ['global'] = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
+    announcementsShown = {},
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
     bars = {

@@ -7,7 +7,7 @@ Local Vars
 ---------------------------------------------------------------------]]
 local p, t = ns:log()
 local L = ns:GetLocale()
-local DatabaseMixin, PickupHooks = O.DatabaseMixin, O.PickupHooks
+local DatabaseMixin, PickupHooks, Announcements = O.DatabaseMixin, O.PickupHooks, O.Announcements
 
 local c1 = ns:ColorFn(ns.colorDef.util1)
 local p1 = ns:ColorFn(ns.colorDef.primary)
@@ -154,6 +154,7 @@ end
 
 function o:OnEnable()
   PickupHooks:Init()
+  C_Timer.After(2, function() Announcements:ShowNextUnseen() end)
 end
 
 --- @return Namespace_ABP_2_0
