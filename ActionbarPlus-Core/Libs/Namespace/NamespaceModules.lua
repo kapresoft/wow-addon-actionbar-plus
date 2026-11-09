@@ -21,6 +21,8 @@ local ModuleNames = {
   --- @type ABP_OptionsUI_2_0
   ['ActionbarPlus-OptionsUI'] = {},
 
+  --- @type Announcements_ABP_2_0
+  Announcements = {},
   --- @type Constants_ABP_2_0
   Constants = {},
   --- @type Compat_ABP_2_0
