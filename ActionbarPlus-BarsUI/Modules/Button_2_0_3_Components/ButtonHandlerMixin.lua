@@ -33,6 +33,18 @@ local o = ns:NewLib(libName)
 local p, t = ns:log(libName)
 
 --[[-----------------------------------------------------------------------------
+Support Functions
+-------------------------------------------------------------------------------]]
+--- Forever is retail code at a Classic expansion level, so
+--- pick by API, not expansion: the getter takes the set ID.
+--- @param eqSet EquipmentSetDetails
+--- @return string|number
+local function EquipmentSetTooltipArg(eqSet)
+  if C_TooltipInfo and C_TooltipInfo.GetEquipmentSet then return eqSet.id end
+  return eqSet.name
+end
+
+--[[-----------------------------------------------------------------------------
 Mixin Methods
 -------------------------------------------------------------------------------]]
 --- @return boolean
@@ -310,11 +322,7 @@ function o.Btn_OnGameTooltip(self, typ, val, isCustom)
       GameTooltip:SetCompanionPet(val) -- val as petGUID
     elseif au.IsEquipmentSet(typ) then
       comp:IfEquipmentSet(val --[[@as EquipmentSetID]], function(eqSet)
-        if cns:IsShadowlandsOrLater() then
-          GameTooltip:SetEquipmentSet(eqSet.id)
-          return
-        end
-        GameTooltip:SetEquipmentSet(eqSet.name)
+        GameTooltip:SetEquipmentSet(EquipmentSetTooltipArg(eqSet))
       end)
     end
   end
