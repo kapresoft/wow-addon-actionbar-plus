@@ -193,10 +193,10 @@ end
 --- @return string
 function ns:MasqueAddonName() return 'ActionbarPlus' end
 
---- Version agnostic: checks the secret-value APIs exist
+--- Version agnostic; Classic ships the secret APIs unrestricted
 --- @return boolean @true on clients with secret values (Retail, Forever)
-function ns:HasSecretValues()
-  return (issecretvalue and canaccessvalue and canaccesstable) ~= nil
+function ns:HasSecretRestrictions()
+  return C_Secrets ~= nil and C_Secrets.HasSecretRestrictions()
 end
 
 --- @param color colorRGBA|HexRGBA|HexRGB|HexRGBA @ RED_THREAT_COLOR | '565656fc' | '565656' | 'fc565656'
