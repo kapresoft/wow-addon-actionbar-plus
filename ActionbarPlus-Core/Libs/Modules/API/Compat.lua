@@ -18,6 +18,7 @@ local C_PickupPet = C_PetJournal and C_PetJournal.PickupPet
 
 local C_PickupSpell = C_Spell.PickupSpell
 local C_GetSpellCooldown = C_Spell.GetSpellCooldown
+local C_GetSpellCooldownDuration = C_Spell.GetSpellCooldownDuration
 local C_GetSpellInfo = C_Spell.GetSpellInfo, GetSpellInfo
 
 local _es = C_EquipmentSet
@@ -258,6 +259,11 @@ function o:GetSpellCooldown(spell)
   )
   return C_GetSpellCooldown(spell)
 end
+
+--- Safe to pass to a Cooldown frame even when its values are secret.
+--- @param spell SpellIdentifier
+--- @return LuaDurationObject? @nil if the spell isn't found
+function o:GetSpellCooldownDuration(spell) return C_GetSpellCooldownDuration(spell) end
 
 --- @see C_Spell.GetSpellCharges()
 --- @param spell SpellIdentifier
