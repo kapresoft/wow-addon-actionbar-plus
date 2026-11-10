@@ -5,6 +5,7 @@ local trace_cvar = ns.trace_ui_cvar
 local Str_IsBlank = ns:String().IsBlank
 local p, t = ns:log('Developer')
 local unit, comp, hu = O.UnitUtil, O.Compat, O.HashUtil
+local au = O.ActionUtil
 
 --- @class Developer_ABP_2_0 : AceEvent-3.0
 local o = ns:NewAceEvent(); Developer_ABP_2_0 = o; dd = o
@@ -130,6 +131,151 @@ function o:IsSealActive(spellID)
     index = index + 1
   end
   return false
+end
+
+--[[-----------------------------------------------------------------------------
+Spike #681: cooldown swipes under secret restrictions
+-------------------------------------------------------------------------------]]
+local HEARTHSTONE = 6948
+local PROBE_ICON_SIZE = 64
+
+--- @type Frame?
+local probe
+
+--- @param label string
+--- @param point 'LEFT'|'RIGHT'
+--- @return Cooldown
+local function AddProbeIcon(label, point)
+  local icon = probe:CreateTexture(nil, 'BACKGROUND')
+  icon:SetSize(PROBE_ICON_SIZE, PROBE_ICON_SIZE)
+  icon:SetPoint(point)
+  local cooldown = CreateFrame('Cooldown', nil, probe, 'CooldownFrameTemplate')
+  cooldown:ClearAllPoints()
+  cooldown:SetAllPoints(icon)
+  cooldown.icon = icon
+  local text = probe:CreateFontString(nil, 'OVERLAY', 'GameFontNormalSmall')
+  text:SetPoint('TOP', icon, 'BOTTOM', 0, -2)
+  text:SetText(label)
+  return cooldown
+end
+
+--- Left icon gets a duration object, right gets numbers
+--- @param texture number|string
+--- @return Cooldown, Cooldown
+local function ShowProbe(texture)
+  if not probe then
+    probe = CreateFrame('Frame', nil, UIParent)
+    probe:SetSize(PROBE_ICON_SIZE * 2 + 10, PROBE_ICON_SIZE)
+    probe:SetPoint('CENTER', 0, 200)
+    probe:EnableMouse(true)
+    probe:SetScript('OnMouseUp', probe.Hide)
+    probe.object = AddProbeIcon('object', 'LEFT')
+    probe.numbers = AddProbeIcon('numbers', 'RIGHT')
+  end
+  probe.object.icon:SetTexture(texture)
+  probe.numbers.icon:SetTexture(texture)
+  probe:Show()
+  return probe.object, probe.numbers
+end
+
+--- @param label string
+--- @param fn fun()
+local function Try(label, fn)
+  local ok, err = pcall(fn)
+  print('  ' .. label .. ':', ok and 'ok' or err)
+end
+
+--- @param spell SpellIdentifier
+--- @param info SpellCooldownInfo
+--- @param itemID ItemID
+local function ReportCooldown(spell, info, itemID)
+  local duration = C_Spell.GetSpellCooldownDuration(spell)
+  local itemStart, itemDuration = C_Container.GetItemCooldown(itemID)
+  print('Cooldown probe:', spell, 'in combat:', InCombatLockdown())
+  print('  isOnGCD:', info.isOnGCD)
+  print('  ShouldCooldownsBeSecret:', C_Secrets.ShouldCooldownsBeSecret())
+  print('  ShouldSpellCooldownBeSecret:', C_Secrets.ShouldSpellCooldownBeSecret(spell))
+  print('  info.duration secret:', issecretvalue(info.duration))
+  print('  duration object secret:', duration and duration:HasSecretValues())
+  print('  item start/duration secret:', issecretvalue(itemStart), issecretvalue(itemDuration))
+  local object, numbers = ShowProbe(C_Spell.GetSpellTexture(spell))
+  Try('duration object', function() object:SetCooldownFromDurationObject(duration) end)
+  Try('numbers', function() numbers:SetCooldown(info.startTime, info.duration, info.modRate) end)
+end
+
+--- One-shot: runs on the spell's next active cooldown
+--- @param spell SpellIdentifier
+--- @param callbackFn fun(info: SpellCooldownInfo)
+--- @param skipGCD boolean? @Wait for the spell's own cooldown
+local function OnNextCooldown(spell, callbackFn, skipGCD)
+  o:RegisterEvent('SPELL_UPDATE_COOLDOWN', function()
+    local info = C_Spell.GetSpellCooldown(spell)
+    if not (info and info.isActive) then return end
+    if skipGCD and info.isOnGCD then return end
+    o:UnregisterEvent('SPELL_UPDATE_COOLDOWN')
+    callbackFn(info)
+  end)
+end
+
+--- Reports which Cooldown setters take the spell's next cooldown (#681).
+--- Arm, then cast: once out of combat, once in combat.
+--- ### Example:
+--- ```lua
+--- dd:CooldownProbe('Hammer of Justice')
+--- ```
+--- @param spell SpellIdentifier
+--- @param itemID ItemID? @Checked for secret cooldown values; default Hearthstone
+function o:CooldownProbe(spell, itemID)
+  local item = itemID or HEARTHSTONE
+  print('Cooldown probe armed, cast:', spell)
+  OnNextCooldown(spell, function(info) ReportCooldown(spell, info, item) end)
+end
+
+--- Draws the next cooldown on a real ABP spell button (#681).
+--- Arm, enter combat, then cast the button's spell.
+--- ### Example:
+--- ```lua
+--- dd:ButtonCooldownProbe(1, 1)
+--- ```
+--- @param frameIndex Index
+--- @param btnIndex Index
+function o:ButtonCooldownProbe(frameIndex, btnIndex)
+  --- @type Button_ABP_2_0_X
+  local btn = _G[('ABP_2_0_F%sButton%s'):format(frameIndex, btnIndex)]
+  local typ, spell = btn.widget:GetActionInfo()
+  assert(au.IsSpell(typ), 'ButtonCooldownProbe: the button needs a spell')
+  print('Button cooldown probe armed, cast:', spell)
+  OnNextCooldown(spell, function(info)
+    local duration = C_Spell.GetSpellCooldownDuration(spell)
+    print('Button cooldown probe:', btn:GetName(), 'in combat:', InCombatLockdown())
+    print('  isOnGCD:', info.isOnGCD, 'object secret:', duration and duration:HasSecretValues())
+    Try('duration object', function() btn.cooldown:SetCooldownFromDurationObject(duration) end)
+  end, true)
+end
+
+--- Reports an item's cooldown values and setters, right now (#681).
+--- Use the item in combat, then run this while it's on cooldown.
+--- ### Example:
+--- ```lua
+--- dd:ItemCooldownProbe('Minor Healthstone')
+--- ```
+--- @param item ItemID|ItemName|ItemLink @A name resolves only for an item you carry
+function o:ItemCooldownProbe(item)
+  local itemID = C_Item.GetItemInfoInstant(item)
+  assert(itemID, 'ItemCooldownProbe: item not found: ' .. tostring(item))
+  local start, duration, enable = C_Container.GetItemCooldown(itemID)
+  local info = C_Spell.GetItemCooldown(itemID)
+  local _, spellID = C_Item.GetItemSpell(itemID)
+  print('Item cooldown probe:', itemID, 'in combat:', InCombatLockdown())
+  print('  start/duration/enable:', scrubsecretvalues(start, duration, enable))
+  print('  secret:', issecretvalue(start), issecretvalue(duration), issecretvalue(enable))
+  print('  C_Spell.GetItemCooldown isActive:', info and info.isActive)
+  print('  C_Spell.GetItemCooldown duration secret:', info and issecretvalue(info.duration))
+  print('  item spell:', spellID)
+  local object, numbers = ShowProbe(C_Item.GetItemIconByID(itemID))
+  Try('numbers', function() numbers:SetCooldown(start, duration) end)
+  local spellDuration = spellID and C_Spell.GetSpellCooldownDuration(spellID)
+  Try('item spell object', function() object:SetCooldownFromDurationObject(spellDuration) end)
 end
 
 --[[-----------------------------------------------------------------------------
