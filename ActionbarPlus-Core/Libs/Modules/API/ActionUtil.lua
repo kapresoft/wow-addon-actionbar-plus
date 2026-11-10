@@ -290,8 +290,6 @@ end
 function o.IfSpellCooldown(spellID, callbackFn)
   local info = comp:GetSpellCooldown(spellID)
   if not info then return end
-  -- issecretvalue() is a retail function
-  if issecretvalue and issecretvalue(info.duration) then return end
   callbackFn(info)
 end
 

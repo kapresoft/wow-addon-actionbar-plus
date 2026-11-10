@@ -230,8 +230,9 @@ end
 --- @param spellID SpellID
 function o.Btn_UpdateSpellCooldown(self, spellID)
   au.IfSpellCooldown(spellID, function(info)
-    if info.isEnabled and info.duration > 0 then
-      self.cooldown:SetCooldown(info.startTime or 0, info.duration, info.modRate or 1)
+    local duration = info.isActive and comp:GetSpellCooldownDuration(spellID)
+    if duration then
+      self.cooldown:SetCooldownFromDurationObject(duration)
     else
       self.cooldown:Clear()
     end
