@@ -72,11 +72,12 @@ local function RestoreButtonVisuals(btn) btn.widget:ResetTemplateVisuals() end
 --- @param disabled boolean true when the Masque group was just disabled
 function o:OnMasqueGroupToggled(_, disabled)
   self:ForEach(function(bm)
-    MF:ApplyLayout(bm.barFrame, bm:c())
     if disabled then
       bm:ForEach(RestoreButtonVisuals)
       bm:ForEachExtraButton(RestoreButtonVisuals, true)
     end
+    -- Last, so buttons in the groups still on get their skin back
+    MF:ApplyLayout(bm.barFrame, bm:c())
   end)
 end
 

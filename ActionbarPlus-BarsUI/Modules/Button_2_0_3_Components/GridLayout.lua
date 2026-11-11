@@ -196,8 +196,7 @@ function S:ApplyExtraButtons(frame)
   for i = 1, renderCols do
     local btn = w.extraButtons[i]
     btn:SetSize(size, size)
-    -- Masque art can't be hidden, so Show Empty off unskins them
-    btn.widget:SetMasqueSkinned(showEmpty)
+    btn.widget:MasqueReSkin()
     btn:ClearAllPoints()
     btn:Show()
     btn.widget:UpdateEmptyState(showEmpty)
@@ -306,7 +305,7 @@ function S:ApplyButtons(frame)
     btn:ClearAllPoints()
     if i <= visible then
       btn:SetSize(size, size)
-      cns:IfMasque(function(abpMasque) abpMasque:AddButton(btn); abpMasque:ReSkin(btn) end)
+      btn.widget:MasqueReSkin()
       btn.HotKey:SetFont(btn.HotKey:GetFont(), hotKeyFontSize, 'OUTLINE')
       btn.HotKey:ClearAllPoints()
       btn.HotKey:SetPoint('TOPRIGHT', btn, 'TOPRIGHT', -hotKeyOffsetX, -hotKeyOffsetY)

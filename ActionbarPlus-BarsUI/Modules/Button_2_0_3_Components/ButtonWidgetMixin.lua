@@ -174,17 +174,12 @@ function o:ResetTemplateVisuals()
   btn.icon:AddMaskTexture(btn.IconMask)
 end
 
---- @param skinned boolean @false hands the art back to the template
-function o:SetMasqueSkinned(skinned)
+--- Adds the button to its Masque group if it isn't in one yet
+function o:MasqueReSkin()
   local btn = self.button
   cns:IfMasque(function(abpMasque)
-    if skinned then
-      abpMasque:AddButton(btn)
-      abpMasque:ReSkin(btn)
-      return
-    end
-    abpMasque:RemoveButton(btn)
-    self:ResetTemplateVisuals()
+    abpMasque:AddButton(btn)
+    abpMasque:ReSkin(btn)
   end)
 end
 
@@ -198,6 +193,8 @@ function o:HasAction() return not self:IsEmpty() end
 function o:UpdateEmptyState(showEmptyButtons)
   local visible = ns:a():IsQuickKeybindModeActive() or showEmptyButtons or self:HasAction()
   self.button.NormalTexture:SetShown(visible)
+  -- Fades the Masque art too, which SetShown can't reach
+  self.button:SetAlpha(visible and 1 or 0)
   local showHotKey = self:HasAction() or visible
   self.HotKey:SetShown(showHotKey)
   if showHotKey then self:UpdateHotKey() end
