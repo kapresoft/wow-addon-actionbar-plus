@@ -694,6 +694,8 @@ local function AddSyncSkinCheckbox(tab, wf, abpMasque)
   chk:SetCallback('OnValueChanged', function(_, _, val)
     mc.syncExtraButtonsSkin = val
     if val then abpMasque:SyncExtraButtonsSkin() end
+    -- Layout add-ons with their own Masque groups sync on this
+    o:SendMessage(cns:msg('OnSyncExtraButtonsSkinChanged'), val)
   end)
   tab:AddChild(chk)
 

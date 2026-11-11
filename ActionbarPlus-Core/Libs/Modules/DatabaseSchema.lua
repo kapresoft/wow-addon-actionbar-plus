@@ -140,6 +140,7 @@ Type Definitions
 --- @class MasqueConfig_ABP_2_0
 --- @field syncExtraButtonsSkin boolean @Extra Buttons take the Buttons skin
 --- @field extraSkinSeeded boolean      @Extra Buttons took the Buttons skin once
+--- @field arcExtraSkinSeeded boolean   @Same, for ArcLayout's two Arc groups
 
 --  ================================================
 
@@ -220,7 +221,11 @@ local DEFAULT_DB = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
     announcementsShown = {},
-    masque = { syncExtraButtonsSkin = true, extraSkinSeeded = false },
+    masque = {
+      syncExtraButtonsSkin = true,
+      extraSkinSeeded = false,
+      arcExtraSkinSeeded = false,
+    },
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
     bars = {
