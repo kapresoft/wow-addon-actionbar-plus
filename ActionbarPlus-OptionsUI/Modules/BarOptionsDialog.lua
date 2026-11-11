@@ -677,6 +677,37 @@ local function AddBackdropTab(tab, window, conf)
   return refs
 end
 
+--- A global setting: Masque groups are shared by all bars
+--- @param tab AceGUITabGroup
+--- @param wf Frame
+--- @param abpMasque Namespace_ABP_Masque_2_0
+--- @return AceGUICheckBox
+local function AddSyncSkinCheckbox(tab, wf, abpMasque)
+  local AceGUI = cns:AceGUI()
+  local mc = cns:masque()
+
+  --- @type AceGUICheckBox
+  local chk = AceGUI:Create('CheckBox')
+  chk:SetLabel(L['Sync Extra Buttons Skin'])
+  chk:SetFullWidth(true)
+  chk:SetValue(mc.syncExtraButtonsSkin)
+  chk:SetCallback('OnValueChanged', function(_, _, val)
+    mc.syncExtraButtonsSkin = val
+    if val then abpMasque:SyncExtraButtonsSkin() end
+  end)
+  tab:AddChild(chk)
+
+  if not wf.syncSkinHelp then
+    wf.syncSkinHelp = CreateHelpIcon(wf, L['Sync Extra Buttons Skin Tooltip'])
+  end
+  local help = wf.syncSkinHelp
+  help:SetFrameLevel(chk.frame:GetFrameLevel() + 2)
+  help:ClearAllPoints()
+  help:SetPoint('LEFT', chk.text, 'LEFT', chk.text:GetUnboundedStringWidth() + 4, 0)
+  help:Show()
+  return chk
+end
+
 --- @param tab AceGUITabGroup
 --- @param window BarOptionsDialogWindow_ABP_2_0
 --- @param conf BarConfig_ABP_2_0
@@ -725,6 +756,12 @@ local function AddExtraButtonsTab(tab, window, conf)
   end)
   tab:AddChild(chkShowEmpty)
   refs.chkShowEmpty = chkShowEmpty
+
+  cns:IfMasque(function(abpMasque)
+    -- An older ActionbarPlus-Masque has one category: nothing to sync
+    if not abpMasque.SyncExtraButtonsSkin then return end
+    refs.chkSyncSkin = AddSyncSkinCheckbox(tab, wf, abpMasque)
+  end)
 
   --- @type AceGUIDropdown
   local ddAnchor = AceGUI:Create('Dropdown')
@@ -839,6 +876,7 @@ local function AddWidgets(window, conf, selectedTab)
     if wf.gapHelp then wf.gapHelp:Hide() end
     if wf.dragHelp then wf.dragHelp:Hide() end
     if wf.layoutTypeHelp then wf.layoutTypeHelp:Hide() end
+    if wf.syncSkinHelp then wf.syncSkinHelp:Hide() end
     if tab == TAB_GENERAL then
       refs.general = AddGeneralTab(tg, window, conf)
     elseif tab == TAB_LAYOUT then

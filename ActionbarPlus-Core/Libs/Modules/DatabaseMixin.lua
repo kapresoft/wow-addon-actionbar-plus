@@ -109,6 +109,14 @@ function o:g() return ns:db()['global'] end
 --- @return ProfileConfig_ABP_2_0
 function o:p() return ns:db()['profile'] end
 
+--- Restores the defaults if the table was cleared, e.g. by a script
+--- @return MasqueConfig_ABP_2_0
+function o:masque()
+  local g = self:g()
+  if not g.masque then g.masque = DatabaseSchema:GetDefaultMasqueConfig() end
+  return g.masque
+end
+
 --- @param barIndex number
 --- @return BarConfig_ABP_2_0
 function o:bar(barIndex)
