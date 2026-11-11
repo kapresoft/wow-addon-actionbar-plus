@@ -918,6 +918,15 @@ local function AddWidgets(window, conf, selectedTab)
   return refs
 end
 
+-- Retail's close art fills its frame; the Window's anchor was
+-- made for Classic's padded art
+--- @param closeBtn Button
+local function FitCloseButton(closeBtn)
+  closeBtn:SetSize(20, 20)
+  closeBtn:ClearAllPoints()
+  closeBtn:SetPoint('TOPRIGHT', -4, -5)
+end
+
 --- @return AceGUIWindow
 local function CreateDialog()
   local AceGUI = cns:AceGUI()
@@ -940,6 +949,7 @@ local function CreateDialog()
   -- dialogbg is the 2nd texture (tooltip bg); AceGUI sets it to 0.75 alpha — override to fully opaque
   local regions = { f:GetRegions() }
   if regions[2] then regions[2]:SetVertexColor(0, 0, 0, 1) end
+  if cns:IsMainline() then FitCloseButton(frame.closebutton) end
 
   tinsert(UISpecialFrames, globalVarName)
 
