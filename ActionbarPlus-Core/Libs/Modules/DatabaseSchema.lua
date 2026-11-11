@@ -85,7 +85,7 @@ Type Definitions
 --- @field arcDirection string  -- 'up' | 'down' -- Arc layout curve direction
 --- @field arcSpan number       -- Degrees the arc spans (0-90); narrower = flatter arc, more even horizontal spacing
 --- @field extraButtonSpacing number -- Static clearance between adjacent extra buttons within a concentric ring; skins with square/bordered art need more than round icons
---- @field initialMasqueSkinApplied boolean -- one-time (per-bar): has Arc's default Masque skin been applied yet for this bar? Absent/nil means not yet applied.
+--- @field initialMasqueSkinApplied boolean -- Legacy per-bar flag; ArcLayout now tracks its default skin globally
 
 --- @class LayoutConfigMap_ABP_2_0
 --- @field grid GridLayoutConfig_ABP_2_0
@@ -141,6 +141,7 @@ Type Definitions
 --- @field syncExtraButtonsSkin boolean @Extra Buttons take the Buttons skin
 --- @field extraSkinSeeded boolean      @Extra Buttons took the Buttons skin once
 --- @field arcExtraSkinSeeded boolean   @Same, for ArcLayout's two Arc groups
+--- @field arcDefaultSkinApplied boolean @ArcLayout set its default skin once
 
 --  ================================================
 
@@ -225,6 +226,7 @@ local DEFAULT_DB = {
       syncExtraButtonsSkin = true,
       extraSkinSeeded = false,
       arcExtraSkinSeeded = false,
+      arcDefaultSkinApplied = false,
     },
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
