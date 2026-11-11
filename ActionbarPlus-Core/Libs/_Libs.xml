@@ -30,7 +30,6 @@
     <Script file="Modules\PickupHooks.lua" />
     <Script file="Modules\Cursor.lua"/>
     <Include file="Modules\Announcement\_Announcement.xml"/>
-    <Script file="Modules\Announcement\Content\RetailForeverCompatibility.lua"/>
     <Script file="ActionbarPlus-Core.lua"/>
     <!--@do-not-package@-->
     <Script file='Libs\Developer\Developer.lua'/>

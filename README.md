@@ -16,24 +16,6 @@
 
 <br/> <hr/>
 
-<span style="color:#E03E2D; font-size: 1.5em;">Compatibility Notice for Retail & Forever Versions:
-<br>ActionbarPlus won't fully work on Retail or Forever realms.</span>
-
-### What's affected
-
-### Cooldowns in combat
-- Cooldown values are now "secret" in combat, which stops the action buttons from displaying cooldown timers correctly.
-### Other secret-value features
-- Any other action that relies on these secret values also won't work properly while in combat.
-
-### What still works
-
-Everything else. ActionbarPlus remains usable and will stay available to download for both Retail and Forever versions.
-
-Thanks for your patience — and for sticking with the addon.
-
-<hr/>
-
 ## Description
 
 ActionbarPlus is a versatile floating action bar add-on that enables you to create and customize up to 10 supplementary action bars. With the flexibility to place them anywhere within the game, these floating action bars can enhance your gaming experience by providing additional functionality and convenience. Whether you need quick access to frequently used spells, items, or macros, or simply want to streamline your UI, ActionbarPlus offers a powerful solution that can help you achieve your goals.
