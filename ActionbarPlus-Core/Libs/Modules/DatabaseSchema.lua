@@ -133,6 +133,13 @@ Type Definitions
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
 --- @field announcementsShown table<string, boolean> @Announcement dbKey to true once shown
+--- @field masque MasqueConfig_ABP_2_0
+
+--  ================================================
+
+--- @class MasqueConfig_ABP_2_0
+--- @field syncExtraButtonsSkin boolean @Extra Buttons take the Buttons skin
+--- @field extraSkinSeeded boolean      @Extra Buttons took the Buttons skin once
 
 --  ================================================
 
@@ -213,6 +220,7 @@ local DEFAULT_DB = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
     announcementsShown = {},
+    masque = { syncExtraButtonsSkin = true, extraSkinSeeded = false },
     -- Every bar's global entry is identical (same default anchor), so AceDB's
     -- wildcard default fills any 'bar_N' key transparently -- no per-bar loop needed.
     bars = {
@@ -303,6 +311,9 @@ function o:GetDefaultDatabase()
 
   return db
 end
+
+--- @return MasqueConfig_ABP_2_0
+function o:GetDefaultMasqueConfig() return tbl_DeepCopy(DEFAULT_DB['global'].masque) end
 
 --- Creates and returns a default BarConfig_ABP_2_0 instance.
 --- Buttons are pre-seeded for all spec groups so AceDB treats them as defaults

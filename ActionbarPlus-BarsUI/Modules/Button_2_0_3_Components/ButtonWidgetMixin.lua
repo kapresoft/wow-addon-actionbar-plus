@@ -126,8 +126,10 @@ function o:HideHighlight() self:UpdateMouseoverHighlight() end
 --- a Masque group is disabled: Masque re-skins those regions with its own default skin
 --- (e.g. UI-Quickslot2 at ARTWORK layer, full alpha, skin-sized on Normal) and then
 --- stops managing them, so the template's art has to be restored manually.
+--- Also hides Masque's leftover backdrop (FloatingBG), if one was created.
 function o:ResetTemplateVisuals()
   local btn = self.button
+  if btn.FloatingBG then btn.FloatingBG:Hide() end
 
   local nt = btn:GetNormalTexture()
   nt:SetTexture([[interface\addons\actionbarplus-core\assets\textures\ui-button-empty]])
@@ -170,6 +172,20 @@ function o:ResetTemplateVisuals()
   -- remove-then-add keeps this idempotent across repeated calls.
   btn.icon:RemoveMaskTexture(btn.IconMask)
   btn.icon:AddMaskTexture(btn.IconMask)
+end
+
+--- @param skinned boolean @false hands the art back to the template
+function o:SetMasqueSkinned(skinned)
+  local btn = self.button
+  cns:IfMasque(function(abpMasque)
+    if skinned then
+      abpMasque:AddButton(btn)
+      abpMasque:ReSkin(btn)
+      return
+    end
+    abpMasque:RemoveButton(btn)
+    self:ResetTemplateVisuals()
+  end)
 end
 
 --- @return boolean

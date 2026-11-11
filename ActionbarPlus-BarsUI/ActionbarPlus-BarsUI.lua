@@ -67,10 +67,7 @@ end
 -- template's own visuals have to be re-asserted manually. Only on disable: on enable,
 -- Masque's ReSkin owns these regions again and restoring them would stomp the skin.
 --- @param btn Button_ABP_2_0_X
-local function RestoreButtonVisuals(btn)
-  if btn.FloatingBG then btn.FloatingBG:Hide() end
-  btn.widget:ResetTemplateVisuals()
-end
+local function RestoreButtonVisuals(btn) btn.widget:ResetTemplateVisuals() end
 
 --- @param disabled boolean true when the Masque group was just disabled
 function o:OnMasqueGroupToggled(_, disabled)

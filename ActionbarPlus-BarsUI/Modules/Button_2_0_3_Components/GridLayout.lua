@@ -196,10 +196,11 @@ function S:ApplyExtraButtons(frame)
   for i = 1, renderCols do
     local btn = w.extraButtons[i]
     btn:SetSize(size, size)
-    cns:IfMasque(function(abpMasque) abpMasque:AddButton(btn); abpMasque:ReSkin(btn) end)
+    -- Masque art can't be hidden, so Show Empty off unskins them
+    btn.widget:SetMasqueSkinned(showEmpty)
     btn:ClearAllPoints()
     btn:Show()
-    if btn.widget then btn.widget:UpdateEmptyState(showEmpty) end
+    btn.widget:UpdateEmptyState(showEmpty)
   end
 
   -- relative point on the grid button to attach to (top edge for TOP*, bottom edge for BOTTOM*)

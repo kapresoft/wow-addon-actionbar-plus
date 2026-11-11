@@ -156,6 +156,8 @@ function ns:a() return ABP_Core_2_0 end
 function ns:p() return self:a():p() end
 --- @return GlobalConfig_ABP_2_0
 function ns:g() return self:a():g() end
+--- @return MasqueConfig_ABP_2_0
+function ns:masque() return self:a():masque() end
 --- @param index Index
 --- @return BarConfig_ABP_2_0
 function ns:bar(index) return self:a():bar(index) end
