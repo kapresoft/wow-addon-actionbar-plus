@@ -14,6 +14,8 @@ local MAX_ROW_SIZE, MAX_COL_SIZE = 18, 36
 local MIN_BTN_SIZE, MAX_BTN_SIZE = 20, 120
 local MIN_EXTRA_BTN_SIZE, MAX_EXTRA_BTN_SIZE = 25, 80
 local MIN_EXTRA_BTN_GAP, MAX_EXTRA_BTN_GAP = 0, 20
+local MAX_EXTRA_BTN_ROWS = 2
+local EXTRA_BTN_SPACING = 2
 local MIN_SPACING, MAX_SPACING = 0, 20
 
 --[[-------------------------------------------------------------------
@@ -399,6 +401,31 @@ function o:GetMaxExtraBtnSize() return MAX_EXTRA_BTN_SIZE end
 function o:GetMinExtraBtnGap() return MIN_EXTRA_BTN_GAP end
 --- @return number
 function o:GetMaxExtraBtnGap() return MAX_EXTRA_BTN_GAP end
+--- @return number
+function o:GetExtraBtnSpacing() return EXTRA_BTN_SPACING end
+--- @return number
+function o:GetMaxExtraBtnRows() return MAX_EXTRA_BTN_ROWS end
+
+--- Grid layout: extra buttons that fit the main grid's width
+--- @param ui BarUIConfig_ABP_2_0
+--- @return number
+function o:GetGridExtraBtnRowSize(ui)
+  local cols = ui.layoutConfig.grid.colSize or 1
+  local btnSize = ui.button.size or 36
+  local btnSpacing = ui.button.spacing.horizontal or 3
+  local gridWidth = cols * btnSize + (cols - 1) * btnSpacing
+  local extraSize = ui.extraButton.size or 30
+  local fit = math.floor((gridWidth + EXTRA_BTN_SPACING) / (extraSize + EXTRA_BTN_SPACING))
+  return math.max(1, fit)
+end
+
+--- Grid layout: max extra buttons within the row cap
+--- @param ui BarUIConfig_ABP_2_0
+--- @return number
+function o:GetMaxGridExtraBtnCount(ui)
+  return math.min(MAX_COL_SIZE, self:GetGridExtraBtnRowSize(ui) * MAX_EXTRA_BTN_ROWS)
+end
+
 --- @return number
 function o:GetMinSpacing() return MIN_SPACING end
 --- @return number

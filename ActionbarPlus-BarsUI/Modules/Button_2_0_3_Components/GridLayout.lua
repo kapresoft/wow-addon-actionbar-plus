@@ -10,8 +10,6 @@ local cns, O = ns:cns()
 local au = O.ActionUtil
 local DS = O.DatabaseSchema
 
-local MAX_EXTRA_BUTTON_ROWS = 2
-
 --- @param name string
 --- @param parent Frame
 --- @param encodedID number
@@ -161,17 +159,12 @@ function S:ApplyExtraButtons(frame)
   -- theme 'none' has no border padding, so it needs a larger base gap to avoid
   -- extra buttons crowding the main bar
   local baseExtraButtonGap = isNoneTheme and 4 or 2
-  local spacing  = 2
+  local spacing  = DS:GetExtraBtnSpacing()
   local mainCols = uic.layoutConfig.grid.colSize or 1
   local mainRows = uic.layoutConfig.grid.rowSize or 1
-  local mainSize = uic.button.size or 36
-  local mainSpacing = uic.button.spacing.horizontal or 3
-  -- wrap extra buttons when their row would exceed the pixel width of the main button grid
-  local gridPixelWidth = mainCols * mainSize + (mainCols - 1) * mainSpacing
-  local wrapCols = math.floor((gridPixelWidth + spacing) / (size + spacing))
-  -- cap rendering at MAX_EXTRA_BUTTON_ROWS -- once that many rows are full, any
-  -- remaining count is simply not shown (buttons still exist/are created, just hidden)
-  local renderCols = math.min(cols, wrapCols * MAX_EXTRA_BUTTON_ROWS)
+  local wrapCols = DS:GetGridExtraBtnRowSize(uic)
+  -- a saved count above the row cap stays hidden
+  local renderCols = math.min(cols, DS:GetMaxGridExtraBtnCount(uic))
   for i = renderCols + 1, cols do
     if w.extraButtons[i] then w.extraButtons[i]:Hide() end
   end
