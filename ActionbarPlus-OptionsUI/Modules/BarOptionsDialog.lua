@@ -710,6 +710,66 @@ local function AddSyncSkinCheckbox(tab, wf, abpMasque)
   return chk
 end
 
+--- Only the grid layout caps extra buttons at its row limit
+--- @param ui BarUIConfig_ABP_2_0
+--- @return boolean
+local function HasExtraBtnRowCap(ui)
+  local layout = ui.layout or 'grid'
+  return layout == 'grid' or not cns:GetLayout(layout)
+end
+
+--- @param ui BarUIConfig_ABP_2_0
+--- @return number
+local function MaxExtraBtnCount(ui)
+  if not HasExtraBtnRowCap(ui) then return DS:GetMaxColSize() end
+  return DS:GetMaxGridExtraBtnCount(ui)
+end
+
+--- Slider labels are centered, so offset from the label's middle
+--- @param help HelpIconFrame
+--- @param slider AceGUISlider
+local function ShowBesideSliderLabel(help, slider)
+  local label = slider.label
+  help:SetFrameLevel(slider.frame:GetFrameLevel() + 2)
+  help:ClearAllPoints()
+  help:SetPoint('LEFT', label, 'CENTER', label:GetUnboundedStringWidth() / 2 + 4, 0)
+  help:Show()
+end
+
+--- Help icon beside a slider's label, about the grid's row cap
+--- @param wf Frame
+--- @param key string                       @Field on wf that holds the icon
+--- @param textKey string                   @Locale key; formatted with the row cap
+--- @param slider AceGUISlider
+--- @param ui BarUIConfig_ABP_2_0
+--- @return HelpIconFrame?                  @nil if the layout has no row cap
+local function ShowRowCapHelp(wf, key, textKey, slider, ui)
+  if not HasExtraBtnRowCap(ui) then return nil end
+  if not wf[key] then wf[key] = CreateHelpIcon(wf, L[textKey]:format(DS:GetMaxExtraBtnRows())) end
+  ShowBesideSliderLabel(wf[key], slider)
+  return wf[key]
+end
+
+--- @param slider AceGUISlider
+--- @param ui BarUIConfig_ABP_2_0
+local function SetExtraBtnCountRange(slider, ui)
+  local max = MaxExtraBtnCount(ui)
+  slider:SetSliderValues(1, max, 1)
+  slider:SetValue(math.min(ui.extraButton.count or 1, max))
+end
+
+--- Full rows stay full; otherwise the count only drops to fit
+--- @param ui BarUIConfig_ABP_2_0
+--- @param size number
+local function SetExtraBtnSize(ui, size)
+  local eb = ui.extraButton
+  local count = eb.count or 1
+  local wasFull = count >= MaxExtraBtnCount(ui)
+  eb.size = size
+  local max = MaxExtraBtnCount(ui)
+  eb.count = wasFull and max or math.min(count, max)
+end
+
 --- @param tab AceGUITabGroup
 --- @param window BarOptionsDialogWindow_ABP_2_0
 --- @param conf BarConfig_ABP_2_0
@@ -802,14 +862,15 @@ local function AddExtraButtonsTab(tab, window, conf)
   local slExtraCols = AceGUI:Create('Slider')
   slExtraCols:SetLabel(L['Button Count'])
   slExtraCols:SetRelativeWidth(0.5)
-  slExtraCols:SetSliderValues(1, DS:GetMaxColSize(), 1)
-  slExtraCols:SetValue(eb.count or 1)
+  SetExtraBtnCountRange(slExtraCols, conf.ui)
   slExtraCols:SetCallback('OnValueChanged', function(_, _, val)
     eb.count = val
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
   tab:AddChild(slExtraCols)
   refs.slExtraCols = slExtraCols
+  refs.extraBtnCountHelp =
+    ShowRowCapHelp(wf, 'extraBtnCountHelp', 'Button Count Tooltip', slExtraCols, conf.ui)
 
   --- @type AceGUISlider
   local slExtraBtnSize = AceGUI:Create('Slider')
@@ -818,11 +879,14 @@ local function AddExtraButtonsTab(tab, window, conf)
   slExtraBtnSize:SetSliderValues(DS:GetMinExtraBtnSize(), DS:GetMaxExtraBtnSize(), 1)
   slExtraBtnSize:SetValue(eb.size or 30)
   slExtraBtnSize:SetCallback('OnValueChanged', function(_, _, val)
-    eb.size = val
+    SetExtraBtnSize(conf.ui, val)
+    SetExtraBtnCountRange(slExtraCols, conf.ui)
     o:SendMessage(ns:msg('OnBarOptionsChanged'), o.barIndex)
   end)
   tab:AddChild(slExtraBtnSize)
   refs.slExtraBtnSize = slExtraBtnSize
+  refs.extraBtnSizeHelp =
+    ShowRowCapHelp(wf, 'extraBtnSizeHelp', 'Extra Button Size Tooltip', slExtraBtnSize, conf.ui)
 
   --- @type AceGUISlider
   local slGap = AceGUI:Create('Slider')
@@ -838,12 +902,8 @@ local function AddExtraButtonsTab(tab, window, conf)
   refs.slGap = slGap
 
   if not wf.gapHelp then wf.gapHelp = CreateHelpIcon(wf, L['Gap Tooltip']) end
-  local gapHelp = wf.gapHelp
-  gapHelp:SetFrameLevel(slGap.frame:GetFrameLevel() + 2)
-  gapHelp:ClearAllPoints()
-  gapHelp:SetPoint('LEFT', slGap.frame, 'RIGHT', 4, 0)
-  gapHelp:Show()
-  refs.gapHelp = gapHelp
+  ShowBesideSliderLabel(wf.gapHelp, slGap)
+  refs.gapHelp = wf.gapHelp
 
   return refs
 end
@@ -876,6 +936,8 @@ local function AddWidgets(window, conf, selectedTab)
     if wf.charPosHelp then wf.charPosHelp:Hide() end
     if wf.mouseoverHighlightHelp then wf.mouseoverHighlightHelp:Hide() end
     if wf.gapHelp then wf.gapHelp:Hide() end
+    if wf.extraBtnCountHelp then wf.extraBtnCountHelp:Hide() end
+    if wf.extraBtnSizeHelp then wf.extraBtnSizeHelp:Hide() end
     if wf.dragHelp then wf.dragHelp:Hide() end
     if wf.layoutTypeHelp then wf.layoutTypeHelp:Hide() end
     if wf.syncSkinHelp then wf.syncSkinHelp:Hide() end
@@ -966,6 +1028,8 @@ Methods
 --- @field mouseoverHighlightHelp HelpIconFrame
 --- @field extraBtnHelp Frame
 --- @field gapHelp HelpIconFrame
+--- @field extraBtnCountHelp HelpIconFrame
+--- @field extraBtnSizeHelp HelpIconFrame
 --- @field settingsIconBtn Button
 --- @field resetBtn Button
 
