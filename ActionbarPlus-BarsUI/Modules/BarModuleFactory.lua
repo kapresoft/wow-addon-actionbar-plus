@@ -10,6 +10,7 @@ local gridLayout = BO.GridLayout
 local cns, O = ns:cns()
 local unit, au = O.UnitUtil, O.ActionUtil
 local DatabaseSchema = O.DatabaseSchema
+local HelpTour = O.HelpTour
 local attr, atyp = cns:constants()
 local Tbl_IsEmpty = cns:Table().IsEmpty
 
@@ -103,6 +104,8 @@ Mixin: BarFrameObjWidgetMixin_2_0
 --- @field buttons Button_ABP_2_0_X[]
 --- @field module BarModule_2_0
 --- @field dragHandle ABP_BarDragHandle_2_0
+--- @field dragHandleEnabled boolean? @nil until the first ApplyDragHandle
+--- @field dragHandleAnchor string?   @Anchor at the last enabled apply
 local BarFrameObjWidgetMixin = {}
 
 --- @class BarFrameWidget_ABP_2_0 : BarFrameWidgetMixin_ABP_2_0
@@ -172,6 +175,7 @@ local function BarFrameWidgetMethods()
   --- switches to a vertical strip on the opposite side to avoid overlap.
   --- @param enabled boolean
   function wm:ApplyDragHandle(enabled)
+    local wasEnabled, prevAnchor = self.dragHandleEnabled, self.dragHandleAnchor
     self.dragHandleEnabled = enabled
     if enabled then
       local conf = self:conf()
@@ -181,9 +185,20 @@ local function BarFrameWidgetMethods()
       local layout = ResolveLayout(conf.ui)
       layout:ApplyDragHandle(self.frame, dragAnchor, thickness)
       self:GetOrCreateDragHandle():Show()
+      self.dragHandleAnchor = dragAnchor
+      self:ShowDragHandleTipOnChange(wasEnabled, prevAnchor)
     elseif self.dragHandle then
       self.dragHandle:Hide()
     end
+  end
+
+  --- Login shows the first tip, so the first apply is skipped.
+  --- @param wasEnabled boolean? @nil on the first apply
+  --- @param prevAnchor string?
+  function wm:ShowDragHandleTipOnChange(wasEnabled, prevAnchor)
+    if wasEnabled == nil or not self.frame:IsVisible() then return end
+    if wasEnabled and prevAnchor == self.dragHandleAnchor then return end
+    HelpTour:ShowOnNextFrame(self.frame)
   end
 
   --- @return ABP_BarDragHandle_2_0 @lazily creates the handle on first use
@@ -412,6 +427,14 @@ end
 function o:GetBarWidget(barIndex)
   local frame = _G[barName(barIndex)]
   return frame and frame.widget
+end
+
+--- @return BarFrame_ABP_2_0? @nil if no bar is visible
+function o:FirstVisibleBar()
+  for i = 1, DatabaseSchema:GetMaxBarCount() do
+    local w = self:GetBarWidget(i)
+    if w and w.frame:IsVisible() then return w.frame end
+  end
 end
 
 --- Directly drives the bar's show/hide logic instead of going through Ace3's

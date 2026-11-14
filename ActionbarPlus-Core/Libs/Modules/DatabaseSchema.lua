@@ -135,6 +135,8 @@ Type Definitions
 --- @class GlobalConfig_ABP_2_0 : RootConfig_ABP_2_0
 --- @field schemaVersion number
 --- @field announcementsShown table<string, boolean> @Announcement dbKey to true once shown
+--- @field helpTipsDismissed table<string, boolean>  @Help tour step key to true once closed or done
+--- @field tourBaseline number?                      @Feature-tour baseline; LibHelpTour saves it on first show
 --- @field masque MasqueConfig_ABP_2_0
 
 --  ================================================
@@ -224,6 +226,7 @@ local DEFAULT_DB = {
     schemaVersion = DB_VERSION,
     mouseoverHighlight = true,
     announcementsShown = {},
+    helpTipsDismissed = {},
     masque = {
       syncExtraButtonsSkin = true,
       extraSkinSeeded = false,

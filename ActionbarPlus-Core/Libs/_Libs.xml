@@ -27,6 +27,8 @@
     -->
     <Script file="Modules\DatabaseSchema.lua" />
     <Script file="Modules\DatabaseMixin.lua" />
+    <Script file="Modules\HelpTips\TourList.lua" />
+    <Script file="Modules\HelpTips\HelpTour.lua" />
     <Script file="Modules\PickupHooks.lua" />
     <Script file="Modules\Cursor.lua"/>
     <Include file="Modules\Announcement\_Announcement.xml"/>

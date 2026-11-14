@@ -9,6 +9,7 @@ local attr = cns:constants()
 local Str_IsBlank = cns:String().IsBlank
 local AceHook = cns:NewAceHook()
 local comp = O.Compat
+local HelpTour = O.HelpTour
 local cfn = cns:ColorFn('679CEE')
 
 --[[-----------------------------------------------------------------------------
@@ -141,6 +142,7 @@ function o.Btn_OnKeyDown(self, key)
       pendingBindings[bindingName] = { old = oldKey, key2 = oldKey2, mode = GetCurrentBindingSet() }
     end
     pendingBindings[bindingName].new = binding
+    HelpTour:Complete('QuickKeybindHover')
   end
   o.Btn_OnEnter(self)
 end

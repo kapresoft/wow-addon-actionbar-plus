@@ -11,6 +11,7 @@
     <Script file="Libs\LibPrettyPrint\Libs\Formatter.lua"/>
     <Script file="Libs\LibPrettyPrint\Libs\Printer.lua"/>
     <Script file="Libs\LibTraceKit\LibTraceKit.lua"/>
+    <Include file="Libs\LibHelpTour\LibHelpTour.xml"/>
 
     <Include file="Ace3.xml"/>
 

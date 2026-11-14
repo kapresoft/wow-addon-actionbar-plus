@@ -10,7 +10,7 @@
 ## DefaultState: enabled
 ## SavedVariables: ABP_PLUS
 ## RequiredDeps: ActionbarPlus
-## OptionalDeps: Ace3, DevSuite
+## OptionalDeps: Ace3, DevSuite, LibHelpTour
 ## Category: ActionbarPlus
 ## Group: ActionbarPlus
 

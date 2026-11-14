@@ -3,6 +3,7 @@ local ns = select(2, ...)
 local cns = ns:cns()
 local AceAddon = cns.O.AceAddon
 local MF = ns.O.BarModuleFactory
+local HelpTour = cns.O.HelpTour
 local EMBEDS = { 'AceEvent-3.0', 'AceBucket-3.0', 'AceConsole-3.0', 'AceHook-3.0' }
 
 local quickKeybindModeActive = false
@@ -40,6 +41,11 @@ local function ResyncAllButtonsEmptyState()
       end, true)
     end
   end)
+end
+
+local function ShowLoginHelpTip()
+  local barFrame = MF:FirstVisibleBar()
+  if barFrame then HelpTour:ShowOn(barFrame) end
 end
 
 --[[-----------------------------------------------------------------------------
@@ -99,6 +105,8 @@ function o:IsQuickKeybindModeActive() return quickKeybindModeActive end
 function o:OnEnable()
   MF:CreateAddonModules()
   self:SendMessage(ns:msg('OnEnable'), self)
+  -- Bars settle after OnEnable
+  C_Timer.After(2, ShowLoginHelpTip)
 end
 
 function o:OnDisable()
