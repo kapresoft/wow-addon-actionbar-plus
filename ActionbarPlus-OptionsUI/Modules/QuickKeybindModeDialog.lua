@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_OptionsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
+local HelpTour = O.HelpTour
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -11,6 +12,7 @@ New Instance
 local libName = 'QuickKeybindModeDialog'
 local globalVarName = 'ABP_QUICK_KEYBIND_DIALOG'
 --- @class QuickKeybindModeDialog_ABP_2_0 : AceEvent-3.0
+--- @field btnOkay AceGUIButton?
 local o = cns:NewAceEvent(); ns:Register(libName, o)
 o.perChar = false
 local p, t = ns:log(libName)
@@ -62,6 +64,13 @@ local TEXT_CANCEL_NOTICE = '\n' .. L['Canceling will remove you from Quick Keybi
 --[[-----------------------------------------------------------------------------
 Support Functions
 -------------------------------------------------------------------------------]]
+
+--- Re-picks the help tip as the dialog opens or closes,
+--- since its two steps only fit while it's open.
+local function RefreshHelpTip()
+  local barFrame = cns:BarsNS().O.BarModuleFactory:FirstVisibleBar()
+  if barFrame then HelpTour:ShowOnNextFrame(barFrame) end
+end
 
 --- @param frame AceGUIWidget
 local function AddBodyText(frame)
@@ -138,6 +147,7 @@ local function AddButtons(frame, chkCharacterSpecific)
   btnOkay:SetFullWidth(true)
   btnOkay:SetCallback('OnClick', function() o:OnOkayClicked() end)
   btnGroup:AddChild(btnOkay)
+  o.btnOkay = btnOkay
   btnGroup:AddChild(AceGUI:Create('Label')) -- spacer
 
   local btnCancel = AceGUI:Create('Button')
@@ -207,7 +217,14 @@ function o:Open()
   dialogFrame:Show()
   self:SendMessage(ns:msg('OnQuickKeybindModeActive'))
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
+  RefreshHelpTip()
 end
+
+--- @return boolean
+function o:IsShown() return dialogFrame ~= nil and dialogFrame.frame:IsShown() end
+
+--- @return Frame? @nil until the dialog is first created
+function o:GetOkayButton() return o.btnOkay and o.btnOkay.frame end
 
 function o:PLAYER_REGEN_DISABLED()
   self:UnregisterEvent('PLAYER_REGEN_DISABLED')
@@ -219,6 +236,7 @@ function o:OnFrameClose()
   if closeReason == 'okay' then self:SendMessage(ns:msg('OnQuickKeybindModeCommit'), o.perChar) end
   closeReason = nil
   self:SendMessage(ns:msg('OnQuickKeybindModeNotActive'))
+  RefreshHelpTip()
 end
 
 function o:OnCancelClicked()
@@ -228,6 +246,7 @@ function o:OnCancelClicked()
 end
 
 function o:OnOkayClicked()
+  HelpTour:Complete('QuickKeybindOkay')
   closeReason = 'okay'
   if not dialogFrame or not dialogFrame.frame:IsShown() then return end
   dialogFrame:Hide()

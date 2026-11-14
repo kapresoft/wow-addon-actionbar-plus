@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
+local HelpTour = O.HelpTour
 
 --[[-----------------------------------------------------------------------------
 New Instance
@@ -36,12 +37,14 @@ function o:OnDragStop()
   self.__dragging = false
   self.barFrame:OnDragStop()
   if not self:IsMouseOver() then self.barFrame.widget:HideDragHandle() end
+  HelpTour:Complete('BarDragHandle')
 end
 
 --- Forwards to the bar frame's existing right-click handler since the handle
 --- sits where the bar frame would otherwise catch the click (now click-through
 --- when empty buttons are hidden).
 function o:OnMouseUp(button)
+  if button == 'RightButton' then HelpTour:Complete('BarDragHandle') end
   self.barFrame:OnMouseUp(button)
 end
 

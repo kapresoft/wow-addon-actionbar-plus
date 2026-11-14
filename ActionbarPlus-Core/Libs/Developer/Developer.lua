@@ -21,6 +21,21 @@ function o:ReplayAnnouncements()
   O.Announcements:ShowNextUnseen()
 end
 
+--- Forgets the seen help tips; /reload afterwards to see them.
+--- ### Example:
+--- ```lua
+--- dd:ResetHelpTips()
+--- ```
+function o:ResetHelpTips()
+  local g = ns:g()
+  g.helpTipsDismissed = {}
+  g.tourBaseline = nil
+  local controller = O.HelpTour.controller
+  controller:HideTip()
+  controller.sessionTour = nil
+  print('ActionbarPlus help tips reset; /reload to see them.')
+end
+
 --- Prints which equipment set tooltip path this client takes (#672)
 --- ### Example:
 --- ```lua

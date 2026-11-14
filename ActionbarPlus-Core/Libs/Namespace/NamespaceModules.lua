@@ -51,4 +51,8 @@ local ModuleNames = {
   DatabaseMixin = {},
   --- @type DatabaseSchema_ABP_2_0
   DatabaseSchema = {},
+  --- @type LibHelpTour_Tour[]
+  TourList = {},
+  --- @type HelpTour_ABP_2_0
+  HelpTour = {},
 }; ModuleUtil:EnrichModules(ModuleNames); ns.M = ModuleNames

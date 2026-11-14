@@ -28,6 +28,9 @@ externals:
   ThirdParty-Libs/LibTraceKit:
     url: https://github.com/kapresoft/wow-addon-LibTraceKit
     tag: latest
+  ThirdParty-Libs/LibHelpTour:
+    url: https://github.com/kapresoft/wow-addon-LibHelpTour
+    tag: latest
   ThirdParty-Libs/LibSharedMedia/LibSharedMedia-3.0:
     url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
     tag: latest
@@ -73,6 +76,9 @@ ignore:
   - ThirdParty-Libs/LibTraceKit/Libs/Assets
   - ThirdParty-Libs/LibTraceKit/Libs/Developer.lua
   - ThirdParty-Libs/LibTraceKit/ThirdParty
+  - ThirdParty-Libs/LibHelpTour/dev
+  - ThirdParty-Libs/LibHelpTour/ThirdParty
+  - ThirdParty-Libs/LibHelpTour/LICENSE
   - ThirdParty-Libs/Kapresoft-LibUtil/dev
   - ThirdParty-Libs/Kapresoft-LibUtil/LICENSE
   - ThirdParty-Libs/Kapresoft-LibUtil/Lib-1-0

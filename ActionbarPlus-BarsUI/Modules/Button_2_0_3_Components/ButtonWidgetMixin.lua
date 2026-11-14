@@ -8,6 +8,7 @@ local comp, au, unit, hash = O.Compat, O.ActionUtil, O.UnitUtil, O.HashUtil
 local druid, rogue, shammy, priest =
       O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
 local attr, atyp = cns:constants()
+local HelpTour = O.HelpTour
 local String = cns:String()
 local Str_IsBlank, Str_IsAnyOf = String.IsBlank, String.IsAnyOf
 
@@ -291,6 +292,7 @@ end
 --- @param cursor Cursor_ABP_2_0
 function o:SaveAction(cursor)
   if not cursor then return end
+  HelpTour:Complete('BarActionButton')
 
   local btn = self.button
   --- @type ButtonConfig_ABP_2_0

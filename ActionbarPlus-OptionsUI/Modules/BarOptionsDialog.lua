@@ -5,6 +5,7 @@ Local Vars
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
 local DS = O.DatabaseSchema
+local HelpTour = O.HelpTour
 local tbl_DeepCopy = cns:Table().DeepCopy
 local OPTIONS = OPTIONS or L['Options']
 
@@ -36,7 +37,18 @@ local RESET = RESET or L['Reset']
 local DRAG_HINT = L['Drag the bar by hovering over the handle at the selected location.']
 
 local function backdrops() return cns:BarsNS().O.Backdrops end
-local function OnSettingsClicked() ns.O.SettingsDialog:Open() end
+local function OnSettingsClicked()
+  HelpTour:Complete('BarSettings')
+  ns.O.SettingsDialog:Open()
+end
+
+--- Re-picks the bar's help tip as the dialog opens or closes,
+--- since the settings icon step only fits while it's open.
+--- @param barIndex Index
+local function RefreshHelpTip(barIndex)
+  local w = cns:BarsNS().O.BarModuleFactory:GetBarWidget(barIndex)
+  if w then HelpTour:ShowOnNextFrame(w.frame) end
+end
 
 local function syncHandleGlow(barIndex)
   local w = cns:BarsUI():ns().O.BarModuleFactory:GetBarWidget(barIndex)
@@ -1070,6 +1082,7 @@ function o:ShowDialog(barIndex, selectedTab)
   dialogWindow.frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
   syncHandleGlow(barIndex)
   dialogWindow:Show()
+  RefreshHelpTip(barIndex)
   self:RegisterEvent('PLAYER_REGEN_DISABLED')
   self:RegisterMessage(ns:msg('OnBarOptionsChanged'), 'OnBarOptionsChanged')
 end
@@ -1106,6 +1119,7 @@ function o:GetFrame() return dialogWindow and dialogWindow.frame end
 
 function o:OnFrameClose()
   stopHandleGlow(self.barIndex)
+  RefreshHelpTip(self.barIndex)
   self:UnregisterMessage(ns:msg('OnBarOptionsChanged'))
 end
 

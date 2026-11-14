@@ -11,6 +11,7 @@ embedded-libraries:
   - LibUtil
   - LibPrettyPrint
   - LibTraceKit
+  - LibHelpTour
   - LibSharedMedia-3-0
 
 tools-used:
@@ -38,6 +39,9 @@ externals:
     tag: latest
   ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit:
     url: https://github.com/kapresoft/wow-addon-LibTraceKit
+    tag: latest
+  ActionbarPlus-Core/ThirdParty/Libs/LibHelpTour:
+    url: https://github.com/kapresoft/wow-addon-LibHelpTour
     tag: latest
   ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil:
     url: https://github.com/kapresoft/wow-lib-util
@@ -78,6 +82,10 @@ ignore:
   - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/Libs/Assets
   - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/Libs/Developer.lua
   - ActionbarPlus-Core/ThirdParty/Libs/LibTraceKit/ThirdParty
+  - ActionbarPlus-Core/ThirdParty/Libs/LibHelpTour/dev
+  - ActionbarPlus-Core/ThirdParty/Libs/LibHelpTour/*.toc
+  - ActionbarPlus-Core/ThirdParty/Libs/LibHelpTour/*.md
+  - ActionbarPlus-Core/ThirdParty/Libs/LibHelpTour/ThirdParty
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/dev
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.md
   - ActionbarPlus-Core/ThirdParty/Libs/Kapresoft-LibUtil/*.yaml

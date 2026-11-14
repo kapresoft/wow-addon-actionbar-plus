@@ -4,6 +4,7 @@ Local Vars
 --- @type Namespace_ABP_BarsUI_2_0
 local ns = select(2, ...)
 local cns, O, L = ns:cns()
+local HelpTour = O.HelpTour
 
 local seedID = 4999
 local hc = cns:ColorFn("539AFA")
@@ -55,7 +56,9 @@ end
 -- BarFrame:SetSize(w, h) is called.
 function o:OnMouseUp(button)
   if InCombatLockdown() then return end
-  if button == 'RightButton' then ns:a():SendMessage(ns:msg('OnBarFrameRightClick'), self) end
+  if button ~= 'RightButton' then return end
+  HelpTour:Complete('BarMenu')
+  ns:a():SendMessage(ns:msg('OnBarFrameRightClick'), self)
 end
 
 function o:OnSizeChanged()
