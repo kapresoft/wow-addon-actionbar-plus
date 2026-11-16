@@ -37,6 +37,8 @@ local ModuleNames = {
   UnitUtil = {},
   --- @type DruidUtil_ABP_2_0
   DruidUtil = {},
+  --- @type HunterUtil_ABP_2_0
+  HunterUtil = {},
   --- @type PriestUtil_ABP_2_0
   PriestUtil = {},
   --- @type RogueUtil_ABP_2_0

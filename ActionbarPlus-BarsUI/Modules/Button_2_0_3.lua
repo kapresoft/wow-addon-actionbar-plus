@@ -58,6 +58,7 @@ local libName = 'Button_2_0_3'
 --- @field Count FontString
 --- @field HotKey FontString
 --- @field icon Texture
+--- @field aspectIcon AspectIcon_ABP_2_0? @Hunters only; created on first aspect
 --- @field cooldown CooldownObj
 --- @field eventsRegistered boolean
 --- @field widget ButtonWidget_ABP_2_0
@@ -542,6 +543,7 @@ function o:UpdateCount() self.widget:UpdateCount() end
 --- @see ButtonWidget_ABP_2_0.GetActionTexture()
 function o:UpdateTexture()
   self.widget:IfActionTexture(function(icon) self.icon:SetTexture(icon) end)
+  self.widget:UpdateAspectIcon()
 end
 
 function o:EnableFlashAnimation() self.widget:EnableFlashAnimation() end
