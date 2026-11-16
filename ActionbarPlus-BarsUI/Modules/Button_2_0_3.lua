@@ -220,6 +220,8 @@ function o:OnEvent(evt, ...)
   elseif Str_IsAnyOf(evt, 'UPDATE_SHAPESHIFT_FORM', 'UPDATE_STEALTH') then
     self:UpdateTexture()
     self:UpdateState('OnEvent')
+  elseif evt == 'SPELL_UPDATE_ICON' then
+    self:UpdateTexture()
   elseif evt == 'LOSS_OF_CONTROL_UPDATE' then
     self:UpdateCooldown()
   elseif Str_IsAnyOf(evt, 'SPELL_UPDATE_COOLDOWN', 'LOSS_OF_CONTROL_ADDED') then
