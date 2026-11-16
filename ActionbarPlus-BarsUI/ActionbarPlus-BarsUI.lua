@@ -65,6 +65,23 @@ function o:OnInitialize()
   -- per-button visuals (hotkey position, empty-button overlay, etc.) stale until the
   -- affected bars are re-rendered.
   self:RegisterMessage(cns:msg('OnMasqueGroupToggled'), self.OnMasqueGroupToggled, self)
+  self:RegisterMessage(cns:msg('OnAspectChanged'), self.OnAspectChanged, self)
+end
+
+-- Macros: GetMacroInfo's icon follows the aspect by itself
+--- @param btn Button_ABP_2_0_X
+local function UpdateAspectState(btn)
+  local w = btn.widget
+  if w.aspectSpellID then w:ShowAspectState()
+  elseif w:IsMacro() then btn:UpdateTexture()
+  end
+end
+
+function o:OnAspectChanged()
+  self:ForEach(function(bm)
+    bm:ForEach(UpdateAspectState)
+    bm:ForEachExtraButton(UpdateAspectState, true)
+  end)
 end
 
 -- On group disable, Masque re-skins each button with its own default skin (the classic

@@ -5,8 +5,8 @@ Local Vars
 local ns = select(2, ...)
 local cns, O = ns:cns()
 local comp, au, unit, hash = O.Compat, O.ActionUtil, O.UnitUtil, O.HashUtil
-local druid, rogue, shammy, priest =
-      O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil
+local druid, rogue, shammy, priest, hunter =
+      O.DruidUtil, O.RogueUtil, O.ShamanUtil, O.PriestUtil, O.HunterUtil
 local attr, atyp = cns:constants()
 local HelpTour = O.HelpTour
 local String = cns:String()
@@ -27,6 +27,7 @@ local libName = ns.M.ButtonWidgetMixin()
 --- @field barIndex Index The owner frame index
 --- @field itemSpellID SpellID @Used for items with spellIDs
 --- @field isExtraButton boolean
+--- @field aspectSpellID SpellID? @Set by UpdateAspectIcon()
 local S = {}; ns:Register(libName, S)
 --
 --- @class ButtonWidget_ABP_2_0 : ButtonWidgetMixin_ABP_2_0
@@ -62,6 +63,7 @@ function o:UpdateAction(name, val)
   if not au.IsSupportedAction(name) then return end
   if Str_IsBlank(val) then
     self.button.icon:SetTexture(nil)
+    self:UpdateAspectIcon()
   else
     self.button:Update()
   end
@@ -339,6 +341,7 @@ function o:ResetButton()
   self.itemSpellID = nil
   self:__ResetAttributes()
   self:__ResetVisuals()
+  self:UpdateAspectIcon()
 end
 
 --- @private
@@ -544,6 +547,67 @@ function o:IfActionTexture(callbackFn)
   callbackFn(icon)
 end
 
+--- @class AspectIcon_ABP_2_0 : Texture
+--- @field iconAlpha number @The icon's own alpha, restored when inactive
+
+-- Follows the icon's styling: range, usability, Masque
+--- @param btn Button_ABP_2_0_X
+--- @return AspectIcon_ABP_2_0
+local function CreateAspectIcon(btn)
+  t('CreateAspectIcon', 'btn=', btn)
+  local icon = btn.icon
+  local tex = btn:CreateTexture(nil, 'ARTWORK', nil, -1) --[[@as AspectIcon_ABP_2_0]]
+  tex:SetAllPoints(icon)
+  tex:SetTexture(hunter:GetActiveShapeshiftFormIcon())
+  tex:SetAlpha(0)
+  tex.iconAlpha = icon:GetAlpha()
+  tex:SetTexCoord(icon:GetTexCoord())
+  tex:SetVertexColor(icon:GetVertexColor())
+  tex:SetDesaturated(icon:IsDesaturated())
+  for i = 1, icon:GetNumMaskTextures() do tex:AddMaskTexture(icon:GetMaskTexture(i)) end
+  hooksecurefunc(icon, 'SetTexCoord', function(_, ...) tex:SetTexCoord(...) end)
+  hooksecurefunc(icon, 'SetVertexColor', function(_, ...) tex:SetVertexColor(...) end)
+  hooksecurefunc(icon, 'SetDesaturated', function(_, d) tex:SetDesaturated(d) end)
+  hooksecurefunc(icon, 'AddMaskTexture', function(_, m) tex:AddMaskTexture(m) end)
+  hooksecurefunc(icon, 'RemoveMaskTexture', function(_, m) tex:RemoveMaskTexture(m) end)
+  btn.aspectIcon = tex
+  return tex
+end
+
+--- @param w ButtonWidget_ABP_2_0
+--- @return SpellID?
+local function ResolveAspectSpellID(w)
+  if not hunter:TracksAspects() then return nil end
+  local typ, val = w:GetActionInfo()
+  if not (typ and au.IsSpell(typ)) then return nil end
+  local sp = comp:GetSpellInfo(val)
+  if sp and hunter:IsAspect(sp.spellID) then return sp.spellID end
+  return nil
+end
+
+--- Re-checks whether the button holds an aspect, then shows its state
+function o:UpdateAspectIcon()
+  self.aspectSpellID = ResolveAspectSpellID(self)
+  self:ShowAspectState()
+end
+
+-- Alpha swap: Forever's active state is secret in combat
+function o:ShowAspectState()
+  --- @type Button_ABP_2_0_X, number?
+  local btn, spellID = self.button, self.aspectSpellID
+  local tex = btn.aspectIcon
+  if not spellID then
+    if not tex then return end
+    tex:SetAlpha(0)
+    btn.icon:SetAlpha(tex.iconAlpha)
+    return
+  end
+  tex = tex or CreateAspectIcon(btn)
+  local active = hunter:IsAspectActive(spellID)
+  tex:SetAlphaFromBoolean(active, tex.iconAlpha, 0)
+  btn.icon:SetAlphaFromBoolean(active, 0, tex.iconAlpha)
+end
+
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end
 
 --- @return ActionTypeName
@@ -707,7 +771,8 @@ function o:SetActionSpell(spellID)
   end
   self:SetAttribute(attr.type, atyp.spell)
   local isShapeShiftSpell = unit:IsShapeShiftSpell(spellID)
-  if isShapeShiftSpell or au.IsTalentSpell(spellID) then
+  -- By name: casting an active aspect toggles it off
+  if isShapeShiftSpell or au.IsTalentSpell(spellID) or hunter:IsAspect(spellID) then
     au.IfSpell(spellID, function(spell)
       self:SetAttribute(atyp.spell, spell.name)
     end)
