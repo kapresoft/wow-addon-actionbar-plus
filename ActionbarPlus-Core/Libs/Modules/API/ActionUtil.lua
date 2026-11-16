@@ -20,6 +20,8 @@ local unit, shaman, priest = O.UnitUtil, O.ShamanUtil, O.PriestUtil
 
 local ATTACK_SPELL_ID = 6603
 local SHOOT_SPELL_ID = 5019
+local AUTO_SHOT_SPELL_ID = 75
+local SHOOT_SPELL_IDS = { [SHOOT_SPELL_ID] = true, [AUTO_SHOT_SPELL_ID] = true }
 local MOP_TALENT_TIERS = 6
 local MOP_TALENT_COLUMNS = 3
 
@@ -173,7 +175,7 @@ function o.IsAutoAttackSpell(spell) return __SpellID(spell) == ATTACK_SPELL_ID e
 
 --- @param spell SpellIdentifier
 --- @return boolean
-function o.IsShootSpell(spell) return __SpellID(spell) == SHOOT_SPELL_ID end
+function o.IsShootSpell(spell) return SHOOT_SPELL_IDS[__SpellID(spell)] == true end
 
 --- @param spell SpellIdentifier
 --- @return boolean

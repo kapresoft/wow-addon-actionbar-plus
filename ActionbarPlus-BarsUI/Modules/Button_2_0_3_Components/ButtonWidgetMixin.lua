@@ -554,7 +554,6 @@ end
 --- @param btn Button_ABP_2_0_X
 --- @return AspectIcon_ABP_2_0
 local function CreateAspectIcon(btn)
-  t('CreateAspectIcon', 'btn=', btn)
   local icon = btn.icon
   local tex = btn:CreateTexture(nil, 'ARTWORK', nil, -1) --[[@as AspectIcon_ABP_2_0]]
   tex:SetAllPoints(icon)
@@ -721,9 +720,8 @@ function o:GetEffectiveSpellID()
       return spid
     elseif au.IsItem(typ) then
       local itemID = self:GetAttributeItemID()
-      local spid = (comp:GetItemSpell(itemID))
-      local spn = comp:GetSpellName(spid)
-      return spid
+      if not itemID then return nil end
+      return (comp:GetItemSpell(itemID))
     elseif au.IsMacro(typ) then
       local spellID, itemID = au.GetMacroAction(val --[[@as MacroIdentifier]])
       if spellID then return spellID
@@ -852,9 +850,8 @@ function o:SetAttribute(attributeName, value) self.button:SetAttribute(attribute
 
 --- @return boolean
 function o:RequiresShootAnimation()
-  local typ, val = self:GetActionInfo()
-  if not (typ and val) then return false end
-  return au.IsSpell(typ) and au.IsShootingInProgress(val)
+  local spellID = self:GetEffectiveSpellID()
+  return spellID ~= nil and au.IsShootingInProgress(spellID)
 end
 
 --- @return boolean
@@ -915,9 +912,8 @@ end
 
 --- @return boolean
 function o:IsShootSpell()
-  local typ, val = self:GetActionInfo()
-  if not (typ and val) then return false end
-  return au.IsSpell(typ) and au.IsShootSpell(val)
+  local spellID = self:GetEffectiveSpellID()
+  return spellID ~= nil and au.IsShootSpell(spellID)
 end
 
 --- @param callbackFn fun(petID:PetGUID)
