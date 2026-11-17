@@ -548,7 +548,7 @@ function o:IfActionTexture(callbackFn)
 end
 
 --- @class AspectIcon_ABP_2_0 : Texture
---- @field iconAlpha number @The icon's own alpha, restored when inactive
+--- @field iconAlpha number @The icon's alpha, used while active
 
 -- Follows the icon's styling: range, usability, Masque
 --- @param btn Button_ABP_2_0_X
@@ -590,21 +590,18 @@ function o:UpdateAspectIcon()
   self:ShowAspectState()
 end
 
--- Alpha swap: Forever's active state is secret in combat
+-- Forever's active state is secret in combat; fade only the
+-- overlay, since Masque compares the icon's alpha.
 function o:ShowAspectState()
   --- @type Button_ABP_2_0_X, number?
   local btn, spellID = self.button, self.aspectSpellID
   local tex = btn.aspectIcon
   if not spellID then
-    if not tex then return end
-    tex:SetAlpha(0)
-    btn.icon:SetAlpha(tex.iconAlpha)
+    if tex then tex:SetAlpha(0) end
     return
   end
   tex = tex or CreateAspectIcon(btn)
-  local active = hunter:IsAspectActive(spellID)
-  tex:SetAlphaFromBoolean(active, tex.iconAlpha, 0)
-  btn.icon:SetAlphaFromBoolean(active, 0, tex.iconAlpha)
+  tex:SetAlphaFromBoolean(hunter:IsAspectActive(spellID), tex.iconAlpha, 0)
 end
 
 function o:ClearAttributeType() self:SetAttribute(attr.type, nil) end

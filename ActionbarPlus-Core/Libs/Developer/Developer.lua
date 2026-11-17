@@ -57,6 +57,31 @@ function o:SecretRestrictionsInfo()
   print('HasSecretRestrictions:', ns:HasSecretRestrictions())
 end
 
+--- @param v any
+local function plain(v) return (issecretvalue and issecretvalue(v)) and '<secret>' or v end
+
+--- @param name string
+--- @param r Texture
+local function PrintRegion(name, r)
+  local layer, sub = r:GetDrawLayer()
+  print(name, 'alpha:', plain(r:GetAlpha()), 'shown:', plain(r:IsShown()),
+    'layer:', layer, sub, 'size:', r:GetWidth(), r:GetHeight(),
+    'masks:', r:GetNumMaskTextures(), 'tex:', r:GetTexture())
+end
+
+--- Prints the aspect overlay and the icon under it (#713)
+--- ### Example:
+--- ```lua
+--- dd:AspectIconInfo('ABP_2_0_F1Button10')
+--- ```
+--- @param btnName string
+function o:AspectIconInfo(btnName)
+  local btn = _G[btnName]
+  PrintRegion('icon', btn.icon)
+  if not btn.aspectIcon then return print('no aspectIcon') end
+  PrintRegion('aspectIcon', btn.aspectIcon)
+end
+
 -- POC: open Masque options directly to Skin Settings/ActionbarPlus/Action Bars
 -- Masque lazy-loads its 'Skins' options group only after Core:ToggleOptions()
 -- runs once (triggered by the /msq slash command). There's no exposed global/API
